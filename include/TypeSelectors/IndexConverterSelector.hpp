@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
        * @brief Specialialised IndexConverterSelector for the second transform
        */
       // Configure index converter on spherical harmonics basis with l spectral ordering
-   #if defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLF
+   #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLF
       #include "Communicators/Converters/SHlIndexConv.hpp"
 
       namespace GeoMHDiSCC {
@@ -93,6 +93,6 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || GEOMHDISCC_SPATIALSCHEME_WLF
+   #endif //GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || GEOMHDISCC_SPATIALSCHEME_WLF
 
 #endif // INDEXCONVERTERSELCTOR_HPP

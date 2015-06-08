@@ -2,4 +2,5 @@
 set(MHDSources
    RegularTools.cpp
    SHTools.cpp
+   ParityTools.cpp
 )

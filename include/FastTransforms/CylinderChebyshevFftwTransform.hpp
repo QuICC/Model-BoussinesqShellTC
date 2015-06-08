@@ -55,12 +55,12 @@ namespace Transform {
           *    - DIFF: D
           *    - DIVR: 1/r
           *    - DIVR2: 1/r^2
-          *    - DIVRDIFFR: 1/r D r
+          *    - DIVRDIFF: 1/r D
           *    - DIFFDIVR: D 1/r
           *
           * All projectors assume "even" data, ie even "m" -> even "r", odd "m" -> odd "r"
           */
-         enum Id {PROJ, DIFF, DIVR, DIVR2, DIVRDIFFR, DIFFDIVR};
+         enum Id {PROJ, DIVR, DIVR2, DIFF, DIVRDIFF, DIFFDIVR};
       };
 
       /**
@@ -70,10 +70,9 @@ namespace Transform {
       {
          /** 
           * Enum of integrator IDs
-          *    - INTGE: even integration, even "m" -> even "r", etc
-          *    - INTGO: odd integration, even "m" -> odd "r", etc
+          *    - INTG: integration
           */
-         enum Id {INTGE, INTGO};
+         enum Id {INTG};
       };
 
    };
@@ -320,36 +319,6 @@ namespace Transform {
          void cleanupFft();
 
          /**
-          * @brief Extract the parity modes from the whole data
-          */
-         void extractParityModes(Matrix& rSelected, const Matrix& data, const MatrixI& info, const int rows);
-
-         /**
-          * @brief Extract the parity modes from the whole data
-          */
-         void extractParityModes(Matrix& rSelected, const MatrixZ& data, const bool isReal, const MatrixI& info, const int rows);
-
-         /**
-          * @brief Set the parity modes into the whole data
-          */
-         void setParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows);
-
-         /**
-          * @brief Set the parity modes into the whole data
-          */
-         void setParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows);
-
-         /**
-          * @brief Add the parity modes into the whole data
-          */
-         void addParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows);
-
-         /**
-          * @brief Add the parity modes into the whole data
-          */
-         void addParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows);
-
-         /**
           * @brief Get input temporary data depending on parity
           */
          Matrix& rTmpIn(const int parity);
@@ -367,17 +336,21 @@ namespace Transform {
          /**
           * @brief Get the FFTW plan depending on parity
           */
-         fftw_plan fPlan(const int parity, const int sizeParity);
+         fftw_plan fPlan(const int inParity, const int outParity);
 
          /**
           * @brief Get the FFTW plan depending on parity
           */
-         fftw_plan bPlan(const int parity, const int sizeParity);
+         fftw_plan bPlan(const int inParity, const int outParity);
 
          /**
           * @brief Get the differentiation matrix depending on parity
           */
          const SparseMatrix& diff(const int parity) const;
+
+         SparseMatrix mDiffE;
+         SparseMatrix mDiffO;
+         SparseMatrix mDiff;
    };
 
    inline Matrix& CylinderChebyshevFftwTransform::rTmpIn(const int parity)
@@ -413,15 +386,15 @@ namespace Transform {
       }
    }
 
-   inline fftw_plan CylinderChebyshevFftwTransform::fPlan(const int parity, const int sizeParity)
+   inline fftw_plan CylinderChebyshevFftwTransform::fPlan(const int inParity, const int outParity)
    {
-      if(parity == 0 && parity == sizeParity)
+      if(inParity == 0 && inParity == outParity)
       {
          return this->mFEPlan;
-      } else if(parity == 1 && parity == sizeParity)
+      } else if(inParity == 1 && inParity == outParity)
       {
          return this->mFBOPlan;
-      } else if(parity == 0)
+      } else if(inParity == 0)
       {
          return this->mFEOPlan;
       } else
@@ -430,15 +403,15 @@ namespace Transform {
       }
    }
 
-   inline fftw_plan CylinderChebyshevFftwTransform::bPlan(const int parity, const int sizeParity)
+   inline fftw_plan CylinderChebyshevFftwTransform::bPlan(const int inParity, const int outParity)
    {
-      if(parity == 0 && parity == sizeParity)
+      if(inParity == 0 && inParity == outParity)
       {
          return this->mBEPlan;
-      } else if(parity == 1 && parity == sizeParity)
+      } else if(inParity == 1 && inParity == outParity)
       {
          return this->mFBOPlan;
-      } else if(parity == 0)
+      } else if(inParity == 0)
       {
          return this->mBEOPlan;
       } else
@@ -449,13 +422,6 @@ namespace Transform {
 
    inline const SparseMatrix& CylinderChebyshevFftwTransform::diff(const int parity) const
    {
-      if(parity == 0)
-      {
-         return this->mDiffE;
-      } else
-      {
-         return this->mDiffO;
-      }
    }
 
 }

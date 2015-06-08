@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "SpatialSchemes/Tools/ParityTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -51,62 +52,10 @@ namespace Schemes {
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
-      std::vector<std::pair<int,int> >::iterator it;
-      std::vector<std::pair<int,int> > even;
-      std::vector<std::pair<int,int> > odd;
-      int idx = 0;
-      int previous = -1;
-      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
-      {
-         if(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i)%2 == 0)
-         {
-            if(previous == 0)
-            {
-               even.back().second += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-            } else
-            {
-               even.push_back(std::make_pair(idx, spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i)));
-            }
-
-            idx += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-
-            previous = 0;
-         } else
-         {
-            if(previous == 1)
-            {
-               odd.back().second += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-            } else
-            {
-               odd.push_back(std::make_pair(idx, spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i)));
-            }
-
-            idx += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-
-            previous = 1;
-         }
-      }
-
-      MatrixI evenBlocks(even.size(), 2);
-      MatrixI oddBlocks(odd.size(), 2);
-
-      int i = 0;
-      for(it = even.begin(); it != even.end(); ++it, ++i)
-      {
-         evenBlocks(i,0) = it->first;
-         evenBlocks(i,1) = it->second;
-      }
-
-      i = 0;
-      for(it = odd.begin(); it != odd.end(); ++it, ++i)
-      {
-         oddBlocks(i,0) = it->first;
-         oddBlocks(i,1) = it->second;
-      }
-
-      ArrayI howmany(2);
-      howmany(0) = evenBlocks.col(1).sum();
-      howmany(1) = oddBlocks.col(1).sum();
+      ArrayI howmany;
+      MatrixI evenBlocks;
+      MatrixI oddBlocks;
+      ParityTools::splitParity(spRes, Dimensions::Transform::TRA1D, howmany, evenBlocks, oddBlocks);
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, evenBlocks, oddBlocks, specSize, Transform::FftSetup::COMPONENT));
    }

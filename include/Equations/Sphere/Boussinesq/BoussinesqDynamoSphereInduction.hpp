@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqSphereMomentum.hpp
- * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq sphere model 
+ * @file BoussinesqDynamoSphereInduction.hpp
+ * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQSPHEREMOMENTUM_HPP
-#define BOUSSINESQSPHEREMOMENTUM_HPP
+#ifndef BOUSSINESQDYNAMOSPHEREINDUCTION_HPP
+#define BOUSSINESQDYNAMOSPHEREINDUCTION_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq sphere model 
+    * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo in a sphere
     */
-   class BoussinesqSphereMomentum: public IVectorEquation
+   class BoussinesqDynamoSphereInduction: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqSphereMomentum(SharedEquationParameters spEqParams);
+         BoussinesqDynamoSphereInduction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqSphereMomentum();
+         virtual ~BoussinesqDynamoSphereInduction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -64,10 +64,15 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents();
+
       private:
    };
 
 }
 }
 
-#endif // BOUSSINESQSPHEREMOMENTUM_HPP
+#endif // BOUSSINESQDYNAMOSPHEREINDUCTION_HPP

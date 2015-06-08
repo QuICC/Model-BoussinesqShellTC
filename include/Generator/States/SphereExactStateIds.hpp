@@ -43,7 +43,23 @@ namespace Equations {
       enum Id {
          // Special states
          CONSTANT = 0,  // All constant
+
+         HARMONIC = 10, // Generate spherical harmonic state
+
+         TOROIDAL = 20, // Toroidal Y_l^m
+         POLOIDAL,      // Poloidal Y_l^m
+
+         TORPOL = 30, // Toroidal+Poloidal state
+
+         BENCHTEMPC1 = 50, // Initial temperature perturbation state for full sphere benchmark C1
+         BENCHVELC1,       // Initial velocity perturbation state for full sphere benchmark C1
+         BENCHMAGC1,       // Initial magnetic perturbation state for full sphere benchmark C1
       };
+
+      /**
+       * @brief Compute spherical harmonic physical values
+       */
+      static Array sph_harmonic(const MHDComplex amplitude, const int l, const int m, const MHDFloat theta, const Array& phi);
    };
 
 }

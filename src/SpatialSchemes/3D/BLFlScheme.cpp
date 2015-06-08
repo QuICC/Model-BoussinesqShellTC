@@ -1,6 +1,6 @@
 /** 
- * @file BLFScheme.cpp
- * @brief Source of the sphere (ball) Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation
+ * @file BLFlScheme.cpp
+ * @brief Source of the sphere (ball) Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation with l spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -13,22 +13,23 @@
 
 // Class include
 //
-#include "SpatialSchemes/3D/BLFScheme.hpp"
+#include "SpatialSchemes/3D/BLFlScheme.hpp"
 
 // Project includes
 //
 #include "PolynomialTransforms/PolynomialTools.hpp"
+#include "SpatialSchemes/Tools/ParityTools.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Schemes {
    
-   std::string BLFScheme::type()
+   std::string BLFlScheme::type()
    {
-      return "BLF";
+      return "BLFl";
    }
 
-   void BLFScheme::addTransformSetups(SharedResolution spRes) const
+   void BLFlScheme::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform
       Transform::SharedFftSetup  spS1D = this->spSetup1D(spRes);
@@ -43,7 +44,7 @@ namespace Schemes {
       spRes->addTransformSetup(Dimensions::Transform::TRA3D, spS3D);
    }
 
-   Transform::SharedFftSetup BLFScheme::spSetup1D(SharedResolution spRes) const
+   Transform::SharedFftSetup BLFlScheme::spSetup1D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -52,16 +53,15 @@ namespace Schemes {
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
-      int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
-      {
-         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-      }
+      ArrayI howmany;
+      MatrixI evenBlocks;
+      MatrixI oddBlocks;
+      ParityTools::splitParity(spRes, Dimensions::Transform::TRA1D, howmany, evenBlocks, oddBlocks);
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, evenBlocks, oddBlocks, specSize, Transform::FftSetup::COMPONENT));
    }
 
-   Transform::SharedPolySetup BLFScheme::spSetup2D(SharedResolution spRes) const
+   Transform::SharedPolySetup BLFlScheme::spSetup2D(SharedResolution spRes) const
    {
       // Get physical size of polynomial transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
@@ -97,7 +97,7 @@ namespace Schemes {
       return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
    }
 
-   Transform::SharedFftSetup BLFScheme::spSetup3D(SharedResolution spRes) const
+   Transform::SharedFftSetup BLFlScheme::spSetup3D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>();
@@ -115,24 +115,24 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::MIXED));
    }
 
-   BLFScheme::BLFScheme(const ArrayI& dim)
-      : IRegularSHScheme(dim)
+   BLFlScheme::BLFlScheme(const ArrayI& dim)
+      : IRegularSHlScheme(dim)
    {
    }
 
-   BLFScheme::~BLFScheme()
+   BLFlScheme::~BLFlScheme()
    {
    }
 
-   void BLFScheme::setDimensions()
+   void BLFlScheme::setDimensions()
    {
       //
       // Set transform space sizes
       //
       ArrayI traSize(3);
       traSize(0) = this->mI + 1;
-      traSize(1) = this->mM + 1;
-      traSize(2) = this->mL + 1;
+      traSize(1) = this->mL + 1;
+      traSize(2) = this->mM + 1;
       this->setTransformSpace(traSize);
 
       //
@@ -140,7 +140,7 @@ namespace Schemes {
       //
 
       // Get standard dealiased FFT size
-      int nR = Transform::Fft::ToolsSelector::dealiasCosFft(this->mI+1);
+      int nR = Transform::Fft::ToolsSelector::dealiasCosFft(this->mI+1+8);
       // Check for optimised FFT sizes
       nR = Transform::Fft::ToolsSelector::optimizeFft(nR);
 
@@ -182,7 +182,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of second transform
-      this->setDimension(traSize(1), Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
+      this->setDimension(traSize(2), Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
 
       //
       // Initialise third transform
@@ -201,7 +201,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
    }
 
-   void BLFScheme::setCosts()
+   void BLFlScheme::setCosts()
    {
       // Set first transform cost
       this->setCost(1.0, Dimensions::Transform::TRA1D);
@@ -213,7 +213,7 @@ namespace Schemes {
       this->setCost(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void BLFScheme::setScalings()
+   void BLFlScheme::setScalings()
    {
       // Set first transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA1D);
@@ -225,7 +225,7 @@ namespace Schemes {
       this->setScaling(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void BLFScheme::setMemoryScore()
+   void BLFlScheme::setMemoryScore()
    {
       // Set first transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
@@ -237,7 +237,7 @@ namespace Schemes {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool BLFScheme::applicable() const
+   bool BLFlScheme::applicable() const
    {
       return true;
    }

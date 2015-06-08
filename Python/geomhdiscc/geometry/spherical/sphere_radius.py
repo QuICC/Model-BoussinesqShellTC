@@ -16,6 +16,63 @@ def zblk(nr, l, bc):
     mat = spsp.coo_matrix((nr,nr))
     return radbc.constrain(mat,l,bc)
 
+def r1(nr, l, bc, coeff = 1.0, zr = 0):
+    """Create operator for r multiplication"""
+
+    ns = np.arange((l+1)%2, 2*nr, 2)
+    if l%2 == 0:
+        offsets = np.arange(0,2)
+    else:
+        offsets = np.arange(-1,1)
+    nzrow = -1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return np.full(n.shape, 1.0/2.0)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return d_1(n)
+
+    ds = [d_1, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    if zr > 0:
+        mat = mat.tolil()
+        mat[-zr:,:] = 0
+        mat = mat.tocoo()
+    return radbc.constrain(mat, l, bc)
+
+def r2(nr, l, bc, coeff = 1.0, zr = 0):
+    """Create operator for r^2 multiplication"""
+
+    ns = np.arange(l%2, 2*nr, 2)
+    offsets = np.arange(-1,2)
+    nzrow = -1
+
+    # Generate 2nd subdiagonal
+    def d_1(n):
+        return np.full(n.shape, 1.0/4.0)
+
+    # Generate diagonal
+    def d0(n):
+        return np.full(n.shape, 1.0/2.0)
+
+    # Generate 2nd superdiagonal
+    def d1(n):
+        return d_1(n)
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    if zr > 0:
+        mat = mat.tolil()
+        mat[-zr:,:] = 0
+        mat = mat.tocoo()
+    return radbc.constrain(mat, l, bc)
+
 def d1(nr, l, bc, coeff = 1.0):
     """Create operator for 1st derivative"""
 
@@ -25,6 +82,87 @@ def d1(nr, l, bc, coeff = 1.0):
         mat[i,i+(l+1)%2:] = row[i+(l+1)%2:]
 
     mat = coeff*mat.tocoo()
+    return radbc.constrain(mat, l, bc)
+
+def i1(nr, l, bc, coeff = 1.0):
+    """Create operator for 1st integral T_n(x)."""
+
+    ns = np.arange((l+1)%2, 2*nr, 2)
+    if l%2 == 0:
+        offsets = np.arange(0,2)
+    else:
+        offsets = np.arange(-1,1)
+    nzrow = 0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return 1.0/(2.0*n)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -d_1(n)
+
+    ds = [d_1, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i2(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral T_n(x)."""
+
+    ns = np.arange(l%2, 2*nr, 2)
+    offsets = np.arange(-1,2)
+    nzrow = 1
+
+    # Generate 2nd subdiagonal
+    def d_1(n):
+        return 1.0/(4.0*n*(n - 1.0))
+
+    # Generate diagonal
+    def d0(n):
+        return -1.0/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd superdiagonal
+    def d1(n):
+        return d_1(n+1.0)
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i2r1d1r1(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r D_r r T_n(x)."""
+
+    ns = np.arange((l+1)%2, 2*nr, 2)
+    if l%2 == 0:
+        offsets = np.arange(-1,3)
+    else:
+        offsets = np.arange(-2,2)
+    nzrow = 1
+
+    # Generate 3rd subdiagonal
+    def d_2(n):
+        return (n - 2.0)/(8.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return (n + 2.0)/(8.0*n*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -d_2(n)
+
+    # Generate 3rd superdiagonal
+    def d2(n):
+        return -d_1(n)
+
+    ds = [d_2, d_1, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i2r2(nr, l, bc, coeff = 1.0):
@@ -83,6 +221,54 @@ def i2r2lapl(nr, l, bc, coeff = 1.0):
 
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i4r3d1r1(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^3 D r T_n(x)."""
+
+    ns = np.arange((l+1)%2, 2*nr, 2)
+    if l%2 == 0:
+        offsets = np.arange(-3,5)
+    else:
+        offsets = np.arange(-4,4)
+    nzrow = 3
+
+    # Generate 7th subdiagonal
+    def d_4(n):
+        return (n - 6.0)/(128.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 5th subdiagonal
+    def d_3(n):
+        return (n**2 + 7.0*n - 54.0)/(128.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_2(n):
+        return -3.0*(n**2 - 4.0*n - 28.0)/(128.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -3.0*(n**3 + 9.0*n**2 - 24.0*n - 156.0)/(128.0*n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return 3.0*(n**3 - 9.0*n**2 - 24.0*n + 156.0)/(128.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d2(n):
+        return 3.0*(n**2 + 4.0*n - 28.0)/(128.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 5th superdiagonal
+    def d3(n):
+        return -(n**2 - 7.0*n - 54.0)/(128.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 7th superdiagonal
+    def d4(n):
+        return -(n + 6.0)/(128.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_4, d_3, d_2, d_1, d1, d2, d3, d4]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -214,7 +400,7 @@ def i4r4lapl2(nr, l, bc, coeff = 1.0):
     return radbc.constrain(mat, l, bc)
 
 def i2r1(nr, l, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x T_n(x)."""
+    """Create operator for 2nd integral of r T_n(x)."""
 
     ns = np.arange((l+1)%2, 2*nr, 2)
     if l%2 == 0:

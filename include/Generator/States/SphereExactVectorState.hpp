@@ -24,6 +24,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Equations/IVectorEquation.hpp"
+#include "Generator/States/SphereExactStateIds.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,13 +36,8 @@ namespace Equations {
    class SphereExactVectorState: public IVectorEquation
    {
       public:
-         /**
-          * @brief Enums for the avaialable exact states
-          */
-         enum StateTypeId {
-            CONSTANT,
-            HARMONIC,
-         };
+         /// Typedef to simplify notations for harmonic mode
+         typedef std::tr1::tuple<int, int, MHDComplex> HarmonicModeType;
 
          /**
           * @brief Simple constructor
@@ -81,16 +77,14 @@ namespace Equations {
          /**
           * @brief Set the state type id
           */
-         void setStateType(const SphereExactVectorState::StateTypeId id);
+         void setStateType(const SphereExactStateIds::Id id);
 
          /**
           * @brief Set options for the harmonics states
           *
-          * @param rModes   List of harmonics with amplitude to create
-          * @param tModes   List of harmonics with amplitude to create
-          * @param pModes   List of harmonics with amplitude to create
+          * @param modes   List of harmonics with amplitude to create
           */
-         void setHarmonicOptions(const std::vector<std::tr1::tuple<int, int, MHDComplex> >& rModes, const std::vector<std::tr1::tuple<int, int, MHDComplex> >& tModes, const std::vector<std::tr1::tuple<int, int, MHDComplex> >& pModes);
+         void setHarmonicOptions(const FieldComponents::Spectral::Id compId, const std::vector<HarmonicModeType>& modes);
 
       protected:
          /**
@@ -110,24 +104,84 @@ namespace Equations {
 
       private:
          /**
+          * @brief Generate Toroidal Y_0^0
+          */
+         void computeTor00(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Toroidal Y_1^0
+          */
+         void computeTor10(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Toroidal Y_1^1
+          */
+         void computeTor11(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Toroidal Y_2^0
+          */
+         void computeTor20(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Toroidal Y_2^1
+          */
+         void computeTor21(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Toroidal Y_2^2
+          */
+         void computeTor22(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Toroidal Y_5^4
+          */
+         void computeTor54(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Poloidal Y_0^0
+          */
+         void computePol00(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Poloidal Y_1^0
+          */
+         void computePol10(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Poloidal Y_1^1
+          */
+         void computePol11(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Poloidal Y_2^0
+          */
+         void computePol20(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Poloidal Y_2^1
+          */
+         void computePol21(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Poloidal Y_2^2
+          */
+         void computePol22(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
+          * @brief Generate Poloidal Y_4^3
+          */
+         void computePol43(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const;
+
+         /**
           * @brief Type of the state to generate
           */
-         StateTypeId mTypeId;
+         SphereExactStateIds::Id mTypeId;
 
          /**
           * @brief Storage for the list of spherical harmonic modes to generate
           */
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > mRSHModes;
-
-         /**
-          * @brief Storage for the list of spherical harmonic modes to generate
-          */
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > mTSHModes;
-
-         /**
-          * @brief Storage for the list of spherical harmonic modes to generate
-          */
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > mPSHModes;
+         std::map<FieldComponents::Spectral::Id,std::vector<HarmonicModeType> > mSHModes;
    };
 
    /// Typedef for a shared SphereExactVectorState

@@ -65,7 +65,10 @@ namespace Transform {
        */
       struct Integrators
       {
-         /// Enum of integrator IDs
+         /** 
+          * Enum of integrator IDs
+          *    - INTG: integration
+          */
          enum Id {INTG};
       };
 

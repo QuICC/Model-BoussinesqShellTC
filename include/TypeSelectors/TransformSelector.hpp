@@ -195,7 +195,7 @@ namespace GeoMHDiSCC {
    #endif //GEOMHDISCC_SPATIALSCHEME_AFT
 
    // Configure code to use BLF scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+   #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
 
       #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
 
@@ -221,7 +221,7 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_BLF
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
 
    // Configure code to use SLF scheme
    #if defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM

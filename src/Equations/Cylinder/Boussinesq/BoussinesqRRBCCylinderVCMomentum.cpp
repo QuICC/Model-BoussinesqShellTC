@@ -48,6 +48,15 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::Z, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
+   void BoussinesqRRBCCylinderVCMomentum::setNLComponents()
+   {
+      this->addNLComponent(FieldComponents::Spectral::R, 0);
+
+      this->addNLComponent(FieldComponents::Spectral::THETA, 0);
+
+      this->addNLComponent(FieldComponents::Spectral::Z, 0);
+   }
+
    void BoussinesqRRBCCylinderVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Get Prandtl number

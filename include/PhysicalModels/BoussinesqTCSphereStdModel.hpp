@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqSphereModel.hpp
- * @brief Implementation of the Boussinesq sphere model
+ * @file BoussinesqTCSphereStdModel.hpp
+ * @brief Implementation of the Boussinesq thermal convection in a sphere (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQSPHEREMODEL_HPP
-#define BOUSSINESQSPHEREMODEL_HPP
+#ifndef BOUSSINESQTCSPHERESTDMODEL_HPP
+#define BOUSSINESQTCSPHERESTDMODEL_HPP
 
 // Configuration includes
 //
@@ -22,14 +22,17 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/BLFScheme.hpp"
+#include "SpatialSchemes/3D/BLFlScheme.hpp"
+
+// THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
+// GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
 
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq sphere model
+    * @brief Implementation of the Boussinesq thermal convection sphere model (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
     */
-   class BoussinesqSphereModel
+   class BoussinesqTCSphereStdModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -42,7 +45,7 @@ namespace GeoMHDiSCC {
          static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::BLFScheme SchemeType;
+         typedef Schemes::BLFlScheme SchemeType;
 
          /**
           * @brief Add the required equations
@@ -99,27 +102,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqSphereModel();
+         BoussinesqTCSphereStdModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqSphereModel();
+         ~BoussinesqTCSphereStdModel();
    };
 
 }
 
-// 
-// Block compilation of unusable parallelisation algorithms
-//
-#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
-#error "The SINGLE1D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE1D
-#ifdef GEOMHDISCC_MPIALGO_SINGLE2D
-#error "The SINGLE2D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE2D
-#ifdef GEOMHDISCC_MPIALGO_TUBULAR
-#error "The TUBULAR parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_TUBULAR
-
-#endif // BOUSSINESQSPHEREMODEL_HPP
+#endif // BOUSSINESQTCSPHERESTDMODEL_HPP

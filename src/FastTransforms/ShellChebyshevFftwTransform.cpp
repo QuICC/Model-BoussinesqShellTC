@@ -194,9 +194,6 @@ namespace Transform {
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 3, pValue);
 
-      // Temporary storage
-      SparseMatrix tmp(this->mspSetup->fwdSize(),this->mspSetup->fwdSize());
-
       // ... set forward operator size
       pValue = PyLong_FromLong(this->mspSetup->fwdSize());
       PyTuple_SetItem(pArgs, 0, pValue);

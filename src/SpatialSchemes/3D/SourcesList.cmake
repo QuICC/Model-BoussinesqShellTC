@@ -37,10 +37,15 @@ elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "WFT")
       IRegular3DScheme.cpp
       WFTScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLF")
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFL")
    list(APPEND MHDSources 
-      IRegularSHScheme.cpp
-      BLFScheme.cpp
+      IRegularSHlScheme.cpp
+      BLFlScheme.cpp
+      )
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFM")
+   list(APPEND MHDSources 
+      IRegularSHmScheme.cpp
+      BLFmScheme.cpp
       )
 elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL")
    list(APPEND MHDSources 

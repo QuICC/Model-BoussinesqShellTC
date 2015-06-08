@@ -180,7 +180,7 @@ def i1(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i1r1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 1st integral x T_n(x)."""
+    """Create operator for 1st integral r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-2,3)
@@ -451,7 +451,7 @@ def i4(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i4r1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 4th integral of x T_n(x)."""
+    """Create operator for 4th integral of r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-5,6)
@@ -508,7 +508,7 @@ def i4r1(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i4r1d1r1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 4th integral of x D x T_n(x)."""
+    """Create operator for 4th integral of r D r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-5,6)
@@ -703,7 +703,7 @@ def i4r4(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i4r4laplrd1r1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 4th integral of r^4 laplacian 1/x D x T_n(x)."""
+    """Create operator for 4th integral of r^4 laplacian 1/r D r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-5,6)
@@ -874,7 +874,7 @@ def i4r4lapl2(nr, l, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i2r1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x T_n(x)."""
+    """Create operator for 2nd integral of r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-3,4)
@@ -915,7 +915,7 @@ def i2r1(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i2r1d1r1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x D_x x T_n(x)."""
+    """Create operator for 2nd integral of r D_r r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-3,4)
@@ -956,7 +956,7 @@ def i2r1d1r1(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i2r2d1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 2nd integral of r^2 D_x T_n(x)."""
+    """Create operator for 2nd integral of r^2 D_r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-3,4)
@@ -1070,7 +1070,7 @@ def i4r3(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i4r3d1r1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 4th integral of r^3 D x T_n(x)."""
+    """Create operator for 4th integral of r^3 D r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-7,8)
@@ -1143,7 +1143,7 @@ def i4r3d1r1(nr, a, b, bc, coeff = 1.0):
     return radbc.constrain(mat, bc)
 
 def i4r4d1(nr, a, b, bc, coeff = 1.0):
-    """Create operator for 4th integral of r^4 D_x T_n(x)."""
+    """Create operator for 4th integral of r^4 D_r T_n(x)."""
 
     ns = np.arange(0, nr)
     offsets = np.arange(-7,8)

@@ -44,7 +44,7 @@ def apply_tau(mat, l, bc, location = 't'):
         cond = tau_value_diff2(mat.shape[0], l%2, bc.get('c',None))
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
-        cond = tau_last(mat.shape[1], bc[0]-990)
+        cond = tau_last(mat.shape[1], l%2, bc[0]-990)
         nbc = bc[0]-990
 
     if not spsp.isspmatrix_coo(mat):
@@ -118,6 +118,18 @@ def tau_value_diff2(nr, parity, coeffs = None):
     cond.append(list(tau_diff2(nr,parity,coeffs)[0]))
 
     return np.array(cond)
+
+def tau_last(nr, parity, nrow):
+    """Create the last modes to zero tau line(s)"""
+
+    # convert nrow to parity aware number
+    prow = nrow//2 + parity*(nrow%2)
+
+    cond = np.zeros((prow, nr))
+    for j in range(0, prow):
+        cond[j,nr-prow+j] = 1.0
+
+    return cond
 
 def apply_galerkin(mat, l, bc):
     """Apply a Galerkin stencil on the matrix"""

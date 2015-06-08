@@ -11,6 +11,7 @@ import scipy.sparse.linalg as spsplin
 import matplotlib.pylab as pl
 
 import geomhdiscc.transform.shell as transf
+transf.min_r_points = 1
 import geomhdiscc.geometry.spherical.shell_radius as shell
 
 import mpmath
@@ -21,7 +22,7 @@ def x_to_phys(expr, grid):
     """Convert sympy expression to grid values"""
 
     x = sy.Symbol('x')
-    func = sy.lambdify(x, expr, 'mpmath')
+    func = sy.lambdify(x, expr)
     return func(grid)
 
 def test_bc(op, res_expr, sol, grid):
@@ -97,7 +98,7 @@ def all_bc(nr, a, b, rg):
 
     print("\t Test BC 20:")
     x = sy.Symbol('x')
-    A = shell.qid(nr, 2, {0:20})[0:2,:]
+    A = shell.qid(nr, 2, {0:20}).tolil()[0:2,:]
     sphys = x**2
     fsol = sy.lambdify(x, sphys)
     sol = np.array([fsol(a+b), fsol(-a+b)])
@@ -105,7 +106,7 @@ def all_bc(nr, a, b, rg):
 
     print("\t Test BC 21:")
     x = sy.Symbol('x')
-    A = shell.qid(nr, 2, {0:21, 'c':{'a':a, 'b':b}})[0:2,:]
+    A = shell.qid(nr, 2, {0:21, 'c':{'a':a, 'b':b}}).tolil()[0:2,:]
     sphys = x**2
     fsol = sy.lambdify(x, sy.diff(sphys))
     sol = np.array([fsol(a+b), fsol(-a+b)])
@@ -113,7 +114,7 @@ def all_bc(nr, a, b, rg):
 
     print("\t Test BC 22:")
     x = sy.Symbol('x')
-    A = shell.qid(nr, 2, {0:22, 'c':{'a':a, 'b':b}})[0:2,:]
+    A = shell.qid(nr, 2, {0:22, 'c':{'a':a, 'b':b}}).tolil()[0:2,:]
     sphys = x**5
     fsol = sy.lambdify(x, x*sy.diff(sphys/x))
     sol = np.array([fsol(a+b), fsol(-a+b)])
@@ -122,7 +123,7 @@ def all_bc(nr, a, b, rg):
     print("\t Test BC 23:")
     x = sy.Symbol('x')
     l = 5
-    A = shell.qid(nr, 2, {0:23, 'c':{'a':a, 'b':b, 'l':l}})[0:2,:]
+    A = shell.qid(nr, 2, {0:23, 'c':{'a':a, 'b':b, 'l':l}}).tolil()[0:2,:]
     sphys = x**2
     fsolO = sy.lambdify(x, sy.diff(sphys) + (l+1.0)*sphys/x)
     fsolI = sy.lambdify(x, sy.diff(sphys) - l*sphys/x)
@@ -131,7 +132,7 @@ def all_bc(nr, a, b, rg):
 
     print("\t Test BC 40:")
     x = sy.Symbol('x')
-    A = shell.qid(nr, 4, {0:40, 'c':{'a':a, 'b':b}})[0:4,:]
+    A = shell.qid(nr, 4, {0:40, 'c':{'a':a, 'b':b}}).tolil()[0:4,:]
     sphys = x**7
     fsolV = sy.lambdify(x, sphys)
     fsolD = sy.lambdify(x, sy.diff(sphys))
@@ -140,7 +141,7 @@ def all_bc(nr, a, b, rg):
 
     print("\t Test BC 41:")
     x = sy.Symbol('x')
-    A = shell.qid(nr, 4, {0:41, 'c':{'a':a, 'b':b}})[0:4,:]
+    A = shell.qid(nr, 4, {0:41, 'c':{'a':a, 'b':b}}).tolil()[0:4,:]
     sphys = x**7
     fsolV = sy.lambdify(x, sphys)
     fsolD = sy.lambdify(x, sy.diff(sphys,x,x))
@@ -177,12 +178,12 @@ def d2(nr, a, b, rg):
     ssol = sy.diff(sphys,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
-def divx(nr, a, b, rg):
+def divr(nr, a, b, rg):
     """Accuracy test for 1/x operator"""
 
     print("1/x:")
     print("\t Forward: (full spectrum):")
-    A = shell.x1(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.r1(nr, a, b, shell.radbc.no_bc()).tocsr()
     lhs = np.ones(rg.shape[0])
     sol = transf.torcheb(transf.torphys(lhs)/rg)
     rhs = spsplin.spsolve(A,lhs)
@@ -191,13 +192,13 @@ def divx(nr, a, b, rg):
     pl.semilogy(abs(A*sol - np.ones(rg.shape[0]))+1e-16)
     pl.show()
 
-def divx2(nr, a, b, rg):
+def divr2(nr, a, b, rg):
     """Accuracy test for 1/x^2 operator"""
 
     print("1/x^2:")
     print("\t Forward: (full spectrum):")
-    A = shell.x1(nr, a, b, shell.radbc.no_bc()).tocsr()
-    B = shell.x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.r1(nr, a, b, shell.radbc.no_bc()).tocsr()
+    B = shell.r2(nr, a, b, shell.radbc.no_bc()).tocsr()
     lhs = np.ones(rg.shape[0])
     sol = transf.torcheb(transf.torphys(lhs)/(rg*rg))
     tmp = spsplin.spsolve(A,lhs)
@@ -208,13 +209,13 @@ def divx2(nr, a, b, rg):
     pl.semilogy(abs(B*sol - np.ones(rg.shape[0]))+1e-16)
     pl.show()
 
-def divx4(nr, a, b, rg):
+def divr4(nr, a, b, rg):
     """Accuracy test for 1/x^4 operator"""
 
     print("1/x^4:")
     print("\t Forward: (full spectrum):")
-    A = shell.x1(nr, a, b, shell.radbc.no_bc()).tocsr()
-    B = shell.x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.r1(nr, a, b, shell.radbc.no_bc()).tocsr()
+    B = shell.r4(nr, a, b, shell.radbc.no_bc()).tocsr()
     lhs = np.ones(rg.shape[0])
     sol = transf.torcheb(transf.torphys(lhs)/(rg*rg*rg*rg))
     tmp = spsplin.spsolve(A,lhs)
@@ -227,53 +228,53 @@ def divx4(nr, a, b, rg):
     pl.semilogy(abs(B*sol - np.ones(rg.shape[0]))+1e-16)
     pl.show()
 
-def x1(nr, a, b, rg):
-    """Accuracy test for x1 operator"""
+def r1(nr, a, b, rg):
+    """Accuracy test for r1 operator"""
 
-    print("x1:")
+    print("r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sphys)
     test_forward(A, sphys, ssol, rg, 0)
 
     print("\t Forward: (full chebyshev):")
-    A = shell.x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = (x*sphys)
     test_forward(A, sphys, ssol, rg, 0)
 
-def x2(nr, a, b, rg):
+def r2(nr, a, b, rg):
     """Accuracy test for x^2 operator"""
 
-    print("x2:")
+    print("r2:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.x2(nr, a, b, shell.radbc.no_bc())
+    A = shell.r2(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*x*sphys)
     test_forward(A, sphys, ssol, rg, 0)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.x2(nr, a, b, shell.radbc.no_bc())
+    A = shell.r2(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = (x*x*sphys)
     test_forward(A, sphys, ssol, rg, 0)
 
-def x4(nr, a, b, rg):
+def r4(nr, a, b, rg):
     """Accuracy test for x^4 operator"""
 
-    print("x4:")
+    print("r4:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.x4(nr, a, b, shell.radbc.no_bc())
+    A = shell.r4(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*x*x*x*sphys)
     test_forward(A, sphys, ssol, rg, 0)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.x4(nr, a, b, shell.radbc.no_bc())
+    A = shell.r4(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = (x*x*x*x*sphys)
     test_forward(A, sphys, ssol, rg, 0)
@@ -295,19 +296,19 @@ def i1(nr, a, b, rg):
     ssol = sy.simplify(sy.integrate(sphys,x))
     test_forward(A, sphys, ssol, rg, 1)
 
-def i1x1(nr, a, b, rg):
-    """Accuracy test for i1x1 operator"""
+def i1r1(nr, a, b, rg):
+    """Accuracy test for i1r1 operator"""
 
-    print("i1x1:")
+    print("i1r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.integrate(x*sphys,x)
     test_forward(A, sphys, ssol, rg, 1)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.simplify(sy.integrate(x*sphys,x))
     test_forward(A, sphys, ssol, rg, 1)
@@ -329,108 +330,108 @@ def i2(nr, a, b, rg):
     ssol = sy.integrate(sphys,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
-def i2x1(nr, a, b, rg):
-    """Accuracy test for i2x1 operator"""
+def i2r1(nr, a, b, rg):
+    """Accuracy test for i2r1 operator"""
 
-    print("i2x1:")
+    print("i2r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i2x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i2x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.integrate(x*sphys,x,x)
     test_forward(A, sphys, ssol, rg, 0)
 
-def i2x2d1(nr, a, b, rg):
-    """Accuracy test for i2x2d1 operator"""
+def i2r2d1(nr, a, b, rg):
+    """Accuracy test for i2r2d1 operator"""
 
-    print("i2x2d1:")
+    print("i2r2d1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i2x2d1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r2d1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**2*sy.diff(sphys,x))
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i2x2d1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r2d1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**2*sy.diff(sphys,x))
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
-def i2x1d1x1(nr, a, b, rg):
-    """Accuracy test for i2x1d1x1 operator"""
+def i2r1d1r1(nr, a, b, rg):
+    """Accuracy test for i2r1d1r1 operator"""
 
-    print("i2x1d1x1:")
+    print("i2r1d1r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i2x1d1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r1d1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i2x1d1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r1d1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
-def i2x2(nr, a, b, rg):
-    """Accuracy test for i2x2 operator"""
+def i2r2(nr, a, b, rg):
+    """Accuracy test for i2r2 operator"""
 
-    print("i2x2:")
+    print("i2r2:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i2x2(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r2(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x**2)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i2x2(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r2(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**2*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
-def i2x3(nr, a, b, rg):
-    """Accuracy test for i2x3 operator"""
+def i2r3(nr, a, b, rg):
+    """Accuracy test for i2r3 operator"""
 
-    print("i2x3:")
+    print("i2r3:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i2x3(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r3(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x**3)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i2x3(nr, a, b, shell.radbc.no_bc())
+    A = shell.i2r3(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
-def i2x2lapl(nr, a, b, rg):
+def i2r2lapl(nr, a, b, rg):
     """Accuracy test for zblk operator"""
 
-    print("i2x2lapl:")
+    print("i2r2lapl:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x2lapl(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i2r2lapl(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1)*sphys)
     ssol = sy.integrate(ssol,x,x)
@@ -438,7 +439,7 @@ def i2x2lapl(nr, a, b, rg):
 
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i2x2lapl(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i2r2lapl(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1)*sphys)
     ssol = sy.integrate(ssol,x,x)
@@ -447,8 +448,8 @@ def i2x2lapl(nr, a, b, rg):
     print("\tbc = 20:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x2lapl(nr, l, a, b, {0:20}).tocsr()
-    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i2r2lapl(nr, l, a, b, {0:20}).tocsr()
+    B = shell.i2r2(nr, a, b, shell.radbc.no_bc()).tocsr()
     ssol = sy.expand((x-(a+b))*(x-(-a+b))*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-2,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
     test_backward_tau(A, B, sphys, ssol, rg)
@@ -456,8 +457,8 @@ def i2x2lapl(nr, a, b, rg):
     print("\tbc = -20:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x2lapl(nr, l, a, b, {0:-20, 'rt':2}).tocsr()
-    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i2r2lapl(nr, l, a, b, {0:-20, 'rt':2}).tocsr()
+    B = shell.i2r2(nr, a, b, shell.radbc.no_bc()).tocsr()
     B = B[2:,:]
     S = shell.radbc.stencil(nr, {0:-20, 'rt':2}).tocsr()
     ssol = (x-(a+b))*(x-(-a+b))*np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr-2,1)])
@@ -468,8 +469,8 @@ def i2x2lapl(nr, a, b, rg):
     print("\tbc = 21:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x2lapl(nr, l, a, b, {0:21}).tocsr()
-    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i2r2lapl(nr, l, a, b, {0:21}).tocsr()
+    B = shell.i2r2(nr, a, b, shell.radbc.no_bc()).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
     test_backward_tau(A, B, sphys, ssol, rg)
@@ -477,8 +478,8 @@ def i2x2lapl(nr, a, b, rg):
     print("\tbc = -21:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x2lapl(nr, l, a, b, {0:-21, 'rt':2}).tocsr()
-    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i2r2lapl(nr, l, a, b, {0:-21, 'rt':2}).tocsr()
+    B = shell.i2r2(nr, a, b, shell.radbc.no_bc()).tocsr()
     B = B[2:,:]
     S = shell.radbc.stencil(nr, {0:-21, 'rt':2}).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
@@ -488,8 +489,8 @@ def i2x2lapl(nr, a, b, rg):
     print("\tbc = 22:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x2lapl(nr, l, a, b, {0:22, 'c':{'a':a, 'b':b}}).tocsr()
-    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i2r2lapl(nr, l, a, b, {0:22, 'c':{'a':a, 'b':b}}).tocsr()
+    B = shell.i2r2(nr, a, b, shell.radbc.no_bc()).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
     test_backward_tau(A, B, sphys, ssol, rg)
@@ -497,29 +498,29 @@ def i2x2lapl(nr, a, b, rg):
     print("\tbc = -22:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x2lapl(nr, l, a, b, {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}).tocsr()
-    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i2r2lapl(nr, l, a, b, {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}).tocsr()
+    B = shell.i2r2(nr, a, b, shell.radbc.no_bc()).tocsr()
     B = B[2:,:]
     S = shell.radbc.stencil(nr, {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
     test_backward_galerkin(A, B, S, sphys, ssol, rg)
 
-def i2x3lapl(nr, a, b, rg):
-    """Accuracy test for i2x3lapl operator"""
+def i2r3lapl(nr, a, b, rg):
+    """Accuracy test for i2r3lapl operator"""
 
-    print("i2x3lapl:")
+    print("i2r3lapl:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i2x3lapl(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i2r3lapl(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sy.diff(sphys,x,x) + 2*x**2*sy.diff(sphys,x) - l*(l+1)*sphys*x)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i2x3lapl(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i2r3lapl(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sy.diff(sphys,x,x) + 2*x**2*sy.diff(sphys,x) - l*(l+1)*sphys*x)
     ssol = sy.integrate(ssol,x,x)
@@ -542,193 +543,193 @@ def i4(nr, a, b, rg):
     ssol = sy.integrate(sphys,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x1(nr, a, b, rg):
-    """Accuracy test for i4x1 operator"""
+def i4r1(nr, a, b, rg):
+    """Accuracy test for i4r1 operator"""
 
-    print("i4x1:")
+    print("i4r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x1d1x1(nr, a, b, rg):
-    """Accuracy test for i4x1d1x1 operator"""
+def i4r1d1r1(nr, a, b, rg):
+    """Accuracy test for i4r1d1r1 operator"""
 
-    print("i4x1d1x1:")
+    print("i4r1d1r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x1d1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r1d1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x1d1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r1d1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x3(nr, a, b, rg):
-    """Accuracy test for i4x3 operator"""
+def i4r3(nr, a, b, rg):
+    """Accuracy test for i4r3 operator"""
 
-    print("i4x3:")
+    print("i4r3:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x3(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r3(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x3(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r3(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x4d1(nr, a, b, rg):
-    """Accuracy test for i4x4d1 operator"""
+def i4r4d1(nr, a, b, rg):
+    """Accuracy test for i4r4d1 operator"""
 
-    print("i4x4d1:")
+    print("i4r4d1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x4d1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r4d1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x4d1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r4d1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x3d1x1(nr, a, b, rg):
-    """Accuracy test for i4x3d1x1 operator"""
+def i4r3d1r1(nr, a, b, rg):
+    """Accuracy test for i4r3d1r1 operator"""
 
-    print("i4x3d1x1:")
+    print("i4r3d1r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x3d1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r3d1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x3d1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r3d1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x3d2(nr, a, b, rg):
-    """Accuracy test for i4x3d2 operator"""
+def i4r3d2(nr, a, b, rg):
+    """Accuracy test for i4r3d2 operator"""
 
-    print("i4x3d2:")
+    print("i4r3d2:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x3d2(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r3d2(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x3d2(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r3d2(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**3*sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x4(nr, a, b, rg):
-    """Accuracy test for i4x4 operator"""
+def i4r4(nr, a, b, rg):
+    """Accuracy test for i4r4 operator"""
 
-    print("i4x4:")
+    print("i4r4:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x4(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r4(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x**4)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x4(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r4(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x**4)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x4laplrd1x1(nr, a, b, rg):
-    """Accuracy test for i4x4laplrd1x1 operator"""
+def i4r4laplrd1r1(nr, a, b, rg):
+    """Accuracy test for i4r4laplrd1r1 operator"""
 
-    print("i4x4laplrd1x1:")
+    print("i4r4laplrd1r1:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
-    A = shell.i4x4laplrd1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r4laplrd1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x,x) + 3.0*x**3*sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x4laplrd1x1(nr, a, b, shell.radbc.no_bc())
+    A = shell.i4r4laplrd1r1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x,x) + 3.0*x**3*sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x4lapl(nr, a, b, rg):
-    """Accuracy test for i4x4lapl operator"""
+def i4r4lapl(nr, a, b, rg):
+    """Accuracy test for i4r4lapl operator"""
 
-    print("i4x4lapl:")
+    print("i4r4lapl:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i4x4lapl(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i4r4lapl(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x) + 2*x**3*sy.diff(sphys,x) - l*(l+1)*x**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x4lapl(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i4r4lapl(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x) + 2*x**3*sy.diff(sphys,x) - l*(l+1)*x**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
-def i4x4lapl2(nr, a, b, rg):
-    """Accuracy test for i4x4lapl2 operator"""
+def i4r4lapl2(nr, a, b, rg):
+    """Accuracy test for i4r4lapl2 operator"""
 
-    print("i4x4lapl2:")
+    print("i4r4lapl2:")
     print("\t Forward: (polynomial):")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i4x4lapl2(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i4r4lapl2(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 4*x**3*sy.diff(sphys,x,x,x) - 2*l*(l+1)*x**2*sy.diff(sphys,x,x) + (l-1)*l*(l+1)*(l+2)*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
     print("\t Forward: (full Chebyshev):")
-    A = shell.i4x4lapl2(nr, l, a, b, shell.radbc.no_bc())
+    A = shell.i4r4lapl2(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 4*x**3*sy.diff(sphys,x,x,x) - 2*l*(l+1)*x**2*sy.diff(sphys,x,x) + (l-1)*l*(l+1)*(l+2)*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -737,8 +738,8 @@ def i4x4lapl2(nr, a, b, rg):
     print("\tbc = 40:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i4x4lapl2(nr, l, a, b, {0:40}).tocsr()
-    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i4r4lapl2(nr, l, a, b, {0:40}).tocsr()
+    B = shell.i4r4(nr, a, b, shell.radbc.no_bc()).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x,x,x) + 4*sy.diff(ssol,x,x,x)/x - 2*l*(l+1)*sy.diff(ssol,x,x)/x**2 + (l-1)*l*(l+1)*(l+2)*ssol/x**4)
     test_backward_tau(A, B, sphys, ssol, rg)
@@ -746,8 +747,8 @@ def i4x4lapl2(nr, a, b, rg):
     print("\tbc = -40:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i4x4lapl2(nr, l, a, b, {0:-40, 'rt':4}).tocsr()
-    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i4r4lapl2(nr, l, a, b, {0:-40, 'rt':4}).tocsr()
+    B = shell.i4r4(nr, a, b, shell.radbc.no_bc()).tocsr()
     B = B[4:,:]
     S = shell.radbc.stencil(nr, {0:-40, 'rt':4}).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
@@ -757,8 +758,8 @@ def i4x4lapl2(nr, a, b, rg):
     print("\tbc = 41:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i4x4lapl2(nr, l, a, b, {0:41}).tocsr()
-    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i4r4lapl2(nr, l, a, b, {0:41}).tocsr()
+    B = shell.i4r4(nr, a, b, shell.radbc.no_bc()).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**3*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-6,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x,x,x) + 4*sy.diff(ssol,x,x,x)/x - 2*l*(l+1)*sy.diff(ssol,x,x)/x**2 + (l-1)*l*(l+1)*(l+2)*ssol/x**4)
     test_backward_tau(A, B, sphys, ssol, rg)
@@ -766,8 +767,8 @@ def i4x4lapl2(nr, a, b, rg):
     print("\tbc = -41:")
     x = sy.Symbol('x')
     l = np.random.randint(1, nr)
-    A = shell.i4x4lapl2(nr, l, a, b, {0:-41, 'rt':4}).tocsr()
-    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    A = shell.i4r4lapl2(nr, l, a, b, {0:-41, 'rt':4}).tocsr()
+    B = shell.i4r4(nr, a, b, shell.radbc.no_bc()).tocsr()
     B = B[4:,:]
     S = shell.radbc.stencil(nr, {0:-41, 'rt':4}).tocsr()
     ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**3*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-3,1)]))
@@ -797,32 +798,32 @@ if __name__ == "__main__":
     #zblk(nr, a, b, rg)
 #    d1(nr, a, b, rg)
 #    d2(nr, a, b, rg)
-#    x1(nr, a, b, rg)
-#    x2(nr, a, b, rg)
-#    x4(nr, a, b, rg)
+#    r1(nr, a, b, rg)
+#    r2(nr, a, b, rg)
+#    r4(nr, a, b, rg)
 #    i1(nr, a, b, rg)
-#    i1x1(nr, a, b, rg)
+#    i1r1(nr, a, b, rg)
 #    i2(nr, a, b, rg)
-#    i2x1(nr, a, b, rg)
-#    i2x1d1x1(nr, a, b, rg)
-#    i2x2d1(nr, a, b, rg)
-#    i2x2(nr, a, b, rg)
-#    i2x3(nr, a, b, rg)
-#    i2x2lapl(nr, a, b, rg)
-#    i2x3lapl(nr, a, b, rg)
+#    i2r1(nr, a, b, rg)
+#    i2r1d1r1(nr, a, b, rg)
+#    i2r2d1(nr, a, b, rg)
+#    i2r2(nr, a, b, rg)
+#    i2r3(nr, a, b, rg)
+#    i2r2lapl(nr, a, b, rg)
+#    i2r3lapl(nr, a, b, rg)
 #    i4(nr, a, b, rg)
-#    i4x1(nr, a, b, rg)
-#    i4x1d1x1(nr, a, b, rg)
-#    i4x3d2(nr, a, b, rg)
-#    i4x3(nr, a, b, rg)
-#    i4x3d1x1(nr, a, b, rg)
-#    i4x4d1(nr, a, b, rg)
-#    i4x4(nr, a, b, rg)
-#    i4x4laplrd1x1(nr, a, b, rg)
-#    i4x4lapl(nr, a, b, rg)
-#    i4x4lapl2(nr, a, b, rg)
+#    i4r1(nr, a, b, rg)
+#    i4r1d1r1(nr, a, b, rg)
+#    i4r3d2(nr, a, b, rg)
+#    i4r3(nr, a, b, rg)
+#    i4r3d1r1(nr, a, b, rg)
+#    i4r4d1(nr, a, b, rg)
+#    i4r4(nr, a, b, rg)
+#    i4r4laplrd1r1(nr, a, b, rg)
+#    i4r4lapl(nr, a, b, rg)
+#    i4r4lapl2(nr, a, b, rg)
 #    qid(nr, a, b, rg)
 
-#    divx(nr, a, b, rg)
-#    divx2(nr, a, b, rg)
-#    divx4(nr, a, b, rg)
+#    divr(nr, a, b, rg)
+#    divr2(nr, a, b, rg)
+#    divr4(nr, a, b, rg)

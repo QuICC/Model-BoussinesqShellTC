@@ -1,11 +1,11 @@
 /** 
- * @file BLFScheme.hpp
- * @brief Implementation of the sphere (ball) Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+ * @file BLFmScheme.hpp
+ * @brief Implementation of the sphere (ball) Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral m ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BLFSCHEME_HPP
-#define BLFSCHEME_HPP
+#ifndef BLFMSCHEME_HPP
+#define BLFMSCHEME_HPP
 
 // Configuration includes
 //
@@ -22,7 +22,7 @@
 #include "TypeSelectors/FftSelector.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/3D/IRegularSHScheme.hpp"
+#include "SpatialSchemes/3D/IRegularSHmScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
 
@@ -31,9 +31,9 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * @brief Implementation of the sphere (ball) Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+    * @brief Implementation of the sphere (ball) Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral m ordering
     */
-   class BLFScheme: public IRegularSHScheme
+   class BLFmScheme: public IRegularSHmScheme
    {
       public:
          /**
@@ -42,16 +42,21 @@ namespace Schemes {
          static std::string type();
 
          /**
+          * @brief Tune the shared resolution used by simulation
+          */
+         static void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
+
+         /**
           * @brief Constructor
           *
           * @param dim     Chebyshev truncations 
           */
-         explicit BLFScheme(const ArrayI& dim);
+         explicit BLFmScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~BLFScheme(); 
+         virtual ~BLFmScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -104,4 +109,4 @@ namespace Schemes {
 }
 }
 
-#endif // BLFSCHEME_HPP
+#endif // BLFMSCHEME_HPP

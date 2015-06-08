@@ -22,6 +22,7 @@
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
+#include "FastTransforms/ParityTransformTools.hpp"
 #include "Python/PythonWrapper.hpp"
 
 namespace GeoMHDiSCC {
@@ -36,14 +37,14 @@ namespace Transform {
       // Create Chebyshev grid
       for(int k = 0; k < size; k++)
       {
-         grid(k) = std::cos((Math::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
+         grid(k) = std::cos((Math::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(2*size));
       }
 
       return grid;
    }
 
    SphereChebyshevFftwTransform::SphereChebyshevFftwTransform()
-      : mFPlan(NULL), mBPlan(NULL)
+      : mFEPlan(NULL), mFBOPlan(NULL), mBEPlan(NULL)
    {
       // Initialise the Python interpreter wrapper
       PythonWrapper::init();
@@ -101,7 +102,9 @@ namespace Transform {
 
       int fwdSize = this->mspSetup->fwdSize();
       int bwdSize = this->mspSetup->bwdSize();
-      int howmany = this->mspSetup->howmany();
+      int howmanyEven = this->mspSetup->howmany(0);
+      int howmanyOdd = this->mspSetup->howmany(1);
+      int howmany = std::max(howmanyEven, howmanyOdd);
 
       // Create the two plans
       const int  *fftSize = &fwdSize;
@@ -112,61 +115,293 @@ namespace Transform {
       {
       }
 
-      // Initialise temporary storage
+      // Safety assert
+      assert(fwdSize == bwdSize);
+
+      // Initialise temporary storage (to max size)
       this->mTmpIn.setZero(fwdSize, howmany);
       this->mTmpOut.setZero(bwdSize, howmany);
 
       // Create the physical to spectral plan
       const fftw_r2r_kind fwdKind[] = {FFTW_REDFT10};
-      this->mFPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpIn.data(), NULL, 1, fwdSize, this->mTmpOut.data(), NULL, 1, bwdSize, fwdKind, FftwLibrary::planFlag());
+      this->mFEPlan = fftw_plan_many_r2r(1, fftSize, howmanyEven, this->mTmpIn.data(), NULL, 1, fwdSize, this->mTmpOut.data(), NULL, 1, bwdSize, fwdKind, FftwLibrary::planFlag());
 
       // Create the spectral to physical plan
       const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
-      this->mBPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
+      this->mBEPlan = fftw_plan_many_r2r(1, fftSize, howmanyEven, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
+
+      const fftw_r2r_kind fbwdKind[] = {FFTW_REDFT11};
+      this->mFBOPlan = fftw_plan_many_r2r(1, fftSize, howmanyOdd, this->mTmpIn.data(), NULL, 1, fwdSize, this->mTmpOut.data(), NULL, 1, bwdSize, fbwdKind, FftwLibrary::planFlag());
+      
+      // Different plans are needed when parity changes!
+      if(howmanyEven != howmanyOdd)
+      {
+         // Create the physical to spectral plan
+         const fftw_r2r_kind fwdKind[] = {FFTW_REDFT10};
+         this->mFEOPlan = fftw_plan_many_r2r(1, fftSize, howmanyOdd, this->mTmpIn.data(), NULL, 1, fwdSize, this->mTmpOut.data(), NULL, 1, bwdSize, fwdKind, FftwLibrary::planFlag());
+
+         // Create the spectral to physical plan
+         const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
+         this->mBEOPlan = fftw_plan_many_r2r(1, fftSize, howmanyOdd, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
+
+         const fftw_r2r_kind fbwdKind[] = {FFTW_REDFT11};
+         this->mFBOEPlan = fftw_plan_many_r2r(1, fftSize, howmanyEven, this->mTmpIn.data(), NULL, 1, fwdSize, this->mTmpOut.data(), NULL, 1, bwdSize, fbwdKind, FftwLibrary::planFlag());
+      } else
+      {
+         this->mFEOPlan = this->mFEPlan;
+
+         this->mBEOPlan = this->mBEPlan;
+
+         this->mFBOEPlan = this->mFBOPlan;
+      }
    }
 
    void SphereChebyshevFftwTransform::initOperators()
    {
+      //
+      // Initialise projector operators
+      //
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::PROJ, 0));
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::DIVR, 1));
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::DIVR2, 0));
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::DIFF, 1));
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::DIFF2, 0));
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::DIFFR, 0));
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::DIVRDIFFR, 1));
+      this->mProjectorFlips.insert(std::make_pair(ProjectorType::RADLAPL, 0));
+
+      //
+      // Initialise integrator operators
+      //
+      this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTG, 0));
+      std::pair<SparseMatrix,SparseMatrix> opPair = std::make_pair(SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize()),SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize()));
+      // Multiplication by R
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGR, opPair));
+      this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGR, 1));
+      // QST Q operator (4th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ4, opPair));
+      this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGQ4, 1));
+      // QST S operator (4th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS4, opPair));
+      this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGS4, 1));
+      // QST T operator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGT, opPair));
+      this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGT, 0));
+      // QST Q operator (2th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ2, opPair));
+      this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGQ2, 1));
+      // QST S operator (2th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS2, opPair));
+      this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGS2, 1));
+
+      //
+      // Initialise solver operators
+      //
+      // Multiplication by R
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIVR, opPair));
+      // Multiplication by R^2
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIVR2, opPair));
+      // First derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, opPair));
+      // Second derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, opPair));
+
+      //
+      // Initialise solvers
+      //
+      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolE(new Solver::SparseSelector<SparseMatrix>::Type());
+      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolO(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIVR, std::make_pair(pSolE,pSolO)));
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIVR2, std::make_pair(pSolE,pSolO)));
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIFF, std::make_pair(pSolE,pSolO)));
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, std::make_pair(pSolE,pSolO)));
+
       // Initialise python wrapper
-      PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.spherical.sphere_radius");
 
-      // Prepare arguments to d1(...) call
+      // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;
       pArgs = PyTuple_New(3);
       // ... get operator size
       pValue = PyLong_FromLong(this->mspSetup->specSize());
       PyTuple_SetItem(pArgs, 0, pValue);
-      // ... create boundray condition (none)
-      pValue = PyList_New(1);
-      PyList_SetItem(pValue, 0, PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0);
-      PyTuple_SetItem(pArgs, 2, pValue);
 
-      // Call d1
-      PythonWrapper::setFunction("d1");
-      pValue = PythonWrapper::callFunction(pArgs);
+      for(int parity = 0; parity < 2; ++parity)
+      {
+         // ... create boundray condition (none)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         PyTuple_SetItem(pArgs, 2, pValue);
 
-      // Fill matrix and clenup
-      PythonWrapper::fillMatrix(this->mDiff, pValue);
-      Py_DECREF(pValue);
+         // ... set forward operator size
+         pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+
+         // Set parity
+         PyTuple_SetItem(pArgs, 1, PyLong_FromLong(parity));
+
+         // Call r1
+         PythonWrapper::setFunction("r1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->intgOp(IntegratorType::INTGR, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call QST Q component (4th order)
+         PythonWrapper::setFunction("i4r3");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->intgOp(IntegratorType::INTGQ4, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call QST S component (4th order)
+         PythonWrapper::setFunction("i4r3d1r1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->intgOp(IntegratorType::INTGS4, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call QST T component
+         PythonWrapper::setFunction("i2r2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->intgOp(IntegratorType::INTGT, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call QST Q component (2nd order)
+         PythonWrapper::setFunction("i2r1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->intgOp(IntegratorType::INTGQ2, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call QST S component (2nd order)
+         PythonWrapper::setFunction("i2r1d1r1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->intgOp(IntegratorType::INTGS2, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Change resoluton for solver matrices
+         pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+
+         // Call r1 for solver
+         PythonWrapper::setFunction("r1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->solveOp(ProjectorType::DIVR, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call r2 for solver
+         PythonWrapper::setFunction("r2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->solveOp(ProjectorType::DIVR2, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call d1 for solver
+         // ... change boundary condition to zero last modes
+         pValue = PyTuple_GetItem(pArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
+         PythonWrapper::setFunction("i1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->solveOp(ProjectorType::DIFF, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call d2 for solver
+         // ... change boundary condition to zero last modes
+         pValue = PyTuple_GetItem(pArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(992));
+         PythonWrapper::setFunction("i2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->solveOp(ProjectorType::DIFF2, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Initialize solver storage
+         this->tmpInS(parity).setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany(parity));
+         this->tmpOutS(parity).setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany(parity));
+
+         // Initialize solver and factorize division by R operator
+         this->solver(ProjectorType::DIVR, parity).compute(this->solveOp(ProjectorType::DIVR, parity));
+         // Check for successful factorisation
+         if(this->solver(ProjectorType::DIVR, parity).info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward division by R failed!");
+         }
+
+         // Initialize solver and factorize division by R^2 operator
+         this->solver(ProjectorType::DIVR2, parity).compute(this->solveOp(ProjectorType::DIVR2, parity));
+         // Check for successful factorisation
+         if(this->solver(ProjectorType::DIVR2, parity).info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward division by R^2 failed!");
+         }
+
+         // Initialize solver and factorize division by d1 operator
+         this->solver(ProjectorType::DIFF, parity).compute(this->solveOp(ProjectorType::DIFF, parity));
+         // Check for successful factorisation
+         if(this->solver(ProjectorType::DIFF, parity).info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward 1st derivative failed!");
+         }
+
+         // Initialize solver and factorize division by d2 operator
+         this->solver(ProjectorType::DIFF2, parity).compute(this->solveOp(ProjectorType::DIFF2, parity));
+         // Check for successful factorisation
+         if(this->solver(ProjectorType::DIFF2, parity).info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward 2nd derivative failed!");
+         }
+      }
+
       PythonWrapper::finalize();
    }
 
    void SphereChebyshevFftwTransform::cleanupFft()
    {
-      // Detroy forward plan
-      if(this->mFPlan)
+      // Detroy forward even plan
+      if(this->mFEPlan)
       {
-         fftw_destroy_plan(this->mFPlan);
+         fftw_destroy_plan(this->mFEPlan);
       }
 
-      // Detroy backward plan
-      if(this->mBPlan)
+      // Detroy backward even plan
+      if(this->mBEPlan)
       {
-         fftw_destroy_plan(this->mBPlan);
+         fftw_destroy_plan(this->mBEPlan);
+      }
+
+      // Detroy forward/backward odd plan
+      if(this->mFBOPlan)
+      {
+         fftw_destroy_plan(this->mFBOPlan);
+      }
+
+      // Detroy forward even plan on odd sizes
+      if(this->mFEOPlan)
+      {
+         fftw_destroy_plan(this->mFEOPlan);
+      }
+
+      // Detroy backward even plan on odd sizes
+      if(this->mBEOPlan)
+      {
+         fftw_destroy_plan(this->mBEOPlan);
+      }
+
+      // Detroy forward/backward odd plan on even sizes
+      if(this->mFBOEPlan)
+      {
+         fftw_destroy_plan(this->mFBOEPlan);
       }
 
       // Unregister the FFTW object
@@ -191,17 +426,31 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // Do transform
-      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+      // Check for parity flipping operator
+      int flip = this->flipsParity(integrator);
+
+      // Do even/odd transforms
+      for(int parity = 0; parity < 2; ++parity)
+      {
+         ParityTransformTools::extractParityModes(this->mTmpIn, physVal, this->parityBlocks(parity), physVal.rows());
+         fftw_execute_r2r(this->fPlan((parity+flip)%2,parity), this->mTmpIn.data(), this->mTmpOut.data());
+         ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, this->parityBlocks(parity), physVal.rows());
+      }
 
       if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
       {
-         // Rescale to remove FFT scaling
-         rChebVal.topRows(this->mspSetup->specSize()) *= this->mspSetup->scale();
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            // Rescale to remove FFT scaling
+            ParityTransformTools::scaleParityModes(rChebVal, this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+         }
 
       } else
       {
-         rChebVal.topRows(this->mspSetup->specSize()) = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*rChebVal;
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            ParityTransformTools::applyOperator(rChebVal, this->intgOp(integrator, parity), this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+         }
       }
 
       #ifdef GEOMHDISCC_DEBUG
@@ -228,80 +477,106 @@ namespace Transform {
       assert(rPhysVal.rows() == this->mspSetup->fwdSize());
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
-      // Compute first derivative
-      if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(1).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+      // Check for parity flipping operator
+      int flip = this->flipsParity(projector);
 
-      // Compute second derivative
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
+      // Loop over parity
+      for(int parity = 0; parity < 2; ++parity)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(2).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+         // Compute first derivative
+         if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
+         {
+            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            if(parity == 1)
+            {
+               this->tmpInS(parity).topRows(1).setZero();
+            }
+            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+            this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute division by R
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+         // Compute second derivative
+         } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
+         {
+            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            this->tmpInS(parity).topRows(1).setZero();
+            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+            this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute division by R^2
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+         // Compute division by R
+         } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
+         {
+            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+            this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute D r projection
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
-      {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+         // Compute division by R^2
+         } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
+         {
+            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+            this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute 1/r D r projection
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
-         this->mTmpIn = this->mTmpInS;
+         // Compute D r projection
+         } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
+         {
+            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
+            if((parity+1)%2 == 1)
+            {
+               this->tmpInS(parity).topRows(1).setZero();
+            }
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+            this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute radial laplacian projection
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
-         this->mTmpIn = this->mTmpInS;
+         // Compute 1/r D r projection
+         } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+         {
+            this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
+            if((parity+1)%2 == 1)
+            {
+               this->tmpInS(parity).topRows(1).setZero();
+            }
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR, parity), this->tmpOutS(parity));
+            this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
 
-      // Compute simple projection
-      } else
-      {
-         // Copy into other array
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+         // Compute radial laplacian projection
+         } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
+         {
+            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            if(parity == 1)
+            {
+               this->tmpInS(parity).topRows(1).setZero();
+            }
+            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,parity), this->tmpInS(parity));
+            this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR2, (parity+1)%2)*this->tmpOutS(parity);
+            if(parity == 1)
+            {
+               this->tmpInS(parity).topRows(1).setZero();
+            }
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR2, parity), this->tmpOutS(parity));
+            this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpIntS(parity);
+
+         // Compute simple projection
+         } else
+         {
+            // Copy into other array
+            ParityTransformTools::extractParityModes(this->mTmpIn, chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+         }
+
+         // Do transform
+         fftw_execute_r2r(this->bPlan((parity+flip)%2, parity), this->mTmpIn.data(), this->mTmpOut.data());
+
+         // Copy data into output variable
+         ParityTransformTools::setParityModes(rPhysVal, this->mTmpOut, this->parityBlocks(parity), rPhysVal.rows());
       }
-
-      // Do transform
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
    void SphereChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, SphereChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
@@ -319,36 +594,34 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // 
-      // Transform real part
-      //
-      this->mTmpIn = physVal.real();
+      // Check for parity flipping operator
+      int flip = this->flipsParity(integrator);
 
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      for(int component = 0; component < 2; ++component)
       {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+         // Do even/odd transforms
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            ParityTransformTools::extractParityModes(this->mTmpIn, physVal, component, this->parityBlocks(parity), physVal.rows());
+            fftw_execute_r2r(this->fPlan((parity+flip)%2,parity), this->mTmpIn.data(), this->mTmpOut.data());
+            ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, component, this->parityBlocks(parity), physVal.rows());
+         }
 
-      } else
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
-      }
+         if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+         {
+            for(int parity = 0; parity < 2; ++parity)
+            {
+               // Rescale to remove FFT scaling
+               ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+            }
 
-      // 
-      // Transform imaginary part
-      //
-      this->mTmpIn = physVal.imag();
-
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         } else
+         {
+            for(int parity = 0; parity < 2; ++parity)
+            {
+               ParityTransformTools::applyOperator(rChebVal, component, this->intgOp(integrator,parity), this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+            }
+         }
       }
 
       #ifdef GEOMHDISCC_DEBUG
@@ -375,156 +648,110 @@ namespace Transform {
       assert(rPhysVal.rows() == this->mspSetup->fwdSize());
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
-      // Compute first derivative of real part
-      if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+      // Check for parity flipping operator
+      int flip = this->flipsParity(projector);
 
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
+      for(int component = 0; component < 2; ++component)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+         // Loop over parity
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            // Compute first derivative
+            if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
+            {
+               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               if(parity == 1)
+               {
+                  this->tmpInS(parity).topRows(1).setZero();
+               }
+               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+               this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute division by R of real part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+               // Compute second derivative
+            } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
+            {
+               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               this->tmpInS(parity).topRows(1).setZero();
+               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+               this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute division by R^2 of real part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+               // Compute division by R
+            } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
+            {
+               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+               this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute D r projection of real part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
-      {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
+               // Compute division by R^2
+            } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
+            {
+               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+               this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute 1/r D r projection of real part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
-         this->mTmpIn = this->mTmpInS;
+               // Compute D r projection
+            } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
+            {
+               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
+               if((parity+1)%2 == 1)
+               {
+                  this->tmpInS(parity).topRows(1).setZero();
+               }
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+               this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-      // Compute radial laplacian projection of real part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
-         this->mTmpIn = this->mTmpInS;
+               // Compute 1/r D r projection
+            } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+            {
+               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
+               if((parity+1)%2 == 1)
+               {
+                  this->tmpInS(parity).topRows(1).setZero();
+               }
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR, parity), this->tmpOutS(parity));
+               this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
 
-      // Compute simple projection of real part
-      } else
-      {
-         // Copy values into simple matrix
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+               // Compute radial laplacian projection
+            } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
+            {
+               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               if(parity == 1)
+               {
+                  this->tmpInS(parity).topRows(1).setZero();
+               }
+               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,parity), this->tmpInS(parity));
+               this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR2, (parity+1)%2)*this->tmpOutS(parity);
+               if(parity == 1)
+               {
+                  this->tmpInS(parity).topRows(1).setZero();
+               }
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR2, parity), this->tmpOutS(parity));
+               this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
+
+            // Compute simple projection
+            } else
+            {
+               // Copy into other array
+               ParityTransformTools::extractParityModes(this->mTmpIn, chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+               this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+            }
+
+            // Do transform
+            fftw_execute_r2r(this->bPlan((parity+flip)%2, parity), this->mTmpIn.data(), this->mTmpOut.data());
+
+            // Copy data into output variable
+            ParityTransformTools::setParityModes(rPhysVal, this->mTmpOut, component, this->parityBlocks(parity), rPhysVal.rows());
+         }
       }
-
-      // Do transform of real part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-      rPhysVal.real() = this->mTmpOut;
-
-      // Compute first derivative of imaginary part
-      if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
-
-      // Compute second derivative by R of imaginary part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
-
-      // Compute division by R of imaginary part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
-
-      // Compute division by R^2 of imaginary part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
-
-      // Compute D r projection of imaginary part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
-      {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpIn = this->mTmpOutS;
-
-      // Compute 1/r D r projection of imaginary part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
-         this->mTmpIn = this->mTmpInS;
-
-      // Compute radial laplacian projection of imaginary part
-      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
-         this->mTmpIn = this->mTmpInS;
-
-      // Compute simple projection of imaginary part
-      } else
-      {
-         // Rescale results
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-      }
-
-      // Do transform of imaginary part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-      rPhysVal.imag() = this->mTmpOut;
    }
 
    void SphereChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, SphereChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
@@ -542,17 +769,31 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // Do transform
-      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+      // Check for parity flipping operator
+      int flip = this->flipsParity(integrator);
+
+      // Do even/odd transforms
+      for(int parity = 0; parity < 2; ++parity)
+      {
+         ParityTransformTools::extractParityModes(this->mTmpIn, physVal, this->parityBlocks(parity), physVal.rows());
+         fftw_execute_r2r(this->fPlan((parity+flip)%2,parity), this->mTmpIn.data(), this->mTmpOut.data());
+         ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, this->parityBlocks(parity), physVal.rows());
+      }
 
       if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
       {
-         // Rescale to remove FFT scaling
-         rChebVal *= this->mspSetup->scale();
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            // Rescale to remove FFT scaling
+            ParityTransformTools::scaleParityModes(rChebVal, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
+         }
 
       } else
       {
-         rChebVal = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*rChebVal;
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            ParityTransformTools::applyOperator(rChebVal, this->intgOp(integrator, parity), this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
+         }
       }
    }
 
@@ -571,36 +812,34 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      //
-      // Transform real part
-      //
-      this->mTmpIn = physVal.real();
+      // Check for parity flipping operator
+      int flip = this->flipsParity(integrator);
 
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      for(int component = 0; component < 2; ++component)
       {
-         rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+         // Do even/odd transforms
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            ParityTransformTools::extractParityModes(this->mTmpIn, physVal, component, this->parityBlocks(parity), physVal.rows());
+            fftw_execute_r2r(this->fPlan((parity+flip)%2,parity), this->mTmpIn.data(), this->mTmpOut.data());
+            ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, component, this->parityBlocks(parity), physVal.rows());
+         }
 
-      } else
-      {
-         rChebVal.real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
-      }
+         if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+         {
+            for(int parity = 0; parity < 2; ++parity)
+            {
+               // Rescale to remove FFT scaling
+               ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
+            }
 
-      //
-      // Transform imaginary part
-      //
-      this->mTmpIn = physVal.imag();
-
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
-      {
-         rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
-
-      } else
-      {
-         rChebVal.imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
+         } else
+         {
+            for(int parity = 0; parity < 2; ++parity)
+            {
+               ParityTransformTools::applyOperator(rChebVal, component, this->intgOp(integrator,parity), this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
+            }
+         }
       }
    }
 

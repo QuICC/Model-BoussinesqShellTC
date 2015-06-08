@@ -175,7 +175,7 @@ namespace GeoMHDiSCC {
       #endif //GEOMHDISCC_SPATIALSCHEME_AFT
 
       // Configure code to use BLF scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;

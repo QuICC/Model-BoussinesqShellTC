@@ -31,6 +31,8 @@
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
+#include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -48,10 +50,10 @@ namespace Transform {
       {
          /** Enum of projector IDs
           *    - PROJ: projection
-          *    - DIFF: D
-          *    - DIFF2: D^2
           *    - DIVR: 1/r
           *    - DIVR2: 1/r^2
+          *    - DIFF: D
+          *    - DIFF2: D^2
           *    - DIFFR: D r
           *    - DIVRDIFFR: 1/r D r
           *    - RADLAPL: radial laplacian: D^2 + 2/r D
@@ -224,14 +226,36 @@ namespace Transform {
          SharedFftSetup    mspSetup;
 
          /**
-          * @brief FFTW plan for the forward transform (real -> real)
+          * @brief FFTW plan for the even forward transform (real -> real)
           */
-         fftw_plan   mFPlan;
+         fftw_plan   mFEPlan;
 
          /**
-          * @brief FFTW plan for the backward transform (real -> real)
+          * @brief FFTW plan for the odd forward and backward transform (real -> real) 
+          *
+          * DCT IV is it's own inverse
           */
-         fftw_plan   mBPlan;
+         fftw_plan   mFBOPlan;
+
+         /**
+          * @brief FFTW plan for the even backward transform (real -> real)
+          */
+         fftw_plan   mBEPlan;
+
+         /**
+          * @brief FFTW plan for the odd forward transform with even size (real -> real)
+          */
+         fftw_plan   mFEOPlan;
+
+         /**
+          * @brief FFTW plan for the even backward transform with odd size (real -> real)
+          */
+         fftw_plan   mBEOPlan;
+
+         /**
+          * @brief FFTW plan for the odd backward transform with even size (real -> real)
+          */
+         fftw_plan   mFBOEPlan;
 
          /**
           * @brief Storage for data input
@@ -244,34 +268,54 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
+          * @brief Does projector flip parity
+          */
+         std::map<ProjectorType::Id, int> mProjectorFlips;
+
+         /**
+          * @brief Does integrator flip parity
+          */
+         std::map<IntegratorType::Id, int> mIntegratorFlips;
+
+         /**
           * @brief Storage for the projector operators
           */
-         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
+         std::map<ProjectorType::Id, std::pair<SparseMatrix,SparseMatrix> > mProjOp;
 
          /**
           * @brief Storage for the integrator operators
           */
-         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
+         std::map<IntegratorType::Id, std::pair<SparseMatrix,SparseMatrix> > mIntgOp;
 
          /**
           * @brief Storage for the sparse solver matrices
           */
-         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
+         std::map<ProjectorType::Id, std::pair<SparseMatrix,SparseMatrix> > mSolveOp;
 
          /**
           * @brief Storage for the sparse solvers
           */
-         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
+         std::map<ProjectorType::Id, std::pair<SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>,SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > > mSolver;
 
          /**
-          * @brief Storage for the backward operators input data
+          * @brief Storage for the backward operators input data for even parity
           */
-         Matrix mTmpInS;
+         Matrix mTmpInSE;
 
          /**
-          * @brief Storage for the backward operators output data
+          * @brief Storage for the backward operators input data for odd parity
           */
-         Matrix mTmpOutS;
+         Matrix mTmpInSO;
+
+         /**
+          * @brief Storage for the backward operators output data for even parity
+          */
+         Matrix mTmpOutSE;
+
+         /**
+          * @brief Storage for the backward operators output data for odd parity
+          */
+         Matrix mTmpOutSO;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
@@ -287,7 +331,171 @@ namespace Transform {
           * @brief Cleanup memory used by FFTW on destruction
           */
          void cleanupFft();
+
+         /**
+          * @brief Get the parity block description
+          */
+         const MatrixI& parityBlocks(const int parity) const;
+
+         /**
+          * @brief Get the FFTW plan depending on parity
+          */
+         fftw_plan fPlan(const int parity, const int sizeParity);
+
+         /**
+          * @brief Get the FFTW plan depending on parity
+          */
+         fftw_plan bPlan(const int parity, const int sizeParity);
+
+         /**
+          * @brief Get sparse integration operator
+          */
+         SparseMatrix& intgOp(const IntegratorType::Id integrator, const int parity);
+
+         /**
+          * @brief Get sparse solver operator
+          */
+         SparseMatrix& solveOp(const ProjectorType::Id projector, const int parity);
+
+         /**
+          * @brief Get sparse solver
+          */
+         Solver::SparseSelector<SparseMatrix>::Type& solver(const ProjectorType::Id projector, const int parity);
+
+         /**
+          * @brief Get temporary storage for solver
+          */
+         Matrix& tmpInS(const int parity);
+
+         /**
+          * @brief Get temporary storage for solver
+          */
+         Matrix& tmpOutS(const int parity);
+
+         /**
+          * brief Does operator flip parity?
+          */
+         int flipsParity(const ProjectorType::Id projector) const;
+
+         /**
+          * brief Does operator flip parity?
+          */
+         int flipsParity(const IntegratorType::Id integrator) const;
    };
+
+   inline const MatrixI& SphereChebyshevFftwTransform::parityBlocks(const int parity) const
+   {
+      if(parity == 0)
+      {
+         return this->mspSetup->evenBlocks();
+      } else
+      {
+         return this->mspSetup->oddBlocks();
+      }
+   }
+
+   inline fftw_plan SphereChebyshevFftwTransform::fPlan(const int inParity, const int outParity)
+   {
+      if(inParity == 0 && inParity == outParity)
+      {
+         return this->mFEPlan;
+      } else if(inParity == 1 && inParity == outParity)
+      {
+         return this->mFBOPlan;
+      } else if(inParity == 0)
+      {
+         return this->mFEOPlan;
+      } else
+      {
+         return this->mFBOEPlan;
+      }
+   }
+
+   inline fftw_plan SphereChebyshevFftwTransform::bPlan(const int inParity, const int outParity)
+   {
+      if(inParity == 0 && inParity == outParity)
+      {
+         return this->mBEPlan;
+      } else if(inParity == 1 && inParity == outParity)
+      {
+         return this->mFBOPlan;
+      } else if(inParity == 0)
+      {
+         return this->mBEOPlan;
+      } else
+      {
+         return this->mFBOEPlan;
+      }
+   }
+
+   inline SparseMatrix& SphereChebyshevFftwTransform::intgOp(const IntegratorType::Id integrator, const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mIntgOp.find(integrator)->second.first;
+      } else
+      {
+         return this->mIntgOp.find(integrator)->second.second;
+      }
+   }
+
+   inline SparseMatrix& SphereChebyshevFftwTransform::solveOp(const ProjectorType::Id projector, const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mSolveOp.find(projector)->second.first;
+      } else
+      {
+         return this->mSolveOp.find(projector)->second.second;
+      }
+   }
+
+   inline Solver::SparseSelector<SparseMatrix>::Type& SphereChebyshevFftwTransform::solver(const ProjectorType::Id projector, const int parity)
+   {
+      if(parity == 0)
+      {
+         return *this->mSolver.find(projector)->second.first;
+      } else
+      {
+         return *this->mSolver.find(projector)->second.second;
+      }
+   }
+
+   inline Matrix& SphereChebyshevFftwTransform::tmpInS(const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mTmpInSE;
+      } else
+      {
+         return this->mTmpInSO;
+      }
+   }
+
+   inline Matrix& SphereChebyshevFftwTransform::tmpOutS(const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mTmpOutSE;
+      } else
+      {
+         return this->mTmpOutSO;
+      }
+   }
+
+   inline int SphereChebyshevFftwTransform::flipsParity(const ProjectorType::Id projector) const
+   {
+      assert(this->mProjectorFlips.count(projector) > 0);
+
+      return this->mProjectorFlips.find(projector)->second;
+   }
+
+   inline int SphereChebyshevFftwTransform::flipsParity(const IntegratorType::Id integrator) const
+   {
+      assert(this->mIntegratorFlips.count(integrator) > 0);
+
+      return this->mIntegratorFlips.find(integrator)->second;
+   }
 
 }
 }

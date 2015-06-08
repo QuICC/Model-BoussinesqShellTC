@@ -48,13 +48,13 @@ namespace Equations {
 
    void IEquation::initSpectralMatricesComponent(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
    {
-      // Get the number of systems
-      int nSystems = this->couplingInfo(compId).nSystems();
-
       //
       // Initialise the galerkin stencils (if activated and required)
       //
       #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+      // Get the number of systems
+      int nSystems = this->couplingInfo(compId).nSystems();
+
       if(this->couplingInfo(compId).isGalerkin())
       {
          this->mGStencils.insert(std::make_pair(compId, std::vector<SparseMatrix>()));

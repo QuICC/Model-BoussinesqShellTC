@@ -20,6 +20,7 @@
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
+#include "FastTransforms/ParityTransformTools.hpp"
 #include "Python/PythonWrapper.hpp"
 
 namespace GeoMHDiSCC {
@@ -43,6 +44,7 @@ namespace Transform {
    CylinderChebyshevFftwTransform::CylinderChebyshevFftwTransform()
       : mFEPlan(NULL), mFBOPlan(NULL), mBEPlan(NULL)
    {
+      // Initialise the Python interpreter wrapper
       PythonWrapper::init();
 
       // Initialize FFTW
@@ -405,135 +407,6 @@ namespace Transform {
       FftwLibrary::cleanupFft();
    }
 
-   void CylinderChebyshevFftwTransform::extractParityModes(Matrix& rSelected, const Matrix& data, const MatrixI& info, const int rows)
-   {
-      assert(rSelected.cols() == info.col(1).sum());
-
-      int k = 0;
-      for(int i = 0; i < info.rows(); ++i)
-      {
-         int j0 = info(i,0);
-         for(int j = 0; j < info(i,1); ++j, ++k)
-         { 
-            rSelected.col(k).topRows(rows) = data.col(j0 + j).topRows(rows);
-         }
-      }
-   }
-
-   void CylinderChebyshevFftwTransform::setParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows)
-   {
-      assert(selected.cols() == info.col(1).sum());
-
-      int k = 0;
-      for(int i = 0; i < info.rows(); ++i)
-      {
-         int j0 = info(i,0);
-         for(int j = 0; j < info(i,1); ++j, ++k)
-         { 
-            rData.col(j0 + j).topRows(rows) = selected.col(k).topRows(rows);
-         }
-      }
-   }
-
-   void CylinderChebyshevFftwTransform::addParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows)
-   {
-      assert(selected.cols() == info.col(1).sum());
-
-      int k = 0;
-      for(int i = 0; i < info.rows(); ++i)
-      {
-         int j0 = info(i,0);
-         for(int j = 0; j < info(i,1); ++j, ++k)
-         { 
-            rData.col(j0 + j).topRows(rows) += selected.col(k).topRows(rows);
-         }
-      }
-   }
-
-   void CylinderChebyshevFftwTransform::extractParityModes(Matrix& rSelected, const MatrixZ& data, const bool isReal, const MatrixI& info, const int rows)
-   {
-      assert(rSelected.cols() == info.col(1).sum());
-
-      int k = 0;
-      if(isReal)
-      {
-         for(int i = 0; i < info.rows(); ++i)
-         {
-            int j0 = info(i,0);
-            for(int j = 0; j < info(i,1); ++j, ++k)
-            { 
-               rSelected.col(k).topRows(rows) = data.col(j0 + j).topRows(rows).real();
-            }
-         }
-      } else
-      {
-         for(int i = 0; i < info.rows(); ++i)
-         {
-            int j0 = info(i,0);
-            for(int j = 0; j < info(i,1); ++j, ++k)
-            { 
-               rSelected.col(k).topRows(rows) = data.col(j0 + j).topRows(rows).imag();
-            }
-         }
-      }
-   }
-
-   void CylinderChebyshevFftwTransform::setParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows)
-   {
-      assert(selected.cols() == info.col(1).sum());
-
-      int k = 0;
-      if(isReal)
-      {
-         for(int i = 0; i < info.rows(); ++i)
-         {
-            int j0 = info(i,0);
-            for(int j = 0; j < info(i,1); ++j, ++k)
-            { 
-               rData.col(j0 + j).topRows(rows).real() = selected.col(k).topRows(rows);
-            }
-         }
-      } else
-      {
-         for(int i = 0; i < info.rows(); ++i)
-         {
-            int j0 = info(i,0);
-            for(int j = 0; j < info(i,1); ++j, ++k)
-            { 
-               rData.col(j0 + j).topRows(rows).imag() = selected.col(k).topRows(rows);
-            }
-         }
-      }
-   }
-
-   void CylinderChebyshevFftwTransform::addParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows)
-   {
-      assert(selected.cols() == info.col(1).sum());
-
-      int k = 0;
-      if(isReal)
-      {
-         for(int i = 0; i < info.rows(); ++i)
-         {
-            int j0 = info(i,0);
-            for(int j = 0; j < info(i,1); ++j, ++k)
-            { 
-               rData.col(j0 + j).topRows(rows).real() += selected.col(k).topRows(rows);
-            }
-         }
-      } else
-      {
-         for(int i = 0; i < info.rows(); ++i)
-         {
-            int j0 = info(i,0);
-            for(int j = 0; j < info(i,1); ++j, ++k)
-            { 
-               rData.col(j0 + j).topRows(rows).imag() += selected.col(k).topRows(rows);
-            }
-         }
-      }
-   }
-
    void CylinderChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, CylinderChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
    {
       assert(arithId == Arithmetics::SET);
@@ -550,23 +423,23 @@ namespace Transform {
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
       // Compute even integration
-      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGE)
+      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTG)
       {
          // Do even transform
          for(int parity = 0; parity < 2; ++parity)
          {
-            this->extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
+            ParityTransformTools::extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
             fftw_execute_r2r(this->fPlan(parity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-            this->setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
+            ParityTransformTools::setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
          }
-      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGO)
+      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTG)
       {
          // Do even transform
          for(int parity = 0; parity < 2; ++parity)
          {
-            this->extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
+            ParityTransformTools::extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
             fftw_execute_r2r(this->fPlan((parity + 1)%2, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-            this->setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
+            ParityTransformTools::setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
          }
       }
 
@@ -597,7 +470,7 @@ namespace Transform {
       {
          int fftParity = parity;
 
-         this->extractParityModes(this->rTmpIn(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+         ParityTransformTools::extractParityModes(this->rTmpIn(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
 
          // Compute first derivative
          if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
@@ -624,9 +497,9 @@ namespace Transform {
          #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
          // Compute 1/r D r
-         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFF)
          {
-            throw Exception("DIVRDIFFR operator is not yet implemented");
+            throw Exception("DIVRDIFF operator is not yet implemented");
 
          // Compute D 1/r
          } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
@@ -653,14 +526,14 @@ namespace Transform {
          {
             this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
 
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
+            ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
 
          // Compute division by R^2
          } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
          {
             this->rTmpOut(parity) = this->mDivR2.asDiagonal()*this->rTmpOut(parity);
 
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
+            ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
 
          // Compute D 1/r
          } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
@@ -668,10 +541,10 @@ namespace Transform {
             // Compute Df/r
             this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
 
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
+            ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
 
             // Compute f/r^2
-            this->extractParityModes(this->rTmpIn(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+            ParityTransformTools::extractParityModes(this->rTmpIn(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
 
             // Set the padded values to zero
             this->rTmpIn(parity).bottomRows(this->mspSetup->padSize()).setZero();
@@ -682,21 +555,19 @@ namespace Transform {
             // Compute D f/r - f/r^2
             this->rTmpOut(parity) = (-this->mDivR2).asDiagonal()*this->rTmpOut(parity);
 
-            this->addParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
+            ParityTransformTools::addParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
          } else
          {
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
+            ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
          }
          #else
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
+            ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
       }
    }
 
    void CylinderChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, CylinderChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
    {
-      assert(TOperation == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -709,7 +580,7 @@ namespace Transform {
       assert(rChebVal.cols() == this->mspSetup->howmany()); 
 
       // Compute even integration
-      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGE)
+      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTG)
       {
          // Loop over real and imaginary
          for(int isReal = 0; isReal < 2; ++isReal)
@@ -717,12 +588,12 @@ namespace Transform {
             // Do transform of real part
             for(int parity = 0; parity < 2; ++parity)
             {
-               this->extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
+               ParityTransformTools::extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
                fftw_execute_r2r(this->fPlan(parity, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-               this->setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
+               ParityTransformTools::setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
             }
          }
-      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGO)
+      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTG)
       {
          // Loop over real and imaginary
          for(int isReal = 0; isReal < 2; ++isReal)
@@ -730,9 +601,9 @@ namespace Transform {
             // Do transform of real part
             for(int parity = 0; parity < 2; ++parity)
             {
-               this->extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
+               ParityTransformTools::extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
                fftw_execute_r2r(this->fPlan((parity+1)%2, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-               this->setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
+               ParityTransformTools::setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
             }
          }
       }
@@ -767,7 +638,7 @@ namespace Transform {
          {
             int fftParity = parity;
 
-            this->extractParityModes(this->rTmpIn(parity), chebVal, isReal, this->parityBlocks(parity), this->mspSetup->specSize());
+            ParityTransformTools::extractParityModes(this->rTmpIn(parity), chebVal, isReal, this->parityBlocks(parity), this->mspSetup->specSize());
 
             // Compute first derivative of real part
             if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
@@ -794,9 +665,9 @@ namespace Transform {
             #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
             // Compute 1/r D r
-            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFF)
             {
-               throw Exception("DIVRDIFFR operator is not yet implemented");
+               throw Exception("DIVRDIFF operator is not yet implemented");
 
             // Compute D 1/r
             } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
@@ -823,14 +694,14 @@ namespace Transform {
             {
                this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
 
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
+               ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
 
             // Compute division by R^2
             } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
             {
                this->rTmpOut(parity) = this->mDivR2.asDiagonal()*this->rTmpOut(parity);
 
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
+               ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
 
             // Compute D 1/r
             } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
@@ -838,10 +709,10 @@ namespace Transform {
                // Compute Df/r
                this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
 
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
+               ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
 
                // Compute f/r^2
-               this->extractParityModes(this->rTmpIn(parity), chebVal, isReal, this->parityBlocks(parity), this->mspSetup->specSize());
+               ParityTransformTools::extractParityModes(this->rTmpIn(parity), chebVal, isReal, this->parityBlocks(parity), this->mspSetup->specSize());
 
                // Set the padded values to zero
                this->rTmpIn(parity).bottomRows(this->mspSetup->padSize()).setZero();
@@ -851,13 +722,13 @@ namespace Transform {
                // Compute D f/r - f/r^2
                this->rTmpOut(parity) = (-this->mDivR2).asDiagonal()*this->rTmpOut(parity);
 
-               this->addParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
+               ParityTransformTools::addParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
             } else
             {
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
+               ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
             }
             #else
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
+               ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
          }
       }

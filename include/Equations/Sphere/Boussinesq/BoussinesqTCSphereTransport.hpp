@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqSphereTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq sphere model 
+ * @file BoussinesqTCSphereTransport.hpp
+ * @brief Implementation of the transport equation for the Boussinesq thermal convection in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQSPHERETRANSPORT_HPP
-#define BOUSSINESQSPHERETRANSPORT_HPP
+#ifndef BOUSSINESQTCSPHERETRANSPORT_HPP
+#define BOUSSINESQTCSPHERETRANSPORT_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the transport equation for the Boussinesq sphere model 
+    * @brief Implementation of the transport equation for the Boussinesq thermal convection in a sphere 
     */
-   class BoussinesqSphereTransport: public IScalarEquation
+   class BoussinesqTCSphereTransport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqSphereTransport(SharedEquationParameters spEqParams);
+         BoussinesqTCSphereTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqSphereTransport();
+         virtual ~BoussinesqTCSphereTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQSPHERETRANSPORT_HPP
+#endif // BOUSSINESQTCSPHERETRANSPORT_HPP

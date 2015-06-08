@@ -18,14 +18,16 @@ if(GEOMHDISCC_FFT STREQUAL "FFTW")
       list(APPEND MHDSources 
          ChebyshevFftwTransform.cpp
          CylinderChebyshevFftwTransform.cpp
+         ParityTransformTools.cpp
          )
    elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFM")
       list(APPEND MHDSources 
          ShellChebyshevFftwTransform.cpp
          )
-   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLF")
+   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFM")
       list(APPEND MHDSources 
          SphereChebyshevFftwTransform.cpp
+         ParityTransformTools.cpp
          )
    else(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
       list(APPEND MHDSources 

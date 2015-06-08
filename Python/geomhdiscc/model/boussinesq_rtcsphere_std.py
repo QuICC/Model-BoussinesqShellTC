@@ -190,7 +190,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4r4(res[0], l, bc, Ral*(l+1.0))
+            mat = geo.i4r4(res[0], l, bc, Ra*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             mat = geo.i2r2(res[0], l, bc, -l*(l+1.0))

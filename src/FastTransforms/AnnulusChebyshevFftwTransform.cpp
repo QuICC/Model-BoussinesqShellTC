@@ -24,7 +24,6 @@
 #include "FastTransforms/FftwLibrary.hpp"
 #include "Python/PythonWrapper.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {

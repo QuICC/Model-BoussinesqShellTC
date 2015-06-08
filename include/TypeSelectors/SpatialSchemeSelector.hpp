@@ -111,20 +111,35 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_AFT
 
-// Configure code to use BLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_BLF
-   // BLF includes
-   #include "SpatialSchemes/3D/BLFScheme.hpp"
+// Configure code to use BLFl scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
+   // BLFl includes
+   #include "SpatialSchemes/3D/BLFlScheme.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Schemes {
 
-         /// Typedef for the BLF spatial scheme
-         typedef BLFScheme SpatialSelector;
+         /// Typedef for the BLFl spatial scheme
+         typedef BLFlScheme SpatialSelector;
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_BLF
+#endif //GEOMHDISCC_SPATIALSCHEME_BLFL
+
+// Configure code to use BLFm scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
+   // BLFm includes
+   #include "SpatialSchemes/3D/BLFmScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the BLFm spatial scheme
+         typedef BLFmScheme SpatialSelector;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_BLFM
 
 // Configure code to use SLFl scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL

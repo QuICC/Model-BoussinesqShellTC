@@ -57,11 +57,12 @@ namespace GeoMHDiSCC {
       // Compute nonlinear terms
       this->computeNonlinear();
 
+/// \mhdBug Problem with equations for generating exact states
       // Solve trivial equations
-      this->solveTrivialEquations(SolveTiming::AFTER);
+//      this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Solve diagnostic equations
-      this->solveDiagnosticEquations(SolveTiming::AFTER);
+//      this->solveDiagnosticEquations(SolveTiming::AFTER);
 
       // Synchronise computation nodes
       FrameworkMacro::synchronize();

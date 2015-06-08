@@ -8,8 +8,60 @@ import sympy
 import geomhdiscc.recurrence.symbolic as symbolic
 
 
-def i2x2():
-    """Sphere second integral of x^2 operator"""
+def r1():
+    """Sphere r operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':1, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def r2():
+    """Sphere r^2 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':2, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i1():
+    """Sphere 1st integral operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':0, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2():
+    """Sphere 2nd integral operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':0, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2r2():
+    """Sphere second integral of r^2 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':2, 'p':2, 'd':0, 'c':1}]
@@ -21,8 +73,22 @@ def i2x2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x2lapl():
-    """Sphere second integral of x^2 laplacian operator"""
+def i2r1d1r1():
+    """Sphere 2nd integral of r D r operator"""
+
+    # Setup terms in recurrence
+    l = sympy.Symbol('l')
+    terms = [{'q':2, 'p':2, 'd':1, 'c':1}, {'q':2, 'p':1, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2r2lapl():
+    """Sphere second integral of r^2 laplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -35,8 +101,8 @@ def i2x2lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4():
-    """Sphere fourth integral of x^4 operator"""
+def i4r4():
+    """Sphere fourth integral of r^4 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':4, 'p':4, 'd':0, 'c':1}]
@@ -48,8 +114,22 @@ def i4x4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4lapl():
-    """Sphere fourth integral of x^4 laplacian operator"""
+def i4r3d1r1():
+    """Sphere 4th integral of r^3 D r operator"""
+
+    # Setup terms in recurrence
+    l = sympy.Symbol('l')
+    terms = [{'q':4, 'p':4, 'd':1, 'c':1}, {'q':4, 'p':3, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i4r4lapl():
+    """Sphere fourth integral of r^4 laplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -62,8 +142,8 @@ def i4x4lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4lapl2():
-    """Sphere fourth integral of x^4 bilaplacian operator"""
+def i4r4lapl2():
+    """Sphere fourth integral of r^4 bilaplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -76,8 +156,8 @@ def i4x4lapl2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x1():
-    """Sphere fourth integral of x^4 bilaplacian operator"""
+def i2r1():
+    """Sphere fourth integral of r^4 bilaplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -90,8 +170,8 @@ def i2x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x3():
-    """Sphere fourth integral of x^4 bilaplacian operator"""
+def i4r3():
+    """Sphere fourth integral of r^4 bilaplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -104,8 +184,8 @@ def i4x3():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x2d1():
-    """Sphere fourth integral of x^4 bilaplacian operator"""
+def i2r2d1():
+    """Sphere fourth integral of r^4 bilaplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -118,8 +198,8 @@ def i2x2d1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4d1():
-    """Sphere fourth integral of x^4 bilaplacian operator"""
+def i4r4d1():
+    """Sphere fourth integral of r^4 bilaplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')

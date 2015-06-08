@@ -30,7 +30,7 @@
       #include "FastTransforms/CylinderChebyshevFftwTransform.hpp"
    #elif defined GEOMHDISCC_SPATIALSCHEME_AFT
       #include "FastTransforms/AnnulusChebyshevFftwTransform.hpp"
-   #elif defined GEOMHDISCC_SPATIALSCHEME_BLF
+   #elif defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
       #include "FastTransforms/SphereChebyshevFftwTransform.hpp"
    #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
       #include "FastTransforms/ShellChebyshevFftwTransform.hpp"
@@ -59,7 +59,7 @@
                /// Typedef for FFTW's annulus Chebyshev FFT implementation
                typedef AnnulusChebyshevFftwTransform AnnulusChebyshevSelector;
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_AFT
+            #elif defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
                /// Typedef for FFTW's sphere Chebyshev FFT implementation
                typedef SphereChebyshevFftwTransform SphereChebyshevSelector;
 

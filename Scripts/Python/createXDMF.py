@@ -56,7 +56,7 @@ def main(argv):
         gSlow = 'r'
         gMid = 'theta'
         gFast = 'z'
-    elif scheme in [b'SLFm', b'SLFl', b'BLF', b'WLF']:
+    elif scheme in [b'SLFm', b'SLFl', b'BLFl', b'BLFm', b'WLF']:
         gSlow = 'r'
         gMid = 'theta'
         gFast = 'phi'
@@ -121,7 +121,7 @@ def main(argv):
 
             print(xdmfVxVyVzGrid.format(nFast = nFast, nMid = nMid, nSlow = nSlow, fid = fId, basename = basename, gFast = gFast, gMid = gMid, gSlow = gSlow, rFast = xdmfRevGrid.format(nD = nFast) if rFast else '', rFastEnd = xdmfRevGridEnd if rFast else '', rMid = xdmfRevGrid.format(nD = nMid) if rMid else '', rMidEnd = xdmfRevGridEnd if rMid else '', rSlow = xdmfRevGrid.format(nD = nSlow) if rSlow else '', rSlowEnd = xdmfRevGridEnd if rSlow else ''), file=out_file)
 
-        elif scheme in [b'CFT', b'AFT', b'BLF', b'SLFm', b'SLFl']:
+        elif scheme in [b'CFT', b'AFT', b'BLFl', b'BLFm', b'SLFm', b'SLFl']:
             if fId == sId:
                 if scheme in [b'CFT']:
                     gridfunc = cylinderXYZ
@@ -129,7 +129,7 @@ def main(argv):
                 elif scheme in [b'AFT']:
                     gridfunc = annulusXYZ
                     gridfname = 'annulus'
-                elif scheme in [b'BLF']:
+                elif scheme in [b'BLFl',b'BLFm']:
                     gridfunc = sphereXYZ
                     gridfname = 'sphere'
                 elif scheme in [b'SLFm', b'SLFl']:

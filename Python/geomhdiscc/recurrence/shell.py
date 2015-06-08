@@ -8,8 +8,8 @@ import sympy
 import geomhdiscc.recurrence.symbolic as symbolic
 
 
-def x1():
-    """Spherical shell x operator"""
+def r1():
+    """Spherical shell r operator"""
 
     # Setup terms in recurrence
     terms = [{'q':0, 'p':1, 'd':0, 'c':1}]
@@ -22,8 +22,8 @@ def x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def x2():
-    """Spherical shell x^2 operator"""
+def r2():
+    """Spherical shell r^2 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':0, 'p':2, 'd':0, 'c':1}]
@@ -36,8 +36,8 @@ def x2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def x4():
-    """Spherical shell x^2 operator"""
+def r4():
+    """Spherical shell r^2 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':0, 'p':4, 'd':0, 'c':1}]
@@ -50,8 +50,8 @@ def x4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i1x1():
-    """Spherical shell 1st integral x operator"""
+def i1r1():
+    """Spherical shell 1st integral r operator"""
 
     # Setup terms in recurrence
     terms = [{'q':1, 'p':1, 'd':0, 'c':1}]
@@ -92,8 +92,8 @@ def i2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x1():
-    """Spherical shell 2nd integral of x operator"""
+def i2r1():
+    """Spherical shell 2nd integral of r operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -107,8 +107,8 @@ def i2x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x2():
-    """Spherical shell 2nd integral of x^2 operator"""
+def i2r2():
+    """Spherical shell 2nd integral of r^2 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':2, 'p':2, 'd':0, 'c':1}]
@@ -121,8 +121,8 @@ def i2x2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x3():
-    """Spherical shell 2nd integral of x^3 operator"""
+def i2r3():
+    """Spherical shell 2nd integral of r^3 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':2, 'p':3, 'd':0, 'c':1}]
@@ -135,8 +135,8 @@ def i2x3():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x1d1x1():
-    """Spherical shell 2nd integral of x D x operator"""
+def i2r1d1r1():
+    """Spherical shell 2nd integral of r D r operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -150,8 +150,8 @@ def i2x1d1x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x2d1():
-    """Spherical shell 2nd integral of x^2 D operator"""
+def i2r2d1():
+    """Spherical shell 2nd integral of r^2 D operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -165,8 +165,8 @@ def i2x2d1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x2lapl():
-    """Spherical shell 2nd integral of x^2 laplacianoperator"""
+def i2r2lapl():
+    """Spherical shell 2nd integral of r^2 laplacianoperator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -180,8 +180,8 @@ def i2x2lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x3lapl():
-    """Spherical shell 2nd integral of x^3 laplacianoperator"""
+def i2r3lapl():
+    """Spherical shell 2nd integral of r^3 laplacianoperator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -209,8 +209,8 @@ def i4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x1():
-    """Spherical shell 4th integral of x operator"""
+def i4r1():
+    """Spherical shell 4th integral of r operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -224,8 +224,8 @@ def i4x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x3d2():
-    """Spherical shell 4th integral of x operator"""
+def i4r3d2():
+    """Spherical shell 4th integral of r operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -239,8 +239,8 @@ def i4x3d2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x1d1x1():
-    """Spherical shell 4th integral of x D x operator"""
+def i4r1d1r1():
+    """Spherical shell 4th integral of r D r operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -254,8 +254,8 @@ def i4x1d1x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4laplrd1x1():
-    """Spherical shell 4th integral of x^4 laplacian D x operator"""
+def i4r4laplrd1r1():
+    """Spherical shell 4th integral of r^4 laplacian D r operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -269,8 +269,8 @@ def i4x4laplrd1x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x3d1x1():
-    """Spherical shell 4th integral of x^3 D x operator"""
+def i4r3d1r1():
+    """Spherical shell 4th integral of r^3 D r operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -284,8 +284,8 @@ def i4x3d1x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x3():
-    """Spherical shell 4th integral of x^3 operator"""
+def i4r3():
+    """Spherical shell 4th integral of r^3 operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -299,8 +299,8 @@ def i4x3():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4():
-    """Spherical shell 4th integral of x^4 operator"""
+def i4r4():
+    """Spherical shell 4th integral of r^4 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':4, 'p':4, 'd':0, 'c':1}]
@@ -313,8 +313,8 @@ def i4x4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4d1():
-    """Spherical shell 4th integral of x^4 D operator"""
+def i4r4d1():
+    """Spherical shell 4th integral of r^4 D operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -328,8 +328,8 @@ def i4x4d1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4lapl():
-    """Spherical shell 4th integral of x^4 laplacian operator"""
+def i4r4lapl():
+    """Spherical shell 4th integral of r^4 laplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
@@ -343,8 +343,8 @@ def i4x4lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4lapl2():
-    """Spherical shell 4th integral of x^4 bilaplacian operator"""
+def i4r4lapl2():
+    """Spherical shell 4th integral of r^4 bilaplacian operator"""
 
     # Setup terms in recurrence
     l = sympy.Symbol('l')
