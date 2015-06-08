@@ -91,16 +91,20 @@ class BoussinesqRTCSphere(base_model.BaseModel):
     def stability_sizes(self, res, eigs):
         """Get the block sizes in the stability calculation matrix"""
 
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+
         # Block sizes
         blocks = []
         for f in self.stability_fields(res, f):
-            blocks.append(self.block_size()[1]*(res[1]-eigs[0]))
+            blocks.append(self.block_size()[1]*(res[1]-m))
 
         # Invariant size (local dimension in spectral space, no restriction)
         invariant = (res[0],)*len(self.stability_fields())
 
         # Index shift
-        shift = int(eigs[0])
+        shift = m
 
         return (blocks, invariant, shift)
 
@@ -221,7 +225,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         assert(eigs[0].is_integer())
 
-        m = eigs[0]
+        m = int(eigs[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -235,6 +239,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
+
         assert(eigs[0].is_integer())
 
         Pr = eq_params['prandtl']

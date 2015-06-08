@@ -126,11 +126,15 @@ namespace Equations {
          Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
          Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
 
-         MHDFloat funcR;
-         MHDFloat funcTh;
-         Array funcPh = (4.0*phGrid).array().cos();
+         MHDFloat funcR0;
+         MHDFloat funcR3;
+         MHDFloat funcTh0;
+         MHDFloat funcTh3;
+         Array funcPh0 = Array::Ones(nPh);
+         Array funcPh3 = (3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
 
-         MHDFloat amplitude = 21.0/std::sqrt(17920*Math::PI);
+         MHDFloat amp0 = 0.5;
+         MHDFloat amp3 = (1e-5/8.0)*std::sqrt(35.0/Math::PI);
 
          MHDFloat r;
          MHDFloat theta;
@@ -140,15 +144,18 @@ namespace Equations {
          for(int iR = 0; iR < nR; ++iR)
          {
             r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
-            funcR = 3.0*std::pow(r,4) - std::pow(r,8);
+            funcR0 = (1.0 - std::pow(r,2));
+            funcR3 = std::pow(r,3)*(1.0 - std::pow(r,2));
 
             nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
                theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
-               funcTh = std::pow(std::sin(theta),4);
+               funcTh0 = 1.0;
+               funcTh3 = std::pow(std::sin(theta),3);
 
-               rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
+               rNLComp.addProfile(amp0*funcR0*funcTh0*funcPh0,iTh,iR);
+               rNLComp.addProfile(amp3*funcR3*funcTh3*funcPh3,iTh,iR);
             }
          }
       } else

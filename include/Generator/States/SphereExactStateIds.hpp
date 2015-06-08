@@ -53,7 +53,8 @@ namespace Equations {
 
          BENCHTEMPC1 = 50, // Initial temperature perturbation state for full sphere benchmark C1
          BENCHVELC1,       // Initial velocity perturbation state for full sphere benchmark C1
-         BENCHMAGC1,       // Initial magnetic perturbation state for full sphere benchmark C1
+         BENCHVELC2,       // Initial velocity perturbation state for full sphere benchmark C2
+         BENCHMAGC2,       // Initial magnetic perturbation state for full sphere benchmark C2
       };
 
       /**

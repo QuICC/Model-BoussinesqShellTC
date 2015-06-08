@@ -76,7 +76,7 @@ def main(argv):
     print("Input base: ", basename)
     print('Output file: ', outputfile)
     print("Scheme: ", scheme)
-    print(gSlow + "grid size: ", nSlow)
+    print(gSlow + " grid size: ", nSlow)
     print(gMid + " grid size: ", nMid)
     print(gFast + " grid size: ", nFast)
     print("Time: ", time)

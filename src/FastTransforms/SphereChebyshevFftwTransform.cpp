@@ -561,7 +561,7 @@ namespace Transform {
             }
             Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
             Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR2, parity), this->tmpOutS(parity));
-            this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpIntS(parity);
+            this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
 
          // Compute simple projection
          } else
