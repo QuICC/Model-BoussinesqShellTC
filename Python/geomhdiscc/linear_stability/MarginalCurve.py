@@ -427,7 +427,7 @@ class GEVP:
         if self.evp_lmb is not None:
 
             # Extra different fields
-            sol_spec = self.viewSpectra(viz_mode, plot = False, naive = naive)
+            sol_spec = self.viewSpectra(viz_mode, plot = False, naive = naive, save_pdf = False)
             if geometry == 'c1d':
                 import geomhdiscc.transform.cartesian as transf
                 nD = 1
@@ -479,6 +479,7 @@ class GEVP:
                     for i,f in enumerate(self.fields):
                         pl.subplot(rows,cols,i+1)
                         pl.plot(grid, sol_rphys[f])
+                        pl.plot(grid, sol_iphys[f])
                         title = f[0]
                         if f[1] != "":
                             title = title + ', ' + f[1]

@@ -33,7 +33,8 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
+        #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -113,55 +114,55 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
             # No-slip / Fixed temperature
             if bcId == 0:
                 if self.use_galerkin:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
 
             # Stress-free / Fixed flux
             elif bcId == 1:
                 if self.use_galerkin:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:-21, 'rt':0}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:-21, 'rt':0}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:-21, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:21}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:21}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
 
             # Fixed temperature at top/Fixed flux at bottom
             elif bcId == 2:
                 if self.use_galerkin:
-                    if field_row == ("temperature","") and field_col == ("temperature",""):
+                    if field_row == ("temperature","") and field_col == field_row:
                         bc = {0:-22, 'rt':0}
 
                 else:
-                    if field_row == ("temperature","") and field_col == ("temperature",""):
+                    if field_row == ("temperature","") and field_col == field_row:
                         bc = {0:22}
             
             # Set LHS galerkin restriction
@@ -221,7 +222,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -235,7 +236,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         elif field_row == ("velocity","z") and field_col == field_row:
             mat = geo.i2(res[0], bc)
-            mat = utils.qid_from_idx(idx_w, res[0])*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2(res[0], bc)
@@ -254,7 +254,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         k1 = eigs[0]
         k2 = eigs[1]
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -307,16 +307,13 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
             elif field_col == ("velocity","z"):
                 mat = geo.i2lapl(res[0], k1, k2, bc, cscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0])*mat*utils.qid_from_idx(idx_w, res[0])
-                if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_1d(idx_w, res[0])
 
             elif field_col == ("temperature",""):
                 mat = geo.i2(res[0], bc, Ra)
 
             elif field_col == ("pressure",""):
                 mat = geo.i2d1(res[0], bc, -1.0, cscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
+                mat = mat*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","x"):
@@ -329,11 +326,9 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params['heating'] == 0:
                         mat = geo.i2(res[0], bc)
-                        mat = mat*utils.qid_from_idx(idx_w, res[0])
 
                     elif eq_params['heating'] == 1:
                         mat = geo.i2x1(res[0], bc)
-                        mat = mat*utils.qid_from_idx(idx_w, res[0])
                 else:
                     mat = geo.zblk(res[0], bc)
 
@@ -364,7 +359,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                     bc['rt'] = 1
                     bc['cr'] = 1
                     mat = geo.i1d1(res[0]+1, bc, cscale = zscale)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_w, res[0])
+                    mat = utils.qid_from_idx(idx_p, res[0])*mat
 
                 elif field_col == ("temperature",""):
                     mat = geo.zblk(res[0], bc)
@@ -383,7 +378,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -399,8 +394,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         elif field_row == ("velocity","z"):
             mat = geo.i2(res[0], bc, 1.0/Pr)
-            S = utils.qid_from_idx(idx_w, res[0])
-            mat = S*mat*S
 
         elif field_row == ("temperature",""):
             mat = geo.i2(res[0], bc)
@@ -422,10 +415,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         # V: T_N
         idx_v = utils.qidx(res[0], res[0]-1)
 
-        # W:
-        idx_w = utils.qidx(res[0], res[0])
-
         # Pressure: T_N
         idx_p = utils.qidx(res[0], res[0]-1)
 
-        return (idx_u, idx_v, idx_w, idx_p)
+        return (idx_u, idx_v, idx_p)

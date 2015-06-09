@@ -101,10 +101,11 @@ if show_spy or solve_gevp:
         Ra = eq_params['rayleigh']
     MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
     gevp_opts['eigs'] = wave(m)
+    gevp_opts['tol'] = 1e-10
     gevp = MarginalCurve.GEVP(**gevp_opts)
 
 if show_spy or write_mtx:
-    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx, tol = 1e-10)
+    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
 
 if solve_gevp:
     gevp.solve(Ra, 1, with_vectors = True)

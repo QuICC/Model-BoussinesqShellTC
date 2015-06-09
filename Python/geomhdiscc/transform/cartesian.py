@@ -26,6 +26,9 @@ def tocheb(phys):
 
     return fftpack.dct(phys,2)/(2*n)
 
+grid_1d = grid
+toprofile = tophys
+
 def tophys2d(spec):
     """Transform 2D spectral coefficients to 2D physical values"""
 
