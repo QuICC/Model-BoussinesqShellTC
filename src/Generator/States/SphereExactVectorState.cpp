@@ -234,10 +234,10 @@ namespace Equations {
          Array funcPhS1 = (phGrid).array().sin();
          MHDFloat funcR = 1.0;
          MHDFloat amplitude = 1.0;
+         MHDFloat funcTh = 1.0;
 
          MHDFloat r;
          MHDFloat theta;
-         MHDFloat scale = 0.5;
          nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
          for(int iR = 0; iR < nR; ++iR)
          {
@@ -256,27 +256,30 @@ namespace Equations {
                   amplitude = -10.0/(7.0*std::sqrt(3.0));
                   funcTh = std::cos(theta);
 
-                  funcR = 3.0*std::pow(r,2)*(-147.0 - 343.0*std::pow(r,2) - 217.0*std::pow(r,4) + 29.0*std::pow(r,6));
+                  funcR = 3.0*std::pow(r,2)*(-147.0 + 343.0*std::pow(r,2) - 217.0*std::pow(r,4) + 29.0*std::pow(r,6));
                   rNLComp.addProfile(amplitude*funcR*funcTh*funcPhC1,iTh,iR);
 
-                  funcR = 14.0*std::pow(r,2)*(-9.0 - 125.0*std::pow(r,2) - 39.0*std::pow(r,4) + 27.0*std::pow(r,6));
+                  funcR = 14.0*std::pow(r,2)*(-9.0 - 125.0*std::pow(r,2) + 39.0*std::pow(r,4) + 27.0*std::pow(r,6));
                   rNLComp.addProfile(amplitude*funcR*funcTh*funcPhS1,iTh,iR);
                } else if(compId == FieldComponents::Physical::PHI)
                {
-                  amplitude = - 5.0/5544.;
+                  amplitude = -5.0/5544.;
+
                   funcR = 7.0*r*(43700.0 - 58113.0*std::pow(r,2) - 15345.0*std::pow(r,4) + 1881.0*std::pow(r,6) + 20790.0*std::pow(r,8));
+                  funcTh = std::sin(theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
 
                   funcR = 7.0*1485*std::pow(r,3)*(-9.0 + 115.0*std::pow(r,2) - 167.0*std::pow(r,4) + 70.0*std::pow(r,6));
+                  funcTh = std::sin(3.0*theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
 
                   funcR = 528*std::sqrt(3)*std::pow(r,2)*14*(-9.0 - 125.0*std::pow(r,2) + 39.0*std::pow(r,4) + 27.0*std::pow(r,6));
+                  funcTh = std::cos(2.0*theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhC1,iTh,iR);
 
-                  funcR = 528*std::sqrt(3)*std::pow(r,2)*3*(147.0 - 343.0*std::pow(r,2) + 39.0*std::pow(r,4) + 27.0*std::pow(r,6));
-
-
-                  funcR = std::sin(Math::PI*(r));
-                  funcTh = std::sin(2*theta);
-
-                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
+                  funcR = 528*std::sqrt(3)*std::pow(r,2)*3*(147.0 - 343.0*std::pow(r,2) + 217.0*std::pow(r,4) - 29.0*std::pow(r,6));
+                  funcTh = std::cos(2.0*theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhS1,iTh,iR);
                }
             }
          }
@@ -292,13 +295,14 @@ namespace Equations {
          Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
 
          Array funcPh = Array::Ones(nPh);
+         Array funcPhCS = (phGrid).array().cos() + (phGrid).array().sin();
+         Array funcPhC_S = (phGrid).array().cos() - (phGrid).array().sin();
          MHDFloat funcR = 1.0;
          MHDFloat funcTh = 1.0;
          MHDFloat amplitude = 1.0;
 
          MHDFloat r;
          MHDFloat theta;
-         MHDFloat scale = 0.5;
          nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
          for(int iR = 0; iR < nR; ++iR)
          {
@@ -310,22 +314,27 @@ namespace Equations {
 
                if(compId == FieldComponents::Physical::R)
                {
-                  amplitude = scale*5.0/8.0;
-                  funcR = 8.0 - 6.0*r - 2.0/std::pow(r,3);
-                  funcTh = std::cos(theta);
+                  amplitude = 0.0;
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
                } else if(compId == FieldComponents::Physical::THETA)
                {
-                  amplitude = -scale*5.0/8.0;
-                  funcR = 8.0 - 9.0*r + 1.0/std::pow(r,3);
-                  funcTh = std::sin(theta);
+                  amplitude = -3.0/2.0;
+                  funcR = r*(-1.0 + 4.0*std::pow(r,2) - 6.0*std::pow(r,4) + 3.0*std::pow(r,6));
+                  funcTh = 1.0;
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhCS,iTh,iR);
                } else if(compId == FieldComponents::Physical::PHI)
                {
-                  amplitude = scale*5.0;
-                  funcR = std::sin(Math::PI*(r));
-                  funcTh = std::sin(2*theta);
+                  amplitude = -3.0/4.0;
+
+                  funcR = 3.0*std::pow(r,2)*(-1.0 + std::pow(r,2))*(2.0 - 5.0*std::pow(r,2) + 4.0*std::pow(r,4));
+                  funcTh = std::cos(theta)*std::sin(theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
+
+                  funcR = 2.0*r*(-1.0 + std::pow(r,2))*(1.0 - 3.0*std::pow(r,2) + 3.0*std::pow(r,4));
+                  funcTh = std::cos(theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhC_S,iTh,iR);
                }
 
-               rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
             }
          }
       } else

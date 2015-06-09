@@ -134,7 +134,8 @@ namespace Equations {
          Array funcPh3 = (3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
 
          MHDFloat amp0 = 0.5;
-         MHDFloat amp3 = (1e-5/8.0)*std::sqrt(35.0/Math::PI);
+         MHDFloat eps = 1e-5;
+         MHDFloat amp3 = (eps/8.0)*std::sqrt(35.0/Math::PI);
 
          MHDFloat r;
          MHDFloat theta;

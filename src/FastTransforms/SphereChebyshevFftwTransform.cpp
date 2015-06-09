@@ -449,7 +449,7 @@ namespace Transform {
       {
          for(int parity = 0; parity < 2; ++parity)
          {
-            ParityTransformTools::applyOperator(rChebVal, this->intgOp(integrator, parity), this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+            ParityTransformTools::applyOperator(rChebVal, this->intgOp(integrator, parity), this->parityBlocks((parity+1)%2), this->mspSetup->scale(), this->mspSetup->specSize());
          }
       }
 
@@ -487,12 +487,12 @@ namespace Transform {
          if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
          {
             ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
-            if(parity == 1)
+            if((parity+1)%2 == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
             }
             this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
             this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
          // Compute second derivative
@@ -509,7 +509,7 @@ namespace Transform {
          {
             ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
             this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
             this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
          // Compute division by R^2
@@ -525,41 +525,41 @@ namespace Transform {
          {
             ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
             this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
-            if((parity+1)%2 == 1)
+            if(parity%2 == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
             }
-            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, parity), this->tmpInS(parity));
             this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
          // Compute 1/r D r projection
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
          {
             this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
-            if((parity+1)%2 == 1)
+            if(parity == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
             }
-            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
-            Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR, parity), this->tmpOutS(parity));
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, parity), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR, (parity+1)%2), this->tmpOutS(parity));
             this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
 
          // Compute radial laplacian projection
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
          {
             ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
-            if(parity == 1)
+            if((parity+1)%2 == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
             }
             this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,parity), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,(parity+1)%2), this->tmpInS(parity));
             this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR2, (parity+1)%2)*this->tmpOutS(parity);
             if(parity == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
             }
-            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+            Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, parity), this->tmpInS(parity));
             Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR2, parity), this->tmpOutS(parity));
             this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
 
@@ -619,7 +619,7 @@ namespace Transform {
          {
             for(int parity = 0; parity < 2; ++parity)
             {
-               ParityTransformTools::applyOperator(rChebVal, component, this->intgOp(integrator,parity), this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+               ParityTransformTools::applyOperator(rChebVal, component, this->intgOp(integrator,(parity+flip)%2), this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
             }
          }
       }
@@ -660,12 +660,12 @@ namespace Transform {
             if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
             {
                ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
-               if(parity == 1)
+               if((parity+1)%2 == 1)
                {
                   this->tmpInS(parity).topRows(1).setZero();
                }
                this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
                // Compute second derivative
@@ -682,7 +682,7 @@ namespace Transform {
             {
                ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
                // Compute division by R^2
@@ -698,11 +698,11 @@ namespace Transform {
             {
                ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
-               if((parity+1)%2 == 1)
+               if(parity%2 == 1)
                {
                   this->tmpInS(parity).topRows(1).setZero();
                }
-               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, parity), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
                // Compute 1/r D r projection
@@ -710,30 +710,30 @@ namespace Transform {
             {
                ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
-               if((parity+1)%2 == 1)
+               if(parity == 1)
                {
                   this->tmpInS(parity).topRows(1).setZero();
                }
-               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
-               Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR, parity), this->tmpOutS(parity));
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, parity), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR, (parity+1)%2), this->tmpOutS(parity));
                this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
 
                // Compute radial laplacian projection
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
             {
                ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
-               if(parity == 1)
+               if((parity+1)%2 == 1)
                {
                   this->tmpInS(parity).topRows(1).setZero();
                }
                this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,parity), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,(parity+1)%2), this->tmpInS(parity));
                this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR2, (parity+1)%2)*this->tmpOutS(parity);
                if(parity == 1)
                {
                   this->tmpInS(parity).topRows(1).setZero();
                }
-               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, (parity+1)%2), this->tmpInS(parity));
+               Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF, parity), this->tmpInS(parity));
                Solver::internal::solveWrapper(this->tmpInS(parity), this->solver(ProjectorType::DIVR2, parity), this->tmpOutS(parity));
                this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
 
