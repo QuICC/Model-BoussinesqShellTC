@@ -10,6 +10,11 @@ def write_header(f, name, nRes, nEigs, eq_params):
     """Write marginal curve file header"""
     
     if MPI.COMM_WORLD.Get_rank() == 0:
+
+        # file is not empty add double newline (gnuplot reads it separately)
+        if f.tell() != 0:
+            f.write('\n\n')
+
         # First header
         f.write('#Results for: ' + name + '\n')
 

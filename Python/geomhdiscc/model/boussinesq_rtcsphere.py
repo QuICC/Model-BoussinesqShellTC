@@ -97,8 +97,8 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         # Block sizes
         blocks = []
-        for f in self.stability_fields(res, f):
-            blocks.append(self.block_size()[1]*(res[1]-m))
+        for f in self.stability_fields():
+            blocks.append(self.block_size(res, f)[1]*(res[1]-m))
 
         # Invariant size (local dimension in spectral space, no restriction)
         invariant = (res[0],)*len(self.stability_fields())

@@ -7,8 +7,8 @@ import numpy as np
 import numpy.polynomial.legendre as leg
 import scipy.special as spe
 
-min_th_points = 500
-min_phi_points = 500
+min_th_points = 200
+min_phi_points = 200
 
 def txgrid(maxl, m):
     """Create the theta Gauss-Legendre grid"""

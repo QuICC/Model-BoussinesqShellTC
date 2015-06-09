@@ -114,7 +114,10 @@ class MarginalCurve:
             pl.title('Critical frequency')
             pl.xlabel('Wavenumber')
             pl.ylabel('frequency')
+            if save_pdf:
+                pl.savefig('marginal_curve.pdf', bbox_inches='tight', dpi = 200)
             pl.show()
+            pl.clf()
 
     def _tracker(self, k):
 
@@ -356,9 +359,9 @@ class GEVP:
             B = opB(restriction = restrict)
 
         if write_mtx:
-            import scipy.io as io
-            io.mmwrite("matrix_A.mtx", A)
-            io.mmwrite("matrix_B.mtx", B)
+            import scipy.io as sciio
+            sciio.mmwrite("matrix_A.mtx", A)
+            sciio.mmwrite("matrix_B.mtx", B)
 
         # Spy the two operators
         if spy:
@@ -372,8 +375,9 @@ class GEVP:
             pl.tick_params(axis='x', labelsize=30)
             pl.tick_params(axis='y', labelsize=30)
             pl.show()
+            pl.clf()
 
-    def viewSpectra(self, viz_mode, plot = True, naive = False):
+    def viewSpectra(self, viz_mode, plot = True, naive = False, save_pdf = True):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
@@ -390,7 +394,7 @@ class GEVP:
                 sol_spec[f] = self.evp_vec[start:stop, viz_mode]
                 start = stop
             
-            if plot:
+            if plot or save_pdf:
                 import matplotlib.pylab as pl
                 Print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
                 # Plot spectra
@@ -403,14 +407,19 @@ class GEVP:
                     if f[1] != "":
                         title = title + ', ' + f[1]
                     pl.title(title)
-                pl.show()
+                if save_pdf:
+                    fname = "spectra_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                    pl.savefig(fname, bbox_inches='tight', dpi=200)
+                if plot:
+                    pl.show()
+                pl.clf()
 
             return sol_spec
 
         else:
             return None
 
-    def viewPhysical(self, viz_mode, geometry, plot = True, naive = False):
+    def viewPhysical(self, viz_mode, geometry, plot = True, naive = False, save_pdf = True):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
@@ -458,7 +467,7 @@ class GEVP:
                     sol_rphys[f] = transf.toprofile(sol_spec[f].real, *prof_opt)
                     sol_iphys[f] = transf.toprofile(sol_spec[f].imag, *prof_opt)
 
-                if plot:
+                if plot or save_pdf:
                     import matplotlib.pylab as pl
                     Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
                     # Plot physical field
@@ -472,7 +481,12 @@ class GEVP:
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
-                    pl.show()
+                    if save_pdf:
+                        fname = "profile_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
 
             # 2D data: plot physical contours on slice
             elif nD == 2:
@@ -497,7 +511,7 @@ class GEVP:
                     sol_rphys[f] = transf.toslice(sol_spec[f].real, res_1d[0], *res_2d)
                     sol_iphys[f] = transf.toslice(sol_spec[f].imag, res_1d[0], *res_2d)
 
-                if plot:
+                if plot or save_pdf:
                     import matplotlib as mpl
                     import matplotlib.pylab as pl
                     import matplotlib.cm as cm
@@ -515,7 +529,12 @@ class GEVP:
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
-                    pl.show()
+                    if save_pdf:
+                        fname = "slice_meridional_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
                     # Plot physical field in equatorial radial profile
                     grid_r = transf.rgrid(*res_1d)
                     rows = np.ceil(len(self.fields)/3)
@@ -532,7 +551,12 @@ class GEVP:
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
-                    pl.show()
+                    if save_pdf:
+                        fname = "profile_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
                     # Plot physical field in equatorial slice
                     grid_eq = transf.grid_eq(*res_1d, m = int(self.eigs[0]))
                     rows = np.ceil(len(self.fields)/3)
@@ -547,7 +571,12 @@ class GEVP:
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
-                    pl.show()
+                    if save_pdf:
+                        fname = "slice_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
             
             return (grid, sol_rphys, sol_iphys)
         else:
