@@ -88,12 +88,15 @@ def petsc_operators(opA, opB, sizes):
 
     return (pA, pB)
 
-def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
+def slepc_eps(A, B, nev, initial_vector = None, shift_range = None, tol = 1e-8):
     """Create SLEPc eigensolver"""
 
     opts = PETSc.Options()
     opts["mat_mumps_icntl_14"] = 80
     opts["mat_mumps_icntl_29"] = 2
+
+    if shift_range is None:
+        shift_range = (1e-2, 0.2)
 
     E = SLEPc.EPS()
     E.create()
@@ -104,21 +107,22 @@ def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
     #E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
     E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
     E.setDimensions(nev = nev)
-    #E.setTolerances(max_it= 100)
+    E.setTolerances(tol = tol)
     if initial_vector is not None:
         v = PETSc.Vec().createWithArray(initial_vector)
         E.setInitialSpace(v)
 
     ST = E.getST()
     ST.setType('sinvert')
-    if tracker is None or abs(tracker) > 0.5:
+    if shift_range[0] == shift_range[1]:
+        s = shift_range[0]
+    else:
         rnd = PETSc.Random()
         rnd.create(comm = MPI.COMM_SELF)
         rnd.setType(PETSc.Random.Type.RAND)
-        rnd.setInterval((0.1, 0.5))
+        rnd.setInterval(shift_range)
         s = rnd.getValueReal()
-    else:
-        s = 0.0
+
     ST.setShift(s)
     KSP = ST.getKSP()
     KSP.setType('preonly')
@@ -133,12 +137,12 @@ def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
 
     return E
 
-def eigenvalues(system, nev, tracker = None, initial_vector = None):
+def eigenvalues(system, nev, initial_vector = None, tol = 1e-8):
     """Compute eigenvalues using SLEPc"""
 
     pA, pB = petsc_operators(*system)
 
-    E = slepc_eps(pA, pB, nev, tracker, initial_vector = initial_vector)
+    E = slepc_eps(pA, pB, nev, initial_vector = initial_vector, tol = tol)
 
     E.solve()
     nconv = E.getConverged()
@@ -154,12 +158,12 @@ def eigenvalues(system, nev, tracker = None, initial_vector = None):
     else:
         return None
 
-def eigenpairs(system, nev, tracker = None, initial_vector = None):
+def eigenpairs(system, nev, initial_vector = None, tol = 1e-8):
     """Compute eigenpairs using SLEPc"""
 
     pA, pB = petsc_operators(*system)
 
-    E = slepc_eps(pA, pB, nev, tracker, initial_vector = initial_vector)
+    E = slepc_eps(pA, pB, nev, initial_vector = initial_vector, tol = tol)
 
     E.solve()
     nconv = E.getConverged()

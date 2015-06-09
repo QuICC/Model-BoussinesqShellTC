@@ -17,7 +17,7 @@ from mpi4py import MPI
 class MarginalCurve:
     """The marginal curve"""
 
-    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7):
+    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7, evp_tol = 1e-8):
         """Initialize the marginal curve"""
 
         # Open file for IO and write header
@@ -27,7 +27,7 @@ class MarginalCurve:
             self.out = None
         io.write_header(self.out, gevp_opts['model'].__class__.__name__, len(gevp_opts['res']), len(gevp_opts['eigs']), gevp_opts['eq_params'])
 
-        self.point = MarginalPoint(gevp_opts, mode, rtol = rtol, out_file = self.out)
+        self.point = MarginalPoint(gevp_opts, mode, rtol = rtol, out_file = self.out, evp_tol = evp_tol)
         self.rtol = rtol
         self.guess = None
 
@@ -126,10 +126,11 @@ class MarginalCurve:
 class MarginalPoint:
     """A point on the marginal curve"""
 
-    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7, out_file = None):
+    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7, out_file = None, evp_tol = 1e-8):
         """Initialize the marginal point"""
 
         self.out = out_file
+        gevp_opts['tol'] = evp_tol
         self._gevp = GEVP(**gevp_opts)
         self.mode = mode
         self.Rac = None
@@ -292,7 +293,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -304,6 +305,7 @@ class GEVP:
         self.no_bcs = bcs.copy()
         self.no_bcs['bcType'] = model.SOLVER_NO_TAU
         self.fields = self.model.stability_fields()
+        self.tol = tol
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
@@ -329,7 +331,7 @@ class GEVP:
        self.eigs = self.wave(k)
        self.changed = True
 
-    def solve(self, Ra, nev, with_vectors = False, tracker = None, use_vector = False):
+    def solve(self, Ra, nev, with_vectors = False, use_vector = False):
         """Solve the GEVP and store eigenvalues"""
 
         if self.changed or Ra != self.eq_params['rayleigh'] or (with_vectors and self.evp_vec is None):
@@ -342,9 +344,9 @@ class GEVP:
                 initial_vector = None
 
             if with_vectors:
-                self.evp_lmb, self.evp_vec = solver.eigenpairs(problem, nev, tracker = tracker, initial_vector = initial_vector)
+                self.evp_lmb, self.evp_vec = solver.eigenpairs(problem, nev, initial_vector = initial_vector, tol = self.tol)
             else:
-                self.evp_lmb = solver.eigenvalues(problem, nev, tracker = tracker, initial_vector = initial_vector)
+                self.evp_lmb = solver.eigenvalues(problem, nev, initial_vector = initial_vector, tol = self.tol)
                 self.evp_vec = None
             Print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
 
@@ -566,7 +568,7 @@ class GEVP:
                         sol_eq = np.outer(np.cos(phi),sol_rrad[f]) - np.outer(np.sin(phi),sol_irad[f])
                         pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
                         vmax = np.max(np.abs(sol_eq))
-                        pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 50, cmap = mycm)
+                        pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 30, cmap = mycm)
                         title = f[0]
                         if f[1] != "":
                             title = title + ', ' + f[1]

@@ -25,14 +25,14 @@ bc_temp = 0 # 0: FT 1: FF
 #res = [64, 64, 0]
 #Ta = 1e11
 #res = [64, 64, 0]
-Ta = 1e12
-res = [96, 96, 0]
+#Ta = 1e12
+#res = [96, 96, 0]
 #Ta = 1e13
 #res = [128, 128, 0]
 #Ta = 1e14
 #res = [256, 256, 0]
-#Ta = 1e15
-#res = [384, 384, 0]
+Ta = 1e15
+res = [384, 384, 0]
 #Ta = 1e16
 #res = [512, 512, 0]
 #Ta = 1e17
@@ -73,7 +73,7 @@ viz_mode = 0
 
 if marginal_point or marginal_curve:
     # Create marginal curve object
-    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
+    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8, evp_tol = 1e-10)
 
 if marginal_point:
     # Compute marginal curve at a single point
@@ -104,7 +104,7 @@ if show_spy or solve_gevp:
     gevp = MarginalCurve.GEVP(**gevp_opts)
 
 if show_spy or write_mtx:
-    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
+    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx, tol = 1e-10)
 
 if solve_gevp:
     gevp.solve(Ra, 1, with_vectors = True)
