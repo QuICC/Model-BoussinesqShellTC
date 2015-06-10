@@ -8,7 +8,7 @@ import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 # Create the model and activate linearization
 model = mod.BoussinesqRTCShell()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.073175e7, 'ro':1, 'rratio':0.35} # m = 13, NS/NS
@@ -34,8 +34,8 @@ rratio = 0.35
 #res = [32, 32, 0]
 #Ta = 1e9
 #res = [48, 48, 0]
-Ta = 1e10
-res = [64, 64, 0]
+#Ta = 1e10
+#res = [64, 64, 0]
 #Ta = 1e11
 #res = [64, 64, 0]
 #Ta = 1e12
@@ -44,8 +44,8 @@ res = [64, 64, 0]
 #res = [128, 128, 0]
 #Ta = 1e14
 #res = [256, 256, 0]
-#Ta = 1e15
-#res = [384, 384, 0]
+Ta = 1e15
+res = [384, 384, 0]
 #Ta = 1e16
 #res = [512, 512, 0]
 #Ta = 1e17

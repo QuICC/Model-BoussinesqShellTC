@@ -117,21 +117,25 @@ def apply_tau(mat, bc, location = 't'):
 def tau_value(nr, pos, coeffs = None):
     """Create the boundary value tau line(s)"""
 
-    it = coeff_iterator(coeffs)
+    it = coeff_iterator(coeffs, pos)
 
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*tau_c(i) for i in np.arange(0,nr)])
+        cnst = c*tau_c()
+        cond.append(cnst*np.ones(nr))
+        cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*tau_c(i)*(-1.0)**i for i in np.arange(0,nr)])
+        cnst = c*tau_c()
+        cond.append(cnst*alt_ones(nr, 1))
+        cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
-        t = cond[0]
-        cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nr)]
-        cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nr)]
+        t = cond[0].copy()
+        cond[0] = (cond[0] + cond[1])/2.0
+        cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
@@ -144,24 +148,25 @@ def tau_diff(nr, pos, coeffs = None):
     if coeffs is None:
         raise RuntimeError
     else:
-        it = coeff_iterator(coeffs.get('c', None))
+        it = coeff_iterator(coeffs.get('c', None), pos)
 
     a = coeffs['a']
     b = coeffs['b']
 
     cond = []
     c = next(it)
+    ns = np.arange(0,nr)
     if pos >= 0:
-        cond.append([c*(2.0/a)*i**2 for i in np.arange(0,nr)])
+        cond.append(c*(2.0/a)*ns**2)
         c = next(it)
 
     if pos <= 0:
-        cond.append([(-1.0)**(i+1)*(2.0/a)*c*i**2 for i in np.arange(0,nr)])
+        cond.append(c*(2.0/a)*ns**2*alt_ones(nr, 0))
 
     if use_parity_bc and pos == 0:
-        t = cond[0]
-        cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nr)]
-        cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nr)]
+        t = cond[0].copy()
+        cond[0] = (cond[0] + cond[1])/2.0
+        cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
@@ -174,24 +179,25 @@ def tau_diff2(nr, pos, coeffs = None):
     if coeffs is None:
         raise RuntimeError
     else:
-        it = coeff_iterator(coeffs.get('c', None))
+        it = coeff_iterator(coeffs.get('c', None), pos)
 
     a = coeffs['a']
     b = coeffs['b']
 
     cond = []
     c = next(it)
+    ns = np.arange(0,nr)
     if pos >= 0:
-        cond.append([c*((2.0/(3.0*a**2))*(i**4 - i**2)) for i in np.arange(0,nr)])
+        cond.append(c*(2.0/(3.0*a**2))*(ns**4 - ns**2))
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(((-1.0)**i*2.0/(3.0*a**2))*(i**4 - i**2)) for i in np.arange(0,nr)])
+        cond.append(c*(2.0/(3.0*a**2))*(ns**4 - ns**2)*alt_ones(nr, 1))
 
     if use_parity_bc and pos == 0:
-        t = cond[0]
-        cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nr)]
-        cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nr)]
+        t = cond[0].copy()
+        cond[0] = (cond[0] + cond[1])/2.0
+        cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
@@ -204,24 +210,27 @@ def tau_rdiffdivr(nr, pos, coeffs = None):
     if coeffs is None:
         raise RuntimeError
     else:
-        it = coeff_iterator(coeffs.get('c', None))
+        it = coeff_iterator(coeffs.get('c', None), pos)
 
     a = coeffs['a']
     b = coeffs['b']
 
     cond = []
-    c = next(it)
+    c = next(it) 
+    ns = np.arange(0,nr)
     if pos >= 0:
-        cond.append([c*((2.0/a)*i**2 - (1.0/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append(c*((2.0/a)*ns**2 - (1.0/(a+b))*tau_c()))
+        cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(-1.0)**(i+1)*((2.0/a)*i**2 + (1.0/(-a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append(c*((2.0/a)*ns**2 + (1.0/(-a+b))*tau_c())*alt_ones(nr, 0))
+        cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
-        t = cond[0]
-        cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nr)]
-        cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nr)]
+        t = cond[0].copy()
+        cond[0] = (cond[0] + cond[1])/2.0
+        cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
@@ -235,7 +244,7 @@ def tau_insulating(nr, pos, coeffs = None):
     if coeffs is None:
         raise RuntimeError
     else:
-        it = coeff_iterator(coeffs.get('c', None))
+        it = coeff_iterator(coeffs.get('c', None), pos)
 
     a = coeffs['a']
     b = coeffs['b']
@@ -243,17 +252,18 @@ def tau_insulating(nr, pos, coeffs = None):
 
     cond = []
     c = next(it)
+    ns = np.arange(0,nr)
     if pos >= 0:
-        cond.append([c*((2.0/a)*i**2 + ((l+1.0)/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append(c*((2.0/a)*ns**2 + ((l+1.0)/(a+b))*tau_c()))
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(-1.0)**(i+1)*((2.0/a)*i**2 + (l/(-a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append(c*((2.0/a)*ns**2 + (l/(-a+b))*tau_c())*alt_ones(nr, 0))
 
     if use_parity_bc and pos == 0:
-        t = cond[0]
-        cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nr)]
-        cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nr)]
+        t = cond[0].copy()
+        cond[0] = (cond[0] + cond[1])/2.0
+        cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
@@ -265,20 +275,20 @@ def tau_value_diff(nr, pos, coeffs = None):
 
     cond = []
     if pos >= 0:
-        cond.append(list(tau_value(nr,1,coeffs.get('c',None))[0]))
-        cond.append(list(tau_diff(nr,1,coeffs)[0]))
+        cond.append(tau_value(nr,1,coeffs.get('c',None))[0])
+        cond.append(tau_diff(nr,1,coeffs)[0])
 
     if pos <= 0:
-        cond.append(list(tau_value(nr,-1,coeffs.get('c',None))[0]))
-        cond.append(list(tau_diff(nr,-1,coeffs)[0]))
+        cond.append(tau_value(nr,-1,coeffs.get('c',None))[0])
+        cond.append(tau_diff(nr,-1,coeffs)[0])
 
     if use_parity_bc and pos == 0:
-        tv = cond[0]
-        td = cond[1]
-        cond[0] = [(cond[0][i] + cond[2][i])/2 for i in np.arange(0,nr)]
-        cond[1] = [(cond[1][i] + cond[3][i])/2 for i in np.arange(0,nr)]
-        cond[2] = [(tv[i] - cond[2][i])/2 for i in np.arange(0,nr)]
-        cond[3] = [(td[i] - cond[3][i])/2 for i in np.arange(0,nr)]
+        tv = cond[0].copy()
+        td = cond[1].copy()
+        cond[0] = (cond[0] + cond[2])/2.0
+        cond[1] = (cond[1] + cond[3])/2.0
+        cond[2] = (tv - cond[2])/2.0
+        cond[3] = (td - cond[3])/2.0
 
     return np.array(cond)
 
@@ -290,29 +300,29 @@ def tau_value_diff2(nr, pos, coeffs = None):
 
     cond = []
     if pos >= 0:
-        cond.append(list(tau_value(nr,1,coeffs.get('c',None))[0]))
-        cond.append(list(tau_diff2(nr,1,coeffs)[0]))
+        cond.append(tau_value(nr,1,coeffs.get('c',None))[0])
+        cond.append(tau_diff2(nr,1,coeffs)[0])
 
     if pos <= 0:
-        cond.append(list(tau_value(nr,-1,coeffs.get('c',None))[0]))
-        cond.append(list(tau_diff2(nr,-1,coeffs)[0]))
+        cond.append(tau_value(nr,-1,coeffs.get('c',None))[0])
+        cond.append(tau_diff2(nr,-1,coeffs)[0])
 
     if use_parity_bc and pos == 0:
-        tv = cond[0]
-        td = cond[1]
-        cond[0] = [(cond[0][i] + cond[2][i])/2 for i in np.arange(0,nr)]
-        cond[1] = [(cond[1][i] + cond[3][i])/2 for i in np.arange(0,nr)]
-        cond[2] = [(tv[i] - cond[2][i])/2 for i in np.arange(0,nr)]
-        cond[3] = [(td[i] - cond[3][i])/2 for i in np.arange(0,nr)]
+        tv = cond[0].copy()
+        td = cond[1].copy()
+        cond[0] = (cond[0] + cond[2])/2.0
+        cond[1] = (cond[1] + cond[3])/2.0
+        cond[2] = (tv - cond[2])/2.0
+        cond[3] = (td - cond[3])/2.0
 
     return np.array(cond)
 
-def tau_last(nx, nrow):
+def tau_last(nr, nrow):
     """Create the last modes to zero tau line(s)"""
 
-    cond = np.zeros((nrow, nx))
+    cond = np.zeros((nrow, nr))
     for j in range(0, nrow):
-        cond[j,nx-nrow+j] = tau_c(nx-nrow+j)
+        cond[j,nr-nrow+j] = tau_c()
 
     return cond
 
@@ -396,7 +406,7 @@ def stencil_value(nr, pos, coeffs = None):
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -423,7 +433,7 @@ def stencil_diff(nr, pos, coeffs = None):
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -464,6 +474,7 @@ def stencil_rdiffdivr(nr, pos, coeffs = None):
     # Generate diagonal
     def d0(n):
         return 1.0
+        return np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -613,22 +624,26 @@ def stencil_value_diff2(nr, pos, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def tau_c(n):
+def tau_c():
     """Compute the chebyshev normalisation c factor"""
-    if n > 0:
-        return 2
-    else:
-        return 1
+
+    return 2.0
 
 def galerkin_c(n):
     """Compute the chebyshev normalisation c factor for galerkin boundary"""
 
-    if n > 0:
-        return 1
-    else:
-        return 0.5
+    val = np.ones(n.shape)
 
-def coeff_iterator(coeffs):
+    for i, n in enumerate(n):
+        if n == 0:
+            val[i] = 0.5
+            break
+        if n > 0:
+            break
+
+    return val
+
+def coeff_iterator(coeffs, pos):
     """Return an iterator over the constants"""
 
     if coeffs is None:
@@ -645,3 +660,12 @@ def coeff_iterator(coeffs):
             it = itertools.cycle([coeffs])
 
     return it
+
+def alt_ones(nr, parity):
+    """Get array of alternating 1 and -1. Parity is the parity of the -1"""
+
+    if parity == 0:
+        return np.cumprod(-np.ones(nr))
+    else:
+        return -np.cumprod(-np.ones(nr))
+

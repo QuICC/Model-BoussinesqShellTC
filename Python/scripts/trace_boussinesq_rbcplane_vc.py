@@ -9,13 +9,13 @@ import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 # Create the model and activate linearization
 model = mod.BoussinesqRBCPlaneVC()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
 res = [128, 0, 0]
 
 # SF, FT,
-bc_vel = 0
+bc_vel = 1
 bc_temp = 0
 phi = 0
 kp = 1.0
@@ -129,7 +129,7 @@ show_spectra = (True and solve_gevp)
 show_physical = (True and solve_gevp)
 save_spectra = False
 save_physical = False
-evp_tol = 1e-8
+evp_tol = 1e-4
 viz_mode = 0
 
 if marginal_point or marginal_curve:
