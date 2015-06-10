@@ -9,13 +9,13 @@ import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 # Create the model and activate linearization
 model = mod.BoussinesqRBCPlaneVC()
 model.linearize = True
-model.use_galerkin = True
+model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [128, 0, 0]
+res = [32, 0, 0]
 
 # SF, FT,
-bc_vel = 1
+bc_vel = 0
 bc_temp = 0
 phi = 0
 kp = 1.0
@@ -129,7 +129,7 @@ show_spectra = (True and solve_gevp)
 show_physical = (True and solve_gevp)
 save_spectra = False
 save_physical = False
-evp_tol = 1e-4
+evp_tol = 1e-8
 viz_mode = 0
 
 if marginal_point or marginal_curve:
@@ -174,7 +174,7 @@ if solve_gevp:
     print(gevp.evp_lmb)
 
 if show_spectra or save_spectra:
-    gevp.viewSpectra(viz_mode, plot = show_spectra, naive = True, save_pdf = save_spectra)
+    gevp.viewSpectra(viz_mode, plot = show_spectra, save_pdf = save_spectra)
 
 if show_physical or save_physical:
-    gevp.viewPhysical(viz_mode, 'c1d', plot = show_physical, naive = True, save_pdf = save_physical)
+    gevp.viewPhysical(viz_mode, 'c1d', plot = show_physical, save_pdf = save_physical)

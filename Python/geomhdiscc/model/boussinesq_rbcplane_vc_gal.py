@@ -354,9 +354,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
-        print((field_row, field_col))
-        print(mat.shape)
-
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):

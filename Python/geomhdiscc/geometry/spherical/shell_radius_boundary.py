@@ -390,7 +390,9 @@ def restrict_eye(nr, t, q):
 def stencil_value(nr, pos, coeffs = None):
     """Create stencil matrix for a zero boundary value"""
 
-    assert(coeffs is None)
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+    assert(coeffs.get('c', None) is None)
 
     ns = np.arange(0,nr,1)
     if pos == 0:
@@ -417,7 +419,9 @@ def stencil_value(nr, pos, coeffs = None):
 def stencil_diff(nr, pos, coeffs = None):
     """Create stencil matrix for a zero 1st derivative"""
 
-    assert(coeffs is None)
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+    assert(coeffs.get('c', None) is None)
 
     ns = np.arange(0,nr,1)
     if pos == 0:
@@ -446,6 +450,7 @@ def stencil_rdiffdivr(nr, pos, coeffs = None):
 
     assert(coeffs.get('a', None) is not None)
     assert(coeffs.get('b', None) is not None)
+    assert(coeffs.get('c', None) is None)
     assert(pos == 0)
 
     a = coeffs['a']
@@ -456,24 +461,34 @@ def stencil_rdiffdivr(nr, pos, coeffs = None):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        el_num = (-a**2*(n**2 - 4.0*n + 2.0)*(n**2 - 2.0*n - 1.0) + b**2*(n - 2.0)**2*(n - 1.0)**2)
-        el_den = (-a**2*(n**2 - 2.0)*(n**2 - 2.0*n - 1.0) + b**2*n**2*(n - 1.0)**2)
-        if n == 2:
-            return -(el_num - a**2*(n**2 - 2.0*n - 1.0))/el_den
-        else:
-            return -el_num/el_den
+        #val_num = a**2*((n - 3.0)**2*n**2 - 2.0) - b**2*(n**2 - 3.0*n + 2.0)**2
+        #val_den = -a**2*((n - 2.0)*n - 1.0)*(n**2 - 2.0) + b**2*(n - 1.0)**2*n**2
+        val_num = a**2*((n - 3.0)**2*n**2 - 2.0) - b**2*(n**2 - 3.0*n + 2.0)**2
+        val_den = -a**2*((n - 2.0)*n - 1.0)*(n**2 - 2.0) + b**2*(n - 1.0)**2*n**2
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = a**2/(2.0*a**2 + 4.0*b**2)
+            if j > 2:
+                break
+
+        return val
 
     # Generate 1st subdiagonal
     def d_1(n):
-        el_den = (a**2*(n**2 - 2.0)*(n**2 + 2.0*n - 1.0) - b**2*n**2*(n + 1.0)**2)
-        if n == 1:
-            return a*b*(n**2 - 6.0*n + 1.0)/el_den
-        else:
-            return -8.0*a*b*n/el_den
+        val_num = -8.0*a*b*n
+        val_den = a**2*(n**2 - 2.0)*(n*(n + 2.0) - 1.0) - b**2*n**2*(n + 1.0)**2
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 1:
+                val[i] = 2.0*a*b/(a**2 + 2.0*b**2)
+            if j > 1:
+                break
+
+        return val
 
     # Generate diagonal
     def d0(n):
-        return 1.0
         return np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
@@ -487,6 +502,7 @@ def stencil_insulating(nr, pos, coeffs = None):
 
     assert(coeffs.get('a', None) is not None)
     assert(coeffs.get('b', None) is not None)
+    assert(coeffs.get('c', None) is None)
     assert(coeffs.get('l', None) is not None)
     assert(pos == 0)
 
@@ -516,7 +532,7 @@ def stencil_insulating(nr, pos, coeffs = None):
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -527,7 +543,9 @@ def stencil_insulating(nr, pos, coeffs = None):
 def stencil_diff2(nr, pos, coeffs = None):
     """Create stencil matrix for a zero 2nd derivative"""
 
-    assert(coeffs is None)
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+    assert(coeffs.get('c', None) is None)
 
     ns = np.arange(0,nr,1)
     if pos == 0:
@@ -546,7 +564,7 @@ def stencil_diff2(nr, pos, coeffs = None):
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -557,7 +575,9 @@ def stencil_diff2(nr, pos, coeffs = None):
 def stencil_value_diff(nr, pos, coeffs = None):
     """Create stencil matrix for a zero boundary value and a zero 1st derivative"""
 
-    assert(coeffs is None)
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+    assert(coeffs.get('c', None) is None)
     assert(pos == 0)
 
     ns = np.arange(0,nr,1)
@@ -565,23 +585,29 @@ def stencil_value_diff(nr, pos, coeffs = None):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        el_num = (n - 3.0)
-        el_den = (n - 1.0)
-        if n == 4:
-            return (el_num - (n - 2.0)**2/8.0)/el_den
-        else:
-            return el_num/el_den
+        val = (n - 3.0)/(n - 1.0)
+        for i,j in enumerate(n):
+            if j == 4:
+                val[i] = 1.0/6.0 
+            if j > 4:
+                break
+
+        return val
 
     # Generate 1st subdiagonal
     def d_1(n):
-        if n == 2:
-            return (n**2 - 12.0*n + 4.0)/(8.0*(n + 1.0))
-        else:
-            return -2.0*n/(n + 1.0)
+        val = -2.0*n/(n + 1.0)
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = -2.0/3.0
+            if j > 2:
+                break
+
+        return val
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -592,7 +618,9 @@ def stencil_value_diff(nr, pos, coeffs = None):
 def stencil_value_diff2(nr, pos, coeffs = None):
     """Create stencil matrix for a zero boundary value and a zero 2nd derivative"""
 
-    assert(coeffs is None)
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+    assert(coeffs.get('c', None) is None)
     assert(pos == 0)
 
     ns = np.arange(0,nr,1)
@@ -600,23 +628,33 @@ def stencil_value_diff2(nr, pos, coeffs = None):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        el_num = (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)
-        el_den = (n - 1.0)*(2.0*n**2 - 4.0*n + 3.0)
-        if n == 4:
-            return (el_num - (n - 3.0)*(n - 1.0)*(n - 2.0)**2/8.0)/el_den
-        else:
-            return el_num/el_den
+        val_num = (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)
+        val_den = (n - 1.0)*(2.0*n**2 - 4.0*n + 3.0)
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 4:
+                val[i] = 1.0/38.0
+            if j > 4:
+                break
+
+        return val
 
     # Generate 1st subdiagonal
     def d_1(n):
-        if n == 2:
-            return (n**4 - 24.0*n**3 + 23.0*n**2 - 84*n + 12.0)/(8.0*(n + 1.0)*(2.0*n**2 + 4.0*n + 3.0))
-        else:
-            return -2.0*n*(2.0*n**2 + 7.0)/((n + 1.0)*(2.0*n**2 + 4.0*n + 3.0))
+        val_num = -2.0*n*(2.0*n**2 + 7.0)
+        val_den = (n + 1.0)*(2.0*n**2 + 4.0*n + 3.0)
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = -10.0/19.0
+            if j > 2:
+                break
+
+        return val
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -634,11 +672,10 @@ def galerkin_c(n):
 
     val = np.ones(n.shape)
 
-    for i, n in enumerate(n):
-        if n == 0:
+    for i, j in enumerate(n):
+        if j == 0:
             val[i] = 0.5
-            break
-        if n > 0:
+        if j > 0:
             break
 
     return val

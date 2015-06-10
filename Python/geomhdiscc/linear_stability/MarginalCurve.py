@@ -379,7 +379,7 @@ class GEVP:
             pl.show()
             pl.clf()
 
-    def viewSpectra(self, viz_mode, plot = True, naive = False, save_pdf = True):
+    def viewSpectra(self, viz_mode, plot = True, save_pdf = True):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
@@ -388,11 +388,8 @@ class GEVP:
             start = 0
             stop = 0
             sol_spec = dict()
-            for f in self.fields:
-                if naive:
-                    stop = stop + self.evp_vec.shape[0]/len(self.fields)
-                else:
-                    stop = stop + self.model.block_size(self.res, f)[0]
+            for i,f in enumerate(self.fields):
+                stop = stop + self.model.stability_sizes(self.res, self.eigs)[0][i]
                 sol_spec[f] = self.evp_vec[start:stop, viz_mode]
                 start = stop
             
@@ -421,13 +418,13 @@ class GEVP:
         else:
             return None
 
-    def viewPhysical(self, viz_mode, geometry, plot = True, naive = False, save_pdf = True):
+    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = True):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
 
             # Extra different fields
-            sol_spec = self.viewSpectra(viz_mode, plot = False, naive = naive, save_pdf = False)
+            sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
             if geometry == 'c1d':
                 import geomhdiscc.transform.cartesian as transf
                 nD = 1

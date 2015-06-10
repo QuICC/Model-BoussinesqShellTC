@@ -84,7 +84,7 @@ if solve_gevp:
     MarginalCurve.Print(gevp.evp_lmb)
 
 if show_spectra:
-    gevp.viewSpectra(viz_mode, naive = True)
+    gevp.viewSpectra(viz_mode)
 
 if show_physical:
-    gevp.viewPhysical(viz_mode, 's1d', naive = True)
+    gevp.viewPhysical(viz_mode, 's1d')

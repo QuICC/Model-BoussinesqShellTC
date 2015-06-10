@@ -130,11 +130,11 @@ class BoussinesqRTCShell(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-40, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -147,7 +147,6 @@ class BoussinesqRTCShell(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
                         bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-41, 'rt':0, 'c':{'a':a, 'b':b}}
@@ -174,11 +173,11 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-40, 'rt':4, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):

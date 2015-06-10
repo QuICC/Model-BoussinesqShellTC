@@ -22,7 +22,7 @@ model.use_galerkin = True
 #eq_params = {'taylor':4e6*0.65**4, 'prandtl':1, 'rayleigh':28.7296, 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
 #eq_params = {'taylor':1e10*(1.0-0.35)**4, 'prandtl':1, 'rayleigh':3.24308e6/((20./13.)**2*0.35*1e10**0.5), 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
 # Internal heating, velocity bc: NS/NS, temperature bc: FT/FT
-bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
+bc_vel = 1 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 ro = 20./13.
 rratio = 0.35
@@ -45,7 +45,7 @@ rratio = 0.35
 #Ta = 1e14
 #res = [256, 256, 0]
 Ta = 1e15
-res = [384, 384, 0]
+res = [128, 384, 0]
 #Ta = 1e16
 #res = [512, 512, 0]
 #Ta = 1e17
@@ -74,17 +74,21 @@ marginal_point = False
 marginal_curve = False
 marginal_minimum = (True and marginal_curve)
 marginal_show_curve = (False and marginal_minimum)
-marginal_show_point = (True and (marginal_point or marginal_minimum))
+marginal_show_point = (False and (marginal_point or marginal_minimum))
 solve_gevp = (True or marginal_show_point)
 show_spy = False
 write_mtx = False
 show_spectra = (True and solve_gevp) or marginal_show_point
-show_physical = (True and solve_gevp) or marginal_show_point
+show_physical = (False and solve_gevp) or marginal_show_point
+save_spectra = False
+save_physical = False
 viz_mode = 0
+
+evp_tol = 1e-8
 
 if marginal_point or marginal_curve:
     # Create marginal curve object
-    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
+    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8, evp_tol = 1e-8)
 
 if marginal_point:
     # Compute marginal curve at a single point
@@ -112,6 +116,7 @@ if show_spy or solve_gevp:
         Ra = eq_params['rayleigh']
     MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
     gevp_opts['eigs'] = wave(m)
+    gevp_opts['tol'] = evp_tol
     gevp = MarginalCurve.GEVP(**gevp_opts)
 
 if show_spy or write_mtx:
@@ -123,7 +128,7 @@ if solve_gevp:
     MarginalCurve.Print(gevp.evp_lmb)
 
 if show_spectra:
-    gevp.viewSpectra(viz_mode, naive = True)
+    gevp.viewSpectra(viz_mode, plot = show_spectra, save_pdf = save_spectra)
 
 if show_physical:
-    gevp.viewPhysical(viz_mode, 'shell', naive = True)
+    gevp.viewPhysical(viz_mode, 'shell', plot = show_physical, save_pdf = save_physical)

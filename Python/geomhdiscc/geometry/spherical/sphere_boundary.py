@@ -27,7 +27,6 @@ def ldependent_bc(bc, l):
 def constrain(mat, nr, maxnl, m, bc, zero_l_zero = False, restriction = None):
     """Contrain the matrix with the tau boundary condition"""
 
-    bc_mat = mat
     if bc[0] > 0:
         bcMat = spsp.coo_matrix((nr,nr))
         if m == 0 and zero_l_zero:
@@ -39,7 +38,7 @@ def constrain(mat, nr, maxnl, m, bc, zero_l_zero = False, restriction = None):
             else:
                 bc_mat = bcMat
         for l in range(m+1, maxnl):
-            bcMat = spsp.lil_matrix((nr,nr))
+            bcMat = spsp.coo_matrix((nr,nr))
             if restriction is None or l in restriction:
                 bc = ldependent_bc(bc, l)
                 bcMat = radbc.constrain(bcMat, l, bc)
@@ -47,4 +46,6 @@ def constrain(mat, nr, maxnl, m, bc, zero_l_zero = False, restriction = None):
 
         bc_mat = mat + bc_mat
 
-    return bc_mat
+        return bc_mat
+    else:
+        return mat
