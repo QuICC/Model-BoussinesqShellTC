@@ -11,7 +11,7 @@ from geomhdiscc.transform.spherical import thgrid, totphys, totleg, eqgrid as eq
 
 eqgrid = functools.partial(eqgrid_full, phi = np.pi)
 
-min_r_points = 200
+min_r_points = 500
 
 def rgrid(nr):
     """Create the radial Chebyshev grid"""
