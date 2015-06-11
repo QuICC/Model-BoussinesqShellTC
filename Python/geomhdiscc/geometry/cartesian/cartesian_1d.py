@@ -32,7 +32,7 @@ def d2(nx, bc, coeff = 1.0, cscale = 1.0, zr = 2):
     """Create operator for 2nd derivative"""
 
     mat = spsp.lil_matrix((nx,nx))
-    cnst = coeff*scale**2
+    cnst = coeff*cscale**2
     for i in range(0,nx-2):
         mat[i,i+2:nx:2] = [cnst*j*(j**2 - i**2) for j in range(0,nx)][i+2:nx:2]
     mat[-zr:,:] = 0
@@ -48,6 +48,14 @@ def d4(nx, bc, coeff = 1.0, cscale = 1.0, zr = 4):
     mat = mat[0:-4, 0:-4]
     mat[-zr:,:] = 0
     
+    mat = coeff*mat.tocoo()
+    return c1dbc.constrain(mat, bc, location = 'b')
+
+def lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
+    """Create operator for horizontal laplacian"""
+
+    mat = d2(nx, bc, cscale = cscale) - k**2*sid(nx,2,bc) - l**2*sid(nx,2,bc)
+
     mat = coeff*mat.tocoo()
     return c1dbc.constrain(mat, bc, location = 'b')
 

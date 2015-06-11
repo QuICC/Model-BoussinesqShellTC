@@ -113,13 +113,6 @@ class BaseModel:
 
         return (is_complex, im_fields, lin_fields, nl_fields, next_fields, index_mode, block_info)
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return geo.stencil(res[0], bc, make_square)
-
     def stability_sizes(self, res, eigs):
         """Get the block sizes in the stability calculation matrix"""
 
@@ -180,3 +173,8 @@ class BaseModel:
         """Create matrix block for explicit nextstep update"""
 
         raise NotImplementedError("Model should implement this method!")
+
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        raise NotImplementedError("Stencil needs to be implemented in model!")

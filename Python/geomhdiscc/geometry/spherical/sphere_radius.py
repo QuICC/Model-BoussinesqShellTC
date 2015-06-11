@@ -570,3 +570,13 @@ def qid(nr, l, q, bc, coeff = 1.0):
     mat.row = np.arange(q,nr)
     mat.col = mat.row
     return radbc.constrain(mat, l, bc)
+
+def stencil(nr, l, bc, make_square):
+    """Create a galerkin stencil matrix"""
+
+    mat = qid(nr, l, 0, radbc.no_bc())
+
+    if not make_square:
+        bc['rt'] = 0
+
+    return radbc.constrain(mat, l, bc)

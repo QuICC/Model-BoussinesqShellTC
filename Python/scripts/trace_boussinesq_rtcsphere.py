@@ -32,13 +32,13 @@ bc_temp = 0 # 0: FT 1: FF
 #Ta = 1e14
 #res = [256, 256, 0]
 #Ta = 1e15
-#res = [384, 384, 0]
+#res = [384, 512, 0]
 Ta = 1e16
-res = [256, 384, 0]
+res = [512, 768, 0]
 #Ta = 1e17
-#res = [768, 768, 0]
+#res = [512, 1024, 0]
 #Ta = 1e18
-#res = [1024, 1024, 0]
+#res = [512, 1024, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
@@ -57,23 +57,24 @@ eigs = wave(1)
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
 # Setup computation, visualization and IO
-marginal_point = True
+marginal_point = False
 marginal_curve = False
 marginal_minimum = (True and marginal_curve)
 marginal_show_curve = (False and marginal_minimum)
 marginal_show_point = (True and (marginal_point or marginal_minimum))
-solve_gevp = False or marginal_show_point
+solve_gevp = True or marginal_show_point
 show_spy = False
 write_mtx = False
-show_spectra = (True and solve_gevp)
+show_spectra = (False and solve_gevp)
 show_physical = (False and solve_gevp)
 save_spectra = False
 save_physical = False
 viz_mode = 0
+evp_tol = 1e-12
 
 if marginal_point or marginal_curve:
     # Create marginal curve object
-    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8, evp_tol = 1e-10)
+    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-10, evp_tol = evp_tol)
 
 if marginal_point:
     # Compute marginal curve at a single point
@@ -101,7 +102,7 @@ if show_spy or solve_gevp:
         Ra = eq_params['rayleigh']
     MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
     gevp_opts['eigs'] = wave(m)
-    gevp_opts['tol'] = 1e-10
+    gevp_opts['tol'] = evp_tol
     gevp = MarginalCurve.GEVP(**gevp_opts)
 
 if show_spy or write_mtx:
@@ -112,8 +113,6 @@ if solve_gevp:
     MarginalCurve.Print("Found eigenvalues:")
     MarginalCurve.Print(gevp.evp_lmb)
 
-if show_spectra or save_spectra:
     gevp.viewSpectra(viz_mode, plot = show_spectra, save_pdf = save_spectra)
-
-if show_physical or save_physical:
+    
     gevp.viewPhysical(viz_mode, 'sphere', plot = show_physical, save_pdf = save_physical)

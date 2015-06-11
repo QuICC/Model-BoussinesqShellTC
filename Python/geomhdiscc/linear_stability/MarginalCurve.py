@@ -8,7 +8,7 @@ import numpy as np
 import scipy.optimize as optimize
 import functools
 
-import geomhdiscc.linear_stability.solver_slepc as solver
+import geomhdiscc.linear_stability.solver_slepc as solver_mod
 import geomhdiscc.linear_stability.io as io
 from geomhdiscc.linear_stability.solver_slepc import Print
 from mpi4py import MPI
@@ -108,6 +108,7 @@ class MarginalCurve:
             pl.title('Critical Rayleigh number')
             pl.xlabel('Wavenumber')
             pl.ylabel('Ra')
+            pl.tight_layout()
 
             pl.subplot(1,2,2)
             pl.plot(ks, fs, 'g')
@@ -116,6 +117,7 @@ class MarginalCurve:
             pl.ylabel('frequency')
             if save_pdf:
                 pl.savefig('marginal_curve.pdf', bbox_inches='tight', dpi = 200)
+            pl.tight_layout()
             pl.show()
             pl.clf()
 
@@ -201,8 +203,8 @@ class MarginalPoint:
 
         try:
             #Rac = optimize.newton(self._signTracker, guess)
-            Rac = solver.newton(self._signTracker, guess, step = 1e-4)
-        except (solver.NewtonDoneError, solver.NewtonNoneError):
+            Rac = solver_mod.newton(self._signTracker, guess, step = 1e-4)
+        except (solver_mod.NewtonDoneError, solver_mod.NewtonNoneError):
             pass
         except:
             raise
@@ -264,7 +266,7 @@ class MarginalPoint:
         self._gevp.solve(Ra, self.nev)
 
         if self._gevp.evp_lmb is None:
-            raise solver.NewtonNoneError
+            raise solver_mod.NewtonNoneError
 
         growth = self._gevp.evp_lmb[self.mode].real
         if growth > 0 and growth < 100:
@@ -273,7 +275,7 @@ class MarginalPoint:
             self.a = Ra
 
         if self.a is not None and self.b is not None:
-            raise solver.NewtonDoneError
+            raise solver_mod.NewtonDoneError
 
         # Check for change of sign (require small change in rayleigh and small growth rate)
         if abs(dRa/Ra) < 0.01 and abs(self._gevp.evp_lmb[self.mode].real) < 1:
@@ -281,7 +283,7 @@ class MarginalPoint:
             if self._gevp.evp_lmb is not None and growth*self._gevp.evp_lmb[self.mode].real < 0:
                 self.a = min(Ra, Ra+dRa)
                 self.b = max(Ra, Ra+dRa)
-                raise solver.NewtonDoneError
+                raise solver_mod.NewtonDoneError
 
         if self.best is None:
             self.best = (abs(growth), Ra, False)
@@ -305,10 +307,10 @@ class GEVP:
         self.no_bcs = bcs.copy()
         self.no_bcs['bcType'] = model.SOLVER_NO_TAU
         self.fields = self.model.stability_fields()
-        self.tol = tol
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
+        self.solver = solver_mod.GEVPSolver(tol = tol)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -344,9 +346,9 @@ class GEVP:
                 initial_vector = None
 
             if with_vectors:
-                self.evp_lmb, self.evp_vec = solver.eigenpairs(problem, nev, initial_vector = initial_vector, tol = self.tol)
+                self.evp_lmb, self.evp_vec = self.solver.eigenpairs(problem, nev, initial_vector = initial_vector)
             else:
-                self.evp_lmb = solver.eigenvalues(problem, nev, initial_vector = initial_vector, tol = self.tol)
+                self.evp_lmb = self.solver.eigenvalues(problem, nev, initial_vector = initial_vector)
                 self.evp_vec = None
             Print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
 
@@ -356,7 +358,7 @@ class GEVP:
         # Create operators
         if spy or write_mtx:
             opA, opB, sizes = self.setupProblem(Ra)
-            restrict = solver.restrict_operators(sizes)
+            restrict = self.solver.restrict_operators(sizes)
             A = opA(restriction = restrict)
             B = opB(restriction = restrict)
 
@@ -406,6 +408,7 @@ class GEVP:
                     if f[1] != "":
                         title = title + ', ' + f[1]
                     pl.title(title)
+                    pl.tight_layout()
                 if save_pdf:
                     fname = "spectra_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                     pl.savefig(fname, bbox_inches='tight', dpi=200)
@@ -418,13 +421,16 @@ class GEVP:
         else:
             return None
 
-    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = True):
+    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = True, save_profile = True):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
 
             # Extra different fields
             sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
+            if self.model.use_galerkin:
+                sol_spec = self.apply_stencil(sol_spec)
+
             if geometry == 'c1d':
                 import geomhdiscc.transform.cartesian as transf
                 nD = 1
@@ -481,6 +487,7 @@ class GEVP:
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
+                        pl.tight_layout()
                     if save_pdf:
                         fname = "profile_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                         pl.savefig(fname, bbox_inches='tight', dpi=200)
@@ -515,6 +522,7 @@ class GEVP:
                     import matplotlib as mpl
                     import matplotlib.pylab as pl
                     import matplotlib.cm as cm
+                    from mpl_toolkits.axes_grid1 import make_axes_locatable
                     Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
                     # Plot physical field in meridional slice
                     grid = transf.grid_2d(*viz_res)
@@ -524,26 +532,36 @@ class GEVP:
                     for i,f in enumerate(self.fields):
                         vmax = np.max(np.abs(sol_rphys[f]))
                         pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
-                        pl.contourf(grid[0], grid[1], sol_rphys[f], 30, cmap = mycm, vmax = vmax, vmin = -vmax)
+                        CS = pl.contourf(grid[0], grid[1], sol_rphys[f], 30, cmap = mycm, vmax = vmax, vmin = -vmax)
                         title = f[0]
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
+                        divider = make_axes_locatable(pl.gca())
+                        cax = divider.append_axes("right", "5%", pad="3%")
+                        pl.colorbar(CS, cax=cax)
+                        pl.tight_layout()
                     if save_pdf:
                         fname = "slice_meridional_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                         pl.savefig(fname, bbox_inches='tight', dpi=200)
                     if plot:
                         pl.show()
                     pl.clf()
+
+                if plot or save_pdf or save_profile:
                     # Plot physical field in equatorial radial profile
                     grid_r = transf.rgrid(*res_1d)
-                    rows = np.ceil(len(self.fields)/3)
-                    cols = min(3, len(self.fields))
                     sol_rrad = dict()
                     sol_irad = dict()
                     for i,f in enumerate(self.fields):
-                        sol_rrad[f] = sol_rphys[f][grid[0].shape[0]//2,:]
-                        sol_irad[f] = sol_iphys[f][grid[0].shape[0]//2,:]
+                        sol_rrad[f] = sol_rphys[f][sol_rphys[f].shape[0]//2,:]
+                        sol_irad[f] = sol_iphys[f][sol_iphys[f].shape[0]//2,:]
+                        if f == ("temperature",""):
+                            np.savetxt("profile_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".dat", np.array([grid_r, sol_rrad[f], sol_irad[f]]).transpose())
+                if plot or save_pdf:
+                    rows = np.ceil(len(self.fields)/3)
+                    cols = min(3, len(self.fields))
+                    for i,f in enumerate(self.fields):
                         pl.subplot(rows,cols,i+1)
                         pl.plot(grid_r, sol_rrad[f], 'b-')
                         pl.plot(grid_r, sol_irad[f], 'r-')
@@ -551,6 +569,7 @@ class GEVP:
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
+                        pl.tight_layout()
                     if save_pdf:
                         fname = "profile_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                         pl.savefig(fname, bbox_inches='tight', dpi=200)
@@ -566,21 +585,30 @@ class GEVP:
                         sol_eq = np.outer(np.cos(phi),sol_rrad[f]) - np.outer(np.sin(phi),sol_irad[f])
                         pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
                         vmax = np.max(np.abs(sol_eq))
-                        pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 30, cmap = mycm)
+                        CS = pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 30, cmap = mycm)
                         title = f[0]
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
+                        divider = make_axes_locatable(pl.gca())
+                        cax = divider.append_axes("right", "5%", pad="3%")
+                        pl.colorbar(CS, cax=cax)
+                        pl.tight_layout()
                     if save_pdf:
                         fname = "slice_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                         pl.savefig(fname, bbox_inches='tight', dpi=200)
                     if plot:
                         pl.show()
                     pl.clf()
-            
-            return (grid, sol_rphys, sol_iphys)
-        else:
-            return None
+
+    def apply_stencil(self, sol_vec):
+        """Apply Galerkin stencil to recover physical fields"""
+        
+        for k,v in sol_vec.items():
+            S = self.model.stencil(self.res, self.eq_params, self.eigs, self.bcs, k, False)
+            sol_vec[k] = S*v
+
+        return sol_vec
 
     def defaultWave(self, k):
         """Default conversion for wavenumber index"""
