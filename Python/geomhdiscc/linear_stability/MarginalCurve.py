@@ -350,7 +350,7 @@ class GEVP:
             else:
                 self.evp_lmb = self.solver.eigenvalues(problem, nev, initial_vector = initial_vector)
                 self.evp_vec = None
-            Print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
+            Print("\t\t (Ra = {:.14g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
 
     def viewOperators(self, Ra, spy = True, write_mtx = True):
         """Spy and/or write the operators to MatrixMarket file"""

@@ -10,7 +10,7 @@ import itertools
 import geomhdiscc.base.utils as utils
 
 
-use_parity_bc = False
+use_parity_bc = True
 
 def no_bc():
     """Get a no boundary condition flag"""

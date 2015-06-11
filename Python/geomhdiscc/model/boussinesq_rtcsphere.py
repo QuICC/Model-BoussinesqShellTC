@@ -257,6 +257,8 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         T = eq_params['taylor']**0.5
 
+        tscale = eq_params['taylor']**(1.0/3.0)
+
         m = int(eigs[0])
 
         mat = None
@@ -283,7 +285,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                 mat = mat + geo.i4r4lapl(res[0], res[1], m, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = geo.i4r4(res[0], res[1], m, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4r4(res[0], res[1], m, bc, -Ra/tscale, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -291,7 +293,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', restriction = restriction)
+                    mat = geo.i2r2(res[0], res[1], m, bc, coeff = tscale, with_sh_coeff = 'laplh', restriction = restriction)
 
                 else:
                     mat = geo.zblk(res[0], res[1], m, bc)
@@ -310,17 +312,18 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         assert(eigs[0].is_integer())
 
         m = int(eigs[0])
+        tscale = eq_params['taylor']**(1.0/3.0)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i2r2(res[0], res[1], m, bc, coeff = tscale, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i4r4lapl(res[0], res[1], m, bc, coeff = tscale, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("temperature",""):
-            mat = geo.i2r2(res[0], res[1], m, bc, restriction = restriction)
+            mat = geo.i2r2(res[0], res[1], m, bc, coeff = tscale, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -30,7 +30,6 @@ def x_to_phys(expr, grid):
     """Convert sympy expression to grid values"""
 
     x = sy.Symbol('x')
-    mpmath.mp.dps = 200
     func = sy.lambdify(x, expr)
     return func(grid)
 
@@ -160,6 +159,25 @@ def lapl2h(nx, xg):
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) - 2.0*k**2*sy.diff(sphys,x,x) + k**4*sphys)
     test_forward(A, sphys, ssol, xg, -4)
+
+def continuity(nx, xg):
+    """Accuracy test for continuity operator"""
+
+    print("continuity:")
+    print("\t Forward: (polynomial):")
+    x = sy.Symbol('x')
+    A = c1d.sid(nx, 0, c1d.c1dbc.no_bc())
+    B = c1d.d1(nx, c1d.c1dbc.no_bc())
+    sphysW = sy.sin(np.pi*(x+1)/2.0)
+    sphysU = -sy.diff(sphysW)
+    func = sy.lambdify(x, sphysU)
+    chebU = transf.tocheb([func(v) for v in xg])
+    func = sy.lambdify(x, sphysW)
+    chebW = transf.tocheb([func(v) for v in xg])
+
+    import matplotlib.pylab as pl
+    pl.semilogy(np.abs(A*chebU + B*chebW))
+    pl.show()
 
 def i1(nx, xg):
     """Accuracy test for i1 operator"""
@@ -646,7 +664,7 @@ def surfaceFlux(nx, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 12
+    nx = 16
     xg = transf.grid(nx)
 
 #    # run hardcoded operator tests
@@ -657,19 +675,20 @@ if __name__ == "__main__":
 #    d4(nx, xg)
 #    laplh(nx, xg)
 #    lapl2h(nx, xg)
+    continuity(nx, xg)
 #    i1(nx, xg)
 #    i2(nx, xg)
 #    i2x1(nx, xg)
 #    i2d1(nx, xg)
-    i2d2(nx, xg)
-    i2lapl(nx, xg)
-    i2laplh(nx, xg)
+#    i2d2(nx, xg)
+#    i2lapl(nx, xg)
+#    i2laplh(nx, xg)
 #    i4(nx, xg)
 #    i4d1(nx, xg)
 #    i4d2(nx, xg)
-    i4d4(nx, xg)
-    i4lapl(nx, xg)
-    i4laplh(nx, xg)
+#    i4d4(nx, xg)
+#    i4lapl(nx, xg)
+#    i4laplh(nx, xg)
 #    i4lapl2(nx, xg)
 #    i4lapl2h(nx, xg)
 #    qid(nx, xg)

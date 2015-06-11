@@ -35,7 +35,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
         #fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
-        fields =  [("velocity","x"), ("velocity","z"), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","z"), ("pressure",""), ("dz_pressure","")]
 
         return fields
 
@@ -262,9 +262,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
                 mat = geo.lapl(res[0], k1, k2, bc, cscale = zscale)
-                mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
-                if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_1d(idx_u, res[0])
 
             elif field_col == ("velocity","y"):
                 mat = geo.zblk(res[0], bc)
@@ -277,7 +274,9 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
             elif field_col == ("pressure",""):
                 mat = geo.sid(res[0], 2, bc, -1j*k1)
-                mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
+
+            elif field_col == ("dz_pressure",""):
+                mat = geo.zblk(res[0], bc)
 
         elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
@@ -285,9 +284,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
             elif field_col == ("velocity","y"):
                 mat = geo.lapl(res[0], k1, k2, bc, cscale = zscale)
-                mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
-                if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_1d(idx_v, res[0])
 
             elif field_col == ("velocity","z"):
                 mat = geo.zblk(res[0], bc)
@@ -297,7 +293,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
             elif field_col == ("pressure",""):
                 mat = geo.sid(res[0], 2, bc, -1j*k2)
-                mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
@@ -313,8 +308,11 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                 mat = geo.sid(res[0], 2, bc, Ra)
 
             elif field_col == ("pressure",""):
-                mat = geo.d1(res[0], bc, -1.0, cscale = zscale, zr = 2)
-                mat = mat*utils.qid_from_idx(idx_p, res[0])
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("dz_pressure",""):
+                #mat = geo.d1(res[0], bc, -1.0, cscale = zscale, zr = 2)
+                mat = geo.sid(res[0], 2, bc, -1.0)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","x"):
@@ -344,27 +342,47 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], no_bc())
 
             else:
-                drop = 2
+                drop = 0
                 if field_col == ("velocity","x"):
                     mat = geo.sid(res[0], drop, bc, 1j*k1)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
-                    mat = mat.tolil()
-                    mat[-2,-1] = 1
 
                 elif field_col == ("velocity","y"):
                     mat = geo.sid(res[0], drop, bc, 1j*k2)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
 
                 elif field_col == ("velocity","z"):
-                    mat = geo.d1(res[0], bc, cscale = zscale, zr = drop)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat
+                    mat = geo.d1(res[0], bc, cscale = zscale)
 
                 elif field_col == ("temperature",""):
                     mat = geo.zblk(res[0], bc)
 
                 elif field_col == ("pressure",""):
                     mat = geo.zblk(res[0], bc)
-                    mat = mat + utils.id_from_idx_1d(idx_p, res[0])
+
+                elif field_col == ("dz_pressure",""):
+                    mat = geo.zblk(res[0], bc)
+
+        elif field_row == ("dz_pressure",""):
+            if bcs["bcType"] == self.SOLVER_NO_TAU:
+                mat = geo.zblk(res[0], no_bc())
+
+            else:
+                if field_col == ("velocity","x"):
+                    mat = geo.zblk(res[0], bc)
+
+                elif field_col == ("velocity","y"):
+                    mat = geo.zblk(res[0], bc)
+
+                elif field_col == ("velocity","z"):
+                    mat = geo.zblk(res[0], bc)
+
+                elif field_col == ("temperature",""):
+                    mat = geo.zblk(res[0], bc)
+
+                elif field_col == ("pressure",""):
+                    mat = geo.d1(res[0], bc, -1, cscale = zscale)
+
+                elif field_col == ("dz_pressure",""):
+                    mat = geo.sid(res[0], 0, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -397,6 +415,9 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
             mat = geo.sid(res[0], 2, bc)
 
         elif field_row == ("pressure",""):
+            mat = geo.zblk(res[0], bc)
+
+        elif field_row == ("dz_pressure",""):
             mat = geo.zblk(res[0], bc)
 
         if mat is None:
