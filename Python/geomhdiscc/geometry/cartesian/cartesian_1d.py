@@ -487,11 +487,15 @@ def sid(nx, s, bc, coeff = 1.0):
     mat.col = mat.row
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def stencil(nx, bc):
+def stencil(nx, bc, make_square):
     """Create a galerkin stencil matrix"""
 
-    bc['rt'] = 0
-    return c1dbc.stencil(nx, bc)
+    mat = qid(nx, 0, c1dbc.no_bc())
+
+    if not make_square:
+        bc['rt'] = 0
+
+    return c1dbc.constrain(mat, bc)
 
 def avg(nx):
     """Compute the average of the expansion"""

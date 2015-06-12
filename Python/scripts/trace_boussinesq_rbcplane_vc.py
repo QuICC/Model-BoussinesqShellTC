@@ -3,13 +3,13 @@
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_rbcplane_vc_diff2 as mod
+import geomhdiscc.model.boussinesq_rbcplane_vc_gal as mod
 import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBCPlaneVC()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
 res = [32, 0, 0]
@@ -169,7 +169,7 @@ if show_spy or write_mtx:
     gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
 
 if solve_gevp:
-    gevp.solve(Ra, 60, with_vectors = True)
+    gevp.solve(Ra, 3, with_vectors = True)
     print("Found eigenvalues:")
     print(gevp.evp_lmb)
 

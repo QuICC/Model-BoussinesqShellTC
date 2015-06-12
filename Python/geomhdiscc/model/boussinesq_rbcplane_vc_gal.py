@@ -34,7 +34,8 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         """Get the list of fields needed for linear stability calculations"""
 
         #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
-        fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
+        #fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")
+        fields =  [("velocity","x"), ("velocity","z"), ("pressure","")]
 
         return fields
 
@@ -73,8 +74,10 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","x") or field_row == ("velocity","y") or field_row == ("velocity","z") or field_row == ("temperature","") or field_row == ("pressure",""):
+            if field_row == ("velocity","x") or field_row == ("velocity","y") or field_row == ("velocity","z") or field_row == ("temperature",""):
                 shift_x = 2
+            elif field_row == ("pressure",""):
+                shift_x = 1
             else:
                 shift_x = 0
 
@@ -86,6 +89,13 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         block_info = (tau_n, gal_n, (shift_x,0,0), 1)
         return block_info
+
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        # Get boundary condition
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        return geo.stencil(res[0], bc, make_square)
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -154,8 +164,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                         bc = {0:20}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
-            if self.use_galerkin and field_col == ("pressure",""):
-                bc = {0:0, 'cr':1}
 
             # Fixed temperature at top/Fixed flux at bottom
             elif bcId == 2:
@@ -166,6 +174,9 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                 else:
                     if field_row == ("temperature","") and field_col == field_row:
                         bc = {0:22}
+
+            if self.use_galerkin and field_col == ("pressure",""):
+                        bc = {0:-1, 'rt':0}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -193,6 +204,8 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                         bc = {0:-20, 'x':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'x':0}
+                    elif field_col == ("pressure",""):
+                        bc = {0:-1, 'x':0}
 
                 elif bcId == 1:
                     if field_col == ("velocity","x"):
@@ -203,6 +216,8 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                         bc = {0:-20, 'x':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-21, 'x':0}
+                    elif field_col == ("pressure",""):
+                        bc = {0:-1, 'x':0}
 
                 elif bcId == 2:
                     if field_col == ("temperature",""):
@@ -226,17 +241,13 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 
-        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x") and field_col == field_row:
             mat = geo.i2(res[0], bc)
-            mat = utils.qid_from_idx(idx_u, res[0])*mat
 
         elif field_row == ("velocity","y") and field_col == field_row:
             mat = geo.i2(res[0], bc)
-            mat = utils.qid_from_idx(idx_v, res[0])*mat
 
         elif field_row == ("velocity","z") and field_col == field_row:
             mat = geo.i2(res[0], bc)
@@ -382,17 +393,3 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
-
-    def zero_blocks(self, res, eigs):
-        """Build restriction matrices"""
-
-        # U: T_N
-        idx_u = utils.qidx(res[0], res[0]-1)
-
-        # V: T_N
-        idx_v = utils.qidx(res[0], res[0]-1)
-
-        # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0]-1)
-
-        return (idx_u, idx_v, idx_p)

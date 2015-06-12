@@ -403,7 +403,7 @@ class GEVP:
                 cols = min(3, len(self.fields))
                 for i,f in enumerate(self.fields):
                     pl.subplot(rows,cols,i+1)
-                    pl.semilogy(abs(sol_spec[f]))
+                    pl.semilogy(np.abs(sol_spec[f]))
                     title = f[0]
                     if f[1] != "":
                         title = title + ', ' + f[1]
@@ -434,6 +434,23 @@ class GEVP:
             if geometry == 'c1d':
                 import geomhdiscc.transform.cartesian as transf
                 nD = 1
+
+                if ("pressure","") in self.fields:
+                    import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
+                    mat = c1d.lapl(self.res[0], self.eigs[0], self.eigs[1], {0:0})
+                    field = sol_spec[("pressure","")]
+                    sol_spec[("pressure","laplacian")] = mat*field
+
+                    mat = c1d.d1(self.res[0], {0:0}, cscale = 2.0)
+                    cont = mat*sol_spec[("velocity","z")]
+                    if ("velocity","x") in self.fields: 
+                        mat = c1d.sid(self.res[0], 0, {0:0}, 1j*self.eigs[0])
+                        cont = cont + mat*sol_spec[("velocity","x")]
+                    if ("velocity","y") in self.fields: 
+                        mat = c1d.sid(self.res[0], 0, {0:0}, 1j*self.eigs[1])
+                        cont = cont + mat*sol_spec[("velocity","y")]
+                    sol_spec[("continuity","")] = cont
+
             elif geometry == 's1d':
                 import geomhdiscc.transform.shell as transf
                 nD = 1
@@ -451,8 +468,7 @@ class GEVP:
                 nD = 2
 
             # 1D data: plot physical profile
-            sol_rphys = dict()
-            sol_iphys = dict()
+            sol_phys = dict()
             if nD == 1:
                 if geometry == 'c1d':
                     viz_res = (self.res[0], )
@@ -468,24 +484,23 @@ class GEVP:
                     viz_res = (self.res[0],)
                     prof_opt = (int(self.eigs[0])%2,)
 
-                for f in self.fields:
-                    sol_rphys[f] = transf.toprofile(sol_spec[f].real, *prof_opt)
-                    sol_iphys[f] = transf.toprofile(sol_spec[f].imag, *prof_opt)
+                for k,f in sol_spec.items():
+                    sol_phys[k] = transf.toprofile(f.real, *prof_opt) + 1j*transf.toprofile(f.imag, *prof_opt)
 
                 if plot or save_pdf:
                     import matplotlib.pylab as pl
                     Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
                     # Plot physical field
                     grid = transf.grid_1d(*viz_res)
-                    rows = np.ceil(len(self.fields)/3)
-                    cols = min(3, len(self.fields))
-                    for i,f in enumerate(self.fields):
+                    rows = np.ceil(len(sol_phys)/3)
+                    cols = min(3, len(sol_phys))
+                    for i,df in enumerate(sol_phys.items()):
                         pl.subplot(rows,cols,i+1)
-                        pl.plot(grid, sol_rphys[f])
-                        pl.plot(grid, sol_iphys[f])
-                        title = f[0]
-                        if f[1] != "":
-                            title = title + ', ' + f[1]
+                        pl.plot(grid, df[1].real)
+                        pl.plot(grid, df[1].imag)
+                        title = df[0][0]
+                        if df[0][1] != "":
+                            title = title + ', ' + df[0][1]
                         pl.title(title)
                         pl.tight_layout()
                     if save_pdf:

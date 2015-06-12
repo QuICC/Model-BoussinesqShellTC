@@ -277,7 +277,9 @@ def tau_last(nx, nrow):
 def stencil(nx, bc):
     """Create a Galerkin stencil matrix"""
 
-    if bc[0] == -10:
+    if bc[0] < 0 and bc[0] > -10:
+        mat = restrict_eye(nx, 'cr', abs(bc[0])) 
+    elif bc[0] == -10:
         mat = stencil_value(nx, 1)
     elif bc[0] == -11:
         mat = stencil_value(nx, -1)

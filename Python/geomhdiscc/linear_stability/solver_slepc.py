@@ -26,20 +26,23 @@ class GEVPSolver:
     def __init__(self, shift_range = None, tol = 1e-8):
         """Initialize the SLEPc solver"""
 
+        self.create_eps(shift_range = None, tol = 1e-8)
+
+    def create_eps(self, shift_range = None, tol = 1e-8):
+        """Create SLEPc's eigensolver"""
+
         opts = PETSc.Options()
         opts["mat_mumps_icntl_14"] = 80
-        opts["mat_mumps_icntl_29"] = 2
+        #opts["mat_mumps_icntl_29"] = 2
 
         if shift_range is None:
-            self.shift_range = (1e-2, 0.2)
+            #self.shift_range = (1e-2, 0.2)
+            self.shift_range = (-1e-2, 1e-2)
         else:
             self.shift_range = shift_range
 
         self.E = SLEPc.EPS()
         self.E.create()
-
-        #self.E.setOperators(A,B)
-        #self.E.setDimensions(nev = nev)
 
         self.E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
         self.E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
