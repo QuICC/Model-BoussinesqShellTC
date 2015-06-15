@@ -3,13 +3,15 @@
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_rbcplane_vc_gal as mod
+#import geomhdiscc.model.boussinesq_rbcplane_vc as mod
+#import geomhdiscc.model.boussinesq_rbcplane_vc_gal as mod
+import geomhdiscc.model.boussinesq_rbcplane_vc_diff as mod
 import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBCPlaneVC()
 model.linearize = True
-model.use_galerkin = True
+model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 res = [32, 0, 0]

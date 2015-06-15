@@ -26,14 +26,16 @@ class GEVPSolver:
     def __init__(self, shift_range = None, tol = 1e-8):
         """Initialize the SLEPc solver"""
 
-        self.create_eps(shift_range = None, tol = 1e-8)
+        self.tol = tol
 
-    def create_eps(self, shift_range = None, tol = 1e-8):
+        self.create_eps(shift_range = None)
+
+    def create_eps(self, shift_range = None):
         """Create SLEPc's eigensolver"""
 
         opts = PETSc.Options()
         opts["mat_mumps_icntl_14"] = 80
-        #opts["mat_mumps_icntl_29"] = 2
+        opts["mat_mumps_icntl_29"] = 2
 
         if shift_range is None:
             #self.shift_range = (1e-2, 0.2)
@@ -48,7 +50,7 @@ class GEVPSolver:
         self.E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
         #self.E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
         self.E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
-        self.E.setTolerances(tol = tol)
+        self.E.setTolerances(tol = self.tol)
 
         ST = self.E.getST()
         ST.setType('sinvert')
@@ -75,6 +77,8 @@ class GEVPSolver:
 
     def update_eps(self, A, B, nev, initial_vector = None, shift_range = None):
         """Create SLEPc eigensolver"""
+
+        self.create_eps(shift_range = shift_range)
 
         self.E.setOperators(A,B)
         if initial_vector is not None:
@@ -107,10 +111,8 @@ class GEVPSolver:
 
         if nconv >= nev:
             eigs = np.array(np.zeros(nev), dtype=complex)
-            err = np.array(np.zeros(nev), dtype=complex)
             for i in range(nev):
                 eigs[i] = self.E.getEigenvalue(i)
-                err[i] = self.E.computeRelativeError(i)
 
             return eigs
         else:
@@ -132,11 +134,9 @@ class GEVPSolver:
             vi, wi = pA.getVecs()
             eigs = np.array(np.zeros(nev), dtype=complex)
             vects = np.array(np.zeros((vi.getLocalSize(),nev)), dtype=complex)
-            err = np.array(np.zeros(nev), dtype=complex)
             for i in range(nev):
                 eigs[i] = self.E.getEigenpair(i, vr, vi)
                 vects[:,i] = vr.getArray() + 1j*vi.getArray()
-                err[i] = self.E.computeRelativeError(i)
 
             return (eigs, vects)
         else:

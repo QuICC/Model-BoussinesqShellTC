@@ -440,6 +440,9 @@ class GEVP:
                     mat = c1d.lapl(self.res[0], self.eigs[0], self.eigs[1], {0:0})
                     field = sol_spec[("pressure","")]
                     sol_spec[("pressure","laplacian")] = mat*field
+                    import matplotlib.pylab as pl
+                    pl.semilogy(np.abs(sol_spec[("pressure","laplacian")]))
+                    pl.show()
 
                     mat = c1d.d1(self.res[0], {0:0}, cscale = 2.0)
                     cont = mat*sol_spec[("velocity","z")]
@@ -529,9 +532,9 @@ class GEVP:
                     res_2d = (self.res[2],)
 
                 viz_res = res_1d + res_2d
-                for f in self.fields:
-                    sol_rphys[f] = transf.toslice(sol_spec[f].real, res_1d[0], *res_2d)
-                    sol_iphys[f] = transf.toslice(sol_spec[f].imag, res_1d[0], *res_2d)
+
+                for k,f in sol_spec.items():
+                    sol_phys[k] = transf.toslice(f.real, res_1d[0], *res_2d) + 1j*transf.toslice(f.imag, res_1d[0], *res_2d)
 
                 if plot or save_pdf:
                     import matplotlib as mpl
@@ -545,9 +548,9 @@ class GEVP:
                     cols = min(3, len(self.fields))
                     mycm = cm.bwr
                     for i,f in enumerate(self.fields):
-                        vmax = np.max(np.abs(sol_rphys[f]))
+                        vmax = np.max(np.abs(sol_phys[f].real))
                         pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
-                        CS = pl.contourf(grid[0], grid[1], sol_rphys[f], 30, cmap = mycm, vmax = vmax, vmin = -vmax)
+                        CS = pl.contourf(grid[0], grid[1], sol_phys[f].real, 30, cmap = mycm, vmax = vmax, vmin = -vmax)
                         title = f[0]
                         if f[1] != "":
                             title = title + ', ' + f[1]
@@ -569,8 +572,8 @@ class GEVP:
                     sol_rrad = dict()
                     sol_irad = dict()
                     for i,f in enumerate(self.fields):
-                        sol_rrad[f] = sol_rphys[f][sol_rphys[f].shape[0]//2,:]
-                        sol_irad[f] = sol_iphys[f][sol_iphys[f].shape[0]//2,:]
+                        sol_rrad[f] = sol_phys[f].real[sol_phys[f].shape[0]//2,:]
+                        sol_irad[f] = sol_phys[f].imag[sol_phys[f].shape[0]//2,:]
                         if f == ("temperature",""):
                             np.savetxt("profile_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".dat", np.array([grid_r, sol_rrad[f], sol_irad[f]]).transpose())
                 if plot or save_pdf:

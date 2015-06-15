@@ -344,12 +344,10 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], no_bc())
 
             else:
-                drop = 2
+                drop = 1
                 if field_col == ("velocity","x"):
                     mat = geo.sid(res[0], drop, bc, 1j*k1)
                     mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
-                    mat = mat.tolil()
-                    mat[-2,-1] = 1
 
                 elif field_col == ("velocity","y"):
                     mat = geo.sid(res[0], drop, bc, 1j*k2)
@@ -414,6 +412,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         idx_v = utils.qidx(res[0], res[0])
 
         # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0])
+        idx_p = utils.qidx(res[0], res[0]-1)
 
         return (idx_u, idx_v, idx_p)

@@ -11,27 +11,46 @@ model.linearize = True
 model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
-#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.073175e7, 'ro':1, 'rratio':0.35} # m = 13, NS/NS
-#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.103005e7, 'ro':1, 'rratio':0.35} # m = 13, SF/SF
-#eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.2726e8, 'ro':1, 'rratio':0.35} # m = 30, NS/NS
-#eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.302e8, 'ro':1, 'rratio':0.35} # m = 30, SF/SF
-#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':3.2e6, 'ro':20.0/13.0, 'rratio':0.35} # m = 4, NS/NS
-#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.07310821e7, 'ro':1.0, 'rratio':0.35, 'heating':0} # m = 13, NS/NS, internal heating
-#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':3.24308e6, 'ro':1.0, 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
-#eq_params = {'taylor':4e6, 'prandtl':1, 'rayleigh':4.75992e4, 'ro':1.0, 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
-#eq_params = {'taylor':4e6*0.65**4, 'prandtl':1, 'rayleigh':28.7296, 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
-#eq_params = {'taylor':1e10*(1.0-0.35)**4, 'prandtl':1, 'rayleigh':3.24308e6/((20./13.)**2*0.35*1e10**0.5), 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
-# Internal heating, velocity bc: NS/NS, temperature bc: FT/FT
-bc_vel = 1 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
-bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
-ro = 20./13.
-rratio = 0.35
+Rac = None
+mc = None
+
+# SF/SF, FT/FT, internal heating
+bc_vel = 1; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
+#Ta = 1e6
+#res = [32, 32, 0]
+#Ta = 1e7
+#res = [32, 32, 0]
+#Ta = 1e8; Rac = 31.957658460641; mc = 7
+#res = [48, 48, 0]
+#Ta = 1e9; Rac = 43.034758690274; mc = 10
+#res = [48, 48, 0]
+#Ta = 1e10; Rac = 59.975071459666; mc = 13
+#res = [64, 64, 0]
+#Ta = 1e11; Rac = 85.363356944817; mc = 20
+#res = [64, 64, 0]
+#Ta = 1e12; Rac = 122.69214718393; mc = 30
+#res = [128, 128, 0]
+#Ta = 1e13; Rac = 177.55422348123; mc = 44
+#res = [192, 192, 0]
+#Ta = 1e14; Rac = 258.13410447601; mc = 65
+#res = [256, 256, 0]
+#Ta = 1e15; Rac = 376.44742717745; mc = 95
+#res = [512, 384, 0]
+#Ta = 1e16
+#res = [768, 512, 0]
+#Ta = 1e17
+#res = [768, 512, 0]
+Ta = 1e18
+res = [1024, 384, 0]
+
+# NS/NS, FT/FT, internal heating
+#bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
 #res = [32, 32, 0]
 #Ta = 1e8
-#res = [32, 32, 0]
+#res = [48, 48, 0]
 #Ta = 1e9
 #res = [48, 48, 0]
 #Ta = 1e10
@@ -39,13 +58,13 @@ rratio = 0.35
 #Ta = 1e11
 #res = [64, 64, 0]
 #Ta = 1e12
-#res = [96, 96, 0]
-#Ta = 1e13
 #res = [128, 128, 0]
+#Ta = 1e13
+#res = [192, 192, 0]
 #Ta = 1e14
 #res = [256, 256, 0]
-Ta = 1e15
-res = [128, 384, 0]
+#Ta = 1e15
+#res = [384, 384, 0]
 #Ta = 1e16
 #res = [512, 512, 0]
 #Ta = 1e17
@@ -54,10 +73,18 @@ res = [128, 384, 0]
 #res = [1024, 1024, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
-m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
+if mc is None:
+    m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
+else:
+    m = mc
+if Rac is None:
+    Ra = (4.1173*Ta**(2./3.) + 17.7815*Ta**(0.5))*(1.0+rratio)/(2.0*ro**2*Ta**0.5) # Asymptotic prediction for critical Rayleigh number
+else:
+    Ra = Rac
+
+
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
-Ra_th = 4.1173*Ta**(2./3.) + 17.7815*Ta**(0.5) # Asymptotic prediction for critical Rayleigh number
-eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra_th*(1.0+rratio)/(2.0*ro**2*Ta**0.5), 'ro':ro, 'rratio':rratio, 'heating':0}
+eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra, 'ro':ro, 'rratio':rratio, 'heating':heating}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)
@@ -84,11 +111,11 @@ save_spectra = False
 save_physical = False
 viz_mode = 0
 
-evp_tol = 1e-8
+evp_tol = 1e-30
 
 if marginal_point or marginal_curve:
     # Create marginal curve object
-    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8, evp_tol = 1e-8)
+    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8, evp_tol = evp_tol)
 
 if marginal_point:
     # Compute marginal curve at a single point
@@ -97,7 +124,7 @@ if marginal_point:
 
 if marginal_curve:
     # Trace marginal curve for a set of wave indexes
-    ms = np.arange(max(0, m-5), m+6, 1)
+    ms = np.arange(max(0, m-3), m+4, 1)
     (data_m, data_Ra, data_freq) = curve.trace(ms, initial_guess = eq_params['rayleigh'])
 
     if marginal_minimum:
@@ -127,8 +154,6 @@ if solve_gevp:
     MarginalCurve.Print("Found eigenvalues:")
     MarginalCurve.Print(gevp.evp_lmb)
 
-if show_spectra:
+if solve_gevp:
     gevp.viewSpectra(viz_mode, plot = show_spectra, save_pdf = save_spectra)
-
-if show_physical:
     gevp.viewPhysical(viz_mode, 'shell', plot = show_physical, save_pdf = save_physical)

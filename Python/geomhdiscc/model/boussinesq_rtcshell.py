@@ -87,6 +87,17 @@ class BoussinesqRTCShell(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+
+        # Get boundary condition
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        return geo.stencil(res[0], res[1], m, bc, make_square)
+
     def stability_sizes(self, res, eigs):
         """Get the block sizes in the stability calculation matrix"""
 
