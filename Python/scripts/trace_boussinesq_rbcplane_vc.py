@@ -3,9 +3,9 @@
 import numpy as np
 import functools
 
-#import geomhdiscc.model.boussinesq_rbcplane_vc as mod
+import geomhdiscc.model.boussinesq_rbcplane_vc as mod
 #import geomhdiscc.model.boussinesq_rbcplane_vc_gal as mod
-import geomhdiscc.model.boussinesq_rbcplane_vc_diff as mod
+#import geomhdiscc.model.boussinesq_rbcplane_vc_diff as mod
 import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
@@ -14,14 +14,16 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [32, 0, 0]
+res = [60, 0, 0]
 
 # SF, FT,
 bc_vel = 0
 bc_temp = 0
-phi = 0
-kp = 1.0
+phi = 45
+kp = 1.5
 eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'heating':0, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':1285, 'heating':0, 'scale1d':2.0}
+#eq_params = {'prandtl':1, 'rayleigh':675, 'heating':0, 'scale1d':2.0}
 ## kx = 0, ky = 2
 #kx = 0
 #ky = 2
@@ -171,7 +173,7 @@ if show_spy or write_mtx:
     gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
 
 if solve_gevp:
-    gevp.solve(Ra, 3, with_vectors = True)
+    gevp.solve(Ra, 10, with_vectors = True)
     print("Found eigenvalues:")
     print(gevp.evp_lmb)
 

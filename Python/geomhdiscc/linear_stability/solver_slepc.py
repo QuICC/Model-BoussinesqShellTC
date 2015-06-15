@@ -47,8 +47,8 @@ class GEVPSolver:
         self.E.create()
 
         self.E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
-        self.E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
-        #self.E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
+        #self.E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
+        self.E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
         self.E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
         self.E.setTolerances(tol = self.tol)
 

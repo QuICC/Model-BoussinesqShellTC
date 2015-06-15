@@ -33,15 +33,15 @@ bc_vel = 1; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e13; Rac = 177.55422348123; mc = 44
 #res = [192, 192, 0]
 #Ta = 1e14; Rac = 258.13410447601; mc = 65
-#res = [256, 256, 0]
-#Ta = 1e15; Rac = 376.44742717745; mc = 95
+res = [512, 256, 0]
+Ta = 1e15; Rac = 376.44742717745; mc = 95
 #res = [512, 384, 0]
 #Ta = 1e16
 #res = [768, 512, 0]
 #Ta = 1e17
 #res = [768, 512, 0]
-Ta = 1e18
-res = [1024, 384, 0]
+#Ta = 1e18
+#res = [1024, 384, 0]
 
 # NS/NS, FT/FT, internal heating
 #bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35

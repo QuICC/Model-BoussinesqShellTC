@@ -437,9 +437,13 @@ class GEVP:
 
                 if ("pressure","") in self.fields:
                     import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
-                    mat = c1d.lapl(self.res[0], self.eigs[0], self.eigs[1], {0:0})
+                    mat = c1d.lapl(self.res[0], self.eigs[0], self.eigs[1], {0:0}, cscale = 2.0)
                     field = sol_spec[("pressure","")]
                     sol_spec[("pressure","laplacian")] = mat*field
+                    mat = c1d.d1(self.res[0], {0:0}, cscale = 2.0)
+                    field = sol_spec[("temperature","")]
+                    sol_spec[("pressure","laplacian")] = sol_spec[("pressure","laplacian")] - self.eq_params['rayleigh']*mat*field
+
                     import matplotlib.pylab as pl
                     pl.semilogy(np.abs(sol_spec[("pressure","laplacian")]))
                     pl.show()
