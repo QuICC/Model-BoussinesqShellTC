@@ -44,9 +44,9 @@ def spectral_monomial(p, f):
         b = sympy.Symbol('b')
         n = sympy.Symbol('n')
         for i in prev.keys():
-            recurrence[i-1] = recurrence.get(i-1,0) + 2*(n+1)*(n + a + b + 1)/((2*n + a + b + 1)*(2*n + a + b + 2))*prev[i]
-            recurrence[i] = recurrence.get(i,0) + (a**2 - b**2)/((2*n + a + b + 2)*(2*n + a + b))*prev[i]
-            recurrence[i+1] = recurrence.get(i+1,0) + 2*(n + a)*(n + b)/((2*n + a + b + 1)*(2*n + a + b))*prev[i]
+            recurrence[i-1] = recurrence.get(i-1,0) + 2*(n + i + 1)*(n + i + a + b + 1)/((2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b + 2))*prev[i]
+            recurrence[i] = recurrence.get(i,0) - (a**2 - b**2)/((2*n + 2*i + a + b + 2)*(2*n + 2*i + a + b))*prev[i]
+            recurrence[i+1] = recurrence.get(i+1,0) + 2*(n + i + a)*(n + i + b)/((2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b + 2))*prev[i]
         for i in recurrence.keys():
             recurrence[i] = recurrence[i].simplify().factor()
     return recurrence
@@ -66,9 +66,9 @@ def spectral_integral(q, f, asrow = True):
         b = sympy.Symbol('b')
         n = sympy.Symbol('n')
         for i in prev.keys():
-            recurrence[i-1] = recurrence.get(i-1,0) - 2*(n + a)*(n + b)/((n + a +b)*(2*n + a + b)*(2*n + a + b + 1))*prev[i]
-            recurrence[i] = recurrence.get(i,0) + 2*(a - b)/((2*n + a + b)*(2*n + a + b + 2))*prev[i]
-            recurrence[i+1] = recurrence.get(i+1,0) + 2*(n + a + b + 1)/((2*n + a + b + 1)*(2*n + a + b + 2))*prev[i]
+            recurrence[i-1] = recurrence.get(i-1,0) - 2*(n + i + a)*(n + i + b)/((n + i + a + b)*(2*n + 2*i + a + b)*(2*n + 2*i + a + b + 1))*prev[i]
+            recurrence[i] = recurrence.get(i,0) + 2*(a - b)/((2*n + 2*i + a + b)*(2*n + 2*i + a + b + 2))*prev[i]
+            recurrence[i+1] = recurrence.get(i+1,0) + 2*(n + i + a + b + 1)/((2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b + 2))*prev[i]
 
         # Convert to row recurrence relation
         if asrow:
