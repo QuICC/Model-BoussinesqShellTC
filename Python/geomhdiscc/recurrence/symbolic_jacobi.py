@@ -6,6 +6,11 @@ from __future__ import unicode_literals
 import sympy
 import copy
 
+l = sympy.Symbol('l')
+n = sympy.Symbol('n')
+a = -sympy.Rational(1,2)
+b = l - sympy.Rational(1,2)
+
 def integrate(term, base = None):
     # Some assertion for safety
     assert (term['q'] >= 0)
@@ -29,7 +34,20 @@ def integrate(term, base = None):
             base = integrate(t, base)
     return base
 
-def spectral_monomial(p, f):
+def norm(i):
+    if i == 0:
+        norm = 1
+    elif i > 0:
+        norm = (2*n + a + b + 1)
+        for j in range(0, i):
+            norm = norm*(n + j + a + 1)*(n + j + b + 1)/((2*n + 2*j + a + b + 3)*(n + j + a + b + 1)*(n + j + 1))
+        norm = sympy.sqrt(norm.simplify())
+    else:
+        norm = 1
+
+    return norm
+
+def spectral_monomial(p, f, asrow = True):
     # Some assertion for safety
     assert (p >= 0)
 
@@ -37,16 +55,21 @@ def spectral_monomial(p, f):
     if p == 0:
         recurrence = dict(f)
     else:
-        prev = spectral_monomial(p-1, f)
+        prev = spectral_monomial(p-1, f, False)
         recurrence = dict()
 
-        a = sympy.Symbol('a')
-        b = sympy.Symbol('b')
-        n = sympy.Symbol('n')
         for i in prev.keys():
-            recurrence[i-1] = recurrence.get(i-1,0) + 2*(n + i + 1)*(n + i + a + b + 1)/((2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b + 2))*prev[i]
+            recurrence[i-1] = recurrence.get(i-1,0) + 2*(n + i + a)*(n + i + b)/((2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b))*prev[i]
             recurrence[i] = recurrence.get(i,0) - (a**2 - b**2)/((2*n + 2*i + a + b + 2)*(2*n + 2*i + a + b))*prev[i]
-            recurrence[i+1] = recurrence.get(i+1,0) + 2*(n + i + a)*(n + i + b)/((2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b + 2))*prev[i]
+            recurrence[i+1] = recurrence.get(i+1,0) + 2*(n + i + 1)*(n + i + a + b + 1)/((2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b + 2))*prev[i]
+
+        # Convert to row recurrence relation
+        if asrow:
+            old = dict(recurrence)
+            recurrence = dict()
+            for i in old.keys():
+                recurrence[-i] = old[i].subs(n, n-i)
+
         for i in recurrence.keys():
             recurrence[i] = recurrence[i].simplify().factor()
     return recurrence
@@ -62,9 +85,6 @@ def spectral_integral(q, f, asrow = True):
         prev = spectral_integral(q-1, f, False)
         recurrence = dict()
 
-        a = sympy.Symbol('a')
-        b = sympy.Symbol('b')
-        n = sympy.Symbol('n')
         for i in prev.keys():
             recurrence[i-1] = recurrence.get(i-1,0) - 2*(n + i + a)*(n + i + b)/((n + i + a + b)*(2*n + 2*i + a + b)*(2*n + 2*i + a + b + 1))*prev[i]
             recurrence[i] = recurrence.get(i,0) + 2*(a - b)/((2*n + 2*i + a + b)*(2*n + 2*i + a + b + 2))*prev[i]

@@ -437,24 +437,25 @@ class GEVP:
 
                 if ("pressure","") in self.fields:
                     import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
-                    mat = c1d.lapl(self.res[0], self.eigs[0], self.eigs[1], {0:0}, cscale = 2.0)
+                    mat = c1d.i2lapl(self.res[0], self.eigs[0], self.eigs[1], {0:0}, cscale = 2.0)
                     field = sol_spec[("pressure","")]
                     sol_spec[("pressure","laplacian")] = mat*field
-                    mat = c1d.d1(self.res[0], {0:0}, cscale = 2.0)
+                    mat = c1d.i2d1(self.res[0], {0:0}, cscale = 2.0)
                     field = sol_spec[("temperature","")]
                     sol_spec[("pressure","laplacian")] = sol_spec[("pressure","laplacian")] - self.eq_params['rayleigh']*mat*field
+                    print(sol_spec[("pressure","laplacian")])
 
                     import matplotlib.pylab as pl
                     pl.semilogy(np.abs(sol_spec[("pressure","laplacian")]))
                     pl.show()
 
-                    mat = c1d.d1(self.res[0], {0:0}, cscale = 2.0)
+                    mat = c1d.i1d1(self.res[0], {0:0}, cscale = 2.0)
                     cont = mat*sol_spec[("velocity","z")]
                     if ("velocity","x") in self.fields: 
-                        mat = c1d.sid(self.res[0], 0, {0:0}, 1j*self.eigs[0])
+                        mat = c1d.i1(self.res[0], {0:0}, 1j*self.eigs[0])
                         cont = cont + mat*sol_spec[("velocity","x")]
                     if ("velocity","y") in self.fields: 
-                        mat = c1d.sid(self.res[0], 0, {0:0}, 1j*self.eigs[1])
+                        mat = c1d.i1(self.res[0], {0:0}, 1j*self.eigs[1])
                         cont = cont + mat*sol_spec[("velocity","y")]
                     sol_spec[("continuity","")] = cont
 

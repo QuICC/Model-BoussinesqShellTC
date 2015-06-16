@@ -416,6 +416,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         idx_v = utils.qidx(res[0], res[0])
 
         # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0] - 2)
+        idx_p = utils.qidx(res[0], res[0] - 1)
 
         return (idx_u, idx_v, idx_p)
