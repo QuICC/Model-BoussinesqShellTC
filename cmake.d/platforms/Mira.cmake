@@ -6,7 +6,7 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(GEOMHDISCC_COMPILERS "XL" "Clang" "GCC" PARENT_SCOPE)
+set(GEOMHDISCC_COMPILERS "Clang" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
@@ -26,8 +26,6 @@ set(GEOMHDISCC_THREADSMODELS "None" PARENT_SCOPE)
 
 set(GEOMHDISCC_FFTS "FFTW" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_FFTW_XL "/soft/libraries/alcf/current/xl/FFTW3/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_FFTW_XL "/soft/libraries/alcf/current/xl/FFTW3/lib" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_FFTW_CLANG "/soft/libraries/alcf/current/gcc/FFTW3/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_FFTW_CLANG "/soft/libraries/alcf/current/gcc/FFTW3/lib" PARENT_SCOPE)
 
@@ -50,8 +48,6 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 set(GEOMHDISCC_SPLINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" "m" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" "lapack" "blas" "gfortran" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_UMFPACK_XL "/soft/libraries/petsc/3.5.2.1/xl-opt/include/" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_UMFPACK_XL "/soft/libraries/alcf/current/xl/LAPACK/lib" "/soft/libraries/alcf/current/xl/BLAS/lib" "/soft/libraries/petsc/3.5.2.1/xl-opt/lib/" PARENT_SCOPE)
 
 set(GEOMHDISCC_INCLUDES_UMFPACK_CLANG "/soft/libraries/petsc/3.5.2.1/xl-opt/include/" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK_CLANG "/soft/libraries/alcf/current/gcc/LAPACK/lib" "/soft/libraries/alcf/current/gcc/BLAS/lib" "/soft/libraries/petsc/3.5.2.1/xl-opt/lib/" PARENT_SCOPE)
@@ -67,8 +63,6 @@ set(GEOMHDISCC_LIBDIR_MUMPS_CLANG "/soft/compilers/bgclang/xlsmp-nonconflicting/
 
 set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "z" "hdf5" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_HDF5_XL "/soft/libraries/hdf5/current/cnk-xl/current/include/" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_HDF5_XL "/soft/libraries/alcf/current/xl/ZLIB/lib/" "/soft/libraries/hdf5/current/cnk-xl/current/lib/" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_HDF5_CLANG "/soft/libraries/hdf5/current/cnk-gcc/current/include/" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_HDF5_CLANG "/soft/libraries/alcf/current/gcc/ZLIB/lib/" "/soft/libraries/hdf5/current/cnk-gcc/current/lib/" PARENT_SCOPE)
 
@@ -89,20 +83,6 @@ set(GEOMHDISCC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
 #--------------- COMPILER SETTINGS ---------------#
 ###################################################
 
-set(GEOMHDISCC_CC_SERIAL_XL "bgxlc++" PARENT_SCOPE)
-
-set(GEOMHDISCC_CC_MPI_XL "mpicxx" PARENT_SCOPE)
-
-set(GEOMHDISCC_CC_ARCH_XL "-qlanglvl=extended0x -O2" PARENT_SCOPE)
-
-set(GEOMHDISCC_CC_INC_XL "" PARENT_SCOPE)
-
-set(GEOMHDISCC_CC_INC_MPI_XL ${GEOMHDISCC_CC_INC_XL} PARENT_SCOPE)
-
-set(GEOMHDISCC_CC_LIB_XL "" PARENT_SCOPE)
-
-set(GEOMHDISCC_CC_LIB_MPI_XL ${GEOMHDISCC_CC_LIB_XL} PARENT_SCOPE)
-
 set(GEOMHDISCC_CC_SERIAL_CLANG "bgclang++" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_MPI_CLANG "mpicxx" PARENT_SCOPE)
@@ -121,10 +101,9 @@ set(GEOMHDISCC_CC_LIB_MPI_CLANG ${GEOMHDISCC_CC_LIB_CLANG} PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_PYTHON "python27" PARENT_SCOPE)
+set(GEOMHDISCC_PYTHONS "python27" PARENT_SCOPE)
+
 set(GEOMHDISCC_LIBRARIES_PYTHON27 "pthread" "z" "dl" "util" "m" "ssl" "crypto" "python2.7" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_PYTHON27_XL "/soft/interpreters/python-2.7.9/powerpc64-bgq-linux/lib/" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON27_XL "/soft/interpreters/python-2.7.9/powerpc64-bgq-linux/include/python2.7" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBDIR_PYTHON27_CLANG "/soft/interpreters/python-2.7.9/powerpc64-bgq-linux/lib/" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_PYTHON27_CLANG "/soft/interpreters/python-2.7.9/powerpc64-bgq-linux/include/python2.7" PARENT_SCOPE)

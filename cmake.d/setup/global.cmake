@@ -127,3 +127,10 @@ if(GEOMHDISCC_MULTPRECISION)
       endif(NOT GEOMHDISCC_LINALG STREQUAL "Eigen")
    endif(mpTest)
 endif(GEOMHDISCC_MULTPRECISION)
+
+
+###################################################
+#------------------ EMBEDDED PYTHON --------------#
+###################################################
+
+geomhdiscc_provide_choice(GEOMHDISCC_PYTHONS "Python version" GEOMHDISCC_PYTHON pythonTest)

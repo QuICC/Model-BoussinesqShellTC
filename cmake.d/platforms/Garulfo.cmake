@@ -99,11 +99,18 @@ set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
 set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
 ###################################################
+#--------------- PYTHON LIBRARIES ----------------#
+###################################################
+
+set(GEOMHDISCC_PYTHONS "python33" PARENT_SCOPE)
+
+find_package(PythonLibs REQUIRED 3.3)
+set(GEOMHDISCC_LIBRARIES_PYTHON33 "${PYTHON_LIBRARIES}" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON33 "${PYTHON_INCLUDE_DIRS}" PARENT_SCOPE)
+
+###################################################
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-# Find python headers and library
-find_package(PythonLibs REQUIRED)
-
-set(GEOMHDISCC_LIBRARIES ${PYTHON_LIBRARIES} PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES ${PYTHON_INCLUDE_DIRS} PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES "" PARENT_SCOPE)
