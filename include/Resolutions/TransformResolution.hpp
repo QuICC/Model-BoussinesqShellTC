@@ -143,7 +143,7 @@ namespace GeoMHDiSCC {
    template <Dimensions::Data::Id TID> int TransformResolution::dim(const int k) const
    {
       // This should never by used
-      Debug::StaticAssert< false >();
+      Debug::StaticAssert< TID == -99 >();
 
       return -1;
    }
@@ -151,7 +151,7 @@ namespace GeoMHDiSCC {
    template <Dimensions::Data::Id TID> int TransformResolution::dim() const
    {
       // This should never by used
-      Debug::StaticAssert< false >();
+      Debug::StaticAssert< TID == -99 >();
 
       return -1;
    }
@@ -159,7 +159,7 @@ namespace GeoMHDiSCC {
    template <Dimensions::Data::Id TID> int TransformResolution::idx(const int i, const int k) const
    {
       // This should never by used
-      Debug::StaticAssert< false>();
+      Debug::StaticAssert< TID == -99 >();
 
       return -1;
    }
@@ -167,7 +167,7 @@ namespace GeoMHDiSCC {
    template <Dimensions::Data::Id TID> int TransformResolution::idx(const int i) const
    {
       // This should never by used
-      Debug::StaticAssert< false>();
+      Debug::StaticAssert< TID == -99 >();
 
       return -1;
    }

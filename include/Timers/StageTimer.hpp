@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
    /**
     * @brief Implementation of a very simple stage timer
     */
-   class StageTimer: public TimerMacro
+   class StageTimer
    {
       public:
          /**
@@ -78,7 +78,15 @@ namespace GeoMHDiSCC {
       protected:
 
       private:
+         /**
+          * @brief Level
+          */
          int mLevel;
+
+         /**
+          * @brief The actual timer
+          */
+         TimerMacro mTimer;
    };
 
 }

@@ -116,12 +116,17 @@ set(GEOMHDISCC_CC_LIB_INTEL "" PARENT_SCOPE)
 set(GEOMHDISCC_CC_LIB_MPI_INTEL ${GEOMHDISCC_CC_LIB_INTEL} PARENT_SCOPE)
 
 ###################################################
+#--------------- PYTHON LIBRARIES ----------------#
+###################################################
+
+set(GEOMHDISCC_PYTHON "python27" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_PYTHON27 "python2.7" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_PYTHON27 "/curc/tools/x_86_64/rh6/anaconda/2.0.0/lib/" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON27 "/curc/tools/x_86_64/rh6/anaconda/2.0.0/include/python2.7" PARENT_SCOPE)
+
+###################################################
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-# Find python headers and library
-set(PYTHON_LIBRARY "/curc/tools/x_86_64/rh6/anaconda/2.0.0/lib/libpython2.7.so")
-set(PYTHON_INCLUDE_DIR "/curc/tools/x_86_64/rh6/anaconda/2.0.0/include/python2.7")
-
-set(GEOMHDISCC_LIBRARIES ${PYTHON_LIBRARY} PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES ${PYTHON_INCLUDE_DIR} PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES "" PARENT_SCOPE)

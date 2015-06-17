@@ -102,7 +102,7 @@ namespace Parallel {
 
    template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType,typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType, typename IndexConverterSelector<TID>::Type>& CommunicatorStorage<Dimensions::ONED,TTypes>::converter()
    {
-      Debug::StaticAssert< false >();
+      Debug::StaticAssert< TID == -99 >();
 
       return -1;
    }

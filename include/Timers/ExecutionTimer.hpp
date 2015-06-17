@@ -74,6 +74,9 @@ namespace GeoMHDiSCC {
       protected:
 
       private:
+
+         using TimerMacro::queryTime;
+
          /**
           * @brief Storage for the execution times
           */

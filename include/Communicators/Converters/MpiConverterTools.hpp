@@ -611,7 +611,7 @@ namespace Parallel {
             i_ = spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,j);
 
             // Create key as (2D, 1D)
-            key = std::tr1::make_tuple(j_, i_);
+            key = std::make_pair(j_, i_);
 
             // Add key to remote set
             remoteKeys.insert(key);

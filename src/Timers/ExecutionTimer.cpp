@@ -47,7 +47,7 @@ namespace GeoMHDiSCC {
 
    MHDFloat ExecutionTimer::queryTime(BreakPoint point) const
    {
-      return this->mTimes(point) + TimerMacro::queryTime();
+      return this->mTimes(point) + this->queryTime();
    }
 
    void ExecutionTimer::analyze(Array& min, Array& max)

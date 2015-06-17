@@ -27,6 +27,10 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
+	const MHDFloat ShellExactStateIds::PCOS = 99999;
+
+   const MHDFloat ShellExactStateIds::PSIN = -99999;
+
    Array ShellExactStateIds::sph_harmonic(const MHDComplex amplitude, const int l, const int m, const MHDFloat theta, const Array& phi)
    {
       MHDFloat re = amplitude.real();

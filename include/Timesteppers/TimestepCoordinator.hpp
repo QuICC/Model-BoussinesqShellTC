@@ -127,6 +127,8 @@ namespace Timestep {
          virtual void buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
+         using Solver::SparseLinearCoordinatorBase<SparseTimestepper>::init;
+
          /**
           * @brief Compute the timestep operator coefficients
           */

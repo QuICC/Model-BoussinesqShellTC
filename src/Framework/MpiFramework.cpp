@@ -67,11 +67,11 @@ namespace GeoMHDiSCC {
       MPI_Group world;
       MPI_Group group;
       MPI_Comm_group(MPI_COMM_WORLD, &world);
-      #ifdef GEOMHDISCC_MPIIMPL_MVAPICH
+      #if defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
          MPI_Group_incl(world, ids.size(), const_cast<int*>(ids.data()), &group);
       #else
          MPI_Group_incl(world, ids.size(), ids.data(), &group);
-      #endif //GEOMHDISCC_MPIIMPL_MVAPICH
+      #endif //defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
       MPI_Comm comm;
       MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 

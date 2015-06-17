@@ -26,6 +26,10 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
+   const MHDFloat AnnulusExactStateIds::PCOS = 99999;
+
+   const MHDFloat AnnulusExactStateIds::PSIN = -99999;
+
    MHDFloat AnnulusExactStateIds::cos(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat theta)
    {
       return amplitude*std::cos(mode*theta);

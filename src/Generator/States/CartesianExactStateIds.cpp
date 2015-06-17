@@ -26,6 +26,10 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
+   const MHDFloat CartesianExactStateIds::PCOS = 99999;
+
+   const MHDFloat CartesianExactStateIds::PSIN = -99999;
+
    MHDFloat CartesianExactStateIds::cos(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat theta)
    {
       return amplitude*std::cos(mode*theta);

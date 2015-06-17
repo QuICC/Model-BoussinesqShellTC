@@ -50,7 +50,7 @@ namespace Parallel {
    template<Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> IConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>&  ConverterDispatcher<Dimensions::Transform::TRA1D>::get(TComm<DIMENSION,TTypes>& comm)
    {
       // This should never get called!
-      Debug::StaticAssert<false>();
+      Debug::StaticAssert<DIMENSION == -99>();
 
       return comm.mspConverter1D;
    }

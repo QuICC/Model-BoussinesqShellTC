@@ -64,3 +64,6 @@ geomhdiscc_link_external(GEOMHDISCC_LARGEIO)
 
 # Multiple precision libraries and includes
 geomhdiscc_link_external(GEOMHDISCC_MPLIB)
+
+# Multiple precision libraries and includes
+geomhdiscc_link_external(GEOMHDISCC_PYTHON)

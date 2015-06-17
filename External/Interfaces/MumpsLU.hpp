@@ -412,11 +412,11 @@ namespace Eigen {
             if(m_isParallel)
             {
                mTmp.resize(m_id.lrhs, m_id.nrhs);
-               #ifdef GEOMHDISCC_MPIIMPL_MVAPICH
+               #if defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
                   MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
                #else
                   MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
-               #endif //GEOMHDISCC_MPIIMPL_MVAPICH
+               #endif //defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
                pRhs = mTmp.data();
             } else
             {

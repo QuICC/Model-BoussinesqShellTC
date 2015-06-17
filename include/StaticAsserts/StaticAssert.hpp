@@ -38,7 +38,7 @@ namespace Debug {
    /**
     * @brief Simple static assert implementation (ok if true)
     */
-   template <> struct StaticAssert<true> {};
+   template <> class StaticAssert<true> {};
 }
 }
 

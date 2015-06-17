@@ -32,10 +32,10 @@ namespace Equations {
    struct ShellExactStateIds
    {
       /// Polynomial approximation to Cosine
-      static const MHDFloat PCOS = 99999;
+      static const MHDFloat PCOS;
 
       /// Polynomial approximation to Sine
-      static const MHDFloat PSIN = -99999;
+      static const MHDFloat PSIN;
 
       /**
        * @brief Enums for the avaialable exact states
