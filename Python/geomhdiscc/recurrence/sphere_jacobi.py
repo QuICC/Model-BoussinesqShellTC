@@ -52,7 +52,7 @@ def i1():
     """Sphere i1 operator"""
 
     # Setup terms in recurrence
-    terms = [{'q':1, 'p':0, 'd':0, 'c':1}]
+    terms = [{'q':1, 'p':0, 'd':0, 'c':sympy.Rational(1,4)}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals
@@ -64,7 +64,7 @@ def i2():
     """Sphere i2 operator"""
 
     # Setup terms in recurrence
-    terms = [{'q':2, 'p':0, 'd':0, 'c':1}]
+    terms = [{'q':2, 'p':0, 'd':0, 'c':sympy.Rational(1,16)}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals
@@ -76,7 +76,7 @@ def i4():
     """Sphere i4 operator"""
 
     # Setup terms in recurrence
-    terms = [{'q':4, 'p':0, 'd':0, 'c':1}]
+    terms = [{'q':4, 'p':0, 'd':0, 'c':sympy.Rational(1,4**4)}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals
@@ -88,7 +88,7 @@ def i2lapl():
     """Sphere i2lapl operator"""
 
     # Setup terms in recurrence
-    terms = [{'q':2, 'p':1, 'd':2, 'c':8}, {'q':2, 'p':0, 'd':2, 'c':8}, {'q':2, 'p':0, 'd':1, 'c':4*(2*l+3)}]
+    terms = [{'q':2, 'p':1, 'd':2, 'c':sympy.Rational(1,2)}, {'q':2, 'p':0, 'd':2, 'c':sympy.Rational(1,2)}, {'q':2, 'p':0, 'd':1, 'c':l*sympy.Rational(1,2) + sympy.Rational(3,4)}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals
@@ -100,7 +100,7 @@ def i4lapl():
     """Sphere i2lapl operator"""
 
     # Setup terms in recurrence
-    terms = [{'q':4, 'p':1, 'd':2, 'c':8}, {'q':4, 'p':0, 'd':2, 'c':8}, {'q':4, 'p':0, 'd':1, 'c':4*(2*l+3)}]
+    terms = [{'q':4, 'p':1, 'd':2, 'c':sympy.Rational(1,32)}, {'q':4, 'p':0, 'd':2, 'c':sympy.Rational(1,32)}, {'q':4, 'p':0, 'd':1, 'c':l*sympy.Rational(1,32) + sympy.Rational(3,64)}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals
@@ -112,7 +112,7 @@ def i4lapl2():
     """Sphere i2lapl2 operator"""
 
     # Setup terms in recurrence
-    terms = [{'q':4, 'p':2, 'd':4, 'c':64}, {'q':4, 'p':1, 'd':4, 'c':128}, {'q':4, 'p':0, 'd':4, 'c':64}, {'q':4, 'p':1, 'd':3, 'c':64*(2*l+5)}, {'q':4, 'p':0, 'd':3, 'c':64*(2*l+5)}, {'q':4, 'p':0, 'd':2, 'c':16*(4*l**2 + 16*l + 15)}]
+    terms = [{'q':4, 'p':2, 'd':4, 'c':sympy.Rational(1,4)}, {'q':4, 'p':1, 'd':4, 'c':sympy.Rational(1,2)}, {'q':4, 'p':0, 'd':4, 'c':sympy.Rational(1,4)}, {'q':4, 'p':1, 'd':3, 'c':l*sympy.Rational(1,2) + sympy.Rational(5,4)}, {'q':4, 'p':0, 'd':3, 'c':l*sympy.Rational(1,2) + sympy.Rational(5,4)}, {'q':4, 'p':0, 'd':2, 'c':l**2*sympy.Rational(1,4) + l + sympy.Rational(15,16)}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals

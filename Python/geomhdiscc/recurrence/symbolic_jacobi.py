@@ -107,7 +107,8 @@ def spectral_intgxmult(q, p, f):
     assert (p >= 0)
 
     # Compute monomial multiplication
-    recurrence = spectral_monomial(p, f)
+    asrow = (p == 0 or q == 0)
+    recurrence = spectral_monomial(p, f, asrow)
 
     # Compute integration
     recurrence = spectral_integral(q, recurrence)
