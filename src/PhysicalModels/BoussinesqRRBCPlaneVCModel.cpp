@@ -20,14 +20,16 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "IoVariable/StateFileReader.hpp"
-#include "IoVariable/StateFileWriter.hpp"
-#include "IoVariable/ContinuityWriter.hpp"
-#include "IoVariable/VisualizationFileWriter.hpp"
-#include "IoTools/IdToHuman.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRRBCPlaneVCTransport.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRRBCPlaneVCMomentum.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRRBCPlaneVCContinuity.hpp"
+#include "IoVariable/StateFileReader.hpp"
+#include "IoVariable/StateFileWriter.hpp"
+#include "IoVariable/ContinuityWriter.hpp"
+#include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DPrimitiveEnergyWriter.hpp"
+#include "IoVariable/VisualizationFileWriter.hpp"
+#include "IoTools/IdToHuman.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
@@ -152,10 +154,19 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBCPlaneVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
-      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITY);
+      IoVariable::SharedContinuityWriter spCont(new IoVariable::ContinuityWriter(SchemeType::type()));
+      spCont->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spCont);
 
-      spSim->addAsciiOutputFile(spState);
+      // Create temperature energy writer
+      IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("temperature", SchemeType::type()));
+      spTemp->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spTemp);
+
+      // Create kinetic energy writer
+      IoVariable::SharedCartesian1DPrimitiveEnergyWriter spKinetic(new IoVariable::Cartesian1DPrimitiveEnergyWriter("kinetic", SchemeType::type()));
+      spKinetic->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spKinetic);
    }
 
    void BoussinesqRRBCPlaneVCModel::addHdf5OutputFiles(SharedSimulation spSim)
