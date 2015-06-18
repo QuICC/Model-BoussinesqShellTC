@@ -122,7 +122,7 @@ def toslice(spec, nr, nz):
 
     spec = np.reshape(spec, (nr, nz), order = 'F')
 
-    rphys = torphys2D(spec)
+    rphys = torphys2D(spec.real) + 1j*torphys2D(spec.imag)
 
     rspec = np.transpose(rphys)
     phys = tozphys2D(rspec)

@@ -90,7 +90,7 @@ def toslice(spec, nr, maxl, m):
 
     spec = np.reshape(spec, (nr, maxl-m+1), order = 'F')
 
-    rphys = torphys2D(spec, m)
+    rphys = torphys2D(spec.real, m) + 1j*torphys2D(spec.imag, m)
 
     rspec = np.transpose(rphys)
     phys = totphys(rspec, maxl, m)

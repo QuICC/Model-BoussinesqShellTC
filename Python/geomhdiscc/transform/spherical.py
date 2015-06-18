@@ -26,7 +26,7 @@ def thgrid(maxl, m):
 
 def totphys(spec, maxl, m):
     """Tranform theta spectral coefficients to physical values"""
-    
+
     mat = plm(maxl, m)
     phys = mat.dot(spec)
 

@@ -278,7 +278,7 @@ class MarginalPoint:
             raise solver_mod.NewtonDoneError
 
         # Check for change of sign (require small change in rayleigh and small growth rate)
-        if abs(dRa/Ra) < 0.01 and abs(self._gevp.evp_lmb[self.mode].real) < 1:
+        if abs(dRa/Ra) < 0.01 and abs(self._gevp.evp_lmb[self.mode].real) < 0.1:
             self._gevp.solve(Ra+dRa, self.nev)
             if self._gevp.evp_lmb is not None and growth*self._gevp.evp_lmb[self.mode].real < 0:
                 self.a = min(Ra, Ra+dRa)
@@ -493,7 +493,7 @@ class GEVP:
                     prof_opt = (int(self.eigs[0])%2,)
 
                 for k,f in sol_spec.items():
-                    sol_phys[k] = transf.toprofile(f.real, *prof_opt) + 1j*transf.toprofile(f.imag, *prof_opt)
+                    sol_phys[k] = transf.toprofile(f, *prof_opt)
 
                 if plot or save_pdf:
                     import matplotlib.pylab as pl
@@ -539,7 +539,7 @@ class GEVP:
                 viz_res = res_1d + res_2d
 
                 for k,f in sol_spec.items():
-                    sol_phys[k] = transf.toslice(f.real, res_1d[0], *res_2d) + 1j*transf.toslice(f.imag, res_1d[0], *res_2d)
+                    sol_phys[k] = transf.toslice(f, res_1d[0], *res_2d) 
 
                 if plot or save_pdf:
                     import matplotlib as mpl

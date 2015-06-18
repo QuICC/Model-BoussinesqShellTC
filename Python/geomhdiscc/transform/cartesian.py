@@ -16,8 +16,11 @@ def tophys(spec):
     """Transform R spectral coefficients to physical values"""
 
     n = len(spec)
+    phys = np.zeros(spec.shape, dtype = spec.dtype)
+    phys.real = fftpack.dct(spec.real,3)
+    phys.imag = fftpack.dct(spec.imag,3)
 
-    return fftpack.dct(spec,3)
+    return phys
 
 def tocheb(phys):
     """Transform physical values to spectral coefficients"""

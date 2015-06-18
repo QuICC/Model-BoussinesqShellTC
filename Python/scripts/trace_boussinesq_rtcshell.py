@@ -15,7 +15,7 @@ Rac = None
 mc = None
 
 # SF/SF, FT/FT, internal heating
-bc_vel = 1; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
+#bc_vel = 1; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -33,8 +33,8 @@ bc_vel = 1; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e13; Rac = 177.55422348123; mc = 44
 #res = [192, 192, 0]
 #Ta = 1e14; Rac = 258.13410447601; mc = 65
-res = [512, 256, 0]
-Ta = 1e15; Rac = 376.44742717745; mc = 95
+#res = [512, 256, 0]
+#Ta = 1e15; Rac = 376.44742717745; mc = 95
 #res = [512, 384, 0]
 #Ta = 1e16
 #res = [768, 512, 0]
@@ -44,7 +44,7 @@ Ta = 1e15; Rac = 376.44742717745; mc = 95
 #res = [1024, 384, 0]
 
 # NS/NS, FT/FT, internal heating
-#bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
+bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -54,19 +54,19 @@ Ta = 1e15; Rac = 376.44742717745; mc = 95
 #Ta = 1e9
 #res = [48, 48, 0]
 #Ta = 1e10
-#res = [64, 64, 0]
+#res = [96, 96, 0]
 #Ta = 1e11
-#res = [64, 64, 0]
-#Ta = 1e12
 #res = [128, 128, 0]
-#Ta = 1e13
+#Ta = 1e12
 #res = [192, 192, 0]
-#Ta = 1e14
+#Ta = 1e13
 #res = [256, 256, 0]
+Ta = 1e14
+res = [384, 256, 0]
 #Ta = 1e15
-#res = [384, 384, 0]
+#res = [512, 384, 0]
 #Ta = 1e16
-#res = [512, 512, 0]
+#res = [768, 512, 0]
 #Ta = 1e17
 #res = [768, 768, 0]
 #Ta = 1e18
@@ -98,20 +98,20 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_point = False
-marginal_curve = False
+marginal_curve = True
 marginal_minimum = (True and marginal_curve)
 marginal_show_curve = (False and marginal_minimum)
-marginal_show_point = (False and (marginal_point or marginal_minimum))
-solve_gevp = (True or marginal_show_point)
+marginal_show_point = (True and (marginal_point or marginal_minimum))
+solve_gevp = (False or marginal_show_point)
 show_spy = False
 write_mtx = False
-show_spectra = (True and solve_gevp) or marginal_show_point
+show_spectra = (False and solve_gevp) or marginal_show_point
 show_physical = (False and solve_gevp) or marginal_show_point
 save_spectra = False
 save_physical = False
 viz_mode = 0
 
-evp_tol = 1e-30
+evp_tol = 1e-16
 
 if marginal_point or marginal_curve:
     # Create marginal curve object
@@ -124,7 +124,7 @@ if marginal_point:
 
 if marginal_curve:
     # Trace marginal curve for a set of wave indexes
-    ms = np.arange(max(0, m-3), m+4, 1)
+    ms = np.arange(max(0, m-2), m+3, 1)
     (data_m, data_Ra, data_freq) = curve.trace(ms, initial_guess = eq_params['rayleigh'])
 
     if marginal_minimum:
