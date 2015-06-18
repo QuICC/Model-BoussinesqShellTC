@@ -428,10 +428,10 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
         """Build restriction matrices"""
 
         # U: TN
-        idx_u = utils.qidx(res[0], res[0]-1)
+        idx_u = utils.qidx(res[0], res[0])
 
         # V: TN
-        idx_v = utils.qidx(res[0], res[0]-1)
+        idx_v = utils.qidx(res[0], res[0])
 
         # W:
         idx_w = utils.qidx(res[0], res[0])

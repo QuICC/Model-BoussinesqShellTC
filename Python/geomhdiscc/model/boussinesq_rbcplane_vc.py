@@ -34,6 +34,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         """Get the list of fields needed for linear stability calculations"""
 
         fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
+        #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("pressure","")]
         #fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
 
         return fields
@@ -416,6 +417,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         idx_v = utils.qidx(res[0], res[0])
 
         # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0] - 1)
+        idx_p = utils.qidx(res[0], res[0])
 
         return (idx_u, idx_v, idx_p)

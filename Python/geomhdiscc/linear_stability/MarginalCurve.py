@@ -95,10 +95,10 @@ class MarginalCurve:
             io.write_results(min_out, self.point._gevp.res, self.point._gevp.wave(min_kc), self.point._gevp.eq_params, min_Rac, min_fc, self.point.mode, self.point.growthRate())
             return (min_kc, min_Rac, min_fc)
 
-    def view(self, ks, Ras, fs, minimum = None, plot = True):
+    def view(self, ks, Ras, fs, minimum = None, plot = True, save_pdf = False):
         """Plot the marginal curve"""
 
-        if plot:
+        if plot or save_pdf:
             import matplotlib.pylab as pl
 
             pl.subplot(1,2,1)
@@ -117,9 +117,10 @@ class MarginalCurve:
             pl.ylabel('frequency')
             if save_pdf:
                 pl.savefig('marginal_curve.pdf', bbox_inches='tight', dpi = 200)
-            pl.tight_layout()
-            pl.show()
-            pl.clf()
+            if plot:
+                pl.tight_layout()
+                pl.show()
+                pl.clf()
 
     def _tracker(self, k):
 
@@ -381,7 +382,7 @@ class GEVP:
             pl.show()
             pl.clf()
 
-    def viewSpectra(self, viz_mode, plot = True, save_pdf = True):
+    def viewSpectra(self, viz_mode, plot = True, save_pdf = False):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
@@ -421,7 +422,7 @@ class GEVP:
         else:
             return None
 
-    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = True, save_profile = True):
+    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = False, save_profile = True):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
@@ -637,3 +638,102 @@ class GEVP:
         """Default conversion for wavenumber index"""
 
         return list(k)
+
+def default_options():
+    """Create dictionary of default options"""
+
+    opts = dict()
+
+    opts['root_tol'] = 1e-8         # Tolerance used in root finding algorighm
+    opts['evp_tol'] = 1e-10         # Tolerance used in eigensolver
+
+    opts['geometry'] = 'c1d'        # Geometry of the system
+
+    opts['point'] = False           # Compute marginal curve point
+    opts['point_k'] = 1           # Compute marginal curve point
+    opts['curve'] = False           # Trace marginal curve
+    opts['curve_points'] = [1]      # Wavenumbers for marginal curve
+    opts['minimum'] = False         # Compute marginal curve minimum
+    opts['minimum_int'] = False     # Only used integer wave numbers
+    opts['solve'] = False           # Solve fixed point
+
+    opts['plot_spy'] = False        # Plot matrix spy
+    opts['plot_point'] = False      # Plot solution for marginal curve point
+    opts['plot_curve'] = False      # Plot marginal curve 
+    opts['viz_mode'] = 0        # Mode to visualize/save
+    opts['show_spectra'] = False    # Plot solution spectra 
+    opts['show_physical'] = False   # Plot solution in physical space 
+
+    opts['write_mtx'] = False       # Write matrix to MatrixMarket files
+    opts['save_curve'] = False      # Save marginal curve plot to pdf
+    opts['save_spectra'] = False    # Save spectra plot to pdf
+    opts['save_physical'] = False   # Save physical space plots to pdf
+    opts['data_spectra'] = False    # Save spectral data to file(s)
+    opts['data_physical'] = False   # Save physical data to file(s)
+
+    return opts
+
+def compute(gevp_opts, marginal_opts):
+    """Compute eigen solutions requested by options"""
+
+    # Make options consistent
+    marginal_opts['minimum'] = marginal_opts['minimum'] and marginal_opts['curve']
+    marginal_opts['plot_point'] = marginal_opts['plot_point'] and (marginal_opts['point'] or marginal_opts['minimum'])
+    marginal_opts['plot_curve'] = marginal_opts['plot_curve'] and marginal_opts['curve']
+    marginal_opts['show_spectra'] = marginal_opts['show_spectra'] and marginal_opts['solve']
+    marginal_opts['show_physical'] = marginal_opts['show_physical'] and marginal_opts['solve']
+    marginal_opts['save_spectra'] = marginal_opts['save_spectra'] and marginal_opts['solve']
+    marginal_opts['save_physical'] = marginal_opts['save_physical'] and marginal_opts['solve']
+
+    if marginal_opts['point'] or marginal_opts['curve']:
+        # Create marginal curve object
+        curve = MarginalCurve(gevp_opts, rtol = marginal_opts['root_tol'], evp_tol = marginal_opts['evp_tol'])
+
+    if marginal_opts['point'] and not marginal_opts['curve']:
+        # Compute marginal curve at a single point
+        kp = marginal_opts['point_k']
+        Rac, evp_freq = curve.point(kp, guess = gevp_opts['eq_params']['rayleigh'])
+        kc = kp
+
+    if marginal_opts['curve']:
+        # Trace marginal curve for a set of wave indexes
+        ks = marginal_opts['curve_points']
+        (data_k, data_Ra, data_freq) = curve.trace(ks, initial_guess = gevp_opts['eq_params']['rayleigh'])
+
+        if marginal_opts['minimum']:
+            # Compute minimum of marginal curve
+            kc, Rac, fc = curve.minimum(data_k, data_Ra, only_int = marginal_opts['minimum_int'])
+
+        if marginal_opts['plot_curve'] or marginal_opts['save_curve']:
+            # Plot marginal curve and minimum
+            if marginal_opts['minimum']:
+                min_point = None
+            else:
+                min_point = (kc, Rac)
+            curve.view(data_k, data_Ra, data_freq, minimum = min_point, plot = marginal_opts['plot_curve'], save_pdf = marginal_opts['save_curve'])
+
+    if marginal_opts['plot_spy'] or marginal_opts['write_mtx'] or marginal_opts['solve']:
+        if marginal_opts['plot_point']:
+            Ra = Rac
+            kp = kc
+        else:
+            kp = marginal_opts['point_k']
+            Ra = gevp_opts['eq_params']['rayleigh']
+        Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
+        gevp_opts['eigs'] = gevp_opts['wave'](kp)
+        gevp_opts['tol'] = marginal_opts['evp_tol']
+        gevp = GEVP(**gevp_opts)
+
+    if marginal_opts['plot_spy'] or marginal_opts['write_mtx']:
+        gevp.viewOperators(Ra, spy = marginal_opts['plot_spy'], write_mtx = marginal_opts['write_mtx'])
+
+    if marginal_opts['solve']:
+        gevp.solve(Ra, marginal_opts['viz_mode']+3, with_vectors = True)
+        Print("Found eigenvalues:")
+        Print(gevp.evp_lmb)
+
+    if marginal_opts['show_spectra'] or marginal_opts['save_spectra'] or marginal_opts['data_spectra']:
+        gevp.viewSpectra(marginal_opts['viz_mode'], plot = marginal_opts['show_spectra'], save_pdf = marginal_opts['save_spectra'])
+
+    if marginal_opts['show_physical'] or marginal_opts['save_physical'] or marginal_opts['data_physical']:
+        gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'])

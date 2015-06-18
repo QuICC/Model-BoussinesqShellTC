@@ -19,9 +19,9 @@ bc_temp = 0
 
 # SF, FT,
 bc_vel = 1
-phi = 90
+phi = 45
 kp = 3.710
-eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':0.0, 'heating':0, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e8, 'heating':0, 'scale1d':2.0}
 #kp = 129
 #eq_params = {'prandtl':1, 'rayleigh':8.7050552e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
 #kp = 60
@@ -79,59 +79,13 @@ eigs = wave(kp)
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
 # Setup computation, visualization and IO
-marginal_point = False
-marginal_curve = False
-marginal_minimum = (True and marginal_curve)
-marginal_show_curve = (True and marginal_minimum)
-solve_gevp = True
-show_spy = True
-write_mtx = False
-show_spectra = (True and solve_gevp)
-show_physical = (True and solve_gevp)
-viz_mode = 0
+marginal_options = MarginalCurve.default_options()
+marginal_options['solve'] = True
+marginal_options['point_k'] = kp
+marginal_options['plot_point'] = True
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
 
-if marginal_point or marginal_curve:
-    # Create marginal curve object
-    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
-
-if marginal_point:
-    # Compute marginal curve at a single point
-    Rac, fc = curve.point(kp, initial_guess = 1e8)
-
-if marginal_curve:
-    # Trace marginal curve for a set of wave indexes
-    ks = np.arange(121, 124, 1)
-    (data_k, data_Ra, data_freq) = curve.trace(ks, guess = 7.8e8)
-
-    if marginal_minimum:
-        # Compute minimum of marginal curve
-        kc, Rac, fc = curve.minimum(data_k, data_Ra)
-
-    if marginal_show_curve:
-        if marginal_minimum:
-            minimum = (kc, Rac)
-        else:
-            minimum = None
-        # Plot marginal curve and minimum (if available)
-        curve.view(data_k, data_Ra, data_freq, minimum = minimum, plot = True)
-
-if show_spy or solve_gevp:
-    Ra = 0
-    kp = 3.71
-    print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
-    gevp = MarginalCurve.GEVP(**gevp_opts)
-    gevp.setEigs(kp)
-
-if show_spy or write_mtx:
-    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
-
-if solve_gevp:
-    gevp.solve(Ra, 10, with_vectors = True)
-    print("Found eigenvalues:")
-    print(gevp.evp_lmb)
-
-if show_spectra:
-    gevp.viewSpectra(viz_mode)
-
-if show_physical:
-    gevp.viewPhysical(viz_mode)
+# Compute 
+MarginalCurve.compute(gevp_opts, marginal_options)

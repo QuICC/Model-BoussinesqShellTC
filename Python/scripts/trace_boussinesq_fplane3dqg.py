@@ -31,53 +31,14 @@ eigs = wave(1.0)
 # Collect GEVP setup parameters into single dictionary
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-# Create marginal curve object
-curve = MarginalCurve.MarginalCurve(gevp_opts)
-
-# Compute marginal curve at a single point
-kp = 1.3048
-Rac, evp_freq = curve.point(kp, guess = 5218.69901425)
-
-# Trace marginal curve for a set of wave indexes
-ks = np.arange(0.5, 10.5, 0.5)
-(data_k, data_Ra, data_freq) = curve.trace(ks, initial_guess = 1)
-
-## Compute minimum of marginal curve
-kc, Rac, fc = curve.minimum(data_k, data_Ra)
-
-# Plot marginal curve and minimum
-curve.view(data_k, data_Ra, data_freq, minimum = (kc, Rac), plot = True)
-
 # Setup computation, visualization and IO
-solve_gevp = True
-show_spy = False
-show_spectra = (True and solve_gevp)
-show_physical = (True and solve_gevp)
-viz_mode = 0
+marginal_options = MarginalCurve.default_options()
+marginal_options['solve'] = True
+marginal_options['point_k'] = kp
+marginal_options['plot_point'] = True
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
 
-if show_spy or solve_gevp:
-    #kp = 1.5
-    #Ra = 9.44899084506
-    #kp = 3.0
-    #Ra = 82.0966227126
-    kp = 5.5
-    Ra = 915.388767955
-    kp = 8.5
-    Ra = 5218.69901425
-    print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
-    gevp_opts['eigs'] = wave(kp)
-    gevp = MarginalCurve.GEVP(**gevp_opts)
-
-if show_spy:
-    gevp.viewOperators(Ra, spy = True, write_mtx = True)
-
-if solve_gevp:
-    gevp.solve(Ra, 5, with_vectors = True)
-    print("Found eigenvalues:")
-    print(gevp.evp_lmb)
-
-if show_spectra:
-    gevp.viewSpectra(viz_mode)
-
-if show_physical:
-    gevp.viewPhysical(viz_mode)
+# Compute 
+MarginalCurve.compute(gevp_opts, marginal_options)

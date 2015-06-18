@@ -1,13 +1,15 @@
 """Script to run a marginal curve trace for the periodic Boussinesq Beta 3DQG model"""
 
 import numpy as np
+import functools
+
 import geomhdiscc.model.boussinesq_beta3dqg_per as mod
+import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQGPer()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [32, 0, 0]
@@ -34,33 +36,34 @@ Ra = 192407.5882
 eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi, 'scale1d':1}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0, 'vorticityz':0}
 
-# Generate the operator A for the generalized EVP Ax = sigm B x
-A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+# Generic Wave number function from single "index" (k perpendicular) and angle
+def generic_wave(kp, phi):
+    if phi == 90:
+        kx = 0
+        ky = kp
+    elif phi == 0:
+        kx = kp
+        ky = 0
+    else:
+        kx = kp*np.cos(phi*np.pi/180.0)
+        ky = (kp**2-kx**2)**0.5
+    return [kx, ky]
 
-# Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = model.SOLVER_NO_TAU
-B = model.time(res, eq_params, eigs, bcs, fields)
+# Wave number function from single "index" (k perpendicular)
+wave = functools.partial(generic_wave, phi = phi)
+eigs = wave(kp)
 
-# Show the "spy" of the two matrices
-if True:
-    import matplotlib.pylab as pl
-    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-# Export the two matrices to matrix market format
-if True:
-    import scipy.io as io
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
+# Setup computation, visualization and IO
+marginal_options = MarginalCurve.default_options()
+marginal_options['solve'] = True
+marginal_options['point_k'] = kp
+marginal_options['plot_point'] = True
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
 
-# Solve EVP with sptarn
-if True:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
-    print(evp_lmb)
+# Compute 
+MarginalCurve.compute(gevp_opts, marginal_options)
