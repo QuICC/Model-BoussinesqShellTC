@@ -3,12 +3,12 @@
 import numpy as np
 
 import geomhdiscc.model.boussinesq_beta3dqg as mod
+import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQG()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [16, 0, 16]
@@ -23,112 +23,29 @@ eigs = [2.221403788]
 # Stress-free/No-slip (simple Beta)
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':2, 'temperature':0, 'velocityz':2, 'vorticityz':2}
 
-# Generate the operator A for the generalized EVP Ax = sigm B x
-A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+# Wave number function from single "index"
+def wave(k):
+    return [k]
 
-# Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = model.SOLVER_NO_TAU
-B = model.time(res, eq_params, eigs, bcs, fields)
+eigs = wave(1)
 
-# Show the "spy" of the two matrices
-if True:
-    import matplotlib.pylab as pl
-    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-# Export the two matrices to matrix market format
-if True:
-    import scipy.io as io
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
+# Setup computation, visualization and IO
+marginal_options = MarginalCurve.default_options()
+marginal_options['evp_tol'] = 1e-16
+marginal_options['geometry'] = '2d'
+marginal_options['curve'] = True
+marginal_options['minimum'] = True
+marginal_options['plot_curve'] = True
+marginal_options['solve'] = True
+marginal_options['minimum_int'] = True
+marginal_options['point_k'] = m
+marginal_options['plot_point'] = True
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['curve_points'] = np.arange(max(0, k-2), k+3, 1)
 
-# Solve EVP with sptarn
-if True:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
-    print(evp_lmb)
-
-    sol_psi = evp_vec[0:res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
-    sol_w = evp_vec[res[0]*res[2]:2*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
-    sol_t = evp_vec[2*res[0]*res[2]:,-1].reshape(res[0], res[2], order = 'F')
-
-    import matplotlib.pylab as pl
-    pl.subplot(1,3,1)
-    pl.imshow(np.log10(np.abs(sol_psi)))
-    pl.colorbar()
-    pl.subplot(1,3,2)
-    pl.imshow(np.log10(np.abs(sol_w)))
-    pl.colorbar()
-    pl.subplot(1,3,3)
-    pl.imshow(np.log10(np.abs(sol_t)))
-    pl.colorbar()
-    pl.show()
-    pl.close("all")
-    import geomhdiscc.transform.cartesian as transf
-    phys_psi = transf.tophys2d(sol_psi)
-    phys_w = transf.tophys2d(sol_w)
-    phys_t = transf.tophys2d(sol_t)
-    pl.subplot(1,3,1)
-    pl.imshow(sol_psi.real)
-    pl.colorbar()
-    pl.subplot(1,3,2)
-    pl.imshow(sol_w.real)
-    pl.colorbar()
-    pl.subplot(1,3,3)
-    pl.imshow(sol_t.real)
-    pl.colorbar()
-    pl.show()
-    pl.close("all")
-
-    xg = transf.grid(res[0])
-    zg = transf.grid(res[2])
-    pl.subplot(1,3,1)
-    pl.plot(xg, sol_psi.real[:,10])
-    pl.title('Psi')
-    pl.subplot(1,3,2)
-    pl.plot(xg, sol_w.real[:,10])
-    pl.title('W')
-    pl.subplot(1,3,3)
-    pl.plot(xg, sol_t.real[:,10])
-    pl.title('T')
-    pl.show()
-    pl.close("all")
-    pl.subplot(1,3,1)
-    pl.plot(zg, sol_psi.real[0,:])
-    pl.title('Psi')
-    pl.subplot(1,3,2)
-    pl.plot(zg, sol_w.real[0,:])
-    pl.title('W')
-    pl.subplot(1,3,3)
-    pl.plot(zg, sol_t.real[0,:])
-    pl.title('T')
-    pl.show()
-    pl.close("all")
-    pl.subplot(1,3,1)
-    pl.plot(zg, sol_psi.real[res[0]//2,:])
-    pl.title('Psi')
-    pl.subplot(1,3,2)
-    pl.plot(zg, sol_w.real[res[0]//2,:])
-    pl.title('W')
-    pl.subplot(1,3,3)
-    pl.plot(zg, sol_t.real[res[0]//2,:])
-    pl.title('T')
-    pl.show()
-    pl.close("all")
-    pl.subplot(1,3,1)
-    pl.plot(zg, sol_psi.real[-1,:])
-    pl.title('Psi')
-    pl.subplot(1,3,2)
-    pl.plot(zg, sol_w.real[-1,:])
-    pl.title('W')
-    pl.subplot(1,3,3)
-    pl.plot(zg, sol_t.real[-1,:])
-    pl.title('T')
-    pl.show()
-    pl.close("all")
+# Compute 
+MarginalCurve.compute(gevp_opts, marginal_options)

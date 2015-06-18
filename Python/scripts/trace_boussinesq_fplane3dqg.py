@@ -1,6 +1,7 @@
 """Script to run a marginal curve trace for the Boussinesq F-plane 3DQG model"""
 
 import numpy as np
+import functools
 
 import geomhdiscc.model.boussinesq_fplane3dqg as mod
 import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve

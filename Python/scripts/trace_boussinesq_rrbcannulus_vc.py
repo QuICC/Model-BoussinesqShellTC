@@ -36,59 +36,19 @@ eigs = wave(0)
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
 # Setup computation, visualization and IO
-marginal_point = True
-marginal_curve = False
-marginal_minimum = (True and marginal_curve)
-marginal_show_curve = (False and marginal_minimum)
-marginal_show_point = (True and (marginal_point or marginal_minimum))
-solve_gevp = (True or marginal_show_point)
-show_spy = False
-write_mtx = False
-show_spectra = (True and solve_gevp) or marginal_show_point
-show_physical = (True and solve_gevp) or marginal_show_point
-viz_mode = 0
+marginal_options = MarginalCurve.default_options()
+marginal_options['evp_tol'] = 1e-16
+marginal_options['geometry'] = 'annulus'
+marginal_options['curve'] = True
+marginal_options['minimum'] = True
+marginal_options['plot_curve'] = True
+marginal_options['solve'] = True
+marginal_options['minimum_int'] = True
+marginal_options['point_k'] = m
+marginal_options['plot_point'] = True
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['curve_points'] = np.arange(max(0, m-2), m+3, 1)
 
-if marginal_point or marginal_curve:
-    # Create marginal curve object
-    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
-
-if marginal_point:
-    # Compute marginal curve at a single point
-    Rac, evp_freq = curve.point(m, guess = eq_params['rayleigh'])
-
-if marginal_curve:
-    # Trace marginal curve for a set of wave indexes
-    ms = np.arange(max(0, m-5), m+6, 1)
-    (data_m, data_Ra, data_freq) = curve.trace(ms, initial_guess = eq_params['rayleigh'])
-
-    if marginal_minimum:
-        # Compute minimum of marginal curve
-        mc, Rac, fc = curve.minimum(data_m, data_Ra, only_int = True)
-
-    if marginal_show_curve:
-        # Plot marginal curve and minimum
-        curve.view(data_m, data_Ra, data_freq, minimum = (mc, Rac), plot = True)
-
-if show_spy or solve_gevp:
-    if marginal_show_point:
-        Ra = Rac
-        m = mc
-    else:
-        Ra = eq_params['rayleigh']
-    MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
-    gevp_opts['eigs'] = wave(m)
-    gevp = MarginalCurve.GEVP(**gevp_opts)
-
-if show_spy or write_mtx:
-    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
-
-if solve_gevp:
-    gevp.solve(Ra, 1, with_vectors = True)
-    MarginalCurve.Print("Found eigenvalues:")
-    MarginalCurve.Print(gevp.evp_lmb)
-
-if show_spectra:
-    gevp.viewSpectra(viz_mode, naive = True)
-
-if show_physical:
-    gevp.viewPhysical(viz_mode, 'annulus', naive = True)
+# Compute 
+MarginalCurve.compute(gevp_opts, marginal_options)
