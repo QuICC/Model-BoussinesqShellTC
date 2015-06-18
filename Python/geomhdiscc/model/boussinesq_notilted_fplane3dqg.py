@@ -185,9 +185,11 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("no_streamfunction","") and field_col == field_row:
             mat = geo.i1(res[0], bc)
+            mat = S1*mat
 
         elif field_row == ("no_velocityz","") and field_col == field_row:
             mat = geo.i1(res[0], bc)
+            mat = S1*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.sid(res[0], 1, bc)
