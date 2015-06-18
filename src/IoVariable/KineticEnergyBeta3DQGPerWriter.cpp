@@ -87,7 +87,7 @@ namespace IoVariable {
       this->postWrite();
 
       // Abort if kinetic energy is NaN
-      if(std::isnan(energy))
+      if(std::isnan(energy(0)) || std::isnan(energy(1)) || std::isnan(energy(2)))
       {
          #ifdef GEOMHDISCC_MPI
             MPI_Abort(MPI_COMM_WORLD, 99);

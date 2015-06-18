@@ -9,6 +9,10 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerNonZonalKineticNRG.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityY.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityZ.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/KineticEnergyTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltBeta3DQGPerWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/KineticEnergyBeta3DQGPerWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp

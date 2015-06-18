@@ -88,8 +88,8 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL1);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         //spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL1);
          spExact->setModeOptions(1e0, 3.0, 1e0, 3.0, 1e0, 3.0);
 
          // Add streamfunction initial state generation equation

@@ -40,10 +40,10 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row == ("streamfunction","") or field_row == ("velocityz","") or field_row == ("temperature","") or field_row == ("vorticityz",""):
+        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz","")]:
             fields = [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz","")]
         else:
-            fields = []
+            fields = [field_row]
 
         return fields
 
@@ -58,6 +58,8 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         elif timing == self.EXPLICIT_NONLINEAR:
             if field_row in [("velocityz",""), ("vorticityz",""), ("dx_meantemperature",""), ("kinetic_energy","")]:
                 fields = [field_row]
+            else:
+                fields = []
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
