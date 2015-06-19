@@ -59,7 +59,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCPlaneVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to scalar equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -68,12 +68,12 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYSINSIN);
-         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 6.0, 1.0e0, 2.0, 1.0e0, 2.0);
+         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYSINCOS);
+         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 6.0, 1.0e0, 2.0, 1.0e0, 0.0);
          spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYSINCOS);
-         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 7.0, 1.0e0, 1.0, 1.0e0, 5.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOSSIN);
-         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 3.0, 1.0e0, 3.0, 1.0e0, 1.0);
+         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 7.0, 1.0e0, 3.0, 1.0e0, 0.0);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOSCOS);
+         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 3.0, 1.0e0, 4.0, 1.0e0, 0.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();

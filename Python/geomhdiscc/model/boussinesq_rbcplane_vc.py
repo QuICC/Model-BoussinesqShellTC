@@ -228,11 +228,9 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         if field_row == ("temperature","") and field_col == ("velocity","z"):
             if eq_params['heating'] == 0:
                 mat = geo.i2(res[0], bc, -1.0)
-                mat = mat*utils.qid_from_idx(idx_w, res[0])
 
             elif eq_params['heating'] == 1:
                 mat = geo.i2x1(res[0], bc, -1.0)
-                mat = mat*utils.qid_from_idx(idx_w, res[0])
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
