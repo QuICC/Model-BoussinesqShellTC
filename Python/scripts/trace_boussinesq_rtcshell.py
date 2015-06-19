@@ -49,21 +49,21 @@ bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #res = [32, 32, 0]
 #Ta = 1e7
 #res = [32, 32, 0]
-#Ta = 1e8
+#Ta = 1e8; Rac = 31.534088376364; mc = 6 
 #res = [48, 48, 0]
-Ta = 1e9
-res = [48, 48, 0]
-#Ta = 1e10
+#Ta = 1e9; Rac = 42.219154540505; mc = 9
+#res = [48, 48, 0]
+#Ta = 1e10; Rac = 59.124359856967; mc = 13
 #res = [96, 96, 0]
-#Ta = 1e11
+#Ta = 1e11; Rac = 84.487326687693; mc = 20
 #res = [128, 128, 0]
-#Ta = 1e12
+#Ta = 1e12; Rac = 121.87739395205; mc = 30
 #res = [192, 192, 0]
-#Ta = 1e13
+#Ta = 1e13; Rac = 176.79656879674; mc = 44
 #res = [256, 256, 0]
-#Ta = 1e14
-#res = [384, 256, 0]
-#Ta = 1e15
+#Ta = 1e14; Rac = 257.45628575047; mc = 65
+res = [384, 256, 0]
+Ta = 1e15; Rac = 375.86277729259; mc = 95
 #res = [512, 384, 0]
 #Ta = 1e16
 #res = [768, 512, 0]
@@ -100,11 +100,11 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-16
 marginal_options['geometry'] = 'shell'
-marginal_options['curve'] = True
-marginal_options['minimum'] = True
+marginal_options['curve'] = False
+marginal_options['minimum'] = False
+marginal_options['minimum_int'] = True
 marginal_options['plot_curve'] = True
 marginal_options['solve'] = True
-marginal_options['minimum_int'] = True
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = True
 marginal_options['show_spectra'] = True
