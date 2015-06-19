@@ -221,7 +221,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
     def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit linear term"""
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
