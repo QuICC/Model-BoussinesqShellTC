@@ -34,8 +34,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         """Get the list of fields needed for linear stability calculations"""
 
         fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
-        #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("pressure","")]
-        #fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -74,7 +72,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","x") or field_row == ("velocity","y") or field_row == ("velocity","z") or field_row == ("temperature","") or field_row == ("pressure",""):
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]:
                 shift_x = 2
             else:
                 shift_x = 0
@@ -219,6 +217,27 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                     bc['rt'] = 2
 
         return bc
+
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit linear term"""
+
+        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == ("velocity","z"):
+            if eq_params['heating'] == 0:
+                mat = geo.i2(res[0], bc, -1.0)
+                mat = mat*utils.qid_from_idx(idx_w, res[0])
+
+            elif eq_params['heating'] == 1:
+                mat = geo.i2x1(res[0], bc, -1.0)
+                mat = mat*utils.qid_from_idx(idx_w, res[0])
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
 
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""

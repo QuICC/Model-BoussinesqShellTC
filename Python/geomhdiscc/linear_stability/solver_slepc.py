@@ -23,25 +23,36 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
-
-        self.create_eps(shift_range = None)
-
-    def create_eps(self, shift_range = None):
-        """Create SLEPc's eigensolver"""
-
-        opts = PETSc.Options()
-        opts["mat_mumps_icntl_14"] = 80
-        opts["mat_mumps_icntl_29"] = 2
+        self.ellipse_radius = ellipse_radius
+        self.fixed_shift = fixed_shift
 
         if shift_range is None:
             #self.shift_range = (1e-2, 0.2)
             self.shift_range = (-1e-2, 1e-2)
         else:
             self.shift_range = shift_range
+
+        if self.fixed_shift:
+            self.setRandomShift()
+
+        self.create_eps()
+
+    def create_eps(self):
+        """Create SLEPc's eigensolver"""
+
+        opts = PETSc.Options()
+        opts["mat_mumps_icntl_14"] = 80
+        opts["mat_mumps_icntl_29"] = 2
+
+        if self.ellipse_radius is not None:
+            opts['rg_type'] = 'ellipse'
+            opts['rg_ellipse_center'] = 0
+            opts['rg_ellipse_radius'] = self.ellipse_radius
+            opts['rg_ellipse_vscale'] = 1.0
 
         self.E = SLEPc.EPS()
         self.E.create()
@@ -54,31 +65,39 @@ class GEVPSolver:
 
         ST = self.E.getST()
         ST.setType('sinvert')
-        if self.shift_range[0] == self.shift_range[1]:
-            s = shift_range[0]
-        else:
-            rnd = PETSc.Random()
-            rnd.create(comm = MPI.COMM_SELF)
-            rnd.setType(PETSc.Random.Type.RAND)
-            rnd.setInterval(self.shift_range)
-            s = rnd.getValueReal()
+        if not self.fixed_shift:
+            self.setRandomShift()
+        ST.setShift(self.shift)
 
-        ST.setShift(s)
         KSP = ST.getKSP()
         KSP.setType('preonly')
+
         PC = KSP.getPC()
         PC.setType('lu')
         PC.setFactorSolverPackage('mumps')
+
         PC.setFromOptions()
         KSP.setFromOptions()
         ST.setFromOptions()
 
         self.E.setFromOptions()
 
-    def update_eps(self, A, B, nev, initial_vector = None, shift_range = None):
+    def setRandomShift(self):
+        """Compute random spectra transform shift and store it"""
+
+        if self.shift_range[0] == self.shift_range[1]:
+            self.shift = shift_range[0]
+        else:
+            rnd = PETSc.Random()
+            rnd.create(comm = MPI.COMM_SELF)
+            rnd.setType(PETSc.Random.Type.RAND)
+            rnd.setInterval(self.shift_range)
+            self.shift = rnd.getValueReal()
+
+    def update_eps(self, A, B, nev, initial_vector = None):
         """Create SLEPc eigensolver"""
 
-        self.create_eps(shift_range = shift_range)
+        self.create_eps()
 
         self.E.setOperators(A,B)
         if initial_vector is not None:
@@ -86,18 +105,6 @@ class GEVPSolver:
             self.E.setInitialSpace(v)
 
         self.E.setDimensions(nev = nev)
-
-#        ST = E.getST()
-#        ST.setType('sinvert')
-#        if shift_range[0] == shift_range[1]:
-#            s = shift_range[0]
-#        else:
-#            rnd = PETSc.Random()
-#            rnd.create(comm = MPI.COMM_SELF)
-#            rnd.setType(PETSc.Random.Type.RAND)
-#            rnd.setInterval(shift_range)
-#            s = rnd.getValueReal()
-#        ST.setShift(s)
 
     def eigenvalues(self, system, nev, initial_vector = None):
         """Compute eigenvalues using SLEPc"""

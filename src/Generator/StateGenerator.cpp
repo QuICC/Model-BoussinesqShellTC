@@ -59,7 +59,7 @@ namespace GeoMHDiSCC {
 
 /// \mhdBug Problem with equations for generating exact states
       // Solve trivial equations
-//      this->solveTrivialEquations(SolveTiming::AFTER);
+      this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Solve diagnostic equations
 //      this->solveDiagnosticEquations(SolveTiming::AFTER);

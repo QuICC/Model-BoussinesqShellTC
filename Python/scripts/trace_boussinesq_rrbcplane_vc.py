@@ -12,23 +12,37 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [32, 0, 0]
+Rac = None
+kc = None
 
-# FT
-bc_temp = 0
 
 # SF, FT,
-bc_vel = 1
-phi = 45
-kp = 3.710
-eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e8, 'heating':0, 'scale1d':2.0}
+#bc_vel = 1
+#heating = 0
+#bc_temp = 0
+#phi = 0
+
+#phi = 45
+#kp = 3.710
 #kp = 129
-#eq_params = {'prandtl':1, 'rayleigh':8.7050552e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
 #kp = 60
-#eq_params = {'prandtl':1, 'rayleigh':4.04824521e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-## NS, FT,
-#bc_vel = 0
-#ky = 54
+
+# NS, FT,
+bc_vel = 0
+heating = 0
+bc_temp = 0
+phi = 0
+
+res = [64, 0, 0]
+Ta = 1e8;
+kp = 20
+
+
+
+
+
+#eq_params = {'prandtl':1, 'rayleigh':2.1544e6, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#kp = 54
 #eq_params = {'prandtl':1, 'rayleigh':3.455838e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #kp = 55
 #eq_params = {'prandtl':1, 'rayleigh':3.450289e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
@@ -63,6 +77,17 @@ eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e8, 'heating':0, 'scale1
 #kp = 131
 #eq_params = {'prandtl':1, 'rayleigh':7.8875224e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
 
+# Create parameters (rescaling to proper nondimensionalisation)
+if kc is None:
+    kp = Ta**(1./6.) # Asymptotic prediction for minimum
+else:
+    kp = kc
+if Rac is None:
+    Ra = Ta**(2./3.) # Asymptotic prediction for critical Rayleigh number
+else:
+    Ra = Rac
+
+eq_params = {'taylor':Ta, 'prandtl':1, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
@@ -80,12 +105,15 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
+marginal_options['ellipse_radius'] = 1e5
+marginal_options['curve'] = True
+marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
+marginal_options['curve_points'] = np.arange(max(0, kp-5), kp+6, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

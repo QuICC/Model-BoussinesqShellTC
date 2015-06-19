@@ -19,9 +19,9 @@ res = [16, 0, 0]
 # SF, FT,
 bc_vel = 0
 bc_temp = 0
-phi = 45
-kp = 1.5
-eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'heating':0, 'scale1d':2.0}
+phi = 0
+kp = 3.
+#eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'heating':0, 'scale1d':2.0}
 eq_params = {'prandtl':1, 'rayleigh':1285, 'heating':0, 'scale1d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':675, 'heating':0, 'scale1d':2.0}
 ## kx = 0, ky = 2
@@ -122,12 +122,16 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
+marginal_options['ellipse_radius'] = 1e5
+marginal_options['curve'] = True
+marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
+marginal_options['plot_curve'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
+marginal_options['curve_points'] = np.arange(max(1, kp-2), kp+3, 0.1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

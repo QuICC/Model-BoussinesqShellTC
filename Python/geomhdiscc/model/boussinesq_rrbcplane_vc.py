@@ -72,7 +72,7 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","x") or field_row == ("velocity","y") or field_row == ("velocity","z") or field_row == ("temperature","") or field_row == ("pressure",""):
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]:
                 shift_x = 2
             else:
                 shift_x = 0
@@ -437,6 +437,6 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
         idx_w = utils.qidx(res[0], res[0])
 
         # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0]-1)
+        idx_p = utils.qidx(res[0], res[0])
 
         return (idx_u, idx_v, idx_w, idx_p)
