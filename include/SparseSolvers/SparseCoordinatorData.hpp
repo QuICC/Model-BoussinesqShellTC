@@ -371,7 +371,7 @@ namespace Solver {
       {
          if((*solIt)->solveTiming() == coord.solveTime())
          {
-            // Compute linear solve RHS
+            // Solve linear system
             (*solIt)->solve(step);
          }
       }

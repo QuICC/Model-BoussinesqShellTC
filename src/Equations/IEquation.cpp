@@ -308,6 +308,7 @@ namespace Equations {
       }
 
       // Create explicit fields
+      bool hasQI = false;
       if(allowExplicit)
       {
          // explicit linear
@@ -330,14 +331,13 @@ namespace Equations {
          {
             infoIt.first->second.addExplicitField(fIt->first, fIt->second, ModelOperator::EXPLICIT_NEXTSTEP);
          }
-      }
 
-      // Extract quasi inverse
-      bool hasQI = false;
-      fIt = std::find(exNLFields.begin(), exNLFields.end(), std::make_pair(this->name(), compId));
-      if(fIt != exNLFields.end())
-      {
-         hasQI = true;
+         // Extract quasi inverse
+         fIt = std::find(exNLFields.begin(), exNLFields.end(), std::make_pair(this->name(), compId));
+         if(fIt != exNLFields.end())
+         {
+            hasQI = true;
+         }
       }
 
       // Set nonlinear flags: has nonlinear term? has quasi-inverse?

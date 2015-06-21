@@ -174,7 +174,7 @@ namespace Solver {
          // Stop simulation if solve failed
          if(this->mSolver.at(i+start)->info() != Eigen::Success)
          {
-            throw Exception("Sparse directo solve failed!");
+            throw Exception("Sparse direct solve failed!");
          }
       }
    }

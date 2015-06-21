@@ -85,7 +85,7 @@ namespace Equations {
          /**
           * Generate Random value
           */
-         void makeRandom(MHDFloat& val, const int i1D, const int i3D, const int i2D, const MHDFloat minVal, const MHDFloat maxVal) const;
+         void makeRandom(MHDFloat& val, const int i1D, const int i3D, const int i2D, const MHDFloat minVal, const MHDFloat maxVal, const unsigned int seed = 1) const;
 
          /**
           * Generate Random value
@@ -117,6 +117,11 @@ namespace Equations {
           * @brief Ratio between first and last coefficient in third direction
           */
          std::map<FieldComponents::Spectral::Id,MHDFloat> mRatio3D;
+
+         /**
+          * @brief Starting seed used for random generator
+          */
+         int mStartSeed;
    };
 
    /// Typedef for a shared RandomVectorState

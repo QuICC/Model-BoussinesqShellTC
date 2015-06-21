@@ -54,6 +54,9 @@ namespace GeoMHDiSCC {
 
    void StateGenerator::mainRun()
    {
+      // Solve trivial equations
+      this->solveTrivialEquations(SolveTiming::BEFORE);
+
       // Compute nonlinear terms
       this->computeNonlinear();
 

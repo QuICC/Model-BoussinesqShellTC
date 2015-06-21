@@ -9,6 +9,7 @@
 
 // System includes
 //
+#include <time.h>
 
 // External includes
 //
@@ -28,8 +29,13 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    RandomVectorState::RandomVectorState(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams)
+      : IVectorEquation(spEqParams), mStartSeed(1)
    {
+      timespec t;
+      clock_gettime(CLOCK_REALTIME, &t);
+      srand(t.tv_sec + t.tv_nsec);
+
+      this->mStartSeed = t.tv_sec + t.tv_nsec;
    }
 
    RandomVectorState::~RandomVectorState()
@@ -94,12 +100,28 @@ namespace Equations {
       // Get third dimension
       int n3D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
-      if(i1D < n1D-4 && i3D < n3D - 4 && i2D < n2D - 4)
+      // Get simulation wide indexes
+      int k2D = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i2D);
+      int k3D = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(i3D);
+
+      int z1D = 4;
+      int z2D = 4;
+      int z3D = 4;
+      #if defined GEOMHDISCC_SPATIALSCHEME_TFF
+      z2D = 2;
+      if(k2D >= n2D/2)
+      {
+         k2D = n2D - k2D;
+      }
+      n2D = n2D/2;
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF
+
+      if(i1D < n1D-z1D && i3D < n3D - z3D && k2D < n2D - z2D)
       {
          // Compute scaling factors
          MHDFloat a1D = exp(-static_cast<MHDFloat>(i1D)*log(ratio1D)/static_cast<MHDFloat>(n1D));
-         MHDFloat a2D = exp(-static_cast<MHDFloat>(i2D)*log(ratio2D)/static_cast<MHDFloat>(n2D));
-         MHDFloat a3D = exp(-static_cast<MHDFloat>(i3D)*log(ratio3D)/static_cast<MHDFloat>(n3D));
+         MHDFloat a2D = exp(-static_cast<MHDFloat>(k2D)*log(ratio2D)/static_cast<MHDFloat>(n2D));
+         MHDFloat a3D = exp(-static_cast<MHDFloat>(k3D)*log(ratio3D)/static_cast<MHDFloat>(n3D));
 
          Datatypes::SpectralScalarType::PointType val;
 
@@ -121,9 +143,19 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(false, true, true, false));
    }
 
-   void RandomVectorState::makeRandom(MHDFloat& val, const int i1D, const int i3D, const int i2D, const MHDFloat minVal, const MHDFloat maxVal) const
+   void RandomVectorState::makeRandom(MHDFloat& val, const int i1D, const int i3D, const int i2D, const MHDFloat minVal, const MHDFloat maxVal, const unsigned int seed) const
    {
-      val = ((minVal-maxVal)*static_cast<MHDFloat>(rand())/RAND_MAX)+maxVal;
+      if(seed == 1)
+      {
+         val = ((minVal-maxVal)*static_cast<MHDFloat>(rand())/RAND_MAX)+maxVal;
+      } else
+      {
+         srand(this->mStartSeed + seed);
+         val = ((minVal-maxVal)*static_cast<MHDFloat>(rand())/RAND_MAX)+maxVal;
+         timespec t;
+         clock_gettime(CLOCK_REALTIME, &t);
+         srand(t.tv_sec + t.tv_nsec);
+      }
    }
 
    void RandomVectorState::makeRandom(MHDComplex& val, const int i1D, const int i3D, const int i2D, const MHDFloat minVal, const MHDFloat maxVal) const
@@ -133,8 +165,43 @@ namespace Equations {
 
       val.real() = tmp;
 
-      #if defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMDHDISCC_SPATIALSCHEME_TFF || defined GEOMDHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
+      #if defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i2D) != 0)
+         {
+            this->makeRandom(tmp, i1D, i3D, i2D, minVal, maxVal);
+            val.imag() = tmp;
+         } else
+         {
+            val.imag() = 0.0;
+         }
+      #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(i3D) == 0)
+         {
+            unsigned int seed = 2;
+            seed += this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(i1D);
+
+            int n2D = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+            int k2D = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i2D);
+            if(k2D < n2D/2)
+            {
+               seed += k2D;
+            } else
+            {
+               seed += n2D - k2D;
+            }
+
+            this->makeRandom(tmp, i1D, i3D, i2D, minVal, maxVal, seed);
+            val.real() = tmp;
+            this->makeRandom(tmp, i1D, i3D, i2D, minVal, maxVal, seed+3);
+            if(k2D < n2D/2)
+            {
+               val.imag() = tmp;
+            } else
+            {
+               val.imag() = -tmp;
+            }
+
+         } else if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i2D) != 0)
          {
             this->makeRandom(tmp, i1D, i3D, i2D, minVal, maxVal);
             val.imag() = tmp;
@@ -151,7 +218,7 @@ namespace Equations {
          {
             val.imag() = 0.0;
          }
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMDHDISCC_SPATIALSCHEME_TFF || defined GEOMDHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
    }
 
    void RandomVectorState::setNLComponents()
