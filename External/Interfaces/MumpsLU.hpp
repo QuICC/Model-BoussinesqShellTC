@@ -66,7 +66,7 @@ namespace Eigen {
    inline mumps_complex MumpsLU_convert(const std::complex<float> val) {return (mumps_complex){.r = val.real(), .i = val.imag()};};
    inline mumps_double_complex MumpsLU_convert(const std::complex<double> val) {return (mumps_double_complex){.r = val.real(), .i = val.imag()};};
    inline std::complex<float> MumpsLU_convert(const mumps_complex val) {return std::complex<float>(val.r, val.i);};
-   inline std::complex<double> MumpsLU_convert(const mumps_double_complex val) {return std::complex<float>(val.r, val.i);};
+   inline std::complex<double> MumpsLU_convert(const mumps_double_complex val) {return std::complex<double>(val.r, val.i);};
 
    template <typename TMatrixType>
    class MumpsLU: internal::noncopyable
