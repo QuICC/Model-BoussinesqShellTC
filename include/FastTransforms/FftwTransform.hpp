@@ -178,6 +178,11 @@ namespace Transform {
 
       private:
          /**
+          * @brief Impose complex conjugate symmetry on special indexes
+          */
+         void forceConjugate(MatrixZ& rFFTVal);
+
+         /**
           * @brief FFT setup object providing the sizes
           */
          SharedFftSetup    mspSetup;

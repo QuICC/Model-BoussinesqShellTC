@@ -69,6 +69,17 @@ namespace Transform {
          FftSetup(const int size, const ArrayI& howmany, const MatrixI& evenBlocks, const MatrixI& oddBlocks, const int specSize, const FftSetup::Type type);
 
          /**
+          * @brief Constructor
+          *
+          * @param size          Size of the transform
+          * @param howmany       Number of similar transforms slip in even and odd
+          * @param specialBlocks Index of modes needing special treatment
+          * @param specSize      Spectral output size (i.e without the padding)
+          * @param type          Type of the transform involved
+          */
+         FftSetup(const int size, const int howmany, const MatrixI& specialBlocks, const int specSize, const FftSetup::Type type);
+
+         /**
           * @brief Empty destructor
           */
          ~FftSetup();
@@ -117,10 +128,20 @@ namespace Transform {
           * @brief Get the odd block distribution
           */
          const MatrixI& oddBlocks() const; 
+
+         /**
+          * @brief Get the special index distribution
+          */
+         const MatrixI& specialBlocks() const; 
          
       protected:
 
       private:
+         /**
+          * @brief Set backward size
+          */
+         void setBackwardSize();
+
          /**
           * @brief Size of the backward transform
           */
@@ -150,6 +171,11 @@ namespace Transform {
           * @brief Storage for the even blocks distribution description
           */
          MatrixI mOddBlocks;
+
+         /**
+          * @brief Storage for the index that require special treatment
+          */
+         MatrixI mSpecialBlocks;
    };
 
    /// Typedef for an smart reference counting pointer for a FftSetup

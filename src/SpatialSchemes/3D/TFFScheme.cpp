@@ -83,12 +83,25 @@ namespace Schemes {
 
       // Get number of transforms
       int howmany = 0;
+      std::vector<std::pair<int,int> > special;
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
+         if(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT3D>(i) == 0)
+         {
+            special.push_back(std::make_pair(howmany, spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i)));
+         }
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPLEX));
+      // fill special block matrix
+      MatrixI specialBlocks(special.size(), 2);
+      for(int i = 0; i < special.size(); i++)
+      {
+         specialBlocks(i,0) = special.at(i).first;
+         specialBlocks(i,1) = special.at(i).second;
+      }
+
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specialBlocks, specSize, Transform::FftSetup::COMPLEX));
    }
 
    Transform::SharedFftSetup TFFScheme::spSetup3D(SharedResolution spRes) const

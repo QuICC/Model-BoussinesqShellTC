@@ -20,6 +20,7 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -313,6 +314,9 @@ namespace Transform {
          this->mTmpZIn.bottomRows(negN) = fftVal.bottomRows(negN);
       }
 
+      // Force complex conjugate symmetry for zero modes
+      this->forceConjugate(this->mTmpZIn);
+
       // Set the padded values to zero
       this->mTmpZIn.block(posN, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
 
@@ -335,6 +339,33 @@ namespace Transform {
       {
          fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(this->mTmpZOut.data()));
          rPhysVal -= this->mTmpZOut;
+      }
+   }
+
+   void FftwTransform::forceConjugate(MatrixZ& rFFTVal)
+   {
+      // Get size of positive and negative frequency parts
+      int negN = this->mspSetup->specSize()/2;
+      int posN = negN + (this->mspSetup->specSize()%2);
+      int endN = rFFTVal.rows();
+
+      // Get number of special blocks
+      int rows = this->mspSetup->specialBlocks().rows();
+
+      // Loop over special blocks
+      MHDFloat err = 0.0;
+      for(int j = 0; j < rows; j++)
+      {
+         // Copy complex conjugate into negative frequency part
+         for(int i = 1; i < posN; i++)
+         {
+            err = std::max(err, (rFFTVal.block(endN - i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) - rFFTVal.block(i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).conjugate()).array().abs().maxCoeff());
+            rFFTVal.block(endN - i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = rFFTVal.block(i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).conjugate();
+         }
+      }
+      if(err > 1e-15)
+      {
+         std::cerr << "Conjugate symmetry error = " << err << std::endl;
       }
    }
 
