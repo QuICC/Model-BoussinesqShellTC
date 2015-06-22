@@ -20,7 +20,6 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -353,19 +352,13 @@ namespace Transform {
       int rows = this->mspSetup->specialBlocks().rows();
 
       // Loop over special blocks
-      MHDFloat err = 0.0;
       for(int j = 0; j < rows; j++)
       {
          // Copy complex conjugate into negative frequency part
          for(int i = 1; i < posN; i++)
          {
-            err = std::max(err, (rFFTVal.block(endN - i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) - rFFTVal.block(i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).conjugate()).array().abs().maxCoeff());
             rFFTVal.block(endN - i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = rFFTVal.block(i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).conjugate();
          }
-      }
-      if(err > 1e-15)
-      {
-         std::cerr << "Conjugate symmetry error = " << err << std::endl;
       }
    }
 

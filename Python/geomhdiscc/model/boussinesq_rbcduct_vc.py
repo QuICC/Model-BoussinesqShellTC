@@ -72,7 +72,7 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
 
         tau_n = res[0]*res[2]
         if self.use_galerkin:
-            if field_row == ("velocity","x") or field_row == ("velocity","y")  or field_row == ("velocity","z") or field_row == ("temperature","") or field_row == ("pressure",""):
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]:
                 shift_x = 2
                 shift_z = 2
             else:
@@ -251,7 +251,7 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
             mat = geo.i2j2(res[0], res[2], bc)
             mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
-        elif field_row == ("velocity","y"): and field_col == field_row
+        elif field_row == ("velocity","y") and field_col == field_row:
             mat = geo.i2j2(res[0], res[2], bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
