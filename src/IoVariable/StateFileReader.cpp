@@ -126,6 +126,9 @@ namespace IoVariable {
       
       // close group
       H5Gclose(group);
+
+      // Adapt data if necessary
+      this->adaptData(rScalar);
    }
 
    void StateFileReader::readSpectralVector(const std::string& name, std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& rVector)
@@ -147,6 +150,9 @@ namespace IoVariable {
 
             // Read component from file 
             this->readRegularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
+
+            // Adapt data if necessary
+            this->adaptData(it->second);
          }
       } else
       {
@@ -157,6 +163,9 @@ namespace IoVariable {
 
             // Read component from file 
             this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
+
+            // Adapt data if necessary
+            this->adaptData(it->second);
          }
       }
       
@@ -185,6 +194,22 @@ namespace IoVariable {
       
       // close group
       H5Gclose(group);
+
+      // Adapt data if necessary
+      this->adaptData(rComp);
+   }
+
+   void StateFileReader::adaptData(Datatypes::SpectralScalarType& rField)
+   {
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+      {
+         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0, k) == 0 && this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) > this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
+         {
+            rField.setProfile(ArrayZ::Zero(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)), 0, k);
+         }
+      }
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
    }
 
 }

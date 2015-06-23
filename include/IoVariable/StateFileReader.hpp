@@ -114,6 +114,13 @@ namespace IoVariable {
           */
          void readSpectralComponent(const std::string& name, FieldComponents::Spectral::Id id, Datatypes::SpectralScalarType& rComp);
 
+         /**
+          * @brief Adapt data after reading it in if necessary
+          *
+          * @param rField   Storage for field
+          */
+         void adaptData(Datatypes::SpectralScalarType& rComp);
+
       private:
    };
 

@@ -495,6 +495,12 @@ namespace Equations {
          ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
 
+         #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         // Filter out complex conjugate modes to be safe
+         if(!(mode(3) == 0 && mode(2) > eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2))
+         {
+         #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+
          // Copy data
          int k = start;
          if(isSet)
@@ -518,6 +524,13 @@ namespace Equations {
                k++;
             }
          }
+
+         #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         } else
+         {
+            setZeroNonlinear(eq, compId, storage, matIdx, start);
+         }
+         #endif //GEOMHDISCC_SPATIALSCHEME_TFF
 
       // There is a single matrix
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)

@@ -29,7 +29,6 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace IoVariable {
@@ -131,7 +130,6 @@ namespace IoVariable {
             int start = 0;
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               std::cerr << this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) << " vs " << this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL) << std::endl;
                if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) <= this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
                {
                   *pEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).col(0).real())(0);
