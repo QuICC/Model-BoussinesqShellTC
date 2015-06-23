@@ -3,189 +3,62 @@
 import numpy as np
 
 import geomhdiscc.model.boussinesq_rrbcduct_vc as mod
+import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRRBCDuctVC()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [14, 0, 14]
+res = [48, 0, 48]
 
-## SF/SF, FF/FT, k = 0
+# SF/SF, FF/FT
 bc_vel = 2
 bc_temp = 1
-eigs = [5]
-## SF/SF, FF/FT, Aspect ratio 1:1
-eq_params = {'prandtl':1, 'rayleigh':1e5, 'taylor':1e3, 'scale1d':2.0, 'scale3d':2.0} # m = 1, n = 1, aspect ration 1:1
+heating = 0
+k = 9
+# SF/SF, FF/FT, Aspect ratio 1:1
+Pr = 1; Ra = 320859.996111; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+
+# NS/NS, FT/FT, k = 0
+#bc_vel = 0
+#bc_temp = 0
+#heating = 0
+#k = 9.7281101194
+#Pr = 1; Ra = 1152782.00348; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'taylor':Ta, 'heating':heating, 'scale1d':2.0*A1d, 'scale3d':2.0*A3d} # m = 1, n = 1, aspect ration 1:1
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
+# Generic Wave number function from single "index" (k perpendicular) and angle
+def wave(k):
+    return [k]
 
-# Generate the operator A for the generalized EVP Ax = sigm B x
-A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+# Wave number function from single "index" (k perpendicular)
+eigs = wave(k)
 
-# Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = model.SOLVER_NO_TAU
-B = model.time(res, eq_params, eigs, bcs, fields)
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-# Setup visualization and IO
-show_spy = True
-write_mtx = True
-solve_evp = True
-show_solution = (True and solve_evp)
+# Setup computation, visualization and IO
+marginal_options = MarginalCurve.default_options()
+marginal_options['mode'] = 0
+marginal_options['ellipse_radius'] = 1e5
+marginal_options['geometry'] = 'c2d'
+marginal_options['point'] = False
+marginal_options['curve'] = False
+marginal_options['minimum'] = True
+marginal_options['solve'] = True
+marginal_options['point_k'] = k
+marginal_options['plot_point'] = True
+marginal_options['plot_curve'] = True
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['viz_mode'] = 1
+marginal_options['curve_points'] = np.arange(max(1, k-0.5), k+2, 0.5)
 
-if show_spy or show_solution:
-    import matplotlib.pylab as pl
+# Compute 
+MarginalCurve.compute(gevp_opts, marginal_options)
 
-if show_solution:
-    import geomhdiscc.transform.cartesian as transf
-
-# Show the "spy" of the two matrices
-if show_spy:
-    import matplotlib.pylab as pl
-    pl.spy(A, markersize=3, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=3, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-
-# Export the two matrices to matrix market format
-if write_mtx:
-    import scipy.io as io
-    print("Writing MTX files")
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
-
-# Solve EVP with sptarn
-if solve_evp:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
-    print("Found " + str(len(evp_lmb)) + " eigenvalues\n")
-
-if show_solution:
-    viz_mode = 0
-    k = eigs[0]
-    xscale = eq_params['scale1d']
-    zscale = eq_params['scale3d']
-
-    for mode in range(0,len(evp_lmb)):
-        # Get solution vectors
-        sol_u = evp_vec[0:res[0]*res[2],mode]
-        sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
-        sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
-
-        # Extract continuity from velocity 
-        sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), xscale = xscale, sz = 0)*sol_u + 1j*k*sol_v + mod.c2d.e1(res[0], res[2], mod.no_bc(), zscale = zscale, sx = 0)*sol_w
-        print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
-
-    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
-    # Get solution vectors
-    sol_u = evp_vec[0:res[0]*res[2],viz_mode]
-    sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],viz_mode]
-    sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],viz_mode]
-    sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
-    sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
-
-    # Extract continuity from velocity 
-    sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), xscale = xscale, sz = 0)*sol_u + 1j*k*sol_v + mod.c2d.e1(res[0], res[2], mod.no_bc(), zscale = zscale, sx = 0)*sol_w
-    
-    # Create spectrum plots
-    pl.subplot(2,3,1)
-    pl.semilogy(np.abs(sol_u))
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.semilogy(np.abs(sol_v))
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.semilogy(np.abs(sol_w))
-    pl.title("w")
-    pl.subplot(2,3,4)
-    pl.semilogy(np.abs(sol_t))
-    pl.title("T")
-    pl.subplot(2,3,5)
-    pl.semilogy(np.abs(sol_c))
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.semilogy(np.abs(sol_p))
-    pl.title("p")
-    pl.show()
-    pl.close("all")
-    
-    # Create solution matrices
-    mat_u = sol_u.reshape(res[0], res[2], order = 'F')
-    mat_v = sol_v.reshape(res[0], res[2], order = 'F')
-    mat_w = sol_w.reshape(res[0], res[2], order = 'F')
-    mat_t = sol_t.reshape(res[0], res[2], order = 'F')
-    mat_p = sol_p.reshape(res[0], res[2], order = 'F')
-    mat_c = sol_c.reshape(res[0], res[2], order = 'F')
-
-    # Visualize spectrum matrix
-    pl.subplot(2,3,1)
-    pl.imshow(np.log10(np.abs(mat_u)))
-    pl.colorbar()
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.imshow(np.log10(np.abs(mat_v)))
-    pl.colorbar()
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.imshow(np.log10(np.abs(mat_w)))
-    pl.colorbar()
-    pl.title("w")
-    pl.subplot(2,3,4)
-    pl.imshow(np.log10(np.abs(mat_t)))
-    pl.colorbar()
-    pl.title("T")
-    pl.subplot(2,3,5)
-    pl.imshow(np.log10(np.abs(mat_c)))
-    pl.colorbar()
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.imshow(np.log10(np.abs(mat_p)))
-    pl.colorbar()
-    pl.title("p")
-    pl.show()
-    pl.close("all")
-
-    # Compute physical space values
-    grid_x = transf.grid(res[0])
-    grid_z = transf.grid(res[2])
-    phys_u = transf.tophys2d(mat_u)
-    phys_v = transf.tophys2d(mat_v)
-    phys_w = transf.tophys2d(mat_w)
-    phys_t = transf.tophys2d(mat_t)
-    phys_p = transf.tophys2d(mat_p)
-    phys_c = transf.tophys2d(mat_c)
-
-    # Show physical contour plot
-    pl.subplot(2,3,1)
-    pl.contourf(grid_z, grid_x, phys_u, 50)
-    pl.colorbar()
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.contourf(grid_z, grid_x, phys_v, 50)
-    pl.colorbar()
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.contourf(grid_z, grid_x, phys_w, 50)
-    pl.colorbar()
-    pl.title("w")
-    pl.subplot(2,3,4)
-    pl.contourf(grid_z, grid_x, phys_t, 50)
-    pl.colorbar()
-    pl.title("T")
-    pl.subplot(2,3,5)
-    pl.contourf(grid_z, grid_x, np.log10(np.abs(phys_c)), 50)
-    pl.colorbar()
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.contourf(grid_z, grid_x, phys_p, 50)
-    pl.colorbar()
-    pl.title("p")
-    pl.show()
-    pl.close("all")

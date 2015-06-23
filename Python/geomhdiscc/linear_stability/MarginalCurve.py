@@ -17,7 +17,7 @@ from mpi4py import MPI
 class MarginalCurve:
     """The marginal curve"""
 
-    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7, evp_tol = 1e-8):
+    def __init__(self, gevp_opts, mode, rtol = 1e-7, evp_tol = 1e-8):
         """Initialize the marginal curve"""
 
         # Open file for IO and write header
@@ -129,7 +129,7 @@ class MarginalCurve:
 class MarginalPoint:
     """A point on the marginal curve"""
 
-    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7, out_file = None, evp_tol = 1e-8):
+    def __init__(self, gevp_opts, mode, rtol = 1e-7, out_file = None, evp_tol = 1e-8):
         """Initialize the marginal point"""
 
         self.out = out_file
@@ -234,7 +234,7 @@ class MarginalPoint:
     def frequency(self):
         """Compute the frequency rate"""
 
-        self._gevp.solve(self.Rac, self.nev, use_vector = True)
+        self._gevp.solve(self.Rac, self.nev, use_vector = self.mode)
 
         return self._gevp.evp_lmb[self.mode].imag
 
@@ -242,7 +242,7 @@ class MarginalPoint:
         """Track the growth rate to find critical value"""
 
         for i in range(0, 10):
-            self._gevp.solve(Ra, self.nev, with_vectors = True, use_vector = True)
+            self._gevp.solve(Ra, self.nev, with_vectors = True, use_vector = self.mode)
             if self._gevp.evp_lmb is not None:
                 break
 
@@ -334,15 +334,15 @@ class GEVP:
        self.eigs = self.wave(k)
        self.changed = True
 
-    def solve(self, Ra, nev, with_vectors = False, use_vector = False):
+    def solve(self, Ra, nev, with_vectors = False, use_vector = None):
         """Solve the GEVP and store eigenvalues"""
 
         if self.changed or Ra != self.eq_params['rayleigh'] or (with_vectors and self.evp_vec is None):
             self.changed = False
             problem = self.setupProblem(Ra)
 
-            if use_vector and self.evp_vec is not None:
-                initial_vector = self.evp_vec
+            if use_vector is not None and self.evp_vec is not None:
+                initial_vector = self.evp_vec[:,use_vector]
             else:
                 initial_vector = None
 
@@ -461,6 +461,28 @@ class GEVP:
             elif geometry == 'b1d':
                 import geomhdiscc.transform.sphere as transf
                 nD = 1
+            elif geometry == 'c2d':
+                import geomhdiscc.transform.cartesian as transf
+                nD = 2
+
+                if ("pressure","") in self.fields:
+                    import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
+                    mat = c2d.i2j2lapl(self.res[0], self.res[2], self.eigs[0], {'x':{0:0}, 'z':{0:0}}, xscale = self.eq_params['scale1d'], zscale = self.eq_params['scale3d'])
+                    field = sol_spec[("pressure","")]
+                    sol_spec[("pressure","laplacian")] = mat*field
+                    mat = c2d.i2j2e1(self.res[0], self.res[2], {'x':{0:0}, 'z':{0:0}}, zscale = self.eq_params['scale3d'])
+                    field = sol_spec[("temperature","")]
+                    sol_spec[("pressure","laplacian")] = sol_spec[("pressure","laplacian")] - self.eq_params['rayleigh']*mat*field
+
+                    mat = c2d.i1j1d1(self.res[0], self.res[2], {'x':{0:0}, 'z':{0:0}}, xscale = self.eq_params['scale1d'])
+                    cont = mat*sol_spec[("velocity","x")]
+                    mat = c2d.i1j1e1(self.res[0], self.res[2], {'x':{0:0}, 'z':{0:0}}, zscale = self.eq_params['scale3d'])
+                    cont = cont +  mat*sol_spec[("velocity","z")]
+                    if ("velocity","y") in self.fields: 
+                        mat = c2d.i1j1(self.res[0], self.res[2], {'x':{0:0}, 'z':{0:0}}, 1j*self.eigs[0])
+                        cont = cont + mat*sol_spec[("velocity","y")]
+                    sol_spec[("continuity","")] = cont
+
             elif geometry == 'shell':
                 import geomhdiscc.transform.shell as transf
                 nD = 2
@@ -516,13 +538,17 @@ class GEVP:
 
             # 2D data: plot physical contours on slice
             elif nD == 2:
-                if geometry == 'shell':
+                if geometry == 'c2d':
+                    res_1d = (self.res[0], )
+                    res_2d = (self.res[2], )
+
+                elif geometry == 'shell':
                     import geomhdiscc.geometry.spherical.shell_radius as geo
                     a, b = geo.linear_r2x(self.eq_params['ro'], self.eq_params['rratio'])
                     res_1d = (self.res[0], a, b)
                     res_2d = (self.res[1]-1, int(self.eigs[0]))
 
-                if geometry == 'sphere':
+                elif geometry == 'sphere':
                     res_1d = (self.res[0],)
                     res_2d = (self.res[1]-1, int(self.eigs[0]))
 
@@ -545,21 +571,21 @@ class GEVP:
                     Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
                     # Plot physical field in meridional slice
                     grid = transf.grid_2d(*viz_res)
-                    rows = np.ceil(len(self.fields)/3)
-                    cols = min(3, len(self.fields))
+                    rows = np.ceil(len(sol_phys)/3)
+                    cols = min(3, len(sol_phys))
                     mycm = cm.bwr
-                    for i,f in enumerate(self.fields):
-                        vmax = np.max(np.abs(sol_phys[f].real))
+                    for i,df in enumerate(sol_phys.items()):
+                        vmax = np.max(np.abs(df[1].real))
                         pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
-                        CS = pl.contourf(grid[0], grid[1], sol_phys[f].real, 30, cmap = mycm, vmax = vmax, vmin = -vmax)
-                        title = f[0]
-                        if f[1] != "":
-                            title = title + ', ' + f[1]
+                        CS = pl.contourf(grid[0], grid[1], df[1].real, 30, cmap = mycm, vmax = vmax, vmin = -vmax)
+                        title = df[0][0]
+                        if df[0][1] != "":
+                            title = title + ', ' + df[0][1]
                         pl.title(title)
                         divider = make_axes_locatable(pl.gca())
                         cax = divider.append_axes("right", "5%", pad="3%")
                         pl.colorbar(CS, cax=cax)
-                        pl.tight_layout()
+                    pl.tight_layout()
                     if save_pdf:
                         fname = "slice_meridional_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                         pl.savefig(fname, bbox_inches='tight', dpi=200)
@@ -567,7 +593,7 @@ class GEVP:
                         pl.show()
                     pl.clf()
 
-                if plot or save_pdf or save_profile:
+                if (geometry == 'shell' or geometry == 'sphere') and (plot or save_pdf or save_profile):
                     # Plot physical field in equatorial radial profile
                     grid_r = transf.rgrid(*res_1d)
                     sol_rrad = dict()
@@ -577,7 +603,8 @@ class GEVP:
                         sol_irad[f] = sol_phys[f].imag[sol_phys[f].shape[0]//2,:]
                         if f == ("temperature",""):
                             np.savetxt("profile_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".dat", np.array([grid_r, sol_rrad[f], sol_irad[f]]).transpose())
-                if plot or save_pdf:
+
+                if (geometry == 'shell' or geometry == 'sphere') and (plot or save_pdf):
                     rows = np.ceil(len(self.fields)/3)
                     cols = min(3, len(self.fields))
                     for i,f in enumerate(self.fields):
@@ -588,7 +615,7 @@ class GEVP:
                         if f[1] != "":
                             title = title + ', ' + f[1]
                         pl.title(title)
-                        pl.tight_layout()
+                    pl.tight_layout()
                     if save_pdf:
                         fname = "profile_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                         pl.savefig(fname, bbox_inches='tight', dpi=200)
@@ -612,7 +639,107 @@ class GEVP:
                         divider = make_axes_locatable(pl.gca())
                         cax = divider.append_axes("right", "5%", pad="3%")
                         pl.colorbar(CS, cax=cax)
-                        pl.tight_layout()
+                    pl.tight_layout()
+                    if save_pdf:
+                        fname = "slice_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
+
+                if (geometry == 'c2d') and (plot or save_pdf or save_profile):
+                    # Plot physical field in equatorial radial profile
+                    grid_z = transf.grid(*res_2d)
+                    sol_prof = dict()
+                    for i,f in enumerate(self.fields):
+                        sol_prof[f] = sol_phys[f][:,sol_phys[f].shape[1]//2]
+
+                if (geometry == 'c2d') and (plot or save_pdf):
+                    rows = np.ceil(len(self.fields)/3)
+                    cols = min(3, len(self.fields))
+                    for i,f in enumerate(self.fields):
+                        pl.subplot(rows,cols,i+1)
+                        pl.plot(grid_z, sol_prof[f].real, 'b-')
+                        pl.plot(grid_z, sol_prof[f].imag, 'r-')
+                        title = f[0]
+                        if f[1] != "":
+                            title = title + ', ' + f[1]
+                        pl.title(title)
+                    pl.tight_layout()
+                    if save_pdf:
+                        fname = "profile_vertical_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
+                    # Plot physical field in vertical slice
+                    grid_eq = transf.grid_eq(*res_2d, m = int(self.eigs[0]))
+                    rows = np.ceil(len(self.fields)/3)
+                    cols = min(3, len(self.fields))
+                    for i,f in enumerate(self.fields):
+                        phi = self.eigs[0]*transf.eqgrid(int(self.eigs[0]))
+                        sol_eq = np.outer(sol_prof[f].real,np.cos(phi)) - np.outer(sol_prof[f].imag, np.sin(phi))
+                        pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
+                        vmax = np.max(np.abs(sol_eq))
+                        CS = pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 30, cmap = mycm)
+                        title = f[0]
+                        if f[1] != "":
+                            title = title + ', ' + f[1]
+                        pl.title(title)
+                        divider = make_axes_locatable(pl.gca())
+                        cax = divider.append_axes("right", "5%", pad="3%")
+                        pl.colorbar(CS, cax=cax)
+                    pl.tight_layout()
+                    if save_pdf:
+                        fname = "slice_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
+
+                if (geometry == 'c2d') and (plot or save_pdf or save_profile):
+                    # Plot physical field in equatorial radial profile
+                    grid_z = transf.grid(*res_1d)
+                    sol_prof = dict()
+                    for i,f in enumerate(self.fields):
+                        sol_prof[f] = sol_phys[f][sol_phys[f].shape[0]//2,:]
+
+                if (geometry == 'c2d') and (plot or save_pdf):
+                    rows = np.ceil(len(self.fields)/3)
+                    cols = min(3, len(self.fields))
+                    for i,f in enumerate(self.fields):
+                        pl.subplot(rows,cols,i+1)
+                        pl.plot(grid_z, sol_prof[f].real, 'b-')
+                        pl.plot(grid_z, sol_prof[f].imag, 'r-')
+                        title = f[0]
+                        if f[1] != "":
+                            title = title + ', ' + f[1]
+                        pl.title(title)
+                    pl.tight_layout()
+                    if save_pdf:
+                        fname = "profile_vertical_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
+                        pl.savefig(fname, bbox_inches='tight', dpi=200)
+                    if plot:
+                        pl.show()
+                    pl.clf()
+                    # Plot physical field in vertical slice
+                    grid_eq = transf.grid_eq(*res_2d, m = int(self.eigs[0]))
+                    rows = np.ceil(len(self.fields)/3)
+                    cols = min(3, len(self.fields))
+                    for i,f in enumerate(self.fields):
+                        phi = self.eigs[0]*transf.eqgrid(int(self.eigs[0]))
+                        sol_eq = np.outer(sol_prof[f].real,np.cos(phi)) - np.outer(sol_prof[f].imag, np.sin(phi))
+                        pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
+                        vmax = np.max(np.abs(sol_eq))
+                        CS = pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 30, cmap = mycm)
+                        title = f[0]
+                        if f[1] != "":
+                            title = title + ', ' + f[1]
+                        pl.title(title)
+                        divider = make_axes_locatable(pl.gca())
+                        cax = divider.append_axes("right", "5%", pad="3%")
+                        pl.colorbar(CS, cax=cax)
+                    pl.tight_layout()
                     if save_pdf:
                         fname = "slice_equatorial_Ta{:g}".format(self.eq_params['taylor']) + ".pdf"
                         pl.savefig(fname, bbox_inches='tight', dpi=200)
@@ -641,6 +768,7 @@ def default_options():
 
     opts['fixed_shift'] = False     # Compute random shift only once
     opts['ellipse_radius'] = None   # Restrict eigenvalue search to be within radius
+    opts['mode'] = 0                # Mode to track
     opts['root_tol'] = 1e-8         # Tolerance used in root finding algorighm
     opts['evp_tol'] = 1e-10         # Tolerance used in eigensolver
 
@@ -688,7 +816,7 @@ def compute(gevp_opts, marginal_opts):
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object
-        curve = MarginalCurve(gevp_opts, rtol = marginal_opts['root_tol'], evp_tol = marginal_opts['evp_tol'])
+        curve = MarginalCurve(gevp_opts, mode = marginal_opts['mode'], rtol = marginal_opts['root_tol'], evp_tol = marginal_opts['evp_tol'])
 
     if marginal_opts['point'] and not marginal_opts['curve']:
         # Compute marginal curve at a single point

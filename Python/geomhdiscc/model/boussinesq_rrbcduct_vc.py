@@ -72,7 +72,7 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
 
         tau_n = res[0]*res[2]
         if self.use_galerkin:
-            if field_row == ("velocity","x") or field_row == ("velocity","y")  or field_row == ("velocity","z") or field_row == ("temperature","") or field_row == ("pressure",""):
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]:
                 shift_x = 2
                 shift_z = 2
             else:
@@ -125,13 +125,13 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
 
             # Stress-free/No-slip, Fixed flux/Fixed temperature
@@ -147,13 +147,13 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
 
             # Stress-free/Stress-free, Fixed flux/Fixed temperature
@@ -167,11 +167,11 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:21}, 'priority':'sx'}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sz'}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
 
             # Set LHS galerkin restriction

@@ -6,11 +6,30 @@ from __future__ import unicode_literals
 import scipy.fftpack as fftpack
 import numpy as np
 
+from geomhdiscc.transform.spherical import eqgrid
 
 def grid(nx):
     """Create the Chebyshev grid"""
 
     return np.cos(np.pi*(np.arange(0,nx)+0.5)/nx)
+
+def grid_2d(nx, nz):
+    """Create 2D grid"""
+
+    xGrid = grid(nx)
+    zGrid = grid(nz)
+    xMesh, yMesh = np.meshgrid(xGrid, zGrid)
+
+    return(xMesh, yMesh)
+
+def grid_eq(nz, m):
+    """Create 2D grid"""
+
+    phi = eqgrid(m)
+    zGrid = grid(nz)
+    xMesh, yMesh = np.meshgrid(phi, zGrid)
+
+    return(xMesh, yMesh)
 
 def tophys(spec):
     """Transform R spectral coefficients to physical values"""
@@ -37,19 +56,21 @@ def tophys2d(spec):
 
     phys = spec.copy()
 
-    if spec.dtype == 'complex_':
-        for i in range(spec.shape[0]):
-            phys.real[i,:] = tophys(spec.real[i,:])
-            phys.imag[i,:] = tophys(spec.imag[i,:])
-        for j in range(spec.shape[1]):
-            phys.real[:,j] = tophys(phys.real[:,j])
-            phys.imag[:,j] = tophys(phys.imag[:,j])
-    else:
-        for i in range(spec.shape[0]):
-            phys[i,:] = tophys(spec[i,:])
-        for j in range(spec.shape[1]):
-            phys[:,j] = tophys(phys[:,j])
+    for i in range(spec.shape[0]):
+        phys[i,:] = tophys(spec[i,:])
+    for j in range(spec.shape[1]):
+        phys[:,j] = tophys(phys[:,j])
+
+    phys = phys.T
     
+    return phys
+
+def toslice(spec, nx, nz):
+    """Convert linear spectral to physical values on grid"""
+
+    spec = np.reshape(spec, (nx, nz), order ='F')
+
+    phys = tophys2d(spec)
     return phys
 
 def tocheb2d(phys):

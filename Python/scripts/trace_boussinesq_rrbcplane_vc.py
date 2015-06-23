@@ -15,7 +15,6 @@ model.use_galerkin = False
 Rac = None
 kc = None
 
-
 # SF, FT,
 #bc_vel = 1
 #heating = 0
@@ -36,10 +35,6 @@ phi = 0
 res = [64, 0, 0]
 Ta = 1e8;
 kp = 20
-
-
-
-
 
 #eq_params = {'prandtl':1, 'rayleigh':2.1544e6, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #kp = 54

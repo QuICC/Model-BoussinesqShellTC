@@ -20,71 +20,78 @@ res = [24, 0, 24]
 # SF/SF, FF/FT, k = 0
 #bc_vel = 2
 #bc_temp = 1
-#eigs = [0]
-## SF/SF, FF/FT, Aspect ratio 1:1
-#eq_params = {'prandtl':1, 'rayleigh':779.273, 'scale1d':2.0, 'scale3d':2.0} # m = 1, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':3044.03, 'scale1d':2.0, 'scale3d':2.0} # m = 2, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':10823.2, 'scale1d':2.0, 'scale3d':2.0} # m = 3, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':12176.1, 'scale1d':2.0, 'scale3d':2.0} # m = 1, n = 2, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':12468.4, 'scale1d':2.0, 'scale3d':2.0} # m = 2, n = 2, aspect ration 1:1
-## SF/SF, FF/FT, Aspect ratio 3:1
-#eq_params = {'prandtl':1, 'rayleigh':660.518, 'scale1d':2.0/3.0, 'scale3d':2.0} # m = 2, n = 1, aspect ratio 3:1
-#eq_params = {'prandtl':1, 'rayleigh':779.273, 'scale1d':2.0/3.0, 'scale3d':2.0} # m = 3, n = 1, aspect ratio 3:1
-#eq_params = {'prandtl':1, 'rayleigh':1174.4, 'scale1d':2.0/3.0, 'scale3d':2.0} # m = 4, n = 1, aspect ratio 3:1
-#eq_params = {'prandtl':1, 'rayleigh':1202.58, 'scale1d':2.0/3.0, 'scale3d':2.0} # m = 1, n = 1, aspect ratio 3:1
-#eq_params = {'prandtl':1, 'rayleigh':10568.3, 'scale1d':2.0/3.0, 'scale3d':2.0} # m = 4, n = 2, aspect ratio 3:1
-## SF/SF, FF/FT, Aspect ratio 1:3
-#eq_params = {'prandtl':1, 'rayleigh':133.62, 'scale1d':2.0, 'scale3d':2.0/3.0} # m = 1, n = 1, aspect ratio 1:3
-#eq_params = {'prandtl':1, 'rayleigh':293.563, 'scale1d':2.0, 'scale3d':2.0/3.0} # m = 1, n = 2, aspect ratio 1:3
-#eq_params = {'prandtl':1, 'rayleigh':779.273, 'scale1d':2.0, 'scale3d':2.0/3.0} # m = 1, n = 3, aspect ratio 1:3
-#eq_params = {'prandtl':1, 'rayleigh':1692.07, 'scale1d':2.0, 'scale3d':2.0/3.0} # m = 2, n = 1, aspect ratio 1:3
-#eq_params = {'prandtl':1, 'rayleigh':2087.81, 'scale1d':2.0, 'scale3d':2.0/3.0} # m = 1, n = 4, aspect ratio 1:3
-#eq_params = {'prandtl':1, 'rayleigh':2137.92, 'scale1d':2.0, 'scale3d':2.0/3.0} # m = 2, n = 2, aspect ratio 1:3
+#heating = 0
+#k = 0
+# SF/SF, FF/FT, Aspect ratio 1:1
+#Pr = 1; Ra = 779.273; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 3044.03; A1d = 1.0; A3d = 1.0 # m = 2, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 10823.2; A1d = 1.0; A3d = 1.0 # m = 3, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 12176.1; A1d = 1.0; A3d = 1.0 # m = 1, n = 2, aspect ration 1:1
+#Pr = 1; Ra = 12468.4; A1d = 1.0; A3d = 1.0 # m = 2, n = 2, aspect ration 1:1
+# SF/SF, FF/FT, Aspect ratio 3:1
+#Pr = 1; Ra = 660.518; A1d = 1.0/3.0; A3d = 1.0 # m = 2, n = 1, aspect ratio 3:1
+#Pr = 1; Ra = 779.273; A1d = 1.0/3.0; A3d = 1.0 # m = 3, n = 1, aspect ratio 3:1
+#Pr = 1; Ra = 1174.40; A1d = 1.0/3.0; A3d = 1.0 # m = 4, n = 1, aspect ratio 3:1
+#Pr = 1; Ra = 1202.58; A1d = 1.0/3.0; A3d = 1.0 # m = 1, n = 1, aspect ratio 3:1
+#Pr = 1; Ra = 10568.3; A1d = 1.0/3.0; A3d = 1.0 # m = 4, n = 2, aspect ratio 3:1
+# SF/SF, FF/FT, Aspect ratio 1:3
+#Pr = 1; Ra = 133.620; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 1, aspect ratio 1:3
+#Pr = 1; Ra = 293.563; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 2, aspect ratio 1:3
+#Pr = 1; Ra = 779.273; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 3, aspect ratio 1:3
+#Pr = 1; Ra = 1692.07; A1d = 1.0; A3d = 1.0/3.0 # m = 2, n = 1, aspect ratio 1:3
+#Pr = 1; Ra = 2087.81; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 4, aspect ratio 1:3
+#Pr = 1; Ra = 2137.92; A1d = 1.0; A3d = 1.0/3.0 # m = 2, n = 2, aspect ratio 1:3
 
 # PAPER
 bc_vel = 2
 bc_temp = 1
-#eigs = [np.pi]
-#eq_params = {'prandtl':1, 'rayleigh':108.0*np.pi**4, 'scale1d':2.0, 'scale3d':2.0} #
-#eigs = [(np.sqrt(7.0)/2.0)*np.pi]
-#eq_params = {'prandtl':7, 'rayleigh':36.0*np.pi**4, 'scale1d':2.0/2.0, 'scale3d':2.0} #
-#eigs = [0]
-#eq_params = {'prandtl':1, 'rayleigh':500*np.pi**4, 'scale1d':2.0*2.0, 'scale3d':2.0} #
-#eigs = [0]
-#eq_params = {'prandtl':7, 'rayleigh':8*np.pi**4, 'scale1d':2.0/8.0, 'scale3d':2.0} #
-k = 0
-eq_params = {'prandtl':1, 'rayleigh':8000*np.pi**4, 'heating':0, 'scale1d':2.0*8.0, 'scale3d':2.0} #
+heating = 0
+k = np.pi
+Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
+#k = (np.sqrt(7.0)/2.0)*np.pi
+#Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
+#k = 0
+#Pr = 1; Ra = 500*np.pi**4; A1d = 2.0; A3d = 1.0
+#k = 0
+#Pr = 7; Ra = 8*np.pi**4; A1d = 1.0/8.0; A3d = 1.0
+#k = 0
+#Pr = 1; Ra = 8000*np.pi**4; A1d = 8.0; A3d = 1.0
 
 # SF/SF, FF/FT, k = 1.0
 #bc_vel = 2
 #bc_temp = 1
-#eigs = [1.0]
+#heating = 0
+#k = 1.0
 # SF/SF, FF/FT, Aspect ratio 1:1
-#eq_params = {'prandtl':1, 'rayleigh':820.6591462, 'scale1d':2.0, 'scale3d':2.0} # l = 1, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':1284.225280, 'scale1d':2.0, 'scale3d':2.0} # l = 0, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':3152.998132, 'scale1d':2.0, 'scale3d':2.0} # l = 2, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':11031.37354, 'scale1d':2.0, 'scale3d':2.0} # l = 3, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':11741.76818, 'scale1d':2.0, 'scale3d':2.0} # l = 1, n = 2, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':12628.25262, 'scale1d':2.0, 'scale3d':2.0} # l = 2, n = 2, aspect ration 1:1
+#Pr = 1; Ra = 820.6591462; A1d = 1.0; A3d = 1.0 # l = 1, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 1284.225280; A1d = 1.0; A3d = 1.0 # l = 0, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 3152.998132; A1d = 1.0; A3d = 1.0 # l = 2, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 11031.37354; A1d = 1.0; A3d = 1.0 # l = 3, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 11741.76818; A1d = 1.0; A3d = 1.0 # l = 1, n = 2, aspect ration 1:1
+#Pr = 1; Ra = 12628.25262; A1d = 1.0; A3d = 1.0 # l = 2, n = 2, aspect ration 1:1
 
 # SF/SF, FF/FT, k = 5.35
 #bc_vel = 2
 #bc_temp = 1
-#eigs = [5.35]
+#heating = 0
+#k = 5.35
 # SF/SF, FF/FT, Aspect ratio 1:1
-#eq_params = {'prandtl':1, 'rayleigh':1992.541617, 'scale1d':2.0, 'scale3d':2.0} # m = 1, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':2938.551173, 'scale1d':2.0, 'scale3d':2.0} # m = 1, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':6960.466725, 'scale1d':2.0, 'scale3d':2.0} # m = 2, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':17572.19000, 'scale1d':2.0, 'scale3d':2.0} # m = 3, n = 1, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':12314.58187, 'scale1d':2.0, 'scale3d':2.0} # m = 1, n = 2, aspect ration 1:1
-#eq_params = {'prandtl':1, 'rayleigh':18282.41677, 'scale1d':2.0, 'scale3d':2.0} # m = 2, n = 2, aspect ration 1:1
+#Pr = 1; Ra = 1992.541617; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 2938.551173; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 6960.466725; A1d = 1.0; A3d = 1.0 # m = 2, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 17572.19000; A1d = 1.0; A3d = 1.0 # m = 3, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 12314.58187; A1d = 1.0; A3d = 1.0 # m = 1, n = 2, aspect ration 1:1
+#Pr = 1; Ra = 18282.41677; A1d = 1.0; A3d = 1.0 # m = 2, n = 2, aspect ration 1:1
 
-## SF/NS, FF/FT
+# SF/NS, FF/FT
 #bc_vel = 1 
 #bc_temp = 1 
-## SF/SF/NS, FF/FF/FT, Aspect ratio 3:1:1
-#eq_params = {'prandtl':1, 'rayleigh':1500.0, 'scale1d':2.0/3.0, 'scale3d':2.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
-#eq_params = {'prandtl':1, 'rayleigh':2000.0, 'scale1d':2.0/3.0, 'scale3d':2.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
+#heating = 0
+# SF/SF/NS, FF/FF/FT, Aspect ratio 3:1:1
+#Pr = 1; Ra = 1500.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
+#Pr = 1; Ra = 2000.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
+
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0*A3d, 'scale3d':2.0*A3d} #
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -100,9 +107,10 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
+marginal_options['mode'] = 0
 marginal_options['ellipse_radius'] = 1e5
-marginal_options['geoemtry'] = 'c2d'
-marginal_options['point'] = False
+marginal_options['geometry'] = 'c2d'
+marginal_options['point'] = True
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
@@ -110,7 +118,7 @@ marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = True
 marginal_options['show_spectra'] = True
-marginal_options['show_physical'] = False
+marginal_options['show_physical'] = True
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
 
 # Compute 
