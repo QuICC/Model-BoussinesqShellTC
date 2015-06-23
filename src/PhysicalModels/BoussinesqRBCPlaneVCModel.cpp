@@ -25,10 +25,10 @@
 #include "Equations/Box/Boussinesq/BoussinesqRBCPlaneVCContinuity.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
-#include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoVariable/ContinuityWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DPrimitiveEnergyWriter.hpp"
+#include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
@@ -124,10 +124,16 @@ namespace GeoMHDiSCC {
       spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
+      // Add pressure field visualization
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, false);
+      spScalar->setIdentity(PhysicalNames::PRESSURE);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -139,6 +145,7 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITY);
+      spIn->expect(PhysicalNames::PRESSURE);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -165,8 +172,8 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCPlaneVCModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
+      std::vector<PhysicalNames::Id>::const_iterator  it;
+      std::vector<PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -174,14 +181,15 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+      spState->expect(PhysicalNames::PRESSURE);
       spSim->addHdf5OutputFile(spState);
    }
 
    void BoussinesqRBCPlaneVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
+      std::vector<PhysicalNames::Id>::const_iterator  it;
+      std::vector<PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

@@ -161,8 +161,8 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCBoxVCModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
+      std::vector<PhysicalNames::Id>::const_iterator  it;
+      std::vector<PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -176,8 +176,8 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCBoxVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
+      std::vector<PhysicalNames::Id>::const_iterator  it;
+      std::vector<PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

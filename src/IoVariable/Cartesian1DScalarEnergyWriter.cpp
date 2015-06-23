@@ -106,7 +106,11 @@ namespace IoVariable {
          int start = 0;
          if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
          {
-            this->mEnergy += (this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+            // Include ignored complex conjugate
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) <= this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
+            {
+               this->mEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+            }
             start = 1;
          }
          this->mEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
