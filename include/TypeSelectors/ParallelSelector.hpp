@@ -91,7 +91,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
       /// Transform configurator selector specialised for COUPLED2D case
-      template <> struct ConfigSelector<Splitting::Algorithms::COUPLED>
+      template <> struct ConfigSelector<Splitting::Algorithms::COUPLED2D>
       {
          /// Typedef for forward configurator
          typedef ForwardSingle1DConfigurator   FwdConfigType;
