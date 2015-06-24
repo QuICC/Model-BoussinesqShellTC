@@ -240,6 +240,23 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
 
         return bc
 
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit linear term"""
+
+        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == ("velocity","z"):
+            if eq_params['heating'] == 0:
+                mat = geo.i2j2(res[0], res[1], bc, -1.0)
+                mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 

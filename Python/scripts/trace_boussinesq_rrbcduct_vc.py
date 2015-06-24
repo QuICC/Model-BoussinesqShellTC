@@ -11,7 +11,7 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [48, 0, 48]
+res = [64, 0, 64]
 
 # SF/SF, FF/FT
 bc_vel = 2
@@ -20,6 +20,8 @@ heating = 0
 k = 5.7300054934036
 # SF/SF, FF/FT, Aspect ratio 1:1
 Pr = 1; Ra = 275718.48221715; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+k = 10
+Pr = 1; Ra = 1e6; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 
 # NS/NS, FT/FT, k = 0
 #bc_vel = 0
@@ -44,7 +46,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['mode'] = 0
+marginal_options['mode'] = 2
 marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
@@ -57,7 +59,7 @@ marginal_options['plot_curve'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['viz_mode'] = 1
-marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 1)
+marginal_options['curve_points'] = np.arange(max(1, k-1), k+2, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)
