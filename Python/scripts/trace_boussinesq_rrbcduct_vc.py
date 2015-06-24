@@ -17,9 +17,9 @@ res = [48, 0, 48]
 bc_vel = 2
 bc_temp = 1
 heating = 0
-k = 9
+k = 5.7300054934036
 # SF/SF, FF/FT, Aspect ratio 1:1
-Pr = 1; Ra = 320859.996111; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+Pr = 1; Ra = 275718.48221715; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 
 # NS/NS, FT/FT, k = 0
 #bc_vel = 0
@@ -48,7 +48,7 @@ marginal_options['mode'] = 0
 marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
-marginal_options['curve'] = False
+marginal_options['curve'] = True
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['point_k'] = k
@@ -57,7 +57,7 @@ marginal_options['plot_curve'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['viz_mode'] = 1
-marginal_options['curve_points'] = np.arange(max(1, k-0.5), k+2, 0.5)
+marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

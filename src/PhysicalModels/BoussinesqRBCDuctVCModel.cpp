@@ -20,14 +20,14 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCContinuity.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/ContinuityWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCTransport.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCMomentum.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCContinuity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
@@ -122,10 +122,16 @@ namespace GeoMHDiSCC {
       spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
+      // Add pressure field visualization
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, false);
+      spScalar->setIdentity(PhysicalNames::PRESSURE);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -137,6 +143,7 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITY);
+      spIn->expect(PhysicalNames::PRESSURE);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -163,6 +170,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+      spState->expect(PhysicalNames::PRESSURE);
       spSim->addHdf5OutputFile(spState);
    }
 

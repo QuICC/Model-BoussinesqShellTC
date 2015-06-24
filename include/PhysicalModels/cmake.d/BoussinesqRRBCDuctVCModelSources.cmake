@@ -10,4 +10,7 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/ContinuityTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/ContinuityWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
 )
