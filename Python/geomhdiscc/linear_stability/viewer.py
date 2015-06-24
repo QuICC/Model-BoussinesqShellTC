@@ -352,8 +352,9 @@ def addContinuityC1D(fields, res, eigs, eq_params):
     f = fields[("pressure","")]
     fields[("pressure","laplacian")] = mat*f
     mat = c1d.i2d1(res[0], {0:0}, cscale = eq_params['scale1d'])
-    f = fields[("temperature","")]
-    fields[("pressure","laplacian")] = fields[("pressure","laplacian")] - eq_params['rayleigh']*mat*f
+    if ("temperature","") in fields:
+        f = fields[("temperature","")]
+        fields[("pressure","laplacian")] = fields[("pressure","laplacian")] - eq_params['rayleigh']*mat*f
 
     mat = c1d.i1d1(res[0], {0:0}, cscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","z")]
@@ -373,8 +374,9 @@ def addContinuityC2D(fields, res, eigs, eq_params):
     f = fields[("pressure","")]
     fields[("pressure","laplacian")] = mat*f
     mat = c2d.i2j2e1(res[0], res[2], {'x':{0:0}, 'z':{0:0}}, zscale = eq_params['scale3d'])
-    f = fields[("temperature","")]
-    fields[("pressure","laplacian")] = fields[("pressure","laplacian")] - eq_params['rayleigh']*mat*f
+    if ("temperature","") in fields:
+        f = fields[("temperature","")]
+        fields[("pressure","laplacian")] = fields[("pressure","laplacian")] - eq_params['rayleigh']*mat*f
 
     mat = c2d.i1j1d1(res[0], res[2], {'x':{0:0}, 'z':{0:0}}, xscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","x")]

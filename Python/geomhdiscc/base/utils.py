@@ -270,7 +270,8 @@ def qid_from_idx(idx, n):
     """Create a sparse identity from zero indexes indexes"""
 
     d = np.ones((1,n))
-    d[0,idx] = 0.0
+    if idx.size > 0:
+        d[0,idx] = 0.0
 
     return spsp.diags(d, [0], 2*(n,))
 
