@@ -21,6 +21,8 @@ def rgrid(nr):
     return np.cos(np.pi*(np.arange(0,gN)+0.5)/gN)
 
 grid_1d = rgrid
+grid_fast = rgrid
+grid_slow = thgrid
 
 def grid_2d(nr, maxl, m):
     """Compute the 2D grid for the contours"""
@@ -33,7 +35,7 @@ def grid_2d(nr, maxl, m):
 
     return (X, Y)
 
-def grid_eq(nr, m):
+def grid_fast_per(nr, m):
     """Compute the 2D grid for the equatorial contours"""
 
     r = rgrid(nr)
@@ -41,6 +43,15 @@ def grid_eq(nr, m):
     rmesh, phimesh = np.meshgrid(r, phi)
     X = rmesh * np.cos(phimesh)
     Y = rmesh * np.sin(phimesh)
+
+    return (X, Y)
+
+def grid_slow_per(maxl, tm, m):
+    """Compute the 2D grid for the equatorial contours"""
+
+    th = thgrid(maxl, tm)
+    phi = eqgrid(m)
+    X, Y = np.meshgrid(th, phi)
 
     return (X, Y)
 

@@ -3,7 +3,7 @@
 import numpy as np
 
 import geomhdiscc.model.boussinesq_rtcshell as mod
-import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
+import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRTCShell()
@@ -48,8 +48,8 @@ bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
-#res = [32, 32, 0]
-#Ta = 1e8; Rac = 31.534088376364; mc = 6 
+res = [32, 32, 0]
+Ta = 1e8; Rac = 31.534088376364; mc = 6 
 #res = [48, 48, 0]
 #Ta = 1e9; Rac = 42.219154540505; mc = 9
 #res = [48, 48, 0]
@@ -62,8 +62,8 @@ bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e13; Rac = 176.79656879674; mc = 44
 #res = [256, 256, 0]
 #Ta = 1e14; Rac = 257.45628575047; mc = 65
-res = [384, 256, 0]
-Ta = 1e15; Rac = 375.86277729259; mc = 95
+#res = [384, 256, 0]
+#Ta = 1e15; Rac = 375.86277729259; mc = 95
 #res = [512, 384, 0]
 #Ta = 1e16
 #res = [768, 512, 0]

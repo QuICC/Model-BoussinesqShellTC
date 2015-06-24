@@ -20,6 +20,8 @@ def rgrid(nr, a, b):
     return a*np.cos(np.pi*(np.arange(0,gN)+0.5)/gN) + b
 
 grid_1d = rgrid
+grid_fast = rgrid
+grid_slow = thgrid
 
 def grid_2d(nr, a, b, maxl, m):
     """Compute the 2D grid for the contours"""
@@ -32,7 +34,7 @@ def grid_2d(nr, a, b, maxl, m):
 
     return (X, Y)
 
-def grid_eq(nr, a, b, m):
+def grid_fast_per(nr, a, b, m):
     """Compute the 2D grid for the equatorial contours"""
 
     r = rgrid(nr, a, b)
@@ -40,6 +42,15 @@ def grid_eq(nr, a, b, m):
     rmesh, phimesh = np.meshgrid(r, phi)
     X = rmesh * np.cos(phimesh)
     Y = rmesh * np.sin(phimesh)
+
+    return (X, Y)
+
+def grid_slow_per(maxl, tm, m):
+    """Compute the 2D grid for the equatorial contours"""
+
+    th = thgrid(maxl, tm)
+    phi = eqgrid(m)
+    X, Y = np.meshgrid(th, phi)
 
     return (X, Y)
 
@@ -86,6 +97,6 @@ def toslice(spec, nr, maxl, m):
 
     rphys = torphys2D(spec.real) + 1j*torphys2D(spec.imag)
 
-    rspec = np.transpose(rphys)
+    rspec = rphys.T
     phys = totphys(rspec, maxl, m)
     return phys

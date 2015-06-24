@@ -6,7 +6,7 @@ import functools
 import geomhdiscc.model.boussinesq_rbcplane_vc as mod
 #import geomhdiscc.model.boussinesq_rbcplane_vc_gal as mod
 #import geomhdiscc.model.boussinesq_rbcplane_vc_diff as mod
-import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
+import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBCPlaneVC()
@@ -123,7 +123,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['ellipse_radius'] = 1e5
-marginal_options['curve'] = True
+marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp

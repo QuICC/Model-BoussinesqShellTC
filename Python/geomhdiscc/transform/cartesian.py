@@ -13,6 +13,9 @@ def grid(nx):
 
     return np.cos(np.pi*(np.arange(0,nx)+0.5)/nx)
 
+grid_fast = grid
+grid_slow = grid
+
 def grid_2d(nx, nz):
     """Create 2D grid"""
 
@@ -22,12 +25,21 @@ def grid_2d(nx, nz):
 
     return(xMesh, yMesh)
 
-def grid_eq(nz, m):
+def grid_fast_per(nx, m):
+    """Create 2D grid"""
+
+    phi = eqgrid(m)
+    xGrid = grid(nx)
+    xMesh, yMesh = np.meshgrid(xGrid, phi)
+
+    return(xMesh, yMesh)
+
+def grid_slow_per(nz, m):
     """Create 2D grid"""
 
     phi = eqgrid(m)
     zGrid = grid(nz)
-    xMesh, yMesh = np.meshgrid(phi, zGrid)
+    xMesh, yMesh = np.meshgrid(zGrid, phi)
 
     return(xMesh, yMesh)
 
@@ -36,8 +48,11 @@ def tophys(spec):
 
     n = len(spec)
     phys = np.zeros(spec.shape, dtype = spec.dtype)
-    phys.real = fftpack.dct(spec.real,3)
-    phys.imag = fftpack.dct(spec.imag,3)
+    if spec.dtype == 'complex_':
+        phys.real = fftpack.dct(spec.real,3)
+        phys.imag = fftpack.dct(spec.imag,3)
+    else:
+        phys = fftpack.dct(spec,3)
 
     return phys
 
@@ -90,30 +105,24 @@ def tophys3d(spec):
 
     phys = spec.copy()
 
-    if spec.dtype == 'complex_':
-        for i in range(spec.shape[0]):
-            for j in range(spec.shape[1]):
-                phys.real[i,j,:] = tophys(spec.real[i,j,:])
-                phys.imag[i,j,:] = tophys(spec.imag[i,j,:])
-        for i in range(spec.shape[0]):
-            for j in range(spec.shape[2]):
-                phys.real[i,:,j] = tophys(phys.real[i,:,j])
-                phys.imag[i,:,j] = tophys(phys.imag[i,:,j])
-        for i in range(spec.shape[1]):
-            for j in range(spec.shape[2]):
-                phys.real[:,i,j] = tophys(phys.real[:,i,j])
-                phys.imag[:,i,j] = tophys(phys.imag[:,i,j])
-    else:
-        for i in range(spec.shape[0]):
-            for j in range(spec.shape[1]):
-                phys[i,j,:] = tophys(spec[i,j,:])
-        for i in range(spec.shape[0]):
-            for j in range(spec.shape[2]):
-                phys[i,:,j] = tophys(phys[i,:,j])
-        for i in range(spec.shape[1]):
-            for j in range(spec.shape[2]):
-                phys[:,i,j] = tophys(phys[:,i,j])
+    for i in range(spec.shape[1]):
+        for j in range(spec.shape[2]):
+            phys[:,i,j] = tophys(phys[:,i,j])
+    for i in range(spec.shape[0]):
+        for j in range(spec.shape[2]):
+            phys[i,:,j] = tophys(phys[i,:,j])
+    for i in range(spec.shape[0]):
+        for j in range(spec.shape[1]):
+            phys[i,j,:] = tophys(spec[i,j,:])
     
+    return phys
+
+def tovolume(spec, nx, ny, nz):
+    """Convert linear spectral to physical values on grid"""
+
+    spec = np.reshape(spec, (nx, ny, nz), order ='F')
+
+    phys = tophys3d(spec)
     return phys
 
 def tocheb3d(phys):

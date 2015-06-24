@@ -3,7 +3,7 @@
 import numpy as np
 
 import geomhdiscc.model.boussinesq_rtcsphere as mod
-import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
+import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRTCSphere()
@@ -17,8 +17,8 @@ bc_temp = 0 # 0: FT 1: FF
 #res = [32, 32, 0]
 #Ta = 1e7
 #res = [32, 32, 0]
-#Ta = 1e8
-#res = [32, 32, 0]
+Ta = 1e8
+res = [32, 32, 0]
 #Ta = 1e9
 #res = [48, 48, 0]
 #Ta = 1e10
@@ -39,8 +39,8 @@ bc_temp = 0 # 0: FT 1: FF
 #res = [512, 1024, 0]
 #Ta = 1e18
 #res = [784, 1536, 0]
-Ta = 1e19
-res = [512, 512, 0]
+#Ta = 1e19
+#res = [512, 512, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
@@ -62,7 +62,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-16
 marginal_options['geometry'] = 'sphere'
-marginal_options['curve'] = True
+marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['plot_curve'] = True
 marginal_options['solve'] = True

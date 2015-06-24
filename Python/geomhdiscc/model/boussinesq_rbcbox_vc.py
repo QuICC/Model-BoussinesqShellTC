@@ -72,7 +72,7 @@ class BoussinesqRBCBoxVC(base_model.BaseModel):
 
         tau_n = res[0]*res[1]*res[2]
         if self.use_galerkin:
-            if field_row == ("velocity","x") or field_row == ("velocity","y")  or field_row == ("velocity","z") or field_row == ("temperature","") or field_row == ("pressure",""):
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]:
                 shift_x = 2
                 shift_y = 2
                 shift_z = 2
@@ -128,13 +128,13 @@ class BoussinesqRBCBoxVC(base_model.BaseModel):
                         bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'yx'}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
 
             # Stress-free/Stress-free/no-slip, Fixed flux/Fixed flux/Fixed temperature
@@ -150,13 +150,13 @@ class BoussinesqRBCBoxVC(base_model.BaseModel):
                         bc = {'x':{0:-21, 'rt':0}, 'y':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:20}, 'priority':'xz'}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'yz'}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsy'}
 
             # Stress-free/Stress-free/no-slip, Fixed flux/Fixed flux/Fixed temperature
@@ -170,11 +170,11 @@ class BoussinesqRBCBoxVC(base_model.BaseModel):
                         bc = {'x':{0:-21, 'rt':0}, 'y':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xsz'}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'ysz'}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
             
             # Set LHS galerkin restriction
