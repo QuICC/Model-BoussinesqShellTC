@@ -139,7 +139,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid = transf.grid_1d(*viz_res)
         viewProfile(sol_profile, grid, show = show, save = save, fid = fid, max_cols = max_cols)
 
-def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = False, save_slow_profile = False, fid = None, max_cols = 3):
+def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = False, save_slow_profile = True, fid = None, max_cols = 3, slice_ratio = 4):
     """View 2D physical data"""
 
     sol_slice = dict()
@@ -181,7 +181,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid_fast = transf.grid_fast(*res_1d)
         prof_fast = dict()
         for k,f in sol_slice.items():
-            prof_fast[k] = f[f.shape[0]//2,:]
+            prof_fast[k] = f[np.floor(f.shape[0]/slice_ratio),:]
 
         pfid = "fast"
         if fid is not None:
@@ -201,7 +201,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid_slow = transf.grid_slow(*res_2d)
         prof_slow = dict()
         for k,f in sol_slice.items():
-            prof_slow[k] = f[:,f.shape[1]//2]
+            prof_slow[k] = f[:,np.floor(f.shape[1]/slice_ratio)]
 
         pfid = "slow"
         if fid is not None:
@@ -216,7 +216,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         phi = eigs[0]*transf.eqgrid(np.ceil(eigs[0]))
         viewPeriodic(prof_slow, grid_per, phi, show = show, save = save, fid = pfid, max_cols = max_cols)
 
-def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, fid = None, max_cols = 3):
+def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, fid = None, max_cols = 3, slice_ratio = 2):
     """View 3D physical data"""
 
     sol_volume = dict()
@@ -236,7 +236,7 @@ def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         slice_res = res_1d + res_2d
         grid = transf.grid_2d(*slice_res)
         for k,f in sol_volume.items():
-            sol_slice[k] = f[:,:,f.shape[2]//2].T
+            sol_slice[k] = f[:,:,np.floor(f.shape[2]/slice_ratio)].T
         sfid = "slow"
         if fid is not None:
             sfid = sfid + "_" + fid
@@ -247,7 +247,7 @@ def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         slice_res = res_1d + res_3d
         grid = transf.grid_2d(*slice_res)
         for k,f in sol_volume.items():
-            sol_slice[k] = f[:,f.shape[1]//2,:].T 
+            sol_slice[k] = f[:,np.floor(f.shape[1]/slice_ratio),:].T 
         sfid = "medium"
         if fid is not None:
             sfid = sfid + "_" + fid
@@ -258,7 +258,7 @@ def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         slice_res = res_2d + res_3d
         grid = transf.grid_2d(*slice_res)
         for k,f in sol_volume.items():
-            sol_slice[k] = f[f.shape[0]//2,:,:].T
+            sol_slice[k] = f[np.floor(f.shape[0]/slice_ratio),:,:].T
         sfid = "fast"
         if fid is not None:
             sfid = sfid + "_" + fid
