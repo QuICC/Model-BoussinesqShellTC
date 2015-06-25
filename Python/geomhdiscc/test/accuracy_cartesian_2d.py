@@ -314,10 +314,25 @@ def i2j2lapl(nx,nz, xg, zg):
 
     print("\tbc = 20, 20")
     k = np.random.ranf()*nx
-    A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}}).tocsr()
+    A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}, 'priority':'x'}).tocsr()
     B = c2d.i2j2(nx, nz, c2d.c2dbc.no_bc()).tocsr()
-    ssol = (1.0 - x**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,nz-2,1)])
+    ssol = 1e3*(1.0 - x**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,nz-2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol + sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, zg)
+
+    print("\tbc = 20, 20")
+    A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}, 'priority':'z'}).tocsr()
+    B = c2d.i2j2(nx, nz, c2d.c2dbc.no_bc()).tocsr()
+    test_backward_tau(A, B, sphys, ssol, xg, zg)
+
+    print("\tbc = 20, 20")
+    A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}, 'priority':'sx'}).tocsr()
+    B = c2d.i2j2(nx, nz, c2d.c2dbc.no_bc()).tocsr()
+    test_backward_tau(A, B, sphys, ssol, xg, zg)
+
+    print("\tbc = 20, 20")
+    A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}, 'priority':'sz'}).tocsr()
+    B = c2d.i2j2(nx, nz, c2d.c2dbc.no_bc()).tocsr()
     test_backward_tau(A, B, sphys, ssol, xg, zg)
 
 def i4j1(nx,nz, xg, zg):
@@ -752,41 +767,41 @@ def surfaceAvg(nx, nz, xg, zg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 10
-    nz = 10
+    nx = 12
+    nz = 12
     xg = transf.grid(nx)
     zg = transf.grid(nz)
 
     # run hardcoded operator tests
     print('Hard coded exact operators')
-    d1(nx, nz, xg, zg)
-    e1(nx, nz, xg, zg)
-    laplh(nx, nz, xg, zg)
-    lapl2h(nx, nz, xg, zg)
-    i2j1e1(nx, nz, xg, zg)
-    i2j2e2(nx, nz, xg, zg)
-    i2j2d2e2(nx, nz, xg, zg)
-    i2(nx, nz, xg, zg)
-    i2j1(nx, nz, xg, zg)
-    i2j2(nx, nz, xg, zg)
-    i2laplh(nx, nz, xg, zg)
-    i2j1laplh(nx, nz, xg, zg)
-    i2j2laplh(nx, nz, xg, zg)
+#    d1(nx, nz, xg, zg)
+#    e1(nx, nz, xg, zg)
+#    laplh(nx, nz, xg, zg)
+#    lapl2h(nx, nz, xg, zg)
+#    i2j1e1(nx, nz, xg, zg)
+#    i2j2e2(nx, nz, xg, zg)
+#    i2j2d2e2(nx, nz, xg, zg)
+#    i2(nx, nz, xg, zg)
+#    i2j1(nx, nz, xg, zg)
+#    i2j2(nx, nz, xg, zg)
+#    i2laplh(nx, nz, xg, zg)
+#    i2j1laplh(nx, nz, xg, zg)
+#    i2j2laplh(nx, nz, xg, zg)
     i2j2lapl(nx, nz, xg, zg)
-    i4j1(nx, nz, xg, zg)
-    i4j2(nx, nz, xg, zg)
-    i4j4(nx, nz, xg, zg)
-    i4j1e1(nx, nz, xg, zg)
-    i4j2e2(nx, nz, xg, zg)
-    i4j1laplh(nx, nz, xg, zg)
-    i4j2laplh(nx, nz, xg, zg)
-    i4j4d1(nx, nz, xg, zg)
-    i4j4lapl(nx, nz, xg, zg)
-    i4j1lapl2h(nx, nz, xg, zg)
-    i4j2lapl2h(nx, nz, xg, zg)
-    i4j4lapl2(nx, nz, xg, zg)
+#    i4j1(nx, nz, xg, zg)
+#    i4j2(nx, nz, xg, zg)
+#    i4j4(nx, nz, xg, zg)
+#    i4j1e1(nx, nz, xg, zg)
+#    i4j2e2(nx, nz, xg, zg)
+#    i4j1laplh(nx, nz, xg, zg)
+#    i4j2laplh(nx, nz, xg, zg)
+#    i4j4d1(nx, nz, xg, zg)
+#    i4j4lapl(nx, nz, xg, zg)
+#    i4j1lapl2h(nx, nz, xg, zg)
+#    i4j2lapl2h(nx, nz, xg, zg)
+#    i4j4lapl2(nx, nz, xg, zg)
 #    lapl2he1_e1laplh(nx, nz, xg, zg)
 #    i4j1_lapl2he1_e1laplh(nx, nz, xg, zg)
 
     # Run average operator tests
-    surfaceAvg(nx, nz, xg, zg)
+#    surfaceAvg(nx, nz, xg, zg)

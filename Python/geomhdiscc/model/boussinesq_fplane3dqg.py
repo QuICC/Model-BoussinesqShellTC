@@ -228,7 +228,6 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):

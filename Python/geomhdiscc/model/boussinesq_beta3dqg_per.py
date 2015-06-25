@@ -117,7 +117,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
                 if self.use_galerkin:
-                    if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
+                    if field_row == ("streamfunction","") and field_col == field_row:
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {0:0}
                         else:
@@ -132,7 +132,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
                             bc = {0:0}
                         else:
                             bc = {0:11, 'c':1j*ky*tanchi/G}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                    elif field_row == ("velocityz","") and field_col == field_row:
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {0:0}
                         else:
@@ -143,7 +143,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
                         bc = {0:10, 'c':-1j*ky*tanchi/G}
                     elif field_row == ("vorticityz","") and field_col == ("velocityz",""):
                         bc = {0:10}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                    elif field_row == ("velocityz","") and field_col == field_row:
                         bc = {0:11}
                     elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
                         bc = {0:11, 'c':1j*ky*tanchi/G}
@@ -193,21 +193,21 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         elif field_row == ("dx_meantemperature","") and field_col == field_row:
             if eigs[1] == 0:
-                mat = geo.avg(res[0])
+                mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
             else:
                 mat = geo.zblk(res[0], bc)
 
         elif field_row == ("kinetic_energy","") and field_col == field_row:
-            mat = geo.avg(res[0])
+            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         elif field_row == ("zonal_kinetic_energy",""):
-            mat = c1d.avg(res[0])
+            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
 
         elif field_row == ("nonzonal_kinetic_energy",""):
-            mat = c1d.avg(res[0])
+            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
 
         return mat
 

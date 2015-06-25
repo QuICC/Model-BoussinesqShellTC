@@ -22,8 +22,6 @@
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
-#include "IoVariable/NusseltBeta3DQGPerWriter.hpp"
-#include "IoVariable/KineticEnergyBeta3DQGPerWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerStreamfunction.hpp"
@@ -36,6 +34,10 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerNonZonalKineticNRG.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityY.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityZ.hpp"
+#include "IoVariable/NusseltBeta3DQGPerWriter.hpp"
+#include "IoVariable/KineticEnergyBeta3DQGPerWriter.hpp"
+#include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -225,6 +227,17 @@ namespace GeoMHDiSCC {
       spKinetic->expect(PhysicalNames::ZONAL_KINETIC_ENERGY);
       spKinetic->expect(PhysicalNames::NONZONAL_KINETIC_ENERGY);
       spSim->addAsciiOutputFile(spKinetic);
+
+      // Create temperature energy writer
+      IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("temperature", SchemeType::type()));
+      spTemp->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spTemp);
+
+      // Create kinetic energy writer
+      IoVariable::SharedCartesian1DStreamEnergyWriter spStream(new IoVariable::Cartesian1DStreamEnergyWriter("new_kinetic", SchemeType::type()));
+      spStream->expect(PhysicalNames::STREAMFUNCTION);
+      spStream->expect(PhysicalNames::VELOCITYZ);
+      spSim->addAsciiOutputFile(spStream);
    }
 
    void BoussinesqBeta3DQGPerModel::addHdf5OutputFiles(SharedSimulation spSim)

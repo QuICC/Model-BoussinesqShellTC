@@ -12,7 +12,7 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [32, 0, 0]
+res = [64, 0, 0]
 chi = 60
 Pr = 1
 G = 1e-3
@@ -28,10 +28,9 @@ print("k_c = " + str(kyc))
 print("f_c = " + str(fc))
 
 # Set wave number
-kx = 0
-ky = 14.4046937485972/2.0
-eigs = [kx, ky]
+kp = 14.4046937485972/2.0
 Ra = 192407.5882
+phi = 90
 
 eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi, 'scale1d':1}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0, 'vorticityz':0}
@@ -58,12 +57,20 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
+marginal_options['ellipse_radius'] = 1e5
+marginal_options['mode'] = 0
+marginal_options['point'] = False
+marginal_options['curve'] = True
+marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
+marginal_options['plot_curve'] = True
+marginal_options['plot_spy'] = False
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
+marginal_options['viz_mode'] = 0
+marginal_options['curve_points'] = np.arange(max(0, kp+1), kp-4, -0.1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

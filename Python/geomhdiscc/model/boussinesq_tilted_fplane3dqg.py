@@ -173,9 +173,6 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
-        S1 = utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
-        S2 = utils.qid_from_idx(utils.qidx(res[0], res[0]-2), res[0])
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -263,9 +260,6 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
-        S1 = utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
-        S2 = utils.qid_from_idx(utils.qidx(res[0], res[0]-2), res[0])
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -315,9 +309,6 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         eta3 = np.cos(np.pi*eq_params['theta']/180)
         kx = eigs[0]
         ky = eigs[1]
-
-        S1 = utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
-        S2 = utils.qid_from_idx(utils.qidx(res[0], res[0]-2), res[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
