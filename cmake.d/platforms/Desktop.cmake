@@ -88,11 +88,17 @@ set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
 set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
 ###################################################
+#--------------- PYTHON LIBRARIES ----------------#
+###################################################
+
+set(GEOMHDISCC_PYTHONS "python27" PARENT_SCOPE)
+
+set(GEOMHDISCC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
+
+###################################################
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-# Find python headers and library
-find_package(PythonLibs REQUIRED)
-
-set(GEOMHDISCC_LIBRARIES ${PYTHON_LIBRARIES} PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES ${PYTHON_INCLUDE_DIRS} PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES "" PARENT_SCOPE)

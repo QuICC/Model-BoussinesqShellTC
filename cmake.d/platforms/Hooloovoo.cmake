@@ -96,9 +96,13 @@ set(GEOMHDISCC_PYTHONS "python33" PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-find_package(PythonLibs REQUIRED 3.3)
-set(GEOMHDISCC_LIBRARIES_PYTHON33 "${PYTHON_LIBRARIES}" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON33 "${PYTHON_INCLUDE_DIRS}" PARENT_SCOPE)
+set(GEOMHDISCC_PYTHONS "python27" "python33" PARENT_SCOPE)
+
+set(GEOMHDISCC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
+
+set(GEOMHDISCC_LIBRARIES_PYTHON33 "/usr/lib64/libpython3.3.so" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON33 "/usr/include/python3.3" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
