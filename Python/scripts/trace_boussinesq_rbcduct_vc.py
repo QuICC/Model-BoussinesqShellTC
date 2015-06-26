@@ -12,7 +12,7 @@ model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 #res = [12, 0, 12]
-res = [16, 0, 18]
+res = [24, 0, 24]
 #res = [24, 0, 24]
 #res = [32, 0, 32]
 #res = [36, 0, 36]
@@ -110,13 +110,15 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['mode'] = 0
 marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'c2d'
-marginal_options['point'] = True
+marginal_options['point'] = False
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
+marginal_options['solve_nev'] = 10
 marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
-marginal_options['plot_curve'] = True
+marginal_options['plot_curve'] = False
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)

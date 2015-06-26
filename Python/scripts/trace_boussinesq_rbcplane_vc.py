@@ -14,15 +14,16 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [16, 0, 0]
+res = [32, 0, 0]
 
 # SF, FT,
-bc_vel = 0
-bc_temp = 0
-phi = 0
-kp = 3.
+bc_vel = 1
+bc_temp = 1
+heating = 0
+#phi = 0
+#kp = 3.
 #eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'heating':0, 'scale1d':2.0}
-eq_params = {'prandtl':1, 'rayleigh':1285, 'heating':0, 'scale1d':2.0}
+#eq_params = {'prandtl':1, 'rayleigh':1285, 'heating':0, 'scale1d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':675, 'heating':0, 'scale1d':2.0}
 ## kx = 0, ky = 2
 #kx = 0
@@ -98,6 +99,11 @@ eq_params = {'prandtl':1, 'rayleigh':1285, 'heating':0, 'scale1d':2.0}
 #phi = 0
 #eq_params = {'prandtl':1, 'rayleigh':5e6, 'heating':1, 'scale1d':2.0}
 
+kp = np.sqrt(2)*np.pi
+Pr = 1; Ra = 108*np.pi**4; phi = 35
+
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0}
+
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
@@ -129,8 +135,10 @@ marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = True
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
+marginal_options['viz_mode'] = 1
 marginal_options['curve_points'] = np.arange(max(1, kp-2), kp+3, 0.1)
 
 # Compute 

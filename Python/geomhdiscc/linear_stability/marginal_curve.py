@@ -446,6 +446,7 @@ def default_options():
     opts['minimum'] = False         # Compute marginal curve minimum
     opts['minimum_int'] = False     # Only used integer wave numbers
     opts['solve'] = False           # Solve fixed point
+    opts['solve_nev'] = 1           # Solve fixed point
 
     opts['plot_spy'] = False        # Plot matrix spy
     opts['plot_point'] = False      # Plot solution for marginal curve point
@@ -522,7 +523,7 @@ def compute(gevp_opts, marginal_opts):
         gevp.viewOperators(Ra, spy = marginal_opts['plot_spy'], write_mtx = marginal_opts['write_mtx'])
 
     if marginal_opts['solve']:
-        gevp.solve(Ra, marginal_opts['viz_mode']+3, with_vectors = True)
+        gevp.solve(Ra, max(marginal_opts['solve_nev'], marginal_opts['viz_mode']+3), with_vectors = True)
         Print("Found eigenvalues:")
         Print(gevp.evp_lmb)
 
