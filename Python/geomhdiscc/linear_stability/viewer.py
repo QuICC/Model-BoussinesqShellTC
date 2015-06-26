@@ -139,7 +139,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid = transf.grid_1d(*viz_res)
         viewProfile(sol_profile, grid, show = show, save = save, fid = fid, max_cols = max_cols)
 
-def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = False, save_slow_profile = True, fid = None, max_cols = 3, slice_ratio = 4):
+def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = True, save_slow_profile = True, fid = None, max_cols = 3, slice_ratio = 4):
     """View 2D physical data"""
 
     sol_slice = dict()

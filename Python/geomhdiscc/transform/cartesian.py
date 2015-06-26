@@ -8,10 +8,14 @@ import numpy as np
 
 from geomhdiscc.transform.spherical import eqgrid
 
+min_x_points = 100
+
 def grid(nx):
     """Create the Chebyshev grid"""
 
-    return np.cos(np.pi*(np.arange(0,nx)+0.5)/nx)
+    gN = max(min_x_points, nx)
+
+    return np.cos(np.pi*(np.arange(0,gN)+0.5)/gN)
 
 grid_fast = grid
 grid_slow = grid
@@ -46,13 +50,17 @@ def grid_slow_per(nz, m):
 def tophys(spec):
     """Transform R spectral coefficients to physical values"""
 
-    n = len(spec)
-    phys = np.zeros(spec.shape, dtype = spec.dtype)
-    if spec.dtype == 'complex_':
-        phys.real = fftpack.dct(spec.real,3)
-        phys.imag = fftpack.dct(spec.imag,3)
+    if len(spec) < min_x_points:
+        data = np.hstack((spec, np.zeros(min_x_points - len(spec), dtype = spec.dtype)))
     else:
-        phys = fftpack.dct(spec,3)
+        data = spec
+
+    phys = np.zeros(data.shape, dtype = spec.dtype)
+    if spec.dtype == 'complex_':
+        phys.real = fftpack.dct(data.real,3)
+        phys.imag = fftpack.dct(data.imag,3)
+    else:
+        phys = fftpack.dct(data,3)
 
     return phys
 
@@ -69,11 +77,11 @@ toprofile = tophys
 def tophys2d(spec):
     """Transform 2D spectral coefficients to 2D physical values"""
 
-    phys = spec.copy()
+    phys = np.zeros((max(spec.shape[0],min_x_points), max(spec.shape[1],min_x_points)), dtype = spec.dtype)
 
     for i in range(spec.shape[0]):
         phys[i,:] = tophys(spec[i,:])
-    for j in range(spec.shape[1]):
+    for j in range(phys.shape[1]):
         phys[:,j] = tophys(phys[:,j])
 
     phys = phys.T
