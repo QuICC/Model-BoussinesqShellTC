@@ -86,6 +86,7 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
 
         if ("pressure","") in fields:
             addContinuityC2D(fields, res, eigs, eq_params)
+            viewSpectra(fields, show = show, save = save, fid=fid, max_cols = max_cols)
 
     elif geometry == 'shell':
         import geomhdiscc.transform.shell as transf
@@ -348,21 +349,22 @@ def addContinuityC1D(fields, res, eigs, eq_params):
     """Add continuity fields for cartesian 1D"""
 
     import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
-    mat = c1d.i2lapl(res[0], eigs[0], eigs[1], {0:0}, cscale = eq_params['scale1d'])
+    from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
+    mat = c1d.i2lapl(res[0], eigs[0], eigs[1], no_bc(), cscale = eq_params['scale1d'])
     f = fields[("pressure","")]
-    fields[("pressure","laplacian")] = mat*f
-    mat = c1d.i2d1(res[0], {0:0}, cscale = eq_params['scale1d'])
+    fields[("pressure","elliptic")] = mat*f
+    mat = c1d.i2d1(res[0], no_bc(), cscale = eq_params['scale1d'])
     if ("temperature","") in fields:
         f = fields[("temperature","")]
-        fields[("pressure","laplacian")] = fields[("pressure","laplacian")] - eq_params['rayleigh']*mat*f
+        fields[("pressure","elliptic")] = fields[("pressure","elliptic")] - eq_params['rayleigh']*mat*f
 
-    mat = c1d.i1d1(res[0], {0:0}, cscale = eq_params['scale1d'])
+    mat = c1d.i1d1(res[0], no_bc(), cscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","z")]
     if ("velocity","x") in fields: 
-        mat = c1d.i1(res[0], {0:0}, 1j*eigs[0])
+        mat = c1d.i1(res[0], no_bc(), 1j*eigs[0])
         cont = cont + mat*fields[("velocity","x")]
     if ("velocity","y") in fields: 
-        mat = c1d.i1(res[0], {0:0}, 1j*eigs[1])
+        mat = c1d.i1(res[0], no_bc(), 1j*eigs[1])
         cont = cont + mat*fields[("velocity","y")]
     fields[("continuity","")] = cont
 
@@ -370,20 +372,21 @@ def addContinuityC2D(fields, res, eigs, eq_params):
     """Add continuity fields for cartesian 2D"""
 
     import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
-    mat = c2d.i2j2lapl(res[0], res[2], eigs[0], {'x':{0:0}, 'z':{0:0}}, xscale = eq_params['scale1d'], zscale = eq_params['scale3d'])
+    from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
+    mat = c2d.i2j2lapl(res[0], res[2], eigs[0], no_bc(), xscale = eq_params['scale1d'], zscale = eq_params['scale3d'])
     f = fields[("pressure","")]
-    fields[("pressure","laplacian")] = mat*f
-    mat = c2d.i2j2e1(res[0], res[2], {'x':{0:0}, 'z':{0:0}}, zscale = eq_params['scale3d'])
+    fields[("pressure","elliptic")] = mat*f
+    mat = c2d.i2j2e1(res[0], res[2], no_bc(), zscale = eq_params['scale3d'])
     if ("temperature","") in fields:
         f = fields[("temperature","")]
-        fields[("pressure","laplacian")] = fields[("pressure","laplacian")] - eq_params['rayleigh']*mat*f
+        fields[("pressure","elliptic")] = fields[("pressure","elliptic")] - eq_params['rayleigh']*mat*f
 
-    mat = c2d.i1j1d1(res[0], res[2], {'x':{0:0}, 'z':{0:0}}, xscale = eq_params['scale1d'])
+    mat = c2d.i1j1d1(res[0], res[2], no_bc(), xscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","x")]
-    mat = c2d.i1j1e1(res[0], res[2], {'x':{0:0}, 'z':{0:0}}, zscale = eq_params['scale3d'])
+    mat = c2d.i1j1e1(res[0], res[2], no_bc(), zscale = eq_params['scale3d'])
     cont = cont +  mat*fields[("velocity","z")]
     if ("velocity","y") in fields: 
-        mat = c2d.i1j1(res[0], res[2], {'x':{0:0}, 'z':{0:0}}, 1j*eigs[0])
+        mat = c2d.i1j1(res[0], res[2], no_bc(), 1j*eigs[0])
         cont = cont + mat*fields[("velocity","y")]
     fields[("continuity","")] = cont
 
@@ -391,17 +394,18 @@ def addContinuityC3D(fields, res, eq_params):
     """Add continuity fields for cartesian 3D"""
 
     import geomhdiscc.geometry.cartesian.cartesian_3d as c3d
-    mat = c3d.i2j2k2lapl(res[0], res[1], res[2], {'x':{0:0}, 'y':{0:0}, 'z':{0:0}}, xscale = eq_params['scale1d'], yscale = eq_params['scale2d'], zscale = eq_params['scale3d'])
+    from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
+    mat = c3d.i2j2k2lapl(res[0], res[1], res[2], no_bc(), xscale = eq_params['scale1d'], yscale = eq_params['scale2d'], zscale = eq_params['scale3d'])
     f = fields[("pressure","")]
-    fields[("pressure","laplacian")] = mat*f
-    mat = c3d.i2j2k2f1(res[0], res[1], res[2], {'x':{0:0}, 'y':{0:0}, 'z':{0:0}}, zscale = eq_params['scale3d'])
+    fields[("pressure","elliptic")] = mat*f
+    mat = c3d.i2j2k2f1(res[0], res[1], res[2], no_bc(), zscale = eq_params['scale3d'])
     f = fields[("temperature","")]
-    fields[("pressure","laplacian")] = fields[("pressure","laplacian")] - eq_params['rayleigh']*mat*f
+    fields[("pressure","elliptic")] = fields[("pressure","elliptic")] - eq_params['rayleigh']*mat*f
 
-    mat = c3d.i1j1k1d1(res[0], res[1], res[2], {'x':{0:0}, 'y':{0:0}, 'z':{0:0}}, xscale = eq_params['scale1d'])
+    mat = c3d.i1j1k1d1(res[0], res[1], res[2], no_bc(), xscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","x")]
-    mat = c3d.i1j1k1e1(res[0], res[1], res[2], {'x':{0:0}, 'y':{0:0}, 'z':{0:0}}, yscale = eq_params['scale3d'])
+    mat = c3d.i1j1k1e1(res[0], res[1], res[2], no_bc(), yscale = eq_params['scale3d'])
     cont = cont +  mat*fields[("velocity","y")]
-    mat = c3d.i1j1k1f1(res[0], res[1], res[2], {'x':{0:0}, 'y':{0:0}, 'z':{0:0}}, zscale = eq_params['scale3d'])
+    mat = c3d.i1j1k1f1(res[0], res[1], res[2], no_bc(), zscale = eq_params['scale3d'])
     cont = cont + mat*fields[("velocity","z")]
     fields[("continuity","")] = cont

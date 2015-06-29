@@ -41,11 +41,11 @@ namespace Equations {
 
    void BoussinesqDynamoSphereInduction::setCoupling()
    {
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
          int start = 1;
-      #else //if GEOMHDISCC_SPATIALSCHEME_SLFM
+      #else //if GEOMHDISCC_SPATIALSCHEME_BLFM
          int start = 0;
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+      #endif //GEOMHDISCC_SPATIALSCHEME_BLFL
 
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
 

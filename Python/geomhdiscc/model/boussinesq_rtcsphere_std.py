@@ -86,7 +86,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
+        # Matrix operator is real
         is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
@@ -125,13 +125,13 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':0}
+                        bc = {0:-12, 'rt':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:11}
+                            bc = {0:12}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
                             bc = {0:21}
             
@@ -158,7 +158,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':1}
+                        bc = {0:-12, 'rt':1}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':2}
         
@@ -182,15 +182,15 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         """Create matrix block for explicit linear term"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         Ra = eq_params['rayleigh']
+        T = eq_params['taylor']**0.5
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4r4(res[0], l, bc, Ra*l*(l+1.0))
+            mat = geo.i4r4(res[0], l, bc, Ra*T*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             mat = geo.i2r2(res[0], l, bc, -l*(l+1.0))
@@ -204,7 +204,6 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         """Create matrix block for explicit nonlinear term"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         mat = None
@@ -221,7 +220,6 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         Pr = eq_params['prandtl']
@@ -246,7 +244,6 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         """Create matrix block of time operator"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         mat = None

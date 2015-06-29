@@ -1,11 +1,11 @@
 /** 
- * @file SphericalTorPolEnergyWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field
+ * @file SphereScalarEnergyWriter.hpp
+ * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPHERICALTORPOLENERGYWRITER_HPP
-#define SPHERICALTORPOLENERGYWRITER_HPP
+#ifndef SPHERESCALARENERGYWRITER_HPP
+#define SPHERESCALARENERGYWRITER_HPP
 
 // Configuration includes
 //
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field
+    * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a sphere
     */
-   class SphericalTorPolEnergyWriter: public IVariableAsciiEWriter
+   class SphereScalarEnergyWriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -40,12 +40,12 @@ namespace IoVariable {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         SphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type);
+         SphereScalarEnergyWriter(const std::string& prefix, const std::string& type);
 
          /**
           * @brief Destructor
           */
-         virtual ~SphericalTorPolEnergyWriter();
+         virtual ~SphereScalarEnergyWriter();
 
          /**
           * @brief Initialise the operator, transform and file
@@ -65,46 +65,42 @@ namespace IoVariable {
          /**
           * @brief Requires heavy calculation?
           */
-         virtual bool isHeavy() const;
+         virtual bool isHeavy() const; 
          
       protected:
 
       private:
-         /**
+         /*
           * @brief Spherical volume to normalize energy to energy density
           */
          MHDFloat mVolume;
 
          /**
-          * @brief Storage for the Toroidal energy
+          * @brief Storage for the scalar energy
           */
-         MHDFloat mTorEnergy;
+         MHDFloat mEnergy;
 
          /**
-          * @brief Storage for the Poloidal energy
+          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for even basis
           */
-         MHDFloat mPolEnergy;
+         SparseMatrix mSphIntgOpEven;
 
          /**
-          * @brief Chebyshev operator to integrate in radius
+          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for odd basis
           */
-         SparseMatrix mIntgOp;
+         SparseMatrix mSphIntgOpOdd;
 
-         /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor)
-          */
-         SparseMatrix mSphIntgOp;
    };
 
-   inline bool SphericalTorPolEnergyWriter::isHeavy() const
+   inline bool SphereScalarEnergyWriter::isHeavy() const
    {
       return true;
    }
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef SharedPtrMacro<SphericalTorPolEnergyWriter> SharedSphericalTorPolEnergyWriter;
+   typedef SharedPtrMacro<SphereScalarEnergyWriter> SharedSphereScalarEnergyWriter;
 
 }
 }
 
-#endif // SPHERICALTORPOLENERGYWRITER_HPP
+#endif // SPHERESCALARENERGYWRITER_HPP

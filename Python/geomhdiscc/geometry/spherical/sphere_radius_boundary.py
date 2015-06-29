@@ -73,10 +73,12 @@ def apply_tau(mat, l, bc, location = 't'):
 
     if bc[0] == 10:
         cond = tau_value(mat.shape[0], l%2, bc.get('c',None))
-    if bc[0] == 11:
+    elif bc[0] == 11:
         cond = tau_diff(mat.shape[0], l%2, bc.get('c',None))
-    if bc[0] == 12:
+    elif bc[0] == 12:
         cond = tau_rdiffdivr(mat.shape[0], l%2, bc.get('c',None))
+    elif bc[0] == 13:
+        cond = tau_insulating(mat.shape[0], l%2, bc.get('c',None))
     elif bc[0] == 20:
         cond = tau_value_diff(mat.shape[0], l%2, bc.get('c',None))
     elif bc[0] == 21:
@@ -161,6 +163,22 @@ def tau_rdiffdivr(nr, parity, coeffs = None):
 
     return np.array(cond)
 
+def tau_insulating(nr, parity, coeffs = None):
+    """Create the insulating boundray tau line(s)"""
+
+    assert(coeffs.get('l', None) is not None)
+
+    c = coeffs.get('c', 1.0)
+    l = coeffs['l']
+
+    cond = []
+    ns = np.arange(parity, 2*nr, 2)
+    cond.append(c*(ns**2 + (l+1.0)*tau_c()))
+    if parity == 0:
+        cond[-1][0] /= tau_c()
+
+    return np.array(cond)
+
 def tau_value_diff(nr, parity, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
 
@@ -200,6 +218,8 @@ def stencil(nr, l, bc):
         mat = stencil_diff(nr, l%2, bc.get('c',None))
     elif bc[0] == -12:
         mat = stencil_rdiffdivr(nr, l%2, bc.get('c',None))
+    elif bc[0] == -13:
+        mat = stencil_insulating(nr, l%2, bc.get('c',None))
     elif bc[0] == -20:
         mat = stencil_value_diff(nr, l%2, bc.get('c',None))
     elif bc[0] == -21:

@@ -1,11 +1,11 @@
 /** 
- * @file SphericalScalarEnergyWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field
+ * @file ShellScalarEnergyWriter.hpp
+ * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPHERICALSCALARENERGYWRITER_HPP
-#define SPHERICALSCALARENERGYWRITER_HPP
+#ifndef SHELLSCALARENERGYWRITER_HPP
+#define SHELLSCALARENERGYWRITER_HPP
 
 // Configuration includes
 //
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field
+    * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a spherical shell
     */
-   class SphericalScalarEnergyWriter: public IVariableAsciiEWriter
+   class ShellScalarEnergyWriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -40,12 +40,12 @@ namespace IoVariable {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         SphericalScalarEnergyWriter(const std::string& prefix, const std::string& type);
+         ShellScalarEnergyWriter(const std::string& prefix, const std::string& type);
 
          /**
           * @brief Destructor
           */
-         virtual ~SphericalScalarEnergyWriter();
+         virtual ~ShellScalarEnergyWriter();
 
          /**
           * @brief Initialise the operator, transform and file
@@ -87,15 +87,15 @@ namespace IoVariable {
 
    };
 
-   inline bool SphericalScalarEnergyWriter::isHeavy() const
+   inline bool ShellScalarEnergyWriter::isHeavy() const
    {
       return true;
    }
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef SharedPtrMacro<SphericalScalarEnergyWriter> SharedSphericalScalarEnergyWriter;
+   typedef SharedPtrMacro<ShellScalarEnergyWriter> SharedShellScalarEnergyWriter;
 
 }
 }
 
-#endif // SPHERICALSCALARENERGYWRITER_HPP
+#endif // SHELLSCALARENERGYWRITER_HPP

@@ -93,7 +93,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
+        # Matrix operator is real
         is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
@@ -132,13 +132,13 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':0}
+                        bc = {0:-12, 'rt':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:11}
+                            bc = {0:12}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
                             bc = {0:21}
             
@@ -165,7 +165,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':0}
+                        bc = {0:-12, 'rt':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':0}
         
@@ -189,7 +189,6 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
         """Create matrix block for explicit linear term"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         Ra = eq_params['rayleigh']
@@ -211,7 +210,6 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
         """Create matrix block for explicit nonlinear term"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         mat = None
@@ -228,7 +226,6 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         Pr = eq_params['prandtl']
@@ -264,7 +261,6 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
         """Create matrix block of time operator"""
 
         assert(eigs[0].is_integer())
-
         l = eigs[0]
 
         mat = None

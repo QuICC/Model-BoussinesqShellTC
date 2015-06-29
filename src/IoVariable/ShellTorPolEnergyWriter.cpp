@@ -1,6 +1,6 @@
 /** 
- * @file SphericalTorPolEnergyWriter.cpp
- * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field
+ * @file ShellTorPolEnergyWriter.cpp
+ * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -17,7 +17,7 @@
 
 // Class include
 //
-#include "IoVariable/SphericalTorPolEnergyWriter.hpp"
+#include "IoVariable/ShellTorPolEnergyWriter.hpp"
 
 // Project includes
 //
@@ -33,16 +33,16 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   SphericalTorPolEnergyWriter::SphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type)
+   ShellTorPolEnergyWriter::ShellTorPolEnergyWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(-1.0), mPolEnergy(-1.0)
    {
    }
 
-   SphericalTorPolEnergyWriter::~SphericalTorPolEnergyWriter()
+   ShellTorPolEnergyWriter::~ShellTorPolEnergyWriter()
    {
    }
 
-   void SphericalTorPolEnergyWriter::init()
+   void ShellTorPolEnergyWriter::init()
    {
       // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
       MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
@@ -75,8 +75,8 @@ namespace IoVariable {
       pValue = PyLong_FromLong(cols);
       PyTuple_SetItem(pArgs, 0, pValue);
 
-      // Call x^2
-      PythonWrapper::setFunction("x2");
+      // Call r^2
+      PythonWrapper::setFunction("r2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
       SparseMatrix tmpR2(cols,cols);
@@ -102,7 +102,7 @@ namespace IoVariable {
       IVariableAsciiEWriter::init();
    }
 
-   void SphericalTorPolEnergyWriter::compute(Transform::TransformCoordinatorType& coord)
+   void ShellTorPolEnergyWriter::compute(Transform::TransformCoordinatorType& coord)
    {
       // get iterator to field
       vector_iterator vIt;
@@ -320,7 +320,7 @@ namespace IoVariable {
       this->mPolEnergy /= 2*this->mVolume;
    }
 
-   void SphericalTorPolEnergyWriter::write()
+   void ShellTorPolEnergyWriter::write()
    {
       // Create file
       this->preWrite();
@@ -346,6 +346,16 @@ namespace IoVariable {
 
       // Close file
       this->postWrite();
+
+      // Abort if kinetic energy is NaN
+      if(std::isnan(this->mTorEnergy) || std::isnan(this->mPolEnergy))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Toroidal/Poloidal energy is NaN!");
+      }
    }
 
 }

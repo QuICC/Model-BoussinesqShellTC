@@ -121,13 +121,13 @@ class BoussinesqTCSphere(base_model.BaseModel):
             elif bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':0}
+                        bc = {0:-12, 'rt':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:11}
+                            bc = {0:12}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
                             bc = {0:21}
             
@@ -154,7 +154,7 @@ class BoussinesqTCSphere(base_model.BaseModel):
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':1}
+                        bc = {0:-12, 'rt':1}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':2}
         

@@ -1,6 +1,6 @@
 /** 
- * @file SphericalScalarEnergyWriter.cpp
- * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field
+ * @file ShellScalarEnergyWriter.cpp
+ * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -17,7 +17,7 @@
 
 // Class include
 //
-#include "IoVariable/SphericalScalarEnergyWriter.hpp"
+#include "IoVariable/ShellScalarEnergyWriter.hpp"
 
 // Project includes
 //
@@ -32,16 +32,16 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   SphericalScalarEnergyWriter::SphericalScalarEnergyWriter(const std::string& prefix, const std::string& type)
+   ShellScalarEnergyWriter::ShellScalarEnergyWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-1.0)
    {
    }
 
-   SphericalScalarEnergyWriter::~SphericalScalarEnergyWriter()
+   ShellScalarEnergyWriter::~ShellScalarEnergyWriter()
    {
    }
 
-   void SphericalScalarEnergyWriter::init()
+   void ShellScalarEnergyWriter::init()
    {
       // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
       MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
@@ -74,8 +74,8 @@ namespace IoVariable {
       pValue = PyLong_FromLong(cols);
       PyTuple_SetItem(pArgs, 0, pValue);
 
-      // Call x^2
-      PythonWrapper::setFunction("x2");
+      // Call r^2
+      PythonWrapper::setFunction("r2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
       SparseMatrix tmpR2;
@@ -97,7 +97,7 @@ namespace IoVariable {
       IVariableAsciiEWriter::init();
    }
 
-   void SphericalScalarEnergyWriter::compute(Transform::TransformCoordinatorType& coord)
+   void ShellScalarEnergyWriter::compute(Transform::TransformCoordinatorType& coord)
    {
       scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 1);
@@ -157,7 +157,7 @@ namespace IoVariable {
       this->mEnergy /= this->mVolume;
    }
 
-   void SphericalScalarEnergyWriter::write()
+   void ShellScalarEnergyWriter::write()
    {
       // Create file
       this->preWrite();
@@ -175,6 +175,16 @@ namespace IoVariable {
 
       // Close file
       this->postWrite();
+
+      // Abort if kinetic energy is NaN
+      if(std::isnan(this->mEnergy))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Scalar energy is NaN!");
+      }
    }
 
 }

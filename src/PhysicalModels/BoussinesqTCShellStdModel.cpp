@@ -26,8 +26,8 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqTCShellTransport.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqTCShellMomentum.hpp"
-#include "IoVariable/SphericalScalarEnergyWriter.hpp"
-#include "IoVariable/SphericalTorPolEnergyWriter.hpp"
+#include "IoVariable/ShellScalarEnergyWriter.hpp"
+#include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -195,12 +195,12 @@ namespace GeoMHDiSCC {
    void BoussinesqTCShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create temperature energy writer
-      IoVariable::SharedSphericalScalarEnergyWriter spScalar(new IoVariable::SphericalScalarEnergyWriter("temperature", SchemeType::type()));
+      IoVariable::SharedShellScalarEnergyWriter spScalar(new IoVariable::ShellScalarEnergyWriter("temperature", SchemeType::type()));
       spScalar->expect(PhysicalNames::TEMPERATURE);
       spSim->addAsciiOutputFile(spScalar);
 
       // Create kinetic energy writer
-      IoVariable::SharedSphericalTorPolEnergyWriter spVector(new IoVariable::SphericalTorPolEnergyWriter("kinetic", SchemeType::type()));
+      IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
    }

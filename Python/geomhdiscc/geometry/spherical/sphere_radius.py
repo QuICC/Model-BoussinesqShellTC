@@ -580,3 +580,23 @@ def stencil(nr, l, bc, make_square):
         bc['rt'] = 0
 
     return radbc.constrain(mat, l, bc)
+
+def integral(nr, l):
+    """Compute the definite integral of the expansion"""
+
+    mat = spsp.lil_matrix((1,nr))
+    if l%2 == 0:
+        mat[0,:] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,2*nr,2)]
+        mat[0,0] = mat[0,0]/2.0
+    else:
+        mat[0,1:] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0) + (-1.0)**((n-1)//2)*n/(n**2 - 1.0)) for n in np.arange(3,2*nr,2)]
+        mat[0,0] = 1
+
+    return mat
+
+def avg(nr, l):
+    """Compute the average of the expansion"""
+
+    mat = integral(nr,l)/2.0
+
+    return mat

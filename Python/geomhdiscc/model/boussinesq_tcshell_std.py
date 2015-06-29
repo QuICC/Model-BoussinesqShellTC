@@ -93,7 +93,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
+        # Matrix operator is real
         is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
@@ -104,7 +104,6 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
-        l = eigs[0]
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         # Solver: no tau boundary conditions
@@ -191,9 +190,10 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit linear term"""
 
-        Ra = eq_params['rayleigh']
-
+        assert(eigs[0].is_integer())
         l = eigs[0]
+
+        Ra = eq_params['rayleigh']
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
@@ -234,10 +234,11 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-
-        l = eigs[0]
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
@@ -276,6 +277,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
+        assert(eigs[0].is_integer())
         l = eigs[0]
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
