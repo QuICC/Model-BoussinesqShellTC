@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqBeta3DQGPerMeanVelocityY::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false);
    }
 
    void BoussinesqBeta3DQGPerMeanVelocityY::setRequirements()

@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqBeta3DQGPerNonZonalKineticNRG::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
    void BoussinesqBeta3DQGPerNonZonalKineticNRG::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
