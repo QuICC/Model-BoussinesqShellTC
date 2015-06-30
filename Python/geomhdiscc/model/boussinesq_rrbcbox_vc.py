@@ -376,39 +376,30 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
                 if field_col == ("velocity","x"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
-                    bc['x']['zb'] = 1
                     bc['y']['cr'] = 1
                     bc['y']['rt'] = 1
-                    bc['y']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
-                    bc['z']['zb'] = 1
                     mat = geo.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
 
                 elif field_col == ("velocity","y"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
-                    bc['x']['zb'] = 1
                     bc['y']['cr'] = 1
                     bc['y']['rt'] = 1
-                    bc['y']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
-                    bc['z']['zb'] = 1
                     mat = geo.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
 
                 elif field_col == ("velocity","z"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
-                    bc['x']['zb'] = 1
                     bc['y']['cr'] = 1
                     bc['y']['rt'] = 1
-                    bc['y']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
-                    bc['z']['zb'] = 1
                     mat = geo.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_w, np.prod(res))
 

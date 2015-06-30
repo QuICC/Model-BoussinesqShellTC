@@ -106,6 +106,7 @@ marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['curve_points'] = np.arange(max(0, kp-5), kp+6, 1)

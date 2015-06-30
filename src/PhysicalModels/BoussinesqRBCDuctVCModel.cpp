@@ -57,7 +57,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCDuctVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -67,17 +67,17 @@ namespace GeoMHDiSCC {
          spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYSINPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
+         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 2.0, 1.0e0, 5.0, 1.0e0, 3.0);
          spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYSINPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYSINPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
+         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 3.0, 1.0e0, 3.0, 1.0e0, 2.0);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOSPOLY);
+         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 3.0, 1.0e0, 4.0, 1.0e0, 1.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CartesianExactStateIds::POLYSINPOLY);
-         spScalar->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+         spScalar->setStateType(Equations::CartesianExactStateIds::POLYCOSPOLY);
+         spScalar->setModeOptions(-1e2, 2.0, 3e0, 10.0, -3e1, 1.0);
 
       // Generate random spectrum
       } else

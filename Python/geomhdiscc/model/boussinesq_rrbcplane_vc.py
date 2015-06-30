@@ -207,18 +207,14 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
     def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit linear term"""
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == ("velocity","z"):
             if eq_params['heating'] == 0:
                 mat = geo.i2(res[0], bc, -1.0)
-                mat = mat*utils.qid_from_idx(idx_w, res[0])
 
             elif eq_params['heating'] == 1:
                 mat = geo.i2x1(res[0], bc, -1.0)
-                mat = mat*utils.qid_from_idx(idx_w, res[0])
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -228,21 +224,16 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x") and field_col == field_row:
             mat = geo.i2(res[0], bc)
-            mat = utils.qid_from_idx(idx_u, res[0])*mat
 
         elif field_row == ("velocity","y") and field_col == field_row:
             mat = geo.i2(res[0], bc)
-            mat = utils.qid_from_idx(idx_v, res[0])*mat
 
         elif field_row == ("velocity","z") and field_col == field_row:
             mat = geo.i2(res[0], bc)
-            mat = utils.qid_from_idx(idx_w, res[0])*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2(res[0], bc)
@@ -263,20 +254,16 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
         k1 = eigs[0]
         k2 = eigs[1]
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        idx_p = self.zero_blocks(res, eigs)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
                 mat = geo.i2lapl(res[0], k1, k2, bc, cscale = zscale)
-                mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
-                if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_1d(idx_u, res[0])
 
             elif field_col == ("velocity","y"):
                 mat = geo.i2(res[0], bc, T)
-                mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
 
             elif field_col == ("velocity","z"):
                 mat = geo.zblk(res[0], bc)
@@ -285,19 +272,14 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2(res[0], bc, -1j*k1)
-                mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
+                mat = geo.i2(res[0], bc, -1j*k1)*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
                 mat = geo.i2(res[0], bc, -T)
-                mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
 
             elif field_col == ("velocity","y"):
                 mat = geo.i2lapl(res[0], k1, k2, bc, cscale = zscale)
-                mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
-                if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_1d(idx_v, res[0])
 
             elif field_col == ("velocity","z"):
                 mat = geo.zblk(res[0], bc)
@@ -306,8 +288,7 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2(res[0], bc, -1j*k2)
-                mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
+                mat = geo.i2(res[0], bc, -1j*k2)*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
@@ -318,16 +299,12 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
 
             elif field_col == ("velocity","z"):
                 mat = geo.i2lapl(res[0], k1, k2, bc, cscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0])*mat*utils.qid_from_idx(idx_w, res[0])
-                if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_1d(idx_w, res[0])
 
             elif field_col == ("temperature",""):
                 mat = geo.i2(res[0], bc, Ra)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2d1(res[0], bc, -1.0, cscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
+                mat = geo.i2d1(res[0], bc, -1.0, cscale = zscale)*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","x"):
@@ -340,11 +317,9 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params['heating'] == 0:
                         mat = geo.i2(res[0], bc)
-                        mat = mat*utils.qid_from_idx(idx_w, res[0])
 
                     elif eq_params['heating'] == 1:
                         mat = geo.i2x1(res[0], bc)
-                        mat = mat*utils.qid_from_idx(idx_w, res[0])
                 else:
                     mat = geo.zblk(res[0], bc)
 
@@ -362,27 +337,23 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
                 if field_col == ("velocity","x"):
                     bc['rt'] = 1
                     bc['cr'] = 1
-                    mat = geo.i1(res[0]+1, bc, 1j*k1)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
+                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+1, bc, 1j*k1)
 
                 elif field_col == ("velocity","y"):
                     bc['rt'] = 1
                     bc['cr'] = 1
-                    mat = geo.i1(res[0]+1, bc, 1j*k2)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
+                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+1, bc, 1j*k2)
 
                 elif field_col == ("velocity","z"):
                     bc['rt'] = 1
                     bc['cr'] = 1
-                    mat = geo.i1d1(res[0]+1, bc, cscale = zscale)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_w, res[0])
+                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1d1(res[0]+1, bc, cscale = zscale)
 
                 elif field_col == ("temperature",""):
                     mat = geo.zblk(res[0], bc)
 
                 elif field_col == ("pressure",""):
-                    mat = geo.zblk(res[0], bc)
-                    mat = mat + utils.id_from_idx_1d(idx_p, res[0])
+                    mat = geo.zblk(res[0], bc) + utils.id_from_idx_1d(idx_p, res[0])
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -394,24 +365,16 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","x"):
             mat = geo.i2(res[0], bc, 1.0/Pr)
-            S = utils.qid_from_idx(idx_u, res[0])
-            mat = S*mat*S
 
         elif field_row == ("velocity","y"):
             mat = geo.i2(res[0], bc, 1.0/Pr)
-            S = utils.qid_from_idx(idx_v, res[0])
-            mat = S*mat*S
 
         elif field_row == ("velocity","z"):
             mat = geo.i2(res[0], bc, 1.0/Pr)
-            S = utils.qid_from_idx(idx_w, res[0])
-            mat = S*mat*S
 
         elif field_row == ("temperature",""):
             mat = geo.i2(res[0], bc)
@@ -427,16 +390,7 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
     def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
-        # U: TN
-        idx_u = utils.qidx(res[0], res[0])
-
-        # V: TN
-        idx_v = utils.qidx(res[0], res[0])
-
-        # W:
-        idx_w = utils.qidx(res[0], res[0])
-
         # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0])
+        idx_p = utils.qidx(res[0], res[0]-1)
 
-        return (idx_u, idx_v, idx_w, idx_p)
+        return idx_p

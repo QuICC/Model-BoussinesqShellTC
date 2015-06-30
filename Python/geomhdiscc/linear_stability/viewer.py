@@ -71,6 +71,7 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
 
         if ("pressure","") in fields:
             addContinuityC1D(fields, res, eigs, eq_params)
+            viewSpectra(fields, show = show, save = save, fid=fid, max_cols = max_cols)
 
     elif geometry == 's1d':
         import geomhdiscc.transform.shell as transf
@@ -106,6 +107,7 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
 
         if ("pressure","") in fields:
             addContinuityC3D(fields, res, eq_params)
+            viewSpectra(fields, show = show, save = save, fid=fid, max_cols = max_cols)
 
     if nD == 1:
         viewPhysical1D(fields, geometry, res, eigs, eq_params, transf, show = show, save = save, fid = fid, max_cols = max_cols)
@@ -353,10 +355,10 @@ def addContinuityC1D(fields, res, eigs, eq_params):
     mat = c1d.i2lapl(res[0], eigs[0], eigs[1], no_bc(), cscale = eq_params['scale1d'])
     f = fields[("pressure","")]
     fields[("pressure","elliptic")] = mat*f
-    mat = c1d.i2d1(res[0], no_bc(), cscale = eq_params['scale1d'])
     if ("temperature","") in fields:
+        mat = c1d.i2d1(res[0], no_bc(), -eq_params['rayleigh'], cscale = eq_params['scale1d'])
         f = fields[("temperature","")]
-        fields[("pressure","elliptic")] = fields[("pressure","elliptic")] - eq_params['rayleigh']*mat*f
+        fields[("pressure","elliptic")] = fields[("pressure","elliptic")] + mat*f
 
     mat = c1d.i1d1(res[0], no_bc(), cscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","z")]
@@ -376,10 +378,10 @@ def addContinuityC2D(fields, res, eigs, eq_params):
     mat = c2d.i2j2lapl(res[0], res[2], eigs[0], no_bc(), xscale = eq_params['scale1d'], zscale = eq_params['scale3d'])
     f = fields[("pressure","")]
     fields[("pressure","elliptic")] = mat*f
-    mat = c2d.i2j2e1(res[0], res[2], no_bc(), zscale = eq_params['scale3d'])
     if ("temperature","") in fields:
+        mat = c2d.i2j2e1(res[0], res[2], no_bc(), -eq_params['rayleigh'], zscale = eq_params['scale3d'])
         f = fields[("temperature","")]
-        fields[("pressure","elliptic")] = fields[("pressure","elliptic")] - eq_params['rayleigh']*mat*f
+        fields[("pressure","elliptic")] = fields[("pressure","elliptic")] + mat*f
 
     mat = c2d.i1j1d1(res[0], res[2], no_bc(), xscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","x")]
@@ -398,9 +400,10 @@ def addContinuityC3D(fields, res, eq_params):
     mat = c3d.i2j2k2lapl(res[0], res[1], res[2], no_bc(), xscale = eq_params['scale1d'], yscale = eq_params['scale2d'], zscale = eq_params['scale3d'])
     f = fields[("pressure","")]
     fields[("pressure","elliptic")] = mat*f
-    mat = c3d.i2j2k2f1(res[0], res[1], res[2], no_bc(), zscale = eq_params['scale3d'])
-    f = fields[("temperature","")]
-    fields[("pressure","elliptic")] = fields[("pressure","elliptic")] - eq_params['rayleigh']*mat*f
+    if ("temperature","") in fields:
+        mat = c3d.i2j2k2f1(res[0], res[1], res[2], no_bc(), -eq_params['rayleigh'], zscale = eq_params['scale3d'])
+        f = fields[("temperature","")]
+        fields[("pressure","elliptic")] = fields[("pressure","elliptic")] + mat*f
 
     mat = c3d.i1j1k1d1(res[0], res[1], res[2], no_bc(), xscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","x")]

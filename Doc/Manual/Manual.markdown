@@ -21,16 +21,18 @@ Manual {#pManToc}
 
 10. @subpage pManVisualization
 
-11. @subpage pManSimulation
+11. @subpage pManAnimation
 
-12. @subpage pManLinearStability
+12. @subpage pManSimulation
 
-13. @subpage pManNewSimulation
+13. @subpage pManLinearStability
 
-14. @subpage pManTransform
+14. @subpage pManNewSimulation
 
-15. @subpage pManParallel
+15. @subpage pManTransform
 
-16. @subpage pManTimestep
+16. @subpage pManParallel
 
-17. @subpage pManSimulationList
+17. @subpage pManTimestep
+
+18. @subpage pManSimulationList

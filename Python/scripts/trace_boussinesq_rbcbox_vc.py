@@ -11,14 +11,15 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-#res = [12, 12, 12]
+#res = [4, 4, 4]
+res = [12, 12, 12]
 #res = [14, 14, 14]
 #res = [16, 16, 16]
 #res = [18, 18, 18]
 #res = [20, 20, 20]
 #res = [20, 20, 18]
 #res = [18, 18, 18]
-res = [32, 32, 32]
+#res = [32, 32, 32]
 
 # SF/SF/SF, FF/FF/FT
 #bc_vel = 6 
@@ -102,6 +103,7 @@ marginal_options['geometry'] = 'c3d'
 marginal_options['point'] = False
 marginal_options['solve'] = True
 marginal_options['plot_point'] = True
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 

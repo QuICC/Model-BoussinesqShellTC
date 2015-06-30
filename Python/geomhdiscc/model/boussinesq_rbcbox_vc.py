@@ -372,39 +372,30 @@ class BoussinesqRBCBoxVC(base_model.BaseModel):
                 if field_col == ("velocity","x"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
-                    bc['x']['zb'] = 1
                     bc['y']['cr'] = 1
                     bc['y']['rt'] = 1
-                    bc['y']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
-                    bc['z']['zb'] = 1
                     mat = geo.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
 
                 elif field_col == ("velocity","y"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
-                    bc['x']['zb'] = 1
                     bc['y']['cr'] = 1
                     bc['y']['rt'] = 1
-                    bc['y']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
-                    bc['z']['zb'] = 1
                     mat = geo.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
 
                 elif field_col == ("velocity","z"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
-                    bc['x']['zb'] = 1
                     bc['y']['cr'] = 1
                     bc['y']['rt'] = 1
-                    bc['y']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
-                    bc['z']['zb'] = 1
                     mat = geo.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_w, np.prod(res))
 
@@ -459,26 +450,30 @@ class BoussinesqRBCBoxVC(base_model.BaseModel):
         """Build restriction matrices"""
     
         # U:
-        idx_u = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0))
-        idx_u = np.union1d(idx_u, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
+#        idx_u = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0))
+#        idx_u = np.union1d(idx_u, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
 
         # V:
-        idx_v = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
-        idx_v = np.union1d(idx_v, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
+#        idx_v = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+#        idx_v = np.union1d(idx_v, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
 
         # W:
-        idx_w = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
-        idx_w = np.union1d(idx_w,  utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0)))
+#        idx_w = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+#        idx_w = np.union1d(idx_w,  utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0)))
+        idx_u = np.array([])
+        idx_v = np.array([])
+        idx_w = np.array([])
 
         # Pressure: T_iNN, T_NjN, T_NNk
-        idx_p = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
-        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0)))
-        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
-        # Pressure: T_{N-2:N,N-2:N,N-2:N}
-        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-3)))
-        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-3), utils.qidx(res[2], res[2]-3), utils.qidx(res[0], 0)))
-        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-3), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-3)))
-        # Pressure: T_000
+#        idx_p = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2))
+#        idx_p = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+#        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0)))
+#        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
+#        # Pressure: T_{N-2:N,N-2:N,N-2:N}
+        idx_p = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2))
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[2], res[2]-2), utils.qidx(res[0], 0)))
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-2)))
+#        # Pressure: T_000
         idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.sidx(res[1], res[1]-1), utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 
         return (idx_u, idx_v, idx_w, idx_p)
