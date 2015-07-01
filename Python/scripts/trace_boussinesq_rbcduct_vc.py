@@ -2,8 +2,8 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
-#import geomhdiscc.model.boussinesq_rbcduct_vc as mod
+#import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
+import geomhdiscc.model.boussinesq_rbcduct_vc as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -12,9 +12,9 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-#res = [8, 0, 8]
+res = [8, 0, 8]
 #res = [6, 0, 6]
-res = [12, 0, 12]
+#res = [12, 0, 12]
 #res = [16, 0, 16]
 #res = [24, 0, 24]
 #res = [32, 0, 32]

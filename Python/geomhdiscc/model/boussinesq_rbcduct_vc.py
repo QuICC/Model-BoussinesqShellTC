@@ -451,7 +451,9 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
                     #mat = mat + geo.i2j2lapl(res[0]+sx, res[2]+sz, k, bc, xscale = xscale, zscale = zscale)
                     mat = mat +  utils.id_from_idx_2d(idx_pp, res[2], res[0])
 #                    tmp = spsp.lil_matrix(mat.shape)
-#                    mat[-1,0] = 1
+#                    t = -3
+#                    tmp[t,0] = 1
+#                    tmp[t,t] = -1
 #                    mat = mat + tmp
             else:
                 mat = geo.zblk(res[0], res[2], 1, 1, no_bc())
@@ -536,12 +538,15 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
         idx_t = np.array([])
         idx_p = np.array([])
         idx_pp = np.array([])
-        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2))
-        #idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
-        #idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-3))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.sidx(res[0], res[0]-1)))
+#        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.qidx(res[0], 0))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[0]-1), utils.qidx(res[0], res[0]-1)))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[0]-1), utils.sidx(res[0], res[0]-1)))
+        #idx_pp = np.array([])
 #        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 #        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
-        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 #        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
 #        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 #        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
