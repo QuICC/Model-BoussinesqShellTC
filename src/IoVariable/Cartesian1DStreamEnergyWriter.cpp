@@ -132,7 +132,7 @@ namespace IoVariable {
          this->mXEnergy = energy(0);
          this->mYEnergy = energy(1);
          this->mZEnergy = energy(2);
-         int i = 3;
+         i = 3;
          if(this->mHasZonalX)
          {
             this->mXZonalXEnergy = energy(i);
