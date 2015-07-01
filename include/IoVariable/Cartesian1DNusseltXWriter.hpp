@@ -1,11 +1,11 @@
 /** 
- * @file NusseltBeta3DQGPerWriter.hpp
- * @brief Implementation of the ASCII Nusselt number writer for the Beta 3DQG model
+ * @file Cartesian1DNusseltXWriter.hpp
+ * @brief Implementation of the ASCII Nusselt number writer through the X boundary
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef NUSSELTBETA3DQGPERWRITER_HPP
-#define NUSSELTBETA3DQGPERWRITER_HPP
+#ifndef CARTESIAN1DNUSSELTXWRITER_HPP
+#define CARTESIAN1DNUSSELTXWRITER_HPP
 
 // Configuration includes
 //
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII Nusselt number writer for the Beta 3DQG model
+    * @brief Implementation of the ASCII Nusselt number writer through the X boundary
     */
-   class NusseltBeta3DQGPerWriter: public IVariableAsciiEWriter
+   class Cartesian1DNusseltXWriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -39,12 +39,12 @@ namespace IoVariable {
           *
           * @param type Type of the file (typically scheme name)
           */
-         NusseltBeta3DQGPerWriter(std::string type);
+         Cartesian1DNusseltXWriter(std::string type);
 
          /**
           * @brief Destructor
           */
-         virtual ~NusseltBeta3DQGPerWriter();
+         virtual ~Cartesian1DNusseltXWriter();
 
          /**
           * @brief Initialise the operator and file
@@ -67,9 +67,9 @@ namespace IoVariable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef SharedPtrMacro<NusseltBeta3DQGPerWriter> SharedNusseltBeta3DQGPerWriter;
+   typedef SharedPtrMacro<Cartesian1DNusseltXWriter> SharedCartesian1DNusseltXWriter;
 
 }
 }
 
-#endif // NUSSELTBETA3DQGPERWRITER_HPP
+#endif // CARTESIAN1DNUSSELTXWRITER_HPP

@@ -31,7 +31,7 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGNoVelocityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGNoVorticityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGMeanHeat.hpp"
-#include "IoVariable/NusseltWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -248,7 +248,7 @@ namespace GeoMHDiSCC {
    void BoussinesqTiltedFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
-      IoVariable::SharedNusseltWriter spState(new IoVariable::NusseltWriter(SchemeType::type()));
+      IoVariable::SharedCartesian1DNusseltZWriter spState(new IoVariable::Cartesian1DNusseltZWriter(SchemeType::type()));
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spSim->addAsciiOutputFile(spState);
 

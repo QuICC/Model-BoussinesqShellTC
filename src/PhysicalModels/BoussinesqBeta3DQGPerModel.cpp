@@ -29,7 +29,7 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanHeat.hpp"
-#include "IoVariable/NusseltBeta3DQGPerWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltXWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -80,16 +80,16 @@ namespace GeoMHDiSCC {
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         //spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL2);
-         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL2);
+         spExact->setModeOptions(1e0, 7.0, 1e0, 5.0, 1e0, 4.0);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         //spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL3);
-         spExact->setModeOptions(1e0, 3.0, 1e0, 1.0, 1e0, 1.0);
+         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL3);
+         spExact->setModeOptions(1e0, 5.0, 1e0, 4.0, 1e0, 7.0);
 
          // Add vertical vorticity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
@@ -193,7 +193,7 @@ namespace GeoMHDiSCC {
    void BoussinesqBeta3DQGPerModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
-      IoVariable::SharedNusseltBeta3DQGPerWriter spNusselt(new IoVariable::NusseltBeta3DQGPerWriter(SchemeType::type()));
+      IoVariable::SharedCartesian1DNusseltXWriter spNusselt(new IoVariable::Cartesian1DNusseltXWriter(SchemeType::type()));
       spNusselt->expect(PhysicalNames::TEMPERATURE);
       spNusselt->expect(PhysicalNames::DX_MEANTEMPERATURE);
       spSim->addAsciiOutputFile(spNusselt);
@@ -204,7 +204,7 @@ namespace GeoMHDiSCC {
       spSim->addAsciiOutputFile(spTemp);
 
       // Create kinetic energy writer
-      IoVariable::SharedCartesian1DStreamEnergyWriter spStream(new IoVariable::Cartesian1DStreamEnergyWriter("kinetic", SchemeType::type()));
+      IoVariable::SharedCartesian1DStreamEnergyWriter spStream(new IoVariable::Cartesian1DStreamEnergyWriter("kinetic", SchemeType::type(), false, true));
       spStream->expect(PhysicalNames::STREAMFUNCTION);
       spStream->expect(PhysicalNames::VELOCITYZ);
       spSim->addAsciiOutputFile(spStream);
