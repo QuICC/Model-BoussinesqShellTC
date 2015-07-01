@@ -12,7 +12,7 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.sphere_radius_boundary import no_bc
 
 
-class BoussinesqRTCSphereStd(base_model.BaseModel):
+class BoussinesqDynamoSphereStd(base_model.BaseModel):
     """Class to setup the Boussinesq rotating thermal convection dynamo in a sphere (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
