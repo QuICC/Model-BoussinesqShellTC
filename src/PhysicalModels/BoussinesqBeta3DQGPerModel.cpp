@@ -29,13 +29,7 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanHeat.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerKineticNRG.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerZonalKineticNRG.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerNonZonalKineticNRG.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityY.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityZ.hpp"
 #include "IoVariable/NusseltBeta3DQGPerWriter.hpp"
-#include "IoVariable/KineticEnergyBeta3DQGPerWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -66,17 +60,6 @@ namespace GeoMHDiSCC {
       
       // Add mean heat computation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanHeat>();
-
-      // Add mean velocity components
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityY>();
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityZ>();
-
-      // Add kinetic energy computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerKineticNRG>();
-
-      // Add zonal kinetic energy computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerZonalKineticNRG>();
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerNonZonalKineticNRG>();
    }
 
    void BoussinesqBeta3DQGPerModel::addStates(SharedStateGenerator spGen)
@@ -97,16 +80,16 @@ namespace GeoMHDiSCC {
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL2);
-         spExact->setModeOptions(1e0, 3.0, 1e0, 3.0, 1e0, 3.0);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         //spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL2);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL3);
-         spExact->setModeOptions(1e0, 3.0, 1e0, 3.0, 1e0, 3.0);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         //spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL3);
+         spExact->setModeOptions(1e0, 3.0, 1e0, 1.0, 1e0, 1.0);
 
          // Add vertical vorticity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
@@ -181,10 +164,6 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::DX_MEANTEMPERATURE);
 
-      // Add Mean variables
-      spVis->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityY>();
-      spVis->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityZ>();
-
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
@@ -192,8 +171,6 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::VORTICITYZ);
       spOut->expect(PhysicalNames::DX_MEANTEMPERATURE);
-      spOut->expect(PhysicalNames::MEAN_VELOCITYY);
-      spOut->expect(PhysicalNames::MEAN_VELOCITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -221,20 +198,13 @@ namespace GeoMHDiSCC {
       spNusselt->expect(PhysicalNames::DX_MEANTEMPERATURE);
       spSim->addAsciiOutputFile(spNusselt);
 
-      // Create kinetic energy writer
-      IoVariable::SharedKineticEnergyBeta3DQGPerWriter spKinetic(new IoVariable::KineticEnergyBeta3DQGPerWriter(SchemeType::type()));
-      spKinetic->expect(PhysicalNames::KINETIC_ENERGY);
-      spKinetic->expect(PhysicalNames::ZONAL_KINETIC_ENERGY);
-      spKinetic->expect(PhysicalNames::NONZONAL_KINETIC_ENERGY);
-      spSim->addAsciiOutputFile(spKinetic);
-
       // Create temperature energy writer
       IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("temperature", SchemeType::type()));
       spTemp->expect(PhysicalNames::TEMPERATURE);
       spSim->addAsciiOutputFile(spTemp);
 
       // Create kinetic energy writer
-      IoVariable::SharedCartesian1DStreamEnergyWriter spStream(new IoVariable::Cartesian1DStreamEnergyWriter("new_kinetic", SchemeType::type()));
+      IoVariable::SharedCartesian1DStreamEnergyWriter spStream(new IoVariable::Cartesian1DStreamEnergyWriter("kinetic", SchemeType::type()));
       spStream->expect(PhysicalNames::STREAMFUNCTION);
       spStream->expect(PhysicalNames::VELOCITYZ);
       spSim->addAsciiOutputFile(spStream);
