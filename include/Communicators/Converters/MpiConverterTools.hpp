@@ -113,8 +113,8 @@ namespace Parallel {
       int nElements = sharedMap.size();
 
       // Prepare data required for MPI datatype
-      MPI_Aint    displ[nElements];
-      int         blocks[nElements];
+      MPI_Aint *displ = new MPI_Aint[nElements];
+      int      *blocks = new int[nElements];
 
       // Prepare data required for MPI datatype
       MPI_Aint    base;
@@ -148,6 +148,10 @@ namespace Parallel {
 
       // Commit MPI datatype
       MPI_Type_commit(&type);
+
+      // Free allocated memory
+      delete[] displ;
+      delete[] blocks;
 
       return type;
    }
@@ -512,8 +516,8 @@ namespace Parallel {
       int nElements = sharedMap.size();
 
       // Prepare data required for MPI datatype
-      MPI_Aint    displ[nElements];
-      int         blocks[nElements];
+      MPI_Aint *displ = new MPI_Aint[nElements];
+      int      *blocks = new int[nElements];
 
       // Prepare data required for MPI datatype
       MPI_Aint    base;
@@ -547,6 +551,10 @@ namespace Parallel {
 
       // Commit MPI datatype
       MPI_Type_commit(&type);
+
+      // Free allocated memory
+      delete[] displ;
+      delete[] blocks;
 
       return type;
    }
@@ -776,8 +784,8 @@ namespace Parallel {
       int nElements = sharedMap.size();
 
       // Prepare data required for MPI datatype
-      MPI_Aint    displ[nElements];
-      int         blocks[nElements];
+      MPI_Aint *displ = new MPI_Aint[nElements];
+      int      *blocks = new int[nElements];
 
       // Prepare data required for MPI datatype
       MPI_Aint    base;
@@ -811,6 +819,10 @@ namespace Parallel {
 
       // Commit MPI datatype
       MPI_Type_commit(&type);
+
+      // Free allocated memory
+      delete[] displ;
+      delete[] blocks;
 
       return type;
    }

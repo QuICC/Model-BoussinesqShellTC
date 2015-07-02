@@ -95,7 +95,7 @@ namespace Schemes {
 
       // fill special block matrix
       MatrixI specialBlocks(special.size(), 2);
-      for(int i = 0; i < special.size(); i++)
+      for(size_t i = 0; i < special.size(); i++)
       {
          specialBlocks(i,0) = special.at(i).first;
          specialBlocks(i,1) = special.at(i).second;
