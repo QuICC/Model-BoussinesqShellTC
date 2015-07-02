@@ -2,8 +2,8 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
-#import geomhdiscc.model.boussinesq_rbcduct_vc as mod
+#import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
+import geomhdiscc.model.boussinesq_rbcduct_vc as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -129,7 +129,7 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 4
+marginal_options['viz_mode'] = 1
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
 
 # Compute 

@@ -34,8 +34,8 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
         """Get the list of fields needed for linear stability calculations"""
 
         #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
-        #fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
-        fields =  [("velocity","x"), ("velocity","z"), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
+        #fields =  [("velocity","x"), ("velocity","z"), ("pressure","")]
         #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("pressure","")]
 
         return fields
@@ -449,12 +449,18 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
                     #tmp_pp = np.union1d(tmp_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], 0)))
                     #mat = mat + utils.id_from_idx_2d(tmp_pp, res[2], res[0])*geo.i2j2lapl(res[0]+sx, res[2]+sz, k, bc, xscale = xscale, zscale = zscale)
                     #mat = mat + geo.i2j2lapl(res[0]+sx, res[2]+sz, k, bc, xscale = xscale, zscale = zscale)
-            #        mat = mat +  utils.id_from_idx_2d(idx_pp, res[2], res[0])
-#                    tmp = spsp.lil_matrix(mat.shape)
-#                    t = -3
-#                    tmp[t,0] = 1
-#                    tmp[t,t] = -1
-#                    mat = mat + tmp
+#                    mat = mat +  utils.id_from_idx_2d(idx_pp, res[2], res[0])
+                    tmp = spsp.lil_matrix(mat.shape)
+                    t = res[0]-1
+                    tmp[t,0] = 1
+                    tmp[t+res[0],1] = 1
+                    tmp[t+2*res[0],res[0]] = 1
+                    tmp[t+3*res[0],res[0]+1] = 1
+                    tmp[-res[0],-1] = 1
+                    tmp[-res[0]+1,-2] = 1
+                    tmp[-res[0]+2,-res[0]-1] = 1
+                    tmp[-res[0]+3,-res[0]-2] = 1
+                    mat = mat + tmp
             else:
                 mat = geo.zblk(res[0], res[2], 1, 1, no_bc())
 
@@ -538,7 +544,7 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
         idx_t = np.array([])
         idx_p = np.array([])
         idx_pp = np.array([])
-        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-3))
+        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-2))
         idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.sidx(res[0], res[0]-1)))
 #        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.qidx(res[0], 0))
         idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[0]-1), utils.qidx(res[0], res[0]-1)))
@@ -559,7 +565,10 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
         idx_t = np.array([])
         idx_p = np.array([])
         idx_pp = np.array([])
-        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], res[0]-4))
-        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-1)))
+        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-4))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-4), utils.qidx(res[0], res[0]-1)))
+#        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.qidx(res[0], 0))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.sidx(res[0], res[0]-1)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2)))
 
         return (idx_u, idx_v, idx_w, idx_t, idx_p, idx_pp)
