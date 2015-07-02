@@ -42,7 +42,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqTiltedFPlane3DQGModel::PYMODULE = "boussinesq_tilted_fplane3dqg";
+   const std::string BoussinesqTiltedFPlane3DQGModel::PYMODULE = "boussinesq_tilted_fplane3dqg_r";
 
    const std::string BoussinesqTiltedFPlane3DQGModel::PYCLASS = "BoussinesqTiltedFPlane3DQG";
 

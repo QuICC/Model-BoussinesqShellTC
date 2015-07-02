@@ -3,7 +3,7 @@
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_notilted_fplane3dqg as mod
+import geomhdiscc.model.boussinesq_notilted_fplane3dqg_r as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -44,6 +44,7 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)

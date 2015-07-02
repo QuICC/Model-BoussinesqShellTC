@@ -1,17 +1,18 @@
 """Script to run a marginal curve trace for the Boussinesq tilted F-plane 3DQG model"""
 
 import numpy as np
+import functools
 
-import geomhdiscc.model.boussinesq_tilted_fplane3dqg as mod
+import geomhdiscc.model.boussinesq_tilted_fplane3dqg_r as mod
+import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqTiltedFPlane3DQG()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [2048, 0, 0]
+res = [128, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'theta':0.0, 'scale1d':2.0}
 kp = 1.3048
 eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0}
@@ -23,86 +24,31 @@ kp = 0.1
 
 # Set wave number
 phi = 90
-kx = kp*np.cos(phi*np.pi/180.0);
-ky = (kp**2-kx**2)**0.5;
-eigs = [kx, ky]
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 
-# Generate the operator A for the generalized EVP Ax = sigm B x
-A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+# Generic Wave number function from single "index" (k perpendicular) and angle
+def generic_wave(kp, phi):
+    kx = kp*np.cos(phi*np.pi/180.0)
+    ky = (kp**2-kx**2)**0.5
+    return [kx, ky]
 
-# Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = model.SOLVER_NO_TAU
-B = model.time(res, eq_params, eigs, bcs, fields)
+# Wave number function from single "index" (k perpendicular)
+wave = functools.partial(generic_wave, phi = phi)
+eigs = wave(1.0)
 
-# Setup visualization and IO
-show_spy = False
-write_mtx = False
-solve_evp = True
-show_solution = (True and solve_evp)
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-if show_spy or show_solution:
-    import matplotlib.pylab as pl
+# Setup computation, visualization and IO
+marginal_options = MarginalCurve.default_options()
+marginal_options['solve'] = True
+marginal_options['point_k'] = kp
+marginal_options['plot_point'] = True
+marginal_options['plot_spy'] = True
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
 
-if show_solution:
-    import geomhdiscc.transform.cartesian as transf
-
-# Show the "spy" of the two matrices
-if show_spy:
-    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-
-# Export the two matrices to matrix market format
-if write_mtx:
-    import scipy.io as io
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
-
-# Solve EVP with sptarn
-if solve_evp:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -0.9, np.inf)
-    print(evp_lmb)
-
-if show_solution:
-    viz_mode = -1
-    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
-    sol_s = evp_vec[0:res[0],viz_mode]
-    sol_w = evp_vec[res[0]:2*res[0],viz_mode]
-    sol_t = evp_vec[2*res[0]:3*res[0],viz_mode]
-    # Create spectrum plots
-    pl.subplot(1,3,1)
-    pl.semilogy(abs(sol_s))
-    pl.title('s')
-    pl.subplot(1,3,2)
-    pl.semilogy(abs(sol_w))
-    pl.title('w')
-    pl.subplot(1,3,3)
-    pl.semilogy(abs(sol_t))
-    pl.title('T')
-    pl.show()
-
-    # Compute physical space values
-    grid_x = transf.grid(res[0])
-    phys_s = transf.tophys(sol_s.real)
-    phys_w = transf.tophys(sol_w.real)
-    phys_t = transf.tophys(sol_t.real)
-
-    # Show physical plot
-    pl.subplot(1,3,1)
-    pl.plot(grid_x, phys_s)
-    pl.title('s')
-    pl.subplot(1,3,2)
-    pl.plot(grid_x, phys_w)
-    pl.title('w')
-    pl.subplot(1,3,3)
-    pl.plot(grid_x, phys_t)
-    pl.title('T')
-    pl.show()
+# Compute 
+MarginalCurve.compute(gevp_opts, marginal_options)
