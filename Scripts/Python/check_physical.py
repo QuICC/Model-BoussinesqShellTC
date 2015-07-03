@@ -152,6 +152,9 @@ def checkSphereBenchmarkC1(h5_file):
     gFast, gMid, gSlow = getGrid(scheme, h5_file)
 
     dataT = h5_file['/temperature/temperature']
+    dataDTr = h5_file['/temperature_grad/temperature_grad_r']
+    dataDTth = h5_file['/temperature_grad/temperature_grad_theta']
+    dataDTph = h5_file['/temperature_grad/temperature_grad_phi']
     dataVr = h5_file['/velocity/velocity_r']
     dataVth = h5_file['/velocity/velocity_theta']
     dataVph = h5_file['/velocity/velocity_phi']
@@ -166,6 +169,11 @@ def checkSphereBenchmarkC1(h5_file):
             # Check temperature field
             errT = np.max(np.abs(dataT[itS.index, itM.index,:] - (0.5*(1 - r**2) + 1e-5/8.*np.sqrt(35/np.pi)*r**3*(1 - r**2)*np.sin(theta)**3*(np.cos(3.0*phi) + np.sin(3.0*phi)))))
 
+            # Check temperature gradient
+            errDTr = np.max(np.abs(dataDTr[itS.index, itM.index,:] - (-r + 1e-5/8.*np.sqrt(35/np.pi)*(3.0*r**2 - 5.0*r**4)*np.sin(theta)**3*(np.cos(3.0*phi) + np.sin(3.0*phi)))))
+            errDTth = np.max(np.abs(dataDTth[itS.index, itM.index,:] - (-3e-5/8.*np.sqrt(35/np.pi)*r**2*(r**2 - 1.0)*np.cos(theta)*np.sin(theta)**2*(np.cos(3.0*phi) + np.sin(3.0*phi)))))
+            errDTph = np.max(np.abs(dataDTph[itS.index, itM.index,:] - (3e-5/8.*np.sqrt(35/np.pi)*r**2*(r**2 - 1.0)*np.sin(theta)**2*(np.cos(3.0*phi) - np.sin(3.0*phi)))))
+
             # Check velocity field
             errVr = np.max(np.abs(dataVr[itS.index, itM.index,:]))
             errVth = np.max(np.abs(dataVth[itS.index, itM.index,:]))
@@ -176,6 +184,9 @@ def checkSphereBenchmarkC1(h5_file):
     print("Error in theta velocity field:  {:g}".format(errVth))
     print("Error in phi velocity field:    {:g}".format(errVph))
     print("Error in temperature field:     {:g}".format(errT))
+    print("Error in radial temperature gradient:     {:g}".format(errDTr))
+    print("Error in theta temperature gradient:     {:g}".format(errDTth))
+    print("Error in phi temperature gradient:     {:g}".format(errDTph))
 
 def checkSphereBenchmarkC2(h5_file):
     """Check initial state for sphere benchmark C2"""
@@ -184,6 +195,9 @@ def checkSphereBenchmarkC2(h5_file):
     gFast, gMid, gSlow = getGrid(scheme, h5_file)
 
     dataT = h5_file['/temperature/temperature']
+    dataDTr = h5_file['/temperature_grad/temperature_grad_r']
+    dataDTth = h5_file['/temperature_grad/temperature_grad_theta']
+    dataDTph = h5_file['/temperature_grad/temperature_grad_phi']
     dataVr = h5_file['/velocity/velocity_r']
     dataVth = h5_file['/velocity/velocity_theta']
     dataVph = h5_file['/velocity/velocity_phi']
@@ -200,6 +214,11 @@ def checkSphereBenchmarkC2(h5_file):
             theta = itM[0]
             # Check temperature field
             errT = np.max(np.abs(dataT[itS.index, itM.index,:] - (0.5*(1 - r**2) + 1e-5/8.*np.sqrt(35/np.pi)*r**3*(1 - r**2)*np.sin(theta)**3*(np.cos(3.0*phi) + np.sin(3.0*phi)))))
+
+            # Check temperature gradient
+            errDTr = np.max(np.abs(dataDTr[itS.index, itM.index,:] - (-r + 1e-5/8.*np.sqrt(35/np.pi)*(3.0*r**2 - 5.0*r**4)*np.sin(theta)**3*(np.cos(3.0*phi) + np.sin(3.0*phi)))))
+            errDTth = np.max(np.abs(dataDTth[itS.index, itM.index,:] - (-3e-5/8.*np.sqrt(35/np.pi)*r**2*(r**2 - 1.0)*np.cos(theta)*np.sin(theta)**2*(np.cos(3.0*phi) + np.sin(3.0*phi)))))
+            errDTph = np.max(np.abs(dataDTph[itS.index, itM.index,:] - (3e-5/8.*np.sqrt(35/np.pi)*r**2*(r**2 - 1.0)*np.sin(theta)**2*(np.cos(3.0*phi) - np.sin(3.0*phi)))))
 
             # Check velocity field
             errVr = np.max(np.abs(dataVr[itS.index, itM.index,:]))
@@ -220,6 +239,9 @@ def checkSphereBenchmarkC2(h5_file):
     print("Error in theta magnetic field:  {:g}".format(errBth))
     print("Error in phi magnetic field:    {:g}".format(errBph))
     print("Error in temperature field:     {:g}".format(errT))
+    print("Error in radial temperature gradient:     {:g}".format(errDTr))
+    print("Error in theta temperature gradient:     {:g}".format(errDTth))
+    print("Error in phi temperature gradient:     {:g}".format(errDTph))
 
 def main(argv):
     inputfile = ''
@@ -239,8 +261,8 @@ def main(argv):
     h5_file = h5py.File(inputfile, 'r')
     # Check state
     #checkShellBenchmarkC0(h5_file)
-    checkShellBenchmarkC1(h5_file)
-    #checkSphereBenchmarkC1(h5_file)
+    #checkShellBenchmarkC1(h5_file)
+    checkSphereBenchmarkC1(h5_file)
     #checkSphereBenchmarkC2(h5_file)
 
     # Close file

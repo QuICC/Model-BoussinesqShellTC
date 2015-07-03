@@ -95,7 +95,7 @@ namespace TransformSteps {
             throw Exception("Requested an unknown vector forward transform");
          }
 
-      // The following assumes the physical values are obtained froma Toroidal/Poloidal decomposition
+      // The following assumes the physical values are obtained from a Toroidal/Poloidal decomposition
       } else
       {
          if(curlFlag == 0 && curlcurlFlag == 0)
