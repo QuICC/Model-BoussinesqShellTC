@@ -9,7 +9,8 @@
 
 // Configuration includes
 // 
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 
 // System includes
 //
@@ -21,7 +22,6 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "TransformConfigurators/IntegratorTree.hpp"
 
 namespace GeoMHDiSCC {
 

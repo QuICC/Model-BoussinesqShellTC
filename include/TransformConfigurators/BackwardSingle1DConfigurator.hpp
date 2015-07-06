@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/BackwardConfigurator.hpp"
 

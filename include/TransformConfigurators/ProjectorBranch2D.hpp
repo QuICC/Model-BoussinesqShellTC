@@ -1,11 +1,11 @@
 /** 
- * @file ProjectorBranch.hpp
- * @brief This class defines a backward transform branch
+ * @file ProjectorBranch2D.hpp
+ * @brief This class defines a backward transform branch for 2D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef PROJECTORBRANCH_HPP
-#define PROJECTORBRANCH_HPP
+#ifndef PROJECTORBRANCH2D_HPP
+#define PROJECTORBRANCH2D_HPP
 
 // Configuration includes
 // 
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/TreeSelector.hpp"
+#include "TypeSelectors/TransformLeafSelector.hpp"
 #include "Enums/Arithmetics.hpp"
 
 namespace GeoMHDiSCC {
@@ -28,18 +28,18 @@ namespace Transform {
    /**
     * @brief This class describes a backward transform tree branch
     */
-   class ProjectorBranch
+   class ProjectorBranch2D
    {  
       public:
          /**
           * @brief Contructor for branch
           */
-         ProjectorBranch(FieldComponents::Spectral::Id specId, ProjSpecId proj1D, ProjPartId proj2D, ProjPhysId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
+         ProjectorBranch2D(FieldComponents::Spectral::Id specId, ProjSpecId projSpec, ProjPhysId projPhys, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
 
          /**
           * @brief Destructor
           */
-         ~ProjectorBranch();
+         ~ProjectorBranch2D();
 
          /**
           * @brief Get spectral component ID
@@ -49,17 +49,12 @@ namespace Transform {
          /**
           * @brief Get 1D transform operator ID
           */
-         ProjSpecId proj1DId() const;
-
-         /**
-          * @brief Get 2D transform operator ID
-          */
-         ProjPartId proj2DId() const;
+         ProjSpecId projSpecId() const;
 
          /**
           * @brief Get 3D transform operator ID
           */
-         ProjPhysId proj3DId() const;
+         ProjPhysId projPhysId() const;
 
          /**
           * @brief Get physical component ID
@@ -85,17 +80,12 @@ namespace Transform {
          /**
           * @brief Projection operation in first dimension
           */
-         ProjSpecId  mProj1D;
-
-         /**
-          * @brief Projection operation in fourth dimension
-          */
-         ProjPartId  mProj2D;
+         ProjSpecId  mProjSpec;
 
          /**
           * @brief Projection operation in third dimension
           */
-         ProjPhysId  mProj3D;
+         ProjPhysId  mProjPhys;
 
          /**
           * @brief Physical component required for transform branch
@@ -116,4 +106,4 @@ namespace Transform {
 }
 }
 
-#endif // PROJECTORBRANCH_HPP
+#endif // PROJECTORBRANCH2D_HPP

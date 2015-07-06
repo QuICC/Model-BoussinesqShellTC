@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/TreeSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/ForwardConfigurator.hpp"
 

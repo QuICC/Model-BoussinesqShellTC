@@ -21,7 +21,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "IoAscii/IAsciiEWriter.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 
 namespace GeoMHDiSCC {
 

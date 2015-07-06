@@ -1,11 +1,11 @@
 /** 
- * @file IntegratorBranch.hpp
- * @brief This class defines a forward transform branch
+ * @file IntegratorBranch3D.hpp
+ * @brief This class defines a forward transform branch for 3D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef INTEGRATORBRANCH_HPP
-#define INTEGRATORBRANCH_HPP
+#ifndef INTEGRATORBRANCH3D_HPP
+#define INTEGRATORBRANCH3D_HPP
 
 // Configuration includes
 // 
@@ -18,7 +18,7 @@
 
 // Intgect includes
 //
-#include "TypeSelectors/TreeSelector.hpp"
+#include "TypeSelectors/TransformLeafSelector.hpp"
 #include "Enums/Arithmetics.hpp"
 
 namespace GeoMHDiSCC {
@@ -26,15 +26,15 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief This class describes a forward transform tree branch
+    * @brief This class describes a forward transform tree branch for 3D space
     */
-   class IntegratorBranch
+   class IntegratorBranch3D
    {  
       public:
          /**
           * @brief Contructor for branch
           */
-         IntegratorBranch(FieldComponents::Physical::Id physId, IntgPhysId intg3D, IntgPartId intg2D, IntgSpecId intg1D, FieldComponents::Spectral::Id specId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
+         IntegratorBranch3D(FieldComponents::Physical::Id physId, IntgPhysId intgPhys, IntgPartId intgPart, IntgSpecId intgSpec, FieldComponents::Spectral::Id specId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
 
          /**
           * @brief Get physical component ID
@@ -44,22 +44,22 @@ namespace Transform {
          /**
           * @brief Destructor
           */
-         ~IntegratorBranch();
+         ~IntegratorBranch3D();
 
          /**
           * @brief Get 1D transform operator ID
           */
-         IntgSpecId intg1DId() const;
+         IntgSpecId intgSpecId() const;
 
          /**
           * @brief Get 2D transform operator ID
           */
-         IntgPartId intg2DId() const;
+         IntgPartId intgPartId() const;
 
          /**
           * @brief Get 3D transform operator ID
           */
-         IntgPhysId intg3DId() const;
+         IntgPhysId intgPhysId() const;
 
          /**
           * @brief Get spectral component ID
@@ -85,17 +85,17 @@ namespace Transform {
          /**
           * @brief Intgection operation in first dimension
           */
-         IntgSpecId  mIntg1D;
+         IntgSpecId  mIntgSpec;
 
          /**
-          * @brief Intgection operation in fourth dimension
+          * @brief Intgection operation in second dimension
           */
-         IntgPartId  mIntg2D;
+         IntgPartId  mIntgPart;
 
          /**
           * @brief Intgection operation in third dimension
           */
-         IntgPhysId  mIntg3D;
+         IntgPhysId  mIntgPhys;
          /**
           * @brief Spectral component required for transform branch
           */
@@ -115,4 +115,4 @@ namespace Transform {
 }
 }
 
-#endif // INTEGRATORBRANCH_HPP
+#endif // INTEGRATORBRANCH3D_HPP

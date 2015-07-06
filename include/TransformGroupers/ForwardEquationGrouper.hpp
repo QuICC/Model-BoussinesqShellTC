@@ -11,7 +11,7 @@
 // Configuration includes
 //
 #include "Framework/FrameworkMacro.h"
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 
 // System includes
 //

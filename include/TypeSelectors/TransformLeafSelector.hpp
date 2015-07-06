@@ -1,11 +1,11 @@
 /** 
- * @file TreeSelector.hpp
- * @brief Typedefs to setup the transform trees
+ * @file TransformLeafSelector.hpp
+ * @brief Typedefs to setup the transform tree leaves
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef TREESELECTOR_HPP
-#define TREESELECTOR_HPP
+#ifndef TRANSFORMLEAFSELECTOR_HPP
+#define TRANSFORMLEAFSELECTOR_HPP
 
 // Configuration includes
 //
@@ -25,13 +25,13 @@ namespace GeoMHDiSCC {
 
    namespace Transform {
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
+      #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
          /// Typedefs to simplify definition of integration operators
-         typedef TransformCoordinatorType::Transform1DType::IntegratorType IntgSpecType;
-         typedef TransformCoordinatorType::Transform2DType::IntegratorType IntgphysType;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType IntgSpecType;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType IntgphysType;
 
-         typedef TransformCoordinatorType::Transform1DType::IntegratorType::Id IntgSpecId;
-         typedef TransformCoordinatorType::Transform2DType::IntegratorType::Id IntgphysId;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType::Id IntgSpecId;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType::Id IntgphysId;
 
          typedef TransformEdge<IntgPhysId,IntgSpecId,void> IntegratorPhysEdge;
          typedef TransformEdge<IntgSpecId,void,void> IntegratorSpecEdge;
@@ -43,11 +43,11 @@ namespace GeoMHDiSCC {
          typedef std::pair<IntegratorPhysEdge_iterator,IntegratorPhysEdge_iterator> IntegratorPhysEdge_range;
 
          /// Typedefs to simplify definition of projection operators
-         typedef TransformCoordinatorType::Transform1DType::ProjectorType ProjSpecType;
-         typedef TransformCoordinatorType::Transform2DType::ProjectorType ProjPhysType;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType ProjSpecType;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType ProjPhysType;
 
-         typedef TransformCoordinatorType::Transform1DType::ProjectorType::Id ProjSpecId;
-         typedef TransformCoordinatorType::Transform2DType::ProjectorType::Id ProjPhysId;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType::Id ProjSpecId;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id ProjPhysId;
 
          typedef TransformEdge<ProjSpecId,ProjPhysId,void> ProjectorSpecEdge;
          typedef TransformEdge<ProjPhysId,void,,void> ProjectorPhysEdge;
@@ -57,15 +57,15 @@ namespace GeoMHDiSCC {
 
          typedef std::pair<ProjectorSpecEdge_iterator,ProjectorSpecEdge_iterator> ProjectorSpecEdge_range;
          typedef std::pair<ProjectorPhysEdge_iterator,ProjectorPhysEdge_iterator> ProjectorPhysEdge_range;
-   #else
+      #else
          /// Typedefs to simplify definition of integration operators
-         typedef TransformCoordinatorType::Transform1DType::IntegratorType IntgSpecType;
-         typedef TransformCoordinatorType::Transform2DType::IntegratorType IntgPartType;
-         typedef TransformCoordinatorType::Transform3DType::IntegratorType IntgPhysType;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType IntgSpecType;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType IntgPartType;
+         typedef TransformSelector<Dimensions::Transform::TRA3D>::Type::IntegratorType IntgPhysType;
 
-         typedef TransformCoordinatorType::Transform1DType::IntegratorType::Id IntgSpecId;
-         typedef TransformCoordinatorType::Transform2DType::IntegratorType::Id IntgPartId;
-         typedef TransformCoordinatorType::Transform3DType::IntegratorType::Id IntgPhysId;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType::Id IntgSpecId;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType::Id IntgPartId;
+         typedef TransformSelector<Dimensions::Transform::TRA3D>::Type::IntegratorType::Id IntgPhysId;
 
          typedef TransformEdge<IntgPhysId,IntgPartId,IntgSpecId> IntegratorPhysEdge;
          typedef TransformEdge<IntgPartId,IntgSpecId,void> IntegratorPartEdge;
@@ -80,13 +80,13 @@ namespace GeoMHDiSCC {
          typedef std::pair<IntegratorPhysEdge_iterator,IntegratorPhysEdge_iterator> IntegratorPhysEdge_range;
 
          /// Typedefs to simplify definition of projection operators
-         typedef TransformCoordinatorType::Transform1DType::ProjectorType ProjSpecType;
-         typedef TransformCoordinatorType::Transform2DType::ProjectorType ProjPartType;
-         typedef TransformCoordinatorType::Transform3DType::ProjectorType ProjPhysType;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType ProjSpecType;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType ProjPartType;
+         typedef TransformSelector<Dimensions::Transform::TRA3D>::Type::ProjectorType ProjPhysType;
 
-         typedef TransformCoordinatorType::Transform1DType::ProjectorType::Id ProjSpecId;
-         typedef TransformCoordinatorType::Transform2DType::ProjectorType::Id ProjPartId;
-         typedef TransformCoordinatorType::Transform3DType::ProjectorType::Id ProjPhysId;
+         typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType::Id ProjSpecId;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id ProjPartId;
+         typedef TransformSelector<Dimensions::Transform::TRA3D>::Type::ProjectorType::Id ProjPhysId;
 
          typedef TransformEdge<ProjSpecId,ProjPartId,ProjPhysId> ProjectorSpecEdge;
          typedef TransformEdge<ProjPartId,ProjPhysId,void> ProjectorPartEdge;
@@ -99,9 +99,8 @@ namespace GeoMHDiSCC {
          typedef std::pair<ProjectorSpecEdge_iterator,ProjectorSpecEdge_iterator> ProjectorSpecEdge_range;
          typedef std::pair<ProjectorPartEdge_iterator,ProjectorPartEdge_iterator> ProjectorPartEdge_range;
          typedef std::pair<ProjectorPhysEdge_iterator,ProjectorPhysEdge_iterator> ProjectorPhysEdge_range;
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
-
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
    }
 }
 
-#endif // TREESELECTOR_HPP
+#endif // TRANSFORMLEAFSELECTOR_HPP

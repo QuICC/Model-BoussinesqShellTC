@@ -53,7 +53,7 @@ bc_vel = 2
 bc_temp = 1
 heating = 0
 #k = np.pi
-#k = 0
+k = 0
 Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 #k = (np.sqrt(7.0)/2.0)*np.pi
 #Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
@@ -81,10 +81,10 @@ Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 bc_vel = 2
 bc_temp = 1
 heating = 0
-k = 5.35
-k = 3.0
+#k = 5.35
+#k = 3.0
 # SF/SF, FF/FT, Aspect ratio 1:1
-Pr = 1; Ra = 1992.541617; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 1992.541617; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 #Pr = 1; Ra = 2938.551173; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 #Pr = 1; Ra = 6960.466725; A1d = 1.0; A3d = 1.0 # m = 2, n = 1, aspect ration 1:1
 #Pr = 1; Ra = 17572.19000; A1d = 1.0; A3d = 1.0 # m = 3, n = 1, aspect ration 1:1
@@ -119,7 +119,7 @@ marginal_options['mode'] = 1
 marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
-marginal_options['curve'] = True
+marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['solve_nev'] = 10
@@ -130,7 +130,7 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 0
+marginal_options['viz_mode'] = 1
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+2, 0.2)
 
 # Compute 

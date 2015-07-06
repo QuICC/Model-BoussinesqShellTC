@@ -1,11 +1,11 @@
 /** 
- * @file ProjectorTree.hpp
- * @brief This template describes the complete projection tree
+ * @file ProjectorTree3D.hpp
+ * @brief This template describes the complete projection tree for 3D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef PROJECTORTREE_HPP
-#define PROJECTORTREE_HPP
+#ifndef PROJECTORTREE3D_HPP
+#define PROJECTORTREE3D_HPP
 
 // Configuration includes
 // 
@@ -18,27 +18,27 @@
 
 // Project includes
 //
-#include "TypeSelectors/TreeSelector.hpp"
+#include "TypeSelectors/TransformLeafSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
    /**
-    * @brief This template describes the complete projection tree
+    * @brief This template describes the complete projection tree for 3D space
     */
-   class ProjectorTree
+   class ProjectorTree3D
    {  
       public:
          /**
           * @brief Contructor for operation
           */
-         ProjectorTree(const PhysicalNames::Id name, const FieldComponents::Spectral::Id comp);
+         ProjectorTree3D(const PhysicalNames::Id name, const FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Destructor
           */
-         ~ProjectorTree();
+         ~ProjectorTree3D();
 
          /**
           * @brief Get physical name
@@ -90,4 +90,4 @@ namespace Transform {
 }
 }
 
-#endif // PROJECTORTREE_HPP
+#endif // PROJECTORTREE3D_HPP

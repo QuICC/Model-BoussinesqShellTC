@@ -9,7 +9,8 @@
 
 // Configuration includes
 // 
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 // System includes
@@ -22,7 +23,6 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
 
 namespace GeoMHDiSCC {
 

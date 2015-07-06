@@ -24,7 +24,6 @@
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
 #include "PhysicalOperators/SphericalCoriolis.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
 
 namespace GeoMHDiSCC {
 

@@ -1,11 +1,11 @@
 /** 
- * @file IntegratorTree.hpp
- * @brief This template describes the complete integration tree
+ * @file IntegratorTree3D.hpp
+ * @brief This template describes the complete integration tree for 3D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef INTEGRATORTREE_HPP
-#define INTEGRATORTREE_HPP
+#ifndef INTEGRATORTREE3D_HPP
+#define INTEGRATORTREE3D_HPP
 
 // Configuration includes
 // 
@@ -18,27 +18,27 @@
 
 // Project includes
 //
-#include "TypeSelectors/TreeSelector.hpp"
+#include "TypeSelectors/TransformLeafSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
    /**
-    * @brief This template describes the complete integration tree
+    * @brief This template describes the complete integration tree for 3D space
     */
-   class IntegratorTree
+   class IntegratorTree3D
    {  
       public:
          /**
           * @brief Contructor for operation
           */
-         IntegratorTree(const PhysicalNames::Id name, const FieldComponents::Physical::Id comp);
+         IntegratorTree3D(const PhysicalNames::Id name, const FieldComponents::Physical::Id comp);
 
          /**
           * @brief Destructor
           */
-         ~IntegratorTree();
+         ~IntegratorTree3D();
 
          /**
           * @brief Get physical name
@@ -90,4 +90,4 @@ namespace Transform {
 }
 }
 
-#endif // INTEGRATORTREE_HPP
+#endif // INTEGRATORTREE3D_HPP

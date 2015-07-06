@@ -19,8 +19,8 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "TransformConfigurators/ProjectorBranch.hpp"
-#include "TransformConfigurators/IntegratorBranch.hpp"
+#include "TransformConfigurators/ProjectorBranch3D.hpp"
+#include "TransformConfigurators/IntegratorBranch3D.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
           *
           * @brief isNL Flag to either compute NL projection or pure Physical <-> Spectral
           */
-         std::vector<IntegratorBranch>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
+         std::vector<IntegratorBranch3D>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
 
          /**
           * @brief Generate the list of branches in vector integration transform
@@ -44,37 +44,37 @@ namespace GeoMHDiSCC {
           * @brief components Spectral components where to store results: 0: \f$\vec r \nabla\wedge N\f$ 1: \f$\vec r \nabla\wedge\nabla\wedge N\f$
           * @brief isNL Flag to either compute NL projection or pure Physical <-> Spectral
           */
-         std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
+         std::vector<IntegratorBranch3D>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
 
          /**
           * @brief Generate the list of branches in scalar projection transform
           */
-         std::vector<ProjectorBranch>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch3D>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in scalar gradient transform
           */
-         std::vector<ProjectorBranch>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch3D>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector projection transform
           */
-         std::vector<ProjectorBranch>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch3D>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector gradient transform
           */
-         std::vector<ProjectorBranch>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch3D>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector curl transform
           */
-         std::vector<ProjectorBranch>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch3D>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector divergence transform
           */
-         std::vector<ProjectorBranch>  backwardDivergence();
+         std::vector<ProjectorBranch3D>  backwardDivergence();
       }
    }
 }

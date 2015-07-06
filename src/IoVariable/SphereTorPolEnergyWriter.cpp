@@ -25,7 +25,6 @@
 #include "Enums/FieldIds.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "IoVariable/EnergyTags.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 

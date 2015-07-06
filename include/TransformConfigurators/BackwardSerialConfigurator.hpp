@@ -18,10 +18,10 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TransformConfigurators/BackwardConfigurator.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
 
 namespace GeoMHDiSCC {
 

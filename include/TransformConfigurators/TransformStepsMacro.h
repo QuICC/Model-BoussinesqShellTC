@@ -10,6 +10,13 @@
 #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_FFF 
    // include transform steps for cartesian geometry
    #include "TransformConfigurators/CartesianTransformSteps.hpp"
+   #include "TransformConfigurators/ProjectorBranch3D.hpp"
+   #include "TransformConfigurators/ProjectorTree3D.hpp"
+   #include "TransformConfigurators/ProjectorTree3DTools.hpp"
+   #include "TransformConfigurators/IntegratorBranch3D.hpp"
+   #include "TransformConfigurators/IntegratorTree3D.hpp"
+   #include "TransformConfigurators/IntegratorTree3DTools.hpp"
+   
 
 #elif defined GEOMHDISCC_SPATIALSCHEME_AFT
    // include transform steps for the cylindrical annulus geometry

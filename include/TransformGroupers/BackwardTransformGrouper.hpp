@@ -10,7 +10,7 @@
 
 // Configuration includes
 // 
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 // System includes

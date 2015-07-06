@@ -21,7 +21,7 @@
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 
 namespace GeoMHDiSCC {
 

@@ -13,6 +13,7 @@
 
 // Configuration includes
 //
+#include "TypeSelectors/TransformTreeSelector.hpp"
 
 // System includes
 //
@@ -28,18 +29,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "Resolutions/Resolution.hpp"
 
-
 namespace GeoMHDiSCC {
-
-   namespace Transform {
-
-      // Forward declaration for ProjectorTree
-      class ProjectorTree;
-
-      // Forward declaration for IntegratorTree
-      class IntegratorTree;
-
-   }
 
    /**
     * 

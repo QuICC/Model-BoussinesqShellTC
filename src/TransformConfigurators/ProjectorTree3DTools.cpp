@@ -1,6 +1,6 @@
 /** 
- * @file ProjectorTreeTools.cpp
- * @brief Source of the implementation of tools to work with projector transform trees
+ * @file ProjectorTree3DTools.cpp
+ * @brief Source of the implementation of tools to work with projector transform trees for 3D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -13,13 +13,14 @@
 
 // System includes
 //
+#include <tr1/tuple>
 
 // External includes
 //
 
 // Class include
 //
-#include "TransformConfigurators/ProjectorTreeTools.hpp"
+#include "TransformConfigurators/ProjectorTree3DTools.hpp"
 
 // Project includes
 //
@@ -28,17 +29,17 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ProjectorTreeTools::generateTrees(std::vector<ProjectorTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<ProjectorBranch> >& branches)
+   void ProjectorTree3DTools::generateTrees(std::vector<ProjectorTree3D>& rTrees, const std::map<PhysicalNames::Id, std::vector<ProjectorBranch3D> >& branches)
    {
       // Debugging info 
       DebuggerMacro_enter("Generating projector trees", 1);
 
       // Loop over all physical fields
-      std::map<PhysicalNames::Id, std::vector<ProjectorBranch> >::const_iterator nameIt;
+      std::map<PhysicalNames::Id, std::vector<ProjectorBranch3D> >::const_iterator nameIt;
       for(nameIt = branches.begin(); nameIt != branches.end(); ++nameIt)
       {
          // Loop over branches
-         std::vector<ProjectorBranch>::const_iterator branchIt;
+         std::vector<ProjectorBranch3D>::const_iterator branchIt;
          std::set<FieldComponents::Spectral::Id> components;
          for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
          {
@@ -51,7 +52,7 @@ namespace Transform {
          for(compIt = components.begin(); compIt != components.end(); ++compIt)
          {
             // Initilize tree
-            rTrees.push_back(ProjectorTree(nameIt->first, *compIt));
+            rTrees.push_back(ProjectorTree3D(nameIt->first, *compIt));
 
             DebuggerMacro_showValue("Field: ", 2, nameIt->first);
             DebuggerMacro_showValue("Component: ", 2, *compIt);
@@ -63,7 +64,7 @@ namespace Transform {
             {
                if(branchIt->specId() == *compIt)
                {
-                  op1DPairIt = op1D.insert(std::make_pair(branchIt->proj1DId(), 0));
+                  op1DPairIt = op1D.insert(std::make_pair(branchIt->projSpecId(), 0));
                   op1DPairIt.first->second += 1;
                }
             }
@@ -81,9 +82,9 @@ namespace Transform {
                std::pair<std::map<ProjPartId,int>::iterator,bool> op2DPairIt;
                for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                {
-                  if(branchIt->specId() == *compIt && branchIt->proj1DId() == op1DIt->first)
+                  if(branchIt->specId() == *compIt && branchIt->projSpecId() == op1DIt->first)
                   {
-                     op2DPairIt = op2D.insert(std::make_pair(branchIt->proj2DId(), 0));
+                     op2DPairIt = op2D.insert(std::make_pair(branchIt->projPartId(), 0));
                      op2DPairIt.first->second += 1;
                   }
                }
@@ -102,11 +103,11 @@ namespace Transform {
                   std::pair<std::map<ProjPhysId,int>::iterator,bool> op3DPairIt;
                   for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                   {
-                     if(branchIt->specId() == *compIt && branchIt->proj1DId() == op1DIt->first && branchIt->proj2DId() == op2DIt->first)
+                     if(branchIt->specId() == *compIt && branchIt->projSpecId() == op1DIt->first && branchIt->projPartId() == op2DIt->first)
                      {
-                        op3DPairIt = op3D.insert(std::make_pair(branchIt->proj3DId(), 0));
+                        op3DPairIt = op3D.insert(std::make_pair(branchIt->projPhysId(), 0));
                         op3DPairIt.first->second += 1;
-                        op3DPhys.insert(std::make_pair(branchIt->proj3DId(), std::tr1::make_tuple(branchIt->physId(), branchIt->fieldId(), branchIt->arithId())));
+                        op3DPhys.insert(std::make_pair(branchIt->projPhysId(), std::tr1::make_tuple(branchIt->physId(), branchIt->fieldId(), branchIt->arithId())));
                      }
                   }
 

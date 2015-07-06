@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Enums/Arithmetics.hpp"
+#include "Enums/FieldIds.hpp"
 
 namespace GeoMHDiSCC {
 

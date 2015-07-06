@@ -1,6 +1,6 @@
 /** 
- * @file IntegratorTree.cpp
- * @brief Source of the implementation of the forward transform tree
+ * @file IntegratorTree3D.cpp
+ * @brief Source of the implementation of the forward transform tree for 3D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "TransformConfigurators/IntegratorTree.hpp"
+#include "TransformConfigurators/IntegratorTree3D.hpp"
 
 // Intgect includes
 //
@@ -24,31 +24,31 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   IntegratorTree::IntegratorTree(const PhysicalNames::Id name, const FieldComponents::Physical::Id comp)
+   IntegratorTree3D::IntegratorTree3D(const PhysicalNames::Id name, const FieldComponents::Physical::Id comp)
       :mName(name), mComp(comp)
    {
    }
 
-   IntegratorTree::~IntegratorTree()
+   IntegratorTree3D::~IntegratorTree3D()
    {
    }
 
-   PhysicalNames::Id IntegratorTree::name() const
+   PhysicalNames::Id IntegratorTree3D::name() const
    {
       return this->mName;
    }
 
-   FieldComponents::Physical::Id IntegratorTree::comp() const
+   FieldComponents::Physical::Id IntegratorTree3D::comp() const
    {
       return this->mComp;
    }
 
-   int IntegratorTree::nPhysEdges() const
+   int IntegratorTree3D::nPhysEdges() const
    {
       return this->mTree.size();
    }
 
-   int IntegratorTree::nPartEdges() const
+   int IntegratorTree3D::nPartEdges() const
    {
       int n = 0;
       IntegratorPhysEdge_iterator it;
@@ -60,12 +60,12 @@ namespace Transform {
       return n;
    }
 
-   IntegratorPhysEdge_range IntegratorTree::edgeRange() const
+   IntegratorPhysEdge_range IntegratorTree3D::edgeRange() const
    {
       return std::make_pair(this->mTree.begin(), this->mTree.end());
    }
 
-   IntegratorPhysEdge& IntegratorTree::addEdge(const IntgPhysId op, const int n)
+   IntegratorPhysEdge& IntegratorTree3D::addEdge(const IntgPhysId op, const int n)
    {
       this->mTree.push_back(IntegratorPhysEdge(op, n));
 

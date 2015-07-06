@@ -21,10 +21,10 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "TypeSelectors/TreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
-#include "TransformConfigurators/IntegratorTree.hpp"
 
 namespace GeoMHDiSCC {
 
