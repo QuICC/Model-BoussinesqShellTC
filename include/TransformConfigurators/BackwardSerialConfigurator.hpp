@@ -124,14 +124,14 @@ namespace Transform {
    template <typename TVariable> void BackwardSerialConfigurator::firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      ProjectorTree::Projector1DEdge_iterator it1D;
-      ProjectorTree::Projector2DEdge_iterator it2D;
-      ProjectorTree::Projector3DEdge_iterator it3D;
+      ProjectorSpecEdge_iterator it1D;
+      ProjectorPartEdge_iterator it2D;
+      ProjectorPhysEdge_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
-      ProjectorTree::Projector2DEdge_range range2D;
-      ProjectorTree::Projector3DEdge_range range3D;
+      ProjectorSpecEdge_range range1D = tree.edgeRange();
+      ProjectorPartEdge_range range2D;
+      ProjectorPhysEdge_range range3D;
 
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);

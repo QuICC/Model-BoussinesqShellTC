@@ -18,8 +18,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
-#include "TransformConfigurators/TransformEdge.hpp"
+#include "TypeSelectors/TreeSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -31,20 +30,6 @@ namespace Transform {
    class ProjectorTree
    {  
       public:
-         /// Typedefs to simplify definition of projection operators
-         typedef TransformCoordinatorType::Transform1DType::ProjectorType::Id Proj1DId;
-         typedef TransformCoordinatorType::Transform2DType::ProjectorType::Id Proj2DId;
-         typedef TransformCoordinatorType::Transform3DType::ProjectorType::Id Proj3DId;
-         typedef TransformEdge<Proj1DId,Proj2DId,Proj3DId> Projector1DEdge;
-         typedef TransformEdge<Proj2DId,Proj3DId,void> Projector2DEdge;
-         typedef TransformEdge<Proj3DId,void,void> Projector3DEdge;
-         typedef std::vector<Projector1DEdge>::const_iterator  Projector1DEdge_iterator;
-         typedef std::vector<Projector2DEdge>::const_iterator  Projector2DEdge_iterator;
-         typedef std::vector<Projector3DEdge>::const_iterator  Projector3DEdge_iterator;
-         typedef std::pair<Projector1DEdge_iterator,Projector1DEdge_iterator> Projector1DEdge_range;
-         typedef std::pair<Projector2DEdge_iterator,Projector2DEdge_iterator> Projector2DEdge_range;
-         typedef std::pair<Projector3DEdge_iterator,Projector3DEdge_iterator> Projector3DEdge_range;
-
          /**
           * @brief Contructor for operation
           */
@@ -66,24 +51,24 @@ namespace Transform {
          FieldComponents::Spectral::Id comp() const;
 
          /**
-          * @brief number of 1D edges
+          * @brief number of spectral space edges
           */
-         int nEdges1D() const;
+         int nSpecEdges() const;
 
          /**
-          * @brief number of 1D edges
+          * @brief number of partially transformed edges
           */
-         int nEdges2D() const;
+         int nPartEdges() const;
 
          /**
-          * @brief Get vector range for 1D edges
+          * @brief Get vector range for spectral edges
           */
-         Projector1DEdge_range edgeRange() const;
+         ProjectorSpecEdge_range edgeRange() const;
 
          /**
-          * @brief Add an edge to tree
+          * @brief Add a spectral edge to tree
           */
-         Projector1DEdge& addEdge(const Proj1DId op, const int n);
+         ProjectorSpecEdge& addEdge(const ProjSpecId op, const int n);
 
       private:
          /**
@@ -99,7 +84,7 @@ namespace Transform {
          /**
           * @brief Projector edges of the tree
           */
-         std::vector<Projector1DEdge> mTree;
+         std::vector<ProjectorSpecEdge> mTree;
    };
 
 }

@@ -43,15 +43,15 @@ namespace Transform {
       return this->mComp;
    }
 
-   int IntegratorTree::nEdges3D() const
+   int IntegratorTree::nPhysEdges() const
    {
       return this->mTree.size();
    }
 
-   int IntegratorTree::nEdges2D() const
+   int IntegratorTree::nPartEdges() const
    {
       int n = 0;
-      Integrator3DEdge_iterator it;
+      IntegratorPhysEdge_iterator it;
       for(it = this->mTree.begin(); it != this->mTree.end(); ++it)
       {
          n += it->nEdges();
@@ -60,14 +60,14 @@ namespace Transform {
       return n;
    }
 
-   IntegratorTree::Integrator3DEdge_range IntegratorTree::edgeRange() const
+   IntegratorPhysEdge_range IntegratorTree::edgeRange() const
    {
       return std::make_pair(this->mTree.begin(), this->mTree.end());
    }
 
-   IntegratorTree::Integrator3DEdge& IntegratorTree::addEdge(const IntegratorTree::Intg3DId op, const int n)
+   IntegratorPhysEdge& IntegratorTree::addEdge(const IntgPhysId op, const int n)
    {
-      this->mTree.push_back(Integrator3DEdge(op, n));
+      this->mTree.push_back(IntegratorPhysEdge(op, n));
 
       return this->mTree.back();
    }

@@ -34,10 +34,10 @@ namespace TransformSteps {
 
       if(isNL)
       {
-         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
       } else
       {
-         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
       }
 
       return transform;
@@ -58,7 +58,7 @@ namespace TransformSteps {
       {
          if(radialFlag == 0)
          {
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, radialId, FieldType::VECTOR));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, radialId, FieldType::VECTOR));
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -66,7 +66,7 @@ namespace TransformSteps {
 
          if(thetaFlag == 0)
          {
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, thetaId, FieldType::VECTOR));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, thetaId, FieldType::VECTOR));
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -74,7 +74,7 @@ namespace TransformSteps {
 
          if(zFlag == 0)
          {
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, zId, FieldType::VECTOR));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, zId, FieldType::VECTOR));
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -83,7 +83,7 @@ namespace TransformSteps {
       {
          if(radialFlag == 0)
          {
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, radialId, FieldType::VECTOR));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, radialId, FieldType::VECTOR));
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -91,7 +91,7 @@ namespace TransformSteps {
 
          if(thetaFlag == 0)
          {
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, thetaId, FieldType::VECTOR));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, thetaId, FieldType::VECTOR));
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -99,7 +99,7 @@ namespace TransformSteps {
 
          if(zFlag == 0)
          {
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, zId, FieldType::VECTOR));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntgPhysType::INTG, IntgPartType::INTG, IntgSpecType::INTG, zId, FieldType::VECTOR));
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -113,7 +113,7 @@ namespace TransformSteps {
    {
       std::vector<ProjectorBranch> transform;
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::SCALAR, FieldType::SCALAR));
 
       return transform;
    }
@@ -124,17 +124,17 @@ namespace TransformSteps {
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjSpecType::DIVR, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
       }
 
       if(req.find(FieldComponents::Physical::Z)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::Z, FieldType::GRADIENT));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::Z, FieldType::GRADIENT));
       }
 
       return transform;
@@ -146,17 +146,17 @@ namespace TransformSteps {
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::VECTOR));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjSpecType::DIVR, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::R, FieldType::VECTOR));
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::VECTOR));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjSpecType::DIVR, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::THETA, FieldType::VECTOR));
       }
 
       if(req.find(FieldComponents::Physical::Z)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::Z, FieldType::VECTOR));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::Z, FieldType::VECTOR));
       }
 
       return transform;
@@ -170,29 +170,29 @@ namespace TransformSteps {
       {
          if(req.find(FieldComponents::Physical::R)->second)
          {
-            transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIFFDIVR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
+            transform.push_back(ProjectorBranch(id, ProjSpecType::DIFFDIVR, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
          }
 
          if(req.find(FieldComponents::Physical::THETA)->second)
          {
-            transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
+            transform.push_back(ProjectorBranch(id, ProjSpecType::DIVR2, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
          }
       } else
       {
          if(req.find(FieldComponents::Physical::R)->second)
          {
-            transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
+            transform.push_back(ProjectorBranch(id, ProjSpecType::DIFF, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
          }
 
          if(req.find(FieldComponents::Physical::THETA)->second)
          {
-            transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
+            transform.push_back(ProjectorBranch(id, ProjSpecType::DIVR, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
          }
       }
 
       if(req.find(FieldComponents::Physical::Z)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::Z, FieldType::GRADIENT));
+         transform.push_back(ProjectorBranch(id, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::Z, FieldType::GRADIENT));
       }
 
       return transform;
@@ -204,23 +204,23 @@ namespace TransformSteps {
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::R, FieldType::CURL, Arithmetics::SETNEG));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjSpecType::DIVR, ProjPartType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::R, FieldType::CURL, Arithmetics::SETNEG));
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::CURL, Arithmetics::ADD));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjSpecType::DIVR, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::R, FieldType::CURL, Arithmetics::ADD));
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SET));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjSpecType::DIVR, ProjPartType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SET));
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SUB));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjSpecType::DIFF, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SUB));
       }
 
       if(req.find(FieldComponents::Physical::Z)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::Z, FieldType::CURL, Arithmetics::SETNEG));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjSpecType::DIVR2, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::Z, FieldType::CURL, Arithmetics::SETNEG));
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::DIVRDIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::Z, FieldType::CURL, Arithmetics::ADD));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjSpecType::DIVRDIFF, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::Z, FieldType::CURL, Arithmetics::ADD));
       }
 
       return transform;
@@ -230,11 +230,11 @@ namespace TransformSteps {
    {
       std::vector<ProjectorBranch> transform;
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::DIVRDIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjSpecType::DIVRDIFF, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjSpecType::DIVR2, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::Z, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
 
       return transform;
    }

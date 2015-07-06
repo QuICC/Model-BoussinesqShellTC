@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   ProjectorBranch::ProjectorBranch(FieldComponents::Spectral::Id specId, ProjectorBranch::Proj1DId proj1D, ProjectorBranch::Proj2DId proj2D, ProjectorBranch::Proj3DId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId)
+   ProjectorBranch::ProjectorBranch(FieldComponents::Spectral::Id specId, ProjSpecId proj1D, ProjPartId proj2D, ProjPhysId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId)
       :mSpecId(specId), mProj1D(proj1D), mProj2D(proj2D), mProj3D(proj3D), mPhysId(physId), mFieldId(fieldId), mArithId(arithId)
    {
    }
@@ -38,17 +38,17 @@ namespace Transform {
       return this->mSpecId;
    }
 
-   ProjectorBranch::Proj1DId ProjectorBranch::proj1DId() const
+   ProjSpecId ProjectorBranch::proj1DId() const
    {
       return this->mProj1D;
    }
 
-   ProjectorBranch::Proj2DId ProjectorBranch::proj2DId() const
+   ProjPartId ProjectorBranch::proj2DId() const
    {
       return this->mProj2D;
    }
 
-   ProjectorBranch::Proj3DId ProjectorBranch::proj3DId() const
+   ProjPhysId ProjectorBranch::proj3DId() const
    {
       return this->mProj3D;
    }

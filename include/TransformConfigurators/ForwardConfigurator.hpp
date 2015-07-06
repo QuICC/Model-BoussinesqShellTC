@@ -21,7 +21,7 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 #include "TransformConfigurators/IntegratorTree.hpp"
@@ -51,21 +51,21 @@ namespace Transform {
           *
           * @param coord   Transform coordinator
           */
-         static void integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void integrate1D(const IntegratorSpecEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Compute the integration transform of the second dimension
           *
           * @param coord   Transform coordinator
           */
-         static void integrate2D(const IntegratorTree::Integrator2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void integrate2D(const IntegratorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Compute the integration transform of the third dimension
           *
           * @param coord   Transform coordinator
           */
-         static void integrate3D(const IntegratorTree::Integrator3DEdge& edge, TransformCoordinatorType& coord, const bool hold);
+         static void integrate3D(const IntegratorPhysEdge& edge, TransformCoordinatorType& coord, const bool hold);
 
          /**
           * @brief Update variable values from dealiased data
@@ -73,7 +73,7 @@ namespace Transform {
           * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void updateEquation(const IntegratorTree::Integrator1DEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold);
+         template <typename TSharedEquation> static void updateEquation(const IntegratorSpecEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold);
 
          /**
           * @brief Empty constructor
@@ -88,7 +88,7 @@ namespace Transform {
       private: 
    };
 
-   template <typename TSharedEquation> void ForwardConfigurator::updateEquation(const IntegratorTree::Integrator1DEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
+   template <typename TSharedEquation> void ForwardConfigurator::updateEquation(const IntegratorSpecEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);

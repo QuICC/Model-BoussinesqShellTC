@@ -57,8 +57,8 @@ namespace Transform {
             DebuggerMacro_showValue("Component: ", 2, *compIt);
 
             // Extract unique 3D operators
-            std::map<IntegratorTree::Intg3DId, int> op3D;
-            std::pair<std::map<IntegratorTree::Intg3DId,int>::iterator,bool> op3DPairIt;
+            std::map<IntgPhysId, int> op3D;
+            std::pair<std::map<IntgPhysId,int>::iterator,bool> op3DPairIt;
             for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
             {
                if(branchIt->physId() == *compIt)
@@ -69,16 +69,16 @@ namespace Transform {
             }
 
             // Create 3D edges
-            std::map<IntegratorTree::Intg3DId,int>::const_iterator op3DIt;
+            std::map<IntgPhysId,int>::const_iterator op3DIt;
             for(op3DIt = op3D.begin(); op3DIt != op3D.end(); ++op3DIt)
             {
-               IntegratorTree::Integrator3DEdge &rEdge3D = rTrees.back().addEdge(op3DIt->first, op3DIt->second);
+               IntegratorPhysEdge &rEdge3D = rTrees.back().addEdge(op3DIt->first, op3DIt->second);
                DebuggerMacro_showValue("Edge operator: ", 3, op3DIt->first);
                DebuggerMacro_showValue("Edge weight: ", 3, op3DIt->second);
 
                // Extract unique 2D Operators
-               std::map<IntegratorTree::Intg2DId, int> op2D;
-               std::pair<std::map<IntegratorTree::Intg2DId,int>::iterator,bool> op2DPairIt;
+               std::map<IntgPartId, int> op2D;
+               std::pair<std::map<IntgPartId,int>::iterator,bool> op2DPairIt;
                for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                {
                   if(branchIt->physId() == *compIt && branchIt->intg3DId() == op3DIt->first)
@@ -89,17 +89,17 @@ namespace Transform {
                }
 
                // Create 2D edges
-               std::map<IntegratorTree::Intg2DId,int>::const_iterator op2DIt;
+               std::map<IntgPartId,int>::const_iterator op2DIt;
                for(op2DIt = op2D.begin(); op2DIt != op2D.end(); ++op2DIt)
                {
-                  IntegratorTree::Integrator2DEdge &rEdge2D = rEdge3D.addEdge(op2DIt->first, op2DIt->second);
+                  IntegratorPartEdge &rEdge2D = rEdge3D.addEdge(op2DIt->first, op2DIt->second);
                   DebuggerMacro_showValue("Edge operator: ", 4, op2DIt->first);
                   DebuggerMacro_showValue("Edge weight: ", 4, op2DIt->second);
 
                   // Extract unique 1D operators
-                  std::map<IntegratorTree::Intg1DId, int> op1D;
-                  std::map<IntegratorTree::Intg1DId, std::tr1::tuple<FieldComponents::Spectral::Id,FieldType::Id,Arithmetics::Id> > op1DSpec;
-                  std::pair<std::map<IntegratorTree::Intg1DId,int>::iterator,bool> op1DPairIt;
+                  std::map<IntgSpecId, int> op1D;
+                  std::map<IntgSpecId, std::tr1::tuple<FieldComponents::Spectral::Id,FieldType::Id,Arithmetics::Id> > op1DSpec;
+                  std::pair<std::map<IntgSpecId,int>::iterator,bool> op1DPairIt;
                   for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                   {
                      if(branchIt->physId() == *compIt && branchIt->intg3DId() == op3DIt->first && branchIt->intg2DId() == op2DIt->first)
@@ -111,10 +111,10 @@ namespace Transform {
                   }
 
                   // Create 1D edges
-                  std::map<IntegratorTree::Intg1DId,int>::const_iterator op1DIt;
+                  std::map<IntgSpecId,int>::const_iterator op1DIt;
                   for(op1DIt = op1D.begin(); op1DIt != op1D.end(); ++op1DIt)
                   {
-                     IntegratorTree::Integrator1DEdge &rEdge1D = rEdge2D.addEdge(op1DIt->first, op1DIt->second);
+                     IntegratorSpecEdge &rEdge1D = rEdge2D.addEdge(op1DIt->first, op1DIt->second);
 
                      rEdge1D.setSpectral(std::tr1::get<0>(op1DSpec.find(op1DIt->first)->second), std::tr1::get<1>(op1DSpec.find(op1DIt->first)->second), std::tr1::get<2>(op1DSpec.find(op1DIt->first)->second));
                      DebuggerMacro_showValue("Edge operator: ", 5, op1DIt->first);

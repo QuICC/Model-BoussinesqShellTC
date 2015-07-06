@@ -44,7 +44,7 @@ namespace Transform {
       std::vector<ProjectorTree>::const_iterator treeIt;
       for(treeIt = projectorTree.begin(); treeIt != projectorTree.end(); ++treeIt)
       {
-         int counter = treeIt->nEdges1D();
+         int counter = treeIt->nSpecEdges();
          list.insert(counter);
 
          this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));
@@ -73,7 +73,7 @@ namespace Transform {
       std::vector<ProjectorTree>::const_iterator treeIt;
       for(treeIt = projectorTree.begin(); treeIt != projectorTree.end(); ++treeIt)
       {
-         int counter = treeIt->nEdges2D();
+         int counter = treeIt->nPartEdges();
          list.insert(counter);
 
          this->mNamedPacks2D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));

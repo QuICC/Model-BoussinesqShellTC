@@ -44,7 +44,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   void ForwardConfigurator::integrate3D(const IntegratorTree::Integrator3DEdge& edge, TransformCoordinatorType& coord, const bool hold)
+   void ForwardConfigurator::integrate3D(const IntegratorPhysEdge& edge, TransformCoordinatorType& coord, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate 3D", 4);
@@ -85,7 +85,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::FWD3D);
    }
 
-   void ForwardConfigurator::integrate2D(const IntegratorTree::Integrator2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void ForwardConfigurator::integrate2D(const IntegratorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate 2D", 4);
@@ -134,7 +134,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::FWD2D);
    }
 
-   void ForwardConfigurator::integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void ForwardConfigurator::integrate1D(const IntegratorSpecEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate 1D", 4);

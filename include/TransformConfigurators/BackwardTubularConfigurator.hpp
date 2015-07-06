@@ -108,10 +108,10 @@ namespace Transform {
    template <typename TVariable> void BackwardTubularConfigurator::firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      ProjectorTree::Projector1DEdge_iterator it1D;
+      ProjectorSpecEdge_iterator it1D;
 
       // Ranges for the vector of edges for the three transforms
-      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
+      ProjectorSpecEdge_range range1D = tree.edgeRange();
 
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
@@ -128,12 +128,12 @@ namespace Transform {
    template <typename TVariable> void BackwardTubularConfigurator::secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      ProjectorTree::Projector1DEdge_iterator it1D;
-      ProjectorTree::Projector2DEdge_iterator it2D;
+      ProjectorSpecEdge_iterator it1D;
+      ProjectorPartEdge_iterator it2D;
 
       // Ranges for the vector of edges for the three transforms
-      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
-      ProjectorTree::Projector2DEdge_range range2D;
+      ProjectorSpecEdge_range range1D = tree.edgeRange();
+      ProjectorPartEdge_range range2D;
 
       // Loop over first transform
       for(it1D = range1D.first; it1D != range1D.second; ++it1D)
@@ -152,14 +152,14 @@ namespace Transform {
    template <typename TVariable> void BackwardTubularConfigurator::lastStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      ProjectorTree::Projector1DEdge_iterator it1D;
-      ProjectorTree::Projector2DEdge_iterator it2D;
-      ProjectorTree::Projector3DEdge_iterator it3D;
+      ProjectorSpecEdge_iterator it1D;
+      ProjectorPartEdge_iterator it2D;
+      ProjectorPhysEdge_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
-      ProjectorTree::Projector2DEdge_range range2D;
-      ProjectorTree::Projector3DEdge_range range3D;
+      ProjectorSpecEdge_range range1D = tree.edgeRange();
+      ProjectorPartEdge_range range2D;
+      ProjectorPhysEdge_range range3D;
 
       // Loop over first transform
       for(it1D = range1D.first; it1D != range1D.second; ++it1D)

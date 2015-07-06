@@ -55,7 +55,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 
-   void BackwardConfigurator::preparePhysical(const ProjectorTree& tree, const ProjectorTree::Projector3DEdge& edge, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   void BackwardConfigurator::preparePhysical(const ProjectorTree& tree, const ProjectorPhysEdge& edge, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD3D);
@@ -75,7 +75,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD3D);
    }
 
-   void BackwardConfigurator::preparePhysical(const ProjectorTree& tree, const ProjectorTree::Projector3DEdge& edge, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   void BackwardConfigurator::preparePhysical(const ProjectorTree& tree, const ProjectorPhysEdge& edge, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD3D);
@@ -100,7 +100,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD3D);
    }
 
-   void BackwardConfigurator::project1D(const ProjectorTree::Projector1DEdge& edge, TransformCoordinatorType& coord, const bool hold)
+   void BackwardConfigurator::project1D(const ProjectorSpecEdge& edge, TransformCoordinatorType& coord, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Project 1D", 4);
@@ -141,7 +141,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 
-   void BackwardConfigurator::project2D(const ProjectorTree::Projector2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void BackwardConfigurator::project2D(const ProjectorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Project 2D", 4);
@@ -191,7 +191,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);
    }
 
-   void BackwardConfigurator::project3D(const ProjectorTree::Projector3DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void BackwardConfigurator::project3D(const ProjectorPhysEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Project 3D", 4);

@@ -43,15 +43,15 @@ namespace Transform {
       return this->mComp;
    }
 
-   int ProjectorTree::nEdges1D() const
+   int ProjectorTree::nSpecEdges() const
    {
       return this->mTree.size();
    }
 
-   int ProjectorTree::nEdges2D() const
+   int ProjectorTree::nPartEdges() const
    {
       int n = 0;
-      Projector1DEdge_iterator it;
+      ProjectorSpecEdge_iterator it;
       for(it = this->mTree.begin(); it != this->mTree.end(); ++it)
       {
          n += it->nEdges();
@@ -60,14 +60,14 @@ namespace Transform {
       return n;
    }
 
-   ProjectorTree::Projector1DEdge_range ProjectorTree::edgeRange() const
+   ProjectorSpecEdge_range ProjectorTree::edgeRange() const
    {
       return std::make_pair(this->mTree.begin(), this->mTree.end());
    }
 
-   ProjectorTree::Projector1DEdge& ProjectorTree::addEdge(const ProjectorTree::Proj1DId op, const int n)
+   ProjectorSpecEdge& ProjectorTree::addEdge(const ProjSpecId op, const int n)
    {
-      this->mTree.push_back(Projector1DEdge(op, n));
+      this->mTree.push_back(ProjectorSpecEdge(op, n));
 
       return this->mTree.back();
    }

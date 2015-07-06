@@ -43,7 +43,7 @@ namespace Transform {
       std::vector<IntegratorTree>::const_iterator treeIt;
       for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
       {
-         int counter = treeIt->nEdges2D();
+         int counter = treeIt->nPartEdges();
          list.insert(counter);
 
          this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));
@@ -72,7 +72,7 @@ namespace Transform {
       std::vector<IntegratorTree>::const_iterator treeIt;
       for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
       {
-         int counter = treeIt->nEdges3D();
+         int counter = treeIt->nPhysEdges();
          list.insert(counter);
 
          this->mNamedPacks2D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));

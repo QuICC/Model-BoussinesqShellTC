@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/ForwardConfigurator.hpp"
 
@@ -115,14 +115,14 @@ namespace Transform {
    template <typename TSharedEquation> void ForwardSerialConfigurator::firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorTree::Integrator1DEdge_iterator it1D;
-      IntegratorTree::Integrator2DEdge_iterator it2D;
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      IntegratorSpecEdge_iterator it1D;
+      IntegratorPartEdge_iterator it2D;
+      IntegratorPhysEdge_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator1DEdge_range range1D;
-      IntegratorTree::Integrator2DEdge_range range2D;
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      IntegratorSpecEdge_range range1D;
+      IntegratorPartEdge_range range2D;
+      IntegratorPhysEdge_range range3D = tree.edgeRange();
 
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);

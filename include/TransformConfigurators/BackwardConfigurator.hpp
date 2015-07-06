@@ -58,7 +58,7 @@ namespace Transform {
           * @param rScalar Scalar variable
           * @param coord   Transform coordinator
           */
-         static void preparePhysical(const ProjectorTree& tree, const ProjectorTree::Projector3DEdge& edge, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+         static void preparePhysical(const ProjectorTree& tree, const ProjectorPhysEdge& edge, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
           * @brief Prepare computation of physical projection for a vector variable
@@ -66,7 +66,7 @@ namespace Transform {
           * @param rVector Vector variable
           * @param coord   Transform coordinator
           */
-         static void preparePhysical(const ProjectorTree& tree, const ProjectorTree::Projector3DEdge& edge, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+         static void preparePhysical(const ProjectorTree& tree, const ProjectorPhysEdge& edge, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the projection transform of the first dimension
@@ -75,7 +75,7 @@ namespace Transform {
           * @param coord   Transform coordinator
           * @param hold    Hold input data?
           */
-         static void project1D(const ProjectorTree::Projector1DEdge& edge, TransformCoordinatorType& coord, const bool hold);
+         static void project1D(const ProjectorSpecEdge& edge, TransformCoordinatorType& coord, const bool hold);
 
          /**
           * @brief Compute the projection transform of the second dimension
@@ -85,7 +85,7 @@ namespace Transform {
           * @param recover Recover input data?
           * @param hold    Hold input data?
           */
-         static void project2D(const ProjectorTree::Projector2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void project2D(const ProjectorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Compute the projection transform of the third dimension
@@ -95,7 +95,7 @@ namespace Transform {
           * @param recover Recover input data?
           * @param hold    Hold input data?
           */
-         static void project3D(const ProjectorTree::Projector3DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void project3D(const ProjectorPhysEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Empty constructor

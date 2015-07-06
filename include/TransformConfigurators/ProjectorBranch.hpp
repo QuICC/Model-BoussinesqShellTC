@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TreeSelector.hpp"
 #include "Enums/Arithmetics.hpp"
 
 namespace GeoMHDiSCC {
@@ -31,18 +31,10 @@ namespace Transform {
    class ProjectorBranch
    {  
       public:
-         /// Typedefs to simplify definition of projection operators
-         typedef TransformCoordinatorType::Transform1DType::ProjectorType Proj1DType;
-         typedef TransformCoordinatorType::Transform2DType::ProjectorType Proj2DType;
-         typedef TransformCoordinatorType::Transform3DType::ProjectorType Proj3DType;
-         typedef TransformCoordinatorType::Transform1DType::ProjectorType::Id Proj1DId;
-         typedef TransformCoordinatorType::Transform2DType::ProjectorType::Id Proj2DId;
-         typedef TransformCoordinatorType::Transform3DType::ProjectorType::Id Proj3DId;
-
          /**
           * @brief Contructor for branch
           */
-         ProjectorBranch(FieldComponents::Spectral::Id specId, Proj1DId proj1D, Proj2DId proj2D, Proj3DId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
+         ProjectorBranch(FieldComponents::Spectral::Id specId, ProjSpecId proj1D, ProjPartId proj2D, ProjPhysId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
 
          /**
           * @brief Destructor
@@ -57,17 +49,17 @@ namespace Transform {
          /**
           * @brief Get 1D transform operator ID
           */
-         Proj1DId proj1DId() const;
+         ProjSpecId proj1DId() const;
 
          /**
           * @brief Get 2D transform operator ID
           */
-         Proj2DId proj2DId() const;
+         ProjPartId proj2DId() const;
 
          /**
           * @brief Get 3D transform operator ID
           */
-         Proj3DId proj3DId() const;
+         ProjPhysId proj3DId() const;
 
          /**
           * @brief Get physical component ID
@@ -93,17 +85,17 @@ namespace Transform {
          /**
           * @brief Projection operation in first dimension
           */
-         Proj1DId  mProj1D;
+         ProjSpecId  mProj1D;
 
          /**
           * @brief Projection operation in fourth dimension
           */
-         Proj2DId  mProj2D;
+         ProjPartId  mProj2D;
 
          /**
           * @brief Projection operation in third dimension
           */
-         Proj3DId  mProj3D;
+         ProjPhysId  mProj3D;
 
          /**
           * @brief Physical component required for transform branch

@@ -57,8 +57,8 @@ namespace Transform {
             DebuggerMacro_showValue("Component: ", 2, *compIt);
 
             // Extract unique 1D operators
-            std::map<ProjectorTree::Proj1DId, int> op1D;
-            std::pair<std::map<ProjectorTree::Proj1DId,int>::iterator,bool> op1DPairIt;
+            std::map<ProjSpecId, int> op1D;
+            std::pair<std::map<ProjSpecId,int>::iterator,bool> op1DPairIt;
             for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
             {
                if(branchIt->specId() == *compIt)
@@ -69,16 +69,16 @@ namespace Transform {
             }
 
             // Create 1D edges
-            std::map<ProjectorTree::Proj1DId,int>::const_iterator op1DIt;
+            std::map<ProjSpecId,int>::const_iterator op1DIt;
             for(op1DIt = op1D.begin(); op1DIt != op1D.end(); ++op1DIt)
             {
-               ProjectorTree::Projector1DEdge &rEdge1D = rTrees.back().addEdge(op1DIt->first, op1DIt->second);
+               ProjectorSpecEdge &rEdge1D = rTrees.back().addEdge(op1DIt->first, op1DIt->second);
                DebuggerMacro_showValue("Edge operator: ", 3, op1DIt->first);
                DebuggerMacro_showValue("Edge weight: ", 3, op1DIt->second);
 
                // Extract unique 2D Operators
-               std::map<ProjectorTree::Proj2DId, int> op2D;
-               std::pair<std::map<ProjectorTree::Proj2DId,int>::iterator,bool> op2DPairIt;
+               std::map<ProjPartId, int> op2D;
+               std::pair<std::map<ProjPartId,int>::iterator,bool> op2DPairIt;
                for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                {
                   if(branchIt->specId() == *compIt && branchIt->proj1DId() == op1DIt->first)
@@ -89,17 +89,17 @@ namespace Transform {
                }
 
                // Create 2D edges
-               std::map<ProjectorTree::Proj2DId,int>::const_iterator op2DIt;
+               std::map<ProjPartId,int>::const_iterator op2DIt;
                for(op2DIt = op2D.begin(); op2DIt != op2D.end(); ++op2DIt)
                {
-                  ProjectorTree::Projector2DEdge &rEdge2D = rEdge1D.addEdge(op2DIt->first, op2DIt->second);
+                  ProjectorPartEdge &rEdge2D = rEdge1D.addEdge(op2DIt->first, op2DIt->second);
                   DebuggerMacro_showValue("Edge operator: ", 4, op2DIt->first);
                   DebuggerMacro_showValue("Edge weight: ", 4, op2DIt->second);
 
                   // Extract unique 3D operators
-                  std::map<ProjectorTree::Proj3DId, int> op3D;
-                  std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> > op3DPhys;
-                  std::pair<std::map<ProjectorTree::Proj3DId,int>::iterator,bool> op3DPairIt;
+                  std::map<ProjPhysId, int> op3D;
+                  std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> > op3DPhys;
+                  std::pair<std::map<ProjPhysId,int>::iterator,bool> op3DPairIt;
                   for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                   {
                      if(branchIt->specId() == *compIt && branchIt->proj1DId() == op1DIt->first && branchIt->proj2DId() == op2DIt->first)
@@ -111,15 +111,15 @@ namespace Transform {
                   }
 
                   // Create 3D edges
-                  std::map<ProjectorTree::Proj3DId,int>::const_iterator op3DIt;
-                  std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator op3DPhysIt;
-                  std::pair<std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator,std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator> op3DPhysRange;
+                  std::map<ProjPhysId,int>::const_iterator op3DIt;
+                  std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator op3DPhysIt;
+                  std::pair<std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator,std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator> op3DPhysRange;
                   for(op3DIt = op3D.begin(); op3DIt != op3D.end(); ++op3DIt)
                   {
                      op3DPhysRange = op3DPhys.equal_range(op3DIt->first);
                      for(op3DPhysIt = op3DPhysRange.first; op3DPhysIt != op3DPhysRange.second; ++op3DPhysIt)
                      {
-                        ProjectorTree::Projector3DEdge &rEdge3D = rEdge2D.addEdge(op3DIt->first, op3DIt->second);
+                        ProjectorPhysEdge &rEdge3D = rEdge2D.addEdge(op3DIt->first, op3DIt->second);
 
                         rEdge3D.setPhysical(std::tr1::get<0>(op3DPhysIt->second), std::tr1::get<1>(op3DPhysIt->second), std::tr1::get<2>(op3DPhysIt->second));
                         DebuggerMacro_showValue("Edge operator: ", 5, op3DIt->first);

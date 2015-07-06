@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   IntegratorBranch::IntegratorBranch(FieldComponents::Physical::Id physId, IntegratorBranch::Intg3DId intg3D, IntegratorBranch::Intg2DId intg2D, IntegratorBranch::Intg1DId intg1D, FieldComponents::Spectral::Id specId, FieldType::Id fieldId, Arithmetics::Id arithId)
+   IntegratorBranch::IntegratorBranch(FieldComponents::Physical::Id physId, IntgPhysId intg3D, IntgPartId intg2D, IntgSpecId intg1D, FieldComponents::Spectral::Id specId, FieldType::Id fieldId, Arithmetics::Id arithId)
       :mPhysId(physId), mIntg1D(intg1D), mIntg2D(intg2D), mIntg3D(intg3D), mSpecId(specId), mFieldId(fieldId), mArithId(arithId)
    {
    }
@@ -38,17 +38,17 @@ namespace Transform {
       return this->mSpecId;
    }
 
-   IntegratorBranch::Intg1DId IntegratorBranch::intg1DId() const
+   IntgSpecId IntegratorBranch::intg1DId() const
    {
       return this->mIntg1D;
    }
 
-   IntegratorBranch::Intg2DId IntegratorBranch::intg2DId() const
+   IntgPartId IntegratorBranch::intg2DId() const
    {
       return this->mIntg2D;
    }
 
-   IntegratorBranch::Intg3DId IntegratorBranch::intg3DId() const
+   IntgPhysId IntegratorBranch::intg3DId() const
    {
       return this->mIntg3D;
    }
