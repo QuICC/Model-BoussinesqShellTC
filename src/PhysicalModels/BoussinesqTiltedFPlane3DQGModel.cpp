@@ -104,6 +104,12 @@ namespace GeoMHDiSCC {
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(1e0, -2.0, 1e0, 5.0, 7e0, 4.0);
 
+         // Add initial mean temperature gradient state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
       // Generate random spectrum
       } else
       {
@@ -124,6 +130,13 @@ namespace GeoMHDiSCC {
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
          spRand->setSpectrum(-1.0e-4, 1.0e-4, 1e4, 1e4, 1e4);
+
+         // Add initial mean temperature gradient state generation equation
+         Equations::SharedCartesianExactScalarState spExact;
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
       }
 
       // Add output file
@@ -131,6 +144,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }
 
