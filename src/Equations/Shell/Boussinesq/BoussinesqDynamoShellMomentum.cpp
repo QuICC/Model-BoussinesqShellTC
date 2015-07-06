@@ -6,6 +6,7 @@
 
 // Configuration includes
 //
+#include "TypeSelectors/TransformSelector.hpp"
 
 // System includes
 //

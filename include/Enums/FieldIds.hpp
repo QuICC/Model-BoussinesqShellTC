@@ -193,6 +193,22 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = PHI,
 
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
+            /// First vector component
+            ONE = X,
+            /// Second vector component
+            TWO = Z,
+            /// Third vector component
+            THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CF || defined GEOMHDISCC_SPATIALSCHEME_AF
+            /// First vector component
+            ONE = R,
+            /// Second vector component
+            TWO = THETA,
+            /// Third vector component
+            THREE = NOTUSED,
+
             #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
          };
       };
@@ -302,6 +318,13 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = NOTUSED,
 
+            #elif defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF 
+               /// First vector component
+               ONE = R,
+               /// Second vector component
+               TWO = THETA,
+               /// Third vector component
+               THREE = NOTUSED,
             #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
          };
       };
