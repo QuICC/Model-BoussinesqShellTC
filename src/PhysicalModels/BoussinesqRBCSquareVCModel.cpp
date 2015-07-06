@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBCDuctVCModel.cpp
- * @brief Source of the Boussinesq Rayleigh-Benard convection in a infinite duct (velocity-continuity formulation) model
+ * @file BoussinesqRBCSquareVCModel.cpp
+ * @brief Source of the Boussinesq Rayleigh-Benard convection in a square (2D) (velocity-continuity formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,14 +15,14 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRBCDuctVCModel.hpp"
+#include "PhysicalModels/BoussinesqRBCSquareVCModel.hpp"
 
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCTransport.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCMomentum.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCDuctVCContinuity.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCContinuity.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/ContinuityWriter.hpp"
@@ -38,26 +38,26 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqRBCDuctVCModel::PYMODULE = "boussinesq_rbcduct_vc";
+   const std::string BoussinesqRBCSquareVCModel::PYMODULE = "boussinesq_rbcduct_vc";
 
-   const std::string BoussinesqRBCDuctVCModel::PYCLASS = "BoussinesqRBCDuctVC";
+   const std::string BoussinesqRBCSquareVCModel::PYCLASS = "BoussinesqRBCSquareVC";
 
-   void BoussinesqRBCDuctVCModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRBCSquareVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqRBCDuctVCTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCSquareVCTransport>();
       
-      // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqRBCDuctVCMomentum>();
+      // Add Navier-Stokes equation (X,Z components)
+      spSim->addVectorEquation<Equations::BoussinesqRBCSquareVCMomentum>();
 
       // Add continuity equation
-      spSim->addScalarEquation<Equations::BoussinesqRBCDuctVCContinuity>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCSquareVCContinuity>();
    }
 
-   void BoussinesqRBCDuctVCModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRBCSquareVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -68,8 +68,6 @@ namespace GeoMHDiSCC {
          spVector->setIdentity(PhysicalNames::VELOCITY);
          spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYSINPOLY);
          spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 2.0, 1.0e0, 5.0, 1.0e0, 3.0);
-         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYSINPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 3.0, 1.0e0, 3.0, 1.0e0, 2.0);
          spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOSPOLY);
          spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 3.0, 1.0e0, 4.0, 1.0e0, 1.0);
 
@@ -90,13 +88,12 @@ namespace GeoMHDiSCC {
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          spVector->setSpectrum(FieldComponents::Spectral::X, -1e-3, 1e-3, 1e4, 1e4, 1e4);
-         spVector->setSpectrum(FieldComponents::Spectral::Y, -1e-3, 1e-3, 1e4, 1e4, 1e4);
          spVector->setSpectrum(FieldComponents::Spectral::Z, -1e-3, 1e-3, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-1e-9, 1e-9, 1e4, 1e4, 1e4);
+         spScalar->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -106,7 +103,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBCDuctVCModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCSquareVCModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -135,7 +132,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBCDuctVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCSquareVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -149,7 +146,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRBCDuctVCModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCSquareVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
       IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
@@ -158,7 +155,7 @@ namespace GeoMHDiSCC {
       spSim->addAsciiOutputFile(spState);
    }
 
-   void BoussinesqRBCDuctVCModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCSquareVCModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -174,7 +171,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRBCDuctVCModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRBCSquareVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;

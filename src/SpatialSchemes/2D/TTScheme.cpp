@@ -6,9 +6,12 @@
 
 // System includes
 //
+#include "Framework/FrameworkMacro.h"
 
 // External includes
 //
+#include <set>
+#include <vector>
 
 // Class include
 //
@@ -16,7 +19,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/FftSelector.hpp"
+#include "Resolutions/Tools/RegularIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 

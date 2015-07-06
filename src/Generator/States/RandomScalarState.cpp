@@ -101,7 +101,7 @@ namespace Equations {
       n2D = n2D/2;
       #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF
 
-      if(i1D < n1D-z1D && i3D < n3D - z3D && k2D < n2D - z2D)
+//      if(i1D < n1D-z1D && i3D < n3D - z3D && k2D < n2D - z2D)
       {
          // Compute scaling factors
          MHDFloat a1D = exp(-static_cast<MHDFloat>(i1D)*log(this->mRatio1D)/static_cast<MHDFloat>(n1D));
@@ -113,9 +113,9 @@ namespace Equations {
          this->makeRandom(val, i1D, i3D, i2D);
 
          return val*a1D*a2D*a3D;
-      } else
-      {
-         return Datatypes::SpectralScalarType::PointType(0);
+ //     } else
+//      {
+//         return Datatypes::SpectralScalarType::PointType(0);
       }
    }
 

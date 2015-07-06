@@ -16,7 +16,6 @@
 
 // Project includes
 //
-#include "TypeSelectors/FftSelector.hpp"
 
 namespace GeoMHDiSCC {
 

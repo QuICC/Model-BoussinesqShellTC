@@ -11,7 +11,11 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [48, 0, 48]
+#res = [8, 0, 8]
+#res = [16, 0, 16]
+#res = [32, 0, 32]
+#res = [48, 0, 48]
+res = [64, 0, 64]
 
 # SF/SF, FF/FT
 bc_vel = 2
@@ -25,8 +29,8 @@ Pr = 1; Ra = 2757.48221715; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspec
 #Pr = 1; Ra = 1e6; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 
 # NS/NS, FT/FT, k = 0
-bc_vel = 0
-bc_temp = 0
+bc_vel = 2
+bc_temp = 1
 heating = 0
 k = 9.7281101194
 Pr = 1; Ra = 1152782.00348; Ta = 1e8; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1

@@ -1,18 +1,17 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a infinite duct(1 periodic direction) (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a square (2D) (velocity-continuity formulation)"""
 
 import numpy as np
 
-#import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
-import geomhdiscc.model.boussinesq_rbcduct_vc as mod
+import geomhdiscc.model.boussinesq_rbcsquare_vc as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCDuctVC()
+model = mod.BoussinesqRBCSquareVC()
 model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-#res = [8, 0, 8]
+res = [8, 0, 8]
 #res = [6, 0, 6]
 #res = [12, 0, 12]
 #res = [16, 0, 16]
@@ -53,7 +52,7 @@ bc_vel = 2
 bc_temp = 1
 heating = 0
 #k = np.pi
-#k = 0
+k = 0
 Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 #k = (np.sqrt(7.0)/2.0)*np.pi
 #Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
@@ -78,13 +77,12 @@ Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 #Pr = 1; Ra = 12628.25262; A1d = 1.0; A3d = 1.0 # l = 2, n = 2, aspect ration 1:1
 
 # SF/SF, FF/FT, k = 5.35
-bc_vel = 2
-bc_temp = 1
-heating = 0
-k = 5.35
-k = 3.0
+#bc_vel = 2
+#bc_temp = 1
+#heating = 0
+#k = 5.35
 # SF/SF, FF/FT, Aspect ratio 1:1
-Pr = 1; Ra = 1992.541617; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
+#Pr = 1; Ra = 1992.541617; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 #Pr = 1; Ra = 2938.551173; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 #Pr = 1; Ra = 6960.466725; A1d = 1.0; A3d = 1.0 # m = 2, n = 1, aspect ration 1:1
 #Pr = 1; Ra = 17572.19000; A1d = 1.0; A3d = 1.0 # m = 3, n = 1, aspect ration 1:1
@@ -115,11 +113,11 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['mode'] = 1
+marginal_options['mode'] = 0
 marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
-marginal_options['curve'] = True
+marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['solve_nev'] = 10
@@ -130,8 +128,8 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 0
-marginal_options['curve_points'] = np.arange(max(1, k-2), k+2, 0.2)
+marginal_options['viz_mode'] = 3
+marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

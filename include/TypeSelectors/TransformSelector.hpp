@@ -306,17 +306,66 @@ namespace GeoMHDiSCC {
       }
    #endif //GEOMHDISCC_SPATIALSCHEME_WLF
 
+   // Configure code to use TT scheme
+   #ifdef GEOMHDISCC_SPATIALSCHEME_TT
+
+      namespace GeoMHDiSCC {
+         namespace Transform {
+
+            template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+            {
+               /// Typedef for the first transform
+               typedef Fft::ChebyshevSelector Type;
+            };
+
+            template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+            {
+               /// Typedef for the second transform
+               typedef Fft::ChebyshevSelector Type;
+            };
+         }
+      }
+   #endif //GEOMHDISCC_SPATIALSCHEME_TT
+
+   // Configure code to use TF scheme
+   #ifdef GEOMHDISCC_SPATIALSCHEME_TF
+
+      namespace GeoMHDiSCC {
+         namespace Transform {
+
+            template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+            {
+               /// Typedef for the first transform
+               typedef Fft::ChebyshevSelector Type;
+            };
+
+            template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+            {
+               /// Typedef for the second transform
+               typedef Fft::FftSelector Type;
+            };
+         }
+      }
+   #endif //GEOMHDISCC_SPATIALSCHEME_TF
+
 namespace GeoMHDiSCC {
 
    namespace Parallel {
-      typedef Communicator<Dimensions::THREED, Datatypes::ScalarSelector> CommunicatorType;
+      #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
+         typedef Communicator<Dimensions::TWOD, Datatypes::ScalarSelector> CommunicatorType;
+      #else
+         typedef Communicator<Dimensions::THREED, Datatypes::ScalarSelector> CommunicatorType;
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
    }
 
    namespace Transform {
-
-      /// Typedef for a TransformCoordinatorType
-      typedef Transform3DCoordinator<TransformSelector<Dimensions::Transform::TRA1D>::Type, TransformSelector<Dimensions::Transform::TRA2D>::Type, TransformSelector<Dimensions::Transform::TRA3D>::Type, Parallel::CommunicatorType> TransformCoordinatorType;
-
+      #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
+         /// Typedef for a TransformCoordinatorType
+         typedef Transform2DCoordinator<TransformSelector<Dimensions::Transform::TRA1D>::Type, TransformSelector<Dimensions::Transform::TRA2D>::Type, Parallel::CommunicatorType> TransformCoordinatorType;
+      #else
+         /// Typedef for a TransformCoordinatorType
+         typedef Transform3DCoordinator<TransformSelector<Dimensions::Transform::TRA1D>::Type, TransformSelector<Dimensions::Transform::TRA2D>::Type, TransformSelector<Dimensions::Transform::TRA3D>::Type, Parallel::CommunicatorType> TransformCoordinatorType;
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
    }
 }
 
