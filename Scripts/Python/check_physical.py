@@ -233,11 +233,12 @@ def checkSphereBenchmarkC2(h5_file):
             errVr = np.max(np.abs(dataVr[itS.index, itM.index,:]))
             errVth = np.max(np.abs(dataVth[itS.index, itM.index,:] - (-10*r**2/(7.0*np.sqrt(3.0))*np.cos(theta)*(3.0*(-147.0 + 343.0*r**2 - 217.0*r**4 + 29*r**6)*np.cos(phi) + 14.0*(-9.0 - 125.0*r**2 + 39*r**4 + 27*r**6)*np.sin(phi)))))
             errVph = np.max(np.abs(dataVph[itS.index, itM.index,:] - (-5.0*r/5544.*(7.0*((43700.0 - 58113*r**2 - 15345*r**4 + 1881*r**6 + 20790*r**8)*np.sin(theta) + 1485*r**2*(-9.0 + 115.0*r**2 - 167.0*r**4 + 70*r**6)*np.sin(3.0*theta)) + 528.0*np.sqrt(3)*r*np.cos(2.0*theta)*(14.0*(-9.0 - 125.0*r**2 + 39.0*r**4 + 27.0*r**6)*np.cos(phi) + 3.0*(147.0 - 343.0*r**2 + 217*r**4 - 29.0*r**6)*np.sin(phi))))))
-
+            
             # Check curl of velocity field
-            errCVr = np.max(np.abs(dataCVr[itS.index, itM.index,:]))
-            errCVth = np.max(np.abs(dataCVth[itS.index, itM.index,:] - (-10*r**2/(7.0*np.sqrt(3.0))*np.cos(theta)*(3.0*(-147.0 + 343.0*r**2 - 217.0*r**4 + 29*r**6)*np.cos(phi) + 14.0*(-9.0 - 125.0*r**2 + 39*r**4 + 27*r**6)*np.sin(phi)))))
-            errCVph = np.max(np.abs(dataCVph[itS.index, itM.index,:] - (-5.0*r/5544.*(7.0*((43700.0 - 58113*r**2 - 15345*r**4 + 1881*r**6 + 20790*r**8)*np.sin(theta) + 1485*r**2*(-9.0 + 115.0*r**2 - 167.0*r**4 + 70*r**6)*np.sin(3.0*theta)) + 528.0*np.sqrt(3)*r*np.cos(2.0*theta)*(14.0*(-9.0 - 125.0*r**2 + 39.0*r**4 + 27.0*r**6)*np.cos(phi) + 3.0*(147.0 - 343.0*r**2 + 217*r**4 - 29.0*r**6)*np.sin(phi))))))
+            errCVr = np.max(np.abs(dataCVr[itS.index, itM.index,:] - ((1.0/1386.0)*(-35.0*(21850.0 + 99.0*r**2*(-361.0 + 785.0*r**2 - 1243.0*r**4 + 630.0*r**6))*np.cos(theta) + 495.0*r*(-105.0*r*(-9.0 + 115.0*r**2 - 167.0*r**4 + 70.0*r**6)*np.cos(3.0*theta) + 4.0*np.sqrt(3)*np.sin(2.0*theta)*(14.0*(-9.0 - 125.0*r**2 + 39.0*r**4 + 27.0*r**6)*np.cos(phi) + 3.0*(147.0 - 343.0*r**2 + 217.0*r**4 - 29.0*r**6)*np.sin(phi)))))))
+            errCVth = np.max(np.abs(dataCVth[itS.index, itM.index,:] - ((54625.0*np.sin(theta))/99.0 + 5.0/84.0*r*(21.0*r*((-1174.0 - 465.0*r**2 + 76.0*r**4 + 1050.0*r**6)*np.sin(theta) + 15.0*(-18.0 + 345.0*r**2 - 668.0*r**4 + 350.0*r**6)*np.sin(3.0*theta)) + 8.0*np.sqrt(3)*np.cos(2.0*theta)*(14.0*(-27.0 - 625.0*r**2 + 273.0*r**4 + 243.0*r**6)*np.cos(phi) + 3.0*(441.0 - 1715.0*r**2 + 1519.0*r**4 - 261.0*r**6)*np.sin(phi))))))
+            errCVph = np.max(np.abs(dataCVph[itS.index, itM.index,:] - (10.0*r/(7.0*np.sqrt(3))*np.cos(theta)*((1323.0 - 5145.0*r**2 + 4557.0*r**4 - 783.0*r**6)*np.cos(phi) + 14.0*(27.0 + 625.0*r**2 - 273.0*r**4 - 243.0*r**6)*np.sin(phi)))))
+            
 
             # Check magnetic field
             errBr = np.max(np.abs(dataBr[itS.index, itM.index,:]))
@@ -245,9 +246,9 @@ def checkSphereBenchmarkC2(h5_file):
             errBph = np.max(np.abs(dataBph[itS.index, itM.index,:] - (-3.0/4.0*r*(-1.0 + r**2)*np.cos(theta)*(3.0*r*(2.0 - 5.0*r**2 + 4.0*r**4)*np.sin(theta) + 2.0*(1.0 - 3.0*r**2 + 3.0*r**4)*(np.cos(phi) - np.sin(phi))))))
 
             # Check curl of magnetic field
-            errCBr = np.max(np.abs(dataCBr[itS.index, itM.index,:]))
-            errCBth = np.max(np.abs(dataCBth[itS.index, itM.index,:] - (-3.0/2.0*r*(-1.0 + 4.0*r**2 - 6.0*r**4 + 3.0*r**6)*(np.cos(phi) + np.sin(phi)))))
-            errCBph = np.max(np.abs(dataCBph[itS.index, itM.index,:] - (-3.0/4.0*r*(-1.0 + r**2)*np.cos(theta)*(3.0*r*(2.0 - 5.0*r**2 + 4.0*r**4)*np.sin(theta) + 2.0*(1.0 - 3.0*r**2 + 3.0*r**4)*(np.cos(phi) - np.sin(phi))))))
+            errCBr = np.max(np.abs(dataCBr[itS.index, itM.index,:] - (-9.0/8.0*r*(-2.0 + 7.0*r**2 - 9.0*r**4 + 4.0*r**6)*(1.0 + 3.0*np.cos(2.0*theta)) + 3.0*(-1.0 + 4*r**2 - 6.0*r**4 + 3.0*r**6)*np.sin(theta)*np.cos(phi) + 3.0*(1.0 - 4.0*r**2 + 6.0*r**4 - 3.0*r**6)*np.sin(theta)*np.sin(phi))))
+            errCBth = np.max(np.abs(dataCBth[itS.index, itM.index,:] - (3.0/4.0*np.cos(theta)*(3.0*r*(-6.0 + 35.0*r**2 - 63.0*r**4 + 36.0*r**6)*np.sin(theta) + 4.0*(-1.0 + 8.0*r**2 - 18.0*r**4 + 12.0*r**6)*(np.cos(phi) - np.sin(phi))))))
+            errCBph = np.max(np.abs(dataCBph[itS.index, itM.index,:] - (-3.0*(-1.0 + 8.0*r**2 - 18.0*r**4 + 12.0*r**6)*(np.cos(phi) + np.sin(phi)))))
 
             itM.iternext()
         itS.iternext()
