@@ -29,7 +29,7 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGNoVelocityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGNoVorticityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGMeanHeat.hpp"
-#include "IoVariable/NusseltWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -40,7 +40,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqNoTiltedFPlane3DQGModel::PYMODULE = "boussinesq_notilted_fplane3dqg";
+   const std::string BoussinesqNoTiltedFPlane3DQGModel::PYMODULE = "boussinesq_notilted_fplane3dqg_r";
 
    const std::string BoussinesqNoTiltedFPlane3DQGModel::PYCLASS = "BoussinesqNoTiltedFPlane3DQG";
 
@@ -89,6 +89,12 @@ namespace GeoMHDiSCC {
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(1e0, -2.0, 1e0, 5.0, 7e0, 4.0);
 
+         // Add initial mean temperature gradient state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
       // Generate random spectrum
       } else
       {
@@ -109,6 +115,13 @@ namespace GeoMHDiSCC {
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::NO_VELOCITYZ);
          spRand->setSpectrum(-1.0e-4, 1.0e-4, 1e4, 1e4, 1e4);
+
+         // Add initial mean temperature gradient state generation equation
+         Equations::SharedCartesianExactScalarState spExact;
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
       }
 
       // Add output file
@@ -116,6 +129,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::NO_STREAMFUNCTION);
       spOut->expect(PhysicalNames::NO_VELOCITYZ);
+      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -177,7 +191,7 @@ namespace GeoMHDiSCC {
    void BoussinesqNoTiltedFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
-      IoVariable::SharedNusseltWriter spState(new IoVariable::NusseltWriter(SchemeType::type()));
+      IoVariable::SharedCartesian1DNusseltZWriter spState(new IoVariable::Cartesian1DNusseltZWriter(SchemeType::type()));
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spSim->addAsciiOutputFile(spState);
 

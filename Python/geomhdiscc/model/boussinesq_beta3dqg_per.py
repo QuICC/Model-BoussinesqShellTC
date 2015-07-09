@@ -56,7 +56,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("velocityz",""), ("vorticityz",""), ("dx_meantemperature",""), ("kinetic_energy","")]:
+            if field_row in [("velocityz",""), ("vorticityz",""), ("dx_meantemperature","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -197,17 +197,8 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
-        elif field_row == ("kinetic_energy","") and field_col == field_row:
-            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
-
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
-
-        elif field_row == ("zonal_kinetic_energy",""):
-            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
-
-        elif field_row == ("nonzonal_kinetic_energy",""):
-            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
 
         return mat
 

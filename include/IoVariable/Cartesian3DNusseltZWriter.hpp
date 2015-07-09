@@ -1,11 +1,11 @@
 /** 
- * @file NusseltCubicWriter.hpp
- * @brief Implementation of the ASCII Nusselt number writer for a finite 3D box
+ * @file Cartesian3DNusseltZWriterriter.hpp
+ * @brief Implementation of the ASCII Nusselt number writer for a 3D box through Z
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef NUSSELTCUBICWRITER_HPP
-#define NUSSELTCUBICWRITER_HPP
+#ifndef CARTESIAN3DNUSSELTZWRITER_HPP
+#define CARTESIAN3DNUSSELTZWRITER_HPP
 
 // Configuration includes
 //
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII Nusselt number writer for a finite 3D box
+    * @brief Implementation of the ASCII Nusselt number writer for a 3D box through Z
     */
-   class NusseltCubicWriter: public IVariableAsciiEWriter
+   class Cartesian3DNusseltZWriterriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -39,12 +39,12 @@ namespace IoVariable {
           *
           * @param type Type of the file (typically scheme name)
           */
-         NusseltCubicWriter(std::string type);
+         Cartesian3DNusseltZWriterriter(std::string type);
 
          /**
           * @brief Destructor
           */
-         virtual ~NusseltCubicWriter();
+         virtual ~Cartesian3DNusseltZWriterriter();
 
          /**
           * @brief Initialise the operator and file
@@ -67,9 +67,9 @@ namespace IoVariable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef SharedPtrMacro<NusseltCubicWriter> SharedNusseltCubicWriter;
+   typedef SharedPtrMacro<Cartesian3DNusseltZWriterriter> SharedCartesian3DNusseltZWriterriter;
 
 }
 }
 
-#endif // NUSSELTCUBICWRITER_HPP
+#endif // CARTESIAN3DNUSSELTZWRITER_HPP

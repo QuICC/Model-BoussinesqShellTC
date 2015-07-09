@@ -1,6 +1,6 @@
 /** 
- * @file NusseltWriter.cpp
- * @brief Source of the implementation of the ASCII Nusselt number writer
+ * @file Cartesian1DNusseltZWriter.cpp
+ * @brief Source of the implementation of the ASCII Nusselt number writer through the Z boundary
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -17,7 +17,7 @@
 
 // Class include
 //
-#include "IoVariable/NusseltWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 
 // Project includes
 //
@@ -31,23 +31,23 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   NusseltWriter::NusseltWriter(std::string type)
+   Cartesian1DNusseltZWriter::Cartesian1DNusseltZWriter(std::string type)
       : IVariableAsciiEWriter(NusseltTags::BASENAME, NusseltTags::EXTENSION, NusseltTags::HEADER, type, NusseltTags::VERSION, Dimensions::Space::SPECTRAL)
    {
    }
 
-   NusseltWriter::~NusseltWriter()
+   Cartesian1DNusseltZWriter::~Cartesian1DNusseltZWriter()
    {
    }
 
-   void NusseltWriter::write()
+   void Cartesian1DNusseltZWriter::write()
    {
       // Create file
       this->preWrite();
 
-      NusseltWriter::scalar_iterator_range sRange = this->scalarRange();
+      Cartesian1DNusseltZWriter::scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 1);
-      NusseltWriter::scalar_iterator sit = sRange.first;
+      Cartesian1DNusseltZWriter::scalar_iterator sit = sRange.first;
 
       ArrayI mode = sit->second->dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(0);
       MHDFloat nusselt = 0.0;

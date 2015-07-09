@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq tilted F-Plane 3DQG model (nonorthogonal formulation)"""
+"""Module provides the functions to generate the Boussinesq tilted F-Plane 3DQG model (nonorthogonal formulation, restricted because of blowup)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,7 +13,7 @@ from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
 class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
-    """Class to setup the Boussinesq tilted F-Plane 3DQG model (nonorthogonal formulation)"""
+    """Class to setup the Boussinesq tilted F-Plane 3DQG model (nonorthogonal formulation, restricted because of blowup)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -136,6 +136,8 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
                             bc = {0:11, 'c':-1j*eta2*kx}
                         elif field_row == ("no_velocityz","") and field_col == field_row:
                             bc = {0:11, 'c':eta3}
+                        elif field_row == ("temperature","") and field_col == field_row:
+                            bc = {0:991}
                     else:
                         bc = no_bc()
             
@@ -179,13 +181,15 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("no_streamfunction","") and field_col == field_row:
+            bc['zb'] = 1
             mat = geo.i1(res[0], bc)
 
         elif field_row == ("no_velocityz","") and field_col == field_row:
+            bc['zb'] = 1
             mat = geo.i1(res[0], bc)
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.sid(res[0], 0, bc)
+            mat = geo.sid(res[0], 1, bc)
 
         elif field_row == ("dz_meantemperature","") and field_col == field_row:
             if kx == 0 and ky == 0:
@@ -259,18 +263,18 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
         elif field_row == ("temperature",""):
             if field_col == ("no_streamfunction",""):
                 if self.linearize:
-                    mat = geo.sid(res[0], 0, bc, -1j*eta2*kx)
+                    mat = geo.sid(res[0], 1, bc, -1j*eta2*kx)
                 else:
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("no_velocityz",""):
                 if self.linearize:
-                    mat = geo.sid(res[0], 0, bc, eta3)
+                    mat = geo.sid(res[0], 1, bc, eta3)
                 else:
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.sid(res[0], 0, bc, -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2))
+                mat = geo.sid(res[0], 1, bc, -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -293,7 +297,7 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
             mat = geo.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
-            mat = geo.sid(res[0], 0, bc)
+            mat = geo.sid(res[0], 1, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

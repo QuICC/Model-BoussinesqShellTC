@@ -1,6 +1,6 @@
 /** 
- * @file NusseltBeta3DQGPerWriter.cpp
- * @brief Source of the implementation of the ASCII Nusselt number writer for the Beta 3DQG periodic model
+ * @file Cartesian1DNusseltXWriter.cpp
+ * @brief Source of the implementation of the ASCII Nusselt number writer through the X boundary
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -17,7 +17,7 @@
 
 // Class include
 //
-#include "IoVariable/NusseltBeta3DQGPerWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltXWriter.hpp"
 
 // Project includes
 //
@@ -32,16 +32,16 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   NusseltBeta3DQGPerWriter::NusseltBeta3DQGPerWriter(std::string type)
+   Cartesian1DNusseltXWriter::Cartesian1DNusseltXWriter(std::string type)
       : IVariableAsciiEWriter(NusseltTags::BASENAME, NusseltTags::EXTENSION, NusseltTags::HEADER, type, NusseltTags::VERSION, Dimensions::Space::SPECTRAL)
    {
    }
 
-   NusseltBeta3DQGPerWriter::~NusseltBeta3DQGPerWriter()
+   Cartesian1DNusseltXWriter::~Cartesian1DNusseltXWriter()
    {
    }
 
-   void NusseltBeta3DQGPerWriter::init()
+   void Cartesian1DNusseltXWriter::init()
    {
       scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 2);
@@ -71,16 +71,16 @@ namespace IoVariable {
       IVariableAsciiEWriter::init();
    }
 
-   void NusseltBeta3DQGPerWriter::write()
+   void Cartesian1DNusseltXWriter::write()
    {
       // Create file
       this->preWrite();
 
-      NusseltBeta3DQGPerWriter::scalar_iterator_range sRange = this->scalarRange();
+      Cartesian1DNusseltXWriter::scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 2);
-      NusseltBeta3DQGPerWriter::scalar_iterator nlIt;
-      NusseltBeta3DQGPerWriter::scalar_iterator tIt;
-      NusseltBeta3DQGPerWriter::scalar_iterator it = sRange.first;
+      Cartesian1DNusseltXWriter::scalar_iterator nlIt;
+      Cartesian1DNusseltXWriter::scalar_iterator tIt;
+      Cartesian1DNusseltXWriter::scalar_iterator it = sRange.first;
       if(it->first == PhysicalNames::TEMPERATURE)
       {
          tIt = it;

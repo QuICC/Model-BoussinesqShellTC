@@ -3,7 +3,7 @@
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_notilted_fplane3dqg as mod
+import geomhdiscc.model.boussinesq_notilted_fplane3dqg_r as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
