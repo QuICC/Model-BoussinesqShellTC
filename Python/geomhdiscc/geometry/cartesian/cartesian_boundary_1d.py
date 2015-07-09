@@ -94,6 +94,8 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 22:
         cond = tau_valuediff(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 23:
+        cond = tau_diff2(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:

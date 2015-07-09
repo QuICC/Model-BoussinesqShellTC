@@ -33,9 +33,9 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
         #fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
-        fields =  [("velocity","x"), ("velocity","z"), ("pressure","")]
+        #fields =  [("velocity","x"), ("velocity","z"), ("pressure","")]
 
         return fields
 
@@ -425,8 +425,8 @@ class BoussinesqRBCDuctVC(base_model.BaseModel):
 
                 elif field_col == ("pressure",""):
                     mat = geo.zblk(res[0], res[2], 1, 1, bc)
-                    s = 0
-                    mat = geo.lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale) - geo.e1(res[0]+s, res[2]+s, bc, zscale = zscale, sx = 0, sz = 1)*geo.e1(res[0]+s, res[2]+s, bc, zscale = zscale, sx = 0, sz = 1) - geo.d1(res[0]+s, res[2]+s, bc, xscale = xscale, sx = 1, sz = 0)*geo.d1(res[0]+s, res[2]+s, bc, xscale = xscale, sx = 1, sz = 0)
+#                    s = 0
+#                    mat = geo.lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale) - geo.e1(res[0]+s, res[2]+s, bc, zscale = zscale, sx = 0, sz = 1)*geo.e1(res[0]+s, res[2]+s, bc, zscale = zscale, sx = 0, sz = 1) - geo.d1(res[0]+s, res[2]+s, bc, xscale = xscale, sx = 1, sz = 0)*geo.d1(res[0]+s, res[2]+s, bc, xscale = xscale, sx = 1, sz = 0)
                     #mat = mat +  utils.id_from_idx_2d(idx_pp, res[2], res[0])
                     #tmp = spsp.lil_matrix(mat.shape)
                     #tmp[-2*res[2]-1,0] = 1

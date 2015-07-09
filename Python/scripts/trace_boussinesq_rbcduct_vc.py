@@ -16,12 +16,12 @@ model.use_galerkin = False
 #res = [6, 0, 6]
 #res = [12, 0, 12]
 #res = [16, 0, 16]
-res = [24, 0, 24]
+#res = [24, 0, 24]
 #res = [32, 0, 32]
 #res = [36, 0, 36]
 #res = [48, 0, 48]
 #res = [64, 0, 64]
-#res = [128, 0, 128]
+res = [128, 0, 128]
 
 # SF/SF, FF/FT, k = 0
 #bc_vel = 2
@@ -49,11 +49,11 @@ res = [24, 0, 24]
 #Pr = 1; Ra = 2137.92; A1d = 1.0; A3d = 1.0/3.0 # m = 2, n = 2, aspect ratio 1:3
 
 # PAPER
-bc_vel = 2
+bc_vel = 0
 bc_temp = 1
 heating = 0
-#k = np.pi
-k = 0
+k = np.pi
+#k = 0
 Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 #k = (np.sqrt(7.0)/2.0)*np.pi
 #Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
@@ -78,9 +78,9 @@ Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 #Pr = 1; Ra = 12628.25262; A1d = 1.0; A3d = 1.0 # l = 2, n = 2, aspect ration 1:1
 
 # SF/SF, FF/FT, k = 5.35
-bc_vel = 2
-bc_temp = 1
-heating = 0
+#bc_vel = 2
+#bc_temp = 1
+#heating = 0
 #k = 5.35
 #k = 3.0
 # SF/SF, FF/FT, Aspect ratio 1:1
@@ -122,7 +122,7 @@ marginal_options['point'] = False
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 10
+marginal_options['solve_nev'] = 20
 marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = False
@@ -130,7 +130,7 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 1
+marginal_options['viz_mode'] = 11
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+2, 0.2)
 
 # Compute 
