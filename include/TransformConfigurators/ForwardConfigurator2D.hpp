@@ -107,6 +107,10 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
    }
 
+#ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+   typedef ForwardConfigurator2D ForwardConfigurator;
+#endif //GEOMHDISCC_SPATIALDIMENSION_2D
+
 }
 }
 

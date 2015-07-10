@@ -59,6 +59,10 @@ namespace Transform {
       private: 
    };
 
+#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   typedef ForwardConfigurator3D ForwardConfigurator;
+#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
 }
 }
 

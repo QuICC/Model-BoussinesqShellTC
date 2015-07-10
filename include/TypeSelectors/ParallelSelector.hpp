@@ -23,18 +23,22 @@
 #include "TransformConfigurators/BackwardSerialConfigurator.hpp"
 #include "TransformConfigurators/ForwardSingle1DConfigurator.hpp"
 #include "TransformConfigurators/BackwardSingle1DConfigurator.hpp"
-#include "TransformConfigurators/ForwardSingle2DConfigurator.hpp"
-#include "TransformConfigurators/BackwardSingle2DConfigurator.hpp"
-#include "TransformConfigurators/ForwardTubularConfigurator.hpp"
-#include "TransformConfigurators/BackwardTubularConfigurator.hpp"
+#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #include "TransformConfigurators/ForwardSingle2DConfigurator.hpp"
+   #include "TransformConfigurators/BackwardSingle2DConfigurator.hpp"
+   #include "TransformConfigurators/ForwardTubularConfigurator.hpp"
+   #include "TransformConfigurators/BackwardTubularConfigurator.hpp"
+#endif //GEOMHDISCC_SPATIALDIMENSION_3D
 #include "TransformGroupers/ForwardEquationGrouper.hpp"
 #include "TransformGroupers/BackwardEquationGrouper.hpp"
 #include "TransformGroupers/ForwardSingle1DGrouper.hpp"
 #include "TransformGroupers/BackwardSingle1DGrouper.hpp"
-#include "TransformGroupers/ForwardSingle2DGrouper.hpp"
-#include "TransformGroupers/BackwardSingle2DGrouper.hpp"
-#include "TransformGroupers/ForwardTransformGrouper.hpp"
-#include "TransformGroupers/BackwardTransformGrouper.hpp"
+#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #include "TransformGroupers/ForwardSingle2DGrouper.hpp"
+   #include "TransformGroupers/BackwardSingle2DGrouper.hpp"
+   #include "TransformGroupers/ForwardTransformGrouper.hpp"
+   #include "TransformGroupers/BackwardTransformGrouper.hpp"
+#endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
 namespace GeoMHDiSCC {
 
@@ -65,41 +69,43 @@ namespace GeoMHDiSCC {
       };
       #endif //GEOMHDISCC_MPIALGO_SINGLE1D
 
-      #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
-      /// Transform configurator selector specialised for SINGLE2D case
-      template <> struct ConfigSelector<Splitting::Algorithms::SINGLE2D>
-      {
-         /// Typedef for forward configurator
-         typedef ForwardSingle2DConfigurator   FwdConfigType;
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+         /// Transform configurator selector specialised for SINGLE2D case
+         template <> struct ConfigSelector<Splitting::Algorithms::SINGLE2D>
+         {
+            /// Typedef for forward configurator
+            typedef ForwardSingle2DConfigurator   FwdConfigType;
 
-         /// Typedef for forward configurator
-         typedef BackwardSingle2DConfigurator  BwdConfigType;
-      };
-      #endif //GEOMHDISCC_MPIALGO_SINGLE2D
+            /// Typedef for forward configurator
+            typedef BackwardSingle2DConfigurator  BwdConfigType;
+         };
+         #endif //GEOMHDISCC_MPIALGO_SINGLE2D
 
-      #ifdef GEOMHDISCC_MPIALGO_TUBULAR
-      /// Transform configurator selector specialised for TUBULAR case
-      template <> struct ConfigSelector<Splitting::Algorithms::TUBULAR>
-      {
-         /// Typedef for forward configurator
-         typedef ForwardTubularConfigurator   FwdConfigType;
+         #ifdef GEOMHDISCC_MPIALGO_TUBULAR
+         /// Transform configurator selector specialised for TUBULAR case
+         template <> struct ConfigSelector<Splitting::Algorithms::TUBULAR>
+         {
+            /// Typedef for forward configurator
+            typedef ForwardTubularConfigurator   FwdConfigType;
 
-         /// Typedef for forward configurator
-         typedef BackwardTubularConfigurator  BwdConfigType;
-      };
-      #endif //GEOMHDISCC_MPIALGO_TUBULAR
+            /// Typedef for forward configurator
+            typedef BackwardTubularConfigurator  BwdConfigType;
+         };
+         #endif //GEOMHDISCC_MPIALGO_TUBULAR
 
-      #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
-      /// Transform configurator selector specialised for COUPLED2D case
-      template <> struct ConfigSelector<Splitting::Algorithms::COUPLED2D>
-      {
-         /// Typedef for forward configurator
-         typedef ForwardSingle1DConfigurator   FwdConfigType;
+         #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
+         /// Transform configurator selector specialised for COUPLED2D case
+         template <> struct ConfigSelector<Splitting::Algorithms::COUPLED2D>
+         {
+            /// Typedef for forward configurator
+            typedef ForwardSingle1DConfigurator   FwdConfigType;
 
-         /// Typedef for forward configurator
-         typedef BackwardSingle1DConfigurator  BwdConfigType;
-      };
-      #endif //GEOMHDISCC_MPIALGO_COUPLED2D
+            /// Typedef for forward configurator
+            typedef BackwardSingle1DConfigurator  BwdConfigType;
+         };
+         #endif //GEOMHDISCC_MPIALGO_COUPLED2D
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       /// Transform grouper selector template
       template <Splitting::Groupers::Id TGrouper,Splitting::Algorithms::Id TAlgo> struct GrouperSelector;
@@ -128,29 +134,31 @@ namespace GeoMHDiSCC {
       };
       #endif //GEOMHDISCC_TRANSGROUPER_SINGLE1D
 
-      #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE2D
-      /// Transform grouper selector for SINGLE2D grouper
-      template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::SINGLE2D,TAlgo>: public ConfigSelector<TAlgo>
-      {
-         /// Typedef for forward grouper
-         typedef ForwardSingle2DGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE2D
+         /// Transform grouper selector for SINGLE2D grouper
+         template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::SINGLE2D,TAlgo>: public ConfigSelector<TAlgo>
+         {
+            /// Typedef for forward grouper
+            typedef ForwardSingle2DGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
 
-         /// Typedef for backward grouper
-         typedef BackwardSingle2DGrouper<typename ConfigSelector<TAlgo>::BwdConfigType>  BwdGrouperType;
-      };
-      #endif //GEOMHDISCC_TRANSGROUPER_SINGLE2D
+            /// Typedef for backward grouper
+            typedef BackwardSingle2DGrouper<typename ConfigSelector<TAlgo>::BwdConfigType>  BwdGrouperType;
+         };
+         #endif //GEOMHDISCC_TRANSGROUPER_SINGLE2D
 
-      #ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
-      /// Transform grouper selector for TRANSFORM grouper
-      template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::TRANSFORM,TAlgo>: public ConfigSelector<TAlgo>
-      {
-         /// Typedef for forward grouper
-         typedef ForwardTransformGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
+         #ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
+         /// Transform grouper selector for TRANSFORM grouper
+         template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::TRANSFORM,TAlgo>: public ConfigSelector<TAlgo>
+         {
+            /// Typedef for forward grouper
+            typedef ForwardTransformGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
 
-         /// Typedef for backward grouper
-         typedef BackwardTransformGrouper<typename ConfigSelector<TAlgo>::BwdConfigType>  BwdGrouperType;
-      };
-      #endif //GEOMHDISCC_TRANSGROUPER_TRANSFORM
+            /// Typedef for backward grouper
+            typedef BackwardTransformGrouper<typename ConfigSelector<TAlgo>::BwdConfigType>  BwdGrouperType;
+         };
+         #endif //GEOMHDISCC_TRANSGROUPER_TRANSFORM
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
    namespace Parallel
@@ -191,21 +199,21 @@ namespace GeoMHDiSCC {
          {
             setGrouper<TGroup,Splitting::Algorithms::SINGLE1D>(spFwdGrouper, spBwdGrouper);
          #endif //GEOMHDISCC_MPIALGO_SINGLE1D
-         #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+         #if defined GEOMHDISCC_SPATIALDIMENSION_3D && defined GEOMHDISCC_MPIALGO_SINGLE2D
          } else if(algo == Splitting::Algorithms::SINGLE2D)
          {
             setGrouper<TGroup,Splitting::Algorithms::SINGLE2D>(spFwdGrouper, spBwdGrouper);
-         #endif //GEOMHDISCC_MPIALGO_SINGLE2D
-         #ifdef GEOMHDISCC_MPIALGO_TUBULAR
+         #endif //defined GEOMHDISCC_SPATIALDIMENSION_3D && defined GEOMHDISCC_MPIALGO_SINGLE2D
+         #if defined GEOMHDISCC_SPATIALDIMENSION_3D && defined GEOMHDISCC_MPIALGO_TUBULAR
          } else if(algo == Splitting::Algorithms::TUBULAR)
          {
             setGrouper<TGroup,Splitting::Algorithms::TUBULAR>(spFwdGrouper, spBwdGrouper);
-         #endif //GEOMHDISCC_MPIALGO_TUBULAR
-         #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
+         #endif //defined GEOMHDISCC_SPATIALDIMENSION_3D && defined GEOMHDISCC_MPIALGO_TUBULAR
+         #if defined GEOMHDISCC_SPATIALDIMENSION_3D && defined GEOMHDISCC_MPIALGO_COUPLED2D
          } else if(algo == Splitting::Algorithms::COUPLED2D)
          {
             setGrouper<TGroup,Splitting::Algorithms::COUPLED2D>(spFwdGrouper, spBwdGrouper);
-         #endif //GEOMHDISCC_MPIALGO_COUPLED2D
+         #endif //defined GEOMHDISCC_SPATIALDIMENSION_3D && defined GEOMHDISCC_MPIALGO_COUPLED2D
       #endif //GEOMHDISCC_MPI
          } else
          {

@@ -100,6 +100,10 @@ namespace Transform {
       private: 
    };
 
+#ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+   typedef BackwardConfigurator2D BackwardConfigurator;
+#endif //GEOMHDISCC_SPATIALDIMENSION_2D
+
 }
 }
 

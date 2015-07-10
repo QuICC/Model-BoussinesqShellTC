@@ -23,6 +23,12 @@
 #include "ScalarFields/ScalarFieldSetup.hpp"
 #include "ScalarFields/FlatScalarField.hpp"
 
+#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #define DIMENSIONS_ID Dimensions::THREED
+#else
+   #define DIMENSIONS_ID Dimensions::TWOD
+#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
 namespace GeoMHDiSCC {
 
    /// Namespace containing the required typedefs for a simulation
@@ -307,19 +313,11 @@ namespace GeoMHDiSCC {
       /// Typedef for the spectral space scalar
       typedef ScalarSelector<Dimensions::Transform::TRA1D>::BwdType SpectralScalarType;
 
-      #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
-         /// Typedef for the physical space scalar
-         typedef ScalarSelector<Dimensions::Transform::TRA2D>::FwdType PhysicalScalarType;
+      /// Typedef for the physical space scalar
+      typedef ScalarSelector<Dimensions::Transform::TRAND>::FwdType PhysicalScalarType;
 
-         /// Typedef for a scalar field setup
-         typedef ScalarFieldSetup<Dimensions::TWOD> ScalarFieldSetupType;
-      #else
-         /// Typedef for the physical space scalar
-         typedef ScalarSelector<Dimensions::Transform::TRA3D>::FwdType PhysicalScalarType;
-
-         /// Typedef for a scalar field setup
-         typedef ScalarFieldSetup<Dimensions::THREED> ScalarFieldSetupType;
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
+      /// Typedef for a scalar field setup
+      typedef ScalarFieldSetup<DIMENSIONS_ID> ScalarFieldSetupType;
 
       /// Typedef for a scalar field setup
       typedef SharedPtrMacro<ScalarFieldSetupType> SharedScalarFieldSetupType;

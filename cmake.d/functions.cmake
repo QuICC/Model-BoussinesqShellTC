@@ -160,7 +160,7 @@ endfunction()
 #
 # Create executable
 #
-function (geomhdiscc_add_executable MHDModel MHDScheme MHDForm MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
+function (geomhdiscc_add_executable MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
    # Create new name for executable
    STRING(REGEX REPLACE "Model" ${MHDPostfix} ExecName ${MHDModel})
 
@@ -176,10 +176,10 @@ function (geomhdiscc_add_executable MHDModel MHDScheme MHDForm MHDPostfix MHDExe
    # Set special properties of target
    if(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_SPATIALDIMENSION_${MHDSchemeDim} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
    else(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme}_${MHDForm} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_SPATIALDIMENSION_${MHDSchemeDim} -DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme}_${MHDForm} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
    endif(${MHDForm} STREQUAL "DEFAULT")
 
    # Show message

@@ -18,15 +18,7 @@
 
 // Project includes
 //
-#if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
-   #include "TransformConfigurators/ProjectorBranch2D.hpp"
-   #include "TransformConfigurators/ProjectorTree2D.hpp"
-   #include "TransformConfigurators/ProjectorTree2DTools.hpp"
-
-   #include "TransformConfigurators/IntegratorBranch2D.hpp"
-   #include "TransformConfigurators/IntegratorTree2D.hpp"
-   #include "TransformConfigurators/IntegratorTree2DTools.hpp"
-#else
+#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
    #include "TransformConfigurators/ProjectorBranch3D.hpp"
    #include "TransformConfigurators/ProjectorTree3D.hpp"
    #include "TransformConfigurators/ProjectorTree3DTools.hpp"
@@ -34,21 +26,21 @@
    #include "TransformConfigurators/IntegratorBranch3D.hpp"
    #include "TransformConfigurators/IntegratorTree3D.hpp"
    #include "TransformConfigurators/IntegratorTree3DTools.hpp"
-#endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
+#else
+   #include "TransformConfigurators/ProjectorBranch2D.hpp"
+   #include "TransformConfigurators/ProjectorTree2D.hpp"
+   #include "TransformConfigurators/ProjectorTree2DTools.hpp"
+
+   #include "TransformConfigurators/IntegratorBranch2D.hpp"
+   #include "TransformConfigurators/IntegratorTree2D.hpp"
+   #include "TransformConfigurators/IntegratorTree2DTools.hpp"
+#endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
 namespace GeoMHDiSCC {
 
    namespace Transform {
 
-      #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
-         typedef ProjectorBranch2D  ProjectorBranch;
-         typedef ProjectorTree2D  ProjectorTree;
-         typedef ProjectorTree2DTools  ProjectorTreeTools;
-         
-         typedef IntegratorBranch2D  IntegratorBranch;
-         typedef IntegratorTree2D  IntegratorTree;
-         typedef IntegratorTree2DTools  IntegratorTreeTools;
-      #else
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
          typedef ProjectorBranch3D  ProjectorBranch;
          typedef ProjectorTree3D  ProjectorTree;
          typedef ProjectorTree3DTools  ProjectorTreeTools;
@@ -56,7 +48,15 @@ namespace GeoMHDiSCC {
          typedef IntegratorBranch3D  IntegratorBranch;
          typedef IntegratorTree3D  IntegratorTree;
          typedef IntegratorTree3DTools  IntegratorTreeTools;
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
+      #else
+         typedef ProjectorBranch2D  ProjectorBranch;
+         typedef ProjectorTree2D  ProjectorTree;
+         typedef ProjectorTree2DTools  ProjectorTreeTools;
+         
+         typedef IntegratorBranch2D  IntegratorBranch;
+         typedef IntegratorTree2D  IntegratorTree;
+         typedef IntegratorTree2DTools  IntegratorTreeTools;
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 }
 
