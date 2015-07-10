@@ -49,13 +49,13 @@ namespace Dimensions {
          TRA2D,
          /// Third transform space
          TRA3D,
-         #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
          /// Last dimension
          TRAND = TRA2D,
          #else
          /// Last dimension
          TRAND = TRA3D,
-         #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
+         #endif //GEOMHDISCC_SPATIALDIMENSION_2D
       };
 
       /**
@@ -100,13 +100,13 @@ namespace Dimensions {
          DAT2D,
          /// Third dimension data
          DAT3D,
-         #if defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
          /// Last data dimension
          DATND = DAT2D,
          #else
          /// Last data dimension
          DATND = DAT3D,
-         #endif //defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF
+         #endif //GEOMHDISCC_SPATIALDIMENSION_2D
       };
    };
 

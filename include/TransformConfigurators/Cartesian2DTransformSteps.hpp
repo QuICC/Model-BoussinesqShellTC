@@ -1,11 +1,11 @@
 /** 
- * @file CartesianTransformSteps.hpp
- * @brief Definition of some useful enums for steps involved in a full cartesian transform
+ * @file Cartesian2DTransformSteps.hpp
+ * @brief Definition of some useful enums for steps involved in a full 2D cartesian transform
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef CARTESIANTRANSFORMSTEPS_HPP
-#define CARTESIANTRANSFORMSTEPS_HPP
+#ifndef CARTESIAN2DTRANSFORMSTEPS_HPP
+#define CARTESIAN2DTRANSFORMSTEPS_HPP
 
 // Configuration includes
 //
@@ -19,8 +19,8 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "TransformConfigurators/ProjectorBranch3D.hpp"
-#include "TransformConfigurators/IntegratorBranch3D.hpp"
+#include "TransformConfigurators/ProjectorBranch2D.hpp"
+#include "TransformConfigurators/IntegratorBranch2D.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
           *
           * @brief isNL Flag to either compute NL projection or pure Physical <-> Spectral
           */
-         std::vector<IntegratorBranch3D>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
+         std::vector<IntegratorBranch2D>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
 
          /**
           * @brief Generate the list of branches in vector integration transform
@@ -44,39 +44,39 @@ namespace GeoMHDiSCC {
           * @brief components Spectral components where to store results: 0: \f$\vec r \nabla\wedge N\f$ 1: \f$\vec r \nabla\wedge\nabla\wedge N\f$
           * @brief isNL Flag to either compute NL projection or pure Physical <-> Spectral
           */
-         std::vector<IntegratorBranch3D>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
+         std::vector<IntegratorBranch2D>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
 
          /**
           * @brief Generate the list of branches in scalar projection transform
           */
-         std::vector<ProjectorBranch3D>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch2D>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in scalar gradient transform
           */
-         std::vector<ProjectorBranch3D>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch2D>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector projection transform
           */
-         std::vector<ProjectorBranch3D>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch2D>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector gradient transform
           */
-         std::vector<ProjectorBranch3D>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch2D>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector curl transform
           */
-         std::vector<ProjectorBranch3D>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req);
+         std::vector<ProjectorBranch2D>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
           * @brief Generate the list of branches in vector divergence transform
           */
-         std::vector<ProjectorBranch3D>  backwardDivergence();
+         std::vector<ProjectorBranch2D>  backwardDivergence();
       }
    }
 }
 
-#endif // CARTESIANTRANSFORMSTEPS_HPP
+#endif // CARTESIAN2DTRANSFORMSTEPS_HPP

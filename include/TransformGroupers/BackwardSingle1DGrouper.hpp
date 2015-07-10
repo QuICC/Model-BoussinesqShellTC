@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 

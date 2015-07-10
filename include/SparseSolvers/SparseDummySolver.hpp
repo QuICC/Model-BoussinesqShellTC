@@ -47,6 +47,11 @@ namespace Solver {
           * @brief Dummy implementation 
           */
          void initStartRow() {};
+
+         /**
+          * @brief Dummy implementation 
+          */
+         void zeroSolver() {};
          
       protected:
 

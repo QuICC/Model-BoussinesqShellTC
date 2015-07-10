@@ -21,11 +21,7 @@
 //
 #include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
-   #include "TransformConfigurators/BackwardConfigurator3D.hpp"
-#else
-   #include "TransformConfigurators/BackwardConfigurator2D.hpp"
-#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+#include "TransformConfigurators/BackwardConfiguratorMacro.h"
 
 namespace GeoMHDiSCC {
 

@@ -1,11 +1,11 @@
 /** 
- * @file IBackwardGrouper.hpp
- * @brief This class defines some basic forward transform grouping tools
+ * @file IBackwardGrouper2D.hpp
+ * @brief This class defines some basic forward transform grouping tools in 2D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef IBACKWARDGROUPER_HPP
-#define IBACKWARDGROUPER_HPP
+#ifndef IBACKWARDGROUPER2D_HPP
+#define IBACKWARDGROUPER2D_HPP
 
 // Configuration includes
 // 
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief This class defines the serial forward transform grouping algorithm
+    * @brief This class defines the serial forward transform grouping algorithm in 2D space
     */
-   class IBackwardGrouper
+   class IBackwardGrouper2D
    {
       public:
          /// Typedef for field and component ID
@@ -54,13 +54,6 @@ namespace Transform {
          virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree) = 0;
 
          /**
-          * @brief Get the number of required buffer packs for the second exchange
-          *
-          * @param projectorTree Transform projector tree
-          */
-         virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree) = 0;
-
-         /**
           * @brief Location of the split in the configurator
           */
          Splitting::Locations::Id split;
@@ -72,23 +65,11 @@ namespace Transform {
          std::map<FieldIdType, int>  mNamedPacks1D;
 
          /**
-          * @brief Storage for named packet sizes for the second exchange
-          */
-         std::map<FieldIdType, int>  mNamedPacks2D;
-
-         /**
           * @brief Get and set the name pack numbers for the first exchange
           *
           * @param projectorTree Transform projector tree
           */
          ArrayI namePacks1D(const std::vector<ProjectorTree>& projectorTree);
-
-         /**
-          * @brief Get and set the named pack numbers for the second exchange
-          *
-          * @param projectorTree Transform projector tree
-          */
-         ArrayI namePacks2D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get the grouped pack number for the first exchange
@@ -98,29 +79,28 @@ namespace Transform {
          ArrayI groupPacks1D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
-          * @brief Get the grouped pack number for the second exchange
-          *
-          * @param projectorTree Transform projector tree
-          */
-         ArrayI groupPacks2D(const std::vector<ProjectorTree>& projectorTree);
-
-         /**
           * @brief Empty constructor
           */
-         IBackwardGrouper();
+         IBackwardGrouper2D();
 
          /**
           * @brief Empty destructor
           */
-         ~IBackwardGrouper();
+         ~IBackwardGrouper2D();
 
       private: 
    };
 
    /// Typdef for a smart reference counting pointer to a backward grouper base
-   typedef SharedPtrMacro<IBackwardGrouper>   SharedIBackwardGrouper;
+   typedef SharedPtrMacro<IBackwardGrouper2D>   SharedIBackwardGrouper2D;
+
+   #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+      typedef IBackwardGrouper2D IBackwardGrouper;
+
+      typedef SharedPtrMacro<IBackwardGrouper2D>   SharedIBackwardGrouper;
+   #endif //GEOMHDISCC_SPATIALDIMENSION_2D
 
 }
 }
 
-#endif // IBACKWARDGROUPER_HPP
+#endif // IBACKWARDGROUPER2D_HPP

@@ -1,11 +1,11 @@
 /** 
- * @file IForwardGrouper.hpp
- * @brief This class defines some basic forward transform grouping tools
+ * @file IForwardGrouper2D.hpp
+ * @brief This class defines some basic forward transform grouping tools in 2D Space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef IFORWARDGROUPER_HPP
-#define IFORWARDGROUPER_HPP
+#ifndef IFORWARDGROUPER2D_HPP
+#define IFORWARDGROUPER2D_HPP
 
 // Configuration includes
 // 
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief This class defines the serial forward transform grouping algorithm
+    * @brief This class defines the serial forward transform grouping algorithm in 2D space
     */
-   class IForwardGrouper
+   class IForwardGrouper2D
    {
       public:
          /// Typedef for field and component ID
@@ -53,13 +53,6 @@ namespace Transform {
          virtual ArrayI packs1D(const std::vector<IntegratorTree>& integratorTree) = 0;
 
          /**
-          * @brief Get the number of required buffer packs for the second exchange
-          *
-          * @param integratorTree Transform integrator tree 
-          */
-         virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree) = 0;
-
-         /**
           * @brief Location of the split in the configurator
           */
          Splitting::Locations::Id split;
@@ -76,23 +69,11 @@ namespace Transform {
          std::map<FieldIdType, int>  mNamedPacks1D;
 
          /**
-          * @brief Storage for named packet sizes for the second exchange
-          */
-         std::map<FieldIdType, int>  mNamedPacks2D;
-
-         /**
           * @brief Get and set the name pack numbers for the first exchange
           *
           * @param integratorTree Transform integrator tree 
           */
          ArrayI namePacks1D(const std::vector<IntegratorTree>& integratorTree);
-
-         /**
-          * @brief Get and set the named pack numbers for the second exchange
-          *
-          * @param integratorTree Transform integrator tree 
-          */
-         ArrayI namePacks2D(const std::vector<IntegratorTree>& integratorTree);
 
          /**
           * @brief Get the grouped pack number for the first exchange
@@ -102,26 +83,19 @@ namespace Transform {
          ArrayI groupPacks1D(const std::vector<IntegratorTree>& integratorTree);
 
          /**
-          * @brief Get the grouped pack number for the second exchange
-          *
-          * @param integratorTree Transform integrator tree 
-          */
-         ArrayI groupPacks2D(const std::vector<IntegratorTree>& integratorTree);
-
-         /**
           * @brief Empty constructor
           */
-         IForwardGrouper();
+         IForwardGrouper2D();
 
          /**
           * @brief Empty destructor
           */
-         ~IForwardGrouper();
+         ~IForwardGrouper2D();
 
       private: 
    };
 
-   template < typename TSharedEquation> typename std::vector<TSharedEquation>::iterator IForwardGrouper::findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name)
+   template < typename TSharedEquation> typename std::vector<TSharedEquation>::iterator IForwardGrouper2D::findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name)
    {
       typename std::vector<TSharedEquation>::iterator eqIt;
       for(eqIt = eqs.begin(); eqIt != eqs.end(); ++eqIt)
@@ -136,9 +110,15 @@ namespace Transform {
    }
 
    /// Typdef for a smart reference counting pointer to a backward grouper base
-   typedef SharedPtrMacro<IForwardGrouper>   SharedIForwardGrouper;
+   typedef SharedPtrMacro<IForwardGrouper2D>   SharedIForwardGrouper2D;
+
+   #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+      typedef IForwardGrouper2D IForwardGrouper;
+
+      typedef SharedPtrMacro<IForwardGrouper2D>   SharedIForwardGrouper;
+   #endif //GEOMHDISCC_SPATIALDIMENSION_2D
 
 }
 }
 
-#endif // IFORWARDGROUPER_HPP
+#endif // IFORWARDGROUPER2D_HPP

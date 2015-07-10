@@ -8,15 +8,8 @@
 #define TRANSFORMSTEPSMACRO_H
 
 #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_FFF 
-   // include transform steps for cartesian geometry
-   #include "TransformConfigurators/CartesianTransformSteps.hpp"
-   #include "TransformConfigurators/ProjectorBranch3D.hpp"
-   #include "TransformConfigurators/ProjectorTree3D.hpp"
-   #include "TransformConfigurators/ProjectorTree3DTools.hpp"
-   #include "TransformConfigurators/IntegratorBranch3D.hpp"
-   #include "TransformConfigurators/IntegratorTree3D.hpp"
-   #include "TransformConfigurators/IntegratorTree3DTools.hpp"
-   
+   // include transform steps for 3D cartesian geometry
+   #include "TransformConfigurators/Cartesian3DTransformSteps.hpp"
 
 #elif defined GEOMHDISCC_SPATIALSCHEME_AFT
    // include transform steps for the cylindrical annulus geometry
@@ -33,6 +26,10 @@
 #elif defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLF
    // include transform steps for the whole sphere geometry
    #include "TransformConfigurators/SphereTransformSteps.hpp"
+
+#elif defined GEOMHDISCC_SPATIALSCHEME_TT || defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_FF
+   // include transform steps for 2D cartesian geometry
+   #include "TransformConfigurators/Cartesian2DTransformSteps.hpp"
 
 #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_FFF
 

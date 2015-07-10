@@ -20,11 +20,7 @@
 //
 #include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
-   #include "TransformConfigurators/ForwardConfigurator3D.hpp"
-#else
-   #include "TransformConfigurators/ForwardConfigurator2D.hpp"
-#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+#include "TransformConfigurators/ForwardConfiguratorMacro.h"
 
 namespace GeoMHDiSCC {
 

@@ -18,8 +18,8 @@
 //
 #include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/TransformTreeSelector.hpp"
-#include "TransformGroupers/IForwardGrouper.hpp"
-#include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformGroupers/IForwardGrouperMacro.h"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 

@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -60,12 +60,14 @@ namespace Transform {
           */
          virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree);
 
-         /**
-          * @brief Get the number of required buffer packs for the second exchange
-          *
-          * @param projectorTree Transform projector tree
-          */
-         virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree);
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            /**
+             * @brief Get the number of required buffer packs for the second exchange
+             *
+             * @param projectorTree Transform projector tree
+             */
+            virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       protected:
          /**
@@ -162,7 +164,9 @@ namespace Transform {
 
    template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp())), coord);
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp())), coord);
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
    template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const std::vector<ProjectorTree>& projectorTree)
@@ -170,10 +174,12 @@ namespace Transform {
       return this->namePacks1D(projectorTree);
    }
 
-   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs2D(const std::vector<ProjectorTree>& projectorTree)
-   {
-      return this->namePacks2D(projectorTree);
-   }
+   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs2D(const std::vector<ProjectorTree>& projectorTree)
+      {
+         return this->namePacks2D(projectorTree);
+      }
+   #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
 }
 }

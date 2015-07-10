@@ -194,7 +194,7 @@ namespace Parallel {
    {
       Debug::StaticAssert< TID == Dimensions::Transform::TRA2D >();
 
-      return *this->mspConverters2D;
+      return ConverterDispatcher<TID>::get(*this);
    }
 
    /**

@@ -1,6 +1,6 @@
 /** 
- * @file CartesianTransformSteps.cpp
- * @brief Source of the implementation of the cartesian transform steps
+ * @file Cartesian2DTransformSteps.cpp
+ * @brief Source of the implementation of the 2D cartesian transform steps
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "TransformConfigurators/CartesianTransformSteps.hpp"
+#include "TransformConfigurators/Cartesian2DTransformSteps.hpp"
 
 // Project includes
 //
