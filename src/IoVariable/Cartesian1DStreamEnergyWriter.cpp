@@ -187,13 +187,7 @@ namespace IoVariable {
       MHDFloat *pY;
       MHDFloat *pZ;
       MHDFloat tmp;
-      if(flag == TOTAL)
-      {
-         pX = &this->mXEnergy;
-         pY = &this->mYEnergy;
-         pZ = &this->mZEnergy;
-
-      } else if(flag == ZONAL_X)
+      if(flag == ZONAL_X)
       {
          pX = &this->mXZonalXEnergy;
          pY = &tmp;
@@ -203,6 +197,11 @@ namespace IoVariable {
          pX = &tmp;
          pY = &this->mYZonalYEnergy;
          pZ = &this->mZZonalYEnergy;
+      } else
+      {
+         pX = &this->mXEnergy;
+         pY = &this->mYEnergy;
+         pZ = &this->mZEnergy;
       }
 
       // Initialize the energy
@@ -248,7 +247,6 @@ namespace IoVariable {
          // Restrict field if necessary
          if(flag == ZONAL_X)
          {
-            int nK = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
             for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
             {
                if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
