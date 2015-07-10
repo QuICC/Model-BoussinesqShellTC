@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
          typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType IntgphysType;
 
          typedef TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType::Id IntgSpecId;
-         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType::Id IntgphysId;
+         typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType::Id IntgPhysId;
 
          typedef TransformEdge<IntgPhysId,IntgSpecId,void> IntegratorPhysEdge;
          typedef TransformEdge<IntgSpecId,void,void> IntegratorSpecEdge;
@@ -50,7 +50,7 @@ namespace GeoMHDiSCC {
          typedef TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id ProjPhysId;
 
          typedef TransformEdge<ProjSpecId,ProjPhysId,void> ProjectorSpecEdge;
-         typedef TransformEdge<ProjPhysId,void,,void> ProjectorPhysEdge;
+         typedef TransformEdge<ProjPhysId,void,void> ProjectorPhysEdge;
 
          typedef std::vector<ProjectorSpecEdge>::const_iterator  ProjectorSpecEdge_iterator;
          typedef std::vector<ProjectorPhysEdge>::const_iterator  ProjectorPhysEdge_iterator;

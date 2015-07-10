@@ -25,27 +25,12 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    IntegratorTree3D::IntegratorTree3D(const PhysicalNames::Id name, const FieldComponents::Physical::Id comp)
-      :mName(name), mComp(comp)
+      :IntegratorTree2D(name, comp)
    {
    }
 
    IntegratorTree3D::~IntegratorTree3D()
    {
-   }
-
-   PhysicalNames::Id IntegratorTree3D::name() const
-   {
-      return this->mName;
-   }
-
-   FieldComponents::Physical::Id IntegratorTree3D::comp() const
-   {
-      return this->mComp;
-   }
-
-   int IntegratorTree3D::nPhysEdges() const
-   {
-      return this->mTree.size();
    }
 
    int IntegratorTree3D::nPartEdges() const
@@ -58,18 +43,6 @@ namespace Transform {
       }
 
       return n;
-   }
-
-   IntegratorPhysEdge_range IntegratorTree3D::edgeRange() const
-   {
-      return std::make_pair(this->mTree.begin(), this->mTree.end());
-   }
-
-   IntegratorPhysEdge& IntegratorTree3D::addEdge(const IntgPhysId op, const int n)
-   {
-      this->mTree.push_back(IntegratorPhysEdge(op, n));
-
-      return this->mTree.back();
    }
 
 }

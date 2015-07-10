@@ -120,10 +120,10 @@ namespace Parallel {
          typedef typename TTypes<Dimensions::Transform::TRA1D>::BwdType Bwd1DType;
 
          /// Typedef for the forward data type in 2D
-         typedef typename TTypes<Dimensions::Transform::TRA2D>::FwdType Fwd2DType;
+         typedef typename TTypes<Dimensions::Transform::TRAND>::FwdType FwdNDType;
 
          /// Typedef for the backward data type in 2D
-         typedef typename TTypes<Dimensions::Transform::TRA2D>::BwdType Bwd2DType;
+         typedef typename TTypes<Dimensions::Transform::TRAND>::BwdType BwdNDType;
 
          /**
          * @brief Constructor
@@ -216,10 +216,10 @@ namespace Parallel {
          typedef typename TTypes<Dimensions::Transform::TRA2D>::BwdType Bwd2DType;
 
          /// Typedef for the forward data type in 3D
-         typedef typename TTypes<Dimensions::Transform::TRA3D>::FwdType Fwd3DType;
+         typedef typename TTypes<Dimensions::Transform::TRAND>::FwdType FwdNDType;
 
          /// Typedef for the backward data type in 3D
-         typedef typename TTypes<Dimensions::Transform::TRA3D>::BwdType Bwd3DType;
+         typedef typename TTypes<Dimensions::Transform::TRAND>::BwdType BwdNDType;
 
          /**
          * @brief Constructor

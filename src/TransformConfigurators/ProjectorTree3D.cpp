@@ -25,27 +25,12 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    ProjectorTree3D::ProjectorTree3D(const PhysicalNames::Id name, const FieldComponents::Spectral::Id comp)
-      :mName(name), mComp(comp)
+      :ProjectorTree2D(name, comp)
    {
    }
 
    ProjectorTree3D::~ProjectorTree3D()
    {
-   }
-
-   PhysicalNames::Id ProjectorTree3D::name() const
-   {
-      return this->mName;
-   }
-
-   FieldComponents::Spectral::Id ProjectorTree3D::comp() const
-   {
-      return this->mComp;
-   }
-
-   int ProjectorTree3D::nSpecEdges() const
-   {
-      return this->mTree.size();
    }
 
    int ProjectorTree3D::nPartEdges() const
@@ -58,18 +43,6 @@ namespace Transform {
       }
 
       return n;
-   }
-
-   ProjectorSpecEdge_range ProjectorTree3D::edgeRange() const
-   {
-      return std::make_pair(this->mTree.begin(), this->mTree.end());
-   }
-
-   ProjectorSpecEdge& ProjectorTree3D::addEdge(const ProjSpecId op, const int n)
-   {
-      this->mTree.push_back(ProjectorSpecEdge(op, n));
-
-      return this->mTree.back();
    }
 
 }

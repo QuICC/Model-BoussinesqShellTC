@@ -21,7 +21,7 @@
 //
 #include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/BackwardConfigurator.hpp"
+#include "TransformConfigurators/BackwardConfigurator3D.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -30,7 +30,7 @@ namespace Transform {
    /**
     * @brief This class defines the backward transform second exchange single splitting operations
     */
-   class BackwardSingle2DConfigurator: public BackwardConfigurator
+   class BackwardSingle2DConfigurator: public BackwardConfigurator3D
    {
       public:
          /**
@@ -116,14 +116,14 @@ namespace Transform {
       ProjectorPartEdge_range range2D;
 
       // Prepare required spectral data
-      BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
+      BackwardConfigurator3D::prepareSpectral(tree, rVariable, coord);
 
       // Loop over first transform
       int hold1D = std::distance(range1D.first, range1D.second) - 1;
       for(it1D = range1D.first; it1D != range1D.second; ++it1D, --hold1D)
       {
          // Compute first transform
-         BackwardConfigurator::project1D(*it1D, coord, hold1D);
+         BackwardConfigurator3D::project1D(*it1D, coord, hold1D);
 
          range2D = it1D->edgeRange();
          int recover2D = 0;
@@ -131,7 +131,7 @@ namespace Transform {
          for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
          {
             // Compute second transform
-            BackwardConfigurator::project2D(*it2D, coord, recover2D, hold2D);
+            BackwardConfigurator3D::project2D(*it2D, coord, recover2D, hold2D);
          }
       }
    }
@@ -164,10 +164,10 @@ namespace Transform {
             for(it3D = range3D.first; it3D != range3D.second; ++it3D, ++recover3D, --hold3D)
             {
                // Prepare physical output data
-               BackwardConfigurator::preparePhysical(tree, *it3D, rVariable, coord);
+               BackwardConfigurator3D::preparePhysical(tree, *it3D, rVariable, coord);
 
                // Compute third transform
-               BackwardConfigurator::project3D(*it3D, coord, recover3D, hold3D);
+               BackwardConfigurator3D::projectND(*it3D, coord, recover3D, hold3D);
             }
          }
       }

@@ -1,11 +1,11 @@
 /** 
- * @file ForwardConfigurator.hpp
- * @brief This class defines the base operations for a forward transform
+ * @file ForwardConfigurator2D.hpp
+ * @brief This class defines the base operations for a forward transform in 2D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef FORWARDCONFIGURATOR_HPP
-#define FORWARDCONFIGURATOR_HPP
+#ifndef FORWARDCONFIGURATOR2D_HPP
+#define FORWARDCONFIGURATOR2D_HPP
 
 // Configuration includes
 // 
@@ -31,9 +31,9 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief This class defines the base operations for a forward transform
+    * @brief This class defines the base operations for a forward transform in 2D space
     */
-   class ForwardConfigurator
+   class ForwardConfigurator2D
    {
       public:
 
@@ -54,18 +54,11 @@ namespace Transform {
          static void integrate1D(const IntegratorSpecEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
-          * @brief Compute the integration transform of the second dimension
+          * @brief Compute the integration transform of the last dimension
           *
           * @param coord   Transform coordinator
           */
-         static void integrate2D(const IntegratorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
-
-         /**
-          * @brief Compute the integration transform of the third dimension
-          *
-          * @param coord   Transform coordinator
-          */
-         static void integrate3D(const IntegratorPhysEdge& edge, TransformCoordinatorType& coord, const bool hold);
+         static void integrateND(const IntegratorPhysEdge& edge, TransformCoordinatorType& coord, const bool hold);
 
          /**
           * @brief Update variable values from dealiased data
@@ -78,17 +71,17 @@ namespace Transform {
          /**
           * @brief Empty constructor
           */
-         ForwardConfigurator() {};
+         ForwardConfigurator2D() {};
 
          /**
           * @brief Empty destructor
           */
-         virtual ~ForwardConfigurator() {};
+         virtual ~ForwardConfigurator2D() {};
 
       private: 
    };
 
-   template <typename TSharedEquation> void ForwardConfigurator::updateEquation(const IntegratorSpecEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
+   template <typename TSharedEquation> void ForwardConfigurator2D::updateEquation(const IntegratorSpecEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
@@ -117,4 +110,4 @@ namespace Transform {
 }
 }
 
-#endif // FORWARDCONFIGURATOR_HPP
+#endif // FORWARDCONFIGURATOR2D_HPP

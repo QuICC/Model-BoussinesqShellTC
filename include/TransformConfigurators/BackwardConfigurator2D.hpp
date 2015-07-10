@@ -1,11 +1,11 @@
 /** 
- * @file BackwardConfigurator.hpp
- * @brief This class defines the base operations for a backward transform
+ * @file BackwardConfigurator2D.hpp
+ * @brief This class defines the base operations for a backward transform in 2D space
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BACKWARDCONFIGURATOR_HPP
-#define BACKWARDCONFIGURATOR_HPP
+#ifndef BACKWARDCONFIGURATOR2D_HPP
+#define BACKWARDCONFIGURATOR2D_HPP
 
 // Configuration includes
 // 
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief This class defines the base operations for a backward transform
+    * @brief This class defines the base operations for a backward transform in 2D space
     */
-   class BackwardConfigurator
+   class BackwardConfigurator2D
    {
       public:
 
@@ -78,16 +78,6 @@ namespace Transform {
          static void project1D(const ProjectorSpecEdge& edge, TransformCoordinatorType& coord, const bool hold);
 
          /**
-          * @brief Compute the projection transform of the second dimension
-          *
-          * @param edge    Transform tree edge
-          * @param coord   Transform coordinator
-          * @param recover Recover input data?
-          * @param hold    Hold input data?
-          */
-         static void project2D(const ProjectorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
-
-         /**
           * @brief Compute the projection transform of the third dimension
           *
           * @param edge    Transform tree edge
@@ -95,17 +85,17 @@ namespace Transform {
           * @param recover Recover input data?
           * @param hold    Hold input data?
           */
-         static void project3D(const ProjectorPhysEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void projectND(const ProjectorPhysEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Empty constructor
           */
-         BackwardConfigurator();
+         BackwardConfigurator2D();
 
          /**
           * @brief Empty destructor
           */
-         virtual ~BackwardConfigurator();
+         virtual ~BackwardConfigurator2D();
 
       private: 
    };
@@ -113,4 +103,4 @@ namespace Transform {
 }
 }
 
-#endif // BACKWARDCONFIGURATOR_HPP
+#endif // BACKWARDCONFIGURATOR2D_HPP

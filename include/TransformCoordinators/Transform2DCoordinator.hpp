@@ -92,6 +92,11 @@ namespace GeoMHDiSCC {
           * @brief Get grid array(s) of the mesh
           */
          std::vector<Array>  mesh();
+
+         /**
+          * @brief Get the transform for the last dimension
+          */
+         T2D&   transformND();
          
       protected:
 
@@ -110,6 +115,11 @@ namespace GeoMHDiSCC {
    };
 
    template <typename T1D, typename T2D, typename TCommunicator> inline T2D&  Transform2DCoordinator<T1D, T2D, TCommunicator>::transform2D()
+   {
+      return this->mTransform2D;
+   }
+
+   template <typename T1D, typename T2D, typename TCommunicator> inline T2D&  Transform2DCoordinator<T1D, T2D, TCommunicator>::transformND()
    {
       return this->mTransform2D;
    }

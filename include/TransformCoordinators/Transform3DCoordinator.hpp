@@ -87,9 +87,14 @@ namespace GeoMHDiSCC {
          void setOptions(const std::map<NonDimensional::Id, MHDFloat>& options);
 
          /**
-          * @brief Get the transform for the first dimension
+          * @brief Get the transform for the third dimension
           */
          T3D&   transform3D();
+
+         /**
+          * @brief Get the transform for the last dimension
+          */
+         T3D&   transformND();
 
          /**
           * @brief Get grid array(s) of the mesh
@@ -113,6 +118,11 @@ namespace GeoMHDiSCC {
    };
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> inline T3D&  Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::transform3D()
+   {
+      return this->mTransform3D;
+   }
+
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> inline T3D&  Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::transformND()
    {
       return this->mTransform3D;
    }

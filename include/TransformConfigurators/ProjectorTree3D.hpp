@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "TypeSelectors/TransformLeafSelector.hpp"
+#include "TransformConfigurators/ProjectorTree2D.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -27,7 +28,7 @@ namespace Transform {
    /**
     * @brief This template describes the complete projection tree for 3D space
     */
-   class ProjectorTree3D
+   class ProjectorTree3D: public ProjectorTree2D
    {  
       public:
          /**
@@ -41,50 +42,11 @@ namespace Transform {
          ~ProjectorTree3D();
 
          /**
-          * @brief Get physical name
-          */
-         PhysicalNames::Id name() const;
-
-         /**
-          * @brief Get spectral field component
-          */
-         FieldComponents::Spectral::Id comp() const;
-
-         /**
-          * @brief number of spectral space edges
-          */
-         int nSpecEdges() const;
-
-         /**
           * @brief number of partially transformed edges
           */
          int nPartEdges() const;
 
-         /**
-          * @brief Get vector range for spectral edges
-          */
-         ProjectorSpecEdge_range edgeRange() const;
-
-         /**
-          * @brief Add a spectral edge to tree
-          */
-         ProjectorSpecEdge& addEdge(const ProjSpecId op, const int n);
-
       private:
-         /**
-          * @brief Physical field name
-          */
-         PhysicalNames::Id mName;
-
-         /**
-          * @brief Spectral field component
-          */
-         FieldComponents::Spectral::Id mComp;
-
-         /**
-          * @brief Projector edges of the tree
-          */
-         std::vector<ProjectorSpecEdge> mTree;
    };
 
 }

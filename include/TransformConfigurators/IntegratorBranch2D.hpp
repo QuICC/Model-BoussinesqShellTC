@@ -16,7 +16,7 @@
 // External includes
 //
 
-// Intgect includes
+// Project includes
 //
 #include "TypeSelectors/TransformLeafSelector.hpp"
 #include "Enums/Arithmetics.hpp"
@@ -47,12 +47,12 @@ namespace Transform {
          ~IntegratorBranch2D();
 
          /**
-          * @brief Get 1D transform operator ID
+          * @brief Get spectral transform operator ID
           */
          IntgSpecId intgSpecId() const;
 
          /**
-          * @brief Get 3D transform operator ID
+          * @brief Get physical transform operator ID
           */
          IntgPhysId intgPhysId() const;
 
@@ -86,6 +86,7 @@ namespace Transform {
           * @brief Intgection operation in third dimension
           */
          IntgPhysId  mIntgPhys;
+
          /**
           * @brief Spectral component required for transform branch
           */

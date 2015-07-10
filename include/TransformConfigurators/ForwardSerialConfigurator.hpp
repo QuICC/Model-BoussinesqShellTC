@@ -20,7 +20,7 @@
 //
 #include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/ForwardConfigurator.hpp"
+#include "TransformConfigurators/ForwardConfigurator3D.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -29,7 +29,7 @@ namespace Transform {
    /**
     * @brief This class defines the forward transform serial operations
     */
-   class ForwardSerialConfigurator: public ForwardConfigurator
+   class ForwardSerialConfigurator: public ForwardConfigurator3D
    {
       public:
          /**
@@ -125,7 +125,7 @@ namespace Transform {
       IntegratorPhysEdge_range range3D = tree.edgeRange();
 
       // Compute the nonlinear interaction
-      ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);
+      ForwardConfigurator3D::nonlinearTerm(tree, spEquation, coord);
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -135,7 +135,7 @@ namespace Transform {
       for(it3D = range3D.first; it3D != range3D.second; ++it3D, --hold3D)
       {
          // Compute third transform
-         ForwardConfigurator::integrate3D(*it3D, coord, hold3D);
+         ForwardConfigurator3D::integrateND(*it3D, coord, hold3D);
 
          range2D = it3D->edgeRange();
          int recover2D = 0;
@@ -143,7 +143,7 @@ namespace Transform {
          for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
          {
             // Compute second transform
-            ForwardConfigurator::integrate2D(*it2D, coord, recover2D, hold2D);
+            ForwardConfigurator3D::integrate2D(*it2D, coord, recover2D, hold2D);
 
             range1D = it2D->edgeRange();
             int recover1D = 0;
@@ -151,10 +151,10 @@ namespace Transform {
             for(it1D = range1D.first; it1D != range1D.second; ++it1D, ++recover1D, --hold1D)
             {
                // Compute third transform
-               ForwardConfigurator::integrate1D(*it1D, coord, recover1D, hold1D);
+               ForwardConfigurator3D::integrate1D(*it1D, coord, recover1D, hold1D);
 
                // Update equation
-               ForwardConfigurator::updateEquation(*it1D, spEquation, coord, hold1D);
+               ForwardConfigurator3D::updateEquation(*it1D, spEquation, coord, hold1D);
             }
          }
       }
