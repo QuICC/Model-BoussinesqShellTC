@@ -74,28 +74,24 @@ namespace GeoMHDiSCC {
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         //spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL1);
          spExact->setModeOptions(1e0, 3.0, 1e0, 3.0, 1e0, 3.0);
 
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL2);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(1e0, 7.0, 1e0, 5.0, 1e0, 4.0);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL3);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(1e0, 5.0, 1e0, 4.0, 1e0, 7.0);
 
          // Add vertical vorticity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VORTICITYZ);
-         //spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setStateType(Equations::CartesianExactStateIds::SPECIAL1);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Generate random spectrum

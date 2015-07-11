@@ -63,6 +63,11 @@ namespace Equations {
          /**
           * @brief Set spectrum variables
           */
+         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D);
+
+         /**
+          * @brief Set spectrum variables
+          */
          void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D);
 
       protected:

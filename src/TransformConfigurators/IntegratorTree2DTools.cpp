@@ -79,6 +79,7 @@ namespace Transform {
 
                // Extract unique spectral Operators
                std::map<IntgSpecId, int> opSpec;
+               std::map<IntgSpecId, std::tr1::tuple<FieldComponents::Spectral::Id,FieldType::Id,Arithmetics::Id> > op1DSpec;
                std::pair<std::map<IntgSpecId,int>::iterator,bool> opSpecPairIt;
                for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                {
@@ -86,6 +87,7 @@ namespace Transform {
                   {
                      opSpecPairIt = opSpec.insert(std::make_pair(branchIt->intgSpecId(), 0));
                      opSpecPairIt.first->second += 1;
+                     op1DSpec.insert(std::make_pair(branchIt->intgSpecId(), std::tr1::make_tuple(branchIt->specId(), branchIt->fieldId(), branchIt->arithId())));
                   }
                }
 
@@ -94,6 +96,8 @@ namespace Transform {
                for(opSpecIt = opSpec.begin(); opSpecIt != opSpec.end(); ++opSpecIt)
                {
                   IntegratorSpecEdge &rEdgeSpec = rEdgePhys.addEdge(opSpecIt->first, opSpecIt->second);
+
+                  rEdgeSpec.setSpectral(std::tr1::get<0>(op1DSpec.find(opSpecIt->first)->second), std::tr1::get<1>(op1DSpec.find(opSpecIt->first)->second), std::tr1::get<2>(op1DSpec.find(opSpecIt->first)->second));
                   DebuggerMacro_showValue("Edge operator: ", 4, opSpecIt->first);
                   DebuggerMacro_showValue("Edge weight: ", 4, opSpecIt->second);
                   DebuggerMacro_showValue("Spectral component: ", 4, rEdgeSpec.specId());

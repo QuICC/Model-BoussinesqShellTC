@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBCSquareVCTransport.cpp
- * @brief Source of the implementation of the transport equation in Rayleigh-Benard convection in a square cavity (2D)
+ * @file BoussinesqRBCPlane2DVCTransport.cpp
+ * @brief Source of the implementation of the transport equation in Rayleigh-Benard convection in a plane layer (2D)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCPlane2DVCTransport.hpp"
 
 // Project includes
 //
@@ -28,23 +28,23 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqRBCSquareVCTransport::BoussinesqRBCSquareVCTransport(SharedEquationParameters spEqParams)
+   BoussinesqRBCPlane2DVCTransport::BoussinesqRBCPlane2DVCTransport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRBCSquareVCTransport::~BoussinesqRBCSquareVCTransport()
+   BoussinesqRBCPlane2DVCTransport::~BoussinesqRBCPlane2DVCTransport()
    {
    }
 
-   void BoussinesqRBCSquareVCTransport::setCoupling()
+   void BoussinesqRBCPlane2DVCTransport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqRBCSquareVCTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRBCPlane2DVCTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -56,7 +56,7 @@ namespace Equations {
       Physical::VelocityHeatAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqRBCSquareVCTransport::setRequirements()
+   void BoussinesqRBCPlane2DVCTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);

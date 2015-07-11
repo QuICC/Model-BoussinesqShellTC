@@ -1,5 +1,6 @@
 set(MHDPhysicalModels 
    # 2D models
+   BoussinesqRBCPlane2DVCModel.hpp
    BoussinesqRBCSquareVCModel.hpp
    # 3D models
    BoussinesqBeta3DQGModel.hpp

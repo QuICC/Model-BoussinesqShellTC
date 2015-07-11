@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBCSquareVCModel.cpp
- * @brief Source of the Boussinesq Rayleigh-Benard convection in a square (2D) (velocity-continuity formulation) model
+ * @file BoussinesqRBCPlane2DVCModel.cpp
+ * @brief Source of the Boussinesq Rayleigh-Benard convection in a plane layer (2D) (velocity-continuity formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,14 +15,14 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRBCSquareVCModel.hpp"
+#include "PhysicalModels/BoussinesqRBCPlane2DVCModel.hpp"
 
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCTransport.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCMomentum.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCContinuity.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCPlane2DVCTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCPlane2DVCMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCPlane2DVCContinuity.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/ContinuityWriter.hpp"
@@ -38,23 +38,23 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqRBCSquareVCModel::PYMODULE = "boussinesq_rbcsquare_vc";
+   const std::string BoussinesqRBCPlane2DVCModel::PYMODULE = "boussinesq_rbcplane2d_vc";
 
-   const std::string BoussinesqRBCSquareVCModel::PYCLASS = "BoussinesqRBCSquareVC";
+   const std::string BoussinesqRBCPlane2DVCModel::PYCLASS = "BoussinesqRBCPlane2DVC";
 
-   void BoussinesqRBCSquareVCModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRBCPlane2DVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqRBCSquareVCTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCPlane2DVCTransport>();
       
       // Add Navier-Stokes equation (X,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqRBCSquareVCMomentum>();
+      spSim->addVectorEquation<Equations::BoussinesqRBCPlane2DVCMomentum>();
 
       // Add continuity equation
-      spSim->addScalarEquation<Equations::BoussinesqRBCSquareVCContinuity>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCPlane2DVCContinuity>();
    }
 
-   void BoussinesqRBCSquareVCModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRBCPlane2DVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
@@ -66,15 +66,15 @@ namespace GeoMHDiSCC {
          // Add exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYPOLY);
+         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYSIN);
          spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 2.0, 1.0e0, 5.0);
-         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYPOLY);
+         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYCOS);
          spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 3.0, 1.0e0, 4.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CartesianExactStateIds::POLYPOLY);
+         spScalar->setStateType(Equations::CartesianExactStateIds::POLYCOS);
          spScalar->setModeOptions(-1e2, 2.0, 3e0, 10.0);
 
       // Generate random spectrum
@@ -103,7 +103,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBCSquareVCModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCPlane2DVCModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -132,7 +132,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBCSquareVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCPlane2DVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -146,7 +146,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRBCSquareVCModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCPlane2DVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
       IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
@@ -155,7 +155,7 @@ namespace GeoMHDiSCC {
       spSim->addAsciiOutputFile(spState);
    }
 
-   void BoussinesqRBCSquareVCModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCPlane2DVCModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -171,7 +171,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRBCSquareVCModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRBCPlane2DVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;

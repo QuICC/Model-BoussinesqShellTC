@@ -197,7 +197,7 @@ namespace GeoMHDiSCC {
             /// First vector component
             ONE = X,
             /// Second vector component
-            TWO = Z,
+            TWO = Y,
             /// Third vector component
             THREE = NOTUSED,
 
@@ -306,13 +306,13 @@ namespace GeoMHDiSCC {
                /// First vector component
                ONE = X,
                /// Second vector component
-               TWO = Z,
+               TWO = Y,
                /// Third vector component
                THREE = NOTUSED,
 
             #elif defined GEOMHDISCC_SPATIALSCHEME_TF
                /// First vector component
-               ONE = Z,
+               ONE = Y,
                /// Second vector component
                TWO = X,
                /// Third vector component

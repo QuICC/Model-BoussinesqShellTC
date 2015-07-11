@@ -385,10 +385,10 @@ namespace Parallel {
             for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(); j++)
             {
                // Loop over backward dimension
-               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATB1D>(j); k++)
+               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATB1D>(); k++)
                {
                   // Generate point information
-                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT2D>(j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DATB1D>(k,j));
+                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT2D>(j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DATB1D>(k));
 
                   // Get insertion position to use as next starting point to speed up insertion
                   mapPos = bwdMap.insert(mapPos, std::make_pair(point, cpu));
@@ -404,10 +404,10 @@ namespace Parallel {
             for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); j++)
             {
                // Loop over forward dimension
-               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>(j); k++)
+               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>(); k++)
                {
                   // Generate point information
-                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(k,j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j));
+                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(k), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j));
 
                   // Look for same key in backward list
                   mapPos = bwdMap.find(point);

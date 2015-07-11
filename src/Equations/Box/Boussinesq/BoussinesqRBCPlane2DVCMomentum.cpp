@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBCSquareVCMomentum.cpp
- * @brief Source of the implementation of the vector momentum equation in Rayleigh-Benard convection in a square cavity (2D)
+ * @file BoussinesqRBCPlane2DVCMomentum.cpp
+ * @brief Source of the implementation of the vector momentum equation in Rayleigh-Benard convection in a plane layer (2D)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCPlane2DVCMomentum.hpp"
 
 // Project includes
 //
@@ -28,32 +28,32 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqRBCSquareVCMomentum::BoussinesqRBCSquareVCMomentum(SharedEquationParameters spEqParams)
+   BoussinesqRBCPlane2DVCMomentum::BoussinesqRBCPlane2DVCMomentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRBCSquareVCMomentum::~BoussinesqRBCSquareVCMomentum()
+   BoussinesqRBCPlane2DVCMomentum::~BoussinesqRBCPlane2DVCMomentum()
    {
    }
 
-   void BoussinesqRBCSquareVCMomentum::setCoupling()
+   void BoussinesqRBCPlane2DVCMomentum::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::X, CouplingInformation::PROGNOSTIC, 0, true, false);
 
       this->defineCoupling(FieldComponents::Spectral::Y, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqRBCSquareVCMomentum::setNLComponents()
+   void BoussinesqRBCPlane2DVCMomentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::X, 0);
 
       this->addNLComponent(FieldComponents::Spectral::Y, 0);
    }
 
-   void BoussinesqRBCSquareVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRBCPlane2DVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Get Prandtl number
       MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
@@ -74,7 +74,7 @@ namespace Equations {
       Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).phys(), this->unknown().dom(0).grad(specId), 1.0/Pr);
    }
 
-   void BoussinesqRBCSquareVCMomentum::setRequirements()
+   void BoussinesqRBCPlane2DVCMomentum::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::VELOCITY);

@@ -51,6 +51,22 @@ namespace Equations {
       this->setRequirements();
    }
 
+   void RandomVectorState::setSpectrum(const FieldComponents::Spectral::Id compId, const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D)
+   {
+      if(max <= min || ratio1D < 1 || ratio2D < 1)
+      {
+         throw Exception("Incompatible spectrum properties requested!");
+      }
+
+      // Set min and max range for values
+      this->mMin.insert(std::make_pair(compId, min));
+      this->mMax.insert(std::make_pair(compId, max));
+
+      // Set spectrum ratios
+      this->mRatio1D.insert(std::make_pair(compId, ratio1D));
+      this->mRatio2D.insert(std::make_pair(compId, ratio2D));
+   }
+
    void RandomVectorState::setSpectrum(const FieldComponents::Spectral::Id compId, const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D)
    {
       if(max <= min || ratio1D < 1 || ratio2D < 1 || ratio3D < 1)

@@ -51,6 +51,22 @@ namespace Equations {
       this->setRequirements();
    }
 
+   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D)
+   {
+      if(max <= min || ratio1D < 1 || ratio2D < 1)
+      {
+         throw Exception("Incompatible spectrum properties requested!");
+      }
+
+      // Set min and max range for values
+      this->mMin = min;
+      this->mMax = max;
+
+      // Set spectrum ratios
+      this->mRatio1D = ratio1D;
+      this->mRatio2D = ratio2D;
+   }
+
    void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D)
    {
       if(max <= min || ratio1D < 1 || ratio2D < 1 || ratio3D < 1)

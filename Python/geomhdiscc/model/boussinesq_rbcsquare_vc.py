@@ -18,12 +18,12 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
     def periodicity(self):
         """Get the domain periodicity"""
 
-        return [False, False, False]
+        return [False, False]
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "heating", "scale1d", "scale3d"]
+        return ["prandtl", "rayleigh", "heating", "scale1d", "scale2d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -33,15 +33,14 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
-        #fields =  [("velocity","x"), ("velocity","z"), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","y"), ("temperature",""), ("pressure","")]
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields =  [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","y"), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -51,13 +50,13 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
             if field_row == ("temperature",""):
-                fields = [("velocity","z")]
+                fields = [("velocity","y")]
             else:
                 fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("velocity","x"), ("velocity","z"), ("temperature","")]:
+            if field_row in [("velocity","x"), ("velocity","y"), ("temperature","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -71,16 +70,16 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
     def block_size(self, res, field_row):
         """Create block size information"""
 
-        tau_n = res[0]*res[2]
+        tau_n = res[0]*res[1]
         if self.use_galerkin:
-            if field_row in [("velocity","x"), ("velocity","z"), ("temperature",""), ("pressure","")]:
+            if field_row in [("velocity","x"), ("velocity","y"), ("temperature",""), ("pressure","")]:
                 shift_x = 2
                 shift_z = 2
             else:
                 shift_x = 0
                 shift_z = 0
 
-            gal_n = (res[0] - shift_x)*(res[2] - shift_z)
+            gal_n = (res[0] - shift_x)*(res[1] - shift_z)
 
         else:
             gal_n = tau_n
@@ -118,7 +117,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
-                    elif field_col == ("velocity","z"):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
@@ -126,7 +125,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 else:
                     if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
-                    elif field_row == ("velocity","z") and field_col == field_row:
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
@@ -136,7 +135,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
-                    elif field_col == ("velocity","z"):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
@@ -144,7 +143,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 else:
                     if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
-                    elif field_row == ("velocity","z") and field_col == field_row:
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
@@ -154,13 +153,13 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-21, 'rt':0}}
-                    elif field_col == ("velocity","z"):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
                     if field_row == ("velocity","x") and field_col == field_row:
                         bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
-                    elif field_row == ("velocity","z") and field_col == field_row:
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
 
             # Set LHS galerkin restriction
@@ -168,7 +167,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 if field_row == ("velocity","x"):
                     bc['x']['rt'] = 2
                     bc['z']['rt'] = 2
-                elif field_row == ("velocity","z"):
+                elif field_row == ("velocity","y"):
                     bc['x']['rt'] = 2
                     bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
@@ -182,7 +181,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 if bcId == 0:
                     if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
-                    elif field_col == ("velocity","z"):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
@@ -190,7 +189,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 elif bcId == 1:
                     if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-21, 'rt':0}}
-                    elif field_col == ("velocity","z"):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-21, 'rt':0}}
@@ -198,7 +197,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 elif bcId == 2:
                     if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:-21, 'rt':0}}
-                    elif field_col == ("velocity","z"):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
         # Field values to RHS:
@@ -208,7 +207,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 if field_row == ("velocity","x"):
                     bc['x']['rt'] = 2
                     bc['z']['rt'] = 2
-                elif field_row == ("velocity","z"):
+                elif field_row == ("velocity","y"):
                     bc['x']['rt'] = 2
                     bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
@@ -224,10 +223,10 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("temperature","") and field_col == ("velocity","z"):
+        if field_row == ("temperature","") and field_col == ("velocity","y"):
             if eq_params['heating'] == 0:
                 mat = geo.i2j2(res[0], res[1], bc, -1.0)
-                mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+                mat = mat*utils.qid_from_idx(idx_w, res[0]*res[1])
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -242,15 +241,15 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[2], bc)
-            mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
+            mat = geo.i2j2(res[0], res[1], bc)
+            mat = utils.qid_from_idx(idx_u, res[0]*res[1])*mat
 
-        elif field_row == ("velocity","z") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[2], bc)
-            mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
+        elif field_row == ("velocity","y") and field_col == field_row:
+            mat = geo.i2j2(res[0], res[1], bc)
+            mat = utils.qid_from_idx(idx_w, res[0]*res[1])*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[2], bc)
+            mat = geo.i2j2(res[0], res[1], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -263,7 +262,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         Ra = eq_params['rayleigh']
 
         xscale = eq_params['scale1d']
-        zscale = eq_params['scale3d']
+        zscale = eq_params['scale2d']
 
         idx_u, idx_w, idx_t, idx_p, idx_pp = self.zero_blocks(res, eigs)
 
@@ -271,59 +270,59 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
-                mat = geo.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale)
-                mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale)
+                mat = utils.qid_from_idx(idx_u, res[0]*res[1])*mat*utils.qid_from_idx(idx_u, res[0]*res[1])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
+                    mat = mat + utils.id_from_idx_2d(idx_u, res[1], res[0])
 
-            elif field_col == ("velocity","z"):
-                mat = geo.zblk(res[0], res[2], 2, 2, bc)
+            elif field_col == ("velocity","y"):
+                mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2j2d1(res[0], res[2], bc, -1.0, xscale = xscale)
-                mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
+                mat = geo.i2j2d1(res[0], res[1], bc, -1.0, xscale = xscale)
+                mat = utils.qid_from_idx(idx_u, res[0]*res[1])*mat*utils.qid_from_idx(idx_p, res[0]*res[1])
 
-        elif field_row == ("velocity","z"):
+        elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
-                mat = geo.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
-            elif field_col == ("velocity","z"):
-                mat = geo.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+            elif field_col == ("velocity","y"):
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale)
+                mat = utils.qid_from_idx(idx_w, res[0]*res[1])*mat*utils.qid_from_idx(idx_w, res[0]*res[1])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_2d(idx_w, res[2], res[0])
+                    mat = mat + utils.id_from_idx_2d(idx_w, res[1], res[0])
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2(res[0], res[2], bc, Ra)
-                mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_t, res[0]*res[2])
+                mat = geo.i2j2(res[0], res[1], bc, Ra)
+                mat = utils.qid_from_idx(idx_w, res[0]*res[1])*mat*utils.qid_from_idx(idx_t, res[0]*res[1])
 
             elif field_col == ("pressure",""):
-                mat = geo.i2j2e1(res[0], res[2], bc, -1.0, zscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
+                mat = geo.i2j2e1(res[0], res[1], bc, -1.0, zscale = zscale)
+                mat = utils.qid_from_idx(idx_w, res[0]*res[1])*mat*utils.qid_from_idx(idx_p, res[0]*res[1])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","x"):
-                mat = geo.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
-            elif field_col == ("velocity","z"):
+            elif field_col == ("velocity","y"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params['heating'] == 0:
-                        mat = geo.i2j2(res[0], res[2], bc)
-                        mat = utils.qid_from_idx(idx_t, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+                        mat = geo.i2j2(res[0], res[1], bc)
+                        mat = utils.qid_from_idx(idx_t, res[0]*res[1])*mat*utils.qid_from_idx(idx_w, res[0]*res[1])
                 else:
-                    mat = geo.zblk(res[0], res[2], 2, 2, bc)
+                    mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale)
-                mat = utils.qid_from_idx(idx_t, res[0]*res[2])*mat*utils.qid_from_idx(idx_t, res[0]*res[2])
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale)
+                mat = utils.qid_from_idx(idx_t, res[0]*res[1])*mat*utils.qid_from_idx(idx_t, res[0]*res[1])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx_2d(idx_t, res[2], res[0])
+                    mat = mat + utils.id_from_idx_2d(idx_t, res[1], res[0])
 
             elif field_col == ("pressure",""):
-                mat = geo.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
         elif field_row == ("pressure",""):
             if bcs["bcType"] == self.SOLVER_HAS_BC:
@@ -333,25 +332,25 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                     bc['x']['rt'] = s
                     bc['z']['cr'] = s
                     bc['z']['rt'] = s
-                    mat = geo.i1j1d1(res[0]+s, res[2]+s, bc, xscale = xscale)
-                    mat = utils.qid_from_idx(idx_pp, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
+                    mat = geo.i1j1d1(res[0]+s, res[1]+s, bc, xscale = xscale)
+                    mat = utils.qid_from_idx(idx_pp, res[0]*res[1])*mat*utils.qid_from_idx(idx_u, res[0]*res[1])
 
-                elif field_col == ("velocity","z"):
+                elif field_col == ("velocity","y"):
                     s = 1
                     bc['x']['cr'] = s
                     bc['x']['rt'] = s
                     bc['z']['cr'] = s
                     bc['z']['rt'] = s
-                    mat = geo.i1j1e1(res[0]+s, res[2]+s, bc, zscale = zscale)
-                    mat = utils.qid_from_idx(idx_pp, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+                    mat = geo.i1j1e1(res[0]+s, res[1]+s, bc, zscale = zscale)
+                    mat = utils.qid_from_idx(idx_pp, res[0]*res[1])*mat*utils.qid_from_idx(idx_w, res[0]*res[1])
 
                 elif field_col == ("temperature",""):
-                    mat = geo.zblk(res[0], res[2], 1, 1, bc)
+                    mat = geo.zblk(res[0], res[1], 1, 1, bc)
 
                 elif field_col == ("pressure",""):
-                    mat = geo.zblk(res[0], res[2], 1, 1, bc)
-                    tmp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2))
-                    tmp = utils.id_from_idx_2d(tmp, res[2], res[0])
+                    mat = geo.zblk(res[0], res[1], 1, 1, bc)
+                    tmp = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[0], res[0]-2))
+                    tmp = utils.id_from_idx_2d(tmp, res[1], res[0])
                     mat = mat + tmp
                     tmp = spsp.lil_matrix(mat.shape)
                     tmp[res[0]-1, 1] = 1
@@ -360,7 +359,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                     tmp[2*res[0]-1, res[0]+1] = 1
                     mat = mat + tmp
             else:
-                mat = geo.zblk(res[0], res[2], 1, 1, no_bc())
+                mat = geo.zblk(res[0], res[1], 1, 1, no_bc())
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -377,22 +376,22 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","x"):
-            mat = geo.i2j2(res[0], res[2], bc, 1.0/Pr)
-            S = utils.qid_from_idx(idx_u, res[0]*res[2])
+            mat = geo.i2j2(res[0], res[1], bc, 1.0/Pr)
+            S = utils.qid_from_idx(idx_u, res[0]*res[1])
             mat = S*mat*S
 
-        elif field_row == ("velocity","z"):
-            mat = geo.i2j2(res[0], res[2], bc, 1.0/Pr)
-            S = utils.qid_from_idx(idx_w, res[0]*res[2])
+        elif field_row == ("velocity","y"):
+            mat = geo.i2j2(res[0], res[1], bc, 1.0/Pr)
+            S = utils.qid_from_idx(idx_w, res[0]*res[1])
             mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = geo.i2j2(res[0], res[2], bc)
-            S = utils.qid_from_idx(idx_t, res[0]*res[2])
+            mat = geo.i2j2(res[0], res[1], bc)
+            S = utils.qid_from_idx(idx_t, res[0]*res[1])
             mat = S*mat*S
 
         elif field_row == ("pressure",""):
-            mat = geo.zblk(res[0], res[2], 1, 1, bc)
+            mat = geo.zblk(res[0], res[1], 1, 1, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -405,60 +404,60 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         # RESTRICT FIELDS to N-1, PRESSURE is N
 
         # U: TiN
-        idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
-        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
+        idx_u = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.qidx(res[0], res[0]-1))
+        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[0], 0)))
 
         # W: TNk
-        idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
-        idx_w = np.union1d(idx_w, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
+        idx_w = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.qidx(res[0], res[0]-1))
+        idx_w = np.union1d(idx_w, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[0], 0)))
 
         # T: TNk
-        idx_t = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
-        idx_t = np.union1d(idx_t, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
+        idx_t = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.qidx(res[0], res[0]-1))
+        idx_t = np.union1d(idx_t, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[0], 0)))
 
         # P
         idx_p = np.array([])
         idx_pp = np.array([])
-#        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2)))
+#        idx_pp = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.qidx(res[0], res[0]-1))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[0], 0)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[0], res[0]-2)))
 #        idx_p = idx_pp
 
         # KEEP EVERYTHING AT N, truncate pressure N+1 modes
         idx_u = np.array([])
-#        idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
+#        idx_u = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[0], 0))
         idx_w = np.array([])
-#        idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+#        idx_w = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.qidx(res[0], res[0]-1))
         idx_t = np.array([])
         idx_p = np.array([])
         idx_pp = np.array([])
-        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-2))
-        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.sidx(res[0], res[0]-1)))
-#        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[0]-1), utils.qidx(res[0], res[0]-1)))
-        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[0]-1), utils.sidx(res[0], res[0]-1)))
+        idx_pp = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-3), utils.qidx(res[0], res[0]-2))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-2), utils.sidx(res[0], res[0]-1)))
+#        idx_pp = utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[1]-1), utils.qidx(res[0], 0))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[0]-1), utils.qidx(res[0], res[0]-1)))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[0]-1), utils.sidx(res[0], res[0]-1)))
         #idx_pp = np.array([])
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
-#        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
-#        idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-6), utils.qidx(res[0], res[0]-1))
-#        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-6)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.qidx(res[0], res[0]-1)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[0], 0)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[1]-1), utils.sidx(res[0], res[0]-1)))
+#        idx_pp = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[0], 0))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.qidx(res[0], res[0]-1)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[1]-1), utils.sidx(res[0], res[0]-1)))
+#        idx_p = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-6), utils.qidx(res[0], res[0]-1))
+#        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[0], res[0]-6)))
 
         idx_u = np.array([])
         idx_w = np.array([])
         idx_t = np.array([])
         idx_p = np.array([])
         idx_pp = np.array([])
-        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-4))
-        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-4), utils.qidx(res[0], res[0]-1)))
-#        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.sidx(res[0], res[0]-1)))
-#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2)))
+        idx_pp = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-1), utils.sidx(res[0], res[0]-4))
+        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[1]-4), utils.qidx(res[0], res[0]-1)))
+#        idx_pp = utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[1]-1), utils.qidx(res[0], 0))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], 0), utils.sidx(res[0], res[0]-1)))
+#        idx_pp = np.union1d(idx_pp, utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[0], res[0]-2)))
 
-        idx_pp = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2))
-        idx_pp = np.union1d(idx_pp,utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-2), utils.qidx(res[0], res[0]-2)))
+        idx_pp = utils.idx_kron_2d(res[1], res[0], utils.qidx(res[1], res[1]-2), utils.qidx(res[0], res[0]-2))
+        idx_pp = np.union1d(idx_pp,utils.idx_kron_2d(res[1], res[0], utils.sidx(res[1], res[1]-2), utils.qidx(res[0], res[0]-2)))
 
         return (idx_u, idx_w, idx_t, idx_p, idx_pp)
