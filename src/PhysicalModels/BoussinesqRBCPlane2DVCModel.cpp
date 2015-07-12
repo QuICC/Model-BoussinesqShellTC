@@ -57,7 +57,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCPlane2DVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -67,15 +67,15 @@ namespace GeoMHDiSCC {
          spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYSIN);
-         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 2.0, 1.0e0, 5.0);
-         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYCOS);
-         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 3.0, 1.0e0, 4.0);
+         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 2.0, 1.0e0, 6.0);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOS);
+         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 3.0, 1.0e0, 4.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
          spScalar->setStateType(Equations::CartesianExactStateIds::POLYCOS);
-         spScalar->setModeOptions(-1e2, 2.0, 3e0, 10.0);
+         spScalar->setModeOptions(1e0, 2.0, 1e0, 10.0);
 
       // Generate random spectrum
       } else
@@ -88,12 +88,12 @@ namespace GeoMHDiSCC {
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          spVector->setSpectrum(FieldComponents::Spectral::X, -1e-3, 1e-3, 1e4, 1e4);
-         spVector->setSpectrum(FieldComponents::Spectral::Y, -1e-3, 1e-3, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::Z, -1e-3, 1e-3, 1e4, 1e4);
 
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-0.001, 0.001, 1e4, 1e4);
+         spScalar->setSpectrum(-1e-3, 1e-3, 1e4, 1e4);
       }
 
       // Add output file
@@ -116,7 +116,7 @@ namespace GeoMHDiSCC {
 
       // Add velocity fields visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, false);
+      spVector->setFields(true, true, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
       // Add pressure field visualization

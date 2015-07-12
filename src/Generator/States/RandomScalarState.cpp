@@ -94,45 +94,74 @@ namespace Equations {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
 
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
       // Get first dimension
-      int n1D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      // Get second dimension
-      int n2D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
-      // Get third dimension
-      int n3D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+         int n1D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+         // Get second dimension
+         int n2D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
+         // Get third dimension
+         int n3D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
-      // Get simulation wide indexes
-      int j_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-      int k_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         // Get simulation wide indexes
+         int j_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+         int k_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
 
-      int z1D = 4;
-      int z2D = 4;
-      int z3D = 4;
-      #if defined GEOMHDISCC_SPATIALSCHEME_TFF
-      z2D = 2;
-      if(k_ >= n2D/2)
-      {
-         k_ = n2D - k_;
-      }
-      n2D = n2D/2;
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF
+         int z1D = 4;
+         int z2D = 4;
+         int z3D = 4;
+         #if defined GEOMHDISCC_SPATIALSCHEME_TFF
+         z2D = 2;
+         if(k_ >= n2D/2)
+         {
+            k_ = n2D - k_;
+         }
+         n2D = n2D/2;
+         #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF
 
-      if(i < n1D-z1D && j_ < n3D - z3D && k_ < n2D - z2D)
-      {
-         // Compute scaling factors
-         MHDFloat a1D = exp(-static_cast<MHDFloat>(i)*log(this->mRatio1D)/static_cast<MHDFloat>(n1D));
-         MHDFloat a2D = exp(-static_cast<MHDFloat>(k_)*log(this->mRatio2D)/static_cast<MHDFloat>(n2D));
-         MHDFloat a3D = exp(-static_cast<MHDFloat>(j_)*log(this->mRatio3D)/static_cast<MHDFloat>(n3D));
+         if(i < n1D-z1D && j_ < n3D - z3D && k_ < n2D - z2D)
+         {
+            // Compute scaling factors
+            MHDFloat a1D = exp(-static_cast<MHDFloat>(i)*log(this->mRatio1D)/static_cast<MHDFloat>(n1D));
+            MHDFloat a2D = exp(-static_cast<MHDFloat>(k_)*log(this->mRatio2D)/static_cast<MHDFloat>(n2D));
+            MHDFloat a3D = exp(-static_cast<MHDFloat>(j_)*log(this->mRatio3D)/static_cast<MHDFloat>(n3D));
 
-         Datatypes::SpectralScalarType::PointType val;
+            Datatypes::SpectralScalarType::PointType val;
 
-         this->makeRandom(val, i, j, k);
+            this->makeRandom(val, i, j, k);
 
-         return val*a1D*a2D*a3D;
-      } else
-      {
-         return Datatypes::SpectralScalarType::PointType(0);
-      }
+            return val*a1D*a2D*a3D;
+         } else
+         {
+            return Datatypes::SpectralScalarType::PointType(0);
+         }
+      #else
+         // Get first dimension
+         int n1D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+         // Get second dimension
+         int n2D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
+
+         // Get simulation wide indexes
+         int j_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j);
+
+         int z1D = 4;
+         int z2D = 4;
+
+         if(i < n1D-z1D && j_ < n2D - z2D)
+         {
+            // Compute scaling factors
+            MHDFloat a1D = exp(-static_cast<MHDFloat>(i)*log(this->mRatio1D)/static_cast<MHDFloat>(n1D));
+            MHDFloat a2D = exp(-static_cast<MHDFloat>(j_)*log(this->mRatio2D)/static_cast<MHDFloat>(n2D));
+
+            Datatypes::SpectralScalarType::PointType val;
+
+            this->makeRandom(val, i, j, k);
+
+            return val*a1D*a2D;
+         } else
+         {
+            return Datatypes::SpectralScalarType::PointType(0);
+         }
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
    void RandomScalarState::setRequirements()

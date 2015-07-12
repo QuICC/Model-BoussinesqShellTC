@@ -79,6 +79,7 @@ namespace Transform {
 
                // Extract unique physical Operators
                std::map<ProjPhysId, int> opPhys;
+               std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> > op3DPhys;
                std::pair<std::map<ProjPhysId,int>::iterator,bool> opPhysPairIt;
                for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                {
@@ -86,19 +87,28 @@ namespace Transform {
                   {
                      opPhysPairIt = opPhys.insert(std::make_pair(branchIt->projPhysId(), 0));
                      opPhysPairIt.first->second += 1;
+                     op3DPhys.insert(std::make_pair(branchIt->projPhysId(), std::tr1::make_tuple(branchIt->physId(), branchIt->fieldId(), branchIt->arithId())));
                   }
                }
 
                // Create physical edges
                std::map<ProjPhysId,int>::const_iterator opPhysIt;
+               std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator op3DPhysIt;
+               std::pair<std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator,std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator> op3DPhysRange;
                for(opPhysIt = opPhys.begin(); opPhysIt != opPhys.end(); ++opPhysIt)
                {
-                  ProjectorPhysEdge &rEdgePhys = rEdgeSpec.addEdge(opPhysIt->first, opPhysIt->second);
-                  DebuggerMacro_showValue("Edge operator: ", 4, opPhysIt->first);
-                  DebuggerMacro_showValue("Edge weight: ", 4, opPhysIt->second);
-                  DebuggerMacro_showValue("Physical component: ", 4, rEdgePhys.physId());
-                  DebuggerMacro_showValue("Field type: ", 4, rEdgePhys.fieldId());
-                  DebuggerMacro_showValue("Arithmetic: ", 4, rEdgePhys.arithId());
+                  op3DPhysRange = op3DPhys.equal_range(opPhysIt->first);
+                  for(op3DPhysIt = op3DPhysRange.first; op3DPhysIt != op3DPhysRange.second; ++op3DPhysIt)
+                  {
+                     ProjectorPhysEdge &rEdgePhys = rEdgeSpec.addEdge(opPhysIt->first, opPhysIt->second);
+
+                     rEdgePhys.setPhysical(std::tr1::get<0>(op3DPhysIt->second), std::tr1::get<1>(op3DPhysIt->second), std::tr1::get<2>(op3DPhysIt->second));
+                     DebuggerMacro_showValue("Edge operator: ", 4, opPhysIt->first);
+                     DebuggerMacro_showValue("Edge weight: ", 4, opPhysIt->second);
+                     DebuggerMacro_showValue("Physical component: ", 4, rEdgePhys.physId());
+                     DebuggerMacro_showValue("Field type: ", 4, rEdgePhys.fieldId());
+                     DebuggerMacro_showValue("Arithmetic: ", 4, rEdgePhys.arithId());
+                  }
                }
             }
          }

@@ -41,16 +41,16 @@ namespace Equations {
 
    void BoussinesqRBCPlane2DVCMomentum::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::X, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::X, CouplingInformation::PROGNOSTIC, 1, true, false);
 
-      this->defineCoupling(FieldComponents::Spectral::Y, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::Z, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void BoussinesqRBCPlane2DVCMomentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::X, 0);
 
-      this->addNLComponent(FieldComponents::Spectral::Y, 0);
+      this->addNLComponent(FieldComponents::Spectral::Z, 0);
    }
 
    void BoussinesqRBCPlane2DVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -66,12 +66,12 @@ namespace Equations {
       if(id == FieldComponents::Physical::X)
       {
          specId = FieldComponents::Spectral::X;
-      } else if(id == FieldComponents::Physical::Y)
+      } else if(id == FieldComponents::Physical::Z)
       {
-         specId = FieldComponents::Spectral::Y;
+         specId = FieldComponents::Spectral::Z;
       }
 
-      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).phys(), this->unknown().dom(0).grad(specId), 1.0/Pr);
+      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys(), this->unknown().dom(0).grad(specId), 1.0/Pr);
    }
 
    void BoussinesqRBCPlane2DVCMomentum::setRequirements()

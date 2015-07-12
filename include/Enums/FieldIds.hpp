@@ -193,11 +193,19 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = PHI,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TF || defined GEOMHDISCC_SPATIALSCHEME_TT
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TT
             /// First vector component
             ONE = X,
             /// Second vector component
-            TWO = Y,
+            TWO = Z,
+            /// Third vector component
+            THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TF
+            /// First vector component
+            ONE = Z,
+            /// Second vector component
+            TWO = X,
             /// Third vector component
             THREE = NOTUSED,
 
@@ -306,13 +314,13 @@ namespace GeoMHDiSCC {
                /// First vector component
                ONE = X,
                /// Second vector component
-               TWO = Y,
+               TWO = Z,
                /// Third vector component
                THREE = NOTUSED,
 
             #elif defined GEOMHDISCC_SPATIALSCHEME_TF
                /// First vector component
-               ONE = Y,
+               ONE = Z,
                /// Second vector component
                TWO = X,
                /// Third vector component

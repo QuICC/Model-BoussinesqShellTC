@@ -137,7 +137,7 @@ namespace Parallel {
          for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(); j++)
          {
             // Loop over fast direction of output
-            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(j); i++)
+            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(); i++)
             {
                rOut.rPoint(i,j) = this->bwdPoint(in, i, j);
             }
@@ -190,7 +190,7 @@ namespace Parallel {
          // Loop over slow direction of output
          for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(); j++)
          {
-            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(j); i++)
+            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(); i++)
             {
                this->rBwdPoint(rOut, i,j) = in.point(i,j);
             }
@@ -223,7 +223,7 @@ namespace Parallel {
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,j);
+            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i);
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
             return in.point(this->mspIdxConv->i(i,j,idxI,idxJ),this->mspIdxConv->j(i,j,idxI,idxJ));
 
@@ -260,7 +260,7 @@ namespace Parallel {
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,j);
+            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i);
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
             return rOut.rPoint(this->mspIdxConv->i(i,j,idxI,idxJ),this->mspIdxConv->j(i,j,idxI,idxJ));
 

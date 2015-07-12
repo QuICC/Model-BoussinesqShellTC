@@ -30,7 +30,7 @@ namespace Eigen1D {
 
    int fieldCouplingNMat(const SharedResolution spRes)
    {
-      return spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+      return spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATND>();
    }
 
    void interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution spRes)

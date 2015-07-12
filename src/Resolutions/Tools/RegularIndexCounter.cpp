@@ -79,7 +79,7 @@ namespace GeoMHDiSCC {
 
       } else //if(spaceId == Dimensions::Space::PHYSICAL)
       {
-         transId = Dimensions::Transform::TRA3D;
+         transId = Dimensions::Transform::TRAND;
          simId = Dimensions::Simulation::SIM1D;
       }
 

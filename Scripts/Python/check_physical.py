@@ -37,6 +37,14 @@ def getOrdering(scheme):
         idSlow = 'r'
         idMid = 'theta'
         idFast = 'phi'
+    elif scheme in [b'TT']:
+        idSlow = None 
+        idMid = 'x'
+        idFast = 'z'
+    elif scheme in [b'TF']:
+        idSlow = None 
+        idMid = 'z'
+        idFast = 'x'
 
     return (idFast, idMid, idSlow)
 
@@ -47,7 +55,10 @@ def getGrid(scheme, h5_file):
 
     gFast = h5_file['mesh']['grid_'+idFast]
     gMid = h5_file['mesh']['grid_'+idMid]
-    gSlow = h5_file['mesh']['grid_'+idSlow]
+    if idSlow is not None:
+        gSlow = h5_file['mesh']['grid_'+idSlow]
+    else:
+        gSlow = None
 
     return (gFast, gMid, gSlow)
 
@@ -58,9 +69,98 @@ def getGridSize(scheme, h5_file):
 
     nFast = h5_file['mesh']['grid_'+idFast].size
     nMid = h5_file['mesh']['grid_'+idMid].size
-    nSlow = h5_file['mesh']['grid_'+idSlow].size
+    if idSlow is not None:
+        nSlow = h5_file['mesh']['grid_'+idSlow].size
+    else:
+        nSlow = 0
 
     return (nFast, nMid, nSlow)
+
+def checkCartesianExact(h5_file):
+    """Check initial state for exact polynomial/trigonometric fields"""
+
+    scheme = h5_file['/'].attrs['type']
+    idFast, idMid, idSlow = getOrdering(scheme)
+    gFast, gMid, gSlow = getGrid(scheme, h5_file)
+
+    dataT = h5_file['/temperature/temperature']
+    dataGTf = h5_file['/temperature_grad/temperature_grad_'+idFast]
+    dataGTm = h5_file['/temperature_grad/temperature_grad_'+idMid]
+    dataVf = h5_file['/velocity/velocity_'+idFast]
+    dataVm = h5_file['/velocity/velocity_'+idMid]
+    dataGfVf = h5_file['/velocity_grad_'+idFast+'/velocity_grad_'+idFast+'_'+idFast]
+    dataGmVf = h5_file['/velocity_grad_'+idFast+'/velocity_grad_'+idFast+'_'+idMid]
+    dataGfVm = h5_file['/velocity_grad_'+idMid+'/velocity_grad_'+idMid+'_'+idFast]
+    dataGmVm = h5_file['/velocity_grad_'+idMid+'/velocity_grad_'+idMid+'_'+idMid]
+
+    if idSlow is not None:
+        dataGTs = h5_file['/temperature_grad/temperature_grad_'+idSlow]
+        gF = gFast[()]
+        itS = np.nditer(gSlow, flags=['c_index'])
+        while not itS.finished:
+            s = itS[0]
+            itM = np.nditer(gMid, flags=['c_index'])
+            while not itM.finished:
+                m = itM[0]
+                # Check temperature field
+                errT = np.max(np.abs(dataT[itS.index, itM.index,:] - (s**2*m**3*gF)))
+
+                # Check velocity field
+                itM.iternext()
+            itS.iternext()
+    else:
+        gF = gFast[()]
+        itM = np.nditer(gMid, flags=['c_index'])
+        while not itM.finished:
+            m = itM[0]
+            if scheme in [b'TT']:
+                scale_f = h5_file['/physical/scale1d'][()]
+                scale_m = h5_file['/physical/scale2d'][()]
+
+                # Check temperature field
+                errT = np.max(np.abs(dataT[itM.index,:] - (m**2*gF**10)))
+                # Check temperature gradient
+                errGTf = np.max(np.abs(dataGTf[itM.index,:] - (scale_f*10.0*m**2*gF**9)))
+                errGTm = np.max(np.abs(dataGTm[itM.index,:] - (scale_m*2*m*gF**10)))
+
+                # Check velocity field
+                errVf = np.max(np.abs(dataVf[itM.index,:] - (m**3*gF**4)))
+                errVm = np.max(np.abs(dataVm[itM.index,:] - (m**2*gF**6)))
+
+                # Check velocity gradient
+                errGfVf = np.max(np.abs(dataGfVf[itM.index,:] - (scale_f*4.0*m**3*gF**3)))
+                errGmVf = np.max(np.abs(dataGmVf[itM.index,:] - (scale_m*3.0*m**2*gF**4)))
+                errGfVm = np.max(np.abs(dataGfVm[itM.index,:] - (scale_f*6.0*m**2*gF**5)))
+                errGmVm = np.max(np.abs(dataGmVm[itM.index,:] - (scale_m*2.0*m*gF**6)))
+            elif scheme in [b'TF']:
+                scale_m = h5_file['/physical/scale1d'][()]
+
+                # Check temperature field
+                errT = np.max(np.abs(dataT[itM.index,:] - (m**2*np.cos(10.0*gF))))
+                # Check temperature gradient
+                errGTf = np.max(np.abs(dataGTf[itM.index,:] - (-10.0*m**2*np.sin(10.0*gF))))
+                errGTm = np.max(np.abs(dataGTm[itM.index,:] - (scale_m*2.0*m*np.cos(10.0*gF))))
+
+                # Check velocity field
+                errVf = np.max(np.abs(dataVf[itM.index,:] - (m**2*np.sin(6.0*gF))))
+                errVm = np.max(np.abs(dataVm[itM.index,:] - (m**3*np.cos(4.0*gF))))
+
+                # Check velocity gradient
+                errGfVf = np.max(np.abs(dataGfVf[itM.index,:] - (6.0*m**2*np.cos(6.0*gF))))
+                errGmVf = np.max(np.abs(dataGmVf[itM.index,:] - (scale_m*2.0*m*np.sin(6.0*gF))))
+                errGfVm = np.max(np.abs(dataGfVm[itM.index,:] - (-4.0*m**3*np.sin(4.0*gF))))
+                errGmVm = np.max(np.abs(dataGmVm[itM.index,:] - (scale_m*3.0*m**2*np.cos(4.0*gF))))
+            itM.iternext()
+    print("Error in fast velocity field: {:g}".format(errVf))
+    print("Error in middle velocity field:  {:g}".format(errVm))
+    print("Error in fast velocity fast gradient: {:g}".format(errGfVf))
+    print("Error in fast velocity middle gradient: {:g}".format(errGmVf))
+    print("Error in middle velocity fast gradient: {:g}".format(errGfVm))
+    print("Error in middle velocity middle gradient: {:g}".format(errGmVm))
+#    print("Error in phi velocity field:    {:g}".format(errVph))
+    print("Error in temperature field:     {:g}".format(errT))
+    print("Error in fast temperature gradient:     {:g}".format(errGTf))
+    print("Error in middle temperature gradient:     {:g}".format(errGTm))
 
 def checkShellBenchmarkC0(h5_file):
     """Check initial state for sphere benchmark C0"""
@@ -292,7 +392,8 @@ def main(argv):
     #checkShellBenchmarkC0(h5_file)
     #checkShellBenchmarkC1(h5_file)
     #checkSphereBenchmarkC1(h5_file)
-    checkSphereBenchmarkC2(h5_file)
+    #checkSphereBenchmarkC2(h5_file)
+    checkCartesianExact(h5_file)
 
     # Close file
     h5_file.close()

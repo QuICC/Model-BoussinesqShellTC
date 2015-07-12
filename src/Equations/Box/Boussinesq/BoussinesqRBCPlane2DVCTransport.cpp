@@ -41,7 +41,7 @@ namespace Equations {
 
    void BoussinesqRBCPlane2DVCTransport::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void BoussinesqRBCPlane2DVCTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -53,7 +53,7 @@ namespace Equations {
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)\theta\f$
       ///
-      Physical::VelocityHeatAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
+      Physical::VelocityHeatAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqRBCPlane2DVCTransport::setRequirements()
