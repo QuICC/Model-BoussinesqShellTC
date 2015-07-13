@@ -1,13 +1,13 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a plane layer (2D) (Velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a plane layer (2D) (streamfunction formulation)"""
 
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_rbcplane2d_vc as mod
+import geomhdiscc.model.boussinesq_rbcplane2d_s as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCPlane2DVC()
+model = mod.BoussinesqRBCPlane2DS()
 model.linearize = True
 model.use_galerkin = False
 
@@ -15,7 +15,7 @@ model.use_galerkin = False
 res = [32, 0]
 
 # SF, FT,
-bc_vel = 0
+bc_stream = 0
 bc_temp = 0
 heating = 0
 
@@ -24,7 +24,7 @@ Pr = 1; Ra = 108*np.pi**4
 
 eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0}
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_stream, 'temperature':bc_temp}
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
 def wave(k):

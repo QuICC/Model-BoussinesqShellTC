@@ -1,18 +1,20 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a square (2D) (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a square (2D) (vorticity-streamfunction formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbcsquare_vc as mod
+import geomhdiscc.model.boussinesq_rbcsquare_s as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCSquareVC()
+model = mod.BoussinesqRBCSquareS()
 model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 #res = [8, 8]
+#res = [10, 10]
 res = [24, 24]
+#res = [32, 32]
 #res = [128, 128]
 
 # SF/SF, FF/FT, k = 0
@@ -41,7 +43,7 @@ res = [24, 24]
 #Pr = 1; Ra = 2137.92; A1d = 1.0; A3d = 1.0/3.0 # m = 2, n = 2, aspect ratio 1:3
 
 # PAPER
-bc_vel = 0
+bc_stream = 0
 bc_temp = 1
 heating = 0
 k = 0
@@ -91,7 +93,7 @@ Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 
 eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0*A3d, 'scale2d':2.0*A3d} #
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_stream, 'temperature':bc_temp}
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
 def wave(k):

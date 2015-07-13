@@ -100,6 +100,8 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 42:
+        cond = tau_diff_diff2(mat.shape[1], 0, bc.get('c',None))
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)
@@ -234,6 +236,28 @@ def tau_value_diff(nx, pos, coeffs = None):
     if pos <= 0:
         cond.append(tau_value(nx,-1,coeffs)[0])
         cond.append(tau_diff(nx,-1,coeffs)[0])
+
+    if use_parity_bc and pos == 0:
+        tv = cond[0].copy()
+        td = cond[1].copy()
+        cond[0] = (cond[0] + cond[2])/2.0
+        cond[1] = (cond[1] + cond[3])/2.0
+        cond[2] = (tv - cond[2])/2.0
+        cond[3] = (td - cond[3])/2.0
+
+    return np.array(cond)
+
+def tau_diff_diff2(nx, pos, coeffs = None):
+    """Create tau lines for a zero 1st derivative and a zero 2nd derivative """
+
+    cond = []
+    if pos >= 0:
+        cond.append(tau_diff(nx,1,coeffs)[0])
+        cond.append(tau_diff2(nx,1,coeffs)[0])
+
+    if pos <= 0:
+        cond.append(tau_diff(nx,-1,coeffs)[0])
+        cond.append(tau_diff2(nx,-1,coeffs)[0])
 
     if use_parity_bc and pos == 0:
         tv = cond[0].copy()
