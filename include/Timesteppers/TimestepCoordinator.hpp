@@ -26,6 +26,7 @@
 #include "Timesteppers/SparseTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
+#include "IoAscii/CflWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -155,9 +156,19 @@ namespace Timestep {
          const MHDFloat mcUpWindow;
 
          /**
+          * @brief No update window for timestep decrease
+          */
+         const MHDFloat mcDownWindow;
+
+         /**
           * @brief Minimal timestep allowed before simulation abort
           */
          const MHDFloat mcMinDt;
+
+         /**
+          * @brief Maximum timestep allowed 
+          */
+         const MHDFloat mcMaxDt;
 
          /**
           * @brief Previous timestep length
@@ -173,6 +184,11 @@ namespace Timestep {
           * @brief Current time
           */
          MHDFloat mTime;
+
+         /**
+          * @brief Shared CFL writer
+          */
+         IoAscii::SharedCflWriter   mspIo;
    };
 
    /**

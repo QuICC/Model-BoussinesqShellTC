@@ -65,7 +65,7 @@ namespace GeoMHDiSCC {
    void BoussinesqBeta3DQGPerModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;

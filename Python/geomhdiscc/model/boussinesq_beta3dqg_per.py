@@ -193,7 +193,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         elif field_row == ("dx_meantemperature","") and field_col == field_row:
             if eigs[1] == 0:
-                mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+                mat = spsp.eye(res[0], 1)*geo.avg(res[0])
             else:
                 mat = geo.zblk(res[0], bc)
 

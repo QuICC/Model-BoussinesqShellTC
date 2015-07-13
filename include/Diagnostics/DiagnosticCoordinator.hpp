@@ -23,7 +23,6 @@
 #include "Enums/FieldIds.hpp"
 #include "Diagnostics/IVelocityWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "IoAscii/CflWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -88,7 +87,7 @@ namespace Diagnostics {
          /**
           * @brief Synchronize diagnostics among CPUs
           */
-         void synchronize(const MHDFloat time);
+         void synchronize();
 
       protected:
 
@@ -99,29 +98,9 @@ namespace Diagnostics {
          const MHDFloat mcCourant;
 
          /**
-          * @brief Minimum (starting) timestep
-          */
-         const MHDFloat mcMinStep;
-
-         /**
           * @brief Maximum timestep
           */
          const MHDFloat mcMaxStep;
-
-         /**
-          * @brief Maximum factor for timestep increase
-          */
-         const MHDFloat mcMaxUp;
-
-         /**
-          * @brief Window factor when increasing timestep
-          */
-         const MHDFloat mcUpWindow;
-
-         /**
-          * @brief Window factor when decreasing timestep
-          */
-         const MHDFloat mcDownWindow;
 
          /**
           * @brief Fixed timestep
@@ -152,11 +131,6 @@ namespace Diagnostics {
           * @brief Shared pointer to a velocity field wrapper
           */
          SharedIVelocityWrapper  mspVelocityWrapper;
-
-         /**
-          * @brief Shared CFL writer
-          */
-         IoAscii::SharedCflWriter   mspIo;
    };
 }
 }

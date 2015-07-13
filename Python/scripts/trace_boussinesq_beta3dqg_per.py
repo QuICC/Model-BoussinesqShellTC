@@ -3,7 +3,7 @@
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_beta3dqg_per as mod
+import geomhdiscc.model.boussinesq_beta3dqg_per2 as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -12,10 +12,10 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [64, 0, 0]
-chi = 60
+res = [32, 0, 0]
+chi = 5
 Pr = 1
-G = 1e-3
+G = 1e-2
 tanchi = np.tan(chi*np.pi/180.)
 beta = tanchi/G
 
@@ -29,7 +29,9 @@ print("f_c = " + str(fc))
 
 # Set wave number
 kp = 14.4046937485972/2.0
+kp = 3/2.0
 Ra = 192407.5882
+Ra = 200
 phi = 90
 
 eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi, 'scale1d':1}
@@ -66,11 +68,11 @@ marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = True
-marginal_options['plot_spy'] = False
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['viz_mode'] = 0
-marginal_options['curve_points'] = np.arange(max(0, kp+1), kp-4, -0.1)
+marginal_options['curve_points'] = np.arange(max(1.2, kp-2), kp+3, 0.3)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

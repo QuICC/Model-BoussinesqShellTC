@@ -30,13 +30,19 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.01), mcDownWindow(0.999), mcMinDt(1e-8), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
    {
       this->mNStep = IntegratorSelector::STEPS;
+
+      // Create CFL writer
+      IoAscii::SharedCflWriter   spCflWriter = IoAscii::SharedCflWriter(new IoAscii::CflWriter());
+      this->mspIo = spCflWriter;
+      this->mspIo->init();
    }
 
    TimestepCoordinator::~TimestepCoordinator()
    {
+      this->mspIo->finalize();
    }
 
    MHDFloat TimestepCoordinator::time() const
@@ -120,6 +126,10 @@ namespace Timestep {
          // Reset the step index
          this->mStep = 0;
       }
+
+      // Update CFL writer
+      this->mspIo->setSimTime(this->mTime, this->mDt);
+      this->mspIo->write();
    }
 
    void TimestepCoordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
