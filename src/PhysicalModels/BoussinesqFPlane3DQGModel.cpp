@@ -66,7 +66,7 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;
@@ -105,23 +105,23 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add streamfunction initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add vertical velocity initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+         spExact->setModeOptions(0e0, 0.0, 1e0, 0.0, 1e0, 0.0);
       }
 
       // Add output file

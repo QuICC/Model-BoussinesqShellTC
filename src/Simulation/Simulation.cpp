@@ -161,7 +161,7 @@ namespace GeoMHDiSCC {
       this->mDiagnostics.initialCfl();
 
       // Synchronise diagnostics
-      this->mDiagnostics.synchronize();
+      this->mDiagnostics.synchronize(this->mDiagnostics.startTime());
 
       // Init timestepper using clf/100 as starting timestep
       this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
@@ -232,7 +232,7 @@ namespace GeoMHDiSCC {
          this->mDiagnostics.updateCfl();
 
          // Synchronise diagnostics
-         this->mDiagnostics.synchronize();
+         this->mDiagnostics.synchronize(this->mTimestepCoordinator.time());
 
          // Adapt timestepper time step
          this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);

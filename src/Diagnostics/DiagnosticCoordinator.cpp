@@ -30,12 +30,14 @@ namespace GeoMHDiSCC {
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcCourant(0.65), mFixedStep(-1), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : mcCourant(0.65), mcMinStep(1e-8), mcMaxStep(0.1), mcMaxUp(1.602), mcUpWindow(1.01), mcDownWindow(0.999), mFixedStep(-1), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
    {
+      this->mCfl = this->mcMinStep;
    }
 
    DiagnosticCoordinator::~DiagnosticCoordinator()
    {
+      this->mspIo->finalize();
    }
 
    void DiagnosticCoordinator::init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors, const Array& tstep)
@@ -94,8 +96,13 @@ namespace Diagnostics {
       // Store configuration file start time
       this->mStartTime = tstep(0);
 
-      // Store configuration file start time
+      // Store configuration file start step
       this->mStartTimestep = tstep(1);
+
+      // Create CFL writer
+      IoAscii::SharedCflWriter   spCflWriter = IoAscii::SharedCflWriter(new IoAscii::CflWriter());
+      this->mspIo = spCflWriter;
+      this->mspIo->init();
    }
 
    void DiagnosticCoordinator::initialCfl()
@@ -130,6 +137,8 @@ namespace Diagnostics {
       // Compute initial CFL condition
       } else
       {
+         MHDFloat oldCfl = this->mCfl;
+
          // Safety assert
          assert(this->mspVelocityWrapper);
 
@@ -146,15 +155,29 @@ namespace Diagnostics {
          DebuggerMacro_showValue("Raw CFL Dz = ", 2, this->mMeshSpacings.at(2).minCoeff());
          DebuggerMacro_showValue("Raw CFL Vz = ", 2, this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
 
+         // Include a window to avoid changing timestep upwards too often
+         if(this->mCfl > oldCfl && this->mCfl < this->mcUpWindow*oldCfl)
+         {
+            this->mCfl = oldCfl;
+
+         // Include a window to avoid changing timestep downwards too often
+         } else if(this->mCfl < oldCfl && this->mCfl > this->mcDownWindow*oldCfl)
+         {
+            this->mCfl = oldCfl;
+
+         // Include maximum step increase
+         } else if(this->mCfl > oldCfl && this->mCfl > this->mcMaxUp*oldCfl)
+         {
+            this->mCfl = this->mcMaxUp*oldCfl;
+         }
+
          DebuggerMacro_showValue("Raw CFL cfl = ", 2, this->mCfl);
-         /// Compute CFL condition : \f$\alpha\frac{\Delta x}{|v_{max}|}\f$
-         /// \mhdBug This is not a clean CFL but min(0.1,cfl)
-         //this->mCfl = std::min(this->mcCourant, this->mCfl);
-         this->mCfl = std::min(0.1, this->mCfl);
+         // Check for maximum timestep
+         this->mCfl = std::min(this->mcMaxStep, this->mCfl);
       }
    }
 
-   void DiagnosticCoordinator::synchronize()
+   void DiagnosticCoordinator::synchronize(const MHDFloat time)
    {
 
       //
@@ -172,6 +195,10 @@ namespace Diagnostics {
       // End of MPI block
       //
       #endif // GEOMHDISCC_MPI
+
+      // Update CFL writer
+      this->mspIo->setSimTime(time, this->mCfl);
+      this->mspIo->write();
    }
 
    MHDFloat DiagnosticCoordinator::cfl() const
