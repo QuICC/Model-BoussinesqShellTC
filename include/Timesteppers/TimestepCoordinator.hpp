@@ -71,6 +71,13 @@ namespace Timestep {
          void init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
+          * @brief Tune adaptive timestepper 
+          *
+          * \mhdBug Not fully implemented
+          */
+         void tuneAdaptive(const MHDFloat time);
+
+         /**
           * @brief Adapt the timestep used
           *
           * @param cfl     CFL condition
@@ -156,11 +163,6 @@ namespace Timestep {
          const MHDFloat mcUpWindow;
 
          /**
-          * @brief No update window for timestep decrease
-          */
-         const MHDFloat mcDownWindow;
-
-         /**
           * @brief Minimal timestep allowed before simulation abort
           */
          const MHDFloat mcMinDt;
@@ -184,6 +186,16 @@ namespace Timestep {
           * @brief Current time
           */
          MHDFloat mTime;
+
+         /**
+          * @brief Constant timestep steps
+          */
+         MHDFloat mCnstSteps;
+
+         /**
+          * @brief Constant timestep steps
+          */
+         MHDFloat mStepTime;
 
          /**
           * @brief Shared CFL writer

@@ -70,8 +70,6 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief End stage
-          *
-          * @param tabs Number of tab characters
           */
          void done();
          

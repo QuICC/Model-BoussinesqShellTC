@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace IoAscii {
 
    CflWriter::CflWriter()
-      : IAsciiEWriter(CflTags::NAME, CflTags::EXTENSION, CflTags::HEADER, CflTags::TYPE, CflTags::VERSION), mTime(-1.0), mTimestep(-1.0), mChanged(false)
+      : IAsciiEWriter(CflTags::NAME, CflTags::EXTENSION, CflTags::HEADER, CflTags::TYPE, CflTags::VERSION), mTime(-1.0), mTimestep(-1.0), mSteps(0.0), mChanged(false)
    {
    }
 
@@ -36,12 +36,14 @@ namespace IoAscii {
    {
    }
 
-   void CflWriter::setSimTime(const MHDFloat time, const MHDFloat timestep)
+   void CflWriter::setSimTime(const MHDFloat time, const MHDFloat timestep, const MHDFloat steps)
    {
       this->mTime = time;
 
       this->mChanged = (timestep != this->mTimestep);
       this->mTimestep = timestep;
+
+      this->mSteps = steps;
    }
 
    void CflWriter::write()
@@ -52,7 +54,7 @@ namespace IoAscii {
       // Check if the workflow allows IO to be performed
       if(this->mChanged && FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTimestep << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTimestep << "\t" << this->mSteps << std::endl;
       }
 
       // post write

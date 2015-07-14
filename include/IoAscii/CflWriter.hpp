@@ -44,8 +44,9 @@ namespace IoAscii {
           *
           * @param time       Reached simulation time
           * @param timestep   Last timestep size
+          * @param steps      Number of steps with previous timestep
           */
-         void setSimTime(const MHDFloat time, const MHDFloat timestep);
+         void setSimTime(const MHDFloat time, const MHDFloat timestep, const MHDFloat steps);
 
          /**
           * @brief Write State to file
@@ -62,6 +63,11 @@ namespace IoAscii {
           * @brief Timestep
           */
          MHDFloat mTimestep;
+
+         /**
+          * @brief Timestep
+          */
+         MHDFloat mSteps;
 
          /**
           * @brief Flag for timestep change

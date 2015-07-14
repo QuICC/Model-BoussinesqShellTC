@@ -108,6 +108,11 @@ namespace Solver {
           */
          virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
+         /**
+          * @brief Factorization time
+          */
+         MHDFloat mFactorTime;
+
       private:
    };
 
@@ -141,7 +146,7 @@ namespace Solver {
    }
 
    template <template <class,class> class TSolver> SparseLinearCoordinatorBase<TSolver>::SparseLinearCoordinatorBase()
-      : SparseCoordinatorBase<TSolver>()
+      : SparseCoordinatorBase<TSolver>(), mFactorTime(-1.0)
    {
    }
 
@@ -259,13 +264,16 @@ namespace Solver {
       //
       
       stage.start("factorizing solver matrices", 1);
+      TimerMacro timer(true);
 
       // Initialise solvers from complex equation steppers
       initSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this);
 
       // Initialise solvers from real equation steppers
       initSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this);
-
+   
+      timer.stop();
+      this->mFactorTime = timer.time();
       stage.done();
 
       // Reset the step index

@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.01), mcDownWindow(0.999), mcMinDt(1e-8), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
       this->mNStep = IntegratorSelector::STEPS;
 
@@ -43,6 +43,11 @@ namespace Timestep {
    TimestepCoordinator::~TimestepCoordinator()
    {
       this->mspIo->finalize();
+   }
+
+   void TimestepCoordinator::tuneAdaptive(const MHDFloat time)
+   {
+      this->mStepTime = time;
    }
 
    MHDFloat TimestepCoordinator::time() const
@@ -125,11 +130,19 @@ namespace Timestep {
 
          // Reset the step index
          this->mStep = 0;
+      } else
+      {
+         this->mCnstSteps += 1.0;
       }
 
       // Update CFL writer
-      this->mspIo->setSimTime(this->mTime, this->mDt);
+      this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps);
       this->mspIo->write();
+
+      if(hasNewDt)
+      {
+         this->mCnstSteps = 0.0;
+      }
    }
 
    void TimestepCoordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
