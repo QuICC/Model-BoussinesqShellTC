@@ -54,7 +54,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
       ///
-      Physical::StreamHeatAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
+      Physical::StreamHeatAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqBeta3DQGPerTransport::setRequirements()
@@ -70,6 +70,18 @@ namespace Equations {
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
+
+      // Gradient does not require Z component
+      ArrayB   comps = ArrayB::Constant(3, true);
+      comps(0) = false;
+      std::map<FieldComponents::Spectral::Id,ArrayB>  gradComps;
+      gradComps.insert(std::make_pair(FieldComponents::Spectral::SCALAR, comps));
+
+      // Update temperature gradient requirements
+      this->updateFieldRequirements(PhysicalNames::TEMPERATURE).updateGradient(gradComps);
+
+      // Update streamfunction gradient requirements
+      this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient(gradComps);
    }
 
 }

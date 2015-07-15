@@ -57,7 +57,7 @@ namespace Equations {
       /// Computation:
       ///   \f$ Pr u \theta\f$
       ///
-      rNLComp.setData((-Pr*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::THREE).data().array()*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
+      rNLComp.setData((-Pr*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
    void BoussinesqBeta3DQGPerMeanHeat::setRequirements()
@@ -72,10 +72,19 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::DX_MEANTEMPERATURE, FieldRequirement(true, true, false, false));
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, true, false));
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
+
+      // Gradient does not require Z component
+      ArrayB   comps = ArrayB::Constant(3, true);
+      comps(0) = false;
+      std::map<FieldComponents::Spectral::Id,ArrayB>  gradComps;
+      gradComps.insert(std::make_pair(FieldComponents::Spectral::SCALAR, comps));
+
+      // Update streamfunction gradient requirements
+      this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient(gradComps);
    }
 
 }
