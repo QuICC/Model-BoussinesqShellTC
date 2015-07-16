@@ -30,6 +30,25 @@ namespace Schemes {
       return "TT";
    }
 
+   void TTScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
+   {
+      TTScheme::tuneMpiResolution(descr);
+      
+      // Create spectral space sub communicators
+      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         // Initialise the ranks with local rank
+         std::set<int>  ranks;
+         for(int cpu = 0; cpu < spRes->nCpu(); ++cpu)
+         {
+            ranks.insert(cpu);
+         }
+
+         FrameworkMacro::initSubComm(FrameworkMacro::SPECTRAL, 1);
+
+         FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, 0, ranks);
+      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+   }
+
    void TTScheme::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform

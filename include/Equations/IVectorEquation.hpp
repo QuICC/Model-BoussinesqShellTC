@@ -838,32 +838,40 @@ namespace Equations {
          assert(matIdx == 0);
          assert(start >= 0);
 
-         // Set data to zero
-         int l;
-         int k_;
-         int j_;
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
-            int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-         #else
-            int dimK = 1;
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
-         int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-         for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
-         {
-            k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
-            for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            for(int k = 0; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
-               j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
-               for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+               // Set value to zero
+               Datatypes::internal::setScalar(storage, k + start, typename TData::Scalar(0.0));
+            }
+         #else
+            // Set data to zero
+            int l;
+            int k_;
+            int j_;
+            #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+               int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+            #else
+               int dimK = 1;
+            #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+            int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            {
+               k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  // Compute correct position
-                  l = start + k_ + j_ + i;
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                  {
+                     // Compute correct position
+                     l = start + k_ + j_ + i;
 
-                  // Set value to zero
-                  Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
+                     // Set value to zero
+                     Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
+                  }
                }
             }
-         }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
       }
    }
 }

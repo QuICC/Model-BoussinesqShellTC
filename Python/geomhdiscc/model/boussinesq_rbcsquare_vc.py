@@ -231,7 +231,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == ("velocity","z"):
             if eq_params['heating'] == 0:
-                mat = geo.i2j2(res[0], res[1], bc, -1.0)
+                mat = geo.i2j2(res[0], res[1], bc, -1.0, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -244,13 +244,13 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[1], bc)
+            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
 
         elif field_row == ("velocity","z") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[1], bc)
+            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[1], bc)
+            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -271,7 +271,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
-                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
 
             elif field_col == ("velocity","z"):
                 mat = geo.zblk(res[0], res[1], 2, 2, bc)
@@ -280,20 +280,20 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2j2d1(res[0], res[1], bc, -1.0, xscale = xscale)*utils.qid_from_idx(idx_rp, res[0]*res[1])
+                mat = geo.i2j2d1(res[0], res[1], bc, -1.0, xscale = xscale, restriction = restriction)*utils.qid_from_idx(idx_rp, res[0]*res[1])
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
                 mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2(res[0], res[1], bc, Ra)
+                mat = geo.i2j2(res[0], res[1], bc, Ra, restriction = restriction)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2j2e1(res[0], res[1], bc, -1.0, zscale = zscale)*utils.qid_from_idx(idx_rp, res[0]*res[1])
+                mat = geo.i2j2e1(res[0], res[1], bc, -1.0, zscale = zscale, restriction = restriction)*utils.qid_from_idx(idx_rp, res[0]*res[1])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","x"):
@@ -302,12 +302,12 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
             elif field_col == ("velocity","z"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params['heating'] == 0:
-                        mat = geo.i2j2(res[0], res[1], bc)
+                        mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
                 else:
                     mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
 
             elif field_col == ("pressure",""):
                 mat = geo.zblk(res[0], res[1], 2, 2, bc)
@@ -315,11 +315,11 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         elif field_row == ("pressure",""):
             if bcs["bcType"] == self.SOLVER_HAS_BC:
                 if field_col == ("velocity","x"):
-                    mat = geo.i2j2d1(res[0], res[1], bc, xscale = xscale)
+                    mat = geo.i2j2d1(res[0], res[1], bc, xscale = xscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_lp, res[0]*res[1])*mat
 
                 elif field_col == ("velocity","z"):
-                    mat = geo.i2j2e1(res[0], res[1], bc, zscale = zscale)
+                    mat = geo.i2j2e1(res[0], res[1], bc, zscale = zscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_lp, res[0]*res[1])*mat
 
                 elif field_col == ("temperature",""):
@@ -336,7 +336,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                     zero_p[1, res[0]-1] = 1
                     zero_p[res[0], -res[0]] = 1
                     zero_p[res[0]+1, -3] = 1
-                    mat = mat + zero_p
+                    mat = mat + zero_p*geo.qid(res[0], res[1], 0, 0, no_bc(), restriction = restriction)
             else:
                 mat = geo.zblk(res[0], res[1], 1, 1, no_bc())
 
@@ -355,13 +355,13 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","x"):
-            mat = geo.i2j2(res[0], res[1], bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[1], bc, 1.0/Pr, restriction = restriction)
 
         elif field_row == ("velocity","z"):
-            mat = geo.i2j2(res[0], res[1], bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[1], bc, 1.0/Pr, restriction = restriction)
 
         elif field_row == ("temperature",""):
-            mat = geo.i2j2(res[0], res[1], bc)
+            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
 
         elif field_row == ("pressure",""):
             mat = geo.zblk(res[0], res[1], 1, 1, bc)
