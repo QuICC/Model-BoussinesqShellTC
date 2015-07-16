@@ -76,6 +76,12 @@ namespace IoTools {
          case PhysicalNames::VORTICITY:
             return "Vorticity";
 
+         case PhysicalNames::VORTICITYX:
+            return "VorticityX";
+
+         case PhysicalNames::VORTICITYY:
+            return "VorticityY";
+
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
 
@@ -180,6 +186,12 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITY:
             return "vorticity";
+
+         case PhysicalNames::VORTICITYX:
+            return "vorticityx";
+
+         case PhysicalNames::VORTICITYY:
+            return "vorticityy";
 
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";

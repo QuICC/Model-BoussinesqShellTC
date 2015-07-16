@@ -87,26 +87,50 @@ namespace GeoMHDiSCC {
       offsets.clear();
       std::vector<OffsetType>  offV;
 
-      offV.push_back(0);
-      offV.push_back(0);
-      offV.push_back(0);
-      for(int i=0; i < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
-      {
-         int i_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
-         // Check if value is available in file
-         if(i_ < spRef->dim(simId,spaceId))
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         offV.push_back(0);
+         offV.push_back(0);
+         offV.push_back(0);
+         for(int i=0; i < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
          {
-            // Compute offset for third dimension
-            offV.at(0) = i_;
+            int i_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+            // Check if value is available in file
+            if(i_ < spRef->dim(simId,spaceId))
+            {
+               // Compute offset for third dimension
+               offV.at(0) = i_;
 
-            // Compute offset for second dimension
-            offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
+               // Compute offset for second dimension
+               offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
 
-            // Store 3D index
-            offV.at(2) = i;
+               // Store 3D index
+               offV.at(2) = i;
 
-            offsets.push_back(offV);
+               offsets.push_back(offV);
+            }
          }
-      }
+      #else
+         offV.push_back(0);
+         offV.push_back(0);
+         offV.push_back(0);
+         for(int j = 0; j < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT2D>(); ++j)
+         {
+            int j_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(j);
+            // Check if value is available in file
+            if(j_ < spRef->dim(simId,spaceId))
+            {
+               // Compute offset for third dimension
+               offV.at(0) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0);
+
+               // Store 2D index
+               offV.at(1) = j;
+
+               // Store (fake) 3D index
+               offV.at(2) = 0;
+
+               offsets.push_back(offV);
+            }
+         }
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 }

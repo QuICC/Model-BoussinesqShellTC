@@ -277,6 +277,11 @@ namespace IoHdf5 {
       // Open dataset in file
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
 
+      if(dataset < 0)
+      {
+         throw Exception("Tried to open inexistant HDF5 dataset");
+      }
+
       // Get file dataspace
       hid_t  filespace = H5Dget_space(dataset);
 
@@ -413,6 +418,11 @@ namespace IoHdf5 {
 
       // Open dataset in file
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
+
+      if(dataset < 0)
+      {
+         throw Exception("Tried to open inexistant HDF5 dataset");
+      }
 
       // Get file dataspace
       hid_t  filespace = H5Dget_space(dataset);

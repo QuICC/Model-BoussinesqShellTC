@@ -61,7 +61,7 @@ namespace IoVariable {
          sit->second->setZeros();
 
          // Read field values
-         this->readSpectralScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->rDom(0).rPerturbation());
+         this->readSpectralScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->rDom(0).rPerturbation(), this->isRequired(sit->first));
       }
 
       // Read all the vectors
@@ -73,7 +73,7 @@ namespace IoVariable {
          vit->second->setZeros();
 
          // Read field values
-         this->readSpectralVector(IoTools::IdToHuman::toTag(vit->first), vit->second->rDom(0).rPerturbation().rData());
+         this->readSpectralVector(IoTools::IdToHuman::toTag(vit->first), vit->second->rDom(0).rPerturbation().rData(), this->isRequired(vit->first));
       }
    }
 
@@ -107,96 +107,118 @@ namespace IoVariable {
       H5Gclose(group);
    }
 
-   void StateFileReader::readSpectralScalar(const std::string& name, Datatypes::SpectralScalarType& rScalar)
+   void StateFileReader::readSpectralScalar(const std::string& name, Datatypes::SpectralScalarType& rScalar, const bool isRequired)
    {
-      // Open the codensity scalar group
+      // Open the scalar group
       hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
 
-      // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rScalar);
+      if(group >= 0)
+      {
+         // Storage for the field information
+         std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rScalar);
 
-      // Check for data regularity
-      if(this->mIsRegular)
+         // Check for data regularity
+         if(this->mIsRegular)
+         {
+            this->readRegularField(group, name, fieldInfo);
+         } else
+         {
+            this->readIrregularField(group, name, fieldInfo);
+         }
+         
+         // close group
+         H5Gclose(group);
+
+         // Adapt data if necessary
+         this->adaptData(rScalar);
+
+      } else if(isRequired)
       {
-         this->readRegularField(group, name, fieldInfo);
-      } else
-      {
-         this->readIrregularField(group, name, fieldInfo);
+         throw Exception("Tried to open inexistant HDF5 group");
       }
-      
-      // close group
-      H5Gclose(group);
-
-      // Adapt data if necessary
-      this->adaptData(rScalar);
    }
 
-   void StateFileReader::readSpectralVector(const std::string& name, std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& rVector)
-   {
-      // Open the magnetic field group
-      hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
-
-      // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo;
-
-      // Check for data regularity
-      std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>::iterator it;
-      if(this->mIsRegular)
-      {
-         for(it = rVector.begin(); it != rVector.end(); ++it)
-         {
-            // create component field information
-            fieldInfo = Datatypes::FieldTools::createInfo(it->second);
-
-            // Read component from file 
-            this->readRegularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
-
-            // Adapt data if necessary
-            this->adaptData(it->second);
-         }
-      } else
-      {
-         for(it = rVector.begin(); it != rVector.end(); ++it)
-         {
-            // create component field information
-            fieldInfo = Datatypes::FieldTools::createInfo(it->second);
-
-            // Read component from file 
-            this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
-
-            // Adapt data if necessary
-            this->adaptData(it->second);
-         }
-      }
-      
-      // close group
-      H5Gclose(group);
-   }
-
-   void StateFileReader::readSpectralComponent(const std::string& name, FieldComponents::Spectral::Id id, Datatypes::SpectralScalarType& rComp)
+   void StateFileReader::readSpectralVector(const std::string& name, std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& rVector, const bool isRequired)
    {
       // Open the vector field group
       hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
 
-      // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rComp);
+      if(group >= 0)
+      {
+         // Storage for the field information
+         std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo;
 
-      // Check for data regularity
-      if(this->mIsRegular)
+         // Check for data regularity
+         std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>::iterator it;
+         if(this->mIsRegular)
+         {
+            for(it = rVector.begin(); it != rVector.end(); ++it)
+            {
+               // create component field information
+               fieldInfo = Datatypes::FieldTools::createInfo(it->second);
+
+               // Read component from file 
+               this->readRegularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
+
+               // Adapt data if necessary
+               this->adaptData(it->second);
+            }
+         } else
+         {
+            for(it = rVector.begin(); it != rVector.end(); ++it)
+            {
+               // create component field information
+               fieldInfo = Datatypes::FieldTools::createInfo(it->second);
+
+               // Read component from file 
+               this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
+
+               // Adapt data if necessary
+               this->adaptData(it->second);
+            }
+         }
+         
+         // close group
+         H5Gclose(group);
+
+      } else if(isRequired)
       {
-         // Read the field component
-         this->readRegularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
-      } else
-      {
-         // Read the field component
-         this->readIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
+         throw Exception("Tried to open inexistant HDF5 group");
       }
-      
-      // close group
-      H5Gclose(group);
+   }
 
-      // Adapt data if necessary
-      this->adaptData(rComp);
+   void StateFileReader::readSpectralComponent(const std::string& name, FieldComponents::Spectral::Id id, Datatypes::SpectralScalarType& rComp, const bool isRequired)
+   {
+      // Open the vector field group
+      hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
+
+      if(group >= 0)
+      {
+         // Storage for the field information
+         std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rComp);
+
+         // Check for data regularity
+         if(this->mIsRegular)
+         {
+            // Read the field component
+            this->readRegularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
+         } else
+         {
+            // Read the field component
+            this->readIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
+         }
+
+         // close group
+         H5Gclose(group);
+
+         // Adapt data if necessary
+         this->adaptData(rComp);
+
+      } else if(isRequired)
+      {
+         throw Exception("Tried to open inexistant HDF5 group");
+      }
+
    }
 
    void StateFileReader::adaptData(Datatypes::SpectralScalarType& rField)

@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBCSquareVCModel.cpp
- * @brief Source of the Boussinesq Rayleigh-Benard convection in a square (2D) (velocity-continuity formulation) model
+ * @file BoussinesqRBCSquareSModel.cpp
+ * @brief Source of the Boussinesq Rayleigh-Benard convection in a square (2D) (streamfunction formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,61 +15,55 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRBCSquareVCModel.hpp"
+#include "PhysicalModels/BoussinesqRBCSquareSModel.hpp"
 
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCTransport.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCMomentum.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRBCSquareVCContinuity.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCSquareSTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCSquareSMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCSquareSVorticityY.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/ContinuityWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Generator/States/RandomScalarState.hpp"
-#include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
-#include "Generator/States/CartesianExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqRBCSquareVCModel::PYMODULE = "boussinesq_rbcsquare_vc";
+   const std::string BoussinesqRBCSquareSModel::PYMODULE = "boussinesq_rbcsquare_s";
 
-   const std::string BoussinesqRBCSquareVCModel::PYCLASS = "BoussinesqRBCSquareVC";
+   const std::string BoussinesqRBCSquareSModel::PYCLASS = "BoussinesqRBCSquareS";
 
-   void BoussinesqRBCSquareVCModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRBCSquareSModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqRBCSquareVCTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCSquareSTransport>();
       
-      // Add Navier-Stokes equation (X,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqRBCSquareVCMomentum>();
-
-      // Add continuity equation
-      spSim->addScalarEquation<Equations::BoussinesqRBCSquareVCContinuity>();
+      // Add Navier-Stokes equation in streamfunction formulation
+      spSim->addScalarEquation<Equations::BoussinesqRBCSquareSMomentum>();
+      
+      // Add vorticity Y equation
+      spSim->addScalarEquation<Equations::BoussinesqRBCSquareSVorticityY>();
    }
 
-   void BoussinesqRBCSquareVCModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRBCSquareSModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
-         Equations::SharedCartesianExactVectorState spVector;
 
-         // Add exact initial state generator
-         spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
-         spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 2.0, 1.0e0, 6.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 3.0, 1.0e0, 4.0);
+         // Add scalar exact initial state generator
+         spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spScalar->setIdentity(PhysicalNames::STREAMFUNCTION);
+         spScalar->setStateType(Equations::CartesianExactStateIds::POLYPOLY);
+         spScalar->setModeOptions(1e0, 2.0, 1e0, 10.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
@@ -82,13 +76,11 @@ namespace GeoMHDiSCC {
       {
          // Shared pointer to random initial state equation
          Equations::SharedRandomScalarState spScalar;
-         Equations::SharedRandomVectorState spVector;
 
-         // Add random initial state generator 
-         spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
-         spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setSpectrum(FieldComponents::Spectral::X, -1e-4, 1e-4, 1e4, 1e4);
-         spVector->setSpectrum(FieldComponents::Spectral::Z, -1e-4, 1e-4, 1e4, 1e4);
+         // Add scalar random initial state generator
+         spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spScalar->setIdentity(PhysicalNames::STREAMFUNCTION);
+         spScalar->setSpectrum(-1e-4, 1e-4, 1e4, 1e4);
 
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
@@ -98,64 +90,51 @@ namespace GeoMHDiSCC {
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::TEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBCSquareVCModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCSquareSModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
-      Equations::SharedVectorFieldVisualizer spVector;
+
+      // Add streamfunction field visualization
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, true);
+      spScalar->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spScalar->setFields(true, true);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
-      // Add velocity fields visualization
-      spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, true, false);
-      spVector->setIdentity(PhysicalNames::VELOCITY);
-
-      // Add pressure field visualization
-      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spScalar->setFields(true, false);
-      spScalar->setIdentity(PhysicalNames::PRESSURE);
-
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spOut->expect(PhysicalNames::VELOCITY);
-      spOut->expect(PhysicalNames::PRESSURE);
+      spOut->expect(PhysicalNames::STREAMFUNCTION);
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBCSquareVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCSquareSModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
 
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
-      spIn->expect(PhysicalNames::VELOCITY);
-      spIn->expect(PhysicalNames::PRESSURE, false);
+      spIn->expect(PhysicalNames::STREAMFUNCTION);
 
       // Set simulation state
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRBCSquareVCModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCSquareSModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-      // Create maximal continuity writer
-      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITY);
-
-      spSim->addAsciiOutputFile(spState);
    }
 
-   void BoussinesqRBCSquareVCModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCSquareSModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -167,11 +146,10 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
-      spState->expect(PhysicalNames::PRESSURE);
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRBCSquareVCModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRBCSquareSModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;

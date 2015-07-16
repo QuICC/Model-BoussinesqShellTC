@@ -46,9 +46,14 @@ namespace IoVariable {
       this->setCollIo();
    }
 
-   void IVariableHdf5Reader::expect(const PhysicalNames::Id id)
+   void IVariableHdf5Reader::expect(const PhysicalNames::Id id, const bool isRequired)
    {
       this->mExpected.insert(id);
+
+      if(isRequired)
+      {
+         this->mRequired.insert(id);
+      }
    }
 
    bool IVariableHdf5Reader::isFull() const
@@ -105,6 +110,11 @@ namespace IoVariable {
    void IVariableHdf5Reader::setCollIo()
    {
       this->mCollIoRead = 0;
+   }
+
+   bool IVariableHdf5Reader::isRequired(const PhysicalNames::Id id)
+   {
+      return this->mRequired.count(id);
    }
 
    void IVariableHdf5Reader::setReadArguments()

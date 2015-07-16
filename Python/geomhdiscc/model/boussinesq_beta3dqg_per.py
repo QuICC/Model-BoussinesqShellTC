@@ -308,7 +308,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
                 mat = geo.i1(res[0], bc)
 
             elif field_row == ("temperature",""):
-                mat = geo.qid(res[0], 0, bc)
+                mat = geo.sid(res[0], 0, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

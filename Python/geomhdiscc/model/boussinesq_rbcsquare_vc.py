@@ -300,7 +300,7 @@ class BoussinesqRBCSquareVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("velocity","z"):
-                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
+                if self.linearize:
                     if eq_params['heating'] == 0:
                         mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
                 else:

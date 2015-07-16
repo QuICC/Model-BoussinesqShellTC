@@ -140,7 +140,7 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITY);
-      spIn->expect(PhysicalNames::PRESSURE);
+      spIn->expect(PhysicalNames::PRESSURE, false);
 
       // Set simulation state
       spVis->setInitialState(spIn);

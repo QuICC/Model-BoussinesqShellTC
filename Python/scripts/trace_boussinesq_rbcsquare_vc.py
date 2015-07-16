@@ -12,8 +12,9 @@ model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 #res = [8, 8]
-res = [24, 24]
+#res = [24, 24]
 #res = [128, 128]
+res = [8, 8]
 
 # SF/SF, FF/FT, k = 0
 #bc_vel = 2

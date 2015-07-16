@@ -12,7 +12,7 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [16, 0, 0]
+res = [64, 0, 0]
 chi = 5
 Pr = 1
 G = 1e-2
@@ -38,7 +38,7 @@ kp = 1
 Ra = Rac
 kp = kyc
 
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi, 'scale1d':1, 'elevator':0}
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi, 'scale1d':1, 'elevator':1}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 
 # Generic Wave number function from single "index" (k perpendicular) and angle

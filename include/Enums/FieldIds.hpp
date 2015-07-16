@@ -61,6 +61,10 @@ namespace GeoMHDiSCC {
          VELOCITYZ,
          /// Vorticity field
          VORTICITY,
+         /// X vorticity field
+         VORTICITYX,
+         /// Y vorticity field
+         VORTICITYY,
          /// Axial vorticity field
          VORTICITYZ,
 

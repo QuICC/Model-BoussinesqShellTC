@@ -53,7 +53,7 @@ namespace IoVariable {
          /**
           * @brief Add name of expected variable to be added
           */
-         void expect(const PhysicalNames::Id id);
+         void expect(const PhysicalNames::Id id, const bool isRequired = true);
 
          /**
           * @brief Make sure all the expected variables have been added
@@ -132,6 +132,11 @@ namespace IoVariable {
           */
          bool mIsRegular;
 
+         /**
+          * @brief Is optional variable?
+          */
+         bool isRequired(const PhysicalNames::Id id);
+
       private:
          /**
           * @brief Set the resolution and use it for preliminary initialisation
@@ -156,9 +161,14 @@ namespace IoVariable {
          SharedSimulationResolution mspFileRes;
 
          /**
-          * @brief Storage for the names of the expecte variables
+          * @brief Storage for the names of the expected variables
           */
          std::set<PhysicalNames::Id>  mExpected;
+
+         /**
+          * @brief Storage for the names of the required variables
+          */
+         std::set<PhysicalNames::Id>  mRequired;
 
          /**
           * @brief Storage for the scalars
