@@ -192,6 +192,12 @@ namespace IoTools {
       {
          return NonDimensional::OMEGA;
 
+      //
+      // Special flags
+      } else if(id == IdToHuman::toTag(NonDimensional::ELEVATOR))
+      {
+         return NonDimensional::ELEVATOR;
+
       } else
       {
          throw Exception("Unknown string to ID conversion requested (Nondimensional)");

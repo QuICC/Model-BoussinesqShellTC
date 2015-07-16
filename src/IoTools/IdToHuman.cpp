@@ -477,6 +477,11 @@ namespace IoTools {
          case NonDimensional::OMEGA:
             return "omega";
 
+         // 
+         // Special flags
+         case NonDimensional::ELEVATOR:
+            return "elevator";
+
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
       }

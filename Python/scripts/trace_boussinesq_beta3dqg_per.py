@@ -12,7 +12,7 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [64, 0, 0]
+res = [16, 0, 0]
 chi = 5
 Pr = 1
 G = 1e-2
@@ -52,8 +52,8 @@ def generic_wave(kp, phi):
     else:
         kx = kp*np.cos(phi*np.pi/180.0)
         ky = (kp**2-kx**2)**0.5
-    kx = 1
-    ky = kp
+    #kx = 1
+    #ky = kp
     return [kx, ky]
 
 # Wave number function from single "index" (k perpendicular)
@@ -78,7 +78,7 @@ marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['write_mtx'] = True
-marginal_options['viz_mode'] = 1
+marginal_options['viz_mode'] = 0
 marginal_options['curve_points'] = np.arange(max(0.3, kp-2), kp+.5, 0.05)
 
 # Compute 

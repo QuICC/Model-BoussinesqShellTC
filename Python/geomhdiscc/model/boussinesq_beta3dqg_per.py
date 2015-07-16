@@ -23,7 +23,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "gamma", "chi", "scale1d"]
+        return ["prandtl", "rayleigh", "gamma", "chi", "scale1d", "elevator"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -182,19 +182,26 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the quasi-inverse operator"""
 
+        kx = eigs[0]
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("streamfunction","") and field_col == field_row:
-            mat = geo.i1(res[0], bc)
 
-        elif field_row == ("velocityz","") and field_col == field_row:
-            mat = geo.i1(res[0], bc)
-
-        elif field_row == ("dx_meantemperature","") and field_col == field_row:
+        if field_row == ("dx_meantemperature","") and field_col == field_row:
             if eigs[1] == 0:
                 mat = geo.avg(res[0])
             else:
                 mat = geo.zblk(res[0], bc)
+
+        # Filter elevator mode
+        elif kx == 0 and eq_params['elevator'] == 0:
+            mat = geo.zblk(res[0], bc)
+
+        else:
+            if field_row == ("streamfunction","") and field_col == field_row:
+                mat = geo.i1(res[0], bc)
+
+            elif field_row == ("velocityz","") and field_col == field_row:
+                mat = geo.i1(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -231,38 +238,50 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("streamfunction",""):
-            if field_col == ("streamfunction",""):
-                mat = geo.i1(res[0], bc, (kx**2 + ky**2)**2)
+        # Filter elevator mode
+        if kx == 0 and eq_params['elevator'] == 0:
+            if bcs["bcType"] == self.SOLVER_NO_TAU:
+                mat = geo.zblk(res[0], no_bc())
 
-            elif field_col == ("velocityz",""):
-                mat = geo.i1d1(res[0], bc, cscale = zscale)
+            elif field_row == field_col:
+                mat = geo.qid(res[0], 0, no_bc())
 
-            elif field_col == ("temperature",""):
-                mat = geo.i1(res[0], bc, 1j*ky*(Ra/(16.0*Pr)))
+            else:
+                mat = geo.zblk(res[0], no_bc())
 
-        elif field_row == ("velocityz",""):
-            if field_col == ("streamfunction",""):
-                mat = geo.i1d1(res[0], bc, (-1.0/G**2), cscale = zscale)
+        else:
+            if field_row == ("streamfunction",""):
+                if field_col == ("streamfunction",""):
+                    mat = geo.i1(res[0], bc, (kx**2 + ky**2)**2)
 
-            elif field_col == ("velocityz",""):
-                mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
+                elif field_col == ("velocityz",""):
+                    mat = geo.i1d1(res[0], bc, cscale = zscale)
 
-            elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], bc)
+                elif field_col == ("temperature",""):
+                    mat = geo.i1(res[0], bc, 1j*ky*(Ra/(16.0*Pr)))
 
-        elif field_row == ("temperature",""):
-            if field_col == ("streamfunction",""):
-                if self.linearize:
-                    mat = geo.qid(res[0], 0, bc, 1j*ky)
-                else:
+            elif field_row == ("velocityz",""):
+                if field_col == ("streamfunction",""):
+                    mat = geo.i1d1(res[0], bc, (-1.0/G**2), cscale = zscale)
+
+                elif field_col == ("velocityz",""):
+                    mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
+
+                elif field_col == ("temperature",""):
                     mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("velocityz",""):
-                mat = geo.zblk(res[0], bc)
+            elif field_row == ("temperature",""):
+                if field_col == ("streamfunction",""):
+                    if self.linearize:
+                        mat = geo.qid(res[0], 0, bc, 1j*ky)
+                    else:
+                        mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("temperature",""):
-                mat = geo.qid(res[0], 0, bc, -(1/Pr)*(kx**2 + ky**2))
+                elif field_col == ("velocityz",""):
+                    mat = geo.zblk(res[0], bc)
+
+                elif field_col == ("temperature",""):
+                    mat = geo.qid(res[0], 0, bc, -(1/Pr)*(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -277,14 +296,19 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("streamfunction",""):
-            mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
+        # Filter elevator mode
+        if kx == 0 and eq_params['elevator'] == 0:
+            mat = geo.zblk(res[0], bc)
 
-        elif field_row == ("velocityz",""):
-            mat = geo.i1(res[0], bc)
+        else:
+            if field_row == ("streamfunction",""):
+                mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
 
-        elif field_row == ("temperature",""):
-            mat = geo.qid(res[0], 0, bc)
+            elif field_row == ("velocityz",""):
+                mat = geo.i1(res[0], bc)
+
+            elif field_row == ("temperature",""):
+                mat = geo.qid(res[0], 0, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
