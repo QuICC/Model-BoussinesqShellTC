@@ -53,7 +53,6 @@ namespace Equations {
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)u_x\f$
       ///
-
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYY).dom(0).grad(), 1.0/Pr);
    }
 

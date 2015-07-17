@@ -110,10 +110,16 @@ namespace GeoMHDiSCC {
       spScalar->setFields(true, true);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
+      // Add temperature field visualization
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, true);
+      spScalar->setIdentity(PhysicalNames::VORTICITYY);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
+      spOut->expect(PhysicalNames::VORTICITYY);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -125,6 +131,7 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::STREAMFUNCTION);
+      spIn->expect(PhysicalNames::VORTICITYY, false);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -146,6 +153,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+      spState->expect(PhysicalNames::VORTICITYY);
       spSim->addHdf5OutputFile(spState);
    }
 

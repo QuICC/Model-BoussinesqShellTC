@@ -46,6 +46,9 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
         elif field_row in [("vorticityy","")]:
             fields = [("vorticityy","")]
 
+        else:
+            fields = []
+
         return fields
 
     def explicit_fields(self, timing, field_row):
@@ -132,9 +135,9 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
 
                 else:
                     if field_row == ("streamfunction","") and field_col == field_row:
-                        bc = {'x':{0:40}, 'z':{0:40}, 'priority':'z'}
+                        bc = {'x':{0:40}, 'z':{0:40}, 'priority':'x'}
                     elif field_row == ("temperature","") and field_col == field_row:
-                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
 
             # Stress-free/No-slip, Fixed flux/Fixed temperature
             elif bcId == 1:
@@ -159,10 +162,6 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
                 else:
                     if field_row == ("streamfunction","") and field_col == field_row:
                         bc = {'x':{0:41}, 'z':{0:41}, 'priority':'z'}
-
-            else:
-                if field_row == ("vorticityy","") and field_col == field_row:
-                    bc = {'x':{0:992}, 'z':{0:992}, 'priority':'sz'}
 
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -215,7 +214,7 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == ("streamfunction",""):
             if eq_params['heating'] == 0:
-                mat = geo.i2j2d1(res[0], res[1], bc, 1.0, xscale = xscale)
+                mat = geo.i2j2d1(res[0], res[1], bc, -1.0, xscale = xscale, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -228,10 +227,10 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction","") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[1], bc)
+            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[1], bc)
+            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -247,7 +246,11 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("vorticityy","") and field_col == ("streamfunction",""):
-            mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
+            bc['x']['rt'] = 2
+            bc['x']['cr'] = 2
+            bc['z']['rt'] = 2
+            bc['z']['cr'] = 2
+            mat = geo.i2j2lapl(res[0]+2, res[1]+2, 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -283,7 +286,11 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
                 mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
 
         elif field_row == ("vorticityy","") and field_col == field_row:
-            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
+            bc['x']['rt'] = 2
+            bc['x']['cr'] = 2
+            bc['z']['rt'] = 2
+            bc['z']['cr'] = 2
+            mat = geo.i2j2(res[0]+2, res[1]+2, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -14,7 +14,7 @@ model.use_galerkin = False
 #res = [8, 8]
 #res = [10, 10]
 #res = [24, 24]
-#res = [32, 32]
+#res = [64, 64]
 res = [128, 128]
 
 # SF/SF, FF/FT, k = 0
@@ -47,15 +47,8 @@ bc_stream = 0
 bc_temp = 1
 heating = 0
 k = 0
-Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
-#k = (np.sqrt(7.0)/2.0)*np.pi
-#Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
-#k = 0
-#Pr = 1; Ra = 500*np.pi**4; A1d = 2.0; A3d = 1.0
-#k = 0
-#Pr = 7; Ra = 8*np.pi**4; A1d = 1.0/8.0; A3d = 1.0
-#k = 0
-#Pr = 1; Ra = 8000*np.pi**4; A1d = 8.0; A3d = 1.0
+Pr = 7; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
+Pr = 7; Ra = 19634.8; A1d = 1.0; A3d = 1.0
 
 # SF/SF, FF/FT, k = 1.0
 #bc_vel = 2
@@ -107,14 +100,14 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['mode'] = 0
-marginal_options['ellipse_radius'] = 1e5
+marginal_options['mode'] = 2
+marginal_options['ellipse_radius'] = 1e3
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 10
+marginal_options['solve_nev'] = 5
 marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = False
@@ -122,7 +115,7 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 3
+marginal_options['viz_mode'] = 2
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
 
 # Compute 

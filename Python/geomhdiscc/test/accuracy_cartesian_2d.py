@@ -15,6 +15,7 @@ else:
     has_error_plot = False
 
 import geomhdiscc.transform.cartesian as transf
+transf.min_x_points = 1
 import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
 
 
@@ -50,8 +51,6 @@ def test_value(op, res_expr, sol, grid_x, grid_z):
     lhs = transf.tocheb2d(mesh)
     lhs = lhs.reshape(nx*nz, order = 'F')
     rhs = op*lhs
-    print(rhs)
-    print(sol)
     err = np.abs(rhs - sol)
     print("\t\tValue error: " + str(err))
 
@@ -90,7 +89,9 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, grid_x, grid_z):
     sol = xz_to_phys(sol_expr, grid_x, grid_z)
     sol = transf.tocheb2d(sol)
     err = np.abs(lhs - sol)
+    relerr = err/(1.0 + np.abs(sol))
     vis_error(err, 'Tau backward error')
+    vis_error(relerr, 'Tau backward relative error')
     print("\t\tMax tau backward error: " + str(np.max(err)))
 
 def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
@@ -333,6 +334,33 @@ def i2j2lapl(nx,nz, xg, zg):
     print("\tbc = 20, 20")
     A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}, 'priority':'sz'}).tocsr()
     B = c2d.i2j2(nx, nz, c2d.c2dbc.no_bc()).tocsr()
+    test_backward_tau(A, B, sphys, ssol, xg, zg)
+
+def i2j2lapl2D(nx,nz, xg, zg):
+    """Accuracy test for i2j2lapl operator for 2D (k=0)"""
+
+    print("i2j2lapl:")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    A = c2d.i2j2lapl(nx, nz, 0, c2d.c2dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,nz-2,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x) + sy.diff(sphys,z,z))
+    ssol = sy.integrate(ssol,x,x)
+    ssol = sy.expand(ssol)
+    ssol = sy.integrate(ssol,z,z)
+    ssol = sy.expand(ssol)
+    test_forward(A, sphys, ssol, xg, zg, 2, 2)
+
+    print("\tforward backward solve")
+    bc = c2d.c2dbc.no_bc()
+    s = 2
+    bc['x']['rt'] = s
+    bc['x']['cr'] = s
+    bc['z']['rt'] = s
+    bc['z']['cr'] = s
+    A = c2d.i2j2(nx+s, nz+s, bc).tocsr()
+    B = c2d.i2j2lapl(nx+s, nz+s, 0, bc).tocsr()
+    ssol = sy.expand(sy.diff(sphys,x,x) + sy.diff(sphys,z,z))
     test_backward_tau(A, B, sphys, ssol, xg, zg)
 
 def i4j1(nx,nz, xg, zg):
@@ -787,7 +815,8 @@ if __name__ == "__main__":
 #    i2laplh(nx, nz, xg, zg)
 #    i2j1laplh(nx, nz, xg, zg)
 #    i2j2laplh(nx, nz, xg, zg)
-    i2j2lapl(nx, nz, xg, zg)
+#    i2j2lapl(nx, nz, xg, zg)
+    i2j2lapl2D(nx, nz, xg, zg)
 #    i4j1(nx, nz, xg, zg)
 #    i4j2(nx, nz, xg, zg)
 #    i4j4(nx, nz, xg, zg)
