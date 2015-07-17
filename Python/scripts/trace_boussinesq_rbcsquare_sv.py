@@ -1,31 +1,31 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a square (2D) (vorticity-streamfunction formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a square (2D) (streamfunction-vorticity formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbcsquare_s as mod
+import geomhdiscc.model.boussinesq_rbcsquare_sv as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCSquareS()
+model = mod.BoussinesqRBCSquareSV()
 model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-#res = [8, 8]
+res = [8, 8]
 #res = [10, 10]
 #res = [24, 24]
-res = [32, 32]
+#res = [32, 32]
 #res = [64, 64]
 #res = [128, 128]
 
-# NS/NS, FF/FT
+# NS/NS, FF/FT 
 bc_stream = 0
 bc_temp = 1
 heating = 0
 k = 0
-Pr = 0.7; Ra = 108*np.pi**4; A3d = 2.0
+Pr = 7; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale2d':2.0*A3d} #
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0*A3d, 'scale2d':2.0*A3d} #
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_stream, 'temperature':bc_temp}
 
@@ -56,7 +56,7 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 0
+marginal_options['viz_mode'] = 1
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
 
 # Compute 

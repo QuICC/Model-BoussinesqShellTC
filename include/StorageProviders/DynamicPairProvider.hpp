@@ -333,8 +333,11 @@ namespace GeoMHDiSCC {
 
    template <typename TForward, typename TBackward> void DynamicPairProvider<TForward, TBackward>::addFStorage()
    {
-      // Safety assert to avoid growin to big
-      assert(this->mFTmp.size() < 20);
+      // Avoid growing to big (error in transform most likely)
+      if(this->mFTmp.size() > 20)
+      {
+         throw Exception("Forward transform storage providers became too large!");
+      }
 
       // Create forward storage scalar
       this->mFTmp.push_back(TForward(this->mspFSetup));
@@ -345,8 +348,11 @@ namespace GeoMHDiSCC {
 
    template <typename TForward, typename TBackward> void DynamicPairProvider<TForward, TBackward>::addBStorage()
    {
-      // Safety assert to avoid growin to big
-      assert(this->mBTmp.size() < 20);
+      // Avoid growing to big (error in transform most likely)
+      if(this->mBTmp.size() > 20)
+      {
+         throw Exception("Backward transform storage providers became too large!");
+      }
 
       // Create backward storage scalar
       TBackward   tmp(this->mspBSetup);
