@@ -107,12 +107,12 @@ namespace GeoMHDiSCC {
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spScalar->setFields(true, true);
+      spScalar->setFields(true, false);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spScalar->setFields(true, true);
+      spScalar->setFields(true, false);
       spScalar->setIdentity(PhysicalNames::VORTICITYY);
 
       // Add output file
