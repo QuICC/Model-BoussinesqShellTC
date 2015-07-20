@@ -11,86 +11,19 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-#res = [8, 8]
-#res = [24, 24]
-#res = [128, 128]
 res = [8, 8]
-
-# SF/SF, FF/FT, k = 0
-#bc_vel = 2
-#bc_temp = 1
-#heating = 0
-#k = 0
-# SF/SF, FF/FT, Aspect ratio 1:1
-#Pr = 1; Ra = 779.273; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 3044.03; A1d = 1.0; A3d = 1.0 # m = 2, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 10823.2; A1d = 1.0; A3d = 1.0 # m = 3, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 12176.1; A1d = 1.0; A3d = 1.0 # m = 1, n = 2, aspect ration 1:1
-#Pr = 1; Ra = 12468.4; A1d = 1.0; A3d = 1.0 # m = 2, n = 2, aspect ration 1:1
-# SF/SF, FF/FT, Aspect ratio 3:1
-#Pr = 1; Ra = 660.518; A1d = 1.0/3.0; A3d = 1.0 # m = 2, n = 1, aspect ratio 3:1
-#Pr = 1; Ra = 779.273; A1d = 1.0/3.0; A3d = 1.0 # m = 3, n = 1, aspect ratio 3:1
-#Pr = 1; Ra = 1174.40; A1d = 1.0/3.0; A3d = 1.0 # m = 4, n = 1, aspect ratio 3:1
-#Pr = 1; Ra = 1202.58; A1d = 1.0/3.0; A3d = 1.0 # m = 1, n = 1, aspect ratio 3:1
-#Pr = 1; Ra = 10568.3; A1d = 1.0/3.0; A3d = 1.0 # m = 4, n = 2, aspect ratio 3:1
-# SF/SF, FF/FT, Aspect ratio 1:3
-#Pr = 1; Ra = 133.620; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 1, aspect ratio 1:3
-#Pr = 1; Ra = 293.563; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 2, aspect ratio 1:3
-#Pr = 1; Ra = 779.273; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 3, aspect ratio 1:3
-#Pr = 1; Ra = 1692.07; A1d = 1.0; A3d = 1.0/3.0 # m = 2, n = 1, aspect ratio 1:3
-#Pr = 1; Ra = 2087.81; A1d = 1.0; A3d = 1.0/3.0 # m = 1, n = 4, aspect ratio 1:3
-#Pr = 1; Ra = 2137.92; A1d = 1.0; A3d = 1.0/3.0 # m = 2, n = 2, aspect ratio 1:3
+#res = [24, 24]
+#res = [32, 32]
+#res = [128, 128]
 
 # PAPER
 bc_vel = 0
 bc_temp = 1
 heating = 0
 k = 0
-Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
-#k = (np.sqrt(7.0)/2.0)*np.pi
-#Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
-#k = 0
-#Pr = 1; Ra = 500*np.pi**4; A1d = 2.0; A3d = 1.0
-#k = 0
-#Pr = 7; Ra = 8*np.pi**4; A1d = 1.0/8.0; A3d = 1.0
-#k = 0
-#Pr = 1; Ra = 8000*np.pi**4; A1d = 8.0; A3d = 1.0
+Pr = 7; Ra = 1e6; A3d = 4.0
 
-# SF/SF, FF/FT, k = 1.0
-#bc_vel = 2
-#bc_temp = 1
-#heating = 0
-#k = 1.0
-# SF/SF, FF/FT, Aspect ratio 1:1
-#Pr = 1; Ra = 820.6591462; A1d = 1.0; A3d = 1.0 # l = 1, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 1284.225280; A1d = 1.0; A3d = 1.0 # l = 0, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 3152.998132; A1d = 1.0; A3d = 1.0 # l = 2, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 11031.37354; A1d = 1.0; A3d = 1.0 # l = 3, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 11741.76818; A1d = 1.0; A3d = 1.0 # l = 1, n = 2, aspect ration 1:1
-#Pr = 1; Ra = 12628.25262; A1d = 1.0; A3d = 1.0 # l = 2, n = 2, aspect ration 1:1
-
-# SF/SF, FF/FT, k = 5.35
-#bc_vel = 2
-#bc_temp = 1
-#heating = 0
-#k = 5.35
-# SF/SF, FF/FT, Aspect ratio 1:1
-#Pr = 1; Ra = 1992.541617; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 2938.551173; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 6960.466725; A1d = 1.0; A3d = 1.0 # m = 2, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 17572.19000; A1d = 1.0; A3d = 1.0 # m = 3, n = 1, aspect ration 1:1
-#Pr = 1; Ra = 12314.58187; A1d = 1.0; A3d = 1.0 # m = 1, n = 2, aspect ration 1:1
-#Pr = 1; Ra = 18282.41677; A1d = 1.0; A3d = 1.0 # m = 2, n = 2, aspect ration 1:1
-
-# SF/NS, FF/FT
-#bc_vel = 1 
-#bc_temp = 1 
-#heating = 0
-# SF/SF/NS, FF/FF/FT, Aspect ratio 3:1:1
-#Pr = 1; Ra = 1500.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
-#Pr = 1; Ra = 2000.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
-
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0*A3d, 'scale2d':2.0*A3d} #
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale2d':2.0*A3d} #
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -107,7 +40,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['mode'] = 0
-marginal_options['ellipse_radius'] = 1e5
+#marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
 marginal_options['curve'] = False

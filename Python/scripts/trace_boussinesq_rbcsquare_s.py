@@ -23,7 +23,7 @@ bc_stream = 0
 bc_temp = 1
 heating = 0
 k = 0
-Pr = 0.7; Ra = 108*np.pi**4; A3d = 2.0
+Pr = 7; Ra = 1e6; A3d = 4.0
 
 eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale2d':2.0*A3d} #
 
@@ -42,13 +42,12 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['mode'] = 0
-marginal_options['ellipse_radius'] = 1e3
+#marginal_options['ellipse_radius'] = 1e3
 marginal_options['geometry'] = 'c2d'
-marginal_options['point'] = False
-marginal_options['curve'] = False
+marginal_options['point'] = True
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 5
+marginal_options['solve_nev'] = 10
 marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = False

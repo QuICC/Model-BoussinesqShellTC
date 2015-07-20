@@ -102,6 +102,13 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_x,0,shift_z), 1)
         return block_info
 
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        # Get boundary condition
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        return geo.stencil(res[0], res[1], bc, make_square)
+
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
@@ -143,13 +150,13 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
+                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:-40, 'rt':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
                     if field_row == ("streamfunction","") and field_col == field_row:
-                        bc = {'x':{0:42}, 'z':{0:40}, 'priority':'x'}
+                        bc = {'x':{0:41}, 'z':{0:40}, 'priority':'x'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
 
@@ -157,7 +164,7 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
             elif bcId == 2:
                 if self.use_galerkin:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-42, 'rt':0}, 'z':{0:-42, 'rt':0}}
+                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:-41, 'rt':0}}
 
                 else:
                     if field_row == ("streamfunction","") and field_col == field_row:
@@ -184,13 +191,13 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
 
                 elif bcId == 1:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-42, 'rt':0}, 'z':{0:-40, 'rt':0}}
+                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:-40, 'rt':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 elif bcId == 2:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-42, 'rt':0}, 'z':{0:-42, 'rt':0}}
+                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:-41, 'rt':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -260,7 +267,19 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
+        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+
+        if False:
+            # Diffusion time
+            ns_diff = 1.0
+            ns_temp = Ra
+            t_diff = 1.0
+        else:
+            # Free fall
+            ns_diff = (Pr/Ra)**0.5
+            ns_temp = Pr
+            t_diff = (Pr/Ra)**0.5
 
         xscale = eq_params['scale1d']
         zscale = eq_params['scale2d']
@@ -269,10 +288,10 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
-                mat = geo.i4j4lapl2(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
+                mat = geo.i4j4lapl2(res[0], res[1], 0, bc, ns_diff, xscale = xscale, zscale = zscale, restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = geo.i4j4d1(res[0], res[1], bc, Ra, xscale = xscale, restriction = restriction)
+                mat = geo.i4j4d1(res[0], res[1], bc, ns_temp, xscale = xscale, restriction = restriction)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
@@ -283,7 +302,7 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
                     mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2lapl(res[0], res[1], 0, bc, xscale = xscale, zscale = zscale, restriction = restriction)
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, t_diff, xscale = xscale, zscale = zscale, restriction = restriction)
 
         elif field_row == ("vorticityy","") and field_col == field_row:
             bc['x']['rt'] = 2
