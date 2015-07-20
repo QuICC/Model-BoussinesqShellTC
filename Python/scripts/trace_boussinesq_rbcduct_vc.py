@@ -16,8 +16,8 @@ model.use_galerkin = False
 #res = [6, 0, 6]
 #res = [12, 0, 12]
 #res = [16, 0, 16]
-res = [24, 0, 24]
-#res = [32, 0, 32]
+#res = [24, 0, 24]
+res = [32, 0, 32]
 #res = [36, 0, 36]
 #res = [48, 0, 48]
 #res = [64, 0, 64]
@@ -52,9 +52,12 @@ res = [24, 0, 24]
 bc_vel = 2
 bc_temp = 1
 heating = 0
-k = np.pi
-#k = 0
-Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0/2.0
+#k = np.pi
+k = 0
+#Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0/2.0
+#Pr = 7; Ra = 116.83858990055; A3d = 1.0/4.0
+Pr = 7; Ra = 800; A3d = 1.0
+#Pr = 7; Ra = 116.83858990055; A3d = 4.0
 #k = (np.sqrt(7.0)/2.0)*np.pi
 #Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
 #k = 0
@@ -99,7 +102,7 @@ Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0/2.0
 #Pr = 1; Ra = 1500.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 #Pr = 1; Ra = 2000.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0*A3d, 'scale3d':2.0*A3d} #
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale3d':2.0*A3d} #
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -118,11 +121,11 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['mode'] = 0
 marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'c2d'
-marginal_options['point'] = False
+marginal_options['point'] = True
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 20
+marginal_options['solve_nev'] = 5
 marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = False
@@ -130,7 +133,7 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 2
+marginal_options['viz_mode'] = 0
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+2, 0.2)
 
 # Compute 

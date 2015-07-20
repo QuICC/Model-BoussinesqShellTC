@@ -12,7 +12,7 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [16, 0, 0]
+res = [7, 0, 0]
 
 # SF, FT,
 bc_vel = 0
