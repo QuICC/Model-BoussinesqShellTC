@@ -251,19 +251,14 @@ class BoussinesqRBCSquareSV(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
-            bc = no_bc()
-            bc['x']['rt']=2
-            bc['x']['cr']=2
-            bc['z']['rt']=2
-            bc['z']['cr']=2
             if field_col == ("streamfunction",""):
-                mat = geo.i2j2lapl(res[0]+2, res[1]+2, 0, bc, -1.0, xscale = xscale, zscale = zscale, restriction = restriction)
+                mat = geo.i2j2lapl(res[0], res[1], 0, bc, -1.0, xscale = xscale, zscale = zscale, restriction = restriction)
 
             elif field_col == ("vorticityy",""):
-                mat = geo.i2j2(res[0]+2, res[1]+2, bc, restriction = restriction)
+                mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0]+2, res[1]+2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], 2, 2, bc)
 
         elif field_row == ("vorticityy",""):
             if field_col == ("streamfunction",""):

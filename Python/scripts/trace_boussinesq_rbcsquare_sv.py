@@ -23,9 +23,9 @@ bc_stream = 0
 bc_temp = 1
 heating = 0
 k = 0
-Pr = 7; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
+Pr = 7; Ra = 1e6; A3d = 4.0
 
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0*A3d, 'scale2d':2.0*A3d} #
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale2d':2.0*A3d} #
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_stream, 'temperature':bc_temp}
 
@@ -45,8 +45,6 @@ marginal_options['mode'] = 0
 marginal_options['ellipse_radius'] = 1e3
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
-marginal_options['curve'] = False
-marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['solve_nev'] = 5
 marginal_options['point_k'] = k

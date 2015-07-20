@@ -270,7 +270,7 @@ class BoussinesqRBCSquareS(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        if False:
+        if True:
             # Diffusion time
             ns_diff = 1.0
             ns_temp = Ra
