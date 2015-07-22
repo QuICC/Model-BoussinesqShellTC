@@ -60,6 +60,11 @@ namespace Solver {
          virtual void addStorage(const int rows, const int cols);
 
          /**
+          * @brief Initialise solution after data was copied
+          */
+         virtual void initSolutions();
+
+         /**
           * @brief Set solver RHS data to zero
           */
          void zeroSolver();
@@ -113,6 +118,10 @@ namespace Solver {
       // Add storage for solution
       this->mSolution.push_back(TData(rows,cols));
       this->mSolution.back().setZero();
+   }
+
+   template <typename TOperator,typename TData> void SparseTrivialSolver<TOperator,TData>::initSolutions()
+   {
    }
 
    template <typename TOperator,typename TData> void SparseTrivialSolver<TOperator,TData>::zeroSolver()

@@ -429,6 +429,8 @@ namespace Solver {
             Equations::copyUnknown(*(*eqIt), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
          }
       }
+
+      (*solIt)->initSolutions();
    }
 
    template <template <class,class> class TSolver,typename TSolverIt,typename TEquationIt> void getExplicitSolverInput(SparseCoordinatorData<TSolver>& coord, TEquationIt eqIt, const int idx, SpectralFieldId id, const ModelOperator::Id opId, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)

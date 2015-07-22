@@ -69,6 +69,11 @@ namespace Timestep {
          virtual void initMatrices(const int n);
 
          /**
+          * @brief Initialise solution after data was copied
+          */
+         virtual void initSolutions();
+
+         /**
           * @brief Compute the RHS of the linear systems
           *
           * @param step    Current substep
@@ -330,6 +335,17 @@ namespace Timestep {
                }
             }
 
+         }
+      }
+   }
+
+   template <typename TOperator,typename TData> void SparseTimestepper<TOperator,TData>::initSolutions()
+   {
+      for(int k = 0; k < this->mOldSolution.size(); ++k)
+      {
+         for(int j = 0; j < this->mOldSolution.at(k).size(); ++j)
+         {
+            this->mOldSolution.at(k).at(j) = this->mSolution.at(k);
          }
       }
    }
