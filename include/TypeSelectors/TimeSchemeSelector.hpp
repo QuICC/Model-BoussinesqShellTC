@@ -28,7 +28,7 @@
 
       namespace Timestep {
 
-         typedef ImExRK3 IntegratorSelector;
+         typedef ImExRK3 TimeSchemeSelector;
 
       }
    }
@@ -43,7 +43,7 @@
 
       namespace Timestep {
 
-         typedef ImExSBDF2 IntegratorSelector;
+         typedef ImExSBDF2 TimeSchemeSelector;
 
       }
    }

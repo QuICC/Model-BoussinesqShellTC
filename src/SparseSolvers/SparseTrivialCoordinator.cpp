@@ -85,26 +85,22 @@ namespace Solver {
       //
 
       DebuggerMacro_start("Trivial: create storage", 2);
-      // Loop over all substeps of timestepper
-      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
+      // Loop over all scalar equations
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
-         // Loop over all scalar equations
-         for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
-         {
-            // Create storage 
-            this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
-         }
+         // Create storage 
+         this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
+      }
 
-         // Loop over all vector equations
-         for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
+      // Loop over all vector equations
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
+      {
+         // Create storage 
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            // Create storage 
-            Equations::IVectorEquation::SpectralComponent_iterator compIt;
-            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
-            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
-            {
-               this->createStorage((*vectEqIt), *compIt);
-            }
+            this->createStorage((*vectEqIt), *compIt);
          }
       }
 

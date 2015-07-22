@@ -116,41 +116,29 @@ namespace Timestep {
           * @brief Build the real operator, complex field solver matrix
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex operator, complex field solver matrix
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
          using Solver::SparseLinearCoordinatorBase<SparseTimestepper>::init;
 
          /**
-          * @brief Compute the timestep operator coefficients
-          */
-         void computeTimeCoeffs(MHDFloat& lhsL, MHDFloat& lhsT, MHDFloat& rhsL, MHDFloat& rhsT, std::vector<MHDFloat>& oldRhsL, std::vector<MHDFloat>& oldRhsT);
-
-         /**
           * @brief Update time dependence
           */
          void updateMatrices();
-
-         /**
-          * @brief Compute the RHS of all linear systems
-          */
-         void computeRHS();
 
          /**
           * @brief Maximum timestep jump per step (See Soederlind)
@@ -206,56 +194,22 @@ namespace Timestep {
    /**
     * @brief Small wrapper for a generic implementation of the solver matrix construction
     */
-   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff, const std::vector<MHDFloat>& oldRhsLCoeff, const std::vector<MHDFloat>& oldRhsTCoeff);
+   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
-   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff, const std::vector<MHDFloat>& oldRhsLCoeff, const std::vector<MHDFloat>& oldRhsTCoeff)
+   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Resize LHS matrix if necessary
-      spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-
-      // Resize RHS matrix at t_n if necessary
-      spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-
-      // Resize RHS matrix at t_(n-i), i > 0 if necessary
-      for(size_t i = 0; i < oldRhsLCoeff.size(); i++)
-      {
-         spSolver->rOldRHSMatrix(i, matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
-
       DecoupledZSparse  linOp;
       DecoupledZSparse  timeOp;
+      DecoupledZSparse  bcOp;
 
-      // Compute model's linear operator
-      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::SOLVER_HAS_BC);
-      // Compute model's time operator
-      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
-
-      // Set LHS matrix
-      Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), lhsLCoeff, linOp); 
-      Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), -lhsTCoeff, timeOp); 
-
-      // Set RHS matrix at t_n
+      // Compute model's linear operator (without Tau lines)
       spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
+      // Compute model's time operator (without Tau lines)
       spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
-      Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsLCoeff, linOp); 
-      Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsTCoeff, timeOp); 
+      // Compute model's tau line boundary operator
+      spEq->buildModelMatrix(bcOp, ModelOperator::BOUNDARY, comp, idx);
 
-      // Set RHS matrix at t_(n-i), i > 0
-      for(size_t i = 0; i < oldRhsLCoeff.size(); i++)
-      {
-         Solver::internal::addOperators(spSolver->rOldRHSMatrix(i, matIdx), -oldRhsLCoeff.at(i), linOp); 
-         Solver::internal::addOperators(spSolver->rOldRHSMatrix(i, matIdx), -oldRhsTCoeff.at(i), timeOp); 
-      }
-
-      // Set time matrix for timestep updates
-      if(matIdx == idx)
-      {
-         // Resize time matrix if necessary
-         spSolver->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-
-         // Set time matrix
-         Solver::internal::addOperators(spSolver->rTMatrix(idx), 1.0, timeOp); 
-      }
+      spSolver->buildOperators(idx, linOp, timeOp, bcOp, spEq->couplingInfo(comp).systemN(idx));
       
       // Solver is initialized
       spSolver->setInitialized();
@@ -265,7 +219,7 @@ namespace Timestep {
    // Dummy solver specialization
    //
 
-   template <> inline void buildSolverMatrixWrapper<Solver::SparseDummySolverComplexType>(SharedPtrMacro<Solver::SparseDummySolverComplexType> spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff, const std::vector<MHDFloat>& oldRhsLCoeff, const std::vector<MHDFloat>& oldRhsTCoeff) {};
+   template <> inline void buildSolverMatrixWrapper<Solver::SparseDummySolverComplexType>(SharedPtrMacro<Solver::SparseDummySolverComplexType> spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) {};
 
 }
 }

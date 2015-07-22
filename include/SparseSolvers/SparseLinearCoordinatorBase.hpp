@@ -90,23 +90,21 @@ namespace Solver {
           * @brief Build the real operator
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
           */
-         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase<TSolver>::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase<TSolver>::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
          /**
           * @brief Build the complex operator
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
           */
-         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
          /**
           * @brief Factorization time
@@ -127,21 +125,17 @@ namespace Solver {
       // Number of linear systems
       int nSystems = spEq->couplingInfo(id.second).nSystems();
 
-      // Loop over all substeps of solver
-      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
+      // start index for matrices
+      int start = this->mStep*nSystems;
+
+      // Reserve storage for matrices and initialise vectors
+      (*solveIt)->initMatrices(nSystems);
+
+      // Build the solver matrices
+      for(int i = 0; i < nSystems; i++)
       {
-         // start index for matrices
-         int start = this->mStep*nSystems;
-
-         // Reserve storage for matrices and initialise vectors
-         (*solveIt)->initMatrices(this->mNStep*nSystems);
-
-         // Build the solver matrices
-         for(int i = 0; i < nSystems; i++)
-         {
-            // Build LHS solver matrix
-            this->buildSolverMatrix(*solveIt, start+i, spEq, id.second, i);
-         }
+         // Build LHS solver matrix
+         this->buildSolverMatrix(*solveIt, spEq, id.second, i);
       }
    }
 
@@ -195,31 +189,26 @@ namespace Solver {
       //
 
       stage.start("initializing solver storage", 1);
-
-      // Loop over all substeps of solver
-      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
+      // Loop over all scalar equations
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
-         // Loop over all scalar equations
-         for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
+         DebuggerMacro_msg("---> scalar storage", 2);
+
+         // Create storage
+         this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
+      }
+
+      // Loop over all vector equations
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
+      {
+         DebuggerMacro_msg("---> vector storage", 2);
+
+         // Create storage
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            DebuggerMacro_msg("---> scalar storage", 2);
-
-            // Create storage
-            this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
-         }
-
-         // Loop over all vector equations
-         for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
-         {
-            DebuggerMacro_msg("---> vector storage", 2);
-
-            // Create storage
-            Equations::IVectorEquation::SpectralComponent_iterator compIt;
-            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
-            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
-            {
-               this->createStorage((*vectEqIt), *compIt);
-            }
+            this->createStorage((*vectEqIt), *compIt);
          }
       }
 

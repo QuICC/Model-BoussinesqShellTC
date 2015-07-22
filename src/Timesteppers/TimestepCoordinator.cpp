@@ -32,7 +32,11 @@ namespace Timestep {
    TimestepCoordinator::TimestepCoordinator()
       : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
-      this->mNStep = IntegratorSelector::STEPS;
+      // Initialize timestepper
+      TimeSchemeSelector::init();
+
+      // Set number of substeps
+      this->mNStep = TimeSchemeSelector::STEPS;
 
       // Create CFL writer
       IoAscii::SharedCflWriter   spCflWriter = IoAscii::SharedCflWriter(new IoAscii::CflWriter());
@@ -152,11 +156,6 @@ namespace Timestep {
       this->getInput(scalEq, vectEq, scalVar, vectVar);
       DetailedProfilerMacro_stop(ProfilerMacro::TSTEPIN);
 
-      DetailedProfilerMacro_start(ProfilerMacro::TSTEPRHS);
-      // Compute the RHS of the linear systems
-      this->computeRHS();
-      DetailedProfilerMacro_stop(ProfilerMacro::TSTEPRHS);
-
       DetailedProfilerMacro_start(ProfilerMacro::TSTEPSOLVE);
       // Solve all the linear systems
       this->solveSystems();
@@ -193,80 +192,22 @@ namespace Timestep {
       // Loop over all substeps of timestepper
       for(int step = 0; step < this->mNStep; ++step)
       {
-         // Compute timestep correction coefficient for LHS matrix
-         MHDFloat lhsCoeff = IntegratorSelector::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
-
-         // Compute timestep correction coefficient for RHS matrix at t_n
-         MHDFloat rhsCoeff = IntegratorSelector::rhsT(0, step)*(1.0/this->mOldDt - 1.0/this->mDt);
-
-         // Compute timestep correction coefficient for RHS matrix at t_(n-i), i > 0
-         std::vector<MHDFloat> oldRhsCoeff;
-         for(int i = 0; i < IntegratorSelector::FIELD_MEMORY; ++i)
-         {
-            oldRhsCoeff.push_back(IntegratorSelector::rhsT(i+1, step)*(1.0/this->mOldDt - 1.0/this->mDt));
-         }
-
          // Loop over all complex operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, lhsCoeff, rhsCoeff, oldRhsCoeff, step);
+         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, step, this->mDt);
 
          // Loop over all real operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, lhsCoeff, rhsCoeff, oldRhsCoeff, step);
+         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, step, this->mDt);
       }
    }
 
-   void TimestepCoordinator::computeRHS()
+   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Compute RHS component for complex operator, complex field linear systems
-      Solver::computeRHSSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, this->mStep);
-
-      // Compute RHS component for real operator, complex field linear systems
-      Solver::computeRHSSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, this->mStep);
+      buildSolverMatrixWrapper(spSolver, spEq, comp, idx);
    }
 
-   void TimestepCoordinator::computeTimeCoeffs(MHDFloat& lhsL, MHDFloat& lhsT, MHDFloat& rhsL, MHDFloat& rhsT, std::vector<MHDFloat>& oldRhsL, std::vector<MHDFloat>& oldRhsT)
+   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Set time coefficients for LHS Matrix
-      lhsT = IntegratorSelector::lhsT(this->mStep)*1.0/this->mDt;
-
-      // Set linear coefficients for LHS Matrix
-      lhsL = IntegratorSelector::lhsL(this->mStep);
-
-      // Set time coefficients for RHS Matrix
-      rhsT = IntegratorSelector::rhsT(0, this->mStep)*1.0/this->mDt;
-
-      // Set linear coefficients for RHS Matrix
-      rhsL = IntegratorSelector::rhsL(0, this->mStep);
-
-      // Compute timestep correction coefficient for RHS matrix at t_(n-i), i > 0
-      for(int i = 0; i < IntegratorSelector::FIELD_MEMORY; ++i)
-      {
-         oldRhsT.push_back(IntegratorSelector::rhsT(i+1, this->mStep)*1.0/this->mDt);
-         oldRhsL.push_back(IntegratorSelector::rhsL(i+1, this->mStep));
-      }
-   }
-
-   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      // Operator coefficients
-      MHDFloat lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff;
-      std::vector<MHDFloat>   oldRhsLCoeff;
-      std::vector<MHDFloat>   oldRhsTCoeff;
-
-      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
-      
-      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
-   }
-
-   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      // Operator coefficients
-      MHDFloat lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff;
-      std::vector<MHDFloat>   oldRhsLCoeff;
-      std::vector<MHDFloat>   oldRhsTCoeff;
-
-      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
-
-      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
+      buildSolverMatrixWrapper(spSolver, spEq, comp, idx);
    }
 
 }

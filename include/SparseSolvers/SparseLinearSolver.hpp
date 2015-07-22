@@ -260,7 +260,6 @@ namespace Solver {
    template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::initSolutions()
    {
       // Nothing to be done in general.
-      // This will be required by timesteppers with previous steps (i.e. BDF schemes)
    }
 
    template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::addStorage(const int rows, const int cols)
