@@ -117,5 +117,9 @@ namespace Timestep {
       return mem;
    }
 
+   void ImExRK3::init()
+   {
+   }
+
 }
 }

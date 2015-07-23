@@ -103,5 +103,9 @@ namespace Timestep {
       return ImExSBDF2::NONLINEAR_MEMORY;
    }
 
+   void ImExSBDF2::init()
+   {
+   }
+
 }
 }

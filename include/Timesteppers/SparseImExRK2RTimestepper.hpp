@@ -116,14 +116,14 @@ namespace Timestep {
          /**
           * @brief Prepare fields for implicit solve
           */
-         bool preSolve();
+         virtual bool preSolve();
 
          /**
           * @brief Work on fields after implicit solve
           *
           * @param step    Current substep
           */
-         void postSolve();
+         virtual void postSolve();
 
          /**
           * @brief Update the LHS matrix with new timedependence
@@ -283,7 +283,7 @@ namespace Timestep {
       // Update implicit term
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
-         this->mImSolution.at(i) = this->mSolution.at(i);
+         internal::computeSet(this->mImSolution.at(i),this->mSolution.at(i));
       }
 
       if(this->mStep == 0)

@@ -96,6 +96,11 @@ namespace Timestep {
           * @brief Number of previous nonlinear terms required
           */
          static const int NONLINEAR_MEMORY;
+
+         /**
+          * @brief Initialize
+          */
+         static void init();
          
       protected:
          /**

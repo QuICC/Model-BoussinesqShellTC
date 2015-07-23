@@ -32,10 +32,10 @@
 // Configure code to use to use old SparseTimestepper
 #if defined GEOMHDISCC_TIMESTEPPER_IMEXRK3 || defined GEOMHDISCC_TIMESTEPPER_IMEXSBDF2
 
-   #include "Timesteppers/SparseTimestepper.hpp"
+   #include "Timesteppers/SparseOldImExTimestepper.hpp"
 
    // Workaround for template typedef
-   #define TimeSchemeTypeSelector SparseTimestepper
+   #define TimeSchemeTypeSelector SparseOldImExTimestepper
 
 #endif //defined GEOMHDISCC_TIMESTEPPER_IMEXRK3 || defined GEOMHDISCC_TIMESTEPPER_IMEXSBDF2
 

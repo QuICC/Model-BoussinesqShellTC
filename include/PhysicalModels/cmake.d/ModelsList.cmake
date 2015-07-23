@@ -34,10 +34,5 @@ set(MHDPhysicalModels
    )
 
 set(MHDTestModels 
-   TestAFTModel.hpp
-   TestCFTModel.hpp
-   TestTTTModel.hpp
-   TestTFTModel.hpp
-   TestTFFModel.hpp
-   TestFFFModel.hpp
+   TimestepperTFFTest.hpp
    )

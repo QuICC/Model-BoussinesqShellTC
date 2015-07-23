@@ -62,6 +62,9 @@ foreach(ModelFile ${MHDPhysicalModels})
 endforeach(ModelFile)
 
 # Loop over all test models
+message(STATUS "***********************************************")
+message(STATUS "***************** Test models *****************")
+message(STATUS "***********************************************")
 foreach(ModelFile ${MHDTestModels})
 
    # Extract filename from full path
@@ -71,6 +74,8 @@ foreach(ModelFile ${MHDTestModels})
    file(STRINGS ${ModelFile} Scheme REGEX "typedef .* SchemeType;")
    STRING(REGEX REPLACE "typedef Schemes::([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
    STRING(REGEX REPLACE " " "" Scheme ${Scheme})
+   STRING(TOUPPER ${Scheme} Scheme) 
+   set(GEOMHDISCC_SPATIALSCHEME ${Scheme})
 
    # Extract the spatial scheme dimension from model file
    file(STRINGS ${ModelFile} SchemeDim REGEX "#include \"SpatialSchemes/.*/")
@@ -78,22 +83,37 @@ foreach(ModelFile ${MHDTestModels})
    STRING(REGEX REPLACE " " "" SchemeDim ${SchemeDim})
    set(GEOMHDISCC_SPATIALDIMENSION ${SchemeDim})
 
+   # Extract the spatial scheme formulation from model file
+   file(STRINGS ${ModelFile} Formulation REGEX "// GEOMHDISCC_SPATIALSCHEME_FORMULATION = .*;")
+   if(NOT ${Formulation} STREQUAL "")
+      STRING(REGEX REPLACE "// GEOMHDISCC_SPATIALSCHEME_FORMULATION = ([a-z,A-Z]*);" "\\1" Formulation ${Formulation})
+      STRING(REGEX REPLACE " " "" Formulation ${Formulation})
+      set(GEOMHDISCC_SPATIALSCHEME_FORMULATION ${Formulation})
+   else(NOT ${Formulation} STREQUAL "")
+      set(Formulation "DEFAULT")
+      set(GEOMHDISCC_SPATIALSCHEME_FORMULATION "DEFAULT")
+   endif(NOT ${Formulation} STREQUAL "")
+
+   # Generate sources list
+   set(All_Srcs )
+   include(../cmake.d/setup/AllSrc.cmake)
+
    # Get model specific sources
    include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/${ModelName}Sources.cmake)
 
    # Create simulation target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Model" "RunSimulation.cpp"
+   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Test" "RunSimulation.cpp"
       MHDModelSources All_Srcs)
 
    # Create configuration file target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Config" "WriteConfig.cpp"
+   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Config" "WriteConfig.cpp"
       MHDModelSources All_Srcs)
 
    # Create state file target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "State" "GenerateState.cpp"
+   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "State" "GenerateState.cpp"
       MHDModelSources All_Srcs)
 
    # Create visualization file target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Visu" "VisualizeState.cpp"
+   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Visu" "VisualizeState.cpp"
       MHDModelSources All_Srcs)
 endforeach(ModelFile)
