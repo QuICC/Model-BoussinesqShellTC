@@ -30,13 +30,10 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
       // Initialize timestepper
       TimeSchemeSelector::init();
-
-      // Set number of substeps
-      this->mNStep = TimeSchemeSelector::STEPS;
 
       // Create CFL writer
       IoAscii::SharedCflWriter   spCflWriter = IoAscii::SharedCflWriter(new IoAscii::CflWriter());
@@ -124,16 +121,13 @@ namespace Timestep {
 
          DebuggerMacro_start("Complex operator update", 0);
          // Update solvers from complex operator, complex field steppers
-         Solver::updateSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this);
+         Solver::updateSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::ComplexSolver_iterator>(*this);
          DebuggerMacro_stop("Complex operator solver update t = ", 0);
 
          DebuggerMacro_start("Real operator solver update", 0);
          // Update solvers from real operator, complex field steppers
-         Solver::updateSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this);
+         Solver::updateSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::RealSolver_iterator>(*this);
          DebuggerMacro_stop("Real operator solver update t = ", 0);
-
-         // Reset the step index
-         this->mStep = 0;
       } else
       {
          this->mCnstSteps += 1.0;
@@ -166,9 +160,6 @@ namespace Timestep {
       this->transferOutput(scalEq, vectEq);
       DetailedProfilerMacro_stop(ProfilerMacro::TSTEPOUT);
 
-      // Update the internal step counter
-      this->updateStep();
-
       // Clear the solver RHS
       this->clearSolvers();
    }
@@ -184,30 +175,26 @@ namespace Timestep {
       DebuggerMacro_showValue("Creating timestepper with initial timestep Dt = ", 0, this->mDt);
 
       // Initialise solver
-      Solver::SparseLinearCoordinatorBase<SparseTimestepper>::init(scalEq, vectEq);
+      Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>::init(scalEq, vectEq);
    }
 
    void TimestepCoordinator::updateMatrices()
    {
-      // Loop over all substeps of timestepper
-      for(int step = 0; step < this->mNStep; ++step)
-      {
-         // Loop over all complex operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, step, this->mDt);
+      // Loop over all complex operator, complex field timesteppers
+      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::ComplexSolver_iterator>(*this, this->mDt);
 
-         // Loop over all real operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, step, this->mDt);
-      }
+      // Loop over all real operator, complex field timesteppers
+      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::RealSolver_iterator>(*this, this->mDt);
    }
 
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      buildSolverMatrixWrapper(spSolver, spEq, comp, idx);
+      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->mDt, idx);
    }
 
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      buildSolverMatrixWrapper(spSolver, spEq, comp, idx);
+      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->mDt, idx);
    }
 
 }

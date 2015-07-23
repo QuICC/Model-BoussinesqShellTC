@@ -23,7 +23,7 @@
 #include "Enums/ModelOperator.hpp"
 #include "Enums/ModelOperatorBoundary.hpp"
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
-#include "Timesteppers/SparseTimestepper.hpp"
+#include "TypeSelectors/TimeSchemeTypeSelector.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 #include "IoAscii/CflWriter.hpp"
@@ -35,7 +35,7 @@ namespace Timestep {
    /**
     * @brief Implementation of general timestepper structure
     */
-   class TimestepCoordinator: public Solver::SparseLinearCoordinatorBase<SparseTimestepper>
+   class TimestepCoordinator: public Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>
    {
       public:
          /// Typedef for a shared scalar equation iterator
@@ -133,7 +133,7 @@ namespace Timestep {
          virtual void buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
-         using Solver::SparseLinearCoordinatorBase<SparseTimestepper>::init;
+         using Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>::init;
 
          /**
           * @brief Update time dependence
@@ -194,9 +194,9 @@ namespace Timestep {
    /**
     * @brief Small wrapper for a generic implementation of the solver matrix construction
     */
-   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+   template <typename TStepper> void buildTimestepMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const MHDFloat dt, const int idx);
 
-   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   template <typename TStepper> void buildTimestepMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const MHDFloat dt, const int idx)
    {
       DecoupledZSparse  linOp;
       DecoupledZSparse  timeOp;
@@ -207,9 +207,10 @@ namespace Timestep {
       // Compute model's time operator (without Tau lines)
       spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
       // Compute model's tau line boundary operator
-      spEq->buildModelMatrix(bcOp, ModelOperator::BOUNDARY, comp, idx);
+      spEq->buildModelMatrix(bcOp, ModelOperator::BOUNDARY, comp, idx, ModelOperatorBoundary::SOLVER_HAS_BC);
 
-      spSolver->buildOperators(idx, linOp, timeOp, bcOp, spEq->couplingInfo(comp).systemN(idx));
+      // Let the timestepper build the right operators
+      spSolver->buildOperators(idx, linOp, timeOp, bcOp, dt, spEq->couplingInfo(comp).systemN(idx));
       
       // Solver is initialized
       spSolver->setInitialized();
@@ -219,7 +220,7 @@ namespace Timestep {
    // Dummy solver specialization
    //
 
-   template <> inline void buildSolverMatrixWrapper<Solver::SparseDummySolverComplexType>(SharedPtrMacro<Solver::SparseDummySolverComplexType> spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) {};
+   template <> inline void buildTimestepMatrixWrapper<Solver::SparseDummySolverComplexType>(SharedPtrMacro<Solver::SparseDummySolverComplexType> spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const MHDFloat dt, const int idx) {};
 
 }
 }

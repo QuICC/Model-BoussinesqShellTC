@@ -509,6 +509,9 @@ namespace IoTools {
          case ModelOperator::IMPLICIT_LINEAR:
             return "implicit_linear";
 
+         case ModelOperator::BOUNDARY:
+            return "boundary";
+
          case ModelOperator::EXPLICIT_LINEAR:
             return "explicit_linear";
 

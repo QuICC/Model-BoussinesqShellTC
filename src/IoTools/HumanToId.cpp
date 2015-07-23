@@ -214,6 +214,10 @@ namespace IoTools {
       {
          return ModelOperator::IMPLICIT_LINEAR;
 
+      } else if(id == IdToHuman::toString(ModelOperator::BOUNDARY))
+      {
+         return ModelOperator::BOUNDARY;
+
       } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR))
       {
          return ModelOperator::EXPLICIT_LINEAR;

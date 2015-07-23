@@ -44,9 +44,6 @@ namespace Solver {
       // Transfer timestep output back to equations
       this->transferOutput(scalEq, vectEq);
 
-      // Update the internal step counter
-      this->updateStep();
-
       // Clear the solver RHS
       this->clearSolvers();
    }
@@ -111,9 +108,6 @@ namespace Solver {
       //
       // Initialise the solvers initial state
       //
-
-      // Reset the step index
-      this->mStep = 0;
 
       // Initialise with initial state
       this->initSolution(scalEq, vectEq);

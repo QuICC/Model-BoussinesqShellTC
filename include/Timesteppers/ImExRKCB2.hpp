@@ -63,7 +63,12 @@ namespace Timestep {
          /**
           * @brief Number of substeps for final step (this is +1 compared to theoretical value due to implementation)
           */
-         static const int STEPS;
+         static const int STEPS; 
+
+         /**
+          * @brief Scheme has embedded lower order scheme?
+          */
+         static const bool HAS_EMBEDDED;
 
          /**
           * @brief Initialize Butcher's tableau
@@ -74,32 +79,32 @@ namespace Timestep {
          /**
           * @brief Storage for the implicit a factors
           */
-         static const Eigen::Array<MHDFloat,3,3> mAIm;
+         static Eigen::Array<MHDFloat,3,3> mAIm;
 
          /**
           * @brief Storage for the implicit b factors
           */
-         static const Eigen::Array<MHDFloat,3,1> mBIm;
+         static Eigen::Array<MHDFloat,3,1> mBIm;
 
          /**
           * @brief Storage for the explicit a factors
           */
-         static const Eigen::Array<MHDFloat,3,3> mAEx;
+         static Eigen::Array<MHDFloat,3,3> mAEx;
 
          /**
           * @brief Storage for the explicit b factors
           */
-         static const Eigen::Array<MHDFloat,3,1> mBEx;
+         static Eigen::Array<MHDFloat,3,1> mBEx;
 
          /**
           * @brief Storage for the implicit embedded scheme b factors
           */
-         static const Eigen::Array<MHDFloat,3,1> mBImErr;
+         static Eigen::Array<MHDFloat,3,1> mBImErr;
 
          /**
           * @brief Storage for the explicit embedded scheme b factors
           */
-         static const Eigen::Array<MHDFloat,3,1> mBExErr;
+         static Eigen::Array<MHDFloat,3,1> mBExErr;
 
       private:
          /**

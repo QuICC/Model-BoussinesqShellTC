@@ -33,6 +33,8 @@ namespace GeoMHDiSCC {
             TIME = 0,
             /// Implicitly timestepped linear operator
             IMPLICIT_LINEAR,
+            /// Tau lines operator
+            BOUNDARY,
             /// Explicitly timestepped linear operator
             EXPLICIT_LINEAR,
             /// Explicitly timestepped linear operator

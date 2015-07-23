@@ -273,7 +273,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
             elif field_row == ("temperature",""):
                 if field_col == ("streamfunction",""):
                     if self.linearize:
-                        mat = geo.qid(res[0], 0, bc, 1j*ky)
+                        mat = geo.sid(res[0], 0, bc, 1j*ky)
                     else:
                         mat = geo.zblk(res[0], bc)
 
@@ -281,7 +281,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
                     mat = geo.zblk(res[0], bc)
 
                 elif field_col == ("temperature",""):
-                    mat = geo.qid(res[0], 0, bc, -(1/Pr)*(kx**2 + ky**2))
+                    mat = geo.sid(res[0], 0, bc, -(1/Pr)*(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

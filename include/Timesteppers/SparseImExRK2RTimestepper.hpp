@@ -1,13 +1,13 @@
 /** 
- * @file SparseImExRKTimestepper.hpp
- * @brief Implementation of a templated (coupled) equation timestepper for Implicit-Explicit Runge-Kutta schemes.
+ * @file SparseImExRK2RTimestepper.hpp
+ * @brief Implementation of a templated (coupled) equation timestepper for Implicit-Explicit Runge-Kutta (2R) schemes.
  *
  * The implementation is based on Cavaglieri & Bewley, "Low-storage implicit/explicit Runge-Kutta schemes for the simulation of stiff high-dimensional ODE systems", JCP, 2015
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPARSEIMEXRKTIMESTEPPER_HPP
-#define SPARSEIMEXRKTIMESTEPPER_HPP
+#ifndef SPARSEIMEXRK2RTIMESTEPPER_HPP
+#define SPARSEIMEXRK2RTIMESTEPPER_HPP
 
 // Configuration includes
 //
@@ -34,37 +34,37 @@ namespace Timestep {
       /**
        * @brief Compute z = y
        */
-      template <typename TOperator,typename TData> void computeSet(TData& z, const TData& y);
+      template <typename TData> void computeSet(TData& z, const TData& y);
 
       /**
        * @brief Compute z = y
        */
-      void computeSet(DecoupledZMatrix& z, const DecouplexZMatrix& y);
+      void computeSet(DecoupledZMatrix& z, const DecoupledZMatrix& y);
 
       /**
        * @brief Compute z = A*y
        */
-      template <typename TOperator,typename TData> void computeMV(TData& z, const SparseMatrix& mat, const TData& y);
+      template <typename TOperator,typename TData> void computeMV(TData& z, const TOperator& mat, const TData& y);
 
       /**
        * @brief Compute z = A*y
        */
-      void computeMV(DecoupledZMatrix& z, const SparseMatrix& mat, const DecouplexZMatrix& y);
+      void computeMV(DecoupledZMatrix& z, const SparseMatrix& mat, const DecoupledZMatrix& y);
 
       /**
        * @brief Compute z = a*x + b*y + z
        */
-      template <typename TOperator,typename TData> void computeAXPBYPZ(TData& z, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y);
+      template <typename TData> void computeAXPBYPZ(TData& z, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y);
 
       /**
        * @brief Compute z = a*x + b*y + z
        */
-      void computeAXPBYPZ(DecoupledZMatrix& z, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecouplexZMatrix& y);
+      void computeAXPBYPZ(DecoupledZMatrix& z, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecoupledZMatrix& y);
 
       /**
        * @brief Compute y = x + a*z
        */
-      template <typename TOperator,typename TData> void computeXPAY(TData& y, const TData& x, const MHDFloat a);
+      template <typename TData> void computeXPAY(TData& y, const TData& x, const MHDFloat a);
 
       /**
        * @brief Compute y = x + a*y
@@ -74,18 +74,18 @@ namespace Timestep {
       /**
        * @brief Compute z = x + a*y + b*z
        */
-      template <typename TOperator,typename TData> void computeXPAYBZ(TData& z, const TData& x, const MHDFloat a, const TData& y, const MHDFloat b);
+      template <typename TData> void computeXPAYPBZ(TData& z, const TData& x, const MHDFloat a, const TData& y, const MHDFloat b);
 
       /**
        * @brief Compute z = x + a*y + b*z
        */
-      void computeXPAYBZ(DecoupledZMatrix& z, const DecoupledZMatrix& x, const MHDFloat a, const DecoupledZMatrix& y, const MHDFloat b);
+      void computeXPAYPBZ(DecoupledZMatrix& z, const DecoupledZMatrix& x, const MHDFloat a, const DecoupledZMatrix& y, const MHDFloat b);
    }
 
    /**
-    * @brief Implementation of a templated (coupled) equation timestepper for Implicit-Explicit Runge-Kutta schemes
+    * @brief Implementation of a templated (coupled) equation timestepper for Implicit-Explicit Runge-Kutta (2R) schemes
     */
-   template <typename TOperator,typename TData> class SparseImExRKTimestepper: public Solver::SparseLinearSolver<TOperator,TData>
+   template <typename TOperator,typename TData> class SparseImExRK2RTimestepper: public Solver::SparseLinearSolver<TOperator,TData>
    {
       public:
          /**
@@ -94,12 +94,12 @@ namespace Timestep {
           * @param start   Starting index (for example without m=0)
           * @param time    Solver timing with respect to timestepping
           */
-         SparseImExRKTimestepper(const int start, const SolveTiming::Id time);
+         SparseImExRK2RTimestepper(const int start, const SolveTiming::Id time);
 
          /**
           * @brief Destructor
           */
-         virtual ~SparseImExRKTimestepper();
+         virtual ~SparseImExRK2RTimestepper();
 
          /**
           * @brief Initialise the solver matrices storage
@@ -115,24 +115,20 @@ namespace Timestep {
 
          /**
           * @brief Prepare fields for implicit solve
-          *
-          * @param step    Current substep
           */
-         bool preSolve(const int step);
+         bool preSolve();
 
          /**
           * @brief Work on fields after implicit solve
           *
           * @param step    Current substep
           */
-         void postSolve(const int step);
+         void postSolve();
 
          /**
           * @brief Update the LHS matrix with new timedependence
-          *
-          * @param step          Timestep scheme substep
           */
-         void updateTimeMatrix(const int step, const MHDFloat dt);
+         void updateTimeMatrix(const MHDFloat dt);
 
          /**
           * @brief Set RHS matrix at t_n
@@ -152,9 +148,19 @@ namespace Timestep {
          /**
           * @brief Build the scheme operators
           */
-         void buildOperators(const int idx, const TOperator& opA, const TOperator& opB, const TOperator& opC, const MHDFloat dt, const int size);
+         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size);
+
+         /**
+          * @brief Finished timestep?
+          */
+         bool finished();
          
       protected:
+         /**
+          * @brief Current substep
+          */
+         int mStep;
+
          /**
           * @brief Current timestep
           */
@@ -188,33 +194,45 @@ namespace Timestep {
       private:
    };
 
-   template <typename TOperator,typename TData> SparseImExRKTimestepper<TOperator,TData>::SparseImExRKTimestepper(const int start, const SolveTiming::Id time)
-      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mDt(-1.0)
+   template <typename TOperator,typename TData> SparseImExRK2RTimestepper<TOperator,TData>::SparseImExRK2RTimestepper(const int start, const SolveTiming::Id time)
+      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mStep(0), mDt(-1.0)
    {
    }
 
-   template <typename TOperator,typename TData> SparseImExRKTimestepper<TOperator,TData>::~SparseImExRKTimestepper()
+   template <typename TOperator,typename TData> SparseImExRK2RTimestepper<TOperator,TData>::~SparseImExRK2RTimestepper()
    {
    }
 
-   template <typename TOperator,typename TData> bool SparseImExRKTimestepper<TOperator,TData>::preSolve(const int step)
+   template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::finished()
    {
-      if(step > 0)
+      this->mStep = (this->mStep + 1) % (TimeSchemeSelector::STEPS + 1);
+
+      return (this->mStep == 0);
+   }
+
+   template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::preSolve()
+   {
+      this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
+
+      if(this->mStep > 0)
       {
          // Update intermediate solution
-         MHDFloat bIm = TimeSchemeSelector::bIm(step)*this->mDt;
-         MHDFloat bEx = TimeSchemeSelector::bEx(step)*this->mDt;
+         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep-1)*this->mDt;
+         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep-1)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeAXPBYPZ(this->mIntSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
          }
 
          // Embedded lower order scheme solution
-         bIm = TimeSchemeSelector::bImErr(step)*this->mDt;
-         bEx = TimeSchemeSelector::bExErr(step)*this->mDt;
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         if(TimeSchemeSelector::HAS_EMBEDDED)
          {
-            internal::computeAXPBYPZ(this->mErrSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+            bIm = TimeSchemeSelector::bImErr(this->mStep-1)*this->mDt;
+            bEx = TimeSchemeSelector::bExErr(this->mStep-1)*this->mDt;
+            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            {
+               internal::computeAXPBYPZ(this->mErrSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+            }
          }
       }
 
@@ -225,7 +243,7 @@ namespace Timestep {
       }
 
       // First step
-      if(step == 0)
+      if(this->mStep == 0)
       {
          // Build RHS for implicit term
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
@@ -236,7 +254,7 @@ namespace Timestep {
          return true;
       
       // Last step has no implicit solve
-      } else if(step == TimeSchemeSelector::STEPS - 1)
+      } else if(this->mStep == TimeSchemeSelector::STEPS)
       {
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
@@ -248,19 +266,19 @@ namespace Timestep {
       } else
       {
          // Build RHS for implicit term
-         MHDFloat aIm = (TimeSchemeSelector::aIm(step, step-1) - TimeSchemeSelector::bIm(step-1))*this->mDt;
-         MHDFloat aEx = (TimeSchemeSelector::aEx(step, step-1) - TimeSchemeSelector::bEx(step-1))*this->mDt;
+         MHDFloat aIm = (TimeSchemeSelector::aIm(this->mStep, this->mStep-1) - TimeSchemeSelector::bIm(this->mStep-1))*this->mDt;
+         MHDFloat aEx = (TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeXPAYPBZ(this->mExSolution.at(i), this->mIntSolution.at(i), aIm, this->mImSolution.at(i), aEx);
             internal::computeMV(this->mRHSData.at(i), this->mRHSMatrix.at(i), this->mExSolution.at(i));
          }
 
-         return true
+         return true;
       }
    }
 
-   template <typename TOperator,typename TData> void SparseImExRKTimestepper<TOperator,TData>::postSolve(const int step)
+   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::postSolve()
    {
       // Update implicit term
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
@@ -268,10 +286,10 @@ namespace Timestep {
          this->mImSolution.at(i) = this->mSolution.at(i);
       }
 
-      if(step == 0)
+      if(this->mStep == 0)
       {
          // Prepare solution for new nonlinear term
-         MHDFloat aIm = TimeSchemeSelector::aIm(step, step)*this->mDt;
+         MHDFloat aIm = TimeSchemeSelector::aIm(this->mStep, this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeXPAY(this->mSolution.at(i), this->mIntSolution.at(i), aIm);
@@ -279,7 +297,7 @@ namespace Timestep {
       } else
       {
          // Prepare solution for new nonlinear term
-         MHDFloat aIm = TimeSchemeSelector::aIm(step, step)*this->mDt;
+         MHDFloat aIm = TimeSchemeSelector::aIm(this->mStep, this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeXPAY(this->mSolution.at(i), this->mExSolution.at(i), aIm);
@@ -287,84 +305,69 @@ namespace Timestep {
       }
    }
 
-   template <typename TOperator,typename TData> void  SparseImExRKTimestepper<TOperator,TData>::updateTimeMatrix(const int step, const MHDFloat dt)
+   template <typename TOperator,typename TData> void  SparseImExRK2RTimestepper<TOperator,TData>::updateTimeMatrix(const MHDFloat dt)
    {
       // Update stored timestep
+      MHDFloat oldDt = this->mDt;
       this->mDt = dt;
 
-      // Set start offset
-      int start = step*this->nSystem();
-
-      // Loop over matrices within same step
-      for(int i = 0; i < this->nSystem(); ++i)
+      for(int step = 0; step < TimeSchemeSelector::STEPS; ++step)
       {
-         // Get the number of nonzero elements in time dependence
-         size_t nnz = this->mRHSMatrix.at(i).nonZeros();
-
-         // Update LHS and RHS matrices
-         size_t lhsJ = 0;
-         size_t rhsJ = 0;
-         for (size_t k=0; k< static_cast<size_t>(this->mRHSMatrix.at(i).outerSize()); ++k)
+         // Loop over matrices within same step
+         for(int i = 0; i < this->nSystem(); ++i)
          {
-            typename TOperator::InnerIterator lhsIt(this->mLHSMatrix.at(start+i),lhsJ);
-            typename TOperator::InnerIterator rhsIt(this->mRHSMatrix.at(start+i),rhsJ);
-            for(typename TOperator::InnerIterator timeIt(this->mRHSMatrix.at(i),k); timeIt; ++timeIt)
+            // Get the number of nonzero elements in time dependence
+            size_t nnz = this->mRHSMatrix.at(i).nonZeros();
+
+            // Update LHS and RHS matrices
+            size_t lhsJ = 0;
+            for (size_t k=0; k< static_cast<size_t>(this->mRHSMatrix.at(i).outerSize()); ++k)
             {
-               // Only keep going if nonzero elements are left
-               if(nnz > 0)
+               typename TOperator::InnerIterator lhsIt(this->rLHSMatrix(TimeSchemeSelector::aIm(step,step), i),lhsJ);
+               for(typename TOperator::InnerIterator timeIt(this->mRHSMatrix.at(i),k); timeIt; ++timeIt)
                {
-                  // Update LHS matrix
-                  if(timeIt.col() == lhsIt.col())
+                  // Only keep going if nonzero elements are left
+                  if(nnz > 0)
                   {
-                     if(timeIt.row() == lhsIt.row())
+                     // Update LHS matrix
+                     if(timeIt.col() == lhsIt.col())
                      {
-                        // Update values
-                        lhsIt.valueRef() += lhsCoeff*timeIt.value();
-
-                        // Update LHS iterators and counters
-                        ++lhsIt;
-                        if(!lhsIt)
+                        if(timeIt.row() == lhsIt.row())
                         {
-                           lhsJ++;
+                           // Update values
+                           lhsIt.valueRef() += TimeSchemeSelector::aIm(step,step)*(oldDt - this->mDt)*timeIt.value();
+
+                           // Update LHS iterators and counters
+                           ++lhsIt;
+                           if(!lhsIt)
+                           {
+                              lhsJ++;
+                           }
                         }
                      }
-                  }
 
-                  // Update RHS matrix at t_n
-                  if(timeIt.col() == rhsIt.col())
+                     // Update nonzero counter
+                     nnz--;
+                  } else
                   {
-                     if(timeIt.row() == rhsIt.row())
-                     {
-                        // Update values
-                        rhsIt.valueRef() += rhsCoeff*timeIt.value();
-
-                        // Update RHS iterators and counters
-                        ++rhsIt;
-                        if(!rhsIt)
-                        {
-                           rhsJ++;
-                        }
-                     }
+                     break;
                   }
-
-                  // Update nonzero counter
-                  nnz--;
-               } else
-               {
-                  break;
                }
             }
-         }
 
-         // Safety assert to make sure all values have been updated
-         assert(nnz == 0);
+            // Safety assert to make sure all values have been updated
+            assert(nnz == 0);
+         }
       }
    }
 
-   template <typename TOperator,typename TData> void SparseImExRKTimestepper<TOperator,TData>::initMatrices(const int n)
+   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::initMatrices(const int n)
    {
       // Initialise base matrices
-      Solver::SparseLinearSolver<TOperator,TData>::initMatrices(TimeSchemeSelector::STEPS*n);
+      for(int i = 0; i < TimeSchemeSelector::STEPS; i++)
+      {
+         Solver::SparseLinearSolver<TOperator,TData>::initMatrices(TimeSchemeSelector::aIm(i,i), n);
+      }
 
       // Do not reinitialise if work already done by other field
       if(this->mRHSMatrix.size() == 0)
@@ -381,7 +384,7 @@ namespace Timestep {
       }
    }
 
-   template <typename TOperator,typename TData> void SparseImExRKTimestepper<TOperator,TData>::initSolutions()
+   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::initSolutions()
    {
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
@@ -389,12 +392,12 @@ namespace Timestep {
       }
    }
 
-   template <typename TOperator,typename TData> TOperator& SparseImExRKTimestepper<TOperator,TData>::rRHSMatrix(const int idx)
+   template <typename TOperator,typename TData> TOperator& SparseImExRK2RTimestepper<TOperator,TData>::rRHSMatrix(const int idx)
    {
       return this->mRHSMatrix.at(idx);
    }
 
-   template <typename TOperator,typename TData> void SparseImExRKTimestepper<TOperator,TData>::addStorage(const int rows, const int cols)
+   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
       assert(rows > 0);
@@ -409,37 +412,40 @@ namespace Timestep {
       this->mErrSolution.push_back(TData(rows,cols));
    }
 
-   template <typename TOperator,typename TData> void SparseImExRKTimestepper<TOperator,TData>::buildOperators(const int idx, const TOperator& opA, const TOperator& opB, const TOperator& opC, const MHDFloat dt, const int size)
+   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size)
    {
       // Update timestep
       this->mDt = dt;
 
-      // Resize matrices if necessary
-      this->rLHSMatrix(idx).resize(size, size);
+      // Set explicit matrix
       this->rRHSMatrix(idx).resize(size, size);
+      Solver::internal::addOperators(this->rRHSMatrix(idx), 1.0, opA);
 
-      this->rRHSMatrix(idx) = opA;
+      // Set implicit matrix
       for(int i = 0; i < TimeSchemeSelector::STEPS; ++i)
       {
-         this->rLHSMatrix(idx + i*this->nSystem()) = opB - TimeSchemeSelector::aIm(i,i)*this->mDt*opA + opC;
+         this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx).resize(size, size);
+         Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), 1.0, opB);
+         Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), -TimeSchemeSelector::aIm(i,i)*this->mDt, opA);
+         Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), 1.0, opC);
       }
    }
 
    namespace internal
    {
-      template <typename TOperator,typename TData> inline void computeAXPBYPZ(TData& y, const TData& x)
+      template <typename TData> inline void computeSet(TData& y, const TData& x)
       {
-         z = y;
+         y = x;
       }
 
-      inline void computeAXPBYPZ(DecoupledZMatrix& z, const DecoupledZMatrix& x)
+      inline void computeSet(DecoupledZMatrix& y, const DecoupledZMatrix& x)
       {
          y.real() = x.real();
 
          y.imag() = x.imag();
       }
 
-      template <typename TOperator,typename TData> inline void computeXPAY(TData& y, const TData& x, const MHDFloat a)
+      template <typename TData> inline void computeXPAY(TData& y, const TData& x, const MHDFloat a)
       {
          y = x + a*y;
       }
@@ -451,7 +457,7 @@ namespace Timestep {
          y.imag() = x.imag() + a*y.imag();
       }
 
-      template <typename TOperator,typename TData> inline void computeXPAYPBZ(TData& z, const TData& x, const MHDFloat a, const TData& y, const MHDFloat b)
+      template <typename TData> inline void computeXPAYPBZ(TData& z, const TData& x, const MHDFloat a, const TData& y, const MHDFloat b)
       {
         z = x + a*y + b*z;
       }
@@ -463,7 +469,7 @@ namespace Timestep {
          z.imag() = x.imag() + a*y.imag() + b*z.imag();
       }
 
-      template <typename TOperator,typename TData> inline void computeAXPBYPZ(TData& z, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y)
+      template <typename TData> inline void computeAXPBYPZ(TData& z, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y)
       {
          z += a*x + b*y;
       }
@@ -475,7 +481,7 @@ namespace Timestep {
          z.imag() += a*x.imag() + b*y.imag();
       }
 
-      template <typename TOperator,typename TData> inline void computeMV(TData& y, const SparseMatrix& A, const TData& x)
+      template <typename TOperator,typename TData> inline void computeMV(TData& y, const TOperator& A, const TData& x)
       {
          y = A*x;
       }
@@ -490,4 +496,4 @@ namespace Timestep {
 }
 }
 
-#endif // SPARSEIMEXRKTIMESTEPPER_HPP
+#endif // SPARSEIMEXRK2RTIMESTEPPER_HPP

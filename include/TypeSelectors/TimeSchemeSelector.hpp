@@ -19,6 +19,21 @@
 // Project includes
 //
 
+// Configure code to use ImExRKCB2
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB2
+
+   #include "Timesteppers/ImExRKCB2.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB2 TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB2
+
 // Configure code to use ImExRK3
 #ifdef GEOMHDISCC_TIMESTEPPER_IMEXRK3
 

@@ -3,6 +3,13 @@ set(MHDSources
    TimestepCoordinator.cpp
 )
 
+# Select Implicit-Explicit RK CB2 scheme
+if(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB2")
+   list(APPEND MHDSources 
+      ImExRKCB2.cpp
+      )
+endif(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB2")
+
 # Select Implicit-Explicit RK3 scheme
 if(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRK3")
    list(APPEND MHDSources 
