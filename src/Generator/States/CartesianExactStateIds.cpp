@@ -47,13 +47,31 @@ namespace Equations {
 
       if(mode == CartesianExactStateIds::PCOS)
       {
-         val = CartesianExactStateIds::cos(amplitude,mode,Math::PI*(x-1)/2.0);
+         val = CartesianExactStateIds::cos(amplitude,mode,Math::PI*(x-1.0)/2.0);
       } else if(mode == CartesianExactStateIds::PSIN)
       {
-         val = CartesianExactStateIds::sin(amplitude,mode,Math::PI*(x-1)/2.0);
+         val = CartesianExactStateIds::sin(amplitude,mode,Math::PI*(x-1.0)/2.0);
       } else
       {
          val = amplitude*std::pow(x,mode);
+      }
+
+      return val;
+   }
+
+   MHDFloat CartesianExactStateIds::zero(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x)
+   {
+      MHDFloat val;
+
+      if(mode == CartesianExactStateIds::PCOS)
+      {
+         val = CartesianExactStateIds::cos(amplitude,mode,Math::PI*x/2.0);
+      } else if(mode == CartesianExactStateIds::PSIN)
+      {
+         val = CartesianExactStateIds::sin(amplitude,mode,Math::PI*(x-1.0)/2.0);
+      } else
+      {
+         val = amplitude*std::pow((1-x*x),mode);
       }
 
       return val;
@@ -90,6 +108,10 @@ namespace Equations {
       } else if(id == SINCOS)
       {
          val = CartesianExactStateIds::sin(amplitude(0), mode(0), x(0));
+         val *= CartesianExactStateIds::cos(amplitude(1), mode(1), x(1));
+      } else if(id == ZEROCOS)
+      {
+         val = CartesianExactStateIds::zero(amplitude(0), mode(0), x(0));
          val *= CartesianExactStateIds::cos(amplitude(1), mode(1), x(1));
       } else
       {
@@ -163,6 +185,10 @@ namespace Equations {
       {
          val = CartesianExactStateIds::exact2D(COSSIN, amplitude, mode, x);
          val *= CartesianExactStateIds::sin(amplitude(2), mode(2), x(2));
+      } else if(id == ZEROCOSCOS)
+      {
+         val = CartesianExactStateIds::exact2D(ZEROCOS, amplitude, mode, x);
+         val *= CartesianExactStateIds::cos(amplitude(2), mode(2), x(2));
       } else
       {
          throw Exception("Unknown exact 3D state");

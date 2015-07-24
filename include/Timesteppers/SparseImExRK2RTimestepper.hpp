@@ -42,6 +42,16 @@ namespace Timestep {
       void computeSet(DecoupledZMatrix& z, const DecoupledZMatrix& y);
 
       /**
+       * @brief Compute z = a*y
+       */
+      template <typename TData> void computeSet(TData& z, const MHDFloat a, const TData& y);
+
+      /**
+       * @brief Compute z = a*y
+       */
+      void computeSet(DecoupledZMatrix& z, const MHDFloat a, const DecoupledZMatrix& y);
+
+      /**
        * @brief Compute z = A*y
        */
       template <typename TOperator,typename TData> void computeMV(TData& z, const TOperator& mat, const TData& y);
@@ -227,7 +237,7 @@ namespace Timestep {
       if(this->mHasExplicit && this->mStep > 0)
       {
          // Update intermediate solution
-         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
+         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep);
          MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
@@ -237,7 +247,7 @@ namespace Timestep {
          // Embedded lower order scheme solution
          if(TimeSchemeSelector::HAS_EMBEDDED)
          {
-            bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
+            bIm = TimeSchemeSelector::bImErr(this->mStep);
             bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
@@ -248,9 +258,6 @@ namespace Timestep {
          this->mStep += 1;
       }
 
-      // Set ID for solver
-      this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
-
       // First step
       if(this->mStep == 0)
       {
@@ -260,6 +267,8 @@ namespace Timestep {
             internal::computeMV(this->mRHSData.at(i), this->mRHSMatrix.at(i), this->mIntSolution.at(i));
          }
 
+         // Set ID for solver
+         this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
          return true;
       
       // Last step has no implicit solve
@@ -278,13 +287,16 @@ namespace Timestep {
       } else
       {
          // Build RHS for implicit term
-         MHDFloat aIm = (TimeSchemeSelector::aIm(this->mStep, this->mStep-1) - TimeSchemeSelector::bIm(this->mStep-1))*this->mDt;
+         MHDFloat aIm = (TimeSchemeSelector::aIm(this->mStep, this->mStep-1) - TimeSchemeSelector::bIm(this->mStep-1));
          MHDFloat aEx = (TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeXPAYPBZ(this->mExSolution.at(i), this->mIntSolution.at(i), aIm, this->mImSolution.at(i), aEx);
             internal::computeMV(this->mRHSData.at(i), this->mRHSMatrix.at(i), this->mExSolution.at(i));
          }
+
+         // Set ID for solver
+         this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
 
          return true;
       }
@@ -295,13 +307,13 @@ namespace Timestep {
       // Update implicit term
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
-         internal::computeSet(this->mImSolution.at(i),this->mSolution.at(i));
+         internal::computeSet(this->mImSolution.at(i), this->mDt, this->mSolution.at(i));
       }
 
       if(this->mStep == 0)
       {
          // Update intermediate solution
-         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
+         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep);
          MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
@@ -311,7 +323,7 @@ namespace Timestep {
          // Embedded lower order scheme solution
          if(TimeSchemeSelector::HAS_EMBEDDED)
          {
-            bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
+            bIm = TimeSchemeSelector::bImErr(this->mStep);
             bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
@@ -330,7 +342,7 @@ namespace Timestep {
       } else
       {
          // Prepare solution for new nonlinear term
-         MHDFloat aIm = TimeSchemeSelector::aIm(this->mStep, this->mStep)*this->mDt;
+         MHDFloat aIm = TimeSchemeSelector::aIm(this->mStep, this->mStep);
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeXPAY(this->mSolution.at(i), this->mExSolution.at(i), aIm);
@@ -481,6 +493,18 @@ namespace Timestep {
          y.real() = x.real();
 
          y.imag() = x.imag();
+      }
+
+      template <typename TData> inline void computeSet(TData& y, const MHDFloat a, const TData& x)
+      {
+         y = a*x;
+      }
+
+      inline void computeSet(DecoupledZMatrix& y, const MHDFloat a, const DecoupledZMatrix& x)
+      {
+         y.real() = a*x.real();
+
+         y.imag() = a*x.imag();
       }
 
       template <typename TData> inline void computeXPAY(TData& y, const TData& x, const MHDFloat a)

@@ -68,7 +68,7 @@ namespace Equations {
          // ---------------------------------------------------
          // Special 3D states (benchmarks, etc)
          // ---------------------------------------------------
-         SPECIAL3D1 = 90,  // Kind of a place holder for tests
+         ZEROCOSCOS = 90,  // Galerkin, Cosine, Cosine
          // ---------------------------------------------------
          // 2D modes
          // ---------------------------------------------------
@@ -85,7 +85,7 @@ namespace Equations {
          // ---------------------------------------------------
          // Special 2D states (benchmarks, etc)
          // ---------------------------------------------------
-         SPECIAL2D1 = 190,  // Kind of a place holder for tests
+         ZEROCOS = 190,  // Kind of a place holder for tests
       };
 
       /**
@@ -102,6 +102,11 @@ namespace Equations {
        * @brief Compute polynomial mode
        */
       static MHDFloat poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
+       * @brief Compute galerkin polynomial mode (zero at boundary)
+       */
+      static MHDFloat zero(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
 
       /**
        * @brief Compute 2D mode

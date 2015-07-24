@@ -80,7 +80,7 @@ namespace Timestep {
       // Initialize implicit a factors
       ImExRKCB2::mAIm(1,1) = 2./5.;
       ImExRKCB2::mAIm(2,1) = 5./6.;
-      ImExRKCB2::mAIm(2,1) = 1./6.;
+      ImExRKCB2::mAIm(2,2) = 1./6.;
 
       // Initialize implicit b factors
       ImExRKCB2::mBIm(1) = 5./6.;
