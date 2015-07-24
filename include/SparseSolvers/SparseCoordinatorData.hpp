@@ -367,19 +367,27 @@ namespace Solver {
       {
          if((*solIt)->solveTiming() == coord.solveTime())
          {
-            // Prepare solve of linear system
-            bool needSolve = (*solIt)->preSolve();
-
-            if(needSolve)
+            bool solving = false;
+            do
             {
-               // Solve linear system
-               (*solIt)->solve();
+               // Prepare solve of linear system
+               bool needSolve = (*solIt)->preSolve();
 
-               // Work on fields after solve
-               (*solIt)->postSolve();
-            }
+               if(needSolve)
+               {
+                  // Solve linear system
+                  (*solIt)->solve();
 
-            status = (*solIt)->finished();
+                  // Work on fields after solve
+                  solving = (*solIt)->postSolve();
+
+               } else
+               {
+                  solving = false;
+               }
+
+               status = (*solIt)->finished();
+            } while (solving);
          }
       }
 

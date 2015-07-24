@@ -123,7 +123,7 @@ namespace Timestep {
           *
           * @param step    Current substep
           */
-         virtual void postSolve();
+         virtual bool postSolve();
 
          /**
           * @brief Update the LHS matrix with new timedependence
@@ -156,6 +156,11 @@ namespace Timestep {
          bool finished();
          
       protected:
+         /**
+          * @brief Explicit calculation took place?
+          */
+         bool mHasExplicit;
+
          /**
           * @brief Current substep
           */
@@ -195,7 +200,7 @@ namespace Timestep {
    };
 
    template <typename TOperator,typename TData> SparseImExRK2RTimestepper<TOperator,TData>::SparseImExRK2RTimestepper(const int start, const SolveTiming::Id time)
-      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mStep(0), mDt(-1.0)
+      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mHasExplicit(true), mStep(0), mDt(-1.0)
    {
    }
 
@@ -205,20 +210,25 @@ namespace Timestep {
 
    template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::finished()
    {
-      this->mStep = (this->mStep + 1) % (TimeSchemeSelector::STEPS + 1);
-
       return (this->mStep == 0);
    }
 
    template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::preSolve()
    {
-      this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
+      if(this->mHasExplicit)
+      {
+         // Update explicit term with explicit (nonlinear) values
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         {
+            internal::computeSet(this->mExSolution.at(i), this->mRHSData.at(i));
+         }
+      }
 
-      if(this->mStep > 0)
+      if(this->mHasExplicit && this->mStep > 0)
       {
          // Update intermediate solution
-         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep-1)*this->mDt;
-         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep-1)*this->mDt;
+         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
+         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeAXPBYPZ(this->mIntSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
@@ -227,20 +237,19 @@ namespace Timestep {
          // Embedded lower order scheme solution
          if(TimeSchemeSelector::HAS_EMBEDDED)
          {
-            bIm = TimeSchemeSelector::bImErr(this->mStep-1)*this->mDt;
-            bEx = TimeSchemeSelector::bExErr(this->mStep-1)*this->mDt;
+            bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
+            bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeAXPBYPZ(this->mErrSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
             }
          }
+
+         this->mStep += 1;
       }
 
-      // Update explicit term
-      for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
-      {
-         internal::computeSet(this->mExSolution.at(i), this->mRHSData.at(i));
-      }
+      // Set ID for solver
+      this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
 
       // First step
       if(this->mStep == 0)
@@ -261,6 +270,9 @@ namespace Timestep {
             internal::computeSet(this->mSolution.at(i), this->mIntSolution.at(i));
          }
 
+         // Reset step to 0
+         this->mStep = 0;
+
          return false;
 
       } else
@@ -278,7 +290,7 @@ namespace Timestep {
       }
    }
 
-   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::postSolve()
+   template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::postSolve()
    {
       // Update implicit term
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
@@ -288,12 +300,33 @@ namespace Timestep {
 
       if(this->mStep == 0)
       {
-         // Prepare solution for new nonlinear term
-         MHDFloat aIm = TimeSchemeSelector::aIm(this->mStep, this->mStep)*this->mDt;
+         // Update intermediate solution
+         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
+         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
-            internal::computeXPAY(this->mSolution.at(i), this->mIntSolution.at(i), aIm);
+            internal::computeAXPBYPZ(this->mIntSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
          }
+
+         // Embedded lower order scheme solution
+         if(TimeSchemeSelector::HAS_EMBEDDED)
+         {
+            bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
+            bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
+            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            {
+               internal::computeAXPBYPZ(this->mErrSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+            }
+         }
+
+         // Increase step counter
+         this->mStep += 1;
+
+         // Loop back to presolve but without new nonlinear term
+         this->mHasExplicit = false;
+
+         return true;
+
       } else
       {
          // Prepare solution for new nonlinear term
@@ -302,6 +335,11 @@ namespace Timestep {
          {
             internal::computeXPAY(this->mSolution.at(i), this->mExSolution.at(i), aIm);
          }
+
+         // Next step will have nonlinear term
+         this->mHasExplicit = true;
+
+         return false;
       }
    }
 
@@ -447,38 +485,104 @@ namespace Timestep {
 
       template <typename TData> inline void computeXPAY(TData& y, const TData& x, const MHDFloat a)
       {
-         y = x + a*y;
+         if(a != 0.0)
+         {
+            y = x + a*y;
+
+         } else
+         {
+            computeSet<TData>(y, x);
+         }
       }
 
       inline void computeXPAY(DecoupledZMatrix& y, const DecoupledZMatrix& x, const MHDFloat a)
       {
-         y.real() = x.real() + a*y.real();
+         if(a != 0.0)
+         {
+            y.real() = x.real() + a*y.real();
 
-         y.imag() = x.imag() + a*y.imag();
+            y.imag() = x.imag() + a*y.imag();
+
+         } else
+         {
+            computeSet(y, x);
+         }
       }
 
       template <typename TData> inline void computeXPAYPBZ(TData& z, const TData& x, const MHDFloat a, const TData& y, const MHDFloat b)
       {
-        z = x + a*y + b*z;
+         if(a == 0.0)
+         {
+            z = x + b*z;
+
+         } else if(b == 0.0)
+         {
+            z = x + a*y;
+
+         } else
+         {
+            z = x + a*y + b*z;
+         }
       }
 
       inline void computeXPAYPBZ(DecoupledZMatrix& z, const DecoupledZMatrix& x, const MHDFloat a, const DecoupledZMatrix& y, const MHDFloat b)
       {
-         z.real() = x.real() + a*y.real() + b*z.real();
+         if(a == 0.0)
+         {
+            z.real() = x.real() + b*z.real();
 
-         z.imag() = x.imag() + a*y.imag() + b*z.imag();
+            z.imag() = x.imag() + b*z.imag();
+
+         } else if(b == 0.0)
+         {
+            z.real() = x.real() + a*y.real();
+
+            z.imag() = x.imag() + a*y.imag();
+
+         } else
+         {
+            z.real() = x.real() + a*y.real() + b*z.real();
+
+            z.imag() = x.imag() + a*y.imag() + b*z.imag();
+         }
       }
 
       template <typename TData> inline void computeAXPBYPZ(TData& z, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y)
       {
-         z += a*x + b*y;
+         if(a == 0.0)
+         {
+            z += b*y;
+
+         } else if(b == 0.0)
+         {
+            z += a*x;
+
+         } else
+         {
+            z += a*x + b*y;
+         }
       }
 
       inline void computeAXPBYPZ(DecoupledZMatrix& z, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecoupledZMatrix& y)
       {
-         z.real() += a*x.real() + b*y.real();
+         if(a == 0.0)
+         {
+            z.real() += b*y.real();
 
-         z.imag() += a*x.imag() + b*y.imag();
+            z.imag() += b*y.imag();
+
+         } else if(b == 0.0)
+         {
+            z.real() += a*x.real();
+
+            z.imag() += a*x.imag();
+
+         } else
+         {
+            z.real() += a*x.real() + b*y.real();
+
+            z.imag() += a*x.imag() + b*y.imag();
+         }
       }
 
       template <typename TOperator,typename TData> inline void computeMV(TData& y, const TOperator& A, const TData& x)

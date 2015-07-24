@@ -99,7 +99,7 @@ namespace Solver {
           *
           * @param step    Current substep
           */
-         virtual void postSolve();
+         virtual bool postSolve();
 
          /**
           * @brief Get the number of linear systems in solver
@@ -234,8 +234,9 @@ namespace Solver {
       }
    }
 
-   template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::postSolve()
+   template <typename TOperator,typename TData> bool SparseLinearSolver<TOperator,TData>::postSolve()
    {
+      return false;
    }
 
    template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::zeroSolver()

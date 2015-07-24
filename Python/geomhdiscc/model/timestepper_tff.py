@@ -54,6 +54,7 @@ class TimestepperTFF(base_model.BaseModel):
                 fields = [field_row]
             else:
                 fields = []
+            fields = []
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
@@ -79,6 +80,13 @@ class TimestepperTFF(base_model.BaseModel):
 
         block_info = (tau_n, gal_n, (shift_z,0,0), 1)
         return block_info
+
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        # Get boundary condition
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        return geo.stencil(res[0], bc, make_square)
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -189,7 +197,7 @@ class TimestepperTFF(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature",""):
             if field_col == ("temperature",""):
-                mat = geo.i2lapl(res[0], kx, ky, bc, eps)
+                mat = geo.i2lapl(res[0], kx, ky, bc, eps, cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
