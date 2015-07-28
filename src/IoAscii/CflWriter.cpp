@@ -36,7 +36,7 @@ namespace IoAscii {
    {
    }
 
-   void CflWriter::setSimTime(const MHDFloat time, const MHDFloat timestep, const MHDFloat steps)
+   void CflWriter::setSimTime(const MHDFloat time, const MHDFloat timestep, const MHDFloat steps, const MHDFloat error)
    {
       this->mTime = time;
 
@@ -44,6 +44,8 @@ namespace IoAscii {
       this->mTimestep = timestep;
 
       this->mSteps = steps;
+
+      this->mError = error;
    }
 
    void CflWriter::write()
@@ -54,7 +56,7 @@ namespace IoAscii {
       // Check if the workflow allows IO to be performed
       if(this->mChanged && FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTimestep << "\t" << this->mSteps << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTimestep << "\t" << this->mSteps << "\t" << this->mError << std::endl;
       }
 
       // post write

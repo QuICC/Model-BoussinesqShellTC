@@ -1,11 +1,11 @@
 /** 
- * @file ImExRKCB2.hpp
- * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 2 (Cavaglieri & Bewley, 2015)
+ * @file ImExRKCB3a.hpp
+ * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 3a (Cavaglieri & Bewley, 2015)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef IMEXRKCB2_HPP
-#define IMEXRKCB2_HPP
+#ifndef IMEXRKCB3A_HPP
+#define IMEXRKCB3A_HPP
 
 // Configuration includes
 //
@@ -25,9 +25,9 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    /**
-    * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 2
+    * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 3a
     */
-   class ImExRKCB2
+   class ImExRKCB3a
    {
       public:
          /**
@@ -120,15 +120,15 @@ namespace Timestep {
          /**
           * @brief Constructor
           */
-         ImExRKCB2();
+         ImExRKCB3a();
 
          /**
           * @brief Destructor
           */
-         ~ImExRKCB2();
+         ~ImExRKCB3a();
 
    };
 }
 }
 
-#endif // IMEXRKCB2_HPP
+#endif // IMEXRKCB3A_HPP

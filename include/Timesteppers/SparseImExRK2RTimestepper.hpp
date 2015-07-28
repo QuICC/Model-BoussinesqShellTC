@@ -25,6 +25,7 @@
 #include "TypeSelectors/TimeSchemeSelector.hpp"
 #include "SparseSolvers/SparseLinearSolver.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Timestep {
@@ -90,6 +91,17 @@ namespace Timestep {
        * @brief Compute z = x + a*y + b*z
        */
       void computeXPAYPBZ(DecoupledZMatrix& z, const DecoupledZMatrix& x, const MHDFloat a, const DecoupledZMatrix& y, const MHDFloat b);
+
+      /**
+       * @brief Compute error
+       */
+      template <typename TData> void computeError(MHDFloat& err, const TData& x, const TData& y);
+
+      /**
+       * @brief Compute error
+       */
+      void computeError(MHDFloat& err, const DecoupledZMatrix& x, const DecoupledZMatrix& y);
+
    }
 
    /**
@@ -163,8 +175,13 @@ namespace Timestep {
          /**
           * @brief Finished timestep?
           */
+         MHDFloat error() const;
+
+         /**
+          * @brief Finished timestep?
+          */
          bool finished();
-         
+
       protected:
          /**
           * @brief Explicit calculation took place?
@@ -180,6 +197,11 @@ namespace Timestep {
           * @brief Current timestep
           */
          MHDFloat mDt;
+
+         /**
+          * @brief Timestep error
+          */
+         MHDFloat mError;
 
          /**
           * @brief RHS operator
@@ -210,12 +232,17 @@ namespace Timestep {
    };
 
    template <typename TOperator,typename TData> SparseImExRK2RTimestepper<TOperator,TData>::SparseImExRK2RTimestepper(const int start, const SolveTiming::Id time)
-      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mHasExplicit(true), mStep(0), mDt(-1.0)
+      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mHasExplicit(true), mStep(0), mDt(-1.0), mError(-1.0)
    {
    }
 
    template <typename TOperator,typename TData> SparseImExRK2RTimestepper<TOperator,TData>::~SparseImExRK2RTimestepper()
    {
+   }
+
+   template <typename TOperator,typename TData> MHDFloat SparseImExRK2RTimestepper<TOperator,TData>::error() const
+   {
+      return this->mError;
    }
 
    template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::finished()
@@ -242,6 +269,9 @@ namespace Timestep {
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeAXPBYPZ(this->mIntSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+
+            std::cerr << (this->mIntSolution.at(i).real().array().colwise().sum() - this->mIntSolution.at(i).real().topRows(1).array()).transpose() << " , ";
+            std::cerr << (this->mIntSolution.at(i).imag().array().colwise().sum() - this->mIntSolution.at(i).imag().topRows(1).array()).transpose() << std::endl;
          }
 
          // Embedded lower order scheme solution
@@ -261,6 +291,12 @@ namespace Timestep {
       // First step
       if(this->mStep == 0)
       {
+         // Reset error
+         if(TimeSchemeSelector::HAS_EMBEDDED)
+         {
+            this->mError = 0.0;
+         }
+
          // Build RHS for implicit term
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
@@ -277,6 +313,17 @@ namespace Timestep {
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeSet(this->mSolution.at(i), this->mIntSolution.at(i));
+         }
+
+         // Compute error estimate using embedded scheme
+         if(TimeSchemeSelector::HAS_EMBEDDED)
+         {
+            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            {
+               internal::computeError(this->mError, this->mIntSolution.at(i), this->mErrSolution.at(i));
+
+               internal::computeSet(this->mErrSolution.at(i), this->mIntSolution.at(i));
+            }
          }
 
          // Reset step to 0
@@ -439,6 +486,11 @@ namespace Timestep {
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
          internal::computeSet(this->mIntSolution.at(i), this->mSolution.at(i));
+
+         if(TimeSchemeSelector::HAS_EMBEDDED)
+         {
+            internal::computeSet(this->mErrSolution.at(i), this->mSolution.at(i));
+         }
       }
    }
 
@@ -459,7 +511,12 @@ namespace Timestep {
       this->mImSolution.push_back(TData(rows,cols));
       this->mExSolution.push_back(TData(rows,cols));
       this->mIntSolution.push_back(TData(rows,cols));
-      this->mErrSolution.push_back(TData(rows,cols));
+
+      // Initialize storage for embedded scheme
+      if(TimeSchemeSelector::HAS_EMBEDDED)
+      {
+         this->mErrSolution.push_back(TData(rows,cols));
+      }
    }
 
    template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size)
@@ -620,6 +677,19 @@ namespace Timestep {
 
          y.imag() = A*x.imag();
       }
+
+      template <typename TData> inline void computeError(MHDFloat& err, const TData& x, const TData& y)
+      {
+         err = std::max(err, ((x.array() - y.array())/(1.0 + x.array().abs())).abs().maxCoeff());
+      }
+
+      inline void computeError(MHDFloat& err, const DecoupledZMatrix& x, const DecoupledZMatrix& y)
+      {
+         err = std::max(err, ((x.real().array() - y.real().array())/(1.0 + x.real().array().abs())).abs().maxCoeff());
+
+         err = std::max(err, ((x.imag().array() - y.imag().array())/(1.0 + x.imag().array().abs())).abs().maxCoeff());
+      }
+
    }
 }
 }

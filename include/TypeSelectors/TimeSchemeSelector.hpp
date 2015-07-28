@@ -34,6 +34,81 @@
    }
 #endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB2
 
+// Configure code to use ImExRKCB3a
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3A
+
+   #include "Timesteppers/ImExRKCB3a.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB3a TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3A
+
+// Configure code to use ImExRKCB3b
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3B
+
+   #include "Timesteppers/ImExRKCB3b.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB3b TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3B
+
+// Configure code to use ImExRKCB3c
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3C
+
+   #include "Timesteppers/ImExRKCB3c.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB3c TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3C
+
+// Configure code to use ImExRKCB3d
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3D
+
+   #include "Timesteppers/ImExRKCB3d.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB3d TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3D
+
+// Configure code to use ImExRKCB3e
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3E
+
+   #include "Timesteppers/ImExRKCB3e.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB3e TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3E
+
 // Configure code to use ImExRK3
 #ifdef GEOMHDISCC_TIMESTEPPER_IMEXRK3
 

@@ -24,8 +24,14 @@ namespace Timestep {
    // Scheme requires 3 substeps
    const int ImExRKCB2::STEPS = 3;
 
+   // Scheme order
+   const int ImExRKCB2::ORDER = 2;
+
    // Scheme has embedded lower order scheme?
    const bool ImExRKCB2::HAS_EMBEDDED = true;
+
+   // Name of the scheme
+   const std::string ImExRKCB2::NAME = "ImExRKCB2";
 
    // Set the implicit a factors
    Eigen::Array<MHDFloat,3,3> ImExRKCB2::mAIm = Eigen::Array<MHDFloat,3,3>::Zero();

@@ -111,6 +111,13 @@ namespace Timestep {
           */
          MHDFloat timestep() const;
          
+         /**
+          * @brief Print timestepper information to stream
+          *
+          * @param stream  Output stream
+          */
+         void printInfo(std::ostream& stream);
+         
       protected:
          /**
           * @brief Build the real operator, complex field solver matrix

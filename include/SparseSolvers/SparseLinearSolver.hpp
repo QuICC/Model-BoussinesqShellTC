@@ -148,6 +148,11 @@ namespace Solver {
          TData& rSolution(const int idx);
 
          /**
+          * @brief Computation error
+          */
+         virtual MHDFloat error() const;
+
+         /**
           * @brief Finished computation?
           */
          virtual bool finished();
@@ -195,6 +200,11 @@ namespace Solver {
 
    template <typename TOperator,typename TData> SparseLinearSolver<TOperator,TData>::~SparseLinearSolver()
    {
+   }
+
+   template <typename TOperator,typename TData> MHDFloat SparseLinearSolver<TOperator,TData>::error() const
+   {
+      return -1.0;
    }
 
    template <typename TOperator,typename TData> bool SparseLinearSolver<TOperator,TData>::finished()

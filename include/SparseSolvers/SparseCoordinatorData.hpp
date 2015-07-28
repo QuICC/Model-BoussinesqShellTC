@@ -171,7 +171,7 @@ namespace Solver {
    /**
     * @brief Generic implementation to solver solvers
     */
-   template <template <class,class> class TSol,typename TSolverIt> bool solveSolvers(SparseCoordinatorData<TSol>& coord, const MHDFloat id);
+   template <template <class,class> class TSol,typename TSolverIt> std::pair<bool,MHDFloat> solveSolvers(SparseCoordinatorData<TSol>& coord, const MHDFloat id);
 
    /**
     * @brief Generic implementation to update the time matrix solvers
@@ -354,7 +354,7 @@ namespace Solver {
       }
    }
 
-   template <template <class,class> class TSolver,typename TSolverIt> bool solveSolvers(SparseCoordinatorData<TSolver>& coord)
+   template <template <class,class> class TSolver,typename TSolverIt> std::pair<bool,MHDFloat> solveSolvers(SparseCoordinatorData<TSolver>& coord)
    {
       // Create iterator to current solver
       TSolverIt solIt;
@@ -362,7 +362,7 @@ namespace Solver {
       TSolverIt endIt;
       coord.setEndIterator(endIt);
 
-      bool status = false;
+      std::pair<bool,MHDFloat>  status = std::make_pair(false, -1.0);
       for(; solIt != endIt; ++solIt)
       {
          if((*solIt)->solveTiming() == coord.solveTime())
@@ -386,8 +386,14 @@ namespace Solver {
                   solving = false;
                }
 
-               status = (*solIt)->finished();
             } while (solving);
+
+            status.first = (*solIt)->finished();
+
+            if(status.first)
+            {
+               status.second = std::max(status.second, (*solIt)->error());
+            }
          }
       }
 
@@ -544,7 +550,7 @@ namespace Solver {
 
    template <> inline void updateSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord) {};
 
-   template <> inline bool solveSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const MHDFloat id) {return true;};
+   template <> inline std::pair<bool,MHDFloat> solveSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const MHDFloat id) {return std::make_pair(true,-1.0);};
 
    template <> inline void updateTimeMatrixSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const MHDFloat dt) {};
 
@@ -568,7 +574,7 @@ namespace Solver {
 
    template <> inline void updateSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord) {};
 
-   template <> inline bool solveSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const MHDFloat id) {return true;};
+   template <> inline std::pair<bool,MHDFloat> solveSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const MHDFloat id) {return std::make_pair(true,-1.0);};
 
    template <> inline void updateTimeMatrixSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const MHDFloat dt) {};
 
@@ -592,7 +598,7 @@ namespace Solver {
 
    template <> inline void updateSolvers<Timestep::TimeSchemeTypeSelector,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::TimeSchemeTypeSelector>& coord) {};
 
-   template <> inline bool solveSolvers<Timestep::TimeSchemeTypeSelector,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::TimeSchemeTypeSelector>& coord, const MHDFloat id) {return true;};
+   template <> inline std::pair<bool,MHDFloat> solveSolvers<Timestep::TimeSchemeTypeSelector,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::TimeSchemeTypeSelector>& coord, const MHDFloat id) {return std::make_pair(true,-1.0);};
 
    template <> inline void updateTimeMatrixSolvers<Timestep::TimeSchemeTypeSelector,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::TimeSchemeTypeSelector>& coord, const MHDFloat dt) {};
 

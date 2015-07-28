@@ -286,12 +286,17 @@ namespace Solver {
    template <template <class,class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::solveSystems()
    {
       // Solve complex operator, complex field linear systems
-      bool zStatus = solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this);
+      std::pair<bool,MHDFloat> zStatus = solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this);
 
       // Solve real operator, complex field linear systems
-      bool dStatus = solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this);
+      std::pair<bool,MHDFloat> dStatus = solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this);
 
-      this->mFinished = zStatus || dStatus;
+      this->mFinished = zStatus.first || dStatus.first;
+
+      if(this->mFinished)
+      {
+         this->mError = std::max(zStatus.second, dStatus.second);
+      }
    }
 
    //

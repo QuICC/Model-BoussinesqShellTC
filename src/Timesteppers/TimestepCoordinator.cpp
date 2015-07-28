@@ -24,6 +24,7 @@
 // Project includes
 //
 #include "TypeSelectors/TimeSchemeSelector.hpp"
+#include "IoTools/Formatter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -72,40 +73,60 @@ namespace Timestep {
       bool hasNewDt = false;
 
       // Check if CFL allows for a larger timestep
-      if(cfl > this->mcUpWindow*this->mDt)
-      {
-         // Activate matrices update
-         hasNewDt = true;
-
-         // Set new timestep
-         this->mOldDt = this->mDt;
-         this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
+//      if(cfl > this->mcUpWindow*this->mDt)
+//      {
+//         // Activate matrices update
+//         hasNewDt = true;
+//
+//         // Set new timestep
+//         this->mOldDt = this->mDt;
+//         this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
+//      
+//      // Check if CFL is below minimal timestep or downard jump is large
+//      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
+//      {
+//         // Don't update matrices
+//         hasNewDt = false;
+// 
+//         // Signal simulation abort
+//         this->mOldDt = this->mDt;
+//         this->mDt = -cfl;
+//     
+//      // Check if CFL requires a lower timestep
+//      } else if(cfl < this->mDt)
+//      {
+//         // Activate matrices update
+//         hasNewDt = true;
+//
+//         // Set new timestep
+//         this->mOldDt = this->mDt;
+//         this->mDt = cfl/this->mcUpWindow;
+//
       
-      // Check if CFL is below minimal timestep or downard jump is large
-      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
-      {
-         // Don't update matrices
-         hasNewDt = false;
- 
-         // Signal simulation abort
-         this->mOldDt = this->mDt;
-         this->mDt = -cfl;
-     
-      // Check if CFL requires a lower timestep
-      } else if(cfl < this->mDt)
-      {
-         // Activate matrices update
-         hasNewDt = true;
-
-         // Set new timestep
-         this->mOldDt = this->mDt;
-         this->mDt = cfl/this->mcUpWindow;
-
-      // No need to change timestep
-      } else
-      {
-         hasNewDt = false;
-      }
+      MHDFloat maxError = 1e-8;
+      // No error control and no CFL condition
+//      if(this->mError < 0.0)
+//      {
+//         hasNewDt = false;
+//
+//      } else if(this->mError > maxError)
+//      {
+//         hasNewDt = true;
+//         this->mOldDt = this->mDt;
+//         this->mDt *= std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
+//
+//      } else if(this->mError < maxError/1.5)
+//      {
+//         hasNewDt = true;
+//         this->mOldDt = this->mDt;
+//         this->mDt = std::min(this->mDt*std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+//
+//      // No need to change timestep
+//      } else
+//      {
+//         hasNewDt = false;
+//      }
+      hasNewDt = false;
 
       //
       // Update the timestep matrices if necessary
@@ -134,7 +155,7 @@ namespace Timestep {
       }
 
       // Update CFL writer
-      this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps);
+      this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps, this->mError);
       this->mspIo->write();
 
       if(hasNewDt)
@@ -195,6 +216,41 @@ namespace Timestep {
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       buildTimestepMatrixWrapper(spSolver, spEq, comp, this->mDt, idx);
+   }
+
+   void TimestepCoordinator::printInfo(std::ostream& stream)
+   {
+      // Create nice looking ouput header
+      IoTools::Formatter::printNewline(stream);
+      IoTools::Formatter::printLine(stream, '-');
+      IoTools::Formatter::printCentered(stream, "Timestepper information", '*');
+      IoTools::Formatter::printLine(stream, '-');
+
+      std::stringstream oss;
+      int base = 20;
+
+      // Timestep scheme
+      oss << "Timestepper: " << TimeSchemeSelector::NAME << " (" << TimeSchemeSelector::ORDER << ")";
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      // Linear solver
+      oss << "Solver: ";
+      #if defined GEOMHDISCC_SPLINALG_MUMPS
+         oss << "MUMPS";
+      #elif defined GEOMHDISCC_SPLINALG_UMFPACK
+         oss << "UmfPack";
+      #elif defined GEOMHDISCC_SPLINALG_SPARSELU
+         oss << "SparseLU";
+      #else
+         oss << "(unknown)";
+      #endif //defined GEOMHDISCC_SPLINALG_MUMPS
+
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      IoTools::Formatter::printLine(stream, '*');
+      IoTools::Formatter::printNewline(stream);
    }
 
 }

@@ -1,11 +1,11 @@
 /** 
- * @file ImExRKCB2.hpp
- * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 2 (Cavaglieri & Bewley, 2015)
+ * @file ImExRKCB3e.hpp
+ * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 3e (Cavaglieri & Bewley, 2015)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef IMEXRKCB2_HPP
-#define IMEXRKCB2_HPP
+#ifndef IMEXRKCB3E_HPP
+#define IMEXRKCB3E_HPP
 
 // Configuration includes
 //
@@ -25,9 +25,9 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    /**
-    * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 2
+    * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 3e
     */
-   class ImExRKCB2
+   class ImExRKCB3e
    {
       public:
          /**
@@ -89,46 +89,46 @@ namespace Timestep {
          /**
           * @brief Storage for the implicit a factors
           */
-         static Eigen::Array<MHDFloat,3,3> mAIm;
+         static Eigen::Array<MHDFloat,4,4> mAIm;
 
          /**
           * @brief Storage for the implicit b factors
           */
-         static Eigen::Array<MHDFloat,3,1> mBIm;
+         static Eigen::Array<MHDFloat,4,1> mBIm;
 
          /**
           * @brief Storage for the explicit a factors
           */
-         static Eigen::Array<MHDFloat,3,3> mAEx;
+         static Eigen::Array<MHDFloat,4,4> mAEx;
 
          /**
           * @brief Storage for the explicit b factors
           */
-         static Eigen::Array<MHDFloat,3,1> mBEx;
+         static Eigen::Array<MHDFloat,4,1> mBEx;
 
          /**
           * @brief Storage for the implicit embedded scheme b factors
           */
-         static Eigen::Array<MHDFloat,3,1> mBImErr;
+         static Eigen::Array<MHDFloat,4,1> mBImErr;
 
          /**
           * @brief Storage for the explicit embedded scheme b factors
           */
-         static Eigen::Array<MHDFloat,3,1> mBExErr;
+         static Eigen::Array<MHDFloat,4,1> mBExErr;
 
       private:
          /**
           * @brief Constructor
           */
-         ImExRKCB2();
+         ImExRKCB3e();
 
          /**
           * @brief Destructor
           */
-         ~ImExRKCB2();
+         ~ImExRKCB3e();
 
    };
 }
 }
 
-#endif // IMEXRKCB2_HPP
+#endif // IMEXRKCB3E_HPP

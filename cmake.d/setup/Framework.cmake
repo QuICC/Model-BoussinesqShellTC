@@ -125,7 +125,7 @@ endif(boundaryTest)
 # Choose the type of time integration the code is using.
 # Possible options are: ImExRKCB2, ImExRK3, ImExSBDF2
 #
-set(GEOMHDISCC_TIMESTEPPERS "ImExRKCB2" "ImExRK3" "ImExSBDF2")
+set(GEOMHDISCC_TIMESTEPPERS "ImExRKCB2" "ImExRKCB3a" "ImExRKCB3b" "ImExRKCB3c" "ImExRKCB3d" "ImExRKCB3e" "ImExRK3" "ImExSBDF2")
 
 geomhdiscc_provide_choice(GEOMHDISCC_TIMESTEPPERS "Time integrator" GEOMHDISCC_TIMESTEPPER timeTest)
 

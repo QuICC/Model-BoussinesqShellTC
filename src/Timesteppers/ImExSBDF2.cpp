@@ -24,11 +24,17 @@ namespace Timestep {
    // Scheme requires single step
    const int ImExSBDF2::STEPS = 1;
 
+   // Scheme order
+   const int ImExSBDF2::ORDER = 2;
+
    // Scheme requires field at t_(n-1)
    const int ImExSBDF2::FIELD_MEMORY = 1;
 
    // Scheme requires nonlinear term at t(n-1)
    const int ImExSBDF2::NONLINEAR_MEMORY = 1;
+
+   // Name of the scheme
+   const std::string ImExSBDF2::NAME = "ImExSBDF2";
 
    MHDFloat ImExSBDF2::lhsT(const int step)
    {

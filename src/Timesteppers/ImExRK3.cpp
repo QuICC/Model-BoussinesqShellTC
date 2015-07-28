@@ -24,11 +24,17 @@ namespace Timestep {
    // Scheme requires 3 substeps
    const int ImExRK3::STEPS = 3;
 
+   // Scheme order
+   const int ImExRK3::ORDER = 2;
+
    // Scheme requires field at t_n
    const int ImExRK3::FIELD_MEMORY = 0;
 
    // Scheme requires nonlinear term at t(n-1)
    const int ImExRK3::NONLINEAR_MEMORY = 1;
+
+   // Name of the scheme
+   const std::string ImExRK3::NAME = "ImExRK3";
 
    // Set the alpha parameters
    const Eigen::Array<MHDFloat,3,1> ImExRK3::mAlpha = Eigen::Array<MHDFloat,3,1>(29./96., -3./40., 1./6.);

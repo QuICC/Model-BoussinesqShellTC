@@ -115,11 +115,16 @@ namespace Solver {
           */
          bool mFinished;
 
+         /**
+          * @brief Computation error
+          */
+         MHDFloat mError;
+
       private:
    };
 
    template <template <class,class> class TSolver> SparseCoordinatorBase<TSolver>::SparseCoordinatorBase()
-      : SparseCoordinatorData<TSolver>(), mFinished(false)
+      : SparseCoordinatorData<TSolver>(), mFinished(false), mError(-1.0)
    {
    }
 

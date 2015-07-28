@@ -156,6 +156,8 @@ namespace GeoMHDiSCC {
       this->preSolveEquations();
 
       stage.start("Building timestepper");
+      // Print timestepper information
+      this->mTimestepCoordinator.printInfo(std::cout);
 
       // Update CFL condition
       this->mDiagnostics.initialCfl();

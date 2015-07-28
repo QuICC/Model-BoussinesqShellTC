@@ -133,6 +133,11 @@ namespace Timestep {
          void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size);
 
          /**
+          * @brief Error of computation
+          */
+         MHDFloat error() const;
+
+         /**
           * @brief Finished timestep?
           */
          bool finished();
@@ -190,6 +195,11 @@ namespace Timestep {
 
    template <typename TOperator,typename TData> SparseOldImExTimestepper<TOperator,TData>::~SparseOldImExTimestepper()
    {
+   }
+
+   template <typename TOperator,typename TData> MHDFloat SparseOldImExTimestepper<TOperator,TData>::error() const
+   {
+      return -1.0;
    }
 
    template <typename TOperator,typename TData> bool SparseOldImExTimestepper<TOperator,TData>::finished()
