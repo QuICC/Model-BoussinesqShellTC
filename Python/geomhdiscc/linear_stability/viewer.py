@@ -44,7 +44,6 @@ def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3):
         cols = min(max_cols, len(fields))
         for i,df in enumerate(fields.items()):
             pl.subplot(rows,cols,i+1)
-            print(df[1])
             pl.semilogy(np.abs(df[1]))
             pl.semilogy(np.abs(df[1].real), ':')
             pl.semilogy(np.abs(df[1].imag), ':')
