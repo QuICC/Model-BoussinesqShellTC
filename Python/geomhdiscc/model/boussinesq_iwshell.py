@@ -22,7 +22,7 @@ class BoussinesqIWShell(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "ro", "rratio"]
+        return ["taylor", "ro", "rratio"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -236,7 +236,6 @@ class BoussinesqIWShell(base_model.BaseModel):
 
         assert(eigs[0].is_integer())
 
-        Pr = eq_params['prandtl']
         T = eq_params['taylor']**0.5
 
         m = int(eigs[0])

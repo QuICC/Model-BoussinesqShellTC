@@ -42,11 +42,10 @@ res = [64, 64, 0]
 #res = [512, 512, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
-m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
+m = 0 #
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
 eq_params = {'taylor':Ta, 'rayleigh':0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel}
-m = 0
 
 # Wave number function from single "index" (k perpendicular)
 def wave(m):
