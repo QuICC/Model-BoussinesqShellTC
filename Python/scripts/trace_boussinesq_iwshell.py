@@ -20,10 +20,10 @@ bc_vel = 1; ro = 20./13.; rratio = 0.35
 #Ta = 1e7
 #res = [32, 32, 0]
 Ta = 1e8
-res = [64, 64, 0]
+res = [48, 48, 0]
 
 # NS/NS
-#bc_vel = 0; ro = 20./13.; rratio = 0.35
+bc_vel = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -58,10 +58,10 @@ marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True
 marginal_options['plot_curve'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 10
+marginal_options['solve_nev'] = 5
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = True
-marginal_options['plot_spy'] = True
+marginal_options['plot_spy'] = False
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['viz_mode'] = 0

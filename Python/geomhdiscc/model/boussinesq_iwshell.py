@@ -153,10 +153,9 @@ class BoussinesqIWShell(base_model.BaseModel):
                         bc = {0:-41, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+                    if field_row == ("velocity","tor") and field_col == field_row:
                         bc = {0:22, 'c':{'a':a, 'b':b}}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                         bc = {0:41, 'c':{'a':a, 'b':b}}
             
             # Set LHS galerkin restriction
@@ -237,6 +236,12 @@ class BoussinesqIWShell(base_model.BaseModel):
         assert(eigs[0].is_integer())
 
         T = eq_params['taylor']**0.5
+        if False:
+            ns_diff = 1.0
+            ns_cor = T
+        else:
+            ns_diff = 1.0/T
+            ns_cor = 1.0
 
         m = int(eigs[0])
 
@@ -246,21 +251,21 @@ class BoussinesqIWShell(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, ns_diff, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m*ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2r2coriolis(res[0], res[1], m, a, b, bc, -T, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i2r2coriolis(res[0], res[1], m, a, b, bc, -ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4r4coriolis(res[0], res[1], m, a, b, bc, T, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4r4coriolis(res[0], res[1], m, a, b, bc, ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, ns_diff, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m*ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

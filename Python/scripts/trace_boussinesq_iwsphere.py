@@ -11,13 +11,13 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-bc_vel = 0 # 0: NS, 1: SF
+bc_vel = 1 # 0: NS, 1: SF
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
 #res = [32, 32, 0]
 Ta = 1e8
-res = [64, 64, 0]
+res = [48, 48, 0]
 #Ta = 1e9
 #res = [48, 48, 0]
 #Ta = 1e10
@@ -59,17 +59,17 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-11
-marginal_options['ellipse_radius'] = 1e5
+#marginal_options['ellipse_radius'] = 1e5
 marginal_options['geometry'] = 'sphere'
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['plot_curve'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 10
+marginal_options['solve_nev'] = 5
 marginal_options['minimum_int'] = True
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = True
-marginal_options['plot_spy'] = True
+marginal_options['plot_spy'] = False
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['viz_mode'] = 0

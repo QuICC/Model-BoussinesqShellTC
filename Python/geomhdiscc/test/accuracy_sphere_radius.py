@@ -21,6 +21,23 @@ def x_to_phys(expr, grid):
     func = sy.utilities.lambdify(x, expr)
     return func(grid)
 
+def test_bc(op, parity, res_expr, sol_expr, point, grid):
+    """Perform a boundary condition test"""
+
+    try:
+        pres, psol = parity
+    except:
+        pres = parity
+        psol = parity
+
+    x = sy.Symbol('x')
+    lhs = transf.torcheb(x_to_phys(res_expr,grid), pres)
+    rhs = op*lhs
+    sol = x_to_phys(sol_expr, point)
+    err = np.abs(rhs[0] - sol)
+    relerr = err/np.abs(1 + sol) 
+    print((rhs[0], sol, err, relerr))
+
 def test_forward(op, parity, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
 
@@ -79,6 +96,63 @@ def zblk(nr, rg):
         sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
         ssol = 0.0
         test_forward(A, l%2, sphys, ssol, rg, 0)
+
+def bc(nr, rg):
+    """Accuracy test for boundary conditions"""
+
+    print("BC 10:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        l = np.random.randint(1, nr-1)
+        l = l + (l+i)%2
+        print("\tTest for l = " + str(l))
+        A = sphere.zblk(nr, l, {0:10})
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
+        test_bc(A, l%2, sphys, sphys, 1.0, rg)
+
+    print("BC 11:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        l = np.random.randint(1, nr-1)
+        l = l + (l+i)%2
+        print("\tTest for l = " + str(l))
+        A = sphere.zblk(nr, l, {0:11})
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(sy.diff(sphys))
+        test_bc(A, l%2, sphys, ssol, 1.0, rg)
+
+    print("BC 12:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        l = np.random.randint(1, nr-1)
+        l = l + (l+i)%2
+        print("\tTest for l = " + str(l))
+        A = sphere.zblk(nr, l, {0:12})
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(sy.diff(sphys) - 1/x*sphys)
+        test_bc(A, l%2, sphys, ssol, 1, rg)
+
+    print("BC 13:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        l = np.random.randint(1, nr-1)
+        l = l + (l+i)%2
+        print("\tTest for l = " + str(l))
+        A = sphere.zblk(nr, l, {0:13, 'c':{'l':l}})
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(sy.diff(sphys) + (l+1.0)/x*sphys)
+        test_bc(A, l%2, sphys, ssol, 1, rg)
+
+    print("BC 14:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        l = np.random.randint(1, nr-1)
+        l = l + (l+i)%2
+        print("\tTest for l = " + str(l))
+        A = sphere.zblk(nr, l, {0:14})
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(sy.diff(sphys,x,x))
+        test_bc(A, l%2, sphys, ssol, 1.0, rg)
 
 def d1(nr, rg):
     """Accuracy test for d1 operator"""
@@ -382,11 +456,12 @@ if __name__ == "__main__":
 
     # run tests
     #zblk(nr, rg)
+    bc(nr, rg)
 #    d1(nr, rg)
-    r1(nr, rg)
-    r2(nr, rg)
-    i1(nr, rg)
-    i2(nr, rg)
+#    r1(nr, rg)
+#    r2(nr, rg)
+#    i1(nr, rg)
+#    i2(nr, rg)
 #    i2r1(nr, rg)
 #    i2r1d1r1(nr, rg)
 #    i2r2d1(nr, rg)

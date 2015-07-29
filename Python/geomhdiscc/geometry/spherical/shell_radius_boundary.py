@@ -219,12 +219,12 @@ def tau_rdiffdivr(nr, pos, coeffs = None):
     c = next(it) 
     ns = np.arange(0,nr)
     if pos >= 0:
-        cond.append(c*((2.0/a)*ns**2 - (1.0/(a+b))*tau_c()))
+        cond.append(c*((1.0/a)*ns**2 - (1.0/(a+b)))*tau_c())
         cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
-        cond.append(c*((2.0/a)*ns**2 + (1.0/(-a+b))*tau_c())*alt_ones(nr, 0))
+        cond.append(c*((1.0/a)*ns**2 + (1.0/(-a+b)))*tau_c()*alt_ones(nr, 0))
         cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
@@ -255,10 +255,12 @@ def tau_insulating(nr, pos, coeffs = None):
     ns = np.arange(0,nr)
     if pos >= 0:
         cond.append(c*((2.0/a)*ns**2 + ((l+1.0)/(a+b))*tau_c()))
+        cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
         cond.append(c*((2.0/a)*ns**2 + (l/(-a+b))*tau_c())*alt_ones(nr, 0))
+        cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
         t = cond[0].copy()
@@ -463,12 +465,13 @@ def stencil_rdiffdivr(nr, pos, coeffs = None):
     def d_2(n):
         #val_num = a**2*((n - 3.0)**2*n**2 - 2.0) - b**2*(n**2 - 3.0*n + 2.0)**2
         #val_den = -a**2*((n - 2.0)*n - 1.0)*(n**2 - 2.0) + b**2*(n - 1.0)**2*n**2
-        val_num = a**2*((n - 3.0)**2*n**2 - 2.0) - b**2*(n**2 - 3.0*n + 2.0)**2
-        val_den = -a**2*((n - 2.0)*n - 1.0)*(n**2 - 2.0) + b**2*(n - 1.0)**2*n**2
+        val_num = (n - 2.0)*(b**2*(n - 2.0)*(n - 1.0) - a**2*(n - 3.0)*n)
+        val_den = n*(a**2*(n - 2.0)*(n + 1.0) - b**2*(n - 1.0)*n)
         val = val_num/val_den
         for i,j in enumerate(n):
             if j == 2:
-                val[i] = a**2/(2.0*a**2 + 4.0*b**2)
+                #val[i] = a**2/(2.0*a**2 + 4.0*b**2)
+                val[i] = 0
             if j > 2:
                 break
 
@@ -476,12 +479,15 @@ def stencil_rdiffdivr(nr, pos, coeffs = None):
 
     # Generate 1st subdiagonal
     def d_1(n):
-        val_num = -8.0*a*b*n
-        val_den = a**2*(n**2 - 2.0)*(n*(n + 2.0) - 1.0) - b**2*n**2*(n + 1.0)**2
+        #val_num = -8.0*a*b*n
+        #val_den = a**2*(n**2 - 2.0)*(n*(n + 2.0) - 1.0) - b**2*n**2*(n + 1.0)**2
+        val_num = -4.0*a*b
+        val_den = (n + 1.0)*(a**2*(n**2 + n - 2.0) - b**2*n*(n + 1.0))
         val = val_num/val_den
         for i,j in enumerate(n):
             if j == 1:
-                val[i] = 2.0*a*b/(a**2 + 2.0*b**2)
+                #val[i] = 2.0*a*b/(a**2 + 2.0*b**2)
+                val[i] = a/(2.0*b)
             if j > 1:
                 break
 
