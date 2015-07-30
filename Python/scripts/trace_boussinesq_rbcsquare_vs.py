@@ -2,11 +2,11 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbcsquare_s as mod
+import geomhdiscc.model.boussinesq_rbcsquare_vs as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCSquareS()
+model = mod.BoussinesqRBCSquareVS()
 model.linearize = True
 model.use_galerkin = False
 
@@ -18,23 +18,13 @@ res = [8, 8]
 #res = [64, 64]
 #res = [128, 128]
 
-# NS/NS, FF/FT
+# NS/NS, FF/FT 
 bc_stream = 0
 bc_temp = 1
 heating = 0
 k = 0
+#Pr = 7; Ra = 1e6; A3d = 4.0
 Pr = 7; Ra = 552.438061798; A3d = 0.25
-#Pr = 7; Ra = 2585.01869147; A3d = 1.0
-#Pr = 7; Ra = 463428.864042; A3d = 4.0
-
-# SF/SF, FF/FT
-#bc_stream = 2
-#bc_temp = 1
-#heating = 0
-#k = 0
-#Pr = 7; Ra = 116.838589902; A3d = 0.25
-#Pr = 7; Ra = 779.272728275; A3d = 1.0
-#Pr = 7; Ra = 169113.005268; A3d = 4.0
 
 eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale2d':2.0*A3d} #
 
@@ -53,7 +43,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['mode'] = 0
-#marginal_options['ellipse_radius'] = 1e3
+marginal_options['ellipse_radius'] = 1e3
 marginal_options['geometry'] = 'c2d'
 marginal_options['point'] = False
 marginal_options['solve'] = True

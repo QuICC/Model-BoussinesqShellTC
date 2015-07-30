@@ -1,31 +1,28 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a square (2D) (streamfunction-vorticity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a plane layer (2D) (vorticity-streamfunction formulation)"""
 
 import numpy as np
+import functools
 
-import geomhdiscc.model.boussinesq_rbcsquare_sv as mod
+import geomhdiscc.model.boussinesq_rbcplane2d_vs as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCSquareSV()
+model = mod.BoussinesqRBCPlane2DVS()
 model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [8, 8]
-#res = [10, 10]
-#res = [24, 24]
-#res = [32, 32]
-#res = [64, 64]
-#res = [128, 128]
+res = [32, 0]
 
-# NS/NS, FF/FT 
+# SF, FT,
 bc_stream = 0
-bc_temp = 1
+bc_temp = 0
 heating = 0
-k = 0
-Pr = 7; Ra = 1e6; A3d = 4.0
 
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale2d':2.0*A3d} #
+k = np.sqrt(2)*np.pi
+Pr = 1; Ra = 108*np.pi**4
+
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0}
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_stream, 'temperature':bc_temp}
 
@@ -33,7 +30,7 @@ bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_stream, 'temperature':b
 def wave(k):
     return [k]
 
-# Wave number function from single "index" (k perpendicular)
+# Wave number function from single "index"
 eigs = wave(k)
 
 # Collect GEVP setup parameters into single dictionary
@@ -41,22 +38,21 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['mode'] = 0
-marginal_options['ellipse_radius'] = 1e3
-marginal_options['geometry'] = 'c2d'
-marginal_options['point'] = False
+marginal_options['geometry'] = 'c1d'
+marginal_options['ellipse_radius'] = 1e5
+marginal_options['curve'] = False
+marginal_options['minimum'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 5
+marginal_options['solve_nev'] = 10
 marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
-marginal_options['plot_curve'] = False
+marginal_options['plot_curve'] = True
 marginal_options['plot_spy'] = True
-marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
+marginal_options['write_mtx'] = True
 marginal_options['viz_mode'] = 1
-marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
+marginal_options['curve_points'] = np.arange(max(1, k-4), k+5, 0.3)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)
-
