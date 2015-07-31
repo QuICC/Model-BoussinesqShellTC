@@ -11,12 +11,12 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [8, 8]
+#res = [8, 8]
 #res = [10, 10]
 #res = [24, 24]
 #res = [32, 32]
 #res = [64, 64]
-#res = [128, 128]
+res = [128, 128]
 
 # NS/NS, FF/FT
 bc_stream = 0
@@ -65,7 +65,7 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 0
+marginal_options['viz_mode'] = 4
 marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
 
 # Compute 

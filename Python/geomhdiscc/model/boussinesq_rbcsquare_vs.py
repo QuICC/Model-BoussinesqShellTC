@@ -273,7 +273,7 @@ class BoussinesqRBCSquareVS(base_model.BaseModel):
 #                mat = mat.tocoo()
 
             elif field_col == ("streamfunction",""):
-                mat = geo.zblk(res[0], res[1], 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], 4, 4, bc)
 #                mat = mat.tolil()
 #                mat[2:3,:] = 0
 #                mat[res[0]+2:res[0]+3,:] = 0
@@ -360,7 +360,7 @@ class BoussinesqRBCSquareVS(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("vorticity",""):
-            mat = geo.i2j2(res[0], res[1], bc, restriction = restriction)
+            mat = geo.i4j4(res[0], res[1], bc, restriction = restriction)
 #            mat = mat.tolil()
             #mat[-res[0]-2,:] = 0
             #mat[-res[0]-1,:] = 0
