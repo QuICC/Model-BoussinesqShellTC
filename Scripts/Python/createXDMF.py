@@ -221,7 +221,7 @@ def annulusXYZ(pz, pth, pr):
 def sphereXYZ(pph, pth, pr):
     return [pr*cos(pth), pr*sin(pth)*cos(pph), pr*sin(pth)*sin(pph)]
 
-def shellXYZ(pFast, pMid, pSlow):
+def shellXYZ(pph, pth, pr):
     return [pr*cos(pth), pr*sin(pth)*cos(pph), pr*sin(pth)*sin(pph)]
 
 if __name__ == "__main__":
