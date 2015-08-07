@@ -47,7 +47,7 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 ###################################################
 
 set(GEOMHDISCC_SPLINALGS "UmfPack" "MUMPS"  "SparseLU" "KentLU" "MKLPardiso" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "suitesparseconfig" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MUMPS "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "dmumps" "zmumps" "mumps_common" "pord" "scalapack" "ptesmumps" "esmumps" "ptscotch" "scotch" "scotcherr" "scotcherrexit" "parmetis" "metis" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_KENTLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "klu" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MKLPARDISO "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" PARENT_SCOPE)
