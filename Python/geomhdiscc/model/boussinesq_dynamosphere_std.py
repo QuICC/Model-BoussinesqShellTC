@@ -294,3 +294,18 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], l, bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
