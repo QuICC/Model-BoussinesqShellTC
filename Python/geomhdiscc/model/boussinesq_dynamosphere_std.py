@@ -28,7 +28,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocity", "temperature"]
+        return ["velocity", "temperature", "magnetic"]
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
