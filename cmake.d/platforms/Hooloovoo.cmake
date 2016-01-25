@@ -90,19 +90,17 @@ set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
-set(GEOMHDISCC_PYTHONS "python33" PARENT_SCOPE)
-
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_PYTHONS "python27" "python33" PARENT_SCOPE)
+set(GEOMHDISCC_PYTHONS "python27" "python34" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
-set(GEOMHDISCC_LIBRARIES_PYTHON33 "/usr/lib64/libpython3.3.so" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON33 "/usr/include/python3.3" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4.so" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON34 "/usr/include/python3.4" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
