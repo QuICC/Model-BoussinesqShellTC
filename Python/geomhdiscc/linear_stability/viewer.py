@@ -34,7 +34,7 @@ def viewOperators(A, B = None, show = True, save = False):
         pl.show()
         pl.clf()
 
-def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3):
+def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3, subplot = False):
     """Plot spectra of eigenvectors"""
 
     if show or save:
@@ -43,25 +43,37 @@ def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3):
         rows = np.ceil(len(fields)/max_cols)
         cols = min(max_cols, len(fields))
         for i,df in enumerate(fields.items()):
-            pl.subplot(rows,cols,i+1)
-            pl.semilogy(np.abs(df[1]))
-            pl.semilogy(np.abs(df[1].real), ':')
-            pl.semilogy(np.abs(df[1].imag), ':')
+            if subplot:
+                pl.subplot(rows,cols,i+1)
+            pl.semilogy(np.abs(df[1]), 'k')
+            #pl.semilogy(np.abs(df[1].real), ':')
+            #pl.semilogy(np.abs(df[1].imag), ':')
             title = df[0][0]
             if df[0][1] != "":
                 title = title + ', ' + df[0][1]
             pl.title(title)
-        pl.tight_layout()
+            if save and not subplot:
+                pl.tight_layout()
+                fname = "spectra_" + title.replace(', ', '_')
+                if fid is not None:
+                    fname = fname + "_" + fid
+                fname = fname + ".pdf"
+                pl.savefig(fname, bbox_inches='tight', dpi=200)
+            if show:
+                pl.show()
+            pl.clf()
+        if subplot:
+            pl.tight_layout()
 
-        if save:
-            fname = "spectra"
-            if fid is not None:
-                fname = fname + "_" + fid
-            fname = fname + ".pdf"
-            pl.savefig(fname, bbox_inches='tight', dpi=200)
+            if save:
+                fname = "spectra"
+                if fid is not None:
+                    fname = fname + "_" + fid
+                fname = fname + ".pdf"
+                pl.savefig(fname, bbox_inches='tight', dpi=200)
 
-        if show:
-            pl.show()
+            if show:
+                pl.show()
         pl.clf()
 
 def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = False, fid = None, max_cols = 3):
@@ -307,7 +319,7 @@ def viewProfile(fields, grid, fid = None, show = True, save = False, max_cols = 
         pl.show()
     pl.clf()
 
-def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3):
+def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3, subplot = False):
     """View a slice"""
 
     import matplotlib as mpl
@@ -320,7 +332,8 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3)
     mycm = cm.bwr
     for i,df in enumerate(fields.items()):
         vmax = np.max(np.abs(df[1].real))
-        pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
+        if subplot:
+            pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
         CS = pl.contourf(grid[0], grid[1], df[1].real, 30, cmap = mycm, vmax = vmax, vmin = -vmax)
         title = df[0][0]
         if df[0][1] != "":
@@ -329,15 +342,26 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3)
         divider = make_axes_locatable(pl.gca())
         cax = divider.append_axes("right", "5%", pad="3%")
         pl.colorbar(CS, cax=cax)
-    pl.tight_layout()
-    if save:
-        fname = "slice"
-        if fid is not None:
-            fname = fname + "_" + fid
-        fname = fname + ".pdf"
-        pl.savefig(fname, bbox_inches='tight', dpi=200)
-    if show:
-        pl.show()
+        if not subplot:
+            pl.tight_layout()
+            fname = "slice_" + title.replace(', ', '_')
+            if fid is not None:
+                fname = fname + "_" + fid
+            fname = fname + ".pdf"
+            pl.savefig(fname, bbox_inches='tight', dpi=200)
+            if show:
+                pl.show()
+            pl.clf()
+    if subplot:
+        pl.tight_layout()
+        if save:
+            fname = "slice"
+            if fid is not None:
+                fname = fname + "_" + fid
+            fname = fname + ".pdf"
+            pl.savefig(fname, bbox_inches='tight', dpi=200)
+        if show:
+            pl.show()
     pl.clf()
 
 def viewPeriodic(fields, grid, grid_per, fid = None, show = True, save = False, max_cols = 3):

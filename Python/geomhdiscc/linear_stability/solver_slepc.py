@@ -31,8 +31,8 @@ class GEVPSolver:
         self.fixed_shift = fixed_shift
 
         if shift_range is None:
-            #self.shift_range = (1e-2, 0.2)
-            self.shift_range = (-1e-2, 1e-2)
+            self.shift_range = (1e-2, 0.2)
+            #self.shift_range = (-1e-2, 1e-2)
         else:
             self.shift_range = shift_range
 
@@ -52,7 +52,7 @@ class GEVPSolver:
             opts['rg_type'] = 'ellipse'
             opts['rg_ellipse_center'] = 0
             opts['rg_ellipse_radius'] = self.ellipse_radius
-            opts['rg_ellipse_vscale'] = 1.0
+            opts['rg_ellipse_vscale'] = 1e4
 
         self.E = SLEPc.EPS()
         self.E.create()
@@ -86,7 +86,7 @@ class GEVPSolver:
         """Compute random spectra transform shift and store it"""
 
         if self.shift_range[0] == self.shift_range[1]:
-            self.shift = shift_range[0]
+            self.shift = self.shift_range[0]
         else:
             rnd = PETSc.Random()
             rnd.create(comm = MPI.COMM_SELF)
@@ -94,7 +94,7 @@ class GEVPSolver:
             rnd.setInterval(self.shift_range)
             self.shift = rnd.getValueReal()
 
-    def update_eps(self, A, B, nev, initial_vector = None):
+    def update_eps(self, A, B, nev, initial_vector = None, initial_euler = True, euler_nstep = 30, euler_step = 0.01):
         """Create SLEPc eigensolver"""
 
         self.create_eps()
@@ -102,6 +102,24 @@ class GEVPSolver:
         self.E.setOperators(A,B)
         if initial_vector is not None:
             v = PETSc.Vec().createWithArray(initial_vector)
+            self.E.setInitialSpace(v)
+        elif initial_euler:
+            # Create initial vector through timestepping
+            vrnd, v = A.getVecs()
+            vrnd.setRandom()
+            vrnd = -(1.0/euler_step)*B*vrnd
+            ksp = PETSc.KSP().create()
+            ksp.setType('preonly')
+            pc = ksp.getPC()
+            pc.setType('lu')
+            pc.setFactorSolverPackage('mumps')
+            AA = A.copy()
+            AA.shift(-1.0/euler_step)
+            ksp.setOperators(AA)
+            ksp.setFromOptions()
+            for i in range(0,euler_nstep):
+                ksp.solve(vrnd, v)
+                vrnd = (-1.0/euler_step)*B*v
             self.E.setInitialSpace(v)
 
         self.E.setDimensions(nev = nev)
