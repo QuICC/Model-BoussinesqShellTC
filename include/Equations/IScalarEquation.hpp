@@ -407,9 +407,12 @@ namespace Equations {
                }
             } else
             {
-               for(int j = zeroCol; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx); j++)
+               for(int j = zeroCol; j < cols; j++)
                {
                   j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+                     j_ -= corrDim;
+                  #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM
                   for(int i = zeroRow; i < rows; i++)
                   {
                      // Compute correct position
