@@ -265,7 +265,6 @@ class BoussinesqRTCShell(base_model.BaseModel):
         assert(eigs[0].is_integer())
 
         Pr = eq_params['prandtl']
-        Ra = eq_params['rayleigh']
         T = eq_params['taylor']**0.5
         Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
@@ -306,9 +305,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
             elif field_col == ("velocity","pol"):
                 if self.linearize:
                     if eq_params["heating"] == 0:
-                        mat = geo.i2r2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
+                        mat = geo.i2r2(res[0], res[1], m, a, b, bc, bg_eff/Pr, with_sh_coeff = 'laplh', restriction = restriction)
                     else:
-                        mat = geo.i2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
+                        mat = geo.i2(res[0], res[1], m, a, b, bc, bg_eff/Pr, with_sh_coeff = 'laplh', restriction = restriction)
 
                 else:
                     mat = geo.zblk(res[0], res[1], m, bc)
@@ -392,5 +391,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
             # (R_o - R_i) rescaling
             Ra_eff = (Ra*T/ro)
             bg_eff = ro**2*rratio
+
+        # Rescale Rayleigh by E^{-4/3}
+        # Ra_eff = Ra_eff*T**(1./3.)
 
         return (Ra_eff, bg_eff)
