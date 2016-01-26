@@ -208,7 +208,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
     
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -230,7 +230,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
