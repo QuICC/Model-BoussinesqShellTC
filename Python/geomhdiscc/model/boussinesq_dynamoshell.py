@@ -96,7 +96,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
         """Convert simulation input boundary conditions to ID"""
 
         m = int(eigs[0])
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -257,7 +257,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -367,7 +367,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
