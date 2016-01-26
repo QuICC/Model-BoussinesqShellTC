@@ -164,7 +164,6 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
                         bc = {0:22, 'c':{'a':a, 'b':b}}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
                         bc = {0:41, 'c':{'a':a, 'b':b}}
