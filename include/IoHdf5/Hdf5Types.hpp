@@ -73,8 +73,18 @@ namespace IoHdf5 {
     */
    template <> inline hid_t Hdf5Types::type<std::complex<double> >()
    {
-      hsize_t dims = 2;
-      return H5Tarray_create(H5T_NATIVE_DOUBLE, 1, &dims);
+//      hsize_t dims = 2;
+//      return H5Tarray_create(H5T_NATIVE_DOUBLE, 1, &dims);
+
+      std::complex<double> tmp(0,0);
+      double d = 0;
+      hid_t complex_id = H5Tcreate (H5T_COMPOUND, sizeof tmp);
+      H5Tinsert (complex_id, "r", 0,
+                       H5T_NATIVE_DOUBLE);
+      H5Tinsert (complex_id, "i", sizeof d,
+                       H5T_NATIVE_DOUBLE);
+
+      return complex_id;
    }
 
 }

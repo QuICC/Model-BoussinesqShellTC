@@ -107,14 +107,14 @@ class GEVPSolver:
             # Create initial vector through timestepping
             vrnd, v = A.getVecs()
             vrnd.setRandom()
+            vrnd.normalize()
             vrnd = -(1.0/euler_step)*B*vrnd
             ksp = PETSc.KSP().create()
             ksp.setType('preonly')
             pc = ksp.getPC()
             pc.setType('lu')
             pc.setFactorSolverPackage('mumps')
-            AA = A.copy()
-            AA.shift(-1.0/euler_step)
+            AA = A - (1.0/euler_step)*B
             ksp.setOperators(AA)
             ksp.setFromOptions()
             for i in range(0,euler_nstep):

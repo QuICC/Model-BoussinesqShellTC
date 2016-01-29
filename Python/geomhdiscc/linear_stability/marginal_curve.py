@@ -8,6 +8,9 @@ import numpy as np
 import scipy.optimize as optimize
 import functools
 
+import h5py
+import tables
+
 import geomhdiscc.linear_stability.solver_slepc as solver_mod
 import geomhdiscc.linear_stability.viewer as viewer
 import geomhdiscc.linear_stability.io as io
@@ -366,6 +369,98 @@ class GEVP:
 
             viewer.viewOperators(A, B, show = spy, save = write_mtx)
 
+    def saveHdf5(self, spectra):
+        """Save spectra to HDF5 file"""
+
+        h5_file = h5py.File('eigensolution.hdf5', 'w')
+
+        # Create physical group
+        group = h5_file.create_group('physical')
+        for k,p in self.eq_params.items():
+            group.create_dataset(k, (), 'f8', data = p)
+        # ... add boundary conditions
+        for k,b in self.bcs.items():
+            if k != 'bcType':
+                group.create_dataset('bc_' + k, (), 'f8', data = b)
+
+        # Create run group
+        group = h5_file.create_group('run')
+        group.create_dataset('time', (), 'f8', data = -1)
+        group.create_dataset('timestep', (), 'f8', data = -1)
+
+        # Create truncation group
+        group = h5_file.create_group('truncation')
+        for sg in ['physical', 'spectral', 'transform']:
+            subgroup = group.create_group(sg)
+            for d in ['dim1D', 'dim2D', 'dim3D']:
+                subgroup.create_dataset(d, (), 'i4')
+
+        # Compute dataset shape
+        ls = 0
+        for m in range(int(self.eigs[0])+1):
+            ls = ls + self.res[1] - m
+        data_shape = (ls, self.res[0])
+
+        for k,f in spectra.items():
+            group = h5_file.require_group(k[0])
+            dset = group.create_dataset(k[0] + '_' + k[1], data_shape, '[f8,f8]')
+#            dset[-48:,:] = np.reshape(f, (self.res[0], self.res[1]-self.eigs[0]))
+
+        h5_file.close()
+
+    def saveHdf5_2(self, spectra):
+        """Save spectra to HDF5 file"""
+
+        h5_file = tables.open_file('eigensolution.hdf5', mode = 'w')
+
+        # Create header
+        h5_file.set_node_attr('/', 'header', 'StateFile'.encode('ascii')) 
+        h5_file.set_node_attr('/', 'type', 'SLFm'.encode('ascii')) 
+        h5_file.set_node_attr('/', 'version', '1.0'.encode('ascii')) 
+
+        # Create physical group
+        group = h5_file.create_group('/', 'physical')
+        for k,p in self.eq_params.items():
+            h5_file.create_array(group, k, p)
+        # ... add boundary conditions
+        for k,b in self.bcs.items():
+            if k != 'bcType':
+                h5_file.create_array(group, 'bc_' + k, b)
+
+        # Create run group
+        group = h5_file.create_group('/', 'run')
+        h5_file.create_array(group, 'time', -1)
+        h5_file.create_array(group, 'timestep', -1)
+
+        # Create truncation group
+        group = h5_file.create_group('/', 'truncation')
+        for sg in ['physical', 'spectral', 'transform']:
+            subgroup = h5_file.create_group(group, sg)
+            file_res = [self.res[0]-1, self.res[1]-1, self.eigs[0]]
+            for i,d in enumerate(['dim1D', 'dim2D', 'dim3D']):
+                h5_file.create_array(subgroup, d, file_res[i])
+
+        # Compute dataset shape
+        ls = 0
+        for m in range(int(self.eigs[0])+1):
+            ls = ls + self.res[1] - m
+        data_shape = (ls, self.res[0])
+
+        # Create data groups
+        for g in set([k[0] for k,f in spectra.items()]):
+            group = h5_file.create_group('/', g)
+
+        # Create datasets
+        for k,f in spectra.items():
+            name = k[0]
+            if k[1] != '':
+                name = name + '_' + k[1]
+            zz = np.zeros(data_shape, dtype=f.dtype)
+            dset = h5_file.create_array(h5_file.get_node('/'+k[0]), name, zz)
+            dset[-self.res[1]+self.eigs[0]:,:] = np.reshape(f, (self.res[0], self.res[1]-self.eigs[0]), order='F')
+
+        h5_file.close()
+
     def viewSpectra(self, viz_mode, plot = True, save_pdf = False):
         """Plot the spectra of the eigenvectors"""
 
@@ -395,7 +490,7 @@ class GEVP:
         else:
             return None
 
-    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = False, save_profile = True):
+    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = False, save_profile = True, save_hdf5 = True):
         """Plot eigenvectors in physical space"""
 
         if self.evp_lmb is not None:
@@ -403,6 +498,10 @@ class GEVP:
             sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
             if self.model.use_galerkin:
                 sol_spec = self.apply_stencil(sol_spec)
+
+            # Save spectra to HDF5
+            if save_hdf5:
+                self.saveHdf5_2(sol_spec)
 
             Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
             fid = ""
@@ -461,6 +560,7 @@ def default_options():
     opts['save_physical'] = False   # Save physical space plots to pdf
     opts['data_spectra'] = False    # Save spectral data to file(s)
     opts['data_physical'] = False   # Save physical data to file(s)
+    opts['save_hdf5'] = True   # Save physical data to file(s)
 
     return opts
 
@@ -530,5 +630,5 @@ def compute(gevp_opts, marginal_opts):
     if marginal_opts['show_spectra'] or marginal_opts['save_spectra'] or marginal_opts['data_spectra']:
         gevp.viewSpectra(marginal_opts['viz_mode'], plot = marginal_opts['show_spectra'], save_pdf = marginal_opts['save_spectra'])
 
-    if marginal_opts['show_physical'] or marginal_opts['save_physical'] or marginal_opts['data_physical']:
+    if marginal_opts['show_physical'] or marginal_opts['save_physical'] or marginal_opts['data_physical'] or marginal_opts['save_hdf5']:
         gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'])
