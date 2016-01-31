@@ -457,7 +457,7 @@ class GEVP:
                 name = name + '_' + k[1]
             zz = np.zeros(data_shape, dtype=f.dtype)
             dset = h5_file.create_array(h5_file.get_node('/'+k[0]), name, zz)
-            dset[-self.res[1]+self.eigs[0]:,:] = np.reshape(f, (self.res[0], self.res[1]-self.eigs[0]), order='F')
+            dset[-self.res[1]+self.eigs[0]:,:] = np.reshape(f, (self.res[1]-self.eigs[0], self.res[0]), order='C') 
 
         h5_file.close()
 
