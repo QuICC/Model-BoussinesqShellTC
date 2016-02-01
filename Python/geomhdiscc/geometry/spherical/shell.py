@@ -46,7 +46,11 @@ def fix_l_zero(nr, m, mat, bc, fix):
     elif fix == 'zero':
         return rad.zblk(nr, bc)
     elif fix == 'set':
-        return rad.qid(nr, 0, bc)
+        if bc[0] < 0:
+            nn = nr - bc['rt']
+        else:
+            nn = nr
+        return rad.qid(nn, 0, {0:0})
     else:
         raise RuntimeError("Unkown l=0 fix!")
 

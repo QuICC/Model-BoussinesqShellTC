@@ -41,7 +41,7 @@ class GEVPSolver:
 
         self.create_eps()
 
-    def create_eps(self):
+    def create_eps(self, use_target = False):
         """Create SLEPc's eigensolver"""
 
         opts = PETSc.Options()
@@ -58,8 +58,12 @@ class GEVPSolver:
         self.E.create()
 
         self.E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
-        self.E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
-        #self.E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
+        if use_target:
+            self.E.setWhichEigenpairs(SLEPc.EPS.Which.TARGET_MAGNITUDE)
+            #self.E.setWhichEigenpairs(SLEPc.EPS.Which.TARGET_IMAGINARY)
+        else:
+            self.E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
+            #self.E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
         self.E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
         self.E.setTolerances(tol = self.tol)
 
@@ -67,6 +71,8 @@ class GEVPSolver:
         ST.setType('sinvert')
         if not self.fixed_shift:
             self.setRandomShift()
+        if use_target:
+            self.E.setTarget(self.shift)
         ST.setShift(self.shift)
 
         KSP = ST.getKSP()
