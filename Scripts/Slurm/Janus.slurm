@@ -7,7 +7,7 @@
 #SBATCH --qos=janus-debug
 #SBATCH --signal=10@60
 
-module load python/anaconda-2.0.0
+module load python/anaconda-2.1.0
 module load intel/intel-13.0.0
 module load openmpi/openmpi-1.8.3_intel-13.0.0
 module load hdf5/hdf5-1.8.13_szip-2.1_zlib-1.2.8_jpeglib-9a_openmpi-1.8.3_intel-13.0.0
