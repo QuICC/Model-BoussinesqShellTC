@@ -33,7 +33,10 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields =  [("velocity","tor"), ("velocity","pol"), ("magnetic","tor"), ("magnetic","pol"), ("temperature","")]
+        if field_row in [("velocity","tor"), ("velocity","pol"), ("temperature","")]:
+           fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+        else:
+           fields = [field_row]
 
         return fields
 
