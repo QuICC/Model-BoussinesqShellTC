@@ -38,6 +38,23 @@ def test_bc(op, parity, res_expr, sol_expr, point, grid):
     relerr = err/np.abs(1 + sol) 
     print((rhs[0], sol, err, relerr))
 
+def test_integral(op, parity, res_expr, grid):
+    """Perform a forward operation test"""
+
+    try:
+        pres, psol = parity
+    except:
+        pres = parity
+        psol = parity
+
+    x = sy.Symbol('x')
+    lhs = transf.torcheb(x_to_phys(res_expr,grid), pres)
+    rhs = op*lhs
+    lhs = lhs[0:op.shape[1]]
+    val = (op*lhs)[0]
+    ref = sy.integrate(res_expr, (x,0,1))
+    print("\t\tIntegral error: " + str(np.abs(val-ref)))
+
 def test_forward(op, parity, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
 
@@ -82,6 +99,19 @@ def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid):
     if np.max(relerr) > 10*np.spacing(1):
         print(relerr)
     print("\t\tMax tau backward relative error: " + str(np.max(relerr)))
+
+def integral(nr, rg):
+    """Accuracy test for integral operator"""
+
+    print("integral:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        l = np.random.randint(1, nr-1)
+        l = l + (l+i)%2
+        print("\tTest for l = " + str(l))
+        A = sphere.integral(nr, l)
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
+        test_integral(A, l%2, sphys, rg)
 
 def zblk(nr, rg):
     """Accuracy test for zblk operator"""
@@ -455,8 +485,9 @@ if __name__ == "__main__":
     rg = transf.rgrid(nr)
 
     # run tests
-    #zblk(nr, rg)
-    bc(nr, rg)
+    integral(nr, rg)
+#    zblk(nr, rg)
+#    bc(nr, rg)
 #    d1(nr, rg)
 #    r1(nr, rg)
 #    r2(nr, rg)

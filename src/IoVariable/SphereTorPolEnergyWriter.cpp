@@ -207,7 +207,7 @@ namespace IoVariable {
       // Free FWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
 
-      // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
+      // Normalize by sphere volume: 4/3*pi
       this->mTorEnergy /= 2*this->mVolume;
 
       // Dealias poloidal variable data for Q component
@@ -239,7 +239,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
                lfactor = std::pow(lfactor*(lfactor+1.0),2);
 
-               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarTor.slice(0).col(j).real()).sum();
+               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolQ.slice(0).col(j).real()).sum();
             }
             start = 1;
          }
@@ -250,7 +250,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = std::pow(lfactor*(lfactor+1.0),2);
 
-               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
@@ -312,7 +312,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarTor.slice(0).col(j).real()).sum();
+               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolS.slice(0).col(j).real()).sum();
             }
             start = 1;
          }
@@ -323,7 +323,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM

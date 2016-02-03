@@ -4,7 +4,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import sympy as sy
-import mpmath
 import numpy as np
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
@@ -14,8 +13,8 @@ import geomhdiscc.transform.shell as transf
 transf.min_r_points = 1
 import geomhdiscc.geometry.spherical.shell_radius as shell
 
-import mpmath
-mpmath.mp.dps = 200
+#import mpmath
+#mpmath.mp.dps = 200
 
 
 def x_to_phys(expr, grid):
@@ -37,6 +36,16 @@ def test_bc(op, res_expr, sol, grid):
         print(rhs)
         print(err)
     print("\t\tMax BC error: " + str(np.max(err)))
+
+def test_integral(op, res_expr, a, b, grid):
+    """Perform a forward operation test"""
+
+    x = sy.Symbol('x')
+    lhs = transf.torcheb(x_to_phys(res_expr,grid))
+    lhs = lhs[0:op.shape[1]]
+    val = (op*lhs)[0]
+    ref = sy.integrate(res_expr, (x,b-a,a+b))
+    print("\t\tIntegral error: " + str(np.abs(val-ref)))
 
 def test_forward(op, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
@@ -153,6 +162,16 @@ def all_bc(nr, a, b, rg):
     fsolD = sy.lambdify(x, sy.diff(sphys,x,x))
     sol = np.array([fsolV(a+b), fsolD(a+b), fsolV(-a+b), fsolD(-a+b)])
     test_bc(A, sphys, sol, rg)
+
+def integral(nr, a, b, rg):
+    """Test the integration operator"""
+
+    print("integral:")
+    x = sy.Symbol('x')
+    A = shell.integral(nr, a, b)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)])
+    test_integral(A, sphys, a, b, rg)
+
 
 def zblk(nr, a, b, rg):
     """Accuracy test for zblk operator"""
@@ -797,11 +816,13 @@ if __name__ == "__main__":
     a, b = shell.linear_r2x(1.0, 0.35)
     #a, b = shell.linear_r2x(20.0/13.0, 0.35)
     print((a, b))
+    print((a+b, b-a))
     rg = transf.rgrid(2*nr, a, b)
 
     # run tests
-    all_bc(nr, a, b, rg)
-    #zblk(nr, a, b, rg)
+#    all_bc(nr, a, b, rg)
+    integral(nr, a, b, rg)
+#    zblk(nr, a, b, rg)
 #    d1(nr, a, b, rg)
 #    d2(nr, a, b, rg)
 #    r1(nr, a, b, rg)

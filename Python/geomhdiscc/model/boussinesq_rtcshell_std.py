@@ -83,6 +83,22 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        # Get boundary condition
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        mat = geo.stencil(res[0], bc, make_square)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
@@ -110,11 +126,11 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-40, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -152,11 +168,11 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-40, 'rt':4, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
