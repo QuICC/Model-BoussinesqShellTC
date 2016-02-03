@@ -34,6 +34,12 @@ namespace IoTools {
          case PhysicalNames::CODENSITY:
             return "Codensity";
 
+         case PhysicalNames::BX:
+            return "Bx";
+
+         case PhysicalNames::BY:
+            return "By";
+
          case PhysicalNames::DENSITY:
             return "Density";
 
@@ -138,6 +144,12 @@ namespace IoTools {
       {
          case PhysicalNames::CODENSITY:
             return "codensity";
+
+         case PhysicalNames::BX:
+            return "Bx";
+
+         case PhysicalNames::BY:
+            return "By";
 
          case PhysicalNames::DENSITY:
             return "density";

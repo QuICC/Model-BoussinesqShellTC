@@ -235,6 +235,14 @@ namespace IoTools {
       {
          return PhysicalNames::CODENSITY;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::BX))
+      {
+         return PhysicalNames::BX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::BY))
+      {
+         return PhysicalNames::BY;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::DENSITY))
       {
          return PhysicalNames::DENSITY;

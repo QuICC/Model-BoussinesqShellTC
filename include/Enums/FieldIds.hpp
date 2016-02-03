@@ -33,6 +33,10 @@ namespace GeoMHDiSCC {
       enum Id {
          /// Codensity field
          CODENSITY = 0,
+         /// large scale x B field 
+         BX,
+         /// large scale y B field 
+         BY,
          /// Density field
          DENSITY,
          /// X derivative of mean temperature field

@@ -23,7 +23,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "scale1d"]
+        return ["prandtl", "magnetic_prandtl", "rayleigh", "scale1d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
