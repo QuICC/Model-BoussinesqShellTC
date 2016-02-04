@@ -110,8 +110,7 @@ class GEVPSolver:
 
         self.E.setOperators(A,B)
         if initial_vector is not None:
-            v = PETSc.Vec().createWithArray(initial_vector)
-            self.E.setInitialSpace(v)
+            self.E.setInitialSpace(initial_vector)
         elif self.euler is not None:
             # Create initial vector through timestepping
             euler_nstep = self.euler[0]
@@ -169,10 +168,10 @@ class GEVPSolver:
             vr, wr = pA.getVecs()
             vi, wi = pA.getVecs()
             eigs = np.array(np.zeros(nev), dtype=complex)
-            vects = np.array(np.zeros((vi.getLocalSize(),nev)), dtype=complex)
+            vects = []
             for i in range(nev):
                 eigs[i] = self.E.getEigenpair(i, vr, vi)
-                vects[:,i] = vr.getArray() + 1j*vi.getArray()
+                vects.append(vr + 1j*vi)
 
             return (eigs, vects)
         else:

@@ -16,6 +16,7 @@ import geomhdiscc.linear_stability.viewer as viewer
 import geomhdiscc.linear_stability.io as io
 from geomhdiscc.linear_stability.solver_slepc import Print
 from mpi4py import MPI
+from petsc4py import PETSc
 
 
 class MarginalCurve:
@@ -346,7 +347,7 @@ class GEVP:
             problem = self.setupProblem(Ra)
 
             if use_vector is not None and self.evp_vec is not None:
-                initial_vector = self.evp_vec[:,use_vector]
+                initial_vector = self.evp_vec[use_vector]
             else:
                 initial_vector = None
 
@@ -488,27 +489,37 @@ class GEVP:
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
+            # Gather full field across ranks
+            rank = MPI.COMM_WORLD.Get_rank()
+            scatter, v = PETSc.Scatter.toZero(self.evp_vec[viz_mode])
+            scatter.scatter(self.evp_vec[viz_mode], v, False, PETSc.Scatter.Mode.FORWARD)
+            full_vec = v.getArray()
 
-            # Extra different fields
-            start = 0
-            stop = 0
-            sol_spec = dict()
-            for i,f in enumerate(self.fields):
-                stop = stop + self.model.stability_sizes(self.res, self.eigs)[0][i]
-                sol_spec[f] = self.evp_vec[start:stop, viz_mode]
-                start = stop
-            
-            if plot or save_pdf:
-                Print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
+            # Output is only done on rank 0
+            if rank == 0:
+                # Extra different fields
+                start = 0
+                stop = 0
+                sol_spec = dict()
+                for i,f in enumerate(self.fields):
+                    stop = stop + self.model.stability_sizes(self.res, self.eigs)[0][i]
+                    sol_spec[f] = full_vec[start:stop]
+                    start = stop
+                
+                if plot or save_pdf:
+                    Print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
 
-                fid = ""
-                if 'prandtl' in self.eq_params:
-                    fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
-                if 'taylor' in self.eq_params:
-                    fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
-                viewer.viewSpectra(sol_spec, show = plot, save = save_pdf, fid = fid)
+                    fid = ""
+                    if 'prandtl' in self.eq_params:
+                        fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                    if 'taylor' in self.eq_params:
+                        fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                    viewer.viewSpectra(sol_spec, show = plot, save = save_pdf, fid = fid)
 
-            return sol_spec
+                return sol_spec
+
+            else:
+                return None
 
         else:
             return None
@@ -519,20 +530,23 @@ class GEVP:
         if self.evp_lmb is not None:
             # Extra different fields
             sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
-            if self.model.use_galerkin:
-                sol_spec = self.apply_stencil(sol_spec)
 
-            # Save spectra to HDF5
-            if save_hdf5:
-                self.saveHdf5_tables(sol_spec, geometry)
+            rank = MPI.COMM_WORLD.Get_rank()
+            if rank == 0:
+                if self.model.use_galerkin:
+                    sol_spec = self.apply_stencil(sol_spec)
 
-            Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
-            fid = ""
-            if 'prandtl' in self.eq_params:
-                fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
-            if 'taylor' in self.eq_params:
-                fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
-            viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
+                # Save spectra to HDF5
+                if save_hdf5:
+                    self.saveHdf5_tables(sol_spec, geometry)
+
+                Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
+                fid = ""
+                if 'prandtl' in self.eq_params:
+                    fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                if 'taylor' in self.eq_params:
+                    fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
 
     def apply_stencil(self, sol_vec):
         """Apply Galerkin stencil to recover physical fields"""
@@ -585,7 +599,7 @@ def default_options():
     opts['save_physical'] = False   # Save physical space plots to pdf
     opts['data_spectra'] = False    # Save spectral data to file(s)
     opts['data_physical'] = False   # Save physical data to file(s)
-    opts['save_hdf5'] = True   # Save physical data to file(s)
+    opts['save_hdf5'] = False   # Save physical data to file(s)
 
     return opts
 
