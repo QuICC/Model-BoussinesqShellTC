@@ -139,19 +139,33 @@ namespace IoVariable {
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mEnergy = 0.0;
 
+      SparseMatrix *op;
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
-         int start = 0;
-         int  m0 = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         if(m0 == 0)
+         double factor = 1.0;
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            this->mEnergy += (this->mSphIntgOp*rInVar.slice(0).real()).sum();
-            start = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0);
-         }
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
+            {
+               factor = 1.0;
+            } else
+            { 
+               factor = 2.0;
+            }
 
-         this->mEnergy += 2.0*(this->mSphIntgOp*rInVar.data().rightCols(rInVar.data().cols()-start).real()).sum();
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) % 2 == 0)
+               {
+                  op = &this->mSphIntgOpEven;
+               } else
+               {
+                  op = &this->mSphIntgOpOdd;
+               }
+               this->mEnergy += factor*((*op)*rInVar.slice(k).col(j).real()).sum();
+            }
+         }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
-         SparseMatrix *op;
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) % 2 == 0)

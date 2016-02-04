@@ -151,35 +151,36 @@ namespace IoVariable {
       this->mPolEnergy = 0.0;
 
       SparseMatrix *op;
-
+      MHDFloat lfactor = 0.0;
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
-         MHDFloat lfactor = 0.0;
-         int start = 0;
-         int m0 = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         if(m0 == 0)
+         double factor = 1.0;
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
             {
-               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
-               lfactor = lfactor*(lfactor+1.0);
-
-               this->mTorEnergy += lfactor*(this->mSphIntgOp*rInVarTor.slice(0).col(j).real()).sum();
+               factor = 1.0;
+            } else
+            { 
+               factor = 2.0;
             }
-            start = 1;
-         }
-         for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
+               if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) % 2 == 0)
+               {
+                  op = &this->mSphIntgOpEven;
+               } else
+               {
+                  op = &this->mSphIntgOpOdd;
+               }
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mTorEnergy += 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+               this->mTorEnergy += factor*lfactor*((*op)*rInVarTor.slice(0).col(j).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
-         MHDFloat lfactor = 0.0;
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) % 2 == 0)
@@ -230,27 +231,28 @@ namespace IoVariable {
 
       // Compute energy in Q component of QST decomposition
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
-         start = 0;
-         m0 = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         if(m0 == 0)
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
             {
-               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
-               lfactor = std::pow(lfactor*(lfactor+1.0),2);
-
-               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolQ.slice(0).col(j).real()).sum();
+               factor = 1.0;
+            } else
+            { 
+               factor = 2.0;
             }
-            start = 1;
-         }
-         for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
-            {
-               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-               lfactor = std::pow(lfactor*(lfactor+1.0),2);
 
-               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) % 2 == 0)
+               {
+                  op = &this->mIntgOpEven;
+               } else
+               {
+                  op = &this->mIntgOpOdd;
+               }
+               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+               lfactor = std::pow(lfactor*(lfactor+1.0),2);
+               this->mPolEnergy += factor*lfactor*((*op)*rInVarPolQ.slice(k).col(j).real())(0);
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
@@ -303,27 +305,29 @@ namespace IoVariable {
 
       // Compute energy in Q component of QST decomposition
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
-         start = 0;
-         m0 = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         if(m0 == 0)
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
             {
-               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
-               lfactor = lfactor*(lfactor+1.0);
-
-               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolS.slice(0).col(j).real()).sum();
+               factor = 1.0;
+            } else
+            { 
+               factor = 2.0;
             }
-            start = 1;
-         }
-         for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
+               if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) % 2 == 0)
+               {
+                  op = &this->mIntgOpEven;
+               } else
+               {
+                  op = &this->mIntgOpOdd;
+               }
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+               this->mPolEnergy += factor*lfactor*((*op)*rInVarPolS.slice(k).col(j).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
