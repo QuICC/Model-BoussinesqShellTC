@@ -300,7 +300,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -315,7 +315,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -555,6 +555,7 @@ def default_options():
 
     opts['fixed_shift'] = False     # Compute random shift only once
     opts['target'] = None           # Compute eigenvalues around target
+    opts['euler'] = None            # Compute implicit Euler steps before starting calculation
     opts['ellipse_radius'] = None   # Restrict eigenvalue search to be within radius
     opts['mode'] = 0                # Mode to track
     opts['root_tol'] = 1e-8         # Tolerance used in root finding algorighm
@@ -604,6 +605,7 @@ def compute(gevp_opts, marginal_opts):
     gevp_opts['ellipse_radius'] = marginal_opts['ellipse_radius']
     gevp_opts['fixed_shift'] = marginal_opts['fixed_shift']
     gevp_opts['target'] = marginal_opts['target']
+    gevp_opts['euler'] = marginal_opts['euler']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object
@@ -632,7 +634,7 @@ def compute(gevp_opts, marginal_opts):
                 min_point = (kc, Rac)
             curve.view(data_k, data_Ra, data_freq, minimum = min_point, plot = marginal_opts['plot_curve'], save_pdf = marginal_opts['save_curve'])
 
-    if marginal_opts['plot_spy'] or marginal_opts['write_mtx'] or marginal_opts['solve']:
+    if marginal_opts['plot_spy'] or marginal_opts['write_mtx'] or marginal_opts['solve'] or marginal_opts['minimum']:
         if marginal_opts['plot_point']:
             Ra = Rac
             kp = kc

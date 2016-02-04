@@ -23,13 +23,14 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
         self.ellipse_radius = ellipse_radius
         self.fixed_shift = fixed_shift
         self.target = target
+        self.euler = euler
 
         if shift_range is None:
             self.shift_range = (1e-2, 0.2)
@@ -102,7 +103,7 @@ class GEVPSolver:
             rnd.setInterval(self.shift_range)
             self.shift = rnd.getValueReal()
 
-    def update_eps(self, A, B, nev, initial_vector = None, initial_euler = True, euler_nstep = 30, euler_step = 0.01):
+    def update_eps(self, A, B, nev, initial_vector = None):
         """Create SLEPc eigensolver"""
 
         self.create_eps()
@@ -111,8 +112,10 @@ class GEVPSolver:
         if initial_vector is not None:
             v = PETSc.Vec().createWithArray(initial_vector)
             self.E.setInitialSpace(v)
-        elif initial_euler:
+        elif self.euler is not None:
             # Create initial vector through timestepping
+            euler_nstep = self.euler[0]
+            euler_step = self.euler[1]
             vrnd, v = A.getVecs()
             vrnd.setRandom()
             vrnd.normalize()
