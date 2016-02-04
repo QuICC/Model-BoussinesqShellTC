@@ -176,9 +176,9 @@ namespace GeoMHDiSCC {
       Equations::SharedVectorFieldVisualizer spVector;
 
       // Add temperature field visualization
-//      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spScalar->setFields(true, true);
-//      spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, true);
+      spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
@@ -187,7 +187,7 @@ namespace GeoMHDiSCC {
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-//      spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
       spVis->addHdf5OutputFile(spOut);
    }
@@ -198,7 +198,7 @@ namespace GeoMHDiSCC {
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
 
       // Set expected fields
-//      spIn->expect(PhysicalNames::TEMPERATURE);
+      spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITY);
 
       // Set simulation state
