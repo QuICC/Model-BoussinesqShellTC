@@ -300,7 +300,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -315,7 +315,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -369,10 +369,20 @@ class GEVP:
 
             viewer.viewOperators(A, B, show = spy, save = write_mtx)
 
-    def saveHdf5(self, spectra):
+    def saveHdf5_h5py(self, spectra, geometry):
         """Save spectra to HDF5 file"""
 
         h5_file = h5py.File('eigensolution.hdf5', 'w')
+
+        eig = int(self.eigs[0])
+
+        # Create header
+        h5_file.attrs['header'] = np.string_('StateFile'.encode('ascii')) 
+        if geometry == 'shell':
+            h5_file.attrs['type'] = np.string_('SLFm'.encode('ascii'))
+        elif geometry == 'sphere': 
+            h5_file.attrs['type'] = np.string_('BLFm'.encode('ascii'))
+        h5_file.attrs['version'] = np.string_('1.0'.encode('ascii'))
 
         # Create physical group
         group = h5_file.create_group('physical')
@@ -389,33 +399,44 @@ class GEVP:
         group.create_dataset('timestep', (), 'f8', data = -1)
 
         # Create truncation group
+        base_res = [self.res[0]-1, self.res[1]-1, eig]
         group = h5_file.create_group('truncation')
         for sg in ['physical', 'spectral', 'transform']:
             subgroup = group.create_group(sg)
-            for d in ['dim1D', 'dim2D', 'dim3D']:
-                subgroup.create_dataset(d, (), 'i4')
+            file_res = base_res
+            for i, d in enumerate(['dim1D', 'dim2D', 'dim3D']):
+                subgroup.create_dataset(d, (), 'i4', data = file_res[i])
 
         # Compute dataset shape
         ls = 0
-        for m in range(int(self.eigs[0])+1):
+        for m in range(eig+1):
             ls = ls + self.res[1] - m
         data_shape = (ls, self.res[0])
 
+        # Create data groups
         for k,f in spectra.items():
-            group = h5_file.require_group(k[0])
-            dset = group.create_dataset(k[0] + '_' + k[1], data_shape, '[f8,f8]')
-#            dset[-48:,:] = np.reshape(f, (self.res[0], self.res[1]-self.eigs[0]))
+            name = k[0]
+            group = h5_file.require_group(name)
+            if k[1] != '':
+                name = name + '_' + k[1]
+            dset = group.create_dataset(name, data_shape, f.dtype)
+            dset[-self.res[1]+eig:,:] = np.reshape(f, (self.res[1]-eig, self.res[0]), order='C') 
 
         h5_file.close()
 
-    def saveHdf5_2(self, spectra):
+    def saveHdf5_tables(self, spectra, geometry):
         """Save spectra to HDF5 file"""
+
+        eig = int(self.eigs[0])
 
         h5_file = tables.open_file('eigensolution.hdf5', mode = 'w')
 
         # Create header
         h5_file.set_node_attr('/', 'header', 'StateFile'.encode('ascii')) 
-        h5_file.set_node_attr('/', 'type', 'SLFm'.encode('ascii')) 
+        if geometry == 'shell':
+            h5_file.set_node_attr('/', 'type', 'SLFm'.encode('ascii')) 
+        elif geometry == 'sphere': 
+            h5_file.set_node_attr('/', 'type', 'BLFm'.encode('ascii')) 
         h5_file.set_node_attr('/', 'version', '1.0'.encode('ascii')) 
 
         # Create physical group
@@ -436,13 +457,13 @@ class GEVP:
         group = h5_file.create_group('/', 'truncation')
         for sg in ['physical', 'spectral', 'transform']:
             subgroup = h5_file.create_group(group, sg)
-            file_res = [self.res[0]-1, self.res[1]-1, self.eigs[0]]
+            file_res = [self.res[0]-1, self.res[1]-1, eig]
             for i,d in enumerate(['dim1D', 'dim2D', 'dim3D']):
                 h5_file.create_array(subgroup, d, file_res[i])
 
         # Compute dataset shape
         ls = 0
-        for m in range(int(self.eigs[0])+1):
+        for m in range(eig+1):
             ls = ls + self.res[1] - m
         data_shape = (ls, self.res[0])
 
@@ -457,7 +478,9 @@ class GEVP:
                 name = name + '_' + k[1]
             zz = np.zeros(data_shape, dtype=f.dtype)
             dset = h5_file.create_array(h5_file.get_node('/'+k[0]), name, zz)
-            dset[-self.res[1]+self.eigs[0]:,:] = np.reshape(f, (self.res[1]-self.eigs[0], self.res[0]), order='C') 
+            if eig == 0:
+                f.imag = 0
+            dset[-self.res[1]+eig:,:] = np.reshape(f, (self.res[1]-eig, self.res[0]), order='C') 
 
         h5_file.close()
 
@@ -501,7 +524,7 @@ class GEVP:
 
             # Save spectra to HDF5
             if save_hdf5:
-                self.saveHdf5_2(sol_spec)
+                self.saveHdf5_tables(sol_spec, geometry)
 
             Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
             fid = ""
@@ -531,6 +554,7 @@ def default_options():
     opts = dict()
 
     opts['fixed_shift'] = False     # Compute random shift only once
+    opts['target'] = None           # Compute eigenvalues around target
     opts['ellipse_radius'] = None   # Restrict eigenvalue search to be within radius
     opts['mode'] = 0                # Mode to track
     opts['root_tol'] = 1e-8         # Tolerance used in root finding algorighm
@@ -579,6 +603,7 @@ def compute(gevp_opts, marginal_opts):
     # Move options to GEVP
     gevp_opts['ellipse_radius'] = marginal_opts['ellipse_radius']
     gevp_opts['fixed_shift'] = marginal_opts['fixed_shift']
+    gevp_opts['target'] = marginal_opts['target']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object

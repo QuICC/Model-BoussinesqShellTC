@@ -23,12 +23,13 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
         self.ellipse_radius = ellipse_radius
         self.fixed_shift = fixed_shift
+        self.target = target
 
         if shift_range is None:
             self.shift_range = (1e-2, 0.2)
@@ -41,7 +42,7 @@ class GEVPSolver:
 
         self.create_eps()
 
-    def create_eps(self, use_target = False):
+    def create_eps(self):
         """Create SLEPc's eigensolver"""
 
         opts = PETSc.Options()
@@ -58,7 +59,7 @@ class GEVPSolver:
         self.E.create()
 
         self.E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
-        if use_target:
+        if self.target is not None:
             self.E.setWhichEigenpairs(SLEPc.EPS.Which.TARGET_MAGNITUDE)
             #self.E.setWhichEigenpairs(SLEPc.EPS.Which.TARGET_IMAGINARY)
         else:
@@ -71,8 +72,9 @@ class GEVPSolver:
         ST.setType('sinvert')
         if not self.fixed_shift:
             self.setRandomShift()
-        if use_target:
-            self.E.setTarget(self.shift)
+        if self.target is not None:
+            self.E.setTarget(self.target)
+            self.shift = self.target
         ST.setShift(self.shift)
 
         KSP = ST.getKSP()

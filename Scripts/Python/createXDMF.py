@@ -14,16 +14,17 @@ def main(argv):
     outputfile = ''
     snapshots = 1 
     with_components = False
+    with_energy = False
     try:
-        opts, args = getopt.getopt(argv,"hi:o:n:", ['with-components'])
+        opts, args = getopt.getopt(argv,"hi:o:n:", ['with-components', 'with-energy'])
     except getopt.GetoptError:
-        print('Single file: createXDMF.py (--with-components) -i <inputfile> -o <outputfile>')
-        print('Timeseries: createXDMF.py (--with-components) -i <inputfile> -o <outputfile> -n <number of snapshots>')
+        print('Single file: createXDMF.py (--with-components) (--with-energy) -i <inputfile> -o <outputfile>')
+        print('Timeseries: createXDMF.py (--with-components) (--with-energy) -i <inputfile> -o <outputfile> -n <number of snapshots>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('Single file: createXDMF.py (--with-components) -i <inputfile> -o <outputfile>')
-            print('Timeseries: createXDMF.py (--with-components) -i <inputfile> -o <outputfile> -n <number of snapshots>')
+            print('Single file: createXDMF.py (--with-components) (--with-energy) -i <inputfile> -o <outputfile>')
+            print('Timeseries: createXDMF.py (--with-components) (--with-energy) -i <inputfile> -o <outputfile> -n <number of snapshots>')
             sys.exit()
         elif opt in ("-i"):
             inputfile = arg
@@ -31,6 +32,8 @@ def main(argv):
             outputfile = arg
         elif opt in ("--with-components"):
             with_components = True
+        elif opt in ("--with-energy"):
+            with_energy = True
         elif opt in ("-n"):
             snapshots = int(arg)
     # Extract file information
@@ -103,6 +106,9 @@ def main(argv):
         xdmfXYZGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DSMesh" NumberOfElements="{nSlow} {nMid} {nFast}"/>\n\t\t\t<Geometry GeometryType="XYZ">\n\t\t\t\t<DataItem Dimensions="{nN} 3" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{gridfile}.hdf5:/mesh/grid_{gFast[0]}{gMid[0]}{gSlow[0]}\n\t\t\t\t</DataItem>\n\t\t\t</Geometry>'
         xdmfScalar ='\t\t\t<Attribute Name="{sname}" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem Dimensions="{nSlow} {nMid} {nFast}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/{sname}/{sname}\n\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
         xdmfVScalar ='\t\t\t<Attribute Name="{sname}" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem Dimensions="{nSlow} {nMid} {nFast}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/{vname}/{sname}\n\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
+        xdmfEFunction ='\t\t\t<Attribute Name="{sname}" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem ItemType="Function" Function="$0*$0 + $1*$1 + $2*$2" Dimensions="{nSlow} {nMid} {nFast}" NumberType="Float" Precision="8">'
+        xdmfEScalar ='\t\t\t\t\t<DataItem Dimensions="{nSlow} {nMid} {nFast}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t\t{basename}{fid:04d}.hdf5:/{vname}/{sname}\n\t\t\t\t\t</DataItem>'
+        xdmfEEnd ='\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
     else:
         xdmfVxVyVzGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="2DRectMesh" NumberOfElements="{nMid} {nFast}"/>\n\t\t\t<Geometry GeometryType="VxVy">\n{rMid}\t\t\t\t<DataItem Dimensions="{nMid}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/mesh/grid_{gMid}\n\t\t\t\t</DataItem>\n{rMidEnd}{rFast}\t\t\t\t<DataItem Dimensions="{nFast}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/mesh/grid_{gFast}\n\t\t\t\t</DataItem>\n{rFastEnd}\t\t\t</Geometry>'
         xdmfXYZGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="2DSMesh" NumberOfElements="{nMid} {nFast}"/>\n\t\t\t<Geometry GeometryType="XY">\n\t\t\t\t<DataItem Dimensions="{nN} 2" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{gridfile}.hdf5:/mesh/grid_{gFast[0]}{gMid[0]}\n\t\t\t\t</DataItem>\n\t\t\t</Geometry>'
@@ -168,6 +174,15 @@ def main(argv):
                 for ext in [gFast, gMid, gSlow]:
                     if (ext is not None) and (v +  '_' + ext in list(h5_file[v])):
                         print(xdmfVScalar.format(nFast = nFast, nMid = nMid, nSlow = nSlow, vname = v, sname = v +  '_' + ext, fid = fId, basename = basename), file=out_file)
+        # Create energy density function if requested
+        if with_energy:
+            for v in list(h5_file):
+                if v +  '_' + gFast in h5_file[v] and len(h5_file[v]) == 3:
+                    print(xdmfEFunction.format(nFast = nFast, nMid = nMid, nSlow = nSlow, sname = v +  '_energy'), file=out_file)
+                    for ext in [gFast, gMid, gSlow]:
+                        if (ext is not None) and (v +  '_' + ext in list(h5_file[v])):
+                            print(xdmfEScalar.format(nFast = nFast, nMid = nMid, nSlow = nSlow, vname = v, sname = v +  '_' + ext, fid = fId, basename = basename), file=out_file)
+                    print(xdmfEEnd, file=out_file)
         time = h5_file['run']['time'].value
         print(xdmfTime.format(time = time), file=out_file)
         if snapshots > 1:
