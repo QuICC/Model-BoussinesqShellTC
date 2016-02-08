@@ -141,9 +141,9 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                            bc = {0:10}
+                        bc = {0:10}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                            bc = {0:20}
+                        bc = {0:20}
                     elif field_row == ("magnetic","tor") and field_col == field_row:
                         bc = {0:10}
                     elif field_row == ("magnetic","pol") and field_col == field_row:
@@ -225,12 +225,15 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
+        Pr = eq_params['prandtl']
+        Pm = eq_params['magnetic_prandtl']
         Ra = eq_params['rayleigh']
+        T = eq_params['taylor']**(0.5)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4r4(res[0], l, bc, Ra*l*(l+1.0))
+            mat = geo.i4r4(res[0], l, bc, (Pm**2*Ra*T/Pr)*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             mat = geo.i2r2(res[0], l, bc, -l*(l+1.0))
@@ -262,25 +265,25 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        Pm = eq_params['magnetic_prandtl']
         Pr = eq_params['prandtl']
+        Pm = eq_params['magnetic_prandtl']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0))
+            mat = geo.i2r2lapl(res[0], l, bc, Pm*l*(l+1.0))
 
         elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4r4lapl2(res[0], l, bc, l*(l+1.0))
+            mat = geo.i4r4lapl2(res[0], l, bc, Pm*l*(l+1.0))
 
         elif field_row == ("magnetic","tor") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0)/Pm)
+            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0))
 
         elif field_row == ("magnetic","pol") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0)/Pm)
+            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, 1.0/Pr)
+            mat = geo.i2r2lapl(res[0], l, bc, Pm/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

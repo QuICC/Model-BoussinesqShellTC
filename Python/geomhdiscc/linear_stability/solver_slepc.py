@@ -23,7 +23,7 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
@@ -31,9 +31,11 @@ class GEVPSolver:
         self.fixed_shift = fixed_shift
         self.target = target
         self.euler = euler
+        self.conv_idx = conv_idx
 
         if shift_range is None:
-            self.shift_range = (1e-2, 0.2)
+            #self.shift_range = (1e-2, 0.2)
+            self.shift_range = (-1e0, 1e-2)
             #self.shift_range = (-1e-2, 1e-2)
         else:
             self.shift_range = shift_range
@@ -112,12 +114,18 @@ class GEVPSolver:
         if initial_vector is not None:
             self.E.setInitialSpace(initial_vector)
         elif self.euler is not None:
+            Print('Initialise vector with Euler steps')
             # Create initial vector through timestepping
             euler_nstep = self.euler[0]
             euler_step = self.euler[1]
             vrnd, v = A.getVecs()
-            vrnd.setRandom()
-            vrnd.normalize()
+            vrnd.set(1.0)
+            data = vrnd.getArray()
+            sze = data.shape[0]//3
+            for j in range(0, data.shape[0]):
+                data[j] = ((2*np.random.ranf() - 1.0)+(2*np.random.ranf() - 1.0)*1j)*10**(-20.0*(j%sze)/float(sze))
+            Print("    Generated spectrum")
+            vrnd.createWithArray(data)
             vrnd = -(1.0/euler_step)*B*vrnd
             ksp = PETSc.KSP().create()
             ksp.setType('preonly')
@@ -130,7 +138,9 @@ class GEVPSolver:
             for i in range(0,euler_nstep):
                 ksp.solve(vrnd, v)
                 vrnd = (-1.0/euler_step)*B*v
+                #vrnd.normalize()
             self.E.setInitialSpace(v)
+            Print('Done')
 
         self.E.setDimensions(nev = nev)
 
@@ -153,6 +163,29 @@ class GEVPSolver:
         else:
             return None
 
+#    def eigenpairs(self, system, nev, initial_vector = None):
+#        """Compute eigenpairs using SLEPc"""
+#
+#        pA, pB = self.petsc_operators(*system)
+#
+#        self.update_eps(pA, pB, nev, initial_vector = initial_vector)
+#
+#        self.E.solve()
+#        nconv = self.E.getConverged()
+#
+#        if nconv >= nev:
+#            # Create the results vectors
+#            vr, wr = pA.getVecs()
+#            vi, wi = pA.getVecs()
+#            eigs = np.array(np.zeros(nev), dtype=complex)
+#            vects = []
+#            for i in range(nev):
+#                eigs[i] = self.E.getEigenpair(i, vr, vi)
+#                vects.append(vr + 1j*vi)
+#
+#            return (eigs, vects)
+#        else:
+#            return (None, None)
     def eigenpairs(self, system, nev, initial_vector = None):
         """Compute eigenpairs using SLEPc"""
 
@@ -160,22 +193,51 @@ class GEVPSolver:
 
         self.update_eps(pA, pB, nev, initial_vector = initial_vector)
 
-        self.E.solve()
-        nconv = self.E.getConverged()
+        c_nev = nev
+        pair = (None, None)
+        tmp_eigs = []
+        def_space = []
+        bad_vects = 0
+        vects = []
+        for attempts in range(0,5):
+            for i in range(0, len(def_space)):
+                self.E.setDeflationSpace(def_space[i])
+            if initial_vector is not None:
+                self.E.setInitialSpace(initial_vector)
+            self.E.setDimensions(nev = c_nev)
 
-        if nconv >= nev:
-            # Create the results vectors
-            vr, wr = pA.getVecs()
-            vi, wi = pA.getVecs()
-            eigs = np.array(np.zeros(nev), dtype=complex)
-            vects = []
-            for i in range(nev):
-                eigs[i] = self.E.getEigenpair(i, vr, vi)
-                vects.append(vr + 1j*vi)
+            self.E.solve()
+            nconv = self.E.getConverged()
+    
+            if nconv >= c_nev:
+                # Create the results vectors
+                vr, wr = pA.getVecs()
+                vi, wi = pA.getVecs()
+                for i in range(nconv):
+                    lmb = self.E.getEigenpair(i, vr, vi)
+                    maxval = np.max(np.abs(vr.getArray()[-self.conv_idx:]))
+                    Print('Spectral convergence test for ' + str(lmb) + ': ' + str(maxval))
+                    if maxval < 1e-10:
+                        tmp_eigs.append(lmb)
+                        vects.append(vr + 1j*vi)
+                    else:
+                        def_space.append(vr + 1j*vi)
+                        bad_vects += 1
+                Print('Converged eigenvalues: ' + str(tmp_eigs))
 
-            return (eigs, vects)
-        else:
-            return (None, None)
+                if len(tmp_eigs) >= nev:
+                    pair = (np.array(tmp_eigs[0:nev], dtype=complex), vects)
+                    break
+                else:
+                    c_nev = 2*c_nev - len(vects)
+                    bad_vects = 0
+                    if len(vects) > 0:
+                        initial_vector = vects[0]
+                        tmp_eigs = []
+                        vects = []
+                        #def_space.append(vects)
+
+        return pair
 
     def restrict_operators(self, sizes):
         """Compute restriction for operators"""

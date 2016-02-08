@@ -301,7 +301,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -316,7 +316,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -570,6 +570,7 @@ def default_options():
     opts['fixed_shift'] = False     # Compute random shift only once
     opts['target'] = None           # Compute eigenvalues around target
     opts['euler'] = None            # Compute implicit Euler steps before starting calculation
+    opts['conv_idx'] = 1            # Number of index at end of spectrum to be converged
     opts['ellipse_radius'] = None   # Restrict eigenvalue search to be within radius
     opts['mode'] = 0                # Mode to track
     opts['root_tol'] = 1e-8         # Tolerance used in root finding algorighm
@@ -620,6 +621,7 @@ def compute(gevp_opts, marginal_opts):
     gevp_opts['fixed_shift'] = marginal_opts['fixed_shift']
     gevp_opts['target'] = marginal_opts['target']
     gevp_opts['euler'] = marginal_opts['euler']
+    gevp_opts['conv_idx'] = marginal_opts['conv_idx']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object

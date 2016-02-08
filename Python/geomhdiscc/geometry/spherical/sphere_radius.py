@@ -273,6 +273,48 @@ def i4r3d1r1(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
+def i4r2(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^2 T_n(x)."""
+
+    parity = l%2
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = np.arange(-3,4)
+    nzrow = 3
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return 1.0/(64.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -(n - 5.0)/(32.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -(n + 17.0)/(64.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return (n**2 - 19.0)/(16.0*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -(n - 17.0)/(64.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -(n + 5.0)/(32.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return 1.0/(64.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
 def i4r4(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of r^4 T_n(x)."""
 
@@ -360,6 +402,32 @@ def i4r4lapl(nr, l, bc, coeff = 1.0):
         return -(l - n - 5.0)*(l + n + 6.0)/(64.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i4r2lapl2_l1(nr, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^2 Laplacian^2 T_n(x) for l = 1."""
+
+    parity = l%2
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = np.arange(-1,2)
+    nzrow = 3
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return (n - 5.0)/(4.0*(n - 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return (n**2 + 3.0)/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return (n + 5.0)/(4.0*(n + 1.0))
+
+    ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')

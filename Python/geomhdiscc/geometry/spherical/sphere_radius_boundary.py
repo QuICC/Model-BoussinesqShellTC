@@ -131,7 +131,7 @@ def tau_diff(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*tau_c()*ns**2)
+    cond.append(c*2.0*ns**2)
 
     return np.array(cond)
 
@@ -145,7 +145,7 @@ def tau_diff2(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*tau_c()*(1.0/3.0)*(ns**4 - ns**2))
+    cond.append(c*(2.0/3.0)*(ns**4 - ns**2))
 
     return np.array(cond)
 
@@ -159,7 +159,7 @@ def tau_rdiffdivr(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*tau_c()*(ns**2 - 1.0))
+    cond.append(c*(ns**2 - 1.0)*tau_c())
     if parity == 0:
         cond[-1][0] /= tau_c()
 
@@ -175,7 +175,7 @@ def tau_insulating(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*(ns**2 + (l+1.0)*tau_c()))
+    cond.append(c*(2.0*ns**2 + (l+1.0)*tau_c()))
     if parity == 0:
         cond[-1][0] /= tau_c()
 
