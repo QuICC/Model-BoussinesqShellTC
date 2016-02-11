@@ -1,6 +1,6 @@
 /** 
  * @file BoussinesqDynamoSphereModel.hpp
- * @brief Implementation of the Boussinesq thermal convection dynamo in a sphere model (Toroidal/Poloidal formulation)
+ * @brief Implementation of the Boussinesq rotating thermal dynamo in a sphere (Toroidal/Poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -30,7 +30,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq thermal convection dynamo in a sphere model (Toroidal/Poloidal formulation)
+    * @brief Implementation of the Boussinesq rotating thermal dynamo sphere model (Toroidal/Poloidal formulation)
     */
    class BoussinesqDynamoSphereModel
    {
