@@ -205,14 +205,8 @@ def makeGridFile(h5_file, gFast, gMid, gSlow, fname, func):
     else:
         if 'mesh' in grid_file:
             del grid_file['mesh']
-
-        box = np.zeros([size,3])
-        i = 0
-        for ps in np.nditer(g_slow):
-            for pm in np.nditer(g_mid):
-                for pf in np.nditer(g_fast):
-                    box[i,:] = func(pf, pm, ps)
-                    i = i + 1
+        
+        # Create mesh dataset
         mesh = grid_file.create_group('mesh')
         mesh.attrs['n_'+gFast[0]] = g_fast.size
         mesh.attrs['n_'+gMid[0]] = g_mid.size
@@ -221,23 +215,35 @@ def makeGridFile(h5_file, gFast, gMid, gSlow, fname, func):
             dset = mesh.create_dataset('grid_'+gFast[0]+gMid[0]+gSlow[0], (size, 3), '=f8')
         else:
             dset = mesh.create_dataset('grid_'+gFast[0]+gMid[0], (size, 2), '=f8')
-        dset[:,:] = box
+
+        j = 0
+        np_fast = np.array(g_fast[:])
+        n_fast = g_fast.shape[0]
+        ds_size = n_fast*g_mid.shape[0]
+        box = np.zeros([ds_size,3])
+        for ps in np.nditer(g_slow):
+            i = 0
+            for pm in np.nditer(g_mid):
+                box[i:i+n_fast,:] = func(np_fast, pm, ps)
+                i = i + n_fast
+            dset[j:j+ds_size,:] = box
+            j = j + ds_size
         grid_file.close()
 
 def boxXYZ(pFast, pMid, pSlow):
-    return [pFast, pMid, pSlow]
+    return np.array([pFast, pMid*np.ones(pFast.shape), pSlow*np.ones(pFast.shape)])
 
 def cylinderXYZ(pz, pth, pr):
-    return [pz, pr*cos(pth), pr*sin(pth)]
+    return np.array([pz, pr*np.cos(pth)*np.ones(pz.shape), pr*np.sin(pth)*np.ones(pz.shape)])
 
 def annulusXYZ(pz, pth, pr):
-    return [pz, pr*cos(pth), pr*sin(pth)]
+    return np.array([pz, pr*np.cos(pth)*np.ones(pz.shape), pr*np.sin(pth)*np.ones(pz.shape)])
 
 def sphereXYZ(pph, pth, pr):
-    return [pr*cos(pth), pr*sin(pth)*cos(pph), pr*sin(pth)*sin(pph)]
+    return np.array([pr*cos(pth)*np.ones(pph.shape), pr*np.sin(pth)*np.cos(pph), pr*np.sin(pth)*np.sin(pph)]).T
 
 def shellXYZ(pph, pth, pr):
-    return [pr*cos(pth), pr*sin(pth)*cos(pph), pr*sin(pth)*sin(pph)]
+    return np.array([pr*cos(pth)*np.ones(pph.shape), pr*np.sin(pth)*np.cos(pph), pr*np.sin(pth)*np.sin(pph)])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
