@@ -114,7 +114,7 @@ def make_sh_qoperator(opl, opr, nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = N
             rows.append(mat)
         mat = spsp.vstack(rows)
     else:
-        mat = rad.zblk(nr, bc)
+        mat = rad.zblk(nr, m, bc)
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 

@@ -271,6 +271,12 @@ class BoussinesqRTCShell(base_model.BaseModel):
         T = eq_params['taylor']**0.5
         Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
+        # Rescale time for eigensolver
+        if self.linearize:
+            c_dt = self.rescale_time(eq_params)
+        else:
+            c_dt = 1.0
+
         m = int(eigs[0])
 
         a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
@@ -279,27 +285,27 @@ class BoussinesqRTCShell(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2r2coriolis(res[0], res[1], m, a, b, bc, -T, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i2r2coriolis(res[0], res[1], m, a, b, bc, -T/c_dt, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4r4coriolis(res[0], res[1], m, a, b, bc, T, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4r4coriolis(res[0], res[1], m, a, b, bc, T/c_dt, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, 1.0/c_dt,with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = geo.i4r4(res[0], res[1], m, a, b, bc, -Ra_eff, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4r4(res[0], res[1], m, a, b, bc, -Ra_eff/c_dt**2, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -317,9 +323,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
             elif field_col == ("temperature",""):
                 if eq_params["heating"] == 0:
-                    mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr, restriction = restriction)
+                    mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, 1.0/(Pr*c_dt), restriction = restriction)
                 else:
-                    mat = geo.i2r3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr, restriction = restriction)
+                    mat = geo.i2r3lapl(res[0], res[1], m, a, b, bc, 1.0/(Pr*c_dt), restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -369,6 +375,15 @@ class BoussinesqRTCShell(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
+
+    def rescale_time(self, eq_params):
+        """Rescale time for linear stability calculation"""
+
+        T = (eq_params['taylor']/(1.0-eq_params['rratio'])**4)**0.5
+        #c_dt = T**(2./3.)*(0.4715 - 0.6089*T**(-1/3.))
+        c_dt = T**(2./3.)*(0.3144 - 0.6089*T**(-1./3.)) + T**(1./3.)*0.5186*int(0.3029*T**(1./3.))
+        c_dt = c_dt*(1.0-eq_params['rratio'])**2
+        return c_dt
 
     def nondimensional_factors(self, eq_params):
         """Compute the effective Rayleigh number and background depending on nondimensionalisation"""

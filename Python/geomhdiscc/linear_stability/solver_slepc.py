@@ -23,7 +23,7 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
@@ -32,10 +32,11 @@ class GEVPSolver:
         self.target = target
         self.euler = euler
         self.conv_idx = conv_idx
+        self.spectrum_conv = spectrum_conv
 
         if shift_range is None:
             #self.shift_range = (1e-2, 0.2)
-            self.shift_range = (-1e0, 1e-2)
+            self.shift_range = (-1e-1, 1e-1)
             #self.shift_range = (-1e-2, 1e-2)
         else:
             self.shift_range = shift_range
@@ -56,7 +57,7 @@ class GEVPSolver:
             opts['rg_type'] = 'ellipse'
             opts['rg_ellipse_center'] = 0
             opts['rg_ellipse_radius'] = self.ellipse_radius
-            opts['rg_ellipse_vscale'] = 1e4
+            opts['rg_ellipse_vscale'] = 1e0
 
         self.E = SLEPc.EPS()
         self.E.create()
@@ -105,7 +106,29 @@ class GEVPSolver:
             rnd.setInterval(self.shift_range)
             self.shift = rnd.getValueReal()
 
-    def update_eps(self, A, B, nev, initial_vector = None):
+    def set_initial_vector(self, v, sizes):
+        """Create an initial vector with converged spectrum"""
+
+        v.set(1.0)
+        data = v.getArray()
+        rstart, rend = v.getOwnershipRange()
+        start = 0
+        par = [1, 0, 0]
+        gal = [2, 4, 2]
+        for i, sze in enumerate(sizes[0]):
+            for j in range(0, sze):
+                if start + j >= rstart and start + j < rend:
+                    if (j//(sizes[1][0]-gal[i]))%2 == par[i]:
+                        data[start+j-rstart] = ((2*np.random.ranf() - 1.0)+(2*np.random.ranf() - 1.0)*1j)*10**(-10.0*(j)/float(sze))*10**(-10*(j%sizes[1][0])/float(sizes[1][0]))
+                    else:
+                        data[start+j-rstart] = 0.0
+                elif start + j >= rend:
+                    break
+            start = start + sze
+        Print("    Generated spectrum")
+        v.createWithArray(data)
+
+    def update_eps(self, A, B, nev, sizes, initial_vector = None):
         """Create SLEPc eigensolver"""
 
         self.create_eps()
@@ -119,13 +142,7 @@ class GEVPSolver:
             euler_nstep = self.euler[0]
             euler_step = self.euler[1]
             vrnd, v = A.getVecs()
-            vrnd.set(1.0)
-            data = vrnd.getArray()
-            sze = data.shape[0]//3
-            for j in range(0, data.shape[0]):
-                data[j] = ((2*np.random.ranf() - 1.0)+(2*np.random.ranf() - 1.0)*1j)*10**(-20.0*(j%sze)/float(sze))
-            Print("    Generated spectrum")
-            vrnd.createWithArray(data)
+            self.set_initial_vector(vrnd, sizes)
             vrnd = -(1.0/euler_step)*B*vrnd
             ksp = PETSc.KSP().create()
             ksp.setType('preonly')
@@ -149,7 +166,7 @@ class GEVPSolver:
 
         pA, pB = self.petsc_operators(*system)
 
-        self.update_eps(pA, pB, nev, initial_vector = initial_vector)
+        self.update_eps(pA, pB, nev, system[-1], initial_vector = initial_vector)
 
         self.E.solve()
         nconv = self.E.getConverged()
@@ -191,19 +208,24 @@ class GEVPSolver:
 
         pA, pB = self.petsc_operators(*system)
 
-        self.update_eps(pA, pB, nev, initial_vector = initial_vector)
+        self.update_eps(pA, pB, nev, system[-1], initial_vector = initial_vector)
 
-        c_nev = nev
+        comm = MPI.COMM_WORLD
+        c_nev = 1
         pair = (None, None)
         tmp_eigs = []
         def_space = []
         bad_vects = 0
         vects = []
-        for attempts in range(0,5):
+        for attempts in range(0,10):
             for i in range(0, len(def_space)):
                 self.E.setDeflationSpace(def_space[i])
             if initial_vector is not None:
                 self.E.setInitialSpace(initial_vector)
+            elif attempts > 0:
+                vtmpL, vtmpR = pA.getVecs()
+                self.set_initial_vector(vtmpL, system[-1])
+                self.E.setInitialSpace(vtmpL)
             self.E.setDimensions(nev = c_nev)
 
             self.E.solve()
@@ -213,13 +235,34 @@ class GEVPSolver:
                 # Create the results vectors
                 vr, wr = pA.getVecs()
                 vi, wi = pA.getVecs()
+                rstart, rend = vr.getOwnershipRange()
                 for i in range(nconv):
                     lmb = self.E.getEigenpair(i, vr, vi)
-                    maxval = np.max(np.abs(vr.getArray()[-self.conv_idx:]))
-                    Print('Spectral convergence test for ' + str(lmb) + ': ' + str(maxval))
-                    if maxval < 1e-10:
-                        tmp_eigs.append(lmb)
-                        vects.append(vr + 1j*vi)
+                    if lmb.imag < 0:
+                        convratio = 1e99
+                        start = 0
+                        for sze in system[-1][0]:
+                            spec_info = np.zeros(2)
+                            tmp_info = np.zeros(2)
+                            rank_start = max(rstart, start)
+                            rank_end = min(rend,start+sze)
+                            # Get max of spectrum
+                            if rank_start < rank_end:
+                                tmp_info[0] = np.max(np.abs(vr.getArray()[rank_start-rstart:rank_end-rstart]))
+                            # Get min of spectrum
+                            rank_start = max(rstart, start+sze-self.conv_idx)
+                            if rank_start < rank_end:
+                                tmp_info[1] = np.max(np.abs(vr.getArray()[rank_start-rstart:rank_end-rstart]))
+                            comm.Allreduce(tmp_info, spec_info, MPI.MAX)
+                            convratio = min(convratio, spec_info[0]/spec_info[1])
+                            start = start + sze
+                        Print('Spectral convergence test for ' + str(lmb) + ': ' + str(convratio))
+                        if convratio > self.spectrum_conv:
+                            tmp_eigs.append(lmb)
+                            vects.append(vr + 1j*vi)
+                        else:
+                            def_space.append(vr + 1j*vi)
+                            bad_vects += 1
                     else:
                         def_space.append(vr + 1j*vi)
                         bad_vects += 1
@@ -229,7 +272,7 @@ class GEVPSolver:
                     pair = (np.array(tmp_eigs[0:nev], dtype=complex), vects)
                     break
                 else:
-                    c_nev = 2*c_nev - len(vects)
+                    c_nev = max(nev, 1 + len(vects))
                     bad_vects = 0
                     if len(vects) > 0:
                         initial_vector = vects[0]

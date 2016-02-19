@@ -301,7 +301,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -316,7 +316,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -370,10 +370,10 @@ class GEVP:
 
             viewer.viewOperators(A, B, show = spy, save = write_mtx)
 
-    def saveHdf5_h5py(self, spectra, geometry):
+    def saveHdf5_h5py(self, spectra, geometry, postfix = ''):
         """Save spectra to HDF5 file"""
 
-        h5_file = h5py.File('eigensolution.hdf5', 'w')
+        h5_file = h5py.File('eigensolution' + postfix + '.hdf5', 'w')
 
         eig = int(self.eigs[0])
 
@@ -425,12 +425,12 @@ class GEVP:
 
         h5_file.close()
 
-    def saveHdf5_tables(self, spectra, geometry):
+    def saveHdf5_tables(self, spectra, geometry, postfix = ''):
         """Save spectra to HDF5 file"""
 
         eig = int(self.eigs[0])
 
-        h5_file = tables.open_file('eigensolution.hdf5', mode = 'w')
+        h5_file = tables.open_file('eigensolution' + postfix + '.hdf5', mode = 'w')
 
         # Create header
         h5_file.set_node_attr('/', 'header', 'StateFile'.encode('ascii')) 
@@ -528,25 +528,39 @@ class GEVP:
         """Plot eigenvectors in physical space"""
 
         if self.evp_lmb is not None:
-            # Extra different fields
-            sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
+            if viz_mode >= 0:
+                # Extra different fields
+                sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
 
-            rank = MPI.COMM_WORLD.Get_rank()
-            if rank == 0:
-                if self.model.use_galerkin:
-                    sol_spec = self.apply_stencil(sol_spec)
+                rank = MPI.COMM_WORLD.Get_rank()
+                if rank == 0:
+                    if self.model.use_galerkin:
+                        sol_spec = self.apply_stencil(sol_spec)
 
-                # Save spectra to HDF5
-                if save_hdf5:
-                    self.saveHdf5_tables(sol_spec, geometry)
+                    # Save spectra to HDF5
+                    if save_hdf5:
+                        self.saveHdf5_tables(sol_spec, geometry)
 
-                Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
-                fid = ""
-                if 'prandtl' in self.eq_params:
-                    fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
-                if 'taylor' in self.eq_params:
-                    fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
-                viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
+                    Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
+                    fid = ""
+                    if 'prandtl' in self.eq_params:
+                        fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                    if 'taylor' in self.eq_params:
+                        fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                    viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
+            else:
+                for i in range(0, len(self.evp_vec)):
+                    # Extra different fields
+                    sol_spec = self.viewSpectra(i, plot = False, save_pdf = False)
+
+                    rank = MPI.COMM_WORLD.Get_rank()
+                    if rank == 0:
+                        if self.model.use_galerkin:
+                            sol_spec = self.apply_stencil(sol_spec)
+
+                        # Save spectra to HDF5
+                        if save_hdf5:
+                            self.saveHdf5_tables(sol_spec, geometry, postfix = '_mode_' + str(i))
 
     def apply_stencil(self, sol_vec):
         """Apply Galerkin stencil to recover physical fields"""
@@ -571,6 +585,7 @@ def default_options():
     opts['target'] = None           # Compute eigenvalues around target
     opts['euler'] = None            # Compute implicit Euler steps before starting calculation
     opts['conv_idx'] = 1            # Number of index at end of spectrum to be converged
+    opts['spectrum_conv'] = 1       # Ratio between min and max of spectrum
     opts['ellipse_radius'] = None   # Restrict eigenvalue search to be within radius
     opts['mode'] = 0                # Mode to track
     opts['root_tol'] = 1e-8         # Tolerance used in root finding algorighm
@@ -622,6 +637,7 @@ def compute(gevp_opts, marginal_opts):
     gevp_opts['target'] = marginal_opts['target']
     gevp_opts['euler'] = marginal_opts['euler']
     gevp_opts['conv_idx'] = marginal_opts['conv_idx']
+    gevp_opts['spectrum_conv'] = marginal_opts['spectrum_conv']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object

@@ -56,7 +56,7 @@ namespace Schemes {
       ArrayI howmany;
       MatrixI evenBlocks;
       MatrixI oddBlocks;
-      ParityTools::splitParity(spRes, Dimensions::Transform::TRA1D, howmany, evenBlocks, oddBlocks);
+      ParityTools::splitParityL(spRes, Dimensions::Transform::TRA1D, howmany, evenBlocks, oddBlocks);
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, evenBlocks, oddBlocks, specSize, Transform::FftSetup::COMPONENT));
    }
