@@ -55,7 +55,6 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0)
       
       rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad().comp(FieldComponents::Physical::X,X).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::X,Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad().comp(FieldComponents::Physical::X,Y).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::Y,Y).data().array())).matrix())   
-      
       ;
    }
 
