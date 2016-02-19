@@ -174,6 +174,38 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         return bc
 
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit nonlinear term"""
+
+        kx = eigs[0]
+        ky = eigs[1]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        
+        if field_row == ("fbx","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0], bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+
+        elif field_row == ("fby","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0], bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+
+        elif field_row == ("fbz","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0], bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
 
