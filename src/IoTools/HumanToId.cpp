@@ -259,6 +259,18 @@ namespace IoTools {
       {
          return PhysicalNames::ENTROPY;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::FBX))
+      {
+         return PhysicalNames::FBX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FBY))
+      {
+         return PhysicalNames::FBY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FBZ))
+      {
+         return PhysicalNames::FBZ;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::MAGNETIC))
       {
          return PhysicalNames::MAGNETIC;

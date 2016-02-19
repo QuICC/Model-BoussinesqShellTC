@@ -45,6 +45,12 @@ namespace GeoMHDiSCC {
          DZ_MEANTEMPERATURE,
          /// Entropy field
          ENTROPY,
+         /// Fluctuating bx
+         FBX,
+         /// Fluctuating by
+         FBY,
+         /// Fluctuating bz
+         FBZ,
          /// Magnetic field
          MAGNETIC,
          /// Mean temperature field

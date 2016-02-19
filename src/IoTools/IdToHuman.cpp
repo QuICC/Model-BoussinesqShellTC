@@ -52,6 +52,15 @@ namespace IoTools {
          case PhysicalNames::ENTROPY:
             return "Entropy";
 
+         case PhysicalNames::FBX:
+            return "Fbx";
+
+         case PhysicalNames::FBY:
+            return "Fby";
+
+         case PhysicalNames::FBZ:
+            return "Fbz";
+
          case PhysicalNames::MAGNETIC:
             return "Magnetic";
 
@@ -162,6 +171,15 @@ namespace IoTools {
 
          case PhysicalNames::ENTROPY:
             return "entropy";
+
+         case PhysicalNames::FBX:
+            return "fbx";
+
+         case PhysicalNames::FBY:
+            return "fby";
+
+         case PhysicalNames::FBZ:
+            return "fbz";
 
          case PhysicalNames::MAGNETIC:
             return "magnetic";
