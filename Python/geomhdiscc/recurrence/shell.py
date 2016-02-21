@@ -5,8 +5,9 @@ from __future__ import unicode_literals
 
 import sympy
 
-import geomhdiscc.recurrence.symbolic as symbolic
+import geomhdiscc.recurrence.symbolic_chebyshev as mod
 
+symbolic = mod.SymbolicChebyshev()
 
 def r1():
     """Spherical shell r operator"""
