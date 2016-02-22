@@ -61,9 +61,17 @@ namespace GeoMHDiSCC {
       // Add vertical vorticity equation
       spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVorticityZ>();
 
-      
       // Add mean heat computation
       spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGMeanHeat>();
+
+      // Add fbx computation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGfbx>();
+
+      // Add fby computation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGfby>();
+
+      // Add fbz heat computation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGfbz>();
    }
 
    void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
@@ -123,6 +131,18 @@ namespace GeoMHDiSCC {
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
+         // Add BX initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::BX);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
+         // Add BY initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::BY);
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
       }
@@ -219,6 +239,7 @@ namespace GeoMHDiSCC {
 
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spState->expect(PhysicalNames::VORTICITYZ);
 
       spSim->addHdf5OutputFile(spState);
    }
