@@ -41,7 +41,7 @@ class SymbolicBase:
                 base = self.integrate(t, base)
         return base
 
-    def spectral_intgxmult(self, q, p, f):
+    def spectral_intgxmult(self, q, p, f, finish = True):
         # Some assertion for safety
         assert (q >= 0)
         assert (p >= 0)
@@ -51,11 +51,11 @@ class SymbolicBase:
         recurrence = self.spectral_monomial(p, f, asrow)
 
         # Compute integration
-        recurrence = self.spectral_integral(q, recurrence)
+        recurrence = self.spectral_integral(q, recurrence, asrow = finish)
 
         return recurrence
 
-    def build_recurrence(self, terms, fs):
+    def build_recurrence(self, terms, fs, finish = True):
         ops = dict();
 
         # Integrate and sum all terms
@@ -68,7 +68,7 @@ class SymbolicBase:
         recurrence = dict()
         for tup in ops.keys():
             for d,f in fs.items():
-                rec = self.spectral_intgxmult(tup[0], tup[1], {d:f})
+                rec = self.spectral_intgxmult(tup[0], tup[1], {d:f}, finish)
                 for i in rec.keys():
                     recurrence[i] = recurrence.get(i,0) + ops[tup]*rec[i]
 
