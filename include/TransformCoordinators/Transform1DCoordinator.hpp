@@ -104,23 +104,6 @@ namespace GeoMHDiSCC {
          const std::vector<Transform::ProjectorTree>& projectorTree() const;
 
          /**
-          * @brief Need to compute backward transform to physical values?
-          *
-          * @param name Name of the field
-          */
-         bool needPhysical(PhysicalNames::Id name);
-
-         /**
-          * @brief Need to compute backward transform to physical gradient values (scalar or vector)?
-          */
-         bool needPhysicalGradient(PhysicalNames::Id name);
-
-         /**
-          * @brief Need to compute backward transform to physical curl values?
-          */
-         bool needPhysicalCurl(PhysicalNames::Id name);
-
-         /**
           * @brief Get grid array(s) of the mesh
           */
          std::vector<Array>  mesh();

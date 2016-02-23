@@ -99,6 +99,28 @@ namespace TransformSteps {
       return transform;
    }
 
+   std::vector<ProjectorBranch3D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
+   {
+      std::vector<ProjectorBranch3D> transform;
+
+      if(req.find(FieldComponents::Physical::ONE)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT2));
+      }
+
+      if(req.find(FieldComponents::Physical::TWO)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT2));
+      }
+
+      if(req.find(FieldComponents::Physical::THREE)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT2));
+      }
+
+      return transform;
+   }
+
    std::vector<ProjectorBranch3D>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
       std::vector<ProjectorBranch3D> transform;

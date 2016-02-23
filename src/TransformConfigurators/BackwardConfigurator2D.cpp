@@ -69,6 +69,11 @@ namespace Transform {
       } else if(edge.fieldId() == FieldType::GRADIENT)
       {
          coord.communicator().holdPhysical(rScalar.rDom(0).rGrad().rComp(edge.physId()));
+
+      // Put 2nd order gradient component into temporary hold storage
+      } else if(edge.fieldId() == FieldType::GRADIENT2)
+      {
+         coord.communicator().holdPhysical(rScalar.rDom(0).rGrad2().rComp(edge.physId()));
       }
 
       // Stop detailed profiler

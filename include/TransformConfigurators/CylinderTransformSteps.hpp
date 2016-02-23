@@ -57,6 +57,11 @@ namespace GeoMHDiSCC {
          std::vector<ProjectorBranch3D>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req);
 
          /**
+          * @brief Generate the list of branches in scalar 2nd order gradient transform
+          */
+         std::vector<ProjectorBranch3D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req);
+
+         /**
           * @brief Generate the list of branches in vector projection transform
           */
          std::vector<ProjectorBranch3D>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req);

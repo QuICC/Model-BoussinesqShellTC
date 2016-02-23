@@ -90,6 +90,23 @@ namespace TransformSteps {
       return transform;
    }
 
+   std::vector<ProjectorBranch2D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
+   {
+      std::vector<ProjectorBranch2D> transform;
+
+      if(req.find(FieldComponents::Physical::ONE)->second)
+      {
+         transform.push_back(ProjectorBranch2D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT2));
+      }
+
+      if(req.find(FieldComponents::Physical::TWO)->second)
+      {
+         transform.push_back(ProjectorBranch2D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::TWO, FieldType::GRADIENT2));
+      }
+
+      return transform;
+   }
+
    std::vector<ProjectorBranch2D>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
       std::vector<ProjectorBranch2D> transform;
