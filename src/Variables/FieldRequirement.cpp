@@ -20,8 +20,8 @@
 
 namespace GeoMHDiSCC {
 
-   FieldRequirement::FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl)
-      : mIsScalar(isScalar), mNeedSpectral(needSpectral), mNeedPhysical(needPhysical), mNeedGradient(needGradient), mNeedCurl(needCurl), mPhysicalComps(3), mGradientComps(), mCurlComps(3)
+   FieldRequirement::FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl, const bool needGradient2)
+      : mIsScalar(isScalar), mNeedSpectral(needSpectral), mNeedPhysical(needPhysical), mNeedGradient(needGradient), mNeedCurl(needCurl), mNeedGradient2(needGradient2), mPhysicalComps(3), mGradientComps(), mCurlComps(3), mGradient2Comps()
    {
       // Init default physical and spectral IDs
       this->initDefaultIds();
@@ -40,6 +40,13 @@ namespace GeoMHDiSCC {
       {
          this->mGradientComps.insert(std::make_pair(*it, arr));
       }
+
+      // Set default 2nd order gradient needs
+      arr.setConstant(this->mNeedGradient2);
+      for(it = this->mVectralIds.begin(); it != this->mVectralIds.end(); ++it)
+      {
+         this->mGradient2Comps.insert(std::make_pair(*it, arr));
+      }
    }
 
    FieldRequirement::~FieldRequirement()
@@ -52,6 +59,19 @@ namespace GeoMHDiSCC {
       if(this->mIsScalar)
       {
          this->mSpectralIds.push_back(FieldComponents::Spectral::SCALAR);
+
+         if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
+         {
+            this->mVectralIds.push_back(FieldComponents::Spectral::ONE);
+         }
+         if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+         {
+            this->mVectralIds.push_back(FieldComponents::Spectral::TWO);
+         }
+         if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+         {
+            this->mVectralIds.push_back(FieldComponents::Spectral::THREE);
+         }
 
       // Create default spectral components
       } else
@@ -110,6 +130,11 @@ namespace GeoMHDiSCC {
       return this->mNeedCurl;
    }
 
+   bool FieldRequirement::needPhysicalGradient2() const
+   {
+      return this->mNeedGradient2;
+   }
+
    const ArrayB& FieldRequirement::physicalComps() const
    {
       return this->mPhysicalComps;
@@ -123,6 +148,11 @@ namespace GeoMHDiSCC {
    const ArrayB& FieldRequirement::curlComps() const
    {
       return this->mCurlComps;
+   }
+
+   const ArrayB& FieldRequirement::gradient2Comps(const FieldComponents::Spectral::Id id) const
+   {
+      return this->mGradient2Comps.find(id)->second;
    }
 
    std::map<FieldComponents::Physical::Id,bool> FieldRequirement::mapPhysicalComps() const
@@ -161,6 +191,18 @@ namespace GeoMHDiSCC {
       return comps;
    }
 
+   std::map<FieldComponents::Physical::Id,bool> FieldRequirement::mapGradient2Comps(const FieldComponents::Spectral::Id id) const
+   {
+      std::map<FieldComponents::Physical::Id,bool> comps;
+
+      for(unsigned int i = 0; i < this->mPhysicalIds.size(); i++)
+      {
+         comps.insert(std::make_pair(this->mPhysicalIds.at(i), this->mGradient2Comps.find(id)->second(i)));
+      }
+
+      return comps;
+   }
+
    const std::vector<FieldComponents::Physical::Id>& FieldRequirement::physicalIds() const
    {
       return this->mPhysicalIds;
@@ -169,6 +211,11 @@ namespace GeoMHDiSCC {
    const std::vector<FieldComponents::Spectral::Id>& FieldRequirement::spectralIds() const
    {
       return this->mSpectralIds;
+   }
+
+   const std::vector<FieldComponents::Spectral::Id>& FieldRequirement::vectralIds() const
+   {
+      return this->mVectralIds;
    }
 
    void FieldRequirement::updatePhysical(const ArrayB& comps)
@@ -197,6 +244,18 @@ namespace GeoMHDiSCC {
       this->mNeedCurl = this->mCurlComps.any();
    }
 
+   void FieldRequirement::updateGradient2(const std::map<FieldComponents::Spectral::Id,ArrayB>& comps)
+   {
+      this->mGradient2Comps = comps;
+
+      // Update 2nd order gradient need
+      std::map<FieldComponents::Spectral::Id,ArrayB>::const_iterator it;
+      for(it = this->mGradient2Comps.begin(); it != this->mGradient2Comps.end(); ++it)
+      {
+         this->mNeedGradient2 = this->mNeedGradient2 || it->second.any();
+      }
+   }
+
    void FieldRequirement::merge(const FieldRequirement& req)
    {
       // Assert for same type
@@ -213,6 +272,9 @@ namespace GeoMHDiSCC {
 
       // Do OR operation on physical curl requirement
       this->mNeedCurl = this->mNeedCurl || req.needPhysicalCurl(); 
+
+      // Do OR operation on physical 2nd order gradient requirement
+      this->mNeedGradient2 = this->mNeedGradient2 || req.needPhysicalGradient2(); 
 
       // Do OR operation of physical components requirement
       this->mPhysicalComps = this->mPhysicalComps + req.physicalComps();
@@ -231,6 +293,16 @@ namespace GeoMHDiSCC {
       if(req.needPhysicalCurl())
       {
          this->mCurlComps = this->mCurlComps + req.curlComps();
+      }
+
+      // Do OR operation of physical 2nd order gradient components requirement
+      if(req.needPhysicalGradient2())
+      {
+         std::vector<FieldComponents::Spectral::Id>::const_iterator it;
+         for(it = this->mVectralIds.begin(); it != this->mVectralIds.end(); ++it)
+         {
+            this->mGradient2Comps.find(*it)->second = this->mGradient2Comps.find(*it)->second + req.gradient2Comps(*it);
+         }
       }
    }
 
