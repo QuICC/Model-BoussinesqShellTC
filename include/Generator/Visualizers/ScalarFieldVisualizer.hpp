@@ -53,7 +53,7 @@ namespace Equations {
          /**
           * @brief Set which fields to output
           */
-         void setFields(const bool viewField, const bool viewGradient);
+         void setFields(const bool viewField, const bool viewGradient, const bool viewGradient2 = false);
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -84,6 +84,11 @@ namespace Equations {
           * @brief Storage for output gradient flag
           */
          bool mViewGradient;
+
+         /**
+          * @brief Storage for output 2nd order gradient flag
+          */
+         bool mViewGradient2;
    };
 
    /// Typedef for a shared ScalarFieldVisualizer

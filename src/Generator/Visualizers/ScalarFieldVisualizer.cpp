@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    ScalarFieldVisualizer::ScalarFieldVisualizer(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mViewField(true), mViewGradient(false)
+      : IScalarEquation(spEqParams), mViewField(true), mViewGradient(false), mViewGradient2(false)
    {
    }
 
@@ -46,11 +46,13 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void ScalarFieldVisualizer::setFields(const bool viewField, const bool viewGradient)
+   void ScalarFieldVisualizer::setFields(const bool viewField, const bool viewGradient, const bool viewGradient2)
    {
       this->mViewField = viewField;
 
       this->mViewGradient = viewGradient;
+
+      this->mViewGradient2 = viewGradient2;
    }
 
    void ScalarFieldVisualizer::setCoupling()
@@ -67,8 +69,8 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
-      // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(this->name(), FieldRequirement(true, true, this->mViewField, this->mViewGradient));
+      // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?, need curl?, need diff2?
+      this->mRequirements.addField(this->name(), FieldRequirement(true, true, this->mViewField, this->mViewGradient, false, this->mViewGradient2));
    }
 
 }
