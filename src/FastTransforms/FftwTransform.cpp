@@ -206,6 +206,15 @@ namespace Transform {
          // Rescale results
          this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
 
+      } else if(projector == FftwTransform::ProjectorType::DIFF2)
+      {
+         // Get differentiation factors
+         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+         factor = factor.array().pow(2);
+
+         // Rescale results
+         this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
+
       // Compute simple projection
       } else
       {
@@ -300,6 +309,19 @@ namespace Transform {
          // Get differentiation factors
          ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
          ArrayZ rfactor = this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+
+         // Split positive and negative frequencies and compute derivative
+         this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
+         this->mTmpZIn.bottomRows(negN) = rfactor.asDiagonal()*fftVal.bottomRows(negN);
+
+      // Compute first derivative
+      } else if(projector == FftwTransform::ProjectorType::DIFF2)
+      {
+         // Get differentiation factors
+         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         factor = factor.array().pow(2);
+         rfactor = factor.array().pow(2);
 
          // Split positive and negative frequencies and compute derivative
          this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
