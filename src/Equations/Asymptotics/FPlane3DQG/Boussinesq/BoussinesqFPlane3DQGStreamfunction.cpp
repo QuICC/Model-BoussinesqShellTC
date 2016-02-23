@@ -52,10 +52,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
-      Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0)
-      
-      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad().comp(FieldComponents::Physical::X,X).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::X,Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad().comp(FieldComponents::Physical::X,Y).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::Y,Y).data().array())).matrix())   
-      ;
+      Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
    void BoussinesqFPlane3DQGStreamfunction::setRequirements()
@@ -71,18 +68,6 @@ namespace Equations {
 
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, true, true));
-
-      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));
-
-      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
-
-      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, true));
-
-      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, true, true, true));
 
       // Gradient does not require Z component
       ArrayB   comps = ArrayB::Constant(3, true);
