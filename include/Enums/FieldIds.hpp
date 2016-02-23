@@ -33,6 +33,10 @@ namespace GeoMHDiSCC {
       enum Id {
          /// Codensity field
          CODENSITY = 0,
+         /// large scale x B field 
+         BX,
+         /// large scale y B field 
+         BY,
          /// Density field
          DENSITY,
          /// X derivative of mean temperature field
@@ -41,6 +45,12 @@ namespace GeoMHDiSCC {
          DZ_MEANTEMPERATURE,
          /// Entropy field
          ENTROPY,
+         /// Fluctuating bx
+         FBX,
+         /// Fluctuating by
+         FBY,
+         /// Fluctuating bz
+         FBZ,
          /// Magnetic field
          MAGNETIC,
          /// Mean temperature field
@@ -124,6 +134,8 @@ namespace GeoMHDiSCC {
          GRADIENT,
          /// Curl field
          CURL,
+         /// 2nd order gradient field
+         GRADIENT2,
          /// divergence field
          DIVERGENCE,
       };
