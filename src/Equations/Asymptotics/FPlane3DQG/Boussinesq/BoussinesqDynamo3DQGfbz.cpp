@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqFPlane3DQGfbz.cpp
+ * @file BoussinesqDynamo3DQGfbz.cpp
  * @brief Source of the implementation of the mean heat computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGfbz.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbz.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGfbz::BoussinesqFPlane3DQGfbz(SharedEquationParameters spEqParams)
+   BoussinesqDynamo3DQGfbz::BoussinesqDynamo3DQGfbz(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlane3DQGfbz::~BoussinesqFPlane3DQGfbz()
+   BoussinesqDynamo3DQGfbz::~BoussinesqDynamo3DQGfbz()
    {
    }
 
-   void BoussinesqFPlane3DQGfbz::setCoupling()
+   void BoussinesqDynamo3DQGfbz::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, true);
    }
 
-   void BoussinesqFPlane3DQGfbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqDynamo3DQGfbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -58,7 +58,7 @@ namespace Equations {
       rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data.array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data.array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array())).matrix());
    }
 
-   Datatypes::SpectralScalarType::PointType BoussinesqFPlane3DQGfbz::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGfbz::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -77,7 +77,7 @@ namespace Equations {
       return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
-   void BoussinesqFPlane3DQGfbz::setRequirements()
+   void BoussinesqDynamo3DQGfbz::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::FBZ);

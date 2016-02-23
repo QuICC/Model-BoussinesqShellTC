@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlane3DQGfbz.hpp
- * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model 
+ * @file BoussinesqDynamo3DQGTransport.hpp
+ * @brief Implementation of the transport equation for the Boussinesq F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGFBZ_HPP
-#define BOUSSINESQFPLANE3DQGFBZ_HPP
+#ifndef BOUSSINESQDYNAMO3DQGTRANSPORT_HPP
+#define BOUSSINESQDYNAMO3DQGTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -28,23 +28,23 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model
+    * @brief Implementation of the transport equation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlane3DQGfbz: public IScalarEquation
+   class BoussinesqDynamo3DQGTransport: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams Shared equation parameters
+          * @param spEqParams    Shared equation parameters
           */
-         BoussinesqFPlane3DQGfbz(SharedEquationParameters spEqParams);
+         BoussinesqDynamo3DQGTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlane3DQGfbz();
-         
+         virtual ~BoussinesqDynamo3DQGTransport();
+
          /**
           * @brief Compute the nonlinear interaction term
           *
@@ -53,16 +53,6 @@ namespace Equations {
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
 
-         /**
-          * @brief Compute the source term
-          *
-          * @param compId  ID of the spectral component
-          * @param i       Fastest index
-          * @param j       Second index
-          * @param k       Slowest index
-          */
-         virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
-         
       protected:
          /**
           * @brief Set variable requirements
@@ -80,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANE3DQGFBZ_HPP
+#endif // BOUSSINESQDYNAMO3DQGTRANSPORT_HPP
