@@ -73,6 +73,20 @@ namespace IoVariable {
             this->writePhysicalVector(IoTools::IdToHuman::toTag(sit->first)+"_grad", sit->second->dom(0).grad().data());
          }
 
+         if(sit->second->dom(0).hasGrad2())
+         {
+            std::vector<FieldComponents::Spectral::Id> fId;
+            fId.push_back(FieldComponents::Spectral::ONE);
+            fId.push_back(FieldComponents::Spectral::TWO);
+            fId.push_back(FieldComponents::Spectral::THREE);
+            for(unsigned int i = 0; i < fId.size(); i ++)
+            {
+               if(fId.at(i) != FieldComponents::Spectral::NOTUSED)
+               {
+                  this->writePhysicalVector(IoTools::IdToHuman::toTag(sit->first)+"_grad_"+IoTools::IdToHuman::toTag(fId.at(i)), sit->second->dom(0).grad2(fId.at(i)).data(), "");
+               }
+            }
+         }
       }
 
       // Write all the vectors
@@ -95,7 +109,7 @@ namespace IoVariable {
             {
                if(fId.at(i) != FieldComponents::Spectral::NOTUSED)
                {
-                  this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first)+"_grad_"+IoTools::IdToHuman::toTag(fId.at(i)), vit->second->dom(0).grad(fId.at(i)).data());
+                  this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first) + "_" + IoTools::IdToHuman::toTag(fId.at(i)) + "_grad", vit->second->dom(0).grad(fId.at(i)).data());
                }
             }
          }
@@ -145,7 +159,7 @@ namespace IoVariable {
       H5Gclose(group);
    }
 
-   void VisualizationFileWriter::writePhysicalVector(const std::string& name, const std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>& vector)
+   void VisualizationFileWriter::writePhysicalVector(const std::string& name, const std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>& vector, const std::string& joint)
    {
       // Create the Magnetic Field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -160,7 +174,7 @@ namespace IoVariable {
          fieldInfo = Datatypes::FieldTools::createInfo(it->second);
 
          // Write the vector field
-         this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
+         this->writeRegularField(group, name + joint + IoTools::IdToHuman::toTag(it->first), fieldInfo);
       }
       
       // close group
