@@ -99,7 +99,7 @@ namespace Transform {
 
                   // Extract unique 3D operators
                   std::map<ProjPhysId, int> op3D;
-                  std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> > op3DPhys;
+                  std::multimap<ProjPhysId, std::tr1::tuple<std::vector<FieldComponents::Physical::Id>,FieldType::Id,Arithmetics::Id> > op3DPhys;
                   std::pair<std::map<ProjPhysId,int>::iterator,bool> op3DPairIt;
                   for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                   {
@@ -113,8 +113,8 @@ namespace Transform {
 
                   // Create 3D edges
                   std::map<ProjPhysId,int>::const_iterator op3DIt;
-                  std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator op3DPhysIt;
-                  std::pair<std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator,std::multimap<ProjPhysId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator> op3DPhysRange;
+                  std::multimap<ProjPhysId, std::tr1::tuple<std::vector<FieldComponents::Physical::Id>,FieldType::Id,Arithmetics::Id> >::iterator op3DPhysIt;
+                  std::pair<std::multimap<ProjPhysId, std::tr1::tuple<std::vector<FieldComponents::Physical::Id>,FieldType::Id,Arithmetics::Id> >::iterator,std::multimap<ProjPhysId, std::tr1::tuple<std::vector<FieldComponents::Physical::Id>,FieldType::Id,Arithmetics::Id> >::iterator> op3DPhysRange;
                   for(op3DIt = op3D.begin(); op3DIt != op3D.end(); ++op3DIt)
                   {
                      op3DPhysRange = op3DPhys.equal_range(op3DIt->first);

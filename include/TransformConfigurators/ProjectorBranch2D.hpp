@@ -64,7 +64,7 @@ namespace Transform {
          /**
           * @brief Get physical component ID
           */
-         FieldComponents::Physical::Id physId() const;
+         const std::vector<FieldComponents::Physical::Id>& physId() const;
 
          /**
           * @brief Get field type ID
@@ -95,7 +95,7 @@ namespace Transform {
          /**
           * @brief Physical component required for transform branch
           */
-         FieldComponents::Physical::Id mPhysId;
+         std::vector<FieldComponents::Physical::Id> mPhysId;
 
          /**
           * @brief Field type required for transform branch

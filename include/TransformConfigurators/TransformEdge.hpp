@@ -109,9 +109,9 @@ namespace Transform {
          TOpA opId() const;
 
          /**
-          * @brief Get Physical component
+          * @brief Get physical component
           */
-          FieldComponents::Physical::Id physId() const;
+          FieldComponents::Physical::Id physId(const int i = 0) const;
 
          /**
           * @brief Get spectral component
@@ -131,7 +131,7 @@ namespace Transform {
          /**
           * @brief Set Physical component
           */
-         void setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type, const Arithmetics::Id arith);
+         void setPhysical(const std::vector<FieldComponents::Physical::Id>& id, const FieldType::Id type, const Arithmetics::Id arith);
 
          /**
           * @brief Set Spectral component
@@ -157,7 +157,7 @@ namespace Transform {
          /**
           * @brief Physical output component
           */
-         FieldComponents::Physical::Id mPhysId;
+         std::vector<FieldComponents::Physical::Id> mPhysId;
 
          /**
           * @brief Spectral output component
@@ -216,9 +216,9 @@ namespace Transform {
       return this->mOpId;
    }
 
-   template <typename TOpA> FieldComponents::Physical::Id TransformEdge<TOpA,void,void>::physId() const
+   template <typename TOpA> FieldComponents::Physical::Id TransformEdge<TOpA,void,void>::physId(const int i) const
    {
-      return this->mPhysId;
+      return this->mPhysId.at(i);
    }
 
    template <typename TOpA> FieldComponents::Spectral::Id TransformEdge<TOpA,void,void>::specId() const
@@ -245,7 +245,7 @@ namespace Transform {
       this->mArithId = arith;
    }
 
-   template <typename TOpA> void TransformEdge<TOpA,void,void>::setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type, const Arithmetics::Id arith)
+   template <typename TOpA> void TransformEdge<TOpA,void,void>::setPhysical(const std::vector<FieldComponents::Physical::Id>& id, const FieldType::Id type, const Arithmetics::Id arith)
    {
       this->mPhysId = id;
 

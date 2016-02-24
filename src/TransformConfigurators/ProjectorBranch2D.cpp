@@ -25,13 +25,16 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    ProjectorBranch2D::ProjectorBranch2D(FieldComponents::Spectral::Id specId, ProjSpecId projSpec, ProjPhysId projPhys, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId)
-      :mSpecId(specId), mProjSpec(projSpec), mProjPhys(projPhys), mPhysId(physId), mFieldId(fieldId), mArithId(arithId)
+      :mSpecId(specId), mProjSpec(projSpec), mProjPhys(projPhys), mFieldId(fieldId), mArithId(arithId)
    {
+      this->mPhysId.push_back(physId);
    }
 
    ProjectorBranch2D::ProjectorBranch2D(FieldComponents::Spectral::Id specId, ProjSpecId projSpec, ProjPhysId projPhys, std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id> physId, FieldType::Id fieldId, Arithmetics::Id arithId)
-      :mSpecId(specId), mProjSpec(projSpec), mProjPhys(projPhys), mPhysId(physId.first), mFieldId(fieldId), mArithId(arithId)
+      :mSpecId(specId), mProjSpec(projSpec), mProjPhys(projPhys), mFieldId(fieldId), mArithId(arithId)
    {
+      this->mPhysId.push_back(physId.first);
+      this->mPhysId.push_back(physId.second);
    }
 
    ProjectorBranch2D::~ProjectorBranch2D()
@@ -53,7 +56,7 @@ namespace Transform {
       return this->mProjPhys;
    }
 
-   FieldComponents::Physical::Id ProjectorBranch2D::physId() const
+   const std::vector<FieldComponents::Physical::Id>& ProjectorBranch2D::physId() const
    {
       return this->mPhysId;
    }
