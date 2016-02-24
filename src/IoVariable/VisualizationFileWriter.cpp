@@ -75,17 +75,7 @@ namespace IoVariable {
 
          if(sit->second->dom(0).hasGrad2())
          {
-            std::vector<FieldComponents::Spectral::Id> fId;
-            fId.push_back(FieldComponents::Spectral::ONE);
-            fId.push_back(FieldComponents::Spectral::TWO);
-            fId.push_back(FieldComponents::Spectral::THREE);
-            for(unsigned int i = 0; i < fId.size(); i ++)
-            {
-               if(fId.at(i) != FieldComponents::Spectral::NOTUSED)
-               {
-                  this->writePhysicalVector(IoTools::IdToHuman::toTag(sit->first)+"_grad_"+IoTools::IdToHuman::toTag(fId.at(i)), sit->second->dom(0).grad2(fId.at(i)).data(), "");
-               }
-            }
+            this->writePhysicalTensor(IoTools::IdToHuman::toTag(sit->first)+"_grad2", sit->second->dom(0).grad2().data());
          }
       }
 
@@ -146,7 +136,7 @@ namespace IoVariable {
 
    void VisualizationFileWriter::writePhysicalScalar(const std::string& name, const Datatypes::PhysicalScalarType& scalar)
    {
-      // Create the Codensity scalar group
+      // Create the scalar group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       // Storage for the field information
@@ -161,7 +151,7 @@ namespace IoVariable {
 
    void VisualizationFileWriter::writePhysicalVector(const std::string& name, const std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>& vector, const std::string& joint)
    {
-      // Create the Magnetic Field group
+      // Create the Field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       // Storage for the field information
@@ -175,6 +165,28 @@ namespace IoVariable {
 
          // Write the vector field
          this->writeRegularField(group, name + joint + IoTools::IdToHuman::toTag(it->first), fieldInfo);
+      }
+      
+      // close group
+      H5Gclose(group);
+   }
+
+   void VisualizationFileWriter::writePhysicalTensor(const std::string& name, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,Datatypes::PhysicalScalarType>& tensor, const std::string& joint)
+   {
+      // Create the Field group
+      hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
+
+      std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,Datatypes::PhysicalScalarType>::const_iterator it;
+      for(it = tensor.begin(); it != tensor.end(); ++it)
+      {
+         // create component field information
+         fieldInfo = Datatypes::FieldTools::createInfo(it->second);
+
+         // Write the tensor field
+         this->writeRegularField(group, name + joint + IoTools::IdToHuman::toTag(it->first.first) + IoTools::IdToHuman::toTag(it->first.second), fieldInfo);
       }
       
       // close group

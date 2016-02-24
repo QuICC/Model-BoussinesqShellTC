@@ -114,7 +114,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get map for 2nd order gradient components to field requirements
           */
-         std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> > mapGradient2Comps(const FieldComponents::Spectral::Id id) const;
+         std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> mapGradient2Comps(const FieldComponents::Spectral::Id id) const;
 
          /**
           * @brief Update the physical component requirements
@@ -209,7 +209,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Detailed requirements for 2nd order gradient field components
           */
-         std::map<FieldComponents::Spectral::Id,MatrixB> > mGradient2Comps;
+         std::map<FieldComponents::Spectral::Id,MatrixB> mGradient2Comps;
    };
 
 }

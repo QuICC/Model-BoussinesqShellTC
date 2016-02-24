@@ -73,7 +73,7 @@ namespace Transform {
       // Put 2nd order gradient component into temporary hold storage
       } else if(edge.fieldId() == FieldType::GRADIENT2)
       {
-         coord.communicator().holdPhysical(rScalar.rDom(0).rGrad2().rComp(edge.physId()));
+         coord.communicator().holdPhysical(rScalar.rDom(0).rGrad2().rComp(edge.physId(),edge.physId()));
       }
 
       // Stop detailed profiler

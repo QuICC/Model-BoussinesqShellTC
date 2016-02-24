@@ -144,7 +144,7 @@ namespace GeoMHDiSCC {
    {
       assert(this->mGradient2Comps.count(id));
 
-      return this->mGradient2Comps.find(id1)->second;
+      return this->mGradient2Comps.find(id)->second;
    }
 
    std::map<FieldComponents::Physical::Id,bool> FieldRequirement::mapPhysicalComps() const

@@ -20,6 +20,7 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -318,10 +319,8 @@ namespace Transform {
       } else if(projector == FftwTransform::ProjectorType::DIFF2)
       {
          // Get differentiation factors
-         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
-         factor = factor.array().pow(2);
-         rfactor = factor.array().pow(2);
+         Array factor = -(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = -(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
 
          // Split positive and negative frequencies and compute derivative
          this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);

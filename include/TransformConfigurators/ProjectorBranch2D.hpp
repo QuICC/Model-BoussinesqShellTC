@@ -32,9 +32,14 @@ namespace Transform {
    {  
       public:
          /**
-          * @brief Contructor for branch
+          * @brief Contructor for branch for single physical ID
           */
          ProjectorBranch2D(FieldComponents::Spectral::Id specId, ProjSpecId projSpec, ProjPhysId projPhys, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
+
+         /**
+          * @brief Contructor for branch for pair physical ID
+          */
+         ProjectorBranch2D(FieldComponents::Spectral::Id specId, ProjSpecId projSpec, ProjPhysId projPhys, std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id> physId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
 
          /**
           * @brief Destructor

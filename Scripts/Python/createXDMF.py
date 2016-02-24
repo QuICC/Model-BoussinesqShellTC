@@ -171,9 +171,15 @@ def main(argv):
         # Create vectors as scalars if requested
         if with_components:
             for v in list(h5_file):
+                # Extract vectors
                 for ext in [gFast, gMid, gSlow]:
                     if (ext is not None) and (v +  '_' + ext in list(h5_file[v])):
                         print(xdmfVScalar.format(nFast = nFast, nMid = nMid, nSlow = nSlow, vname = v, sname = v +  '_' + ext, fid = fId, basename = basename), file=out_file)
+                # Extract 2D tensors
+                for ext1 in [gFast, gMid, gSlow]:
+                    for ext2 in [gFast, gMid, gSlow]:
+                        if (ext1 is not None and ext2 is not None) and (v +  '_' + ext1 + ext2 in list(h5_file[v])):
+                            print(xdmfVScalar.format(nFast = nFast, nMid = nMid, nSlow = nSlow, vname = v, sname = v +  '_' + ext1 + ext2, fid = fId, basename = basename), file=out_file)
         # Create energy density function if requested
         if with_energy:
             for v in list(h5_file):

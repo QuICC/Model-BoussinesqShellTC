@@ -29,6 +29,11 @@ namespace Transform {
    {
    }
 
+   ProjectorBranch2D::ProjectorBranch2D(FieldComponents::Spectral::Id specId, ProjSpecId projSpec, ProjPhysId projPhys, std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id> physId, FieldType::Id fieldId, Arithmetics::Id arithId)
+      :mSpecId(specId), mProjSpec(projSpec), mProjPhys(projPhys), mPhysId(physId.first), mFieldId(fieldId), mArithId(arithId)
+   {
+   }
+
    ProjectorBranch2D::~ProjectorBranch2D()
    {
    }

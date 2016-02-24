@@ -99,23 +99,45 @@ namespace TransformSteps {
       return transform;
    }
 
-   std::vector<ProjectorBranch3D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<ProjectorBranch3D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req)
    {
       std::vector<ProjectorBranch3D> transform;
+      std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>  pairId;
 
-      if(req.find(FieldComponents::Physical::ONE)->second)
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::ONE);
+      if(req.find(pairId)->second)
       {
-         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT2));
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF2, ProjPartType::PROJ, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
       }
 
-      if(req.find(FieldComponents::Physical::TWO)->second)
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
       {
-         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT2));
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPartType::DIFF, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
       }
 
-      if(req.find(FieldComponents::Physical::THREE)->second)
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
       {
-         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT2));
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPartType::PROJ, ProjPhysType::DIFF, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::TWO,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::DIFF2, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::TWO,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::DIFF, ProjPhysType::DIFF, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::THREE,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::DIFF2, pairId, FieldType::GRADIENT2));
       }
 
       return transform;

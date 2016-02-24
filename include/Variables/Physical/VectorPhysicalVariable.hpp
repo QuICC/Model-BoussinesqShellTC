@@ -22,6 +22,7 @@
 //
 #include "Resolutions/Resolution.hpp"
 #include "VectorFields/VectorField.hpp"
+#include "TensorFields/SymmetricTensorField.hpp"
 #include "Variables/VariableBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -80,6 +81,16 @@ namespace Datatypes {
          VectorField<TScalar,FieldComponents::Physical::Id>&   rCurl();
 
          /**
+          * @brief Get the physical vector 2nd order gradient values
+          */
+         const SymmetricTensorField<TScalar,FieldComponents::Physical::Id>&   grad2(FieldComponents::Spectral::Id id) const;
+
+         /**
+          * @brief Set the physical vector 2nd order gradient values
+          */
+         SymmetricTensorField<TScalar,FieldComponents::Physical::Id>&   rGrad2(FieldComponents::Spectral::Id id);
+
+         /**
           * @brief Initialise to zero
           */
          void setZeros();
@@ -100,6 +111,11 @@ namespace Datatypes {
          void initPhysicalCurl(const std::map<FieldComponents::Physical::Id,bool>& comps);
 
          /**
+          * @brief Initialise the physical 2nd order gradient storage
+          */
+         void initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps);
+
+         /**
           * @brief Check if variable has physical data setup
           */
          bool hasPhys() const;
@@ -113,6 +129,11 @@ namespace Datatypes {
           * @brief Check if variable has curl data setup
           */
          bool hasCurl() const;
+
+         /**
+          * @brief Check if variable has vector 2nd order gradient data setup
+          */
+         bool hasGrad2() const;
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -138,6 +159,11 @@ namespace Datatypes {
           * @brief Smart pointer for the physical curl values
           */
          SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > mspCurl;
+
+         /**
+          * @brief Smart pointer for the physical vector 2nd order gradient values
+          */
+         std::map<FieldComponents::Spectral::Id,SharedPtrMacro<SymmetricTensorField<TScalar,FieldComponents::Physical::Id> > > mVGrad2;
    };
 
    template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasPhys() const
@@ -153,6 +179,11 @@ namespace Datatypes {
    template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasCurl() const
    {
       return this->mspCurl;
+   }
+
+   template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasGrad2() const
+   {
+      return this->mVGrad2.size();
    }
 
    template <typename TScalar> inline const VectorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::phys() const
@@ -203,6 +234,22 @@ namespace Datatypes {
       return *this->mspCurl;
    }
 
+   template <typename TScalar> inline const SymmetricTensorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::grad2(FieldComponents::Spectral::Id id) const
+   {
+      // Safety assertion
+      assert(this->mVGrad2.count(id));
+
+      return *(this->mVGrad2.find(id)->second);
+   }
+
+   template <typename TScalar> inline SymmetricTensorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::rGrad2(FieldComponents::Spectral::Id id)
+   {
+      // Safety assertion
+      assert(this->mVGrad2.count(id));
+
+      return *(this->mVGrad2.find(id)->second);
+   }
+
    template <typename TScalar> VectorPhysicalVariable<TScalar>::VectorPhysicalVariable(SharedResolution spRes)
       : VariableBase(spRes)
    {
@@ -235,6 +282,16 @@ namespace Datatypes {
       {
          this->rCurl().setZeros();
       }
+
+      // Initialise vector gradient values to zero if required
+      if(this->mVGrad2.size() > 0)
+      {
+         typename std::map<FieldComponents::Spectral::Id,SharedPtrMacro<SymmetricTensorField<TScalar,FieldComponents::Physical::Id> > >::iterator it;
+         for(it = this->mVGrad2.begin(); it != this->mVGrad2.end(); ++it)
+         {
+            it->second->setZeros();
+         }
+      }
    }
 
    template <typename TScalar> void VectorPhysicalVariable<TScalar>::initPhysical(const std::map<FieldComponents::Physical::Id,bool>& comps)
@@ -265,6 +322,18 @@ namespace Datatypes {
       this->mspCurl = SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> >(new VectorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), comps));
    }
 
+   template <typename TScalar> void VectorPhysicalVariable<TScalar>::initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps)
+   {
+      // Safety assert
+      assert(this->mVGrad2.count(id) == 0);
+
+      // Create shared pointer
+      SharedPtrMacro<SymmetricTensorField<TScalar,FieldComponents::Physical::Id> > spGrad2 = SharedPtrMacro<SymmetricTensorField<TScalar,FieldComponents::Physical::Id> >(new SymmetricTensorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), comps));
+
+      // Insert into map
+      this->mVGrad2.insert(std::make_pair(id, spGrad2));
+   }
+
 #ifdef GEOMHDISCC_STORAGEPROFILE
    template <typename TScalar> MHDFloat VectorPhysicalVariable<TScalar>::requiredStorage() const
    {
@@ -290,6 +359,16 @@ namespace Datatypes {
       if(this->mspCurl)
       {
          mem += this->curl().requiredStorage();
+      }
+
+      // Physical vector 2nd order gradient storage
+      if(this->mVGrad2.size() > 0)
+      {
+         std::map<FieldComponents::Spectral::Id,SharedPtrMacro<SymmetricTensorField<TScalar,FieldComponents::Physical::Id> > >::const_iterator it;
+         for(it = this->mVGrad2.begin(); it != this->mVGrad2.end(); ++it)
+         {
+            mem += it->second->requiredStorage();
+         }
       }
 
       return mem;

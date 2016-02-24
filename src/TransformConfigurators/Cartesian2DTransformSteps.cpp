@@ -90,18 +90,27 @@ namespace TransformSteps {
       return transform;
    }
 
-   std::vector<ProjectorBranch2D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<ProjectorBranch2D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req)
    {
       std::vector<ProjectorBranch2D> transform;
+      std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>  pairId;
 
-      if(req.find(FieldComponents::Physical::ONE)->second)
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::ONE);
+      if(req.find(pairId)->second)
       {
-         transform.push_back(ProjectorBranch2D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPhysType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT2));
+         transform.push_back(ProjectorBranch2D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF2, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
       }
 
-      if(req.find(FieldComponents::Physical::TWO)->second)
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
       {
-         transform.push_back(ProjectorBranch2D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPhysType::DIFF, FieldComponents::Physical::TWO, FieldType::GRADIENT2));
+         transform.push_back(ProjectorBranch2D(FieldComponents::Spectral::SCALAR, ProjSpecType::DIFF, ProjPhysType::DIFF, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::TWO,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch2D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPhysType::DIFF2, pairId, FieldType::GRADIENT2));
       }
 
       return transform;
