@@ -23,6 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
+#include "Enums/FieldIdsTools.hpp"
 
 namespace GeoMHDiSCC {
 

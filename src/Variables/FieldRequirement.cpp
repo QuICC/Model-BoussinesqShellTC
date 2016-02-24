@@ -42,8 +42,8 @@ namespace GeoMHDiSCC {
       }
 
       // Set default 2nd order gradient needs
-      MatrixB mat(3,3);
-      mat.setConstant(this->mNeedGradient2);
+      MatrixB mat = MatrixB::Zero(3,3);
+      mat.triangularView<Eigen::Upper>().setConstant(this->mNeedGradient2);
       for(it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
       {
          this->mGradient2Comps.insert(std::make_pair(*it, mat));
@@ -239,9 +239,12 @@ namespace GeoMHDiSCC {
       this->mGradient2Comps = comps;
 
       // Update 2nd order gradient need
-      std::map<FieldComponents::Spectral::Id,MatrixB>::const_iterator it;
+      std::map<FieldComponents::Spectral::Id,MatrixB>::iterator it;
       for(it = this->mGradient2Comps.begin(); it != this->mGradient2Comps.end(); ++it)
       {
+         // Clear strictly lower triangular part
+         it->second.triangularView<Eigen::StrictlyLower>().setZero();
+
          this->mNeedGradient2 = this->mNeedGradient2 || it->second.any();
       }
    }

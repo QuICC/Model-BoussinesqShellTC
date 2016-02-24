@@ -20,7 +20,6 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {

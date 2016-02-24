@@ -140,22 +140,22 @@ namespace GeoMHDiSCC {
 
       // Add transport field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false, true);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
       // Add background temperature profile visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Add output file
