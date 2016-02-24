@@ -126,13 +126,9 @@ namespace GeoMHDiSCC {
                // Separate scalar and vector fields
                if(infoIt->second.isScalar())
                {
-                  std::vector<FieldComponents::Spectral::Id>::const_iterator it;
-                  for(it = infoIt->second.vectralIds().begin(); it != infoIt->second.vectralIds().end(); ++it)
-                  {
-                     rScalarVars.at(infoIt->first)->initPhysicalGradient2(*it, infoIt->second.mapGradient2Comps(*it));
-                     tmpBranches = Transform::TransformSteps::backwardGradient2(*it, infoIt->second.mapGradient2Comps(*it));
-                     branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
-                  }
+                  rScalarVars.at(infoIt->first)->initPhysicalGradient2(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradient2Comps(FieldComponents::Spectral::SCALAR));
+                  tmpBranches = Transform::TransformSteps::backwardGradient2(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradient2Comps(FieldComponents::Spectral::SCALAR));
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
                } else
                {
                   throw Exception("2nd order Vector gradient is not implemented!");

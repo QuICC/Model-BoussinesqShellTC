@@ -72,12 +72,12 @@ namespace Datatypes {
          /**
           * @brief Get the physical 2nd order gradient values
           */
-         const VectorField<TScalar,FieldComponents::Physical::Id>&   grad2(FieldComponents::Spectral::Id id) const;
+         const VectorField<TScalar,FieldComponents::Physical::Id>&   grad2(FieldComponents::Physical::Id id) const;
 
          /**
           * @brief Set the physical 2nd order gradient values
           */
-         VectorField<TScalar,FieldComponents::Physical::Id>&   rGrad2(FieldComponents::Spectral::Id id);
+         VectorField<TScalar,FieldComponents::Physical::Id>&   rGrad2(FieldComponents::Physical::Id id);
 
          /**
           * @brief Initialise to zero
@@ -97,7 +97,7 @@ namespace Datatypes {
          /**
           * @brief Initialise the physical 2nd order gradient storage
           */
-         void initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
+         void initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps);
 
          /**
           * @brief Check if variable has physical data setup
@@ -137,7 +137,7 @@ namespace Datatypes {
          /**
           * @brief Smart pointer for the physical 2nd order gradient values
           */
-         std::map<FieldComponents::Spectral::Id,SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > > mGrad2;
+         std::map<FieldComponents::Physical::Id,SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > mGrad2;
    };
 
    template <typename TScalar> inline bool ScalarPhysicalVariable<TScalar>::hasPhys() const
@@ -187,7 +187,7 @@ namespace Datatypes {
       return *this->mspGrad;
    }
 
-   template <typename TScalar> inline const VectorField<TScalar,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar>::grad2(FieldComponents::Spectral::Id id) const
+   template <typename TScalar> inline const VectorField<TScalar,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar>::grad2(FieldComponents::Physical::Id id) const
    {
       // Safety assertion
       assert(this->mGrad2.count(id));
@@ -195,7 +195,7 @@ namespace Datatypes {
       return *(this->mGrad2.find(id)->second);
    }
 
-   template <typename TScalar> inline VectorField<TScalar,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar>::rGrad2(FieldComponents::Spectral::Id id)
+   template <typename TScalar> inline VectorField<TScalar,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar>::rGrad2(FieldComponents::Physical::Id id)
    {
       // Safety assertion
       assert(this->mGrad2.count(id));
@@ -229,7 +229,7 @@ namespace Datatypes {
       // Initialise vector gradient values to zero if required
       if(this->mGrad2.size() > 0)
       {
-         typename std::map<FieldComponents::Spectral::Id,SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > >::iterator it;
+         typename std::map<FieldComponents::Physical::Id,SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > >::iterator it;
          for(it = this->mGrad2.begin(); it != this->mGrad2.end(); ++it)
          {
             it->second->setZeros();
@@ -254,16 +254,21 @@ namespace Datatypes {
       this->mspGrad = SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> >(new VectorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), comps));
    }
 
-   template <typename TScalar> void ScalarPhysicalVariable<TScalar>::initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps)
+   template <typename TScalar> void ScalarPhysicalVariable<TScalar>::initPhysicalGradient2(const FieldComponents::Physical::Id id, const std::map<std::pair<FieldComponents::Physical::Id, FieldComponents::Physical::Id>,bool>& comps)
    {
       // Safety assert
       assert(this->mGrad2.count(id) == 0);
+      assert(id == FieldComponents::Spectral::SCALAR);
 
-      // Create shared pointer
-      SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > spGrad2 = SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> >(new VectorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), comps));
+      std::map<FieldComponents::Physical::Id, std::map<FieldComponents::Physical::Id,bool> >::iterator outerIt;
+      for(outerIt = comps.begin(); outerIt != comps.end(); ++outerIt)
+      {
+         // Create shared pointer
+         SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > spGrad2 = SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> >(new VectorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), *outerIt));
 
-      // Insert into map
-      this->mGrad2.insert(std::make_pair(id, spGrad2));
+         // Insert into map
+         this->mGrad2.insert(std::make_pair(outerIt->first, spGrad2));
+      }
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
@@ -286,7 +291,7 @@ namespace Datatypes {
       // Physical 2nd order gradient storage
       if(this->mGrad2.size() > 0)
       {
-         std::map<FieldComponents::Spectral::Id,SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > >::const_iterator it;
+         std::map<FieldComponents::Physical::Id,SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > >::const_iterator it;
          for(it = this->mGrad2.begin(); it != this->mGrad2.end(); ++it)
          {
             mem += it->second->requiredStorage();
