@@ -192,6 +192,12 @@ namespace IoTools {
       {
          return NonDimensional::OMEGA;
 
+      //
+      // Special flags
+      } else if(id == IdToHuman::toTag(NonDimensional::ELEVATOR))
+      {
+         return NonDimensional::ELEVATOR;
+
       } else
       {
          throw Exception("Unknown string to ID conversion requested (Nondimensional)");
@@ -207,6 +213,10 @@ namespace IoTools {
       } else if(id == IdToHuman::toString(ModelOperator::IMPLICIT_LINEAR))
       {
          return ModelOperator::IMPLICIT_LINEAR;
+
+      } else if(id == IdToHuman::toString(ModelOperator::BOUNDARY))
+      {
+         return ModelOperator::BOUNDARY;
 
       } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR))
       {
@@ -310,6 +320,14 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
       {
          return PhysicalNames::VORTICITY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYX))
+      {
+         return PhysicalNames::VORTICITYX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYY))
+      {
+         return PhysicalNames::VORTICITYY;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYZ))
       {

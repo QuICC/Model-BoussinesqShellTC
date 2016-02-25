@@ -25,7 +25,7 @@
 
 // Project includes
 //
-#include "Base/MathConstants.hpp"
+#include "TypeSelectors/TimeSchemeTypeSelector.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "SparseSolvers/SparseCoordinatorBase.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -35,13 +35,6 @@
 namespace GeoMHDiSCC {
 
 namespace Solver {
-
-   namespace internal {
-
-      void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
-
-      void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat);
-   }
 
    /**
     * @brief Implementation of the base for a general sparse linear solver coordinator
@@ -90,23 +83,26 @@ namespace Solver {
           * @brief Build the real operator
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
           */
-         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase<TSolver>::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase<TSolver>::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
          /**
           * @brief Build the complex operator
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
           */
-         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+
+         /**
+          * @brief Factorization time
+          */
+         MHDFloat mFactorTime;
 
       private:
    };
@@ -122,26 +118,19 @@ namespace Solver {
       // Number of linear systems
       int nSystems = spEq->couplingInfo(id.second).nSystems();
 
-      // Loop over all substeps of solver
-      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
+      // Reserve storage for matrices and initialise vectors
+      (*solveIt)->initMatrices(nSystems);
+
+      // Build the solver matrices
+      for(int i = 0; i < nSystems; i++)
       {
-         // start index for matrices
-         int start = this->mStep*nSystems;
-
-         // Reserve storage for matrices and initialise vectors
-         (*solveIt)->initMatrices(this->mNStep*nSystems);
-
-         // Build the solver matrices
-         for(int i = 0; i < nSystems; i++)
-         {
-            // Build LHS solver matrix
-            this->buildSolverMatrix(*solveIt, start+i, spEq, id.second, i);
-         }
+         // Build LHS solver matrix
+         this->buildSolverMatrix(*solveIt, spEq, id.second, i);
       }
    }
 
    template <template <class,class> class TSolver> SparseLinearCoordinatorBase<TSolver>::SparseLinearCoordinatorBase()
-      : SparseCoordinatorBase<TSolver>()
+      : SparseCoordinatorBase<TSolver>(), mFactorTime(-1.0)
    {
    }
 
@@ -190,31 +179,26 @@ namespace Solver {
       //
 
       stage.start("initializing solver storage", 1);
-
-      // Loop over all substeps of solver
-      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
+      // Loop over all scalar equations
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
-         // Loop over all scalar equations
-         for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
+         DebuggerMacro_msg("---> scalar storage", 2);
+
+         // Create storage
+         this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
+      }
+
+      // Loop over all vector equations
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
+      {
+         DebuggerMacro_msg("---> vector storage", 2);
+
+         // Create storage
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            DebuggerMacro_msg("---> scalar storage", 2);
-
-            // Create storage
-            this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
-         }
-
-         // Loop over all vector equations
-         for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
-         {
-            DebuggerMacro_msg("---> vector storage", 2);
-
-            // Create storage
-            Equations::IVectorEquation::SpectralComponent_iterator compIt;
-            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
-            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
-            {
-               this->createStorage((*vectEqIt), *compIt);
-            }
+            this->createStorage((*vectEqIt), *compIt);
          }
       }
 
@@ -259,17 +243,17 @@ namespace Solver {
       //
       
       stage.start("factorizing solver matrices", 1);
+      TimerMacro timer(true);
 
       // Initialise solvers from complex equation steppers
       initSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this);
 
       // Initialise solvers from real equation steppers
       initSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this);
-
+   
+      timer.stop();
+      this->mFactorTime = timer.time();
       stage.done();
-
-      // Reset the step index
-      this->mStep = 0;
 
       stage.start("initializing solutions", 1);
 
@@ -302,45 +286,16 @@ namespace Solver {
    template <template <class,class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::solveSystems()
    {
       // Solve complex operator, complex field linear systems
-      solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, this->mStep);
+      std::pair<bool,MHDFloat> zStatus = solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this);
 
       // Solve real operator, complex field linear systems
-      solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, this->mStep);
-   }
+      std::pair<bool,MHDFloat> dStatus = solveSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this);
 
-   namespace internal {
+      this->mFinished = zStatus.first || dStatus.first;
 
-      inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat)
+      if(this->mFinished)
       {
-         assert(decMat.real().rows() > 0);
-         assert(decMat.real().cols() > 0);
-         assert(decMat.imag().size() == 0 || decMat.imag().nonZeros() == 0);
-
-         if(c != 1.0)
-         {
-            mat += c*decMat.real();
-         } else
-         {
-            mat += decMat.real();
-         }
-      }
-
-      inline void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat)
-      {
-         assert(decMat.real().rows() > 0);
-         assert(decMat.real().cols() > 0);
-         assert(decMat.imag().rows() > 0);
-         assert(decMat.imag().cols() > 0);
-         assert(decMat.real().rows() == decMat.imag().rows());
-         assert(decMat.real().cols() == decMat.imag().cols());
-
-         if(c != 1.0)
-         {
-            mat += c*decMat.real().cast<MHDComplex>() + c*Math::cI*decMat.imag();
-         } else
-         {
-            mat += decMat.real().cast<MHDComplex>() + Math::cI*decMat.imag();
-         }
+         this->mError = std::max(zStatus.second, dStatus.second);
       }
    }
 
@@ -369,8 +324,8 @@ namespace Solver {
    // SparseLinearSolver
    template <> inline void buildSolverMatricesSolver<SparseLinearSolver,ComplexDummy_iterator>(SparseLinearCoordinatorBase<SparseLinearSolver>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId id) {};
 
-   // SparseTimestepper
-   template <> inline void buildSolverMatricesSolver<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseLinearCoordinatorBase<Timestep::SparseTimestepper>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId id) {};
+   // Timestepper
+   template <> inline void buildSolverMatricesSolver<Timestep::TimeSchemeTypeSelector,ComplexDummy_iterator>(SparseLinearCoordinatorBase<Timestep::TimeSchemeTypeSelector>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId id) {};
 }
 }
 

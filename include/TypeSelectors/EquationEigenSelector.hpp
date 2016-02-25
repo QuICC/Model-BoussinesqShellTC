@@ -187,4 +187,32 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WLF
 
+// Configure code to use TT scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_TT
+   
+   #include "Equations/Tools/EquationNoEigenTools.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Equations {
+
+         namespace EigenSelector = NoEigen;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_TT
+
+// Configure code to use TF scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_TF
+   
+   #include "Equations/Tools/EquationEigen1DTools.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Equations {
+
+         namespace EigenSelector = Eigen1D;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_TF
+
 #endif // EQUATIONEIGENSELECTOR_HPP

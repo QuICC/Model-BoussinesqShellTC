@@ -10,7 +10,7 @@
 
 // Configuration includes
 // 
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 
 // System includes
 //
@@ -22,7 +22,7 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "TransformGroupers/IForwardGrouper.hpp"
+#include "TransformGroupers/IForwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 

@@ -165,7 +165,7 @@ namespace IoVariable {
          transId = Dimensions::Transform::TRA1D;
       } else
       {
-         transId = Dimensions::Transform::TRA3D;
+         transId = Dimensions::Transform::TRAND;
       }
 
       // Get the maximum number of slowest directions over all CPUs

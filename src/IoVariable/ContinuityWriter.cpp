@@ -48,8 +48,12 @@ namespace IoVariable {
       ContinuityWriter::vector_iterator_range vRange = this->vectorRange();
       assert(std::distance(vRange.first, vRange.second) == 1);
       ContinuityWriter::vector_iterator  vIt = vRange.first;
-   
-      MHDFloat continuity = (vIt->second->dom(0).grad(FieldComponents::Spectral::X).comp(FieldComponents::Physical::X).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::Y).comp(FieldComponents::Physical::Y).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::Z).comp(FieldComponents::Physical::Z).data()).array().abs().maxCoeff();
+
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         MHDFloat continuity = (vIt->second->dom(0).grad(FieldComponents::Spectral::ONE).comp(FieldComponents::Physical::ONE).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::TWO).comp(FieldComponents::Physical::TWO).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::THREE).comp(FieldComponents::Physical::THREE).data()).array().abs().maxCoeff();
+      #else
+         MHDFloat continuity = (vIt->second->dom(0).grad(FieldComponents::Spectral::ONE).comp(FieldComponents::Physical::ONE).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::TWO).comp(FieldComponents::Physical::TWO).data()).array().abs().maxCoeff();
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       // Get the "global" velocity divergence from MPI code
       #ifdef GEOMHDISCC_MPI

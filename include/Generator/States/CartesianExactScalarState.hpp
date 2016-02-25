@@ -75,7 +75,17 @@ namespace Equations {
          void setStateType(const CartesianExactStateIds::Id id);
 
          /**
-          * @brief Set the options for the solution states
+          * @brief Set the options for the solution states in 2D
+          *
+          * @param a1   Amplitude of the first direction
+          * @param k1   Wave number of the first direction
+          * @param a2   Amplitude of the second direction
+          * @param k2   Wave number of the second direction
+          */
+         void setModeOptions(const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2);
+
+         /**
+          * @brief Set the options for the solution states in 3D
           *
           * @param a1   Amplitude of the first direction
           * @param k1   Wave number of the first direction

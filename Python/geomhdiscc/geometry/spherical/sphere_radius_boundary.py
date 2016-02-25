@@ -79,6 +79,8 @@ def apply_tau(mat, l, bc, location = 't'):
         cond = tau_rdiffdivr(mat.shape[0], l%2, bc.get('c',None))
     elif bc[0] == 13:
         cond = tau_insulating(mat.shape[0], l%2, bc.get('c',None))
+    elif bc[0] == 14:
+        cond = tau_diff2(mat.shape[0], l%2, bc.get('c',None))
     elif bc[0] == 20:
         cond = tau_value_diff(mat.shape[0], l%2, bc.get('c',None))
     elif bc[0] == 21:
@@ -129,7 +131,7 @@ def tau_diff(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*ns**2)
+    cond.append(c*2.0*ns**2)
 
     return np.array(cond)
 
@@ -143,7 +145,7 @@ def tau_diff2(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*(1.0/3.0)*(ns**4 - ns**2))
+    cond.append(c*(2.0/3.0)*(ns**4 - ns**2))
 
     return np.array(cond)
 
@@ -157,7 +159,7 @@ def tau_rdiffdivr(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*(ns**2 - tau_c()))
+    cond.append(c*(ns**2 - 1.0)*tau_c())
     if parity == 0:
         cond[-1][0] /= tau_c()
 
@@ -173,7 +175,7 @@ def tau_insulating(nr, parity, coeffs = None):
 
     cond = []
     ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*(ns**2 + (l+1.0)*tau_c()))
+    cond.append(c*(2.0*ns**2 + (l+1.0)*tau_c()))
     if parity == 0:
         cond[-1][0] /= tau_c()
 
@@ -323,10 +325,41 @@ def stencil_rdiffdivr(nr, parity, coeffs = None):
 
     # Generate subdiagonal
     def d_1(n):
-        val = -(n**2 - 4.0*n + 2.0)/(n**2 - 2.0)
+        val = -(n - 3.0)/(n + 1.0)
         for i,j in enumerate(n):
             if j == 2:
-                val[i] = 1.0/2.0
+                val[i] = 1.0/6.0
+                break
+            if j > 2:
+                break
+        return val
+
+    # Generate diagonal
+    def d0(n):
+        return np.ones(n.shape)
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_insulating(nr, parity, coeffs = None):
+    """Create stencil matrix for a insulating boundary"""
+
+    assert(coeffs.get('l', None) is not None)
+
+    l = coeffs['l']
+
+    ns = np.arange(parity,2*nr,2)
+    offsets = [-1, 0]
+
+    # Generate subdiagonal
+    def d_1(n):
+        val = -(l + n**2 - 4.0*n + 5.0)/(l + n**2 + 1.0)
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = -(l + 1.0)/(l + 5.0)
                 break
             if j > 2:
                 break

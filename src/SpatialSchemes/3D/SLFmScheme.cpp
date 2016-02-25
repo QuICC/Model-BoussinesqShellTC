@@ -42,7 +42,7 @@ namespace Schemes {
          MPI_Group world;
          MPI_Group group;
          MPI_Comm_group(MPI_COMM_WORLD, &world);
-         MPI_Group_incl(world, FrameworkMacro::groupCpuIds(0).size(), FrameworkMacro::groupCpuIds(0).data(), &group);
+         MPI_Group_incl(world, FrameworkMacro::transformCpus(0).size(), FrameworkMacro::transformCpus(0).data(), &group);
          MPI_Comm comm;
          MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 
@@ -68,7 +68,7 @@ namespace Schemes {
          int globalCpu = FrameworkMacro::id();
          MPI_Comm_rank(comm, &commId); 
          ArrayI tmp;
-         for(int commCpu = 0; commCpu < FrameworkMacro::groupCpuIds(0).size(); ++commCpu)
+         for(int commCpu = 0; commCpu < FrameworkMacro::transformCpus(0).size(); ++commCpu)
          {
             int size;
             if(commCpu == commId)

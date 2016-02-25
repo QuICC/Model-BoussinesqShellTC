@@ -287,6 +287,9 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> inline typename FlatScalarField<TData, DIMENSION>::PointType FlatScalarField<TData, DIMENSION>::point(const int i, const int j, const int k) const
    {
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
+
       return (*this->mspField)(i,this->mspSetup->colIdx(j,k));
    }
 
@@ -294,14 +297,16 @@ namespace Datatypes {
    {
       // Profiles only make sense in 2D and 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::TWOD) || (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       return this->mspField->col(this->mspSetup->colIdx(j,k));
    }
 
    template <typename TData, Dimensions::Type DIMENSION> inline typename FlatScalarField<TData, DIMENSION>::SliceType FlatScalarField<TData, DIMENSION>::slice(const int k) const
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       return this->mspField->block(0,this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k));
    }
@@ -326,6 +331,9 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> void FlatScalarField<TData, DIMENSION>::setPoint(const FlatScalarField<TData, DIMENSION>::PointType pt, const int i, const int j, const int k)
    {
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
+
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
       assert(this->mspField->cols() > 0);
@@ -335,6 +343,9 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> inline typename FlatScalarField<TData, DIMENSION>::PointType& FlatScalarField<TData, DIMENSION>::rPoint(const int i, const int j, const int k)
    {
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
+
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
       assert(this->mspField->cols() > 0);
@@ -346,6 +357,8 @@ namespace Datatypes {
    {
       // Profiles only make sense in 2D and 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::TWOD) || (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -358,6 +371,8 @@ namespace Datatypes {
    {
       // Profiles only make sense in 2D and 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::TWOD) || (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -370,6 +385,8 @@ namespace Datatypes {
    {
       // Profiles only make sense in 2D and 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::TWOD) || (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -380,8 +397,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -392,8 +409,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -408,8 +425,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -420,8 +437,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -432,8 +449,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -447,8 +464,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -466,8 +483,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -481,8 +498,8 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      // Allow single slice to generalize code
+      assert((DIMENSION != Dimensions::TWOD) || (k == 0));
 
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -553,8 +570,7 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> int FlatScalarField<TData, DIMENSION>::nSlice() const
    {
-      // Slices only make sense in 3D
-      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      assert((DIMENSION != Dimensions::TWOD) || (this->mspSetup->nBlock() == 1));
 
       return this->mspSetup->nBlock();
    }

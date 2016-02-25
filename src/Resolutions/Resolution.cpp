@@ -240,6 +240,18 @@ namespace GeoMHDiSCC {
                rSlow.push_back(this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k));
             }
 
+         // Two dimensional matrices in 2D simulation
+         #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+            // Make sure middle is empty
+            rMiddle.clear();
+
+            rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k));
+
+            for(int j = 0; j < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+            {
+               rSlow.push_back(this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k));
+            }
+
          #else
             #error "Tried to setup MPI sparse solver for unimplemented scheme."
          #endif //defined GEOMHDISCC_SPATIALSCHEME_TTT

@@ -20,9 +20,9 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/ForwardConfigurator.hpp"
+#include "TransformConfigurators/ForwardConfigurator3D.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -31,7 +31,7 @@ namespace Transform {
    /**
     * @brief This class defines the forward transform tubular splitting operations
     */
-   class ForwardTubularConfigurator: public ForwardConfigurator
+   class ForwardTubularConfigurator: public ForwardConfigurator3D
    {
       public:
          /**
@@ -148,13 +148,13 @@ namespace Transform {
    template <typename TSharedEquation> void ForwardTubularConfigurator::firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      IntegratorPhysEdge_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      IntegratorPhysEdge_range range3D = tree.edgeRange();
 
       // Compute the nonlinear interaction
-      ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);
+      ForwardConfigurator3D::nonlinearTerm(tree, spEquation, coord);
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -164,7 +164,7 @@ namespace Transform {
       for(it3D = range3D.first; it3D != range3D.second; ++it3D, --hold3D)
       {
          // Compute third transform
-         ForwardConfigurator::integrate3D(*it3D, coord, hold3D);
+         ForwardConfigurator3D::integrateND(*it3D, coord, hold3D);
       }
 
       // Stop profiler
@@ -174,12 +174,12 @@ namespace Transform {
    template <typename TSharedEquation> void ForwardTubularConfigurator::secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorTree::Integrator2DEdge_iterator it2D;
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      IntegratorPartEdge_iterator it2D;
+      IntegratorPhysEdge_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator2DEdge_range range2D;
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      IntegratorPartEdge_range range2D;
+      IntegratorPhysEdge_range range3D = tree.edgeRange();
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -193,7 +193,7 @@ namespace Transform {
          for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
          {
             // Compute second transform
-            ForwardConfigurator::integrate2D(*it2D, coord, recover2D, hold2D);
+            ForwardConfigurator3D::integrate2D(*it2D, coord, recover2D, hold2D);
          }
       }
 
@@ -204,14 +204,14 @@ namespace Transform {
    template <typename TSharedEquation> void ForwardTubularConfigurator::lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorTree::Integrator1DEdge_iterator it1D;
-      IntegratorTree::Integrator2DEdge_iterator it2D;
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      IntegratorSpecEdge_iterator it1D;
+      IntegratorPartEdge_iterator it2D;
+      IntegratorPhysEdge_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator1DEdge_range range1D;
-      IntegratorTree::Integrator2DEdge_range range2D;
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      IntegratorSpecEdge_range range1D;
+      IntegratorPartEdge_range range2D;
+      IntegratorPhysEdge_range range3D = tree.edgeRange();
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -228,10 +228,10 @@ namespace Transform {
             for(it1D = range1D.first; it1D != range1D.second; ++it1D, ++recover1D, --hold1D)
             {
                // Compute third transform
-               ForwardConfigurator::integrate1D(*it1D, coord, recover1D, hold1D);
+               ForwardConfigurator3D::integrate1D(*it1D, coord, recover1D, hold1D);
 
                // Update equation
-               ForwardConfigurator::updateEquation(*it1D, spEquation, coord, hold1D);
+               ForwardConfigurator3D::updateEquation(*it1D, spEquation, coord, hold1D);
             }
          }
       }

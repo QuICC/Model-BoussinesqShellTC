@@ -119,6 +119,11 @@ namespace GeoMHDiSCC {
             PSI,
             /// Omega
             OMEGA,
+
+            //
+            // Special flags
+            /// Flag to filter elevator modes
+            ELEVATOR,
          };
       };
 }

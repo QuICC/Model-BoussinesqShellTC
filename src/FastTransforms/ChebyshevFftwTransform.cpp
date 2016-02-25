@@ -153,6 +153,7 @@ namespace Transform {
       //
       // Initialise solver operators
       //
+      //---------------------------------------------------------------
       // First derivative
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
@@ -191,6 +192,45 @@ namespace Transform {
       this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
       // Check for successful factorisation
       if(this->mSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward 1st derivative failed!");
+      }
+
+      //---------------------------------------------------------------
+      // Second derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+
+      // Prepare arguments to Chebyshev matrices call
+      pArgs = PyTuple_New(3);
+      // ... create boundray condition (last mode is zero)
+      pValue = PyDict_New();
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(992));
+      PyTuple_SetItem(pArgs, 1, pValue);
+      // ... set coefficient to 1.0
+      pValue = PyFloat_FromDouble(1.0/this->mCScale);
+      PyTuple_SetItem(pArgs, 2, pValue);
+
+      // ... set resoluton for solver matrices
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+      PyTuple_SetItem(pArgs, 0, pValue);
+
+      // Call i1 for solver
+      PythonWrapper::setFunction("i2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF2)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Initialize solver storage
+      this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
+      this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
+
+      // Initialize solver and factorize division by d1 operator
+      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
+      this->mSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      // Check for successful factorisation
+      if(this->mSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
       {
          throw Exception("Factorization of backward 1st derivative failed!");
       }
@@ -284,6 +324,15 @@ namespace Transform {
 //         // Recurrence relation
 //         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
 //         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+
+      // Compute second derivative
+      } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.topRows(2).setZero();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection
       } else
@@ -381,6 +430,15 @@ namespace Transform {
 //         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
 //         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
+      // Compute second derivative of real part
+      } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
       // Compute simple projection of real part
       } else
       {
@@ -405,6 +463,15 @@ namespace Transform {
 //         // Recurrence relation
 //         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
 //         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+
+      // Compute second derivative of imaginary part
+      } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection of imaginary part
       } else

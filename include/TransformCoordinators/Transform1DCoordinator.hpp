@@ -13,6 +13,7 @@
 
 // Configuration includes
 //
+#include "TypeSelectors/TransformTreeSelector.hpp"
 
 // System includes
 //
@@ -28,18 +29,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "Resolutions/Resolution.hpp"
 
-
 namespace GeoMHDiSCC {
-
-   namespace Transform {
-
-      // Forward declaration for ProjectorTree
-      class ProjectorTree;
-
-      // Forward declaration for IntegratorTree
-      class IntegratorTree;
-
-   }
 
    /**
     * 
@@ -114,26 +104,14 @@ namespace GeoMHDiSCC {
          const std::vector<Transform::ProjectorTree>& projectorTree() const;
 
          /**
-          * @brief Need to compute backward transform to physical values?
-          *
-          * @param name Name of the field
-          */
-         bool needPhysical(PhysicalNames::Id name);
-
-         /**
-          * @brief Need to compute backward transform to physical gradient values (scalar or vector)?
-          */
-         bool needPhysicalGradient(PhysicalNames::Id name);
-
-         /**
-          * @brief Need to compute backward transform to physical curl values?
-          */
-         bool needPhysicalCurl(PhysicalNames::Id name);
-
-         /**
           * @brief Get grid array(s) of the mesh
           */
          std::vector<Array>  mesh();
+
+         /**
+          * @brief Get the transform for the last dimension
+          */
+         T1D&   transformND();
          
       protected:
 
@@ -167,6 +145,11 @@ namespace GeoMHDiSCC {
    };
 
    template <typename T1D, typename TCommunicator> inline T1D&  Transform1DCoordinator<T1D,TCommunicator>::transform1D()
+   {
+      return this->mTransform1D;
+   }
+
+   template <typename T1D, typename TCommunicator> inline T1D&  Transform1DCoordinator<T1D,TCommunicator>::transformND()
    {
       return this->mTransform1D;
    }

@@ -131,6 +131,8 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                         bc = {0:20}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
+#                    elif field_row == ("pressure","") and field_col == ("velocity","z"):
+#                        bc = {0:13}
 
             # Stress-free / Fixed flux
             elif bcId == 1:
@@ -346,20 +348,24 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], no_bc())
 
             else:
+                s = 1
                 if field_col == ("velocity","x"):
-                    bc['rt'] = 1
-                    bc['cr'] = 1
-                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+1, bc, 1j*k1)
+                    bc['rt'] = s
+                    bc['cr'] = s
+                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+s, bc, 1j*k1)
+#                    mat = geo.i2(res[0], bc, 1j*k1)
 
                 elif field_col == ("velocity","y"):
-                    bc['rt'] = 1
-                    bc['cr'] = 1
-                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+1, bc, 1j*k2)
+                    bc['rt'] = s
+                    bc['cr'] = s
+                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+s, bc, 1j*k2)
+#                    mat = geo.i2(res[0], bc, 1j*k2)
 
                 elif field_col == ("velocity","z"):
-                    bc['rt'] = 1
-                    bc['cr'] = 1
-                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1d1(res[0]+1, bc, cscale = zscale)
+                    bc['rt'] = s
+                    bc['cr'] = s
+                    mat = utils.qid_from_idx(idx_p, res[0])*geo.i1d1(res[0]+s, bc, cscale = zscale)
+#                    mat = geo.i2d1(res[0], bc, cscale = zscale)
 
                 elif field_col == ("temperature",""):
                     mat = geo.zblk(res[0], bc)
@@ -403,6 +409,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         """Build restriction matrices"""
 
         # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0]-1)
+        idx_p = utils.qidx(res[0], res[0])
 
         return idx_p

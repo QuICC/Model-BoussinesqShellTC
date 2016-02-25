@@ -94,16 +94,18 @@ namespace IoVariable {
           *
           * @param name    Name of the scalar field
           * @param rScalar Storage for the field
+          * @param isRequired field is required
           */
-         void readSpectralScalar(const std::string& name, Datatypes::SpectralScalarType& rScalar);
+         void readSpectralScalar(const std::string& name, Datatypes::SpectralScalarType& rScalar, const bool isRequired);
 
          /**
           * @brief Read vector field values from file
           *
           * @param name    Name of the vector field
           * @param rVector Storage for the field
+          * @param isRequired field is required
           */
-         void readSpectralVector(const std::string& name, std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& rVector);
+         void readSpectralVector(const std::string& name, std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& rVector, const bool isRequired);
 
          /**
           * @brief Read vector field component from file
@@ -111,8 +113,9 @@ namespace IoVariable {
           * @param name    Name of the vector field
           * @param id      ID of the component
           * @param rComp   Storage for field component
+          * @param isRequired field is required
           */
-         void readSpectralComponent(const std::string& name, FieldComponents::Spectral::Id id, Datatypes::SpectralScalarType& rComp);
+         void readSpectralComponent(const std::string& name, FieldComponents::Spectral::Id id, Datatypes::SpectralScalarType& rComp, const bool isRequired);
 
          /**
           * @brief Adapt data after reading it in if necessary

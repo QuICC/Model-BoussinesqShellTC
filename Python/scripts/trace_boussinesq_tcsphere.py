@@ -11,10 +11,16 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
+#res = [64, 0, 0]
+#bc_vel = 0 # NS/NS
+#bc_temp = 0 # FT/FT
+#l = 1; eq_params = {'prandtl':1, 'rayleigh':1.645e4}
+
+# Set resolution, parameters, boundary conditions
 res = [64, 0, 0]
-l = 7; eq_params = {'prandtl':1, 'rayleigh':1.645e4}
-bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
-bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+bc_vel = 1 # SF/SF
+bc_temp = 0 # FT/FT
+l = 1; eq_params = {'prandtl':1, 'rayleigh':1.645e4}
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -33,14 +39,15 @@ marginal_options['evp_tol'] = 1e-16
 marginal_options['geometry'] = 'b1d'
 marginal_options['curve'] = True
 marginal_options['minimum'] = True
-marginal_options['plot_curve'] = True
-marginal_options['solve'] = True
 marginal_options['minimum_int'] = True
+marginal_options['plot_curve'] = True
+marginal_options['solve'] = False
 marginal_options['point_k'] = l
 marginal_options['plot_point'] = True
+marginal_options['plot_spy'] = False
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(0, l-2), l+3, 1)
+marginal_options['curve_points'] = np.arange(max(1, l-10), l+11, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

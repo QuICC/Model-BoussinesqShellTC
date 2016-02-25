@@ -98,6 +98,11 @@ namespace Diagnostics {
          const MHDFloat mcCourant;
 
          /**
+          * @brief Maximum timestep
+          */
+         const MHDFloat mcMaxStep;
+
+         /**
           * @brief Fixed timestep
           */
          MHDFloat mFixedStep;

@@ -24,19 +24,32 @@
 // Project includes
 //
 #include "TypeSelectors/TimeSchemeSelector.hpp"
+#include "IoTools/Formatter.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
-      this->mNStep = IntegratorSelector::STEPS;
+      // Initialize timestepper
+      TimeSchemeSelector::init();
+
+      // Create CFL writer
+      IoAscii::SharedCflWriter   spCflWriter = IoAscii::SharedCflWriter(new IoAscii::CflWriter());
+      this->mspIo = spCflWriter;
+      this->mspIo->init();
    }
 
    TimestepCoordinator::~TimestepCoordinator()
    {
+      this->mspIo->finalize();
+   }
+
+   void TimestepCoordinator::tuneAdaptive(const MHDFloat time)
+   {
+      this->mStepTime = time;
    }
 
    MHDFloat TimestepCoordinator::time() const
@@ -60,40 +73,60 @@ namespace Timestep {
       bool hasNewDt = false;
 
       // Check if CFL allows for a larger timestep
-      if(cfl > this->mcUpWindow*this->mDt)
-      {
-         // Activate matrices update
-         hasNewDt = true;
-
-         // Set new timestep
-         this->mOldDt = this->mDt;
-         this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
+//      if(cfl > this->mcUpWindow*this->mDt)
+//      {
+//         // Activate matrices update
+//         hasNewDt = true;
+//
+//         // Set new timestep
+//         this->mOldDt = this->mDt;
+//         this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
+//      
+//      // Check if CFL is below minimal timestep or downard jump is large
+//      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
+//      {
+//         // Don't update matrices
+//         hasNewDt = false;
+// 
+//         // Signal simulation abort
+//         this->mOldDt = this->mDt;
+//         this->mDt = -cfl;
+//     
+//      // Check if CFL requires a lower timestep
+//      } else if(cfl < this->mDt)
+//      {
+//         // Activate matrices update
+//         hasNewDt = true;
+//
+//         // Set new timestep
+//         this->mOldDt = this->mDt;
+//         this->mDt = cfl/this->mcUpWindow;
+//
       
-      // Check if CFL is below minimal timestep or downard jump is large
-      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
-      {
-         // Don't update matrices
-         hasNewDt = false;
- 
-         // Signal simulation abort
-         this->mOldDt = this->mDt;
-         this->mDt = -cfl;
-     
-      // Check if CFL requires a lower timestep
-      } else if(cfl < this->mDt)
-      {
-         // Activate matrices update
-         hasNewDt = true;
-
-         // Set new timestep
-         this->mOldDt = this->mDt;
-         this->mDt = cfl/this->mcUpWindow;
-
-      // No need to change timestep
-      } else
-      {
-         hasNewDt = false;
-      }
+      MHDFloat maxError = 1e-8;
+      // No error control and no CFL condition
+//      if(this->mError < 0.0)
+//      {
+//         hasNewDt = false;
+//
+//      } else if(this->mError > maxError)
+//      {
+//         hasNewDt = true;
+//         this->mOldDt = this->mDt;
+//         this->mDt *= std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
+//
+//      } else if(this->mError < maxError/1.5)
+//      {
+//         hasNewDt = true;
+//         this->mOldDt = this->mDt;
+//         this->mDt = std::min(this->mDt*std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+//
+//      // No need to change timestep
+//      } else
+//      {
+//         hasNewDt = false;
+//      }
+      hasNewDt = false;
 
       //
       // Update the timestep matrices if necessary
@@ -109,16 +142,25 @@ namespace Timestep {
 
          DebuggerMacro_start("Complex operator update", 0);
          // Update solvers from complex operator, complex field steppers
-         Solver::updateSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this);
+         Solver::updateSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::ComplexSolver_iterator>(*this);
          DebuggerMacro_stop("Complex operator solver update t = ", 0);
 
          DebuggerMacro_start("Real operator solver update", 0);
          // Update solvers from real operator, complex field steppers
-         Solver::updateSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this);
+         Solver::updateSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::RealSolver_iterator>(*this);
          DebuggerMacro_stop("Real operator solver update t = ", 0);
+      } else
+      {
+         this->mCnstSteps += 1.0;
+      }
 
-         // Reset the step index
-         this->mStep = 0;
+      // Update CFL writer
+      this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps, this->mError);
+      this->mspIo->write();
+
+      if(hasNewDt)
+      {
+         this->mCnstSteps = 0.0;
       }
    }
 
@@ -129,11 +171,6 @@ namespace Timestep {
       this->getInput(scalEq, vectEq, scalVar, vectVar);
       DetailedProfilerMacro_stop(ProfilerMacro::TSTEPIN);
 
-      DetailedProfilerMacro_start(ProfilerMacro::TSTEPRHS);
-      // Compute the RHS of the linear systems
-      this->computeRHS();
-      DetailedProfilerMacro_stop(ProfilerMacro::TSTEPRHS);
-
       DetailedProfilerMacro_start(ProfilerMacro::TSTEPSOLVE);
       // Solve all the linear systems
       this->solveSystems();
@@ -143,9 +180,6 @@ namespace Timestep {
       // Transfer timestep output back to equations
       this->transferOutput(scalEq, vectEq);
       DetailedProfilerMacro_stop(ProfilerMacro::TSTEPOUT);
-
-      // Update the internal step counter
-      this->updateStep();
 
       // Clear the solver RHS
       this->clearSolvers();
@@ -162,88 +196,61 @@ namespace Timestep {
       DebuggerMacro_showValue("Creating timestepper with initial timestep Dt = ", 0, this->mDt);
 
       // Initialise solver
-      Solver::SparseLinearCoordinatorBase<SparseTimestepper>::init(scalEq, vectEq);
+      Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>::init(scalEq, vectEq);
    }
 
    void TimestepCoordinator::updateMatrices()
    {
-      // Loop over all substeps of timestepper
-      for(int step = 0; step < this->mNStep; ++step)
-      {
-         // Compute timestep correction coefficient for LHS matrix
-         MHDFloat lhsCoeff = IntegratorSelector::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
+      // Loop over all complex operator, complex field timesteppers
+      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::ComplexSolver_iterator>(*this, this->mDt);
 
-         // Compute timestep correction coefficient for RHS matrix at t_n
-         MHDFloat rhsCoeff = IntegratorSelector::rhsT(0, step)*(1.0/this->mOldDt - 1.0/this->mDt);
-
-         // Compute timestep correction coefficient for RHS matrix at t_(n-i), i > 0
-         std::vector<MHDFloat> oldRhsCoeff;
-         for(int i = 0; i < IntegratorSelector::FIELD_MEMORY; ++i)
-         {
-            oldRhsCoeff.push_back(IntegratorSelector::rhsT(i+1, step)*(1.0/this->mOldDt - 1.0/this->mDt));
-         }
-
-         // Loop over all complex operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, lhsCoeff, rhsCoeff, oldRhsCoeff, step);
-
-         // Loop over all real operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, lhsCoeff, rhsCoeff, oldRhsCoeff, step);
-      }
+      // Loop over all real operator, complex field timesteppers
+      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::RealSolver_iterator>(*this, this->mDt);
    }
 
-   void TimestepCoordinator::computeRHS()
+   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Compute RHS component for complex operator, complex field linear systems
-      Solver::computeRHSSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, this->mStep);
-
-      // Compute RHS component for real operator, complex field linear systems
-      Solver::computeRHSSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, this->mStep);
+      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->mDt, idx);
    }
 
-   void TimestepCoordinator::computeTimeCoeffs(MHDFloat& lhsL, MHDFloat& lhsT, MHDFloat& rhsL, MHDFloat& rhsT, std::vector<MHDFloat>& oldRhsL, std::vector<MHDFloat>& oldRhsT)
+   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Set time coefficients for LHS Matrix
-      lhsT = IntegratorSelector::lhsT(this->mStep)*1.0/this->mDt;
-
-      // Set linear coefficients for LHS Matrix
-      lhsL = IntegratorSelector::lhsL(this->mStep);
-
-      // Set time coefficients for RHS Matrix
-      rhsT = IntegratorSelector::rhsT(0, this->mStep)*1.0/this->mDt;
-
-      // Set linear coefficients for RHS Matrix
-      rhsL = IntegratorSelector::rhsL(0, this->mStep);
-
-      // Compute timestep correction coefficient for RHS matrix at t_(n-i), i > 0
-      for(int i = 0; i < IntegratorSelector::FIELD_MEMORY; ++i)
-      {
-         oldRhsT.push_back(IntegratorSelector::rhsT(i+1, this->mStep)*1.0/this->mDt);
-         oldRhsL.push_back(IntegratorSelector::rhsL(i+1, this->mStep));
-      }
+      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->mDt, idx);
    }
 
-   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void TimestepCoordinator::printInfo(std::ostream& stream)
    {
-      // Operator coefficients
-      MHDFloat lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff;
-      std::vector<MHDFloat>   oldRhsLCoeff;
-      std::vector<MHDFloat>   oldRhsTCoeff;
+      // Create nice looking ouput header
+      IoTools::Formatter::printNewline(stream);
+      IoTools::Formatter::printLine(stream, '-');
+      IoTools::Formatter::printCentered(stream, "Timestepper information", '*');
+      IoTools::Formatter::printLine(stream, '-');
 
-      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
-      
-      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
-   }
+      std::stringstream oss;
+      int base = 20;
 
-   void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      // Operator coefficients
-      MHDFloat lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff;
-      std::vector<MHDFloat>   oldRhsLCoeff;
-      std::vector<MHDFloat>   oldRhsTCoeff;
+      // Timestep scheme
+      oss << "Timestepper: " << TimeSchemeSelector::NAME << " (" << TimeSchemeSelector::ORDER << ")";
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
 
-      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
+      // Linear solver
+      oss << "Solver: ";
+      #if defined GEOMHDISCC_SPLINALG_MUMPS
+         oss << "MUMPS";
+      #elif defined GEOMHDISCC_SPLINALG_UMFPACK
+         oss << "UmfPack";
+      #elif defined GEOMHDISCC_SPLINALG_SPARSELU
+         oss << "SparseLU";
+      #else
+         oss << "(unknown)";
+      #endif //defined GEOMHDISCC_SPLINALG_MUMPS
 
-      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      IoTools::Formatter::printLine(stream, '*');
+      IoTools::Formatter::printNewline(stream);
    }
 
 }

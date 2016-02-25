@@ -88,6 +88,11 @@ namespace Timestep {
          static const int STEPS;
 
          /**
+          * @brief Order of the scheme
+          */
+         static const int ORDER;
+
+         /**
           * @brief Number of previous field values required
           */
          static const int FIELD_MEMORY;
@@ -96,6 +101,16 @@ namespace Timestep {
           * @brief Number of previous nonlinear terms required
           */
          static const int NONLINEAR_MEMORY;
+
+         /**
+          * @brief Name of the scheme
+          */
+         static const std::string NAME;
+
+         /**
+          * @brief Initialize Butcher's tableau
+          */
+         static void init();
          
       protected:
 

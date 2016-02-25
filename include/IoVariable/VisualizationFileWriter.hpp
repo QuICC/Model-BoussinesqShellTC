@@ -71,7 +71,15 @@ namespace IoVariable {
           * @param name    Name of the field
           * @param vector  Vector of components
           */
-         void writePhysicalVector(const std::string& name, const std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>& vector);
+         void writePhysicalVector(const std::string& name, const std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>& vector, const std::string& joint = "_");
+
+         /**
+          * @brief Create group for tensor field
+          *
+          * @param name    Name of the field
+          * @param tensor  Vector of components
+          */
+         void writePhysicalTensor(const std::string& name, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,Datatypes::PhysicalScalarType>& tensor, const std::string& joint = "_");
 
       private:
 

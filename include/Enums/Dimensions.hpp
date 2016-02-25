@@ -48,7 +48,14 @@ namespace Dimensions {
          /// Second transform space
          TRA2D,
          /// Third transform space
-         TRA3D
+         TRA3D,
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+         /// Last dimension
+         TRAND = TRA2D,
+         #else
+         /// Last dimension
+         TRAND = TRA3D,
+         #endif //GEOMHDISCC_SPATIALDIMENSION_2D
       };
 
       /**
@@ -92,7 +99,14 @@ namespace Dimensions {
          /// Second dimension of data
          DAT2D,
          /// Third dimension data
-         DAT3D
+         DAT3D,
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+         /// Last data dimension
+         DATND = DAT2D,
+         #else
+         /// Last data dimension
+         DATND = DAT3D,
+         #endif //GEOMHDISCC_SPATIALDIMENSION_2D
       };
    };
 

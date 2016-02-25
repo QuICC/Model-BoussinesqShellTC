@@ -81,6 +81,31 @@ namespace Schemes {
          
       protected:
          /**
+          * @brief Compute mode distribution for serial algorithm
+          *
+          * @param modes   Map of all modes
+          */
+         void splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId);
+
+         /**
+          * @brief Compute mode distribution for single splitting on 1D algorithm
+          *
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
+          */
+         void splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+
+         /**
+          * @brief Compute mode distribution for coupled 2D algorithm
+          *
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
+          */
+         void splitCoupled2D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+
+         /**
           * @brief First truncation
           */
          int   mI;

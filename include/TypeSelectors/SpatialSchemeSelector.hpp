@@ -201,4 +201,36 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WLF
 
+// Configure code to use TT scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_TT
+   
+   // TTT includes
+   #include "SpatialSchemes/2D/TTScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the TT spatial scheme
+         typedef TTScheme SpatialSelector;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_TT
+
+// Configure code to use TF scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_TF
+   
+   // TFT includes
+   #include "SpatialSchemes/2D/TFScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the TF spatial scheme
+         typedef TFScheme SpatialSelector;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_TF
+
 #endif // SPATIALSCHEMESELECTOR_HPP

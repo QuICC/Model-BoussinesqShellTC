@@ -1,6 +1,6 @@
 /** 
- * @file IdToHuman.cpp
- * @brief Source of enum id to human strings converters
+ * @file DimensionTools.cpp
+ * @brief Source of utility tools for the dimension IDs
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 

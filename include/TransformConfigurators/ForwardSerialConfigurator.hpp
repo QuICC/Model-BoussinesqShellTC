@@ -18,9 +18,9 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/ForwardConfigurator.hpp"
+#include "TransformConfigurators/ForwardConfiguratorMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -114,15 +114,13 @@ namespace Transform {
 
    template <typename TSharedEquation> void ForwardSerialConfigurator::firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
-      // Iterators for the three transforms
-      IntegratorTree::Integrator1DEdge_iterator it1D;
-      IntegratorTree::Integrator2DEdge_iterator it2D;
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      // Iterators for the transforms
+      IntegratorSpecEdge_iterator itSpec;
+      IntegratorPhysEdge_iterator itPhys;
 
-      // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator1DEdge_range range1D;
-      IntegratorTree::Integrator2DEdge_range range2D;
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      // Ranges for the vector of edges for the transforms
+      IntegratorSpecEdge_range rangeSpec;
+      IntegratorPhysEdge_range rangePhys = tree.edgeRange();
 
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);
@@ -130,34 +128,62 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      // Loop over first transform
-      int hold3D = std::distance(range3D.first, range3D.second) - 1;
-      for(it3D = range3D.first; it3D != range3D.second; ++it3D, --hold3D)
-      {
-         // Compute third transform
-         ForwardConfigurator::integrate3D(*it3D, coord, hold3D);
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         // Iterators for the second transforms
+         IntegratorPartEdge_iterator it2D;
 
-         range2D = it3D->edgeRange();
-         int recover2D = 0;
-         int hold2D = std::distance(range2D.first, range2D.second) - 1;
-         for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+         // Ranges for the vector of edges for the second transforms
+         IntegratorPartEdge_range range2D;
+
+         // Loop over first transform
+         int holdPhys = std::distance(rangePhys.first, rangePhys.second) - 1;
+         for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys, --holdPhys)
          {
-            // Compute second transform
-            ForwardConfigurator::integrate2D(*it2D, coord, recover2D, hold2D);
+            // Compute third transform
+            ForwardConfigurator3D::integrateND(*itPhys, coord, holdPhys);
 
-            range1D = it2D->edgeRange();
-            int recover1D = 0;
-            int hold1D = std::distance(range1D.first, range1D.second) - 1;
-            for(it1D = range1D.first; it1D != range1D.second; ++it1D, ++recover1D, --hold1D)
+            range2D = itPhys->edgeRange();
+            int recover2D = 0;
+            int hold2D = std::distance(range2D.first, range2D.second) - 1;
+            for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
             {
-               // Compute third transform
-               ForwardConfigurator::integrate1D(*it1D, coord, recover1D, hold1D);
+               // Compute second transform
+               ForwardConfigurator3D::integrate2D(*it2D, coord, recover2D, hold2D);
 
-               // Update equation
-               ForwardConfigurator::updateEquation(*it1D, spEquation, coord, hold1D);
+               rangeSpec = it2D->edgeRange();
+               int recoverSpec = 0;
+               int holdSpec = std::distance(rangeSpec.first, rangeSpec.second) - 1;
+               for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec, ++recoverSpec, --holdSpec)
+               {
+                  // Compute third transform
+                  ForwardConfigurator3D::integrate1D(*itSpec, coord, recoverSpec, holdSpec);
+
+                  // Update equation
+                  ForwardConfigurator3D::updateEquation(*itSpec, spEquation, coord, holdSpec);
+               }
             }
          }
-      }
+      #else
+         // Loop over physical transform
+         int holdPhys = std::distance(rangePhys.first, rangePhys.second) - 1;
+         for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys, --holdPhys)
+         {
+            // Compute physical transform
+            ForwardConfigurator2D::integrateND(*itPhys, coord, holdPhys);
+
+            rangeSpec = itPhys->edgeRange();
+            int recoverSpec = 0;
+            int holdSpec = std::distance(rangeSpec.first, rangeSpec.second) - 1;
+            for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec, ++recoverSpec, --holdSpec)
+            {
+               // Compute third transform
+               ForwardConfigurator2D::integrate1D(*itSpec, coord, recoverSpec, holdSpec);
+
+               // Update equation
+               ForwardConfigurator2D::updateEquation(*itSpec, spEquation, coord, holdSpec);
+            }
+         }
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);

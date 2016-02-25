@@ -22,6 +22,7 @@
 // Project includes
 //
 #include "PolynomialTransforms/PolynomialTools.hpp"
+#include "SpatialSchemes/Tools/ParityTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -42,7 +43,7 @@ namespace Schemes {
          MPI_Group world;
          MPI_Group group;
          MPI_Comm_group(MPI_COMM_WORLD, &world);
-         MPI_Group_incl(world, FrameworkMacro::groupCpuIds(0).size(), FrameworkMacro::groupCpuIds(0).data(), &group);
+         MPI_Group_incl(world, FrameworkMacro::transformCpus(0).size(), FrameworkMacro::transformCpus(0).data(), &group);
          MPI_Comm comm;
          MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 
@@ -68,7 +69,7 @@ namespace Schemes {
          int globalCpu = FrameworkMacro::id();
          MPI_Comm_rank(comm, &commId); 
          ArrayI tmp;
-         for(int commCpu = 0; commCpu < FrameworkMacro::groupCpuIds(0).size(); ++commCpu)
+         for(int commCpu = 0; commCpu < FrameworkMacro::transformCpus(0).size(); ++commCpu)
          {
             int size;
             if(commCpu == commId)
@@ -196,13 +197,12 @@ namespace Schemes {
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
-      int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
-      {
-         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-      }
+      ArrayI howmany;
+      MatrixI evenBlocks;
+      MatrixI oddBlocks;
+      ParityTools::splitParityM(spRes, Dimensions::Transform::TRA1D, howmany, evenBlocks, oddBlocks);
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, evenBlocks, oddBlocks, specSize, Transform::FftSetup::COMPONENT));
    }
 
    Transform::SharedPolySetup BLFmScheme::spSetup2D(SharedResolution spRes) const

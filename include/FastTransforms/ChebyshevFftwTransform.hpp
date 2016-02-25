@@ -52,8 +52,9 @@ namespace Transform {
          /** Enum of projector IDs:
           *    - PROJ: projection
           *    - DIFF: D
+          *    - DIFF2: D^2
           */
-         enum Id {PROJ, DIFF};
+         enum Id {PROJ, DIFF, DIFF2};
       };
 
       /**

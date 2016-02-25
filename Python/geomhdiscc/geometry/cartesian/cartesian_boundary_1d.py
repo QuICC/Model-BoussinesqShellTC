@@ -94,10 +94,14 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 22:
         cond = tau_valuediff(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 23:
+        cond = tau_diff2(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 42:
+        cond = tau_diff_diff2(mat.shape[1], 0, bc.get('c',None))
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)
@@ -232,6 +236,28 @@ def tau_value_diff(nx, pos, coeffs = None):
     if pos <= 0:
         cond.append(tau_value(nx,-1,coeffs)[0])
         cond.append(tau_diff(nx,-1,coeffs)[0])
+
+    if use_parity_bc and pos == 0:
+        tv = cond[0].copy()
+        td = cond[1].copy()
+        cond[0] = (cond[0] + cond[2])/2.0
+        cond[1] = (cond[1] + cond[3])/2.0
+        cond[2] = (tv - cond[2])/2.0
+        cond[3] = (td - cond[3])/2.0
+
+    return np.array(cond)
+
+def tau_diff_diff2(nx, pos, coeffs = None):
+    """Create tau lines for a zero 1st derivative and a zero 2nd derivative """
+
+    cond = []
+    if pos >= 0:
+        cond.append(tau_diff(nx,1,coeffs)[0])
+        cond.append(tau_diff2(nx,1,coeffs)[0])
+
+    if pos <= 0:
+        cond.append(tau_diff(nx,-1,coeffs)[0])
+        cond.append(tau_diff2(nx,-1,coeffs)[0])
 
     if use_parity_bc and pos == 0:
         tv = cond[0].copy()
@@ -401,7 +427,7 @@ def stencil_diff2(nx, pos):
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -412,32 +438,36 @@ def stencil_diff2(nx, pos):
 def stencil_value_diff(nx, pos):
     """Create stencil matrix for a zero boundary value and a zero 1st derivative"""
 
+    assert(pos == 0)
+
     ns = np.arange(0,nx,1)
-    if pos == 0:
-        offsets = [-4, -2, 0]
+    offsets = [-4, -2, 0]
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (n - 3.0)/(n - 1.0)
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        val = (n - 3.0)/(n - 1.0)
+        for i,j in enumerate(n):
+            if j == 4:
+                val[i] = 1.0/6.0 
+            if j > 4:
+                break
 
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -2.0*n/(n + 1.0)
+        return val
 
-    else:
-        offsets = [-2, -1, 0]
+    # Generate 1st subdiagonal
+    def d_1(n):
+        val = -2.0*n/(n + 1.0)
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = -2.0/3.0
+            if j > 2:
+                break
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (2.0*n - 3.0)/(2.0*n - 1.0)
-
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -pos*4.0*n/(2.0*n + 1.0)
+        return val
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -448,32 +478,40 @@ def stencil_value_diff(nx, pos):
 def stencil_value_diff2(nx, pos):
     """Create stencil matrix for a zero boundary value and a zero 2nd derivative"""
 
+    assert(pos == 0)
+
     ns = np.arange(0,nx,1)
-    if pos == 0:
-        offsets = [-4, -2, 0]
+    offsets = [-4, -2, 0]
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)/((n - 1.0)*(2*n**2 - 4.0*n + 3.0))
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        val_num = (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)
+        val_den = (n - 1.0)*(2.0*n**2 - 4.0*n + 3.0)
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 4:
+                val[i] = 1.0/38.0
+            if j > 4:
+                break
 
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -2.0*n*(2.0*n**2 + 7.0)/((n + 1.0)*(2.0*n**2 + 4.0*n + 3.0))
+        return val
 
-    else:
-        offsets = [-2, -1, 0]
+    # Generate 1st subdiagonal
+    def d_1(n):
+        val_num = -2.0*n*(2.0*n**2 + 7.0)
+        val_den = (n + 1.0)*(2.0*n**2 + 4.0*n + 3.0)
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = -10.0/19.0
+            if j > 2:
+                break
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (n - 3.0)*(2.0*n - 3.0)/(n*(2.0*n - 1.0))
-
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -pos*2.0*(2*.0*n**2 + 1.0)/((n + 1.0)*(2.0*n + 1.0))
+        return val
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)

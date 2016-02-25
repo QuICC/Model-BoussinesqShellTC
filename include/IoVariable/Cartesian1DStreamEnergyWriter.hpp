@@ -35,12 +35,21 @@ namespace IoVariable {
    {
       public:
          /**
+          * @brief Enum type for different energies
+          */
+         enum EnergyTypeId {
+            TOTAL,
+            ZONAL_X,
+            ZONAL_Y,
+         };
+
+         /**
           * @brief Constructor
           *
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         Cartesian1DStreamEnergyWriter(const std::string& prefix, const std::string& type);
+         Cartesian1DStreamEnergyWriter(const std::string& prefix, const std::string& type, const bool hasZonalX = false, const bool hasZonalY = false);
 
          /**
           * @brief Destructor
@@ -71,6 +80,21 @@ namespace IoVariable {
 
       private:
          /**
+          * @brief Compute energy for scalar field
+          */
+         void computeEnergy(Transform::TransformCoordinatorType& coord, const EnergyTypeId flag);
+
+         /**
+          * @brief Flag to compute zonal energy along X
+          */
+         bool mHasZonalX;
+
+         /**
+          * @brief Flag to compute zonal energy along Y
+          */
+         bool mHasZonalY;
+
+         /**
           * @brief Cartesian box volume to normalize energy to energy density
           */
          MHDFloat mVolume;
@@ -89,6 +113,26 @@ namespace IoVariable {
           * @brief Storage for the Z component energy
           */
          MHDFloat mZEnergy;
+
+         /**
+          * @brief Storage for the X component X zonal energy
+          */
+         MHDFloat mXZonalXEnergy;
+
+         /**
+          * @brief Storage for the Z component X zonal energy
+          */
+         MHDFloat mZZonalXEnergy;
+
+         /**
+          * @brief Storage for the Y component Y zonal energy
+          */
+         MHDFloat mYZonalYEnergy;
+
+         /**
+          * @brief Storage for the Z component Y zonal energy
+          */
+         MHDFloat mZZonalYEnergy;
 
          /**
           * @brief Chebyshev operator to integrate

@@ -10,11 +10,11 @@ import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 
 
-def zblk(nx, bc):
+def zblk(nx, bc, location = 't'):
     """Create a block of zeros"""
 
     mat = spsp.coo_matrix((nx,nx))
-    return c1dbc.constrain(mat,bc)
+    return c1dbc.constrain(mat,bc, location = location)
 
 def d1(nx, bc, coeff = 1.0, cscale = 1.0, zr = 1):
     """Create operator for 1st derivative"""

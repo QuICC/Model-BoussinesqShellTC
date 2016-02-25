@@ -29,7 +29,7 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGTransport.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGMeanHeat.hpp"
-#include "IoVariable/NusseltWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -66,7 +66,7 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;
@@ -105,23 +105,23 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add streamfunction initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add vertical velocity initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+         spExact->setModeOptions(0e0, 0.0, 1e0, 0.0, 1e0, 0.0);
       }
 
       // Add output file
@@ -140,22 +140,22 @@ namespace GeoMHDiSCC {
 
       // Add transport field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
       // Add background temperature profile visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Add output file
@@ -185,7 +185,7 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
-      IoVariable::SharedNusseltWriter spNusselt(new IoVariable::NusseltWriter(SchemeType::type()));
+      IoVariable::SharedCartesian1DNusseltZWriter spNusselt(new IoVariable::Cartesian1DNusseltZWriter(SchemeType::type()));
       spNusselt->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spSim->addAsciiOutputFile(spNusselt);
 

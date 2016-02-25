@@ -10,7 +10,7 @@
 
 // Configuration includes
 // 
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 // System includes
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 

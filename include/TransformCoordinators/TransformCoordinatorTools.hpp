@@ -16,10 +16,10 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
-#include "TransformGroupers/IForwardGrouper.hpp"
-#include "TransformGroupers/IBackwardGrouper.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformGroupers/IForwardGrouperMacro.h"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 

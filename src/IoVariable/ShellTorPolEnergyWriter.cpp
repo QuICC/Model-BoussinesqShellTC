@@ -25,7 +25,6 @@
 #include "Enums/FieldIds.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "IoVariable/EnergyTags.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -279,7 +278,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarTor.slice(0).col(j).real()).sum();
+               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolS.slice(0).col(j).real()).sum();
             }
             start = 1;
          }
@@ -290,7 +289,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM

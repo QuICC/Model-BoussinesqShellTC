@@ -48,21 +48,18 @@ namespace Solver {
       // Transfer timestep output back to equations
       this->transferOutput(scalEq, vectEq);
 
-      // Update the internal step counter
-      this->updateStep();
-
       // Clear the solver RHS
       this->clearSolvers();
    }
 
-   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      buildLinearSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
+      buildLinearSolverMatrixWrapper(spSolver, spEq, comp, idx);
    }
 
-   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      buildLinearSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
+      buildLinearSolverMatrixWrapper(spSolver, spEq, comp, idx);
    }
 
 }

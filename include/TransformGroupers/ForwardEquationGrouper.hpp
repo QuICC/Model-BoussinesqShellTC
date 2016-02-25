@@ -11,7 +11,7 @@
 // Configuration includes
 //
 #include "Framework/FrameworkMacro.h"
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 
 // System includes
 //
@@ -23,7 +23,7 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "TransformGroupers/IForwardGrouper.hpp"
+#include "TransformGroupers/IForwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -61,12 +61,14 @@ namespace Transform {
           */
          virtual ArrayI packs1D(const std::vector<IntegratorTree>& integratorTree);
 
-         /**
-          * @brief Get the number of required buffer packs for the second exchange
-          *
-          * @param integratorTree Transform integrator tree
-          */
-         virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree);
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            /**
+             * @brief Get the number of required buffer packs for the second exchange
+             *
+             * @param integratorTree Transform integrator tree
+             */
+            virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       protected:
          /**
@@ -174,9 +176,11 @@ namespace Transform {
 
    template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
    {
-      int packs = this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp()));
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         int packs = this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp()));
 
-      TConfigurator::setup2DCommunication(packs, coord);
+         TConfigurator::setup2DCommunication(packs, coord);
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
    template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const std::vector<IntegratorTree>& integratorTree)
@@ -184,10 +188,12 @@ namespace Transform {
       return this->namePacks1D(integratorTree);
    }
 
-   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const std::vector<IntegratorTree>& integratorTree)
-   {  
-      return this->namePacks2D(integratorTree);
-   }
+   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const std::vector<IntegratorTree>& integratorTree)
+      {  
+         return this->namePacks2D(integratorTree);
+      }
+   #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
 }
 }

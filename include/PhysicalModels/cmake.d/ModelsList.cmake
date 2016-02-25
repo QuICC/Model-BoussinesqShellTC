@@ -1,4 +1,9 @@
 set(MHDPhysicalModels 
+   # 2D models
+   BoussinesqRBCPlane2DVCModel.hpp
+   BoussinesqRBCSquareVCModel.hpp
+   BoussinesqRBCSquareSModel.hpp
+   # 3D models
    BoussinesqBeta3DQGModel.hpp
    BoussinesqBeta3DQGPerModel.hpp
    BoussinesqFPlane3DQGModel.hpp
@@ -30,10 +35,5 @@ set(MHDPhysicalModels
    )
 
 set(MHDTestModels 
-   TestAFTModel.hpp
-   TestCFTModel.hpp
-   TestTTTModel.hpp
-   TestTFTModel.hpp
-   TestTFFModel.hpp
-   TestFFFModel.hpp
+   TimestepperTFFTest.hpp
    )

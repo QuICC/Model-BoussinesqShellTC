@@ -23,25 +23,25 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "gamma", "chi", "scale1d"]
+        return ["prandtl", "rayleigh", "gamma", "chi", "scale1d", "elevator"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["streamfunction", "velocityz", "temperature", "vorticityz"]
+        return ["streamfunction", "velocityz", "temperature"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields = [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz", "")]
+        fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz","")]:
-            fields = [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz","")]
+        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature","")]:
+            fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
         else:
             fields = [field_row]
 
@@ -56,14 +56,17 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("velocityz",""), ("vorticityz",""), ("dx_meantemperature",""), ("kinetic_energy","")]:
+            if field_row in [("velocityz",""), ("streamfunction",""), ("dx_meantemperature","")]:
                 fields = [field_row]
             else:
                 fields = []
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
-            fields = []
+            if field_row in [("vorticityz","")]:
+                fields = [("streamfunction","")]
+            else:
+                fields = []
 
         return fields
 
@@ -72,20 +75,18 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("temperature","") or field_row == ("velocityz",""):
-                shift_x = 0
-            elif field_row == ("streamfunction",""):
-                shift_x = 0
+            if field_row in [("streamfunction",""),("velocityz","")]:
+                shift_z = 1
             else:
-                shift_x = 0
+                shift_z = 0
 
-            gal_n = (res[0] - shift_x)
+            gal_n = (res[0] - shift_z)
 
         else:
             gal_n = tau_n
-            shift_x = 0
+            shift_z = 0
 
-        block_info = (tau_n, gal_n, (shift_x,0,0), 1)
+        block_info = (tau_n, gal_n, (shift_z,0,0), 1)
         return block_info
 
     def equation_info(self, res, field_row):
@@ -139,9 +140,9 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
                             bc = {0:11}
 
                 else:
-                    if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+                    if field_row == ("streamfunction","") and field_col == field_row:
                         bc = {0:10, 'c':-1j*ky*tanchi/G}
-                    elif field_row == ("vorticityz","") and field_col == ("velocityz",""):
+                    elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                         bc = {0:10}
                     elif field_row == ("velocityz","") and field_col == field_row:
                         bc = {0:11}
@@ -155,8 +156,6 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
                 elif field_row == ("velocityz",""):
                     bc['rt'] = 0
                 elif field_row == ("temperature",""):
-                    bc['rt'] = 0
-                elif field_row == ("vorticity",""):
                     bc['rt'] = 0
 
         # Stencil:
@@ -183,31 +182,45 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the quasi-inverse operator"""
 
+        kx = eigs[0]
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocityz","") and field_col == field_row:
-            mat = geo.i1(res[0], bc)
 
-        elif field_row == ("vorticityz","") and field_col == field_row:
-            mat = geo.i1(res[0], bc)
-
-        elif field_row == ("dx_meantemperature","") and field_col == field_row:
+        if field_row == ("dx_meantemperature","") and field_col == field_row:
             if eigs[1] == 0:
-                mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+                mat = geo.avg(res[0])
             else:
                 mat = geo.zblk(res[0], bc)
 
-        elif field_row == ("kinetic_energy","") and field_col == field_row:
-            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+        # Filter elevator mode
+        elif kx == 0 and eq_params['elevator'] == 0:
+            mat = geo.zblk(res[0], bc)
+
+        else:
+            if field_row == ("streamfunction","") and field_col == field_row:
+                mat = geo.i1(res[0], bc)
+
+            elif field_row == ("velocityz","") and field_col == field_row:
+                mat = geo.i1(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
-        elif field_row == ("zonal_kinetic_energy",""):
-            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+        return mat
 
-        elif field_row == ("nonzonal_kinetic_energy",""):
-            mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+    def nextstep_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit nextstep update"""
+
+        kx = eigs[0]
+        ky = eigs[1]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -225,60 +238,50 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("streamfunction",""):
-            if field_col == ("streamfunction",""):
-                mat = geo.qid(res[0], 0, bc, (kx**2 + ky**2))
+        # Filter elevator mode
+        if kx == 0 and eq_params['elevator'] == 0:
+            if bcs["bcType"] == self.SOLVER_NO_TAU:
+                mat = geo.zblk(res[0], no_bc())
 
-            elif field_col == ("velocityz",""):
-                mat = geo.zblk(res[0], bc)
+            elif field_row == field_col:
+                mat = geo.qid(res[0], 0, no_bc())
 
-            elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], bc)
+            else:
+                mat = geo.zblk(res[0], no_bc())
 
-            elif field_col == ("vorticityz",""):
-                mat = geo.qid(res[0], 0, bc)
+        else:
+            if field_row == ("streamfunction",""):
+                if field_col == ("streamfunction",""):
+                    mat = geo.i1(res[0], bc, (kx**2 + ky**2)**2)
 
-        elif field_row == ("velocityz",""):
-            if field_col == ("streamfunction",""):
-                mat = geo.i1d1(res[0], bc, (-1.0/G**2), cscale = zscale)
+                elif field_col == ("velocityz",""):
+                    mat = geo.i1d1(res[0], bc, cscale = zscale)
 
-            elif field_col == ("velocityz",""):
-                mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
+                elif field_col == ("temperature",""):
+                    mat = geo.i1(res[0], bc, 1j*ky*(Ra/(16.0*Pr)))
 
-            elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], bc)
+            elif field_row == ("velocityz",""):
+                if field_col == ("streamfunction",""):
+                    mat = geo.i1d1(res[0], bc, (-1.0/G**2), cscale = zscale)
 
-            elif field_col == ("vorticityz",""):
-                mat = geo.zblk(res[0], bc)
+                elif field_col == ("velocityz",""):
+                    mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
 
-        elif field_row == ("temperature",""):
-            if field_col == ("streamfunction",""):
-                if self.linearize:
-                    mat = geo.qid(res[0], 0, bc, 1j*ky)
-                else:
+                elif field_col == ("temperature",""):
                     mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("velocityz",""):
-                mat = geo.zblk(res[0], bc)
+            elif field_row == ("temperature",""):
+                if field_col == ("streamfunction",""):
+                    if self.linearize:
+                        mat = geo.sid(res[0], 0, bc, 1j*ky)
+                    else:
+                        mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("temperature",""):
-                mat = geo.qid(res[0], 0, bc, -(1/Pr)*(kx**2 + ky**2))
+                elif field_col == ("velocityz",""):
+                    mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("vorticityz",""):
-                mat = geo.zblk(res[0], bc)
-
-        elif field_row == ("vorticityz",""):
-            if field_col == ("streamfunction",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("velocityz",""):
-                mat = geo.i1d1(res[0], bc, cscale = zscale)
-
-            elif field_col == ("temperature",""):
-                mat = geo.i1(res[0], bc, 1j*ky*(Ra/(16.0*Pr)))
-
-            elif field_col == ("vorticityz",""):
-                mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
+                elif field_col == ("temperature",""):
+                    mat = geo.sid(res[0], 0, bc, -(1/Pr)*(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -288,19 +291,24 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
+        kx = eigs[0]
+        ky = eigs[1]
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("streamfunction",""):
+        # Filter elevator mode
+        if kx == 0 and eq_params['elevator'] == 0:
             mat = geo.zblk(res[0], bc)
 
-        elif field_row == ("velocityz",""):
-            mat = geo.i1(res[0], bc)
+        else:
+            if field_row == ("streamfunction",""):
+                mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
 
-        elif field_row == ("temperature",""):
-            mat = geo.qid(res[0], 0, bc)
+            elif field_row == ("velocityz",""):
+                mat = geo.i1(res[0], bc)
 
-        elif field_row == ("vorticityz",""):
-            mat = geo.i1(res[0], bc)
+            elif field_row == ("temperature",""):
+                mat = geo.sid(res[0], 0, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

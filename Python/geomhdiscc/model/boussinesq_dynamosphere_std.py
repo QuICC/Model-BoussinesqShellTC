@@ -12,7 +12,7 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.sphere_radius_boundary import no_bc
 
 
-class BoussinesqRTCSphereStd(base_model.BaseModel):
+class BoussinesqDynamoSphereStd(base_model.BaseModel):
     """Class to setup the Boussinesq rotating thermal convection dynamo in a sphere (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
@@ -28,7 +28,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocity", "temperature"]
+        return ["velocity", "temperature", "magnetic"]
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
@@ -85,6 +85,22 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        # Get boundary condition
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        mat = geo.stencil(res[0], l, bc, make_square)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
@@ -116,14 +132,18 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
                         bc = {0:-10, 'rt':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-20, 'rt':0}
+                    elif field_col == ("magnetic","tor"):
+                        bc = {0:-10, 'rt':0}
+                    elif field_col == ("magnetic","pol"):
+                        bc = {0:-13, 'rt':0, 'c':{'l':l}}
                     elif field_col == ("temperature",""):
                         bc = {0:-10, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                            bc = {0:10}
+                        bc = {0:10}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                            bc = {0:20}
+                        bc = {0:20}
                     elif field_row == ("magnetic","tor") and field_col == field_row:
                         bc = {0:10}
                     elif field_row == ("magnetic","pol") and field_col == field_row:
@@ -205,12 +225,15 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
+        Pr = eq_params['prandtl']
+        Pm = eq_params['magnetic_prandtl']
         Ra = eq_params['rayleigh']
+        T = eq_params['taylor']**(0.5)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4r4(res[0], l, bc, Ra*l*(l+1.0))
+            mat = geo.i4r4(res[0], l, bc, (Pm**2*Ra*T/Pr)*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             mat = geo.i2r2(res[0], l, bc, -l*(l+1.0))
@@ -242,25 +265,25 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        Pm = eq_params['magnetic_prandtl']
         Pr = eq_params['prandtl']
+        Pm = eq_params['magnetic_prandtl']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0))
+            mat = geo.i2r2lapl(res[0], l, bc, Pm*l*(l+1.0))
 
         elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4r4lapl2(res[0], l, bc, l*(l+1.0))
+            mat = geo.i4r4lapl2(res[0], l, bc, Pm*l*(l+1.0))
 
         elif field_row == ("magnetic","tor") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0)/Pm)
+            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0))
 
         elif field_row == ("magnetic","pol") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0)/Pm)
+            mat = geo.i2r2lapl(res[0], l, bc, l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, bc, 1.0/Pr)
+            mat = geo.i2r2lapl(res[0], l, bc, Pm/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -289,6 +312,21 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
 
         elif field_row == ("temperature",""):
             mat = geo.i2r2(res[0], l, bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], l, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

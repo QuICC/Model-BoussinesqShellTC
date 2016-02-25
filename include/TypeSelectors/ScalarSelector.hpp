@@ -23,6 +23,12 @@
 #include "ScalarFields/ScalarFieldSetup.hpp"
 #include "ScalarFields/FlatScalarField.hpp"
 
+#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #define DIMENSIONS_ID Dimensions::THREED
+#else
+   #define DIMENSIONS_ID Dimensions::TWOD
+#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
 namespace GeoMHDiSCC {
 
    /// Namespace containing the required typedefs for a simulation
@@ -270,14 +276,48 @@ namespace GeoMHDiSCC {
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_WLF
 
-      /// Typedef for the physical space scalar
-      typedef ScalarSelector<Dimensions::Transform::TRA3D>::FwdType PhysicalScalarType;
+      // Configure code to use TT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TT
+         template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::TWOD> FwdType;
+
+            typedef  FlatScalarField<MHDFloat, Dimensions::TWOD> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::TWOD> FwdType;
+
+            typedef  FlatScalarField<MHDFloat, Dimensions::TWOD> BwdType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_TT
+
+      // Configure code to use TF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TF
+         template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
+         {
+            typedef  FlatScalarField<MHDComplex, Dimensions::TWOD> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::TWOD> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::TWOD> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::TWOD> BwdType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_TF
 
       /// Typedef for the spectral space scalar
       typedef ScalarSelector<Dimensions::Transform::TRA1D>::BwdType SpectralScalarType;
 
+      /// Typedef for the physical space scalar
+      typedef ScalarSelector<Dimensions::Transform::TRAND>::FwdType PhysicalScalarType;
+
       /// Typedef for a scalar field setup
-      typedef ScalarFieldSetup<Dimensions::THREED> ScalarFieldSetupType;
+      typedef ScalarFieldSetup<DIMENSIONS_ID> ScalarFieldSetupType;
 
       /// Typedef for a scalar field setup
       typedef SharedPtrMacro<ScalarFieldSetupType> SharedScalarFieldSetupType;

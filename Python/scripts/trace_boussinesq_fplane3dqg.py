@@ -18,6 +18,7 @@ res = [64, 0, 0]
 eq_params = {'prandtl':7, 'rayleigh':8.6957, 'scale1d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 phi = 0
+kp = 1.40
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
 def generic_wave(kp, phi):
@@ -37,6 +38,7 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)

@@ -3,7 +3,8 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRBCBoxVCMomentum.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRBCBoxVCContinuity.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationNoEigenTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltCubicWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian3DNusseltZWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactStateIds.cpp

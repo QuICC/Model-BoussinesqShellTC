@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcCourant(0.65), mFixedStep(-1), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : mcCourant(0.65), mcMaxStep(0.1), mFixedStep(-1), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
    {
    }
 
@@ -94,7 +94,7 @@ namespace Diagnostics {
       // Store configuration file start time
       this->mStartTime = tstep(0);
 
-      // Store configuration file start time
+      // Store configuration file start step
       this->mStartTimestep = tstep(1);
    }
 
@@ -147,16 +147,13 @@ namespace Diagnostics {
          DebuggerMacro_showValue("Raw CFL Vz = ", 2, this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
 
          DebuggerMacro_showValue("Raw CFL cfl = ", 2, this->mCfl);
-         /// Compute CFL condition : \f$\alpha\frac{\Delta x}{|v_{max}|}\f$
-         /// \mhdBug This is not a clean CFL but min(0.1,cfl)
-         //this->mCfl = std::min(this->mcCourant, this->mCfl);
-         this->mCfl = std::min(0.1, this->mCfl);
+         // Check for maximum timestep
+         this->mCfl = std::min(this->mcMaxStep, this->mCfl);
       }
    }
 
    void DiagnosticCoordinator::synchronize()
    {
-
       //
       // Start of MPI block
       //

@@ -130,8 +130,6 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                             bc = {0:11}
                         elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                             bc = {0:10}
-                        elif field_row == ("temperature","") and field_col == field_row:
-                            bc = {0:991}
                     else:
                         bc = no_bc()
 
@@ -183,7 +181,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             if bcs["temperature"] == 1 and not self.use_galerkin:
                 mat = geo.sid(res[0], 2, bc)
             else:
-                mat = geo.sid(res[0], 1, bc)
+                mat = geo.sid(res[0], 0, bc)
 
         elif field_row == ("streamfunction","") and field_col == field_row:
             mat = geo.i1(res[0], bc)
@@ -262,7 +260,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     if bcs["temperature"] == 1 and not self.use_galerkin:
                         mat = geo.sid(res[0],2, bc)
                     else:
-                        mat = geo.sid(res[0],1, bc)
+                        mat = geo.sid(res[0],0, bc)
                 else:
                     mat = geo.zblk(res[0], bc)
 
@@ -270,7 +268,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 if bcs["temperature"] == 1 and not self.use_galerkin:
                     mat = geo.sid(res[0],2, bc, -(1.0/Pr)*(kx**2 + ky**2))
                 else:
-                    mat = geo.sid(res[0],1, bc, -(1.0/Pr)*(kx**2 + ky**2))
+                    mat = geo.sid(res[0],0, bc, -(1.0/Pr)*(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -295,7 +293,19 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             if bcs["temperature"] == 1 and not self.use_galerkin:
                 mat = geo.sid(res[0],2, bc)
             else:
-                mat = geo.sid(res[0],1, bc)
+                mat = geo.sid(res[0],0, bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -54,6 +54,17 @@ class BaseModel:
             io.mmwrite(fname  + ".mtx", mat)
         return mat
 
+    def boundary(self, res, eq_params, eigs, bcs, fields, restriction = None):
+        """Create the boundary operator"""
+
+        mat = utils.build_block_matrix(fields, self.boundary_block, (res,eq_params,eigs,bcs), restriction = restriction)
+        if verbose_write_mtx:
+            fname = "matrix_boundary_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            for e in eigs:
+                fname = fname + "_" + str(e)
+            io.mmwrite(fname  + ".mtx", mat)
+        return mat
+
     def explicit_linear(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit linear operator"""
 
@@ -151,6 +162,11 @@ class BaseModel:
 
     def explicit_fields(self, timing, field_row):
         """Get the list of fields with explicit dependence"""
+
+        raise NotImplementedError("Model should implement this method!")
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for boundary operator"""
 
         raise NotImplementedError("Model should implement this method!")
 

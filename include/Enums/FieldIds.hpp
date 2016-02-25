@@ -71,6 +71,10 @@ namespace GeoMHDiSCC {
          VELOCITYZ,
          /// Vorticity field
          VORTICITY,
+         /// X vorticity field
+         VORTICITYX,
+         /// Y vorticity field
+         VORTICITYY,
          /// Axial vorticity field
          VORTICITYZ,
 
@@ -130,6 +134,8 @@ namespace GeoMHDiSCC {
          GRADIENT,
          /// Curl field
          CURL,
+         /// 2nd order gradient field
+         GRADIENT2,
          /// divergence field
          DIVERGENCE,
       };
@@ -202,6 +208,30 @@ namespace GeoMHDiSCC {
             TWO = THETA,
             /// Third vector component
             THREE = PHI,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+            /// First vector component
+            ONE = X,
+            /// Second vector component
+            TWO = Z,
+            /// Third vector component
+            THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TF
+            /// First vector component
+            ONE = Z,
+            /// Second vector component
+            TWO = X,
+            /// Third vector component
+            THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CF || defined GEOMHDISCC_SPATIALSCHEME_AF
+            /// First vector component
+            ONE = R,
+            /// Second vector component
+            TWO = THETA,
+            /// Third vector component
+            THREE = NOTUSED,
 
             #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
          };
@@ -296,6 +326,29 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = PHI,
 
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+               /// First vector component
+               ONE = X,
+               /// Second vector component
+               TWO = Z,
+               /// Third vector component
+               THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TF
+               /// First vector component
+               ONE = Z,
+               /// Second vector component
+               TWO = X,
+               /// Third vector component
+               THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF 
+               /// First vector component
+               ONE = R,
+               /// Second vector component
+               TWO = THETA,
+               /// Third vector component
+               THREE = NOTUSED,
             #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
          };
       };

@@ -18,10 +18,10 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/BackwardConfigurator.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
+#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/BackwardConfiguratorMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -123,47 +123,73 @@ namespace Transform {
 
    template <typename TVariable> void BackwardSerialConfigurator::firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      // Iterators for the three transforms
-      ProjectorTree::Projector1DEdge_iterator it1D;
-      ProjectorTree::Projector2DEdge_iterator it2D;
-      ProjectorTree::Projector3DEdge_iterator it3D;
+      // Iterators for the transforms
+      ProjectorSpecEdge_iterator itSpec;
+      ProjectorPhysEdge_iterator itPhys;
 
       // Ranges for the vector of edges for the three transforms
-      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
-      ProjectorTree::Projector2DEdge_range range2D;
-      ProjectorTree::Projector3DEdge_range range3D;
+      ProjectorSpecEdge_range rangeSpec = tree.edgeRange();
+      ProjectorPhysEdge_range rangePhys;
 
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
 
-      // Loop over first transform
-      int hold1D = std::distance(range1D.first, range1D.second) - 1;
-      for(it1D = range1D.first; it1D != range1D.second; ++it1D, --hold1D)
-      {
-         // Compute first transform
-         BackwardConfigurator::project1D(*it1D, coord, hold1D);
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         // Iterators for the second transforms
+         ProjectorPartEdge_iterator it2D;
 
-         range2D = it1D->edgeRange();
-         int recover2D = 0;
-         int hold2D = std::distance(range2D.first, range2D.second) - 1;
-         for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+         // Ranges for the vector of edges for the second transforms
+         ProjectorPartEdge_range range2D;
+
+         // Loop over first transform
+         int holdSpec = std::distance(rangeSpec.first, rangeSpec.second) - 1;
+         for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec, --holdSpec)
          {
-            // Compute second transform
-            BackwardConfigurator::project2D(*it2D, coord, recover2D, hold2D);
+            // Compute first transform
+            BackwardConfigurator3D::project1D(*itSpec, coord, holdSpec);
 
-            range3D = it2D->edgeRange();
-            int recover3D = 0;
-            int hold3D = std::distance(range3D.first, range3D.second) - 1;
-            for(it3D = range3D.first; it3D != range3D.second; ++it3D, ++recover3D, --hold3D)
+            range2D = itSpec->edgeRange();
+            int recover2D = 0;
+            int hold2D = std::distance(range2D.first, range2D.second) - 1;
+            for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
             {
-               // Prepare physical output data
-               BackwardConfigurator::preparePhysical(tree, *it3D, rVariable, coord);
+               // Compute second transform
+               BackwardConfigurator3D::project2D(*it2D, coord, recover2D, hold2D);
 
-               // Compute third transform
-               BackwardConfigurator::project3D(*it3D, coord, recover3D, hold3D);
+               rangePhys = it2D->edgeRange();
+               int recoverPhys = 0;
+               int holdPhys = std::distance(rangePhys.first, rangePhys.second) - 1;
+               for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys, ++recoverPhys, --holdPhys)
+               {
+                  // Prepare physical output data
+                  BackwardConfigurator3D::preparePhysical(tree, *itPhys, rVariable, coord);
+
+                  // Compute third transform
+                  BackwardConfigurator3D::projectND(*itPhys, coord, recoverPhys, holdPhys);
+               }
             }
          }
-      }
+      #else
+         // Loop over first transform
+         int holdSpec = std::distance(rangeSpec.first, rangeSpec.second) - 1;
+         for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec, --holdSpec)
+         {
+            // Compute first transform
+            BackwardConfigurator2D::project1D(*itSpec, coord, holdSpec);
+
+            rangePhys = itSpec->edgeRange();
+            int recoverPhys = 0;
+            int holdPhys = std::distance(rangePhys.first, rangePhys.second) - 1;
+            for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys, ++recoverPhys, --holdPhys)
+            {
+               // Prepare physical output data
+               BackwardConfigurator2D::preparePhysical(tree, *itPhys, rVariable, coord);
+
+               // Compute third transform
+               BackwardConfigurator2D::projectND(*itPhys, coord, recoverPhys, holdPhys);
+            }
+         }
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
    template <typename TVariable> void BackwardSerialConfigurator::secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)

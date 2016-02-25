@@ -61,23 +61,21 @@ namespace Solver {
           * @brief Build the real operator, complex field solver matrix
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex operator, complex field solver matrix
           *
           * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
    };
@@ -85,17 +83,16 @@ namespace Solver {
    /**
     * @brief Generic implementation to build solver matrices
     */
-   template <typename TSolver> void buildLinearSolverMatrixWrapper(SharedPtrMacro<TSolver > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+   template <typename TSolver> void buildLinearSolverMatrixWrapper(SharedPtrMacro<TSolver > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
-   template <typename TSolver> void buildLinearSolverMatrixWrapper(SharedPtrMacro<TSolver > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   template <typename TSolver> void buildLinearSolverMatrixWrapper(SharedPtrMacro<TSolver > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Resize operator matrix
-      spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-
-      // Get model operator
       DecoupledZSparse  linOp;
+
+      // Get model's linear operator with tau lines
       spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::SOLVER_HAS_BC);
-      Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), 1.0, linOp); 
+
+      spSolver->buildOperators(idx, linOp, spEq->couplingInfo(comp).systemN(idx));
 
       // Solver is initialized
       spSolver->setInitialized();
@@ -105,7 +102,7 @@ namespace Solver {
    // Dummy solver specialization
    //
    
-   template <> inline void buildLinearSolverMatrixWrapper<SparseDummySolverComplexType>(SharedPtrMacro<SparseDummySolverComplexType > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) {};
+   template <> inline void buildLinearSolverMatrixWrapper<SparseDummySolverComplexType>(SharedPtrMacro<SparseDummySolverComplexType > spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) {};
 }
 }
 

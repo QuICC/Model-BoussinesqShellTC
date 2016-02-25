@@ -18,12 +18,6 @@
 // Project includes
 //
 #include "TransformConfigurators/TransformStepsMacro.h"
-#include "TransformConfigurators/ProjectorBranch.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
-#include "TransformConfigurators/ProjectorTreeTools.hpp"
-#include "TransformConfigurators/IntegratorBranch.hpp"
-#include "TransformConfigurators/IntegratorTree.hpp"
-#include "TransformConfigurators/IntegratorTreeTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -96,12 +90,12 @@ namespace GeoMHDiSCC {
                {
                   rScalarVars.at(infoIt->first)->initPhysical(infoIt->second.mapPhysicalComps());
                   tmpBranches = Transform::TransformSteps::backwardScalar(infoIt->second.mapPhysicalComps());
-                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
                } else
                {
                   rVectorVars.at(infoIt->first)->initPhysical(infoIt->second.mapPhysicalComps());
                   tmpBranches = Transform::TransformSteps::backwardVector(infoIt->second.mapPhysicalComps());
-                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
                }
             }
 
@@ -113,7 +107,7 @@ namespace GeoMHDiSCC {
                {
                   rScalarVars.at(infoIt->first)->initPhysicalGradient(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradientComps(FieldComponents::Spectral::SCALAR));
                   tmpBranches = Transform::TransformSteps::backwardGradient(infoIt->second.mapGradientComps(FieldComponents::Spectral::SCALAR));
-                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
                } else
                {
                   std::vector<FieldComponents::Spectral::Id>::const_iterator it;
@@ -121,8 +115,23 @@ namespace GeoMHDiSCC {
                   {
                      rVectorVars.at(infoIt->first)->initPhysicalGradient(*it, infoIt->second.mapGradientComps(*it));
                      tmpBranches = Transform::TransformSteps::backwardVGradient(*it, infoIt->second.mapGradientComps(*it));
-                     branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
+                     branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
                   }
+               }
+            }
+
+            // Initialise the physical 2nd order gradient values if required
+            if(infoIt->second.needPhysicalGradient2())
+            {
+               // Separate scalar and vector fields
+               if(infoIt->second.isScalar())
+               {
+                  rScalarVars.at(infoIt->first)->initPhysicalGradient2(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradient2Comps(FieldComponents::Spectral::SCALAR));
+                  tmpBranches = Transform::TransformSteps::backwardGradient2(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradient2Comps(FieldComponents::Spectral::SCALAR));
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
+               } else
+               {
+                  throw Exception("2nd order Vector gradient is not implemented!");
                }
             }
 
@@ -204,7 +213,7 @@ namespace GeoMHDiSCC {
             }
 
             // Set scalar variable as additional scalar field
-            if((*scalEqIt)->requirements(scalIt->first).needPhysical() || (*scalEqIt)->requirements(scalIt->first).needPhysicalGradient())
+            if((*scalEqIt)->requirements(scalIt->first).needPhysical() || (*scalEqIt)->requirements(scalIt->first).needPhysicalGradient() || (*scalEqIt)->requirements(scalIt->first).needPhysicalGradient2())
             {
                (*scalEqIt)->setField(scalIt->first, scalarVars.at(scalIt->first));
             }
@@ -215,7 +224,7 @@ namespace GeoMHDiSCC {
          for(vectEqIt = rVectorEqs.begin(); vectEqIt < rVectorEqs.end(); vectEqIt++)
          {
             // Set scalar variable as additional scalar field
-            if((*vectEqIt)->requirements(scalIt->first).needPhysical() || (*vectEqIt)->requirements(scalIt->first).needPhysicalGradient())
+            if((*vectEqIt)->requirements(scalIt->first).needPhysical() || (*vectEqIt)->requirements(scalIt->first).needPhysicalGradient() || (*vectEqIt)->requirements(scalIt->first).needPhysicalGradient2())
             {
                (*vectEqIt)->setField(scalIt->first, scalarVars.at(scalIt->first));
             }
@@ -231,7 +240,7 @@ namespace GeoMHDiSCC {
          for(scalEqIt = rScalarEqs.begin(); scalEqIt < rScalarEqs.end(); scalEqIt++)
          {
             // Set vector variable as additional vector field
-            if((*scalEqIt)->requirements(vectIt->first).needPhysical() || (*scalEqIt)->requirements(vectIt->first).needPhysicalGradient() || (*scalEqIt)->requirements(vectIt->first).needPhysicalCurl())
+            if((*scalEqIt)->requirements(vectIt->first).needPhysical() || (*scalEqIt)->requirements(vectIt->first).needPhysicalGradient() || (*scalEqIt)->requirements(vectIt->first).needPhysicalCurl() || (*scalEqIt)->requirements(vectIt->first).needPhysicalGradient2())
             {
                (*scalEqIt)->setField(vectIt->first, vectorVars.at(vectIt->first));
             }
@@ -263,7 +272,7 @@ namespace GeoMHDiSCC {
             }
 
             // Set vector variable as additional vector field
-            if((*vectEqIt)->requirements(vectIt->first).needPhysical() || (*vectEqIt)->requirements(vectIt->first).needPhysicalGradient() || (*vectEqIt)->requirements(vectIt->first).needPhysicalCurl())
+            if((*vectEqIt)->requirements(vectIt->first).needPhysical() || (*vectEqIt)->requirements(vectIt->first).needPhysicalGradient() || (*vectEqIt)->requirements(vectIt->first).needPhysicalCurl() || (*vectEqIt)->requirements(vectIt->first).needPhysicalGradient2())
             {
                (*vectEqIt)->setField(vectIt->first, vectorVars.at(vectIt->first));
             }

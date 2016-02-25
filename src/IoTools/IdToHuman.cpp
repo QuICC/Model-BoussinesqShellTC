@@ -91,6 +91,12 @@ namespace IoTools {
          case PhysicalNames::VORTICITY:
             return "Vorticity";
 
+         case PhysicalNames::VORTICITYX:
+            return "VorticityX";
+
+         case PhysicalNames::VORTICITYY:
+            return "VorticityY";
+
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
 
@@ -210,6 +216,12 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITY:
             return "vorticity";
+
+         case PhysicalNames::VORTICITYX:
+            return "vorticityx";
+
+         case PhysicalNames::VORTICITYY:
+            return "vorticityy";
 
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";
@@ -507,6 +519,11 @@ namespace IoTools {
          case NonDimensional::OMEGA:
             return "omega";
 
+         // 
+         // Special flags
+         case NonDimensional::ELEVATOR:
+            return "elevator";
+
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
       }
@@ -521,6 +538,9 @@ namespace IoTools {
 
          case ModelOperator::IMPLICIT_LINEAR:
             return "implicit_linear";
+
+         case ModelOperator::BOUNDARY:
+            return "boundary";
 
          case ModelOperator::EXPLICIT_LINEAR:
             return "explicit_linear";

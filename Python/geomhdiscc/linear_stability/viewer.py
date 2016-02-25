@@ -34,7 +34,7 @@ def viewOperators(A, B = None, show = True, save = False):
         pl.show()
         pl.clf()
 
-def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3):
+def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3, subplot = False):
     """Plot spectra of eigenvectors"""
 
     if show or save:
@@ -43,23 +43,37 @@ def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3):
         rows = np.ceil(len(fields)/max_cols)
         cols = min(max_cols, len(fields))
         for i,df in enumerate(fields.items()):
-            pl.subplot(rows,cols,i+1)
-            pl.semilogy(np.abs(df[1]))
+            if subplot:
+                pl.subplot(rows,cols,i+1)
+            pl.semilogy(np.abs(df[1]), 'k')
+            #pl.semilogy(np.abs(df[1].real), ':')
+            #pl.semilogy(np.abs(df[1].imag), ':')
             title = df[0][0]
             if df[0][1] != "":
                 title = title + ', ' + df[0][1]
             pl.title(title)
-        pl.tight_layout()
+            if save and not subplot:
+                pl.tight_layout()
+                fname = "spectra_" + title.replace(', ', '_')
+                if fid is not None:
+                    fname = fname + "_" + fid
+                fname = fname + ".pdf"
+                pl.savefig(fname, bbox_inches='tight', dpi=200)
+            if show:
+                pl.show()
+            pl.clf()
+        if subplot:
+            pl.tight_layout()
 
-        if save:
-            fname = "spectra"
-            if fid is not None:
-                fname = fname + "_" + fid
-            fname = fname + ".pdf"
-            pl.savefig(fname, bbox_inches='tight', dpi=200)
+            if save:
+                fname = "spectra"
+                if fid is not None:
+                    fname = fname + "_" + fid
+                fname = fname + ".pdf"
+                pl.savefig(fname, bbox_inches='tight', dpi=200)
 
-        if show:
-            pl.show()
+            if show:
+                pl.show()
         pl.clf()
 
 def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = False, fid = None, max_cols = 3):
@@ -148,7 +162,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
     sol_slice = dict()
     if geometry == 'c2d':
         res_1d = (res[0], )
-        res_2d = (res[2], )
+        res_2d = (res[-1], )
 
     elif geometry == 'shell':
         import geomhdiscc.geometry.spherical.shell_radius as geo
@@ -164,7 +178,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         import geomhdiscc.geometry.cylindrical.annulus_radius as geo
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
         res_1d = (res[0], a, b)
-        res_2d = (res[2],)
+        res_2d = (res[-1],)
 
     viz_res = res_1d + res_2d
 
@@ -305,7 +319,7 @@ def viewProfile(fields, grid, fid = None, show = True, save = False, max_cols = 
         pl.show()
     pl.clf()
 
-def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3):
+def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3, subplot = False):
     """View a slice"""
 
     import matplotlib as mpl
@@ -318,7 +332,8 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3)
     mycm = cm.bwr
     for i,df in enumerate(fields.items()):
         vmax = np.max(np.abs(df[1].real))
-        pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
+        if subplot:
+            pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
         CS = pl.contourf(grid[0], grid[1], df[1].real, 30, cmap = mycm, vmax = vmax, vmin = -vmax)
         title = df[0][0]
         if df[0][1] != "":
@@ -327,15 +342,26 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3)
         divider = make_axes_locatable(pl.gca())
         cax = divider.append_axes("right", "5%", pad="3%")
         pl.colorbar(CS, cax=cax)
-    pl.tight_layout()
-    if save:
-        fname = "slice"
-        if fid is not None:
-            fname = fname + "_" + fid
-        fname = fname + ".pdf"
-        pl.savefig(fname, bbox_inches='tight', dpi=200)
-    if show:
-        pl.show()
+        if not subplot:
+            pl.tight_layout()
+            fname = "slice_" + title.replace(', ', '_')
+            if fid is not None:
+                fname = fname + "_" + fid
+            fname = fname + ".pdf"
+            pl.savefig(fname, bbox_inches='tight', dpi=200)
+            if show:
+                pl.show()
+            pl.clf()
+    if subplot:
+        pl.tight_layout()
+        if save:
+            fname = "slice"
+            if fid is not None:
+                fname = fname + "_" + fid
+            fname = fname + ".pdf"
+            pl.savefig(fname, bbox_inches='tight', dpi=200)
+        if show:
+            pl.show()
     pl.clf()
 
 def viewPeriodic(fields, grid, grid_per, fid = None, show = True, save = False, max_cols = 3):
@@ -352,7 +378,13 @@ def addContinuityC1D(fields, res, eigs, eq_params):
 
     import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
     from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
-    mat = c1d.i2lapl(res[0], eigs[0], eigs[1], no_bc(), cscale = eq_params['scale1d'])
+    if len(res) == 3:
+        k1 = eigs[0]
+        k2 = eigs[1]
+    else:
+        k1 = eigs[0]
+        k2 = 0 
+    mat = c1d.i2lapl(res[0], k1, k2, no_bc(), cscale = eq_params['scale1d'])
     f = fields[("pressure","")]
     fields[("pressure","elliptic")] = mat*f
     if ("temperature","") in fields:
@@ -363,10 +395,10 @@ def addContinuityC1D(fields, res, eigs, eq_params):
     mat = c1d.i1d1(res[0], no_bc(), cscale = eq_params['scale1d'])
     cont = mat*fields[("velocity","z")]
     if ("velocity","x") in fields: 
-        mat = c1d.i1(res[0], no_bc(), 1j*eigs[0])
+        mat = c1d.i1(res[0], no_bc(), 1j*k1)
         cont = cont + mat*fields[("velocity","x")]
     if ("velocity","y") in fields: 
-        mat = c1d.i1(res[0], no_bc(), 1j*eigs[1])
+        mat = c1d.i1(res[0], no_bc(), 1j*k2)
         cont = cont + mat*fields[("velocity","y")]
     fields[("continuity","")] = cont
 
@@ -375,20 +407,26 @@ def addContinuityC2D(fields, res, eigs, eq_params):
 
     import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
     from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
-    mat = c2d.i2j2lapl(res[0], res[2], eigs[0], no_bc(), xscale = eq_params['scale1d'], zscale = eq_params['scale3d'])
+    xscale = eq_params['scale1d']
+    if len(res) == 3:
+        zscale = eq_params['scale3d']
+    else:
+        zscale = eq_params['scale2d']
+
+    mat = c2d.i2j2lapl(res[0], res[-1], eigs[0], no_bc(), xscale = xscale, zscale = zscale)
     f = fields[("pressure","")]
     fields[("pressure","elliptic")] = mat*f
     if ("temperature","") in fields:
-        mat = c2d.i2j2e1(res[0], res[2], no_bc(), -eq_params['rayleigh'], zscale = eq_params['scale3d'])
+        mat = c2d.i2j2e1(res[0], res[-1], no_bc(), -eq_params['rayleigh'], zscale = zscale)
         f = fields[("temperature","")]
         fields[("pressure","elliptic")] = fields[("pressure","elliptic")] + mat*f
 
-    mat = c2d.i1j1d1(res[0], res[2], no_bc(), xscale = eq_params['scale1d'])
+    mat = c2d.i1j1d1(res[0], res[-1], no_bc(), xscale = xscale)
     cont = mat*fields[("velocity","x")]
-    mat = c2d.i1j1e1(res[0], res[2], no_bc(), zscale = eq_params['scale3d'])
+    mat = c2d.i1j1e1(res[0], res[-1], no_bc(), zscale = zscale)
     cont = cont +  mat*fields[("velocity","z")]
     if ("velocity","y") in fields: 
-        mat = c2d.i1j1(res[0], res[2], no_bc(), 1j*eigs[0])
+        mat = c2d.i1j1(res[0], res[-1], no_bc(), 1j*eigs[0])
         cont = cont + mat*fields[("velocity","y")]
     fields[("continuity","")] = cont
 

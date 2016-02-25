@@ -219,7 +219,7 @@ namespace Equations {
 
       } else if(typeId == ShellExactStateIds::BENCHVELC1)
       {
-         rNLComp.rData().setConstant(1e-12);
+         rNLComp.rData().setConstant(1e-16);
 
       } else if(typeId == ShellExactStateIds::BENCHMAGC1)
       {
