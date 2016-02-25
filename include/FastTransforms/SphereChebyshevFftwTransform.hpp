@@ -210,6 +210,30 @@ namespace Transform {
           */
          void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
+         /**
+          * @brief Compute forward FFT (R2R) for energy calculation on full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space for energy (f^2 and thus always even)
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_energy(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (C2C) for energy calculation  on full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space for energy (f^2 and thus always even)
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_energy(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements

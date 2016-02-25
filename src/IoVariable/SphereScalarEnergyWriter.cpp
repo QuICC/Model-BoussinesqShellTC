@@ -86,29 +86,7 @@ namespace IoVariable {
       Py_DECREF(pValue);
 
       this->mSphIntgOpEven = tmpAvg*tmpR2.leftCols(cols-2);
-
-      // Set odd basis
-      pValue = PyLong_FromLong(1);
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // Call r^2
-      PythonWrapper::setFunction("r2");
-      pValue = PythonWrapper::callFunction(pArgs);
-      // Fill matrix and cleanup
-      tmpR2.resize(0,0);
-      PythonWrapper::fillMatrix(tmpR2, pValue);
-      Py_DECREF(pValue);
-
-      pTmp = PyTuple_GetSlice(pArgs, 0, 2);
-      // Call avg
-      PythonWrapper::setFunction("integral");
-      pValue = PythonWrapper::callFunction(pTmp);
-      // Fill matrix and cleanup
-      tmpAvg.resize(0,0);
-      PythonWrapper::fillMatrix(tmpAvg, pValue);
-      Py_DECREF(pValue);
       PythonWrapper::finalize();
-
-      this->mSphIntgOpOdd = tmpAvg*tmpR2.leftCols(cols-2);
 
       IVariableAsciiEWriter::init();
    }
@@ -134,12 +112,11 @@ namespace IoVariable {
       rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+      coord.transform1D().integrate_energy(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mEnergy = 0.0;
 
-      SparseMatrix *op;
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
          double factor = 1.0;
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -154,34 +131,20 @@ namespace IoVariable {
 
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) % 2 == 0)
-               {
-                  op = &this->mSphIntgOpEven;
-               } else
-               {
-                  op = &this->mSphIntgOpOdd;
-               }
-               this->mEnergy += factor*((*op)*rInVar.slice(k).col(j).real()).sum();
+               this->mEnergy += factor*(this->mSphIntgOpEven*rInVar.slice(k).col(j).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
       #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) % 2 == 0)
-            {
-               op = &this->mSphIntgOpEven;
-            } else
-            {
-               op = &this->mSphIntgOpOdd;
-            }
             int start = 0;
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               this->mEnergy += ((*op)*rInVar.slice(k).col(0).real())(0);
+               this->mEnergy += (this->mSphIntgOpEven*rInVar.slice(k).col(0).real())(0);
                start = 1;
             }
-            this->mEnergy += 2.0*((*op)*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
+            this->mEnergy += 2.0*(this->mSphIntgOpEven*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
          }
       #endif //GEOMHDISCC_SPATIALSCHEME_BLFL
 

@@ -164,6 +164,52 @@ namespace TransformSteps {
       return transform;
    }
 
+   std::vector<ProjectorBranch3D>  backwardGradient2(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req)
+   {
+      std::vector<ProjectorBranch3D> transform;
+      std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>  pairId;
+
+      throw Exception("Second derivative is not implementated yet!");
+
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::ONE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::TWO,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::TWO,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::THREE,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::SCALAR, ProjSpecType::PROJ, ProjPartType::PROJ, ProjPhysType::PROJ, pairId, FieldType::GRADIENT2));
+      }
+
+      return transform;
+   }
+
    #if defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL
 
    std::vector<ProjectorBranch3D>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)

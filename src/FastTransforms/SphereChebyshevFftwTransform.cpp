@@ -843,6 +843,61 @@ namespace Transform {
       }
    }
 
+   void SphereChebyshevFftwTransform::integrate_energy(Matrix& rChebVal, const Matrix& physVal, SphereChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Do even/odd transforms
+      for(int parity = 0; parity < 2; ++parity)
+      {
+         ParityTransformTools::extractParityModes(this->mTmpIn, physVal, this->parityBlocks(parity), physVal.rows());
+         fftw_execute_r2r(this->fPlan(0,0), this->mTmpIn.data(), this->mTmpOut.data());
+         ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, this->parityBlocks(parity), physVal.rows());
+         // Rescale to remove FFT scaling
+         ParityTransformTools::scaleParityModes(rChebVal, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
+      }
+   }
+
+   void SphereChebyshevFftwTransform::integrate_energy(MatrixZ& rChebVal, const MatrixZ& physVal, SphereChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      for(int component = 0; component < 2; ++component)
+      {
+         // Energy transform is only even
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            ParityTransformTools::extractParityModes(this->mTmpIn, physVal, component, this->parityBlocks(parity), physVal.rows());
+            fftw_execute_r2r(this->fPlan(0,0), this->mTmpIn.data(), this->mTmpOut.data());
+            ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, component, this->parityBlocks(parity), physVal.rows());
+            // Rescale to remove FFT scaling
+            ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
+         }
+      }
+   }
+
 #ifdef GEOMHDISCC_STORAGEPROFILE
    MHDFloat SphereChebyshevFftwTransform::requiredStorage() const
    {
