@@ -13,6 +13,7 @@
 
 // Class include
 //
+#include "Exceptions/Exception.hpp"
 #include "Variables/FieldRequirement.hpp"
 
 // Project includes
@@ -23,6 +24,12 @@ namespace GeoMHDiSCC {
    FieldRequirement::FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl, const bool needGradient2)
       : mIsScalar(isScalar), mNeedSpectral(needSpectral), mNeedPhysical(needPhysical), mNeedGradient(needGradient), mNeedCurl(needCurl), mNeedGradient2(needGradient2), mPhysicalComps(3), mGradientComps(), mCurlComps(3), mGradient2Comps()
    {
+      // Stop if curl is requested for scalar
+      if(isScalar && needCurl)
+      {
+         throw Exception("Tried to setup curl calculation for a scalar!");
+      }
+
       // Init default physical and spectral IDs
       this->initDefaultIds();
 

@@ -198,7 +198,6 @@ class TimestepperTFF(base_model.BaseModel):
         if field_row == ("temperature",""):
             if field_col == ("temperature",""):
                 mat = geo.i2lapl(res[0], kx, ky, bc, eps, cscale = zscale)
-                #mat = geo.lapl(res[0], kx, ky, bc, eps, cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -215,7 +214,6 @@ class TimestepperTFF(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("temperature",""):
             mat = geo.i2(res[0], bc)
-            #mat = geo.sid(res[0], 2, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -228,7 +226,6 @@ class TimestepperTFF(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         mat = geo.zblk(res[0], bc)
-        #mat = geo.zblk(res[0], bc, location = 'b')
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

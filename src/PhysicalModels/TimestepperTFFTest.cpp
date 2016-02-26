@@ -41,14 +41,14 @@ namespace GeoMHDiSCC {
 
    void TimestepperTFFTest::addEquations(SharedSimulation spSim)
    {
-      // Add mean heat computation
+      // Add timestepper test equation
       spSim->addScalarEquation<Equations::TimestepperTFFScalar>();
    }
 
    void TimestepperTFFTest::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;
@@ -69,7 +69,7 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-7, 1e-7, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -85,7 +85,7 @@ namespace GeoMHDiSCC {
 
       // Add transport field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add output file

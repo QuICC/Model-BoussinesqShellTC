@@ -1,6 +1,6 @@
 /**
  * @file TimestepperTFFScalar.hpp
- * @brief Implementation of the test equation for the timestepper test in TFF scheme
+ * @brief Implementation of the equation for the timestepper test in TFF scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
