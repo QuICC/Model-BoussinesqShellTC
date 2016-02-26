@@ -59,15 +59,13 @@ namespace Equations {
       Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
       Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
 
-      MHDFloat k_;
+      MHDFloat z;
       MHDFloat j_;
       MHDFloat i_;
-      MHDFloat z;
       nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
       for(int iK = 0; iK < nK; ++iK)
       {
-         k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
-         z = (k_ + 1.0)/2.0;
+         z = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
          nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
          for(int iJ = 0; iJ < nJ; ++iJ)
          {
@@ -76,13 +74,12 @@ namespace Equations {
             {
                i_ = gI(iI);
 
-               MHDFloat val = 2.0*(z - 1.0)*z*(147.0 + z*(-714.0 + z*(589.0 + 10.0*z*(16.0 + z))))*eps/std::pow(7 + z,3);
-
+               MHDFloat val = -(std::pow(z + 7.0, 2)*(std::pow(z,2) - 1.0) + 96.0*eps)/std::pow(z + 7.0,3);
+               val -= this->unknown().dom(0).phys().point(iI,iJ,iK);
                rNLComp.setPoint(val, iI, iJ, iK);
             }
          }
       }
-
    }
 
    void TimestepperTFFScalar::setRequirements()
