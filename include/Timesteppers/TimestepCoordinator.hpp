@@ -183,6 +183,11 @@ namespace Timestep {
          MHDFloat mTime;
 
          /**
+          * @brief Current reference time
+          */
+         MHDFloat mRefTime;
+
+         /**
           * @brief Constant timestep steps
           */
          MHDFloat mCnstSteps;

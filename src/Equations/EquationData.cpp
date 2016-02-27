@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    EquationData::EquationData(SharedEquationParameters spEqParams)
-      : mspEqParams(spEqParams)
+      : mspEqParams(spEqParams), mTime(-1.0)
    {
    }
 
@@ -324,6 +324,16 @@ namespace Equations {
    SolveTiming::Id  EquationData::solveTiming() const
    {
       return this->mSolveTiming;
+   }
+
+   MHDFloat  EquationData::time() const
+   {
+      return this->mTime;
+   }
+
+   void  EquationData::setTime(const MHDFloat time)
+   {
+      this->mTime = time;
    }
 
    const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& EquationData::nlComponents() const

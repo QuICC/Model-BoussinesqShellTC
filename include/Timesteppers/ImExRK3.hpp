@@ -83,6 +83,11 @@ namespace Timestep {
          static int nonlinearMemory(const int step);
 
          /**
+          * @brief Butcher's tableau c_i factor for explicit scheme
+          */
+         static MHDFloat cEx(const int i);
+
+         /**
           * @brief Number of substeps for final step
           */
          static const int STEPS;
@@ -132,6 +137,11 @@ namespace Timestep {
           * @brief Storage for the zeta parameters
           */
          static const Eigen::Array<MHDFloat,3,1> mZeta;
+
+         /**
+          * @brief Storage for the explicit c factors
+          */
+         static const Eigen::Array<MHDFloat,3,1> mCEx;
 
       private:
          /**

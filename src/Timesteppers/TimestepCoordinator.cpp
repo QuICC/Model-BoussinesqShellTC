@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
       // Initialize timestepper
       TimeSchemeSelector::init();
@@ -64,7 +64,8 @@ namespace Timestep {
 
    void TimestepCoordinator::update()
    {
-      this->mTime += this->mDt;
+      this->mTime = this->mRefTime + this->mDt;
+      this->mRefTime = this->mTime;
    }
 
    void TimestepCoordinator::adaptTimestep(const MHDFloat cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
@@ -183,12 +184,16 @@ namespace Timestep {
 
       // Clear the solver RHS
       this->clearSolvers();
+
+      // Update current time
+      this->mTime = this->mRefTime + this->stepFraction()*this->mDt;
    }
 
    void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Set initial time
       this->mTime = time;
+      this->mRefTime = this->mTime;
 
       // Set initial timestep
       this->mOldDt = dt;

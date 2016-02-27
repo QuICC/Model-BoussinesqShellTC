@@ -51,6 +51,11 @@ namespace Timestep {
          static MHDFloat bEx(const int i);
 
          /**
+          * @brief Butcher's tableau c_i factor for explicit scheme
+          */
+         static MHDFloat cEx(const int i);
+
+         /**
           * @brief Butcher's tableau b_i factor for implicit embedded lower order scheme
           */
          static MHDFloat bImErr(const int i);
@@ -105,6 +110,11 @@ namespace Timestep {
           * @brief Storage for the explicit b factors
           */
          static Eigen::Array<MHDFloat,3,1> mBEx;
+
+         /**
+          * @brief Storage for the explicit c factors
+          */
+         static Eigen::Array<MHDFloat,3,1> mCEx;
 
          /**
           * @brief Storage for the implicit embedded scheme b factors

@@ -23,7 +23,7 @@ class TimestepperTFF(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["epsilon", "scale1d"]
+        return ["delta", "epsilon", "scale1d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""

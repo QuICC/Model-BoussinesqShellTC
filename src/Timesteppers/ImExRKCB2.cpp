@@ -45,6 +45,9 @@ namespace Timestep {
    // Set the explicit b factors
    Eigen::Array<MHDFloat,3,1> ImExRKCB2::mBEx = Eigen::Array<MHDFloat,3,1>::Zero();
 
+   // Set the explicit c factors
+   Eigen::Array<MHDFloat,3,1> ImExRKCB2::mCEx = Eigen::Array<MHDFloat,3,1>::Zero();
+
    // Set the implicit embedded b factors
    Eigen::Array<MHDFloat,3,1> ImExRKCB2::mBImErr = Eigen::Array<MHDFloat,3,1>::Zero();
 
@@ -69,6 +72,11 @@ namespace Timestep {
    MHDFloat ImExRKCB2::bEx(const int i)
    {
       return ImExRKCB2::mBEx(i);
+   }
+
+   MHDFloat ImExRKCB2::cEx(const int i)
+   {
+      return ImExRKCB2::mCEx(i);
    }
 
    MHDFloat ImExRKCB2::bImErr(const int i)
@@ -99,6 +107,10 @@ namespace Timestep {
       // Initialize explicit b factors
       ImExRKCB2::mBEx(1) = 5./6.;
       ImExRKCB2::mBEx(2) = 1./6.;
+
+      // Initialize explicit c factors
+      ImExRKCB2::mCEx(1) = 2./5.;
+      ImExRKCB2::mCEx(2) = 1.;
       
       // Initialize implicit embedded b factors
       ImExRKCB2::mBImErr(1) = 4./5.;

@@ -24,6 +24,7 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -49,7 +50,8 @@ namespace Equations {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
 
-      MHDFloat eps = this->eqParams().nd(NonDimensional::EPSILON);
+      MHDFloat delta = this->eqParams().nd(NonDimensional::DELTA);
+      MHDFloat epsilon = this->eqParams().nd(NonDimensional::EPSILON);
 
       int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
       int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
@@ -58,6 +60,8 @@ namespace Equations {
       Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
       Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
       Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+
+      std::cerr << "EQUATION TIME: " << this->time() << std::endl;
 
       MHDFloat z;
       MHDFloat j_;
@@ -74,8 +78,8 @@ namespace Equations {
             {
                i_ = gI(iI);
 
-               MHDFloat val = -(std::pow(z + 7.0, 2)*(std::pow(z,2) - 1.0) + 96.0*eps)/std::pow(z + 7.0,3);
-               val -= this->unknown().dom(0).phys().point(iI,iJ,iK);
+               MHDFloat val = (1./8.)*(std::cos(Math::PI*z/2.0)*(8.0*std::cos(2.0*Math::PI*this->time()) + Math::PI*epsilon*(-1.0 + 2.0*Math::PI + std::sin(2.0*Math::PI*this->time()))) - 2.0*delta*(-1.0 + 2.0*Math::PI + std::sin(2.0*Math::PI*this->time()))*std::sin(Math::PI*z/2.0)) ;
+               val -= delta*this->unknown().dom(0).grad().comp(FieldComponents::Physical::Z).point(iI,iJ,iK);
                rNLComp.setPoint(val, iI, iJ, iK);
             }
          }
@@ -91,7 +95,7 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?, need curl?, need grad2?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, true, false, false));
    }
 
 }

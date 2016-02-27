@@ -182,6 +182,11 @@ namespace Timestep {
           */
          bool finished();
 
+         /**
+          * @brief Get current timestep fraction
+          */
+         MHDFloat stepFraction() const;
+
       protected:
          /**
           * @brief Explicit calculation took place?
@@ -250,6 +255,11 @@ namespace Timestep {
       return (this->mStep == 0);
    }
 
+   template <typename TOperator,typename TData> MHDFloat SparseImExRK2RTimestepper<TOperator,TData>::stepFraction() const
+   {
+      return TimeSchemeSelector::cEx(this->mStep);
+   }
+
    template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::preSolve()
    {
       if(this->mHasExplicit)
@@ -270,8 +280,8 @@ namespace Timestep {
          {
             internal::computeAXPBYPZ(this->mIntSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
 
-            std::cerr << (this->mIntSolution.at(i).real().array().colwise().sum() - this->mIntSolution.at(i).real().topRows(1).array()).transpose() << " , ";
-            std::cerr << (this->mIntSolution.at(i).imag().array().colwise().sum() - this->mIntSolution.at(i).imag().topRows(1).array()).transpose() << std::endl;
+//            std::cerr << (this->mIntSolution.at(i).real().array().colwise().sum() - this->mIntSolution.at(i).real().topRows(1).array()).transpose() << " , ";
+//            std::cerr << (this->mIntSolution.at(i).imag().array().colwise().sum() - this->mIntSolution.at(i).imag().topRows(1).array()).transpose() << std::endl;
          }
 
          // Embedded lower order scheme solution
@@ -389,7 +399,7 @@ namespace Timestep {
       } else
       {
          // Prepare solution for new nonlinear term
-         MHDFloat aIm = TimeSchemeSelector::aIm(this->mStep, this->mStep);
+         MHDFloat aIm = TimeSchemeSelector::aIm(this->mStep, this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeXPAY(this->mSolution.at(i), this->mExSolution.at(i), aIm);
@@ -410,50 +420,54 @@ namespace Timestep {
 
       for(int step = 0; step < TimeSchemeSelector::STEPS; ++step)
       {
-         // Loop over matrices within same step
-         for(int i = 0; i < this->nSystem(); ++i)
+         // Update is only required if aIm is not zero
+         if(TimeSchemeSelector::aIm(step,step) != 0.0)
          {
-            // Get the number of nonzero elements in time dependence
-            size_t nnz = this->mRHSMatrix.at(i).nonZeros();
-
-            // Update LHS and RHS matrices
-            size_t lhsJ = 0;
-            for (size_t k=0; k< static_cast<size_t>(this->mRHSMatrix.at(i).outerSize()); ++k)
+            // Loop over matrices within same step
+            for(int i = 0; i < this->nSystem(); ++i)
             {
-               typename TOperator::InnerIterator lhsIt(this->rLHSMatrix(TimeSchemeSelector::aIm(step,step), i),lhsJ);
-               for(typename TOperator::InnerIterator timeIt(this->mRHSMatrix.at(i),k); timeIt; ++timeIt)
-               {
-                  // Only keep going if nonzero elements are left
-                  if(nnz > 0)
-                  {
-                     // Update LHS matrix
-                     if(timeIt.col() == lhsIt.col())
-                     {
-                        if(timeIt.row() == lhsIt.row())
-                        {
-                           // Update values
-                           lhsIt.valueRef() += TimeSchemeSelector::aIm(step,step)*(oldDt - this->mDt)*timeIt.value();
+               // Get the number of nonzero elements in time dependence
+               size_t nnz = this->mRHSMatrix.at(i).nonZeros();
 
-                           // Update LHS iterators and counters
-                           ++lhsIt;
-                           if(!lhsIt)
+               // Update LHS and RHS matrices
+               size_t lhsJ = 0;
+               for (size_t k=0; k< static_cast<size_t>(this->mRHSMatrix.at(i).outerSize()); ++k)
+               {
+                  typename TOperator::InnerIterator lhsIt(this->rLHSMatrix(TimeSchemeSelector::aIm(step,step), i),lhsJ);
+                  for(typename TOperator::InnerIterator timeIt(this->mRHSMatrix.at(i),k); timeIt; ++timeIt)
+                  {
+                     // Only keep going if nonzero elements are left
+                     if(nnz > 0)
+                     {
+                        // Update LHS matrix
+                        if(timeIt.col() == lhsIt.col())
+                        {
+                           if(timeIt.row() == lhsIt.row())
                            {
-                              lhsJ++;
+                              // Update values
+                              lhsIt.valueRef() += TimeSchemeSelector::aIm(step,step)*(oldDt - this->mDt)*timeIt.value();
+
+                              // Update LHS iterators and counters
+                              ++lhsIt;
+                              if(!lhsIt)
+                              {
+                                 lhsJ++;
+                              }
                            }
                         }
-                     }
 
-                     // Update nonzero counter
-                     nnz--;
-                  } else
-                  {
-                     break;
+                        // Update nonzero counter
+                        nnz--;
+                     } else
+                     {
+                        break;
+                     }
                   }
                }
-            }
 
-            // Safety assert to make sure all values have been updated
-            assert(nnz == 0);
+               // Safety assert to make sure all values have been updated
+               assert(nnz == 0);
+            }
          }
       }
    }
