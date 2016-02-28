@@ -155,7 +155,7 @@ namespace IoVariable {
             MPI_Abort(MPI_COMM_WORLD, 99);
          #endif //GEOMHDISCC_MPI
 
-         throw Exception("Kinetic energy is NaN!");
+         throw Exception("Scalar energy is NaN!");
       }
    }
 

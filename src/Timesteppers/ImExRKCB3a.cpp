@@ -115,7 +115,7 @@ namespace Timestep {
 
       // Initialize explicit c factors
       ImExRKCB3a::mCEx(1) = c2;
-      ImExRKCB3a::mCEx(2) = c3;
+      ImExRKCB3a::mCEx(2) = c3; 
    }
 
 }
