@@ -111,8 +111,8 @@ namespace Timestep {
       ImExRKCB3b::mAEx(3,2) = c4;
 
       // Initialize explicit b factors
-      ImExRKCB3b::mBEx(1) = 1./2.;
       ImExRKCB3b::mBEx(2) = 1./2.;
+      ImExRKCB3b::mBEx(3) = 1./2.;
 
       // Initialize explicit c factors
       ImExRKCB3b::mCEx(1) = g;
