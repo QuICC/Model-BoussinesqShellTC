@@ -73,6 +73,36 @@ namespace Timestep {
       void computeAXPBYPZ(DecoupledZMatrix& z, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecoupledZMatrix& y);
 
       /**
+       * @brief Compute z = a*M*x + y + b*z
+       */
+      template <typename TData> void computeAMXPYPBZ(TData& z, const SparseMatrix& mat, const MHDFloat a, const TData& x, const TData& y, const MHDFloat b);
+
+      /**
+       * @brief Compute z = a*M*x + y + b*z
+       */
+      void computeAMXPYPBZ(DecoupledZMatrix& z, const SparseMatrix& mat, const MHDFloat a, const DecoupledZMatrix& x, const DecoupledZMatrix& y, const MHDFloat b);
+
+      /**
+       * @brief Compute z = a*M*x + b*y + z
+       */
+      template <typename TData> void computeAMXPBYPZ(TData& z, const SparseMatrix& mat, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y);
+
+      /**
+       * @brief Compute z = a*M*x + b*y + z
+       */
+      void computeAMXPBYPZ(DecoupledZMatrix& z, const SparseMatrix& mat, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecoupledZMatrix& y);
+
+      /**
+       * @brief Compute z = a*M*x + b*y + M*z
+       */
+      template <typename TData> void computeAMXPBYPMZ(TData& z, const SparseMatrix& mat, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y);
+
+      /**
+       * @brief Compute z = a*M*x + b*y + M*z
+       */
+      void computeAMXPBYPMZ(DecoupledZMatrix& z, const SparseMatrix& mat, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecoupledZMatrix& y);
+
+      /**
        * @brief Compute y = x + a*z
        */
       template <typename TData> void computeXPAY(TData& y, const TData& x, const MHDFloat a);
@@ -83,14 +113,14 @@ namespace Timestep {
       void computeXPAY(DecoupledZMatrix& y, const DecoupledZMatrix& x, const MHDFloat a);
 
       /**
-       * @brief Compute z = x + a*y + b*z
+       * @brief Compute z = M*y
        */
-      template <typename TData> void computeXPAYPBZ(TData& z, const TData& x, const MHDFloat a, const TData& y, const MHDFloat b);
+      template <typename TOperator,typename TData> void computeMY(TData& z, const TOperator& mat, const TData& y);
 
       /**
-       * @brief Compute z = x + a*y + b*z
+       * @brief Compute z = M*y
        */
-      void computeXPAYPBZ(DecoupledZMatrix& z, const DecoupledZMatrix& x, const MHDFloat a, const DecoupledZMatrix& y, const MHDFloat b);
+      void computeMY(DecoupledZMatrix& z, const SparseMatrix& mat, const DecoupledZMatrix& y);
 
       /**
        * @brief Compute error
@@ -110,6 +140,20 @@ namespace Timestep {
    template <typename TOperator,typename TData> class SparseImExRK2RTimestepper: public Solver::SparseLinearSolver<TOperator,TData>
    {
       public:
+         /**
+          * @brief Enum for registers
+          */
+         enum RegisterId {
+            // 
+            IMPLICIT_REGISTER = 0,
+            // 
+            EXPLICIT_REGISTER,
+            // 
+            INTERMEDIATE_REGISTER,
+            // 
+            ERROR_REGISTER,
+         };
+
          /**
           * @brief Constructor
           *
@@ -209,9 +253,19 @@ namespace Timestep {
          MHDFloat mError;
 
          /**
+          * @brief ID of the register to use
+          */
+         RegisterId  mRegisterId;
+
+         /**
           * @brief RHS operator
           */
          std::vector<TOperator>   mRHSMatrix;
+
+         /**
+          * @brief Mass matrix operator
+          */
+         std::vector<SparseMatrix>   mMassMatrix;
 
          /**
           * @brief Storage for implicit solution piece
@@ -237,7 +291,7 @@ namespace Timestep {
    };
 
    template <typename TOperator,typename TData> SparseImExRK2RTimestepper<TOperator,TData>::SparseImExRK2RTimestepper(const int start, const SolveTiming::Id time)
-      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mHasExplicit(true), mStep(0), mDt(-1.0), mError(-1.0)
+      : Solver::SparseLinearSolver<TOperator,TData>(start, time), mHasExplicit(true), mStep(0), mDt(-1.0), mError(-1.0), mRegisterId(IMPLICIT_REGISTER)
    {
    }
 
@@ -274,24 +328,21 @@ namespace Timestep {
       if(this->mHasExplicit && this->mStep > 0)
       {
          // Update intermediate solution
-         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep);
+         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
          MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
-            internal::computeAXPBYPZ(this->mIntSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
-
-//            std::cerr << (this->mIntSolution.at(i).real().array().colwise().sum() - this->mIntSolution.at(i).real().topRows(1).array()).transpose() << " , ";
-//            std::cerr << (this->mIntSolution.at(i).imag().array().colwise().sum() - this->mIntSolution.at(i).imag().topRows(1).array()).transpose() << std::endl;
+            internal::computeAMXPBYPZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
          }
 
          // Embedded lower order scheme solution
          if(TimeSchemeSelector::HAS_EMBEDDED)
          {
-            bIm = TimeSchemeSelector::bImErr(this->mStep);
+            bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
             bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
-               internal::computeAXPBYPZ(this->mErrSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+               internal::computeAMXPBYPZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
             }
          }
 
@@ -315,45 +366,121 @@ namespace Timestep {
 
          // Set ID for solver
          this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
+
+         this->mRegisterId = IMPLICIT_REGISTER;
+
          return true;
       
       // Last step has no implicit solve
       } else if(this->mStep == TimeSchemeSelector::STEPS)
       {
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         if(this->mRegisterId == INTERMEDIATE_REGISTER)
          {
-            internal::computeSet(this->mSolution.at(i), this->mIntSolution.at(i));
-         }
+            // Compute error estimate using embedded scheme
+            if(TimeSchemeSelector::HAS_EMBEDDED)
+            {
+               for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+               {
+                  internal::computeSet(this->mRHSData.at(i), this->mErrSolution.at(i));
+               }
 
-         // Compute error estimate using embedded scheme
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+               // Set mass matrix ID for solver
+               this->mId = 0.0;
+
+               // Set explicit store register for solution
+               this->mRegisterId = ERROR_REGISTER; 
+               
+               return true;
+            } else
+            {
+               for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+               {
+                  internal::computeSet(this->mSolution.at(i), this->mIntSolution.at(i));
+               }
+
+               // Explicit nonlinear term at next step
+               this->mHasExplicit = true;
+
+               // Reset step to 0
+               this->mStep = 0;
+
+               // Reset register ID
+               this->mRegisterId = IMPLICIT_REGISTER; 
+
+               return false;
+            }
+         } else if(this->mRegisterId == ERROR_REGISTER)
          {
+            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            {
+               internal::computeSet(this->mSolution.at(i), this->mIntSolution.at(i));
+            }
+
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeError(this->mError, this->mIntSolution.at(i), this->mErrSolution.at(i));
 
                internal::computeSet(this->mErrSolution.at(i), this->mIntSolution.at(i));
             }
+
+            // Explicit nonlinear term at next step
+            this->mHasExplicit = true;
+
+            // Reset step to 0
+            this->mStep = 0;
+
+            // Reset register ID
+            this->mRegisterId = IMPLICIT_REGISTER; 
+
+            return false;
+         } else
+         {
+            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            {
+               internal::computeSet(this->mRHSData.at(i), this->mIntSolution.at(i));
+            }
+
+            // Set mass matrix ID for solver
+            this->mId = 0.0;
+
+            // Set explicit store register for solution
+            this->mRegisterId = INTERMEDIATE_REGISTER;
+
+            return true;
          }
-
-         // Reset step to 0
-         this->mStep = 0;
-
-         return false;
-
       } else
       {
-         // Build RHS for implicit term
-         MHDFloat aIm = (TimeSchemeSelector::aIm(this->mStep, this->mStep-1) - TimeSchemeSelector::bIm(this->mStep-1));
-         MHDFloat aEx = (TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         if(this->mRegisterId == IMPLICIT_REGISTER)
          {
-            internal::computeXPAYPBZ(this->mExSolution.at(i), this->mIntSolution.at(i), aIm, this->mImSolution.at(i), aEx);
-            internal::computeMV(this->mRHSData.at(i), this->mRHSMatrix.at(i), this->mExSolution.at(i));
-         }
+            // Build RHS for implicit term
+            MHDFloat aIm = (TimeSchemeSelector::aIm(this->mStep, this->mStep-1) - TimeSchemeSelector::bIm(this->mStep-1))*this->mDt;
+            MHDFloat aEx = (TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
+            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            {
+               internal::computeAMXPYPBZ(this->mExSolution.at(i), this->mMassMatrix.at(i), aIm, this->mImSolution.at(i), this->mIntSolution.at(i), aEx);
+               internal::computeSet(this->mRHSData.at(i), this->mExSolution.at(i));
+            }
 
-         // Set ID for solver
-         this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
+            // Set mass matrix ID for solver
+            this->mId = 0.0;
+
+            // Set explicit store register for solution
+            this->mRegisterId = EXPLICIT_REGISTER;
+
+         } else if(this->mRegisterId == EXPLICIT_REGISTER)
+         {
+            // Update explicit term
+            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            {
+               internal::computeMV(this->mRHSData.at(i), this->mRHSMatrix.at(i), this->mExSolution.at(i));
+            }
+
+            // Set ID for solver
+            this->mId = TimeSchemeSelector::aIm(this->mStep, this->mStep);
+
+            // Set implicit store register for solution
+            this->mRegisterId = IMPLICIT_REGISTER;
+         }
 
          return true;
       }
@@ -361,30 +488,72 @@ namespace Timestep {
 
    template <typename TOperator,typename TData> bool SparseImExRK2RTimestepper<TOperator,TData>::postSolve()
    {
-      // Update implicit term
-      for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+      if(this->mRegisterId == EXPLICIT_REGISTER)
       {
-         internal::computeSet(this->mImSolution.at(i), this->mDt, this->mSolution.at(i));
+         // Update explicit term
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         {
+            internal::computeSet(this->mExSolution.at(i), this->mSolution.at(i));
+         }
+
+         // Loop back to presolve but without new nonlinear term
+         this->mHasExplicit = false;
+
+         return true;
+
+      } else if(this->mRegisterId == IMPLICIT_REGISTER)
+      {
+         // Update implicit term
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         {
+            internal::computeSet(this->mImSolution.at(i), this->mSolution.at(i));
+         }
+
+      } else if(this->mRegisterId == INTERMEDIATE_REGISTER)
+      {
+         // Update intermediate term
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         {
+            internal::computeSet(this->mIntSolution.at(i), this->mSolution.at(i));
+         }
+
+         // Loop back to presolve but without new nonlinear term
+         this->mHasExplicit = false;
+
+         return true;
+
+      } else if(this->mRegisterId == ERROR_REGISTER)
+      {
+         // Update error term
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         {
+            internal::computeSet(this->mErrSolution.at(i), this->mSolution.at(i));
+         }
+
+         // Loop back to presolve but without new nonlinear term
+         this->mHasExplicit = false;
+
+         return true;
       }
 
       if(this->mStep == 0)
       {
          // Update intermediate solution
-         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep);
+         MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
          MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
-            internal::computeAXPBYPZ(this->mIntSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+            internal::computeAMXPBYPMZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
          }
 
          // Embedded lower order scheme solution
          if(TimeSchemeSelector::HAS_EMBEDDED)
          {
-            bIm = TimeSchemeSelector::bImErr(this->mStep);
+            bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
             bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
-               internal::computeAXPBYPZ(this->mErrSolution.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+               internal::computeAMXPBYPMZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
             }
          }
 
@@ -493,6 +662,20 @@ namespace Timestep {
             this->mRHSMatrix.push_back(TOperator());
          }
       }
+
+      // Do not reinitialise if work already done by other field
+      if(this->mMassMatrix.size() == 0)
+      {
+         // Reserve space for the RHS matrices
+         this->mMassMatrix.reserve(n);
+
+         // Initialise storage for RHS matrices
+         for(int i = 0; i < n; ++i)
+         {
+            // Create storage for LHS matrices
+            this->mMassMatrix.push_back(SparseMatrix());
+         }
+      }
    }
 
    template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::initSolutions()
@@ -541,6 +724,10 @@ namespace Timestep {
       // Set explicit matrix
       this->rRHSMatrix(idx).resize(size, size);
       Solver::internal::addOperators(this->rRHSMatrix(idx), 1.0, opA);
+
+      // Set mass matrix
+      this->mMassMatrix.at(idx).resize(size, size);
+      Solver::internal::addOperators(this->mMassMatrix.at(idx), 1.0, opB);
 
       // Set implicit matrix
       for(int i = 0; i < TimeSchemeSelector::STEPS; ++i)
@@ -677,6 +864,110 @@ namespace Timestep {
             z.real() += a*x.real() + b*y.real();
 
             z.imag() += a*x.imag() + b*y.imag();
+         }
+      }
+
+      template <typename TData> void computeAMXPYPBZ(TData& z, const SparseMatrix& mat, const MHDFloat a, const TData& x, const TData& y, const MHDFloat b)
+      {
+         if(a == 0.0)
+         {
+            z = y + b*z;
+
+         } else
+         {
+            z = mat*(a*x) + y + b*z;
+         }
+      }
+
+      inline void computeAMXPYPBZ(DecoupledZMatrix& z, const SparseMatrix& mat, const MHDFloat a, const DecoupledZMatrix& x, const DecoupledZMatrix& y, const MHDFloat b)
+      {
+         if(a == 0.0)
+         {
+            z.real() = y.real() + b*z.real();
+
+            z.imag() = y.imag() + b*z.imag();
+
+         } else
+         {
+            z.real() = mat*(a*x.real()) + y.real() + b*z.real();
+
+            z.imag() = mat*(a*x.imag()) + y.imag() + b*z.imag();
+         }
+      }
+
+      template <typename TData> void computeAMXPBYPZ(TData& z, const SparseMatrix& mat, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y)
+      {
+         if(a == 0.0)
+         {
+            z += b*y;
+
+         } else if(b == 0.0)
+         {
+            z += mat*(a*x);
+
+         } else
+         {
+            z += mat*(a*x) + b*y;
+         }
+      }
+
+      inline void computeAMXPBYPZ(DecoupledZMatrix& z, const SparseMatrix& mat, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecoupledZMatrix& y)
+      {
+         if(a == 0.0)
+         {
+            z.real() += b*y.real();
+
+            z.imag() += b*y.imag();
+
+         } else if(b == 0.0)
+         {
+            z.real() += mat*(a*x.real());
+
+            z.imag() += mat*(a*x.imag());
+
+         } else
+         {
+            z.real() += mat*(a*x.real()) + b*y.real();
+
+            z.imag() += mat*(a*x.imag()) + b*y.imag();
+         }
+      }
+
+      template <typename TData> void computeAMXPBYPMZ(TData& z, const SparseMatrix& mat, const MHDFloat a, const TData& x, const MHDFloat b, const TData& y)
+      {
+         if(a == 0.0)
+         {
+            z = b*y + mat*z;
+
+         } else if(b == 0.0)
+         {
+            z = mat*(a*x + z);
+
+         } else
+         {
+            z = mat*(a*x + z) + b*y;
+         }
+      }
+
+      inline void computeAMXPBYPMZ(DecoupledZMatrix& z, const SparseMatrix& mat, const MHDFloat a, const DecoupledZMatrix& x, const MHDFloat b, const DecoupledZMatrix& y)
+      {
+         if(a == 0.0)
+         {
+            z.real() = b*y.real() + mat*z.real();
+
+            z.imag() = b*y.imag() + mat*z.imag();
+
+         } else if(b == 0.0)
+         {
+            z.real() = mat*(a*x.real() + z.real());
+
+            z.imag() = mat*(a*x.imag() + z.imag());
+
+         } else
+         {
+            z.real() = mat*(a*x.real() + z.real()) + b*y.real();
+
+            z.imag() = mat*(a*x.imag() + z.imag()) + b*y.imag();
          }
       }
 

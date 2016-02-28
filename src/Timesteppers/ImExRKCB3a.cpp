@@ -91,7 +91,7 @@ namespace Timestep {
 
    void ImExRKCB3a::init()
    {
-      MHDFloat c2 = (27.0 + std::pow(2187.0 - 1458.0*std::sqrt(2.0), 1./3.) + 9.0*std::pow(3.0 + 2.0*std::sqrt(2.0), 1./3.))/54.;
+      MHDFloat c2 = (27.0 + std::pow(2187.0 - 1458.0*std::sqrt(2.0), 1./3.) + 9.0*std::pow(3.0 + 2.0*std::sqrt(2.0), 1./3.))/54.0;
       MHDFloat c3 = c2/(6.0*std::pow(c2,2) - 3.0*c2 + 1.0);
       MHDFloat b2 = (3.0*c2 - 1.0)/(6.0*std::pow(c2,2));
       MHDFloat b3 = (6.0*std::pow(c2,2) - 3.0*c2 + 1.0)/(6.0*std::pow(c2,2));

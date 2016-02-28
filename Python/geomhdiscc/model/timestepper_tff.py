@@ -54,7 +54,6 @@ class TimestepperTFF(base_model.BaseModel):
                 fields = [field_row]
             else:
                 fields = []
-            fields = []
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
