@@ -109,6 +109,36 @@
    }
 #endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3E
 
+// Configure code to use ImExRKCB3f
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3F
+
+   #include "Timesteppers/ImExRKCB3f.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB3f TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3F
+
+// Configure code to use ImExRKCB4
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB4
+
+   #include "Timesteppers/ImExRKCB4.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExRKCB4 TimeSchemeSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB4
+
 // Configure code to use ImExRK3
 #ifdef GEOMHDISCC_TIMESTEPPER_IMEXRK3
 

@@ -99,7 +99,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   std::vector<ProjectorBranch3D>  backwardGradient2(FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req)
+   std::vector<ProjectorBranch3D>  backwardGradient2(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req)
    {
       std::vector<ProjectorBranch3D> transform;
       std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>  pairId;

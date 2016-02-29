@@ -48,6 +48,9 @@ namespace Timestep {
    // Set the zeta parameters
    const Eigen::Array<MHDFloat,3,1> ImExRK3::mZeta = Eigen::Array<MHDFloat,3,1>(0., -17./60., -5./12.);
 
+   // Set the zeta parameters
+   const Eigen::Array<MHDFloat,3,1> ImExRK3::mCEx = Eigen::Array<MHDFloat,3,1>(0., 0., 1.);
+
    MHDFloat ImExRK3::lhsT(const int step)
    {
       assert(step < ImExRK3::STEPS);
@@ -96,6 +99,11 @@ namespace Timestep {
       }
 
       return coeff;
+   }
+
+   MHDFloat ImExRK3::cEx(const int i)
+   {
+      return ImExRK3::mCEx(i);
    }
 
    int ImExRK3::fieldMemory(const int step)

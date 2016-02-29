@@ -72,7 +72,7 @@ def apply_tau(mat, l, bc, location = 't'):
     nbc = bc[0]//10
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[0], l%2, bc.get('c',None))
+        cond = tau_value(mat.shape[0], bc.get('c',None))
     elif bc[0] == 11:
         cond = tau_diff(mat.shape[0], l%2, bc.get('c',None))
     elif bc[0] == 12:
@@ -105,20 +105,28 @@ def apply_tau(mat, l, bc, location = 't'):
 
     return mat
 
-def tau_value(nr, parity, coeffs = None):
+def worland_endvalue(n):
+    """Compute the endpoint value for Worland polynomials"""
+
+    val = 1.0
+    if n > 0:
+        for i in range(1,n):
+            val = val*float(n+i)/float(i)
+
+        val = val*2**(1-2*n)
+    return val
+
+def tau_value(nr, coeffs = None):
     """Create the boundary value tau line(s)"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     if coeffs is None:
         c = 1.0
     else:
         c = coeffs
 
     cond = []
-    cnst = c*tau_c()
-    cond.append(cnst*np.ones(nr))
-    if parity == 0:
-        cond[-1][0] /= tau_c()
+    cond.append(c*np.array([worland_endvalue(i) for i in range(0,nr)]))
+    print(cond)
 
     return np.array(cond)
 

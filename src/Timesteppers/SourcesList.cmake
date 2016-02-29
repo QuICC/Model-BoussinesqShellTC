@@ -45,6 +45,20 @@ if(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB3e")
       )
 endif(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB3e")
 
+# Select Implicit-Explicit RK CB3f scheme
+if(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB3f")
+   list(APPEND MHDSources 
+      ImExRKCB3f.cpp
+      )
+endif(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB3f")
+
+# Select Implicit-Explicit RK CB4 scheme
+if(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB4")
+   list(APPEND MHDSources 
+      ImExRKCB4.cpp
+      )
+endif(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRKCB4")
+
 # Select Implicit-Explicit RK3 scheme
 if(GEOMHDISCC_TIMESTEPPER STREQUAL "ImExRK3")
    list(APPEND MHDSources 

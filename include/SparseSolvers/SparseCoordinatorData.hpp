@@ -113,6 +113,11 @@ namespace Solver {
           * @brief Clear the RHS data of all solvers
           */
          void clearSolvers();
+
+         /**
+          * @brief Get current time
+          */
+         MHDFloat stepFraction();
          
       protected:
          /**
@@ -273,6 +278,17 @@ namespace Solver {
       for(typename std::vector<SharedComplexSolverType>::iterator zIt = this->mComplexSolvers.begin(); zIt != this->mComplexSolvers.end(); ++zIt)
       {
          (*zIt)->zeroSolver();
+      }
+   }
+
+   template <template <class,class> class TSolver> MHDFloat SparseCoordinatorData<TSolver>::stepFraction()
+   {
+      if(this->mRealSolvers.begin() != this->mRealSolvers.end())
+      {
+         return (*this->mRealSolvers.begin())->stepFraction();
+      } else
+      {
+         return (*this->mComplexSolvers.begin())->stepFraction();
       }
    }
 

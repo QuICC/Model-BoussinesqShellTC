@@ -69,6 +69,7 @@ namespace Equations {
          // Special 3D states (benchmarks, etc)
          // ---------------------------------------------------
          ZEROCOSCOS = 90,  // Galerkin, Cosine, Cosine
+         PEYRET1DA,        // Kind of a place holder for tests
          // ---------------------------------------------------
          // 2D modes
          // ---------------------------------------------------

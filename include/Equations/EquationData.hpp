@@ -181,6 +181,16 @@ namespace Equations {
          SolveTiming::Id  solveTiming() const;
 
          /**
+          * @brief Current simulation time to allow for timedependent implementations
+          */
+         MHDFloat  time() const;
+
+         /**
+          * @brief Set current simulation time to allow for timedependent implementations
+          */
+         void  setTime(const MHDFloat time);
+
+         /**
           * @brief Get the nonlinear integration components order
           */
          const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& nlComponents() const;
@@ -277,6 +287,11 @@ namespace Equations {
           * @brief Storage for smart equation parameters
           */
          SharedEquationParameters   mspEqParams;
+
+         /**
+          * @brief Name ID of the unknown
+          */
+         MHDFloat mTime;
 
          /**
           * @brief Map of name and pointer for the scalar variables

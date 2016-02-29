@@ -46,7 +46,7 @@ def i2(nr, l, bc, coeff = 1.0):
 
     ns = np.arange(0, nr)
     offsets = np.arange(-2,3)
-    nzrow = 1
+    nzrow = 0
 
     # Generate 2nd subdiagonal
     def d_2(n):
@@ -69,7 +69,7 @@ def i2(nr, l, bc, coeff = 1.0):
         return (2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)/(4.0*(l + n)*(l + n + 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0))
 
     ds = [d_2, d_1, d0, d1, d2]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -128,7 +128,7 @@ def i2lapl(nr, l, bc, coeff = 1.0):
 
     ns = np.arange(0, nr)
     offsets = np.arange(-1,2)
-    nzrow = 1
+    nzrow = 0
 
     # Generate 1st subdiagonal
     def d_1(n):
@@ -143,7 +143,7 @@ def i2lapl(nr, l, bc, coeff = 1.0):
         return 2.0*(2.0*n + 1.0)**2*(2.0*l + 2.0*n + 1.0)/((l + n)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
 
     ds = [d_1, d0, d1]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = True)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)

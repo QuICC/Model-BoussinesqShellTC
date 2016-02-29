@@ -141,6 +141,11 @@ namespace Timestep {
           * @brief Finished timestep?
           */
          bool finished();
+
+         /**
+          * @brief Get current timestep fraction
+          */
+         MHDFloat stepFraction() const;
          
       protected:
          /**
@@ -207,6 +212,11 @@ namespace Timestep {
       this->mStep = (this->mStep + 1) % (TimeSchemeSelector::STEPS);
 
       return (this->mStep == 0);
+   }
+
+   template <typename TOperator,typename TData> MHDFloat SparseOldImExTimestepper<TOperator,TData>::stepFraction() const
+   {
+      return TimeSchemeSelector::cEx(this->mStep);
    }
 
    template <typename TOperator,typename TData> bool SparseOldImExTimestepper<TOperator,TData>::preSolve()

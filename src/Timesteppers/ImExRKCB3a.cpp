@@ -45,6 +45,9 @@ namespace Timestep {
    // Set the explicit b factors
    Eigen::Array<MHDFloat,3,1> ImExRKCB3a::mBEx = Eigen::Array<MHDFloat,3,1>::Zero();
 
+   // Set the explicit c factors
+   Eigen::Array<MHDFloat,3,1> ImExRKCB3a::mCEx = Eigen::Array<MHDFloat,3,1>::Zero();
+
    // Set the implicit embedded b factors
    Eigen::Array<MHDFloat,3,1> ImExRKCB3a::mBImErr = Eigen::Array<MHDFloat,3,1>::Zero();
 
@@ -71,6 +74,11 @@ namespace Timestep {
       return ImExRKCB3a::mBEx(i);
    }
 
+   MHDFloat ImExRKCB3a::cEx(const int i)
+   {
+      return ImExRKCB3a::mCEx(i);
+   }
+
    MHDFloat ImExRKCB3a::bImErr(const int i)
    {
       return ImExRKCB3a::mBImErr(i);
@@ -83,7 +91,7 @@ namespace Timestep {
 
    void ImExRKCB3a::init()
    {
-      MHDFloat c2 = (27.0 + std::pow(2187.0 - 1458.0*std::sqrt(2.0), 1./3.) + 9.0*std::pow(3.0 + 2.0*std::sqrt(2.0), 1./3.))/54.;
+      MHDFloat c2 = (27.0 + std::pow(2187.0 - 1458.0*std::sqrt(2.0), 1./3.) + 9.0*std::pow(3.0 + 2.0*std::sqrt(2.0), 1./3.))/54.0;
       MHDFloat c3 = c2/(6.0*std::pow(c2,2) - 3.0*c2 + 1.0);
       MHDFloat b2 = (3.0*c2 - 1.0)/(6.0*std::pow(c2,2));
       MHDFloat b3 = (6.0*std::pow(c2,2) - 3.0*c2 + 1.0)/(6.0*std::pow(c2,2));
@@ -104,6 +112,10 @@ namespace Timestep {
       // Initialize explicit b factors
       ImExRKCB3a::mBEx(1) = b2;
       ImExRKCB3a::mBEx(2) = b3;
+
+      // Initialize explicit c factors
+      ImExRKCB3a::mCEx(1) = c2;
+      ImExRKCB3a::mCEx(2) = c3; 
    }
 
 }

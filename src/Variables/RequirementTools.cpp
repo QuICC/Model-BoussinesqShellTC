@@ -127,7 +127,7 @@ namespace GeoMHDiSCC {
                if(infoIt->second.isScalar())
                {
                   rScalarVars.at(infoIt->first)->initPhysicalGradient2(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradient2Comps(FieldComponents::Spectral::SCALAR));
-                  tmpBranches = Transform::TransformSteps::backwardGradient2(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradient2Comps(FieldComponents::Spectral::SCALAR));
+                  tmpBranches = Transform::TransformSteps::backwardGradient2(infoIt->second.mapGradient2Comps(FieldComponents::Spectral::SCALAR));
                   branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(), tmpBranches.begin(), tmpBranches.end());
                } else
                {
