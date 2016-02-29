@@ -69,21 +69,21 @@ def constrain(mat, l, bc, location = 't'):
 def apply_tau(mat, l, bc, location = 't'):
     """Add Tau lines to the matrix"""
 
-    nbc = bc[0]//10
+    nbc = bc[0]//20
 
-    if bc[0] == 10:
-        cond = tau_value(mat.shape[0], bc.get('c',None))
-    elif bc[0] == 11:
-        cond = tau_diff(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 12:
-        cond = tau_rdiffdivr(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 13:
-        cond = tau_insulating(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 20:
-        cond = tau_value_diff(mat.shape[0], l%2, bc.get('c',None))
+    if bc[0] == 20:
+        cond = tau_value(mat.shape[0], l, bc.get('c',None))
     elif bc[0] == 21:
+        cond = tau_diff(mat.shape[0], l%2, bc.get('c',None))
+    elif bc[0] == 22:
+        cond = tau_rdiffdivr(mat.shape[0], l%2, bc.get('c',None))
+    elif bc[0] == 23:
+        cond = tau_insulating(mat.shape[0], l%2, bc.get('c',None))
+    elif bc[0] == 24:
+        cond = tau_diff2(mat.shape[0], l%2, bc.get('c',None))
+    elif bc[0] == 40:
+        cond = tau_value_diff(mat.shape[0], l%2, bc.get('c',None))
+    elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[0], l%2, bc.get('c',None))
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
@@ -116,7 +116,34 @@ def worland_endvalue(n):
         val = val*2**(1-2*n)
     return val
 
-def tau_value(nr, coeffs = None):
+def jacobi_zerovalue(n, a, b):
+    """Compute value of Jacobi polynomial at 0"""
+
+    val = np.zeros(n)
+    val[0] = 1.0
+    val[1] = (a - b)/2.0
+
+    for i in range(2, n):
+        m = float(i)
+        val[i] = val[i-1]*(2.0*m + a + b - 1.0)*(a**2 - b**2)/(2.0*m*(m + a + b)*(2.0*m + a + b - 2.0)) - val[i-2]*(m + a - 1.0)*(m + b - 1.0)*(2.0*m + a + b)/(m*(m + a + b)*(2.0*m + a + b - 2.0))
+
+    return val
+
+def worland_integration_constant(n, l):
+    """Compute integration constant value for single integral"""
+
+    val = jacobi_zerovalue(n+1,-0.5,l-0.5)
+
+    cnst = np.zeros(n)
+    for i in range(0,n):
+        m = float(i)
+        cnst[i] = -2.0*(l + m)/((l + 2.0*m)*(l + 2.0*m + 1.0))*val[i+1] + 2.0*l/((l + 2.0*m - 1.0)*(l + 2.0*m + 1.0))*val[i]
+        if i > 0:
+            cnst[i] += (2.0*m - 1.0)*(2.0*l + 2.0*m - 1.0)/(2.0*(l + m - 1.0)*(l + 2.0*m - 1.0)*(l + 2.0*m))*val[i-1]
+
+    return cnst
+
+def tau_value(nr, l, coeffs = None):
     """Create the boundary value tau line(s)"""
 
     if coeffs is None:
@@ -126,6 +153,7 @@ def tau_value(nr, coeffs = None):
 
     cond = []
     cond.append(c*np.array([worland_endvalue(i) for i in range(0,nr)]))
+#    cond.append(c*worland_integration_constant(nr, l))
     print(cond)
 
     return np.array(cond)
