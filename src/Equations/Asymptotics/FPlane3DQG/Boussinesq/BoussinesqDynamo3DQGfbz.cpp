@@ -89,13 +89,13 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, false));
 
       // Add BX requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, false, true, false));
+      this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));
 
       // Add BY requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, false, true, false));
+      this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, false, true, true));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
    }
 
 }

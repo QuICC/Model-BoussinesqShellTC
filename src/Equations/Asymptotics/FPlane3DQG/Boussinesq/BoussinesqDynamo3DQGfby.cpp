@@ -56,7 +56,7 @@ namespace Equations {
       /// Computation:
       ///   \f$ MPr(Bx dxy\Psi + By dyy\Psi) \f$
       ///
-      rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::X,X).data().array() + this->scalar(PhysicalNames::BY).dom(0).phys().data().array*this->scalar(PhysicalNames:STREAMFUNCTION).dom().grad().comp(FieldComponents::Physical::X,Y).data().array())).matrix());
+      rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() + this->scalar(PhysicalNames::BY).dom(0).phys().data().array*this->scalar(PhysicalNames:STREAMFUNCTION).dom().grad2().comp(FieldComponents::Physical::X,FieldComponents:Physical::Y).data().array())).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGfby::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -96,8 +96,25 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, true, false));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
    }
 
+//      // Restrict components of 2nd order gradient
+//      // Make upper triangular matrix
+      MatrixB   compsTen = MatrixB::Constant(3,3, true);
+      compsTen.triangularView<Eigen::StrictlyLower>().setZero();
+      // Don't compute DxDz derivative (order doesn't matter, but use fieldPairSym)
+      std::pair<int,int> idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::X);
+      compsTen(idx.first, idx.second) = false;
+      // Don't compute DzDy derivative (order doesn't matter, but use fieldPairSym)
+      idx = fieldPairSym(FieldComponents::Physical::Y,FieldComponents::Physical::Z);
+      compsTen(idx.first, idx.second) = false;
+      // Don't compute DzDz derivative (order doesn't matter, but use fieldPairSym)
+      std::pair<int,int> idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::Z);
+      compsTen(idx.first, idx.second) = false;
+      std::map<FieldComponents::Spectral::Id,MatrixB>  grad2Comps;
+      grad2Comps.insert(std::make_pair(FieldComponents::Spectral::SCALAR, compsTen));
+//
+      this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient2(grad2Comps);
 }
 }
