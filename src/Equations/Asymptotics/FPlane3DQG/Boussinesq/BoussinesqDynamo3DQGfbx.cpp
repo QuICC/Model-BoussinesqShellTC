@@ -95,8 +95,8 @@ namespace Equations {
       // Add BY requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
+      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false, true));
    }
 
 //      // Restrict components of 2nd order gradient (only example, actually not used)

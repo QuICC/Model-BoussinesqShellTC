@@ -54,7 +54,7 @@ namespace Equations {
       ///
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0)
       
-      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad().comp(FieldComponents::Physical::X,X).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::X,Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad().comp(FieldComponents::Physical::X,Y).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::Y,Y).data().array())).matrix())   
+      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix())   
       ;
    }
 
@@ -78,11 +78,11 @@ namespace Equations {
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
-      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, true));
+      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
+      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, false, false, true));
 
-      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, true, true, true));
+      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
+      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, true, true, false, false, true));
 
       // Gradient does not require Z component
       ArrayB   comps = ArrayB::Constant(3, true);
@@ -95,6 +95,25 @@ namespace Equations {
 
       // Update streamfunction gradient requirements
       this->updateFieldRequirements(PhysicalNames::VORTICITYZ).updateGradient(gradComps);
+
+//      // Restrict components of 2nd order gradient
+//      // Make upper triangular matrix
+      MatrixB   compsTen = MatrixB::Constant(3,3, true);
+      compsTen.triangularView<Eigen::StrictlyLower>().setZero();
+      // Don't compute DxDz derivative (order doesn't matter, but use fieldPairSym)
+      std::pair<int,int> idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::X);
+      compsTen(idx.first, idx.second) = false;
+      // Don't compute DzDy derivative (order doesn't matter, but use fieldPairSym)
+      idx = fieldPairSym(FieldComponents::Physical::Y,FieldComponents::Physical::Z);
+      compsTen(idx.first, idx.second) = false;
+      // Don't compute DzDz derivative (order doesn't matter, but use fieldPairSym)
+      std::pair<int,int> idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::Z);
+      compsTen(idx.first, idx.second) = false;
+      std::map<FieldComponents::Spectral::Id,MatrixB>  grad2Comps;
+      grad2Comps.insert(std::make_pair(FieldComponents::Spectral::SCALAR, compsTen));
+//
+      this->updateFieldRequirements(PhysicalNames::FBY).updateGradient2(grad2Comps);
+      this->updateFieldRequirements(PhysicalNames::FBX).updateGradient2(grad2Comps);
    }
 
 }
