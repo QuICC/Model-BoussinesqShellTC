@@ -9,7 +9,7 @@ set(MHDModelSources
 	${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVorticityZ.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltTags.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DNusseltZWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DScalarEnergyWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DStreamEnergyWriter.cpp

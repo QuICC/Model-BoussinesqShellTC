@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqDynamo3DQGfbz::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 1, true, true);
    }
 
    void BoussinesqDynamo3DQGfbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -83,7 +83,7 @@ namespace Equations {
       this->setName(PhysicalNames::FBZ);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::AFTER);
+      this->setSolveTiming(SolveTiming::DIAGNOSTIC);
 
       // Add fbz requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, false));

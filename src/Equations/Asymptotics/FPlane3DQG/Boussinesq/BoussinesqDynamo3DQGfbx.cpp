@@ -41,7 +41,7 @@ namespace Equations {
    void BoussinesqDynamo3DQGfbx::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 1, true, true);
    }
 
    void BoussinesqDynamo3DQGfbx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -84,7 +84,7 @@ namespace Equations {
       this->setName(PhysicalNames::FBX);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::AFTER);
+      this->setSolveTiming(SolveTiming::DIAGNOSTIC);
 
       // Add fBX requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, false));
