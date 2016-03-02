@@ -129,17 +129,73 @@ def jacobi_zerovalue(n, a, b):
 
     return val
 
-def worland_integration_constant(n, l):
+def worland_constant_i1(n, l):
     """Compute integration constant value for single integral"""
 
     val = jacobi_zerovalue(n+1,-0.5,l-0.5)
 
+    def d1(m):
+        num = -2.0*(l + m)
+        den = (l + 2.0*m)*(l + 2.0*m + 1.0)
+        return num/den
+
+    def d0(m):
+        num = 2.0*l
+        den = (l + 2.0*m - 1.0)*(l + 2.0*m + 1.0)
+        return num/den
+
+    def d_1(m):
+        num = (2.0*m - 1.0)*(2.0*l + 2.0*m - 1.0)
+        den = 2.0*(l + m - 1.0)*(l + 2.0*m - 1.0)*(l + 2.0*m)
+        return num/den
+
     cnst = np.zeros(n)
     for i in range(0,n):
         m = float(i)
-        cnst[i] = -2.0*(l + m)/((l + 2.0*m)*(l + 2.0*m + 1.0))*val[i+1] + 2.0*l/((l + 2.0*m - 1.0)*(l + 2.0*m + 1.0))*val[i]
+        cnst[i] = d1(m)*val[i+1] + d0(m)*val[i]
         if i > 0:
-            cnst[i] += (2.0*m - 1.0)*(2.0*l + 2.0*m - 1.0)/(2.0*(l + m - 1.0)*(l + 2.0*m - 1.0)*(l + 2.0*m))*val[i-1]
+            cnst[i] += d_1(m)*val[i-1]
+
+    return cnst
+
+def worland_constant_i2(n, l):
+    """Compute integration constant value for second integral"""
+
+    val = jacobi_zerovalue(n+2,-0.5,l-0.5)
+
+    def d2(m):
+        num = -4.0*(l + m)*(1.0 + l + m)
+        den = (l + 2.0*m)*(1.0 + l + 2.0*m)*(2.0 + l + 2.0*m)*(3.0 + l + 2.0*m)
+        return num/den
+
+    def d1(m):
+        num = 8.0*l*(l + m)
+        den = (-1.0 + l + 2*m)*(l + 2.0*m)*(1.0 + l + 2.0*m)*(3.0 + l + 2.0*m)
+        return num/den
+
+    def d0(m):
+        num = -2.0*(1.0 + 2.0*l**2 - 4.0*l*m - 4.0*m**2)
+        den = (-2.0 + l + 2.0*m)*(-1.0 + l + 2.0*m)*(1.0 + l + 2.0*m)*(2.0 + l + 2.0*m)
+        return num/den
+
+    def d_1(m):
+        num = -2.0*l*(-1.0 + 2.0*m)*(-1.0 + 2.0*l + 2.0*m)
+        den = (-1.0 + l + m)*(-3.0 + l + 2.0*m)*(-1.0 + l + 2.0*m)*(l + 2.0*m)*(1.0 + l + 2.0*m)
+        return num/den
+
+    def d_2(m):
+        num = -(-3.0 + 2.0*m)*(-1.0 + 2.0*m)*(-3.0 + 2.0*l + 2.0*m)*(-1.0 + 2.0*l + 2.0*m)
+        den = 4.0*(-2.0 + l + m)*(-1.0 + l + m)*(-3.0 + l + 2.0*m)*(-2.0 + l + 2.0*m)*(-1.0 + l + 2.0*m)*(l + 2.0*m)
+        return num/den
+
+    cnst = np.zeros(n)
+    for i in range(0,n):
+        m = float(i)
+        cnst[i] = d2(m)*val[i+2] + d1(m)*val[i+1] + d0(m)*val[i]
+        if i > 0:
+            cnst[i] += d_1(m)*val[i-1]
+        if i-1 > 0:
+            cnst[i] += d_2(m)*val[i-2]
 
     return cnst
 
@@ -153,8 +209,7 @@ def tau_value(nr, l, coeffs = None):
 
     cond = []
     cond.append(c*np.array([worland_endvalue(i) for i in range(0,nr)]))
-#    cond.append(c*worland_integration_constant(nr, l))
-    print(cond)
+    cond.append(c*(worland_constant_i1(nr, l) - worland_constant_i2(nr,l)))
 
     return np.array(cond)
 
