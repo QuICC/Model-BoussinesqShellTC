@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (velocity-continuity formulation)"""
+"""Module provides the functions to generate the tilted Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -12,8 +12,8 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
-class BoussinesqRRBCPlaneVC(base_model.BaseModel):
-    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (velocity-continuity formulation)"""
+class BoussinesqTiltedRRBCPlaneVC(base_model.BaseModel):
+    """Class to setup the tilted Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (velocity-continuity formulation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -23,7 +23,7 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "taylor", "heating", "scale1d"]
+        return ["prandtl", "rayleigh", "taylor", "theta", "heating", "scale1d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -248,6 +248,9 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
 
         Ra = eq_params['rayleigh']
         T = eq_params['taylor']**0.5
+        # Convert angular theta to radians
+        cth = np.cos(eq_params['theta']*np.pi/180.)
+        sth = np.sin(eq_params['theta']*np.pi/180.)
         zscale = eq_params['scale1d']
 
         k1 = eigs[0]
@@ -262,10 +265,10 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
                 mat = utils.qid_from_idx(idx_u, res[0])*geo.i2lapl(res[0], k1, k2, bc, cscale = zscale)*utils.qid_from_idx(idx_u, res[0]) + utils.id_from_idx_1d(idx_u, res[0])
 
             elif field_col == ("velocity","y"):
-                mat = utils.qid_from_idx(idx_u, res[0])*geo.i2(res[0], bc, T)*utils.qid_from_idx(idx_v, res[0])
+                mat = utils.qid_from_idx(idx_u, res[0])*geo.i2(res[0], bc, T*cth)*utils.qid_from_idx(idx_v, res[0])
 
             elif field_col == ("velocity","z"):
-                mat = geo.zblk(res[0], bc)
+                mat = utils.qid_from_idx(idx_u, res[0])*geo.i2(res[0], bc, -T*sth)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -275,7 +278,7 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
 
         elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
-                mat = utils.qid_from_idx(idx_v, res[0])*geo.i2(res[0], bc, -T)*utils.qid_from_idx(idx_u, res[0])
+                mat = utils.qid_from_idx(idx_v, res[0])*geo.i2(res[0], bc, -T*cth)*utils.qid_from_idx(idx_u, res[0])
 
             elif field_col == ("velocity","y"):
                 mat = utils.qid_from_idx(idx_v, res[0])*geo.i2lapl(res[0], k1, k2, bc, cscale = zscale)*utils.qid_from_idx(idx_p, res[0]) + utils.id_from_idx_1d(idx_v, res[0])
@@ -291,7 +294,7 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
-                mat = geo.zblk(res[0], bc)
+                mat = geo.i2(res[0], bc, T*sth)*utils.qid_from_idx(idx_u, res[0])
 
             elif field_col == ("velocity","y"):
                 mat = geo.zblk(res[0], bc)
