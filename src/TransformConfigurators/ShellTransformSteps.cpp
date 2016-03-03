@@ -290,11 +290,10 @@ namespace TransformSteps {
 
    std::vector<ProjectorBranch3D>  backwardDivergence()
    {
+      // The divergence is zero be construction in this case!
+      throw Exception("Divergence should not be used in Toroidal/Poloidal expansion");
+
       std::vector<ProjectorBranch3D> transform;
-
-      transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::POL, ProjSpecType::DIVR, ProjPartType::PROJ, ProjPhysType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
-
-      transform.push_back(ProjectorBranch3D(FieldComponents::Spectral::POL, ProjSpecType::DIVR, ProjPartType::DIVSINDIFFSIN, ProjPhysType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
 
       return transform;
    }
