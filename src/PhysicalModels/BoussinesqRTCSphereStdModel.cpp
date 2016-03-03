@@ -66,18 +66,19 @@ namespace GeoMHDiSCC {
          // Add temperature initial state generator
          spScalar = spGen->addScalarEquation<Equations::SphereExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         switch(1)
+         switch(0)
          {
             case 0:
                spScalar->setStateType(Equations::SphereExactStateIds::HARMONIC);
                tSH.clear(); 
-               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+//               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(63,1,MHDComplex(1,1)));
                spScalar->setHarmonicOptions(tSH);
                break;
 
@@ -89,7 +90,7 @@ namespace GeoMHDiSCC {
          // Add temperature initial state generator
          spVector = spGen->addVectorEquation<Equations::SphereExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(3)
+         switch(2)
          {
             case 0:
                spVector->setStateType(Equations::SphereExactStateIds::TOROIDAL);
