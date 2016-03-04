@@ -669,7 +669,7 @@ namespace Transform {
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-               // Compute second derivative
+            // Compute second derivative
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
             {
                ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
@@ -678,35 +678,19 @@ namespace Transform {
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
-               // Compute division by R
+            // Compute division by R
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
             {
                ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-// With exact r^l value should be zero, compute error to correct flat spectrum
-//Array error(this->tmpInS(parity).cols());
-//if(parity == 0)
-//{
-//   error = -this->tmpInS(parity).row(0);
-//   for(int bb = 0; bb < this->mspSetup->specSize(); bb++)
-//   {
-//      error += 2.0*std::pow(-1.0,bb)*this->tmpInS(parity).row(bb).transpose();
-//   }
-//}
+
+               // With exact r^l value should be zero, compute and correct regularity error (without it it will generate a flat spectrum for c/r)
+               if(parity == 0)
+               {
+                  ParityTransformTools::correctRegularity(this->tmpInS(parity), this->mspSetup->specSize());
+               }
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
-//if(parity == 0)
-//{
-//for(int bb = 0; bb < this->mTmpIn.rows(); bb++)
-//{
-//   this->mTmpIn.leftCols(this->tmpOutS(parity).cols()).row(bb) += -std::pow(-1.0,bb)*error.transpose();
-//}
-//std::cerr << "****************************************" << std::endl;
-//std::cerr << this->mTmpIn.leftCols(this->tmpOutS(parity).cols()).col(0).transpose() << std::endl;
-//std::cerr << this->mTmpIn.leftCols(this->tmpOutS(parity).cols()).col(1).transpose() << std::endl;
-//std::cerr << this->mTmpIn.leftCols(this->tmpOutS(parity).cols()).col(2).transpose() << std::endl;
-//std::cerr << this->mTmpIn.leftCols(this->tmpOutS(parity).cols()).col(3).transpose() << std::endl;
-//}
 
                // Compute division by R^2
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)

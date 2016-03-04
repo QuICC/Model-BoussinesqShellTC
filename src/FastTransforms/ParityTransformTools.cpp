@@ -17,6 +17,7 @@
 // Project includes
 //
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -218,6 +219,27 @@ namespace Transform {
             rData.block(0, j0, rows, cols).imag() = scale*op.topRows(rows)*rData.block(0, j0, dataRows, cols).imag();
          }
       }
+   }
+
+   void ParityTransformTools::checkRegularity(const Matrix& data, const int rows)
+   {
+      Array err = Array::Zero(data.cols());
+      for(int i = rows-1; i > 0; --i)
+      {
+         err.transpose() += std::pow(-1,i+1)*data.row(i);
+      }
+      err *= 2.0;
+      std::cerr << "l = 0: " << err(0) - data(0,0) << " l> 0: " << (err.bottomRows(err.rows()-1).transpose() - data.row(0).rightCols(data.cols()-1)).array().abs().maxCoeff() << std::endl;
+   }
+
+   void ParityTransformTools::correctRegularity(Matrix& rData, const int rows)
+   {
+      rData.row(0).setZero();
+      for(int i = rows-1; i > 0; --i)
+      {
+         rData.row(0) += std::pow(-1,i+1)*rData.row(i);
+      }
+      rData.row(0) *= 2.0;
    }
 
 }

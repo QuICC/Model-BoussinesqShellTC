@@ -103,7 +103,7 @@ namespace Equations {
                   int m = std::tr1::get<1>(*it);
 
                   funcR = 1.0;
-                  for(int n = 1; n < 9; ++n)
+                  for(int n = 1; n < 23; ++n)
                   {
                      funcR += std::pow(r,2*n);
                   }

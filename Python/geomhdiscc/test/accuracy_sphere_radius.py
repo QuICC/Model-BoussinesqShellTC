@@ -96,9 +96,14 @@ def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid, fix = None):
 
     x = sy.Symbol('x')
     rhs = transf.torcheb(x_to_phys(res_expr,grid), pres)
-    rhs[0] += 1e8
-#    if fix == 'DIVR2':
-#        lhs = spsplin.spsolve(opA[0],opB[0]*rhs)
+    if fix == 'DIVR':
+        if pres == 0:
+            n = rhs.shape[0]
+            rhs[0] = 0
+            for i in range(1,n):
+                rhs[0] += (-1)**(i+1)*2.0*rhs[i]
+        lhs = spsplin.spsolve(opA,opB*rhs)
+#    elif fix == 'DIVR2':
 #        err = 0.0
 #        n = lhs.shape[0]
 #        if pres == 1:
@@ -118,18 +123,17 @@ def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid, fix = None):
 #            err = lhs[-2]
 #            for i in range(0,lhs.shape[0]):
 #                lhs[i] += (-1)**(n+i+1)*err
-#    else:
-#        lhs = spsplin.spsolve(opA,opB*rhs)
-    lhs = spsplin.spsolve(opA,opB*rhs)
-    if fix == 'DIVR':
-        if pres == 0:
-            n = lhs.shape[0]
-            for i in range(0,lhs.shape[0]):
-                lhs[i] += (-1)**(n+i)*lhs[-1]
-    elif fix == 'DIVR2':
-        n = lhs.shape[0]
-        for i in range(0,n):
-            lhs[i] += (-1)**(i+n)*(n-i)*lhs[-1]
+    else:
+        lhs = spsplin.spsolve(opA,opB*rhs)
+#    if fix == 'DIVR':
+#        if pres == 0:
+#            n = lhs.shape[0]
+#            for i in range(0,lhs.shape[0]):
+#                lhs[i] += (-1)**(n+i)*lhs[-1]
+#    elif fix == 'DIVR2':
+#        n = lhs.shape[0]
+#        for i in range(0,n):
+#            lhs[i] += (-1)**(i+n)*(n-i)*lhs[-1]
     print(lhs)
     print('-------------------------------------------------------------')
     sol = transf.torcheb(x_to_phys(sol_expr,grid), psol)
@@ -260,12 +264,13 @@ def r1(nr, rg):
     for i in range(0,2):
         l = np.random.randint(1, nr-1)
         l = l + (l+i)%2
+        l = i
         print("\tTest for l = " + str(l))
         A = sphere.r1(nr, (l+1)%2, sphere.radbc.no_bc()).tocsr()
         B = sphere.qid(nr, l, 0, sphere.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(2*((l+1)%2) + l%2,2*nr-2,2)])
+        sphys = np.sum([1e6*np.random.ranf()*x**(i) for i in np.arange(2*((l+1)%2) + l%2,2*nr-2,2)])
         ssol = sy.expand(sphys/x)
-        error = 100.0
+        error = 1e-4 
         sphys += error
         test_backward_tau(A, B, (l%2,(l+1)%2), sphys, ssol, rg, fix = 'DIVR')
 
@@ -533,7 +538,7 @@ def qid(nr, rg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 20
+    nr = 64
     rg = transf.rgrid(nr)
 
     # run tests
@@ -541,8 +546,8 @@ if __name__ == "__main__":
 #    zblk(nr, rg)
 #    bc(nr, rg)
 #    d1(nr, rg)
-#    r1(nr, rg)
-    r2(nr, rg)
+    r1(nr, rg)
+#    r2(nr, rg)
 #    i1(nr, rg)
 #    i2(nr, rg)
 #    i2r1(nr, rg)
