@@ -102,8 +102,8 @@ namespace Equations {
                   int l = std::tr1::get<0>(*it);
                   int m = std::tr1::get<1>(*it);
 
-                  funcR = 100.0;
-                  for(int n = 1; n < 63; ++n)
+                  funcR = 1.0;
+                  for(int n = 1; n < 9; ++n)
                   {
                      funcR += std::pow(r,2*n);
                   }
