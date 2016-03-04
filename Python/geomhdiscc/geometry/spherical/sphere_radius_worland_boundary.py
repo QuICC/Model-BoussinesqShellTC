@@ -69,21 +69,21 @@ def constrain(mat, l, bc, location = 't'):
 def apply_tau(mat, l, bc, location = 't'):
     """Add Tau lines to the matrix"""
 
-    nbc = bc[0]//20
+    nbc = bc[0]//10
 
-    if bc[0] == 20:
+    if bc[0] == 10:
         cond = tau_value(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 21:
+    elif bc[0] == 11:
         cond = tau_diff(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 22:
+    elif bc[0] == 12:
         cond = tau_rdiffdivr(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 23:
+    elif bc[0] == 13:
         cond = tau_insulating(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 24:
+    elif bc[0] == 14:
         cond = tau_diff2(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 40:
+    elif bc[0] == 20:
         cond = tau_value_diff(mat.shape[0], l%2, bc.get('c',None))
-    elif bc[0] == 41:
+    elif bc[0] == 21:
         cond = tau_value_diff2(mat.shape[0], l%2, bc.get('c',None))
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
@@ -109,9 +109,10 @@ def worland_endvalue(n):
     """Compute the endpoint value for Worland polynomials"""
 
     val = 1.0
+    val = np.ones(n)
     if n > 0:
         for i in range(1,n):
-            val = val*float(n+i)/float(i)
+            val[i] = val[i-1]*float(n+i)/float(i)
 
         val = val*2**(1-2*n)
     return val
@@ -208,8 +209,8 @@ def tau_value(nr, l, coeffs = None):
         c = coeffs
 
     cond = []
+    cond.append(np.zeros(nr))
     cond.append(c*np.array([worland_endvalue(i) for i in range(0,nr)]))
-    cond.append(c*(worland_constant_i1(nr, l) - worland_constant_i2(nr,l)))
 
     return np.array(cond)
 

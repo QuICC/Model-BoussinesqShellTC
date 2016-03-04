@@ -44,9 +44,13 @@ def i1(nr, l, bc, coeff = 1.0):
 def i2(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral r^l P_n^{-1/2,l-1/2}(2r^2 -1)."""
 
-    ns = np.arange(0, nr)
+    ns = np.arange(0, nr+1)
     offsets = np.arange(-2,3)
     nzrow = 1
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 1
+    bc['rt'] = bc.get('rt',0) + 1
 
     # Generate 2nd subdiagonal
     def d_2(n):
@@ -126,9 +130,13 @@ def i4(nr, l, bc, coeff = 1.0):
 def i2lapl(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral of Laplacian r^l P_n^{-1/2,l-1/2}(2r^2 -1)."""
 
-    ns = np.arange(0, nr)
+    ns = np.arange(0, nr+1)
     offsets = np.arange(-1,2)
     nzrow = 1
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 1
+    bc['rt'] = bc.get('rt',0) + 1
 
     # Generate 1st subdiagonal
     def d_1(n):
