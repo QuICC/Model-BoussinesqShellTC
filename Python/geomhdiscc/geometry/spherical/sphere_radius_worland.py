@@ -85,6 +85,10 @@ def i4(nr, l, bc, coeff = 1.0):
     offsets = np.arange(-4,5)
     nzrow = 3
 
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 2
+    bc['rt'] = bc.get('rt',0) + 2
+
     # Generate 4th subdiagonal
     def d_4(n):
         return 16.0*(l + n - 4.0)*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 8.0)*(l + 2.0*n - 7.0)*(l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
@@ -163,6 +167,10 @@ def i4lapl(nr, l, bc, coeff = 1.0):
     offsets = np.arange(-3,4)
     nzrow = 3
 
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 2
+    bc['rt'] = bc.get('rt',0) + 2
+
     # Generate 3rd subdiagonal
     def d_3(n):
         return 32.0*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)*(2.0*l + 2.0*n - 5.0)/((l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
@@ -203,6 +211,10 @@ def i4lapl2(nr, l, bc, coeff = 1.0):
     ns = np.arange(0, nr)
     offsets = np.arange(-2,3)
     nzrow = 3
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 2
+    bc['rt'] = bc.get('rt',0) + 2
 
     # Generate 2nd subdiagonal
     def d_2(n):

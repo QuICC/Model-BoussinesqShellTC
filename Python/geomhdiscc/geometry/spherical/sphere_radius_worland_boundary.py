@@ -74,20 +74,20 @@ def apply_tau(mat, l, bc, location = 't'):
     if bc[0] == 10:
         cond = tau_value(mat.shape[0], l, bc.get('c',None))
     elif bc[0] == 11:
-        cond = tau_diff(mat.shape[0], l%2, bc.get('c',None))
+        cond = tau_diff(mat.shape[0], l, bc.get('c',None))
     elif bc[0] == 12:
-        cond = tau_rdiffdivr(mat.shape[0], l%2, bc.get('c',None))
+        cond = tau_rdiffdivr(mat.shape[0], l, bc.get('c',None))
     elif bc[0] == 13:
-        cond = tau_insulating(mat.shape[0], l%2, bc.get('c',None))
+        cond = tau_insulating(mat.shape[0], l, bc.get('c',None))
     elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[0], l%2, bc.get('c',None))
+        cond = tau_diff2(mat.shape[0], l, bc.get('c',None))
     elif bc[0] == 20:
-        cond = tau_value_diff(mat.shape[0], l%2, bc.get('c',None))
+        cond = tau_value_diff(mat.shape[0], l, bc.get('c',None))
     elif bc[0] == 21:
-        cond = tau_value_diff2(mat.shape[0], l%2, bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[0], l, bc.get('c',None))
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
-        cond = tau_last(mat.shape[1], l%2, bc[0]-990)
+        cond = tau_last(mat.shape[1], bc[0]-990)
         nbc = bc[0]-990
 
     if not spsp.isspmatrix_coo(mat):
@@ -105,100 +105,89 @@ def apply_tau(mat, l, bc, location = 't'):
 
     return mat
 
-def worland_endvalue(n):
+def worland_value(nr, l):
     """Compute the endpoint value for Worland polynomials"""
 
-    val = 1.0
-    val = np.ones(n)
-    if n > 0:
-        for i in range(1,n):
-            val[i] = val[i-1]*float(n+i)/float(i)
-
-        val = val*2**(1-2*n)
-    return val
-
-def jacobi_zerovalue(n, a, b):
-    """Compute value of Jacobi polynomial at 0"""
-
-    val = np.zeros(n)
+    val = np.zeros(nr)
     val[0] = 1.0
-    val[1] = (a - b)/2.0
-
-    for i in range(2, n):
-        m = float(i)
-        val[i] = val[i-1]*(2.0*m + a + b - 1.0)*(a**2 - b**2)/(2.0*m*(m + a + b)*(2.0*m + a + b - 2.0)) - val[i-2]*(m + a - 1.0)*(m + b - 1.0)*(2.0*m + a + b)/(m*(m + a + b)*(2.0*m + a + b - 2.0))
+    if nr > 0:
+        for i in range(1,nr):
+            val[i] = val[i-1]*(2.0*i-1.0)/(2.0*i)
 
     return val
 
-def worland_constant_i1(n, l):
-    """Compute integration constant value for single integral"""
+def worland_diff(nr, l):
+    """Compute the first derivative at endpoint for Worland polynomials"""
 
-    val = jacobi_zerovalue(n+1,-0.5,l-0.5)
+    val = np.zeros(nr)
+    if nr > 0:
+        val[1] = 1.0
+        for i in range(1,nr-1):
+            val[i+1] = val[i]*(2.0*i+1.0)/(2.0*i)
+        val = val*2.0*(l+np.arange(0,nr))
+        
+        if l > 0:
+            val += l*worland_value(nr, l)
 
-    def d1(m):
-        num = -2.0*(l + m)
-        den = (l + 2.0*m)*(l + 2.0*m + 1.0)
-        return num/den
+    return val
 
-    def d0(m):
-        num = 2.0*l
-        den = (l + 2.0*m - 1.0)*(l + 2.0*m + 1.0)
-        return num/den
+def worland_rdiffdivr(nr, l):
+    """Compute the stress-free condition at endpoint for Worland polynomials"""
 
-    def d_1(m):
-        num = (2.0*m - 1.0)*(2.0*l + 2.0*m - 1.0)
-        den = 2.0*(l + m - 1.0)*(l + 2.0*m - 1.0)*(l + 2.0*m)
-        return num/den
+    val = np.zeros(nr)
+    if nr > 0:
+        val[1] = 1.0
+        for i in range(1,nr-1):
+            val[i+1] = val[i]*(2.0*i+1.0)/(2.0*i)
+        val = val*2.0*(l+np.arange(0,nr))
+        
+        if l > 0:
+            val += (l-1.0)*worland_value(nr, l)
+        else:
+            val -= worland_value(nr, l)
 
-    cnst = np.zeros(n)
-    for i in range(0,n):
-        m = float(i)
-        cnst[i] = d1(m)*val[i+1] + d0(m)*val[i]
-        if i > 0:
-            cnst[i] += d_1(m)*val[i-1]
+    return val
 
-    return cnst
+def worland_divrdiffr(nr, l):
+    """Compute the insulating magnetic condition at endpoint for Worland polynomials"""
 
-def worland_constant_i2(n, l):
-    """Compute integration constant value for second integral"""
+    val = np.zeros(nr)
+    if nr > 0:
+        val[1] = 1.0
+        for i in range(1,nr-1):
+            val[i+1] = val[i]*(2.0*i+1.0)/(2.0*i)
+        val = val*2.0*(l+np.arange(0,nr))
+        
+        if l > 0:
+            val += (2.0*l+1.0)*worland_value(nr, l)
+        else:
+            val += 1.0*worland_value(nr, l)
 
-    val = jacobi_zerovalue(n+2,-0.5,l-0.5)
+    return val
 
-    def d2(m):
-        num = -4.0*(l + m)*(1.0 + l + m)
-        den = (l + 2.0*m)*(1.0 + l + 2.0*m)*(2.0 + l + 2.0*m)*(3.0 + l + 2.0*m)
-        return num/den
+def worland_diff2(nr, l):
+    """Compute the second derivative at endpoint for Worland polynomials"""
 
-    def d1(m):
-        num = 8.0*l*(l + m)
-        den = (-1.0 + l + 2*m)*(l + 2.0*m)*(1.0 + l + 2.0*m)*(3.0 + l + 2.0*m)
-        return num/den
+    val = np.zeros(nr)
+    if nr > 0:
+        val[2] = 1.0
+        for i in range(1,nr-2):
+            val[i+2] = val[i+1]*(2.0*i+3.0)/(2.0*i)
+        val = val*4.0*(l+np.arange(0,nr)+1)*(l+np.arange(0,nr))
 
-    def d0(m):
-        num = -2.0*(1.0 + 2.0*l**2 - 4.0*l*m - 4.0*m**2)
-        den = (-2.0 + l + 2.0*m)*(-1.0 + l + 2.0*m)*(1.0 + l + 2.0*m)*(2.0 + l + 2.0*m)
-        return num/den
+        tmp = np.zeros(nr)
+        tmp[1] = 1.0
+        for i in range(1,nr-1):
+            tmp[i+1] = tmp[i]*(2.0*i+1.0)/(2.0*i)
+        if l > 0:
+            val += tmp*2.0*(2.0*l+1.0)*(l+np.arange(0,nr))
+        else:
+            val += tmp*2.0*(l+np.arange(0,nr))
 
-    def d_1(m):
-        num = -2.0*l*(-1.0 + 2.0*m)*(-1.0 + 2.0*l + 2.0*m)
-        den = (-1.0 + l + m)*(-3.0 + l + 2.0*m)*(-1.0 + l + 2.0*m)*(l + 2.0*m)*(1.0 + l + 2.0*m)
-        return num/den
+        if l > 1:
+            val += l*(l-1.0)*worland_value(nr, l)
 
-    def d_2(m):
-        num = -(-3.0 + 2.0*m)*(-1.0 + 2.0*m)*(-3.0 + 2.0*l + 2.0*m)*(-1.0 + 2.0*l + 2.0*m)
-        den = 4.0*(-2.0 + l + m)*(-1.0 + l + m)*(-3.0 + l + 2.0*m)*(-2.0 + l + 2.0*m)*(-1.0 + l + 2.0*m)*(l + 2.0*m)
-        return num/den
-
-    cnst = np.zeros(n)
-    for i in range(0,n):
-        m = float(i)
-        cnst[i] = d2(m)*val[i+2] + d1(m)*val[i+1] + d0(m)*val[i]
-        if i > 0:
-            cnst[i] += d_1(m)*val[i-1]
-        if i-1 > 0:
-            cnst[i] += d_2(m)*val[i-2]
-
-    return cnst
+    return val
 
 def tau_value(nr, l, coeffs = None):
     """Create the boundary value tau line(s)"""
@@ -210,104 +199,102 @@ def tau_value(nr, l, coeffs = None):
 
     cond = []
     cond.append(np.zeros(nr))
-    cond.append(c*np.array([worland_endvalue(i) for i in range(0,nr)]))
+    cond.append(c*worland_value(nr, l))
 
     return np.array(cond)
 
-def tau_diff(nr, parity, coeffs = None):
+def tau_diff(nr, l, coeffs = None):
     """Create the 1st derivative tau line(s)"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     if coeffs is None:
         c = 1.0
     else:
         c = coeffs
 
     cond = []
-    ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*2.0*ns**2)
+    cond.append(np.zeros(nr))
+    cond.append(c*worland_diff(nr,l))
 
     return np.array(cond)
 
-def tau_diff2(nr, parity, coeffs = None):
+def tau_diff2(nr, l, coeffs = None):
     """Create the second deriviative tau line(s)"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     if coeffs is None:
         c = 1.0
     else:
         c = coeffs
 
     cond = []
-    ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*(2.0/3.0)*(ns**4 - ns**2))
+    cond.append(np.zeros(nr))
+    cond.append(c*worland_diff2(nr,l))
 
     return np.array(cond)
 
-def tau_rdiffdivr(nr, parity, coeffs = None):
+def tau_rdiffdivr(nr, l, coeffs = None):
     """Create the r D 1/r tau line(s)"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     if coeffs is None:
         c = 1.0
     else:
         c = coeffs
 
     cond = []
-    ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*(ns**2 - 1.0)*tau_c())
-    if parity == 0:
-        cond[-1][0] /= tau_c()
+    cond.append(np.zeros(nr))
+    cond.append(c*worland_rdiffdivr(nr,l))
 
     return np.array(cond)
 
-def tau_insulating(nr, parity, coeffs = None):
+def tau_insulating(nr, l, coeffs = None):
     """Create the insulating boundray tau line(s)"""
 
-    assert(coeffs.get('l', None) is not None)
-
-    raise NotImplementedError("Boundary condition not yet implemented!")
     c = coeffs.get('c', 1.0)
     l = coeffs['l']
 
     cond = []
-    ns = np.arange(parity, 2*nr, 2)
-    cond.append(c*(2.0*ns**2 + (l+1.0)*tau_c()))
-    if parity == 0:
-        cond[-1][0] /= tau_c()
+    cond.append(np.zeros(nr))
+    cond.append(c*worland_divrdiffr(nr,l))
 
     return np.array(cond)
 
-def tau_value_diff(nr, parity, coeffs = None):
+def tau_value_diff(nr, l, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
+    if coeffs is None:
+        c = 1.0
+    else:
+        c = coeffs
+
     cond = []
-    cond.append(tau_value(nr,parity,coeffs)[0])
-    cond.append(tau_diff(nr,parity,coeffs)[0])
+    cond.append(np.zeros(nr))
+    cond.append(np.zeros(nr))
+    cond.append(c*worland_value(nr,l))
+    cond.append(c*worland_diff(nr,l))
 
     return np.array(cond)
 
-def tau_value_diff2(nr, parity, coeffs = None):
+def tau_value_diff2(nr, l, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
+    if coeffs is None:
+        c = 1.0
+    else:
+        c = coeffs
+
     cond = []
-    cond.append(tau_value(nr,parity,coeffs)[0])
-    cond.append(tau_diff2(nr,parity,coeffs)[0])
+    cond.append(np.zeros(nr))
+    cond.append(np.zeros(nr))
+    cond.append(c*worland_value(nr,l))
+    cond.append(c*worland_diff2(nr,l))
 
     return np.array(cond)
 
-def tau_last(nr, parity, nrow):
+def tau_last(nr, nrow):
     """Create the last modes to zero tau line(s)"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
-    # convert nrow to parity aware number
-    prow = nrow//2 + parity*(nrow%2)
-
-    cond = np.zeros((prow, nr))
-    for j in range(0, prow):
-        cond[j,nr-prow+j] = 1.0
+    cond = np.zeros((nrow, nr))
+    for j in range(0, nrow):
+        cond[j,nr-nrow+j] =1.0 
 
     return cond
 
@@ -315,17 +302,17 @@ def stencil(nr, l, bc):
     """Create a Galerkin stencil matrix"""
 
     if bc[0] == -10:
-        mat = stencil_value(nr, l%2, bc.get('c',None))
+        mat = stencil_value(nr, l, bc.get('c',None))
     elif bc[0] == -11:
-        mat = stencil_diff(nr, l%2, bc.get('c',None))
+        mat = stencil_diff(nr, l, bc.get('c',None))
     elif bc[0] == -12:
-        mat = stencil_rdiffdivr(nr, l%2, bc.get('c',None))
+        mat = stencil_rdiffdivr(nr, l, bc.get('c',None))
     elif bc[0] == -13:
-        mat = stencil_insulating(nr, l%2, bc.get('c',None))
+        mat = stencil_insulating(nr, l, bc.get('c',None))
     elif bc[0] == -20:
-        mat = stencil_value_diff(nr, l%2, bc.get('c',None))
+        mat = stencil_value_diff(nr, l, bc.get('c',None))
     elif bc[0] == -21:
-        mat = stencil_value_diff2(nr, l%2, bc.get('c',None))
+        mat = stencil_value_diff2(nr, l, bc.get('c',None))
     elif bc[0] < -1 and bc[0] > -5:
         mat = restrict_eye(nr, 'cr', -bc[0])
 
@@ -364,25 +351,17 @@ def restrict_eye(nr, t, q):
 
     return spsp.diags(diags, offsets, (nrows, ncols))
 
-def stencil_value(nr, parity, coeffs = None):
+def stencil_value(nr, l, coeffs = None):
     """Create stencil matrix for a zero boundary value"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     assert(coeffs is None)
 
-    ns = np.arange(parity,2*nr,2)
+    ns = np.arange(0,nr)
     offsets = [-1, 0]
 
     # Generate subdiagonal
     def d_1(n):
-        val = -np.ones(n.shape)
-        for i,j in enumerate(n):
-            if j == 2:
-                val[i] = -1.0/2.0
-                break
-            if j > 2:
-                break
-        return val
+        return -2.0*n/(2.0*n - 1.0)
 
     # Generate diagonal
     def d0(n):
@@ -394,18 +373,19 @@ def stencil_value(nr, parity, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def stencil_diff(nr, parity, coeffs = None):
+def stencil_diff(nr, l, coeffs = None):
     """Create stencil matrix for a zero 1st derivative"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     assert(coeffs is None)
 
-    ns = np.arange(parity,2*nr,2)
+    ns = np.arange(0,nr)
     offsets = [-1, 0]
 
     # Generate subdiagonal
     def d_1(n):
-        return -(n - 2.0)**2/n**2
+        num = -2.0*m*(4.0*(-1.0 + m)**2 + l*(-3.0 + 4.0*m))
+        den = (-1.0 + 2.0*m)*(l + 4.0*l*m + 4.0*m**2)
+        return num/den
 
     # Generate diagonal
     def d0(n):
@@ -417,25 +397,19 @@ def stencil_diff(nr, parity, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def stencil_rdiffdivr(nr, parity, coeffs = None):
+def stencil_rdiffdivr(nr, l, coeffs = None):
     """Create stencil matrix for a zero r D 1/r"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     assert(coeffs is None)
 
-    ns = np.arange(parity,2*nr,2)
+    ns = np.arange(0,nr)
     offsets = [-1, 0]
 
     # Generate subdiagonal
     def d_1(n):
-        val = -(n - 3.0)/(n + 1.0)
-        for i,j in enumerate(n):
-            if j == 2:
-                val[i] = 1.0/6.0
-                break
-            if j > 2:
-                break
-        return val
+        num = -2.0*n*(3.0 - 3.0*l - 8.0*n + 4.0*l*n + 4.0*n**2)
+        den = (-1.0 + 2.0*n)*(-1.0 + l + 4.0*l*n + 4.0*n**2)
+        return num/den
 
     # Generate diagonal
     def d0(n):
@@ -447,7 +421,7 @@ def stencil_rdiffdivr(nr, parity, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def stencil_insulating(nr, parity, coeffs = None):
+def stencil_insulating(nr, l, coeffs = None):
     """Create stencil matrix for a insulating boundary"""
 
     raise NotImplementedError("Boundary condition not yet implemented!")
@@ -479,7 +453,7 @@ def stencil_insulating(nr, parity, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def stencil_value_diff(nr, parity, coeffs = None):
+def stencil_value_diff(nr, l, coeffs = None):
     """Create stencil matrix for a zero boundary value and zero 1st derivative"""
 
     raise NotImplementedError("Boundary condition not yet implemented!")
@@ -520,7 +494,7 @@ def stencil_value_diff(nr, parity, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def stencil_value_diff2(nr, parity, coeffs = None):
+def stencil_value_diff2(nr, l, coeffs = None):
     """Create stencil matrix for a zero boundary value and zero 2nd derivative"""
 
     raise NotImplementedError("Boundary condition not yet implemented!")
