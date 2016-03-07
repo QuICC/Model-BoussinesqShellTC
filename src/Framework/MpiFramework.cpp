@@ -195,6 +195,18 @@ namespace GeoMHDiSCC {
       MpiFramework::synchronize();
    }
 
+   void MpiFramework::sleep(const int seconds)
+   {
+      // Sleep MPI process for given amount of seconds
+      MHDFloat start = MPI_Wtime();
+      MHDFloat tmp = 0.0;
+      while(MPI_Wtime() - start < seconds)
+      {
+         // Do Nothing ... just waiting
+         tmp += 1.0;
+      }
+   }
+
    std::vector<int>  MpiFramework::mTransformIds = std::vector<int>();
 
    std::vector<ArrayI>  MpiFramework::mTransformCpus = std::vector<ArrayI>();

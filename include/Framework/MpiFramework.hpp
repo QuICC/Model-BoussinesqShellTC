@@ -104,6 +104,11 @@ namespace GeoMHDiSCC {
           * @brief Set the MPI sub group and sub communicator
           */
          static void setSubComm(const SubCommId id, const int idx, const std::set<int>& ranks);
+
+         /**
+          * @brief Sleep MPI process for given number of seconds
+          */
+         static void sleep(const int seconds);
          
       protected:
 
