@@ -104,8 +104,16 @@ namespace Timestep {
 //         this->mDt = cfl/this->mcUpWindow;
 //
       
-      MHDFloat maxError = 1e-8;
+      // Gather error accros processes
+      #ifdef GEOMHDISCC_MPI
+      if(this->mError > 0.0)
+      {
+         MPI_Allreduce(MPI_IN_PLACE, &this->mError, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      }
+      #endif //GEOMHDISCC_MPI
+      
       // No error control and no CFL condition
+//      MHDFloat maxError = 1e-8;
 //      if(this->mError < 0.0)
 //      {
 //         hasNewDt = false;

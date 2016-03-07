@@ -249,7 +249,7 @@ def sphereXYZ(pph, pth, pr):
     return np.array([pr*cos(pth)*np.ones(pph.shape), pr*np.sin(pth)*np.cos(pph), pr*np.sin(pth)*np.sin(pph)]).T
 
 def shellXYZ(pph, pth, pr):
-    return np.array([pr*cos(pth)*np.ones(pph.shape), pr*np.sin(pth)*np.cos(pph), pr*np.sin(pth)*np.sin(pph)])
+    return np.array([pr*cos(pth)*np.ones(pph.shape), pr*np.sin(pth)*np.cos(pph), pr*np.sin(pth)*np.sin(pph)]).T
 
 if __name__ == "__main__":
     main(sys.argv[1:])
