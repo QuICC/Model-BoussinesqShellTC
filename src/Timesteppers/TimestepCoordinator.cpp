@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.301), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
       // Initialize timestepper
       TimeSchemeSelector::init();
@@ -113,29 +113,28 @@ namespace Timestep {
       #endif //GEOMHDISCC_MPI
       
       // No error control and no CFL condition
-//      MHDFloat maxError = 1e-8;
-//      if(this->mError < 0.0)
-//      {
-//         hasNewDt = false;
-//
-//      } else if(this->mError > maxError)
-//      {
-//         hasNewDt = true;
-//         this->mOldDt = this->mDt;
-//         this->mDt *= std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
-//
-//      } else if(this->mError < maxError/1.5)
-//      {
-//         hasNewDt = true;
-//         this->mOldDt = this->mDt;
-//         this->mDt = std::min(this->mDt*std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
-//
-//      // No need to change timestep
-//      } else
-//      {
-//         hasNewDt = false;
-//      }
-      hasNewDt = false;
+      MHDFloat maxError = 1e-4;
+      if(this->mError < 0.0)
+      {
+         hasNewDt = false;
+
+      } else if(this->mError > maxError)
+      {
+         hasNewDt = true;
+         this->mOldDt = this->mDt;
+         this->mDt *= std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
+
+      } else if(this->mError < maxError/(this->mcMaxJump*0.9) && this->mCnstSteps > 10)
+      {
+         hasNewDt = true;
+         this->mOldDt = this->mDt;
+         this->mDt = std::min(this->mDt*std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+
+      // No need to change timestep
+      } else
+      {
+         hasNewDt = false;
+      }
 
       //
       // Update the timestep matrices if necessary

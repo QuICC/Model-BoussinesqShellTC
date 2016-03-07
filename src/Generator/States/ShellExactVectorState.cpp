@@ -240,7 +240,7 @@ namespace Equations {
 
          MHDFloat r;
          MHDFloat theta;
-         MHDFloat scale = 0.5;
+         MHDFloat scale = 1.0/std::sqrt(2);
          nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
          for(int iR = 0; iR < nR; ++iR)
          {
