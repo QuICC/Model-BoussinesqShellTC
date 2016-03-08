@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.301), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
       // Initialize timestepper
       TimeSchemeSelector::init();
@@ -70,39 +70,31 @@ namespace Timestep {
 
    void TimestepCoordinator::adaptTimestep(const MHDFloat cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
-      // Flag to update timestep
-      bool hasNewDt = false;
+      // Store old timestep
+      this->mOldDt = this->mDt;
 
       // Check if CFL allows for a larger timestep
-//      if(cfl > this->mcUpWindow*this->mDt)
-//      {
-//         // Activate matrices update
-//         hasNewDt = true;
-//
-//         // Set new timestep
-//         this->mOldDt = this->mDt;
-//         this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
-//      
-//      // Check if CFL is below minimal timestep or downard jump is large
-//      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
-//      {
-//         // Don't update matrices
-//         hasNewDt = false;
-// 
-//         // Signal simulation abort
-//         this->mOldDt = this->mDt;
-//         this->mDt = -cfl;
-//     
-//      // Check if CFL requires a lower timestep
-//      } else if(cfl < this->mDt)
-//      {
-//         // Activate matrices update
-//         hasNewDt = true;
-//
-//         // Set new timestep
-//         this->mOldDt = this->mDt;
-//         this->mDt = cfl/this->mcUpWindow;
-//
+      MHDFloat newCflDt = 0.0;
+      if(cfl > this->mcUpWindow*this->mDt)
+      {
+         // Set new timestep
+         newCflDt = std::min(cfl, this->mcMaxJump*this->mDt);
+      
+      // Check if CFL is below minimal timestep or downard jump is large
+      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
+      {
+         // Signal simulation abort
+         newCflDt = -cfl;
+     
+      // Check if CFL requires a lower timestep
+      } else if(cfl < this->mDt)
+      {
+         // Set new timestep
+         newCflDt = cfl/this->mcUpWindow;
+      } else
+      {
+         newCflDt = cfl;
+      }
       
       // Gather error accros processes
       #ifdef GEOMHDISCC_MPI
@@ -113,33 +105,41 @@ namespace Timestep {
       #endif //GEOMHDISCC_MPI
       
       // No error control and no CFL condition
-      MHDFloat maxError = 1e-4;
-      if(this->mError < 0.0)
+      MHDFloat newErrorDt = 0.0;
+      if(this->mError > this->mMaxError)
       {
-         hasNewDt = false;
+         newErrorDt = this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
 
-      } else if(this->mError > maxError)
+      } else if(this->mError < this->mMaxError/(this->mcMaxJump*0.9) && this->mCnstSteps > 10)
       {
-         hasNewDt = true;
-         this->mOldDt = this->mDt;
-         this->mDt *= std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
+         newErrorDt = std::min(this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+      }
 
-      } else if(this->mError < maxError/(this->mcMaxJump*0.9) && this->mCnstSteps > 10)
+      // CFL condition requested abort!
+      if(newCflDt < 0.0)
       {
-         hasNewDt = true;
-         this->mOldDt = this->mDt;
-         this->mDt = std::min(this->mDt*std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+         this->mDt = newCflDt;
 
-      // No need to change timestep
-      } else
+      // Get minimum between both conditions
+      } else if(newCflDt > 0.0 && newErrorDt > 0.0)
       {
-         hasNewDt = false;
+         this->mDt = std::min(newCflDt, newErrorDt);
+
+      // Use CFL condition
+      } else if(newCflDt > 0.0)
+      {
+         this->mDt = newCflDt;
+
+      // Use error condition
+      } else if(newErrorDt > 0.0)
+      {
+         this->mDt = newErrorDt;
       }
 
       //
       // Update the timestep matrices if necessary
       //
-      if(hasNewDt)
+      if(this->mDt != this->mOldDt && this->mDt > 0.0)
       {
          DebuggerMacro_showValue("Updating timestep and matrices with new Dt = ", 0, this->mDt);
 
@@ -166,7 +166,7 @@ namespace Timestep {
       this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps, this->mError);
       this->mspIo->write();
 
-      if(hasNewDt)
+      if(this->mDt != this->mOldDt && this->mDt > 0.0)
       {
          this->mCnstSteps = 0.0;
       }
@@ -196,11 +196,18 @@ namespace Timestep {
       this->mTime = this->mRefTime + this->stepFraction()*this->mDt;
    }
 
-   void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Set initial time
       this->mTime = time;
       this->mRefTime = this->mTime;
+
+      // Use embedded scheme to compute error
+      if(maxError > 0.0)
+      {
+         TimeSchemeSelector::useEmbedded();
+         this->mMaxError = maxError;
+      }
 
       // Set initial timestep
       this->mOldDt = dt;

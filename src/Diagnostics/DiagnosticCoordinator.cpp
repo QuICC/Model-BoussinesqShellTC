@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcCourant(0.65), mcMaxStep(0.1), mFixedStep(-1), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : mcCourant(0.65), mcMaxStep(0.1), mcMinStep(1e-11), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
    {
    }
 
@@ -55,11 +55,11 @@ namespace Diagnostics {
       // Required wrapper is not implemented
       } else
       {
-         throw Exception("Unknown velocity wrapper is required or need to switch to fixed timestep!");
+         this->mFixedStep = tstep(1);
       }
 
       // Prepare mesh if CFL computation is required
-      if(this->mFixedStep <= 0)
+      if(this->mFixedStep <= 0 && this->mspVelocityWrapper)
       {
          // Compute the mesh spacings
          this->mMeshSpacings.reserve(mesh.size());
@@ -96,6 +96,12 @@ namespace Diagnostics {
 
       // Store configuration file start step
       this->mStartTimestep = tstep(1);
+
+      // Store error goal from configuration file (not enabled if fixed timestep is used)
+      if(tstep(1) < 0)
+      {
+         this->mMaxError = tstep(2);
+      }
    }
 
    void DiagnosticCoordinator::initialCfl()
@@ -106,10 +112,8 @@ namespace Diagnostics {
          this->mCfl = this->mFixedStep;
 
       // Compute initial CFL condition
-      } else
+      } else if(this->mspVelocityWrapper)
       {
-         assert(this->mspVelocityWrapper);
-
          // Compute CFL for initial state
          this->updateCfl();
 
@@ -117,6 +121,11 @@ namespace Diagnostics {
          this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/100.);
          this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/100.);
          this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/100.);
+
+      // No CFL but allow for adaptive timestep based on error
+      } else
+      {
+         this->mCfl = std::min(this->mcMinStep, -this->mFixedStep);
       }
    }
 
@@ -128,7 +137,7 @@ namespace Diagnostics {
          this->mCfl = this->mFixedStep;
 
       // Compute initial CFL condition
-      } else
+      } else if(this->mspVelocityWrapper)
       {
          // Safety assert
          assert(this->mspVelocityWrapper);
@@ -149,6 +158,11 @@ namespace Diagnostics {
          DebuggerMacro_showValue("Raw CFL cfl = ", 2, this->mCfl);
          // Check for maximum timestep
          this->mCfl = std::min(this->mcMaxStep, this->mCfl);
+      
+      // Use given negative timestep as max value
+      } else
+      {
+         this->mCfl = std::min(this->mcMaxStep, -this->mFixedStep);
       }
    }
 
@@ -159,7 +173,7 @@ namespace Diagnostics {
       //
       #ifdef GEOMHDISCC_MPI
 
-      if(this->mFixedStep <= 0)
+      if(this->mFixedStep <= 0 && this->mspVelocityWrapper)
       {
          // Reduce CFL on all CPUs to the global minimum
          MPI_Allreduce(MPI_IN_PLACE, &this->mCfl, 1, Parallel::MpiTypes::type<MHDFloat>(), MPI_MIN, MPI_COMM_WORLD);
@@ -169,6 +183,11 @@ namespace Diagnostics {
       // End of MPI block
       //
       #endif // GEOMHDISCC_MPI
+   }
+
+   MHDFloat DiagnosticCoordinator::maxError() const
+   {
+      return this->mMaxError;
    }
 
    MHDFloat DiagnosticCoordinator::cfl() const

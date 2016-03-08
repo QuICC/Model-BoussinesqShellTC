@@ -335,7 +335,7 @@ namespace Timestep {
          }
 
          // Embedded lower order scheme solution
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
             bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
@@ -352,7 +352,7 @@ namespace Timestep {
       if(this->mStep == 0)
       {
          // Reset error
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             this->mError = 0.0;
          }
@@ -376,7 +376,7 @@ namespace Timestep {
          if(this->mRegisterId == SOLUTION_REGISTER)
          {
             // Compute error estimate using embedded scheme
-            if(TimeSchemeSelector::HAS_EMBEDDED)
+            if(TimeSchemeSelector::USE_EMBEDDED)
             {
                for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
                {
@@ -546,7 +546,7 @@ namespace Timestep {
          }
 
          // Embedded lower order scheme solution
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
             bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
@@ -683,7 +683,7 @@ namespace Timestep {
       {
          internal::computeSet(this->mIntSolution.at(i), this->mSolution.at(i));
 
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             internal::computeSet(this->mErrSolution.at(i), this->mSolution.at(i));
          }
@@ -709,7 +709,7 @@ namespace Timestep {
       this->mIntSolution.push_back(TData(rows,cols));
 
       // Initialize storage for embedded scheme
-      if(TimeSchemeSelector::HAS_EMBEDDED)
+      if(TimeSchemeSelector::USE_EMBEDDED)
       {
          this->mErrSolution.push_back(TData(rows,cols));
       }

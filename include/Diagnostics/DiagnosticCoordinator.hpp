@@ -70,6 +70,11 @@ namespace Diagnostics {
          MHDFloat cfl() const;
 
          /**
+          * @brief Get max error goal
+          */
+         MHDFloat maxError() const;
+
+         /**
           * @brief Get start time
           */
          MHDFloat startTime() const;
@@ -103,9 +108,19 @@ namespace Diagnostics {
          const MHDFloat mcMaxStep;
 
          /**
+          * @brief Minimum timestep
+          */
+         const MHDFloat mcMinStep;
+
+         /**
           * @brief Fixed timestep
           */
          MHDFloat mFixedStep;
+
+         /**
+          * @brief Max error goal
+          */
+         MHDFloat mMaxError;
 
          /**
           * @brief Current CFL condition

@@ -338,13 +338,16 @@ namespace GeoMHDiSCC {
       // Safety assert for non NULL pointer
       assert(this->mspCfgFile);
 
-      Array tstep(2);
+      Array tstep(3);
 
       // Get timestepping time configuration
       tstep(0) = this->mspCfgFile->spTimestepping()->fValue("time");
 
       // Get timestepping timestep configuration
       tstep(1) = this->mspCfgFile->spTimestepping()->fValue("timestep");
+
+      // Get timestepping error configuration
+      tstep(2) = this->mspCfgFile->spTimestepping()->fValue("error");
 
       return tstep;
    }

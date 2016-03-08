@@ -65,10 +65,11 @@ namespace Timestep {
           *
           * @param time    Initial time value
           * @param dt      Initial timestep value
+          * @param error   Max error allowed during timestep
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void init(const MHDFloat time, const MHDFloat dt, const MHDFloat mxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Tune adaptive timestepper 
@@ -166,6 +167,11 @@ namespace Timestep {
           * @brief Maximum timestep allowed 
           */
          const MHDFloat mcMaxDt;
+
+         /**
+          * @brief Maximum error allowed 
+          */
+         MHDFloat mMaxError;
 
          /**
           * @brief Previous timestep length

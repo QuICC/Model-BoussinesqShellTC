@@ -16,6 +16,7 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -29,6 +30,9 @@ namespace Timestep {
 
    // Scheme has embedded lower order scheme?
    const bool ImExRKCB3a::HAS_EMBEDDED = false;
+
+   // Use scheme's embedded lower order scheme?
+   bool ImExRKCB3a::USE_EMBEDDED = false;
 
    // Name of the scheme
    const std::string ImExRKCB3a::NAME = "ImExRKCB3a";
@@ -116,6 +120,17 @@ namespace Timestep {
       // Initialize explicit c factors
       ImExRKCB3a::mCEx(1) = c2;
       ImExRKCB3a::mCEx(2) = c3; 
+   }
+
+   void ImExRKCB3a::useEmbedded()
+   {
+      if(ImExRKCB3a::HAS_EMBEDDED)
+      {
+         ImExRKCB3a::USE_EMBEDDED = true;
+      } else
+      {
+         throw Exception("Tried to activate inexistant embedded scheme!");
+      }
    }
 
 }

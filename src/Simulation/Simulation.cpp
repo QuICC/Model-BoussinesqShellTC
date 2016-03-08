@@ -172,7 +172,7 @@ namespace GeoMHDiSCC {
       this->mDiagnostics.synchronize();
 
       // Init timestepper using clf/100 as starting timestep
-      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
 
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
