@@ -328,7 +328,7 @@ namespace Timestep {
       {
          // Update intermediate solution
          MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
-         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
+         MHDFloat bEx = -TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeAMXPBYPZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
@@ -338,7 +338,7 @@ namespace Timestep {
          if(TimeSchemeSelector::USE_EMBEDDED)
          {
             bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
-            bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
+            bEx = -TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeAMXPBYPZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
@@ -453,7 +453,7 @@ namespace Timestep {
          {
             // Build RHS for implicit term
             MHDFloat aIm = (TimeSchemeSelector::aIm(this->mStep, this->mStep-1) - TimeSchemeSelector::bIm(this->mStep-1))*this->mDt;
-            MHDFloat aEx = (TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
+            MHDFloat aEx = -(TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeAMXPYPBZ(this->mExSolution.at(i), this->mMassMatrix.at(i), aIm, this->mImSolution.at(i), this->mIntSolution.at(i), aEx);
@@ -539,7 +539,7 @@ namespace Timestep {
       {
          // Update intermediate solution
          MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
-         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
+         MHDFloat bEx = -TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeAMXPBYPMZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
@@ -549,7 +549,7 @@ namespace Timestep {
          if(TimeSchemeSelector::USE_EMBEDDED)
          {
             bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
-            bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
+            bEx = -TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeAMXPBYPMZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
