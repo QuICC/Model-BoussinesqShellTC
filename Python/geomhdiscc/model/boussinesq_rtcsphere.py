@@ -269,7 +269,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
                 mat = mat + geo.i2r2(res[0], res[1], m, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
 
@@ -284,7 +284,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                 mat = geo.i4r4coriolis(res[0], res[1], m, bc, T/c_dt, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i4r4lapl2(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
                 mat = mat + geo.i4r4lapl(res[0], res[1], m, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
 
@@ -320,10 +320,10 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("temperature",""):
             mat = geo.i2r2(res[0], res[1], m, bc, restriction = restriction)
@@ -342,7 +342,10 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        mat = geo.zblk(res[0], res[1], m, bc)
+        if field_row in [("velocity","tor"), ("velocity","tor")] and field_row == field_col:
+            mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix = 'zero', restriction = restriction)
+        else:
+            mat = geo.zblk(res[0], res[1], m, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

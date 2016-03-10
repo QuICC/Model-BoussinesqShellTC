@@ -118,16 +118,10 @@ def make_sh_qoperator(opl, opr, nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = N
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
-def zblk(nr, maxnl, m, bc):
+def zblk(nr, maxnl, m, bc, l_zero_fix = False, restriction = None):
     """Create a block of zeros"""
 
-    bcr = convert_bc(bc)
-
-    mat = rad.zblk(nr, m, bcr)
-    for l in range(m+1, maxnl):
-        mat = spsp.block_diag((mat,rad.zblk(nr, l, bcr)), format = 'coo')
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc)
+    return make_sh_loperator(rad.zblk, nr, maxnl, m, bc, 0.0, with_sh_coeff = None, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def i2r2(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2r2 radial operator kronecker with an identity"""

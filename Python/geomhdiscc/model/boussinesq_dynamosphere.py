@@ -12,7 +12,7 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.sphere_boundary import no_bc
 
 
-class BoussinesqRTCSphere(base_model.BaseModel):
+class BoussinesqDynamoSphere(base_model.BaseModel):
     """Class to setup the Boussinesq rotating thermal dynamo in a sphere (Toroidal/Poloidal formulation)"""
 
     def periodicity(self):
@@ -30,8 +30,8 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         return ["velocity", "temperature", "magnetic"]
 
-    def stability_fields(self):
-        """Get the list of fields needed for linear stability calculations"""
+    def implicit_fields(self, field_row):
+        """Get the list of coupled fields in solve"""
 
         fields =  [("velocity","tor"), ("velocity","pol"), ("temperature",""), ("magnetic","tor"), ("magnetic","pol")]
 
@@ -257,7 +257,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, bc, Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, bc, Pm, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
                 mat = mat + geo.i2r2(res[0], res[1], m, bc, 1j*m*T*Pm, l_zero_fix = 'zero', restriction = restriction)
 
@@ -278,7 +278,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                 mat = geo.i4r4coriolis(res[0], res[1], m, bc, T*Pm, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], res[1], m, bc, Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i4r4lapl2(res[0], res[1], m, bc, Pm, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
                 mat = mat + geo.i4r4lapl(res[0], res[1], m, bc, 1j*m*T*Pm, l_zero_fix = 'zero', restriction = restriction)
 
@@ -291,7 +291,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.i4r4(res[0], res[1], m, bc, -Pm**2*Ra*T/Pr, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
-        elif field_row == ("magnetic","tor")
+        elif field_row == ("magnetic","tor"):
             if field_col == ("velocity","tor"):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
@@ -358,10 +358,10 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("magnetic","tor"):
             mat = geo.i2r2(res[0], res[1], m, bc, l*(l+1.0))
@@ -381,11 +381,14 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         assert(eigs[0].is_integer())
-        m = int(eigs[0))
+        m = int(eigs[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        mat = geo.zblk(res[0], res[1], m, bc)
+        if field_row in [("velocity","tor"), ("velocity","tor")] and field_row == field_col:
+            mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix = 'zero', restriction = restriction)
+        else:
+            mat = geo.zblk(res[0], res[1], m, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
