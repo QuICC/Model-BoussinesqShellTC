@@ -25,7 +25,6 @@
 #include "FastTransforms/ParityTransformTools.hpp"
 #include "Python/PythonWrapper.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -891,18 +890,16 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      for(int component = 0; component < 2; ++component)
+      // Energy transform is only even
+      for(int parity = 0; parity < 2; ++parity)
       {
-         // Energy transform is only even
-         for(int parity = 0; parity < 2; ++parity)
-         {
-            ParityTransformTools::extractParityModes(this->mTmpIn, physVal, component, this->parityBlocks(parity), physVal.rows());
-            fftw_execute_r2r(this->fPlan(0,0), this->mTmpIn.data(), this->mTmpOut.data());
-            ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, component, this->parityBlocks(parity), physVal.rows());
-            // Rescale to remove FFT scaling
-            ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
-         }
+         ParityTransformTools::extractParityModes(this->mTmpIn, physVal, 1, this->parityBlocks(parity), physVal.rows());
+         fftw_execute_r2r(this->fPlan(0,0), this->mTmpIn.data(), this->mTmpOut.data());
+         ParityTransformTools::setParityModes(rChebVal, this->mTmpOut, 1, this->parityBlocks(parity), physVal.rows());
+         // Rescale to remove FFT scaling
+         ParityTransformTools::scaleParityModes(rChebVal, 1, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
       }
+      rChebVal.imag().setZero();
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

@@ -113,6 +113,11 @@ namespace Timestep {
       } else if(this->mError < this->mMaxError/(this->mcMaxJump*0.9) && this->mCnstSteps > 10)
       {
          newErrorDt = std::min(this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+
+      // Timestep should not be increased
+      }else
+      {
+         newErrorDt = this->mDt;
       }
 
       // CFL condition requested abort!
