@@ -410,7 +410,7 @@ def i4r4lapl(nr, l, bc, coeff = 1.0):
 def i4r2lapl2_l1(nr, bc, coeff = 1.0):
     """Create operator for 4th integral of r^2 Laplacian^2 T_n(x) for l = 1."""
 
-    parity = l%2
+    parity = 1
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
     nzrow = 3
@@ -431,7 +431,7 @@ def i4r2lapl2_l1(nr, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
-    return radbc.constrain(mat, l, bc)
+    return radbc.constrain(mat, 1, bc)
 
 def i4r4lapl2(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of r^4 Laplacian^2 T_n(x)."""
