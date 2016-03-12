@@ -33,6 +33,14 @@ class BoussinesqDynamoSphere(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
+#        # Coupled solve for velocity field and temperature
+#        if field_row in [("velocity","tor"), ("velocity","pol"), ("temperature","")]:
+#           fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+#        # Independent solve for magnetic field
+#        else:
+#           fields = [field_row]
+
+        # Large coupled solve
         fields =  [("velocity","tor"), ("velocity","pol"), ("temperature",""), ("magnetic","tor"), ("magnetic","pol")]
 
         return fields
@@ -299,7 +307,7 @@ class BoussinesqDynamoSphere(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("magnetic","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("magnetic","pol"):
                 mat = geo.zblk(res[0], res[1], m, bc)
@@ -318,7 +326,7 @@ class BoussinesqDynamoSphere(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("magnetic","pol"):
-                mat = geo.i2r2lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], res[1], m, bc)
@@ -364,10 +372,10 @@ class BoussinesqDynamoSphere(base_model.BaseModel):
             mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("magnetic","tor"):
-            mat = geo.i2r2(res[0], res[1], m, bc, l*(l+1.0))
+            mat = geo.i2r2(res[0], res[1], m, bc, l*(l+1.0), l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("magnetic","pol"):
-            mat = geo.i2r2(res[0], res[1], m, bc, l*(l+1.0))
+            mat = geo.i2r2(res[0], res[1], m, bc, l*(l+1.0), l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("temperature",""):
             mat = geo.i2r2(res[0], res[1], m, bc, restriction = restriction)
