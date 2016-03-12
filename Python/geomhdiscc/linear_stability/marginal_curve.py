@@ -60,7 +60,7 @@ class MarginalCurve:
 
         return (data_k, data_Ra, data_freq)
 
-    def minimum(self, ks, Ras, xtol = 1e-4, only_int = False):
+    def minimum(self, ks, Ras, xtol = 1e-8, only_int = False):
         """Compute the critical value (minimum of curve)"""
 
         # Open file for IO and write header
@@ -638,6 +638,7 @@ def compute(gevp_opts, marginal_opts):
     gevp_opts['euler'] = marginal_opts['euler']
     gevp_opts['conv_idx'] = marginal_opts['conv_idx']
     gevp_opts['spectrum_conv'] = marginal_opts['spectrum_conv']
+    gevp_opts['geometry'] = marginal_opts['geometry']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object
@@ -690,4 +691,4 @@ def compute(gevp_opts, marginal_opts):
         gevp.viewSpectra(marginal_opts['viz_mode'], plot = marginal_opts['show_spectra'], save_pdf = marginal_opts['save_spectra'])
 
     if marginal_opts['show_physical'] or marginal_opts['save_physical'] or marginal_opts['data_physical'] or marginal_opts['save_hdf5']:
-        gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'])
+        gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'], save_hdf5 = marginal_opts['save_hdf5'])
