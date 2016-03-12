@@ -301,7 +301,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -316,7 +316,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv, geometry = geometry)
         if wave is None:
             self.wave = self.defaultWave
         else:
