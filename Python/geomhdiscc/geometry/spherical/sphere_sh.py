@@ -64,6 +64,66 @@ def coriolis_r(maxnl, m, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return mat
 
+def coriolismdr(maxnl, m, coeff = 1.0):
+    """Create operator for the spherical harmonic coriolis Q term with D_r radial dependence."""
+
+    ls = np.arange(m, maxnl)
+    offsets = np.array([-1])
+    nzrow = -1
+
+    def dgen(l):
+        return -(l - 1.0)*(l + 1.0)*np.sqrt(((l - m)*(l + m))/((2.0*l - 1.0)*(2.0*l + 1.0)))
+
+    # Generate 1st subdiagonal
+    def d_1(l):
+        return dgen(l)
+
+    ds = [d_1]
+    diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return mat
+
+def coriolisp_r(maxnl, m, coeff = 1.0):
+    """Create operator for the spherical harmonic coriolis Q term with 1/r radial dependence."""
+
+    ls = np.arange(m, maxnl)
+    offsets = np.array([1])
+    nzrow = -1
+
+    def dgen(l):
+        return  (l - 1.0)*(l + 1.0)*np.sqrt(((l - m)*(l + m))/((2.0*l - 1.0)*(2.0*l + 1.0)))
+
+    # Generate 1st superdiagonal
+    def d1(l):
+        return -(l + 2.0)*dgen(l + 1.0)
+
+    ds = [d1]
+    diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return mat
+
+def coriolispdr(maxnl, m, coeff = 1.0):
+    """Create operator for the spherical harmonic coriolis Q term with D_r radial dependence."""
+
+    ls = np.arange(m, maxnl)
+    offsets = np.array([1])
+    nzrow = -1
+
+    def dgen(l):
+        return -(l - 1.0)*(l + 1.0)*np.sqrt(((l - m)*(l + m))/((2.0*l - 1.0)*(2.0*l + 1.0)))
+
+    # Generate 1st superdiagonal
+    def d1(l):
+        return dgen(l + 1.0)
+
+    ds = [d1]
+    diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return mat
+
 def qid(maxnl, m, coeff = 1.0):
     """Create a quasi identity block"""
 

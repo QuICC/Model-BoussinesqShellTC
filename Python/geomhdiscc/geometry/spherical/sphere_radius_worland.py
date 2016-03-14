@@ -13,7 +13,20 @@ import geomhdiscc.geometry.spherical.sphere_radius_worland_boundary as radbc
 def zblk(nr, l, bc):
     """Create a block of zeros"""
 
-    mat = spsp.coo_matrix((nr,nr))
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    if bc[0] > 0:
+        # Compute extension
+        pr = bc[0]//10
+
+        # Remove extra column and unused boundary row
+        bc['cr'] = bc.get('cr',0) + pr
+        bc['rt'] = bc.get('rt',0) + pr
+    else:
+        pr = 0
+
+    mat = spsp.coo_matrix((nr+pr,nr+pr))
     return radbc.constrain(mat,l,bc)
 
 def i1(nr, l, bc, coeff = 1.0):
@@ -43,6 +56,9 @@ def i1(nr, l, bc, coeff = 1.0):
 
 def i2(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral r^l P_n^{-1/2,l-1/2}(2r^2 -1)."""
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
 
     ns = np.arange(0, nr+1)
     offsets = np.arange(-2,3)
@@ -81,7 +97,10 @@ def i2(nr, l, bc, coeff = 1.0):
 def i4(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral r^l P_n^{-1/2,l-1/2}(2r^2 -1)."""
 
-    ns = np.arange(0, nr)
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+2)
     offsets = np.arange(-4,5)
     nzrow = 3
 
@@ -134,6 +153,9 @@ def i4(nr, l, bc, coeff = 1.0):
 def i2lapl(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral of Laplacian r^l P_n^{-1/2,l-1/2}(2r^2 -1)."""
 
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
     ns = np.arange(0, nr+1)
     offsets = np.arange(-1,2)
     nzrow = 1
@@ -160,10 +182,121 @@ def i2lapl(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
+def i2qmdr(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral of D_r r^{l-1} P_n^{-1/2,l-3/2}(2r^2 -1)."""
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+1)
+    offsets = np.arange(-1,3)
+    nzrow = 1
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 1
+    bc['rt'] = bc.get('rt',0) + 1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return 8.0*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -4.0*(l + n - 1.0)*(2.0*l - 2.0*n - 1.0)/((l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -2.0*(2.0*n + 1.0)*(4.0*l + 2.0*n - 1.0)/((l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l + 2.0*n + 1.0)/((l + n)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0))
+
+    ds = [d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i2qp_r(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral of 1/r r^{l+1} P_n^{-1/2,l+1/2}(2r^2 -1)."""
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+1)
+    offsets = np.arange(-2,2)
+    nzrow = 1
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 1
+    bc['rt'] = bc.get('rt',0) + 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return 4.0*(l + n - 1.0)/((l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -2.0*(4.0*l + 2.0*n + 1.0)/((l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return (2.0*l - 2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)/((l + n)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return (2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)/(2.0*(l + n)*(l + n + 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0))
+
+    ds = [d_2, d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i2qpdr(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral of D_r r^{l+1} P_n^{-1/2,l+1/2}(2r^2 -1)."""
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+1)
+    offsets = np.arange(-2,2)
+    nzrow = 1
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 1
+    bc['rt'] = bc.get('rt',0) + 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return 4.0*(l + n - 1.0)/((l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return 2.0*(2.0*l*n + 5.0*l + 4.0*n**2 - 1.0)/((l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -(2.0*l + 2.0*n + 1.0)*(2.0*l**2 + 6.0*l*n + 5.0*l + 4.0*n**2 - 1.0)/((l + n)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -(2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)/(2.0*(l + n)*(l + n + 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+
+    ds = [d_2, d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
 def i4lapl(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of Laplacian r^l P_n^{-1/2,l-1/2}(2r^2 -1)."""
 
-    ns = np.arange(0, nr)
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+2)
     offsets = np.arange(-3,4)
     nzrow = 3
 
@@ -208,7 +341,10 @@ def i4lapl(nr, l, bc, coeff = 1.0):
 def i4lapl2(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral bilaplacian r^l P_n^{-1/2, l-1/2}(2r^2 - 1)."""
 
-    ns = np.arange(0, nr)
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+2)
     offsets = np.arange(-2,3)
     nzrow = 3
 
@@ -237,6 +373,162 @@ def i4lapl2(nr, l, bc, coeff = 1.0):
         return 4.0*(2.0*n + 1.0)*(2.0*n + 3.0)**2*(2.0*n + 5.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)/((l + n)*(l + n + 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0))
 
     ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i4qmdr(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of D_r r^{l-1} P_n^{-1/2, l-3/2}(2r^2 - 1)."""
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+2)
+    offsets = np.arange(-3,5)
+    nzrow = 3
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 2
+    bc['rt'] = bc.get('rt',0) + 2
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return 32.0*(l + n - 4.0)*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 7.0)*(l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -16.0*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)*(6.0*l - 2.0*n - 1.0)/((l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return 24.0*(l + n - 2.0)*(l + n - 1.0)*(4.0*l**2 - 8.0*l*n - 4.0*n**2 + 8.0*n + 5.0)/((l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+
+    # Generate diagonal
+    def d0(n):
+        return -4.0*(l + n - 1.0)*(8.0*l**3 - 72.0*l**2*n - 12.0*l**2 - 24.0*l*n**2 + 72.0*l*n + 58.0*l + 24.0*n**3 + 12.0*n**2 - 54.0*n - 27.0)/((l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -2.0*(2.0*n + 1.0)*(32.0*l**3 - 48.0*l**2*n - 72.0*l**2 - 96.0*l*n**2 - 48.0*l*n + 112.0*l - 24.0*n**3 + 12.0*n**2 + 54.0*n - 27.0)/((l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -3.0*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l + 2.0*n + 1.0)*(8.0*l**2 - 8.0*l - 4.0*n**2 - 8.0*n + 5.0)/((l + n)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(8.0*l + 2.0*n - 1.0)/(2.0*(l + n)*(l + n + 1.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return -(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)/(4.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0)*(l + 2.0*n + 7.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3, d4]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i4qp_r(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of 1/r r^{l+1} P_n^{-1/2, l+1/2}(2r^2 - 1)."""
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+2)
+    offsets = np.arange(-4,4)
+    nzrow = 3
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 2
+    bc['rt'] = bc.get('rt',0) + 2
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return 16.0*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 7.0)*(l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return -8.0*(l + n - 2.0)*(l + n - 1.0)*(8.0*l + 2.0*n + 1.0)/((l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return 12.0*(l + n - 1.0)*(8.0*l**2 + 8.0*l - 4.0*n**2 + 8.0*n + 5.0)/((l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -2.0*(32.0*l**3 - 48.0*l**2*n + 72.0*l**2 - 96.0*l*n**2 + 48.0*l*n + 112.0*l - 24.0*n**3 - 12.0*n**2 + 54.0*n + 27.0)/((l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0))
+
+    # Generate diagonal
+    def d0(n):
+        return (2.0*l + 2.0*n + 1.0)*(8.0*l**3 - 72.0*l**2*n + 12.0*l**2 - 24.0*l*n**2 - 72.0*l*n + 58.0*l + 24.0*n**3 - 12.0*n**2 - 54.0*n + 27.0)/((l + n)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return 3.0*(2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(4.0*l**2 - 8.0*l*n - 4.0*n**2 - 8.0*n + 5.0)/(2.0*(l + n)*(l + n + 1.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return (2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)*(6.0*l - 2.0*n + 1.0)/(4.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return (2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)*(2.0*l + 2.0*n + 7.0)/(8.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + n + 3.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0)*(l + 2.0*n + 7.0))
+
+    ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, l, bc)
+
+def i4qpdr(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of D_r r^{l+1} P_n^{-1/2, l+1/2}(2r^2 - 1)."""
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+2)
+    offsets = np.arange(-4,4)
+    nzrow = 3
+
+    # Remove extra column and unused boundary row
+    bc['cr'] = bc.get('cr',0) + 2
+    bc['rt'] = bc.get('rt',0) + 2
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return 16.0*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return -8.0*(l + n - 2.0)*(l + n - 1.0)*(4.0*l**2 + 6.0*l*n - 33.0*l - 4.0*n**2 + 8.0*n + 5.0)/((l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -12.0*(l + n - 1.0)*(8.0*l**2*n + 20.0*l**2 + 20.0*l*n**2 - 32.0*l*n - 5.0*l + 8.0*n**3 - 28.0*n**2 + 14.0*n + 15.0)/((l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return 2.0*(16.0*l**4 + 80.0*l**3*n + 104.0*l**3 + 96.0*l**2*n**2 - 144.0*l**2*n - 16.0*l**2 - 24.0*l*n**3 - 204.0*l*n**2 + 118.0*l*n + 139.0*l - 48.0*n**4 + 120.0*n**2 - 27.0)/((l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0))
+
+    # Generate diagonal
+    def d0(n):
+        return -(2.0*l + 2.0*n + 1.0)*(8.0*l**4 - 8.0*l**3*n + 44.0*l**3 - 120.0*l**2*n**2 - 264.0*l**2*n - 14.0*l**2 - 168.0*l*n**3 - 204.0*l*n**2 + 122.0*l*n + 139.0*l - 48.0*n**4 + 120.0*n**2 - 27.0)/((l + n)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -3.0*(2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(4.0*l**3 + 8.0*l**2*n + 24.0*l**2 - 4.0*l*n**2 - 24.0*l*n - 19.0*l - 8.0*n**3 - 28.0*n**2 - 14.0*n + 15.0)/(2.0*(l + n)*(l + n + 1.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)*(6.0*l**2 + 14.0*l*n + 41.0*l + 4.0*n**2 + 8.0*n - 5.0)/(4.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)*(2.0*l + 2.0*n + 7.0)/(8.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + n + 3.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0)) 
+
+    ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
