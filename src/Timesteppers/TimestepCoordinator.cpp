@@ -91,12 +91,13 @@ namespace Timestep {
       {
          // Set new timestep
          newCflDt = cfl/this->mcUpWindow;
+
       } else
       {
          newCflDt = cfl;
       }
       
-      // Gather error accros processes
+      // Gather error across processes
       #ifdef GEOMHDISCC_MPI
       if(this->mError > 0.0)
       {
@@ -115,7 +116,11 @@ namespace Timestep {
          newErrorDt = std::min(this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
 
       // Timestep should not be increased
-      }else
+      } else if(this->mError < 0)
+      {
+         newErrorDt = cfl;
+
+      } else
       {
          newErrorDt = this->mDt;
       }

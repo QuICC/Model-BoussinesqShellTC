@@ -23,14 +23,21 @@
 //
 #include "Base/MpiTypes.hpp"
 #include "Exceptions/Exception.hpp"
-#include "Diagnostics/StreamVerticalWrapper.hpp"
+#if defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
+   #include "Diagnostics/StreamVerticalWrapper.hpp"
+   #include "Diagnostics/CartesianCflWrapper.hpp"
+#elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFMTORPOL
+   #include "Diagnostics/SphericalTorPolWrapper.hpp"
+   #include "Diagnostics/SphericalCflWrapper.hpp"
+#endif //defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcCourant(0.65), mcMaxStep(0.1), mcMinStep(1e-11), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : mcMaxStep(0.1), mcMinStep(1e-11), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
    {
    }
 
@@ -43,52 +50,34 @@ namespace Diagnostics {
       // Check for constant timestep setup
       if(tstep(1) > 0)
       {
-         this->mFixedStep = tstep(1);
+         this->mFixedStep = std::max(this->mcMinStep, tstep(1));
+         this->mFixedStep = std::min(this->mFixedStep, this->mcMaxStep);
 
+      #if defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
       // Create a stream function and vertical velocity wrapper
       } else if(scalars.count(PhysicalNames::STREAMFUNCTION) && scalars.count(PhysicalNames::VELOCITYZ))
       {
-         SharedStreamVerticalWrapper   spWrapper = SharedStreamVerticalWrapper(new StreamVerticalWrapper(scalars.find(PhysicalNames::STREAMFUNCTION)->second, scalars.find(PhysicalNames::VELOCITYZ)->second));
+         SharedStreamVerticalWrapper spVelocity = SharedStreamVerticalWrapper(new StreamVerticalWrapper(scalars.find(PhysicalNames::STREAMFUNCTION)->second, scalars.find(PhysicalNames::VELOCITYZ)->second));
 
-         this->mspVelocityWrapper = spWrapper;
+         this->mspCflWrapper = SharedCartesianCflWrapper(new CartesianCflWrapper(spVelocity, mesh));
+
+         this->mFixedStep = tstep(1);
+
+      #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFMTORPOL
+      // Create a stream function and vertical velocity wrapper
+      } else if(vectors.count(PhysicalNames::VELOCITY))
+      {
+         SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
+
+         this->mspCflWrapper = SharedSphericalCflWrapper(new SphericalCflWrapper(spVelocity, mesh));
+
+         this->mFixedStep = tstep(1);
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
 
       // Required wrapper is not implemented
       } else
       {
          this->mFixedStep = tstep(1);
-      }
-
-      // Prepare mesh if CFL computation is required
-      if(this->mFixedStep <= 0 && this->mspVelocityWrapper)
-      {
-         // Compute the mesh spacings
-         this->mMeshSpacings.reserve(mesh.size());
-         // Loop over all dimensions
-         for(size_t i = 0; i < mesh.size(); i++)
-         {
-            // Create storage
-            this->mMeshSpacings.push_back(Array(mesh.at(i).size()));
-
-            // Extract minimal spacing for each grid in current direction
-            for(int j = 0; j < mesh.at(i).size(); ++j)
-            {
-               // Get internal points grid spacing
-               if(j > 0 && j < mesh.at(i).size() - 1)
-               {
-                  this->mMeshSpacings.back()(j) = std::min(std::abs(mesh.at(i)(j) - mesh.at(i)(j-1)), std::abs(mesh.at(i)(j) - mesh.at(i)(j+1)));
-
-               // Get left endpoint grid spacing
-               } else if(j > 0)
-               {
-                  this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j-1));
-
-               // Get right endpoint grid spacing
-               } else
-               {
-                  this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j+1));
-               }
-            }
-         }
       }
 
       // Store configuration file start time
@@ -98,7 +87,7 @@ namespace Diagnostics {
       this->mStartTimestep = tstep(1);
 
       // Store error goal from configuration file (not enabled if fixed timestep is used)
-      if(tstep(1) < 0)
+      if(tstep(2) > 0)
       {
          this->mMaxError = tstep(2);
       }
@@ -107,25 +96,21 @@ namespace Diagnostics {
    void DiagnosticCoordinator::initialCfl()
    {
       // Used fixed timestep
-      if(this->mFixedStep > 0)
+      if(this->mFixedStep > 0 && this->mMaxError > 0)
+      {
+         this->mCfl = this->mcMinStep;
+
+      } else if(this->mFixedStep > 0)
       {
          this->mCfl = this->mFixedStep;
 
       // Compute initial CFL condition
-      } else if(this->mspVelocityWrapper)
+      } else if(this->mspCflWrapper)
       {
          // Compute CFL for initial state
-         this->updateCfl();
+         this->mCfl = this->mspCflWrapper->initialCfl();
 
-         // Assume a velocity of 100 to avoid problems with "zero" starting values 
-         this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/100.);
-         this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/100.);
-         this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/100.);
-
-      // No CFL but allow for adaptive timestep based on error
-      } else
-      {
-         this->mCfl = std::min(this->mcMinStep, -this->mFixedStep);
+         this->mCfl = std::min(this->mcMinStep, this->mCfl);
       }
    }
 
@@ -136,33 +121,18 @@ namespace Diagnostics {
       {
          this->mCfl = this->mFixedStep;
 
-      // Compute initial CFL condition
-      } else if(this->mspVelocityWrapper)
+      // Compute CFL condition
+      } else if(this->mspCflWrapper)
       {
          // Safety assert
-         assert(this->mspVelocityWrapper);
+         assert(this->mspCflWrapper);
 
-         // Compute most stringent CFL condition
-         this->mCfl = this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/this->mspVelocityWrapper->one().data().array().abs().maxCoeff();
-         DebuggerMacro_showValue("Raw CFL Dx = ", 2, this->mMeshSpacings.at(0).minCoeff());
-         DebuggerMacro_showValue("Raw CFL Vx = ", 2, this->mspVelocityWrapper->one().data().array().abs().maxCoeff());
+         this->mCfl = this->mspCflWrapper->cfl();
 
-         this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
-         DebuggerMacro_showValue("Raw CFL Dy = ", 2, this->mMeshSpacings.at(1).minCoeff());
-         DebuggerMacro_showValue("Raw CFL Vy = ", 2, this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
-
-         this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
-         DebuggerMacro_showValue("Raw CFL Dz = ", 2, this->mMeshSpacings.at(2).minCoeff());
-         DebuggerMacro_showValue("Raw CFL Vz = ", 2, this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
-
-         DebuggerMacro_showValue("Raw CFL cfl = ", 2, this->mCfl);
          // Check for maximum timestep
          this->mCfl = std::min(this->mcMaxStep, this->mCfl);
-      
-      // Use given negative timestep as max value
-      } else
-      {
-         this->mCfl = std::min(this->mcMaxStep, -this->mFixedStep);
+
+         this->mCfl = std::min(-this->mFixedStep, this->mCfl);
       }
    }
 
@@ -173,7 +143,7 @@ namespace Diagnostics {
       //
       #ifdef GEOMHDISCC_MPI
 
-      if(this->mFixedStep <= 0 && this->mspVelocityWrapper)
+      if(this->mFixedStep <= 0 && this->mspCflWrapper)
       {
          // Reduce CFL on all CPUs to the global minimum
          MPI_Allreduce(MPI_IN_PLACE, &this->mCfl, 1, Parallel::MpiTypes::type<MHDFloat>(), MPI_MIN, MPI_COMM_WORLD);

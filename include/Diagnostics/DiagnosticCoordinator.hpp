@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "Diagnostics/IVelocityWrapper.hpp"
+#include "Diagnostics/ICflWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -98,11 +98,6 @@ namespace Diagnostics {
 
       private:
          /**
-          * @brief Courant constant used for the CFL computation
-          */
-         const MHDFloat mcCourant;
-
-         /**
           * @brief Maximum timestep
           */
          const MHDFloat mcMaxStep;
@@ -138,14 +133,9 @@ namespace Diagnostics {
          MHDFloat mStartTimestep;
 
          /**
-          * @brief Spacing between grid points
+          * @brief Shared pointer to a CFL condition wrapper
           */
-         std::vector<Array> mMeshSpacings;
-
-         /**
-          * @brief Shared pointer to a velocity field wrapper
-          */
-         SharedIVelocityWrapper  mspVelocityWrapper;
+         SharedICflWrapper  mspCflWrapper;
    };
 }
 }
