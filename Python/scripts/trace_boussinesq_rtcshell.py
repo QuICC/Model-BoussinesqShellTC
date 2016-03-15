@@ -82,7 +82,6 @@ if Rac is None:
 else:
     Ra = Rac
 
-
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
 eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra, 'ro':ro, 'rratio':rratio, 'heating':heating}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}

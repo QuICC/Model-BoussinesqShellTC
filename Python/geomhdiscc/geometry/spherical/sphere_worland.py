@@ -76,50 +76,41 @@ def make_sh_loperator(op, nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
-def make_sh_qoperator(opmdr, opp_r, oppdr, nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+def make_sh_qoperator(opm, opp, nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create the coupled operator for the coriolis Q term"""
 
     # Only compute if there are at least 2 harmonic degrees
     if maxnl - m > 1:
-        cormdr = sh.coriolismdr(maxnl, m)
-        corp_r = sh.coriolisp_r(maxnl, m)
-        corpdr = sh.coriolispdr(maxnl, m)
+        corm = sh.coriolism(maxnl, m)
+        corp = sh.coriolisp(maxnl, m)
 
         if restriction is not None:
-            cormdr = cormdr.tolil()
-            corp_r = corp_r.tolil()
-            corpdr = corpdr.tolil()
-            res_cols = list(set(range(0,corp_r.shape[1])) - set([i - m for i in restriction]))
-            cormdr[:,res_cols] = 0
-            copr_r[:,res_cols] = 0
-            corpdr[:,res_cols] = 0
+            corm = corm.tolil()
+            corp = corp.tolil()
+            res_cols = list(set(range(0,corp.shape[1])) - set([i - m for i in restriction]))
+            corm[:,res_cols] = 0
+            corp[:,res_cols] = 0
 
-        cormdr = cormdr.tocsr()
-        corp_r = corp_r.tocsr()
-        corpdr = corpdr.tocsr()
+        corm = corm.tocsr()
+        corp = corp.tocsr()
 
         bcr = convert_bc(bc)
         shc = sh_coeff(with_sh_coeff)
 
         assert(l_zero_fix == 'zero')
         bcr = sphbc.ldependent_bc(bcr, m)
-        rmatmdr = opmdr(nr, m, bcr)
-        rmatp_r = opp_r(nr, m, bcr)
-        rmatpdr = oppdr(nr, m, bcr)
-        rmatmdr = fix_l_zero(nr, m, rmatmdr, bcr, l_zero_fix)
-        rmatp_r = fix_l_zero(nr, m, rmatp_r, bcr, l_zero_fix)
-        rmatpdr = fix_l_zero(nr, m, rmatpdr, bcr, l_zero_fix)
-        mat = coeff*shc(m)*spsp.kron(cormdr[0,:], rmatmdr, format = 'coo')
-        mat += coeff*shc(m)*spsp.kron(corp_r[0,:],rmatp_r, format = 'coo') + coeff*shc(m)*spsp.kron(corpdr[0,:], rmatpdr, format = 'coo')
+        rmatm = opm(nr, m, bcr)
+        rmatp = opp(nr, m, bcr)
+        rmatm = fix_l_zero(nr, m, rmatm, bcr, l_zero_fix)
+        rmatp = fix_l_zero(nr, m, rmatp, bcr, l_zero_fix)
+        mat = coeff*shc(m)*spsp.kron(corm[0,:], rmatm, format = 'coo') + coeff*shc(m)*spsp.kron(corp[0,:],rmatp, format = 'coo')
         rows = [mat]
         for ir,l in enumerate(range(m+1, maxnl)):
             bcr = sphbc.ldependent_bc(bcr, l-1)
-            rmatmdr = opmdr(nr, l, bcr)
+            rmatm = opm(nr, l, bcr)
             bcr = sphbc.ldependent_bc(bcr, l+1)
-            rmatp_r = opp_r(nr, l, bcr)
-            rmatpdr = oppdr(nr, l, bcr)
-            mat = coeff*shc(l)*spsp.kron(cormdr[ir+1,:], rmatmdr, format = 'coo')
-            mat += coeff*shc(l)*spsp.kron(corp_r[ir+1,:],rmatp_r, format = 'coo') + coeff*shc(l)*spsp.kron(corpdr[ir+1,:],rmatpdr, format = 'coo')
+            rmatp = opp(nr, l, bcr)
+            mat = coeff*shc(l)*spsp.kron(corm[ir+1,:], rmatm, format = 'coo') + coeff*shc(l)*spsp.kron(corp[ir+1,:],rmatp, format = 'coo')
             rows.append(mat)
         mat = spsp.vstack(rows)
     else:
@@ -160,12 +151,12 @@ def i4lapl2(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = Fa
 def i2coriolis(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2 radial operator kronecker with coriolis Q term"""
 
-    return make_sh_qoperator(rad.i2qmdr, rad.i2qp_r, rad.i2qpdr, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_qoperator(rad.i2qm, rad.i2qp, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def i4coriolis(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i4 radial operator kronecker with coriolis Q term"""
 
-    return make_sh_qoperator(rad.i4qmdr, rad.i4qp_r, rad.i4qpdr, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_qoperator(rad.i4qm, rad.i4qp, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def qid(nr, maxnl, m, qr, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""

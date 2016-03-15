@@ -135,11 +135,11 @@ def i4lapl2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2qmdr():
+def i2qm():
     """Sphere i2qm (i1r1i1r1 coriolis Q(l-1)) operator"""
 
     # Compute starting terms
-    fs = symbolic.spectral_increase({0:4}, False)
+    fs = symbolic.spectral_increase({0:-4}, False)
 
     # Setup terms in recurrence
     terms = [
@@ -152,25 +152,25 @@ def i2qmdr():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2qp_r():
-    """Sphere i2qp_r (i1r1i1r1 coriolis Q(l+1) 1/r) operator"""
+def i2qp():
+    """Sphere i2qp (i1r1i1r1 coriolis Q(l+1)) operator"""
 
     above = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l + sympy.Rational(1,2))
+
+    # Setup terms in recurrence
+    terms = [
+            {'q':1, 'p':0, 'd':0, 'c':(2*l + 1)},
+            ]
+    tmp = above.build_recurrence(terms, {0:1}, False)
+    partA = symbolic.spectral_decrease(tmp, True)
+
+    # Compute starting terms
+    fs = symbolic.spectral_decrease({0:-(2*l-1)}, False)
 
     # Setup terms in recurrence
     terms = [
             {'q':1, 'p':0, 'd':0, 'c':1},
             ]
-    tmp = above.build_recurrence(terms, {0:1}, False)
-    partA = symbolic.spectral_decrease(tmp, True)
-
-    # Compute starting terms
-    fs = symbolic.spectral_decrease({0:1}, False)
-
-    # Setup terms in recurrence
-    terms = [
-            {'q':1, 'p':0, 'd':0, 'c':-1},
-            ]
     partB = symbolic.build_recurrence(terms, fs, True)
     r = partA
     for k,v in partB.items():
@@ -182,41 +182,11 @@ def i2qp_r():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2qpdr():
-    """Sphere i2qpdr (i1r1i1r1 coriolis Q(l+1) dr) operator"""
-
-    above = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l + sympy.Rational(1,2))
-
-    # Setup terms in recurrence
-    terms = [
-            {'q':1, 'p':0, 'd':0, 'c':(l-1)},
-            ]
-    tmp = above.build_recurrence(terms, {0:1}, False)
-    partA = symbolic.spectral_decrease(tmp, True)
-
-    # Compute starting terms
-    fs = symbolic.spectral_decrease({0:1}, False)
-
-    # Setup terms in recurrence
-    terms = [
-            {'q':1, 'p':0, 'd':0, 'c':-(l-3)},
-            ]
-    partB = symbolic.build_recurrence(terms, fs, True)
-    r = partA
-    for k,v in partB.items():
-        r[k] = r[k] + v
-        r[k] = r[k].simplify().factor()
-
-    # Print recurrence relation per diagonals
-    for k,rec in sorted(r.items()):
-        print("\t" + str(k) + ": \t" + str(rec))
-    print("\n")
-
-def i4qmdr():
+def i4qm():
     """Sphere i4qm (i1r1i1r1i1r1i1r1 coriolis Q(l-1)) operator"""
 
     # Compute starting terms
-    fs = symbolic.spectral_increase({0:4}, False)
+    fs = symbolic.spectral_increase({0:-4}, False)
 
     # Setup terms in recurrence
     terms = [
@@ -229,14 +199,14 @@ def i4qmdr():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4qp_r():
-    """Sphere i4qp_r (i1r1i1r1i1r1i1r1 coriolis Q(l+1) 1/r) operator"""
+def i4qp():
+    """Sphere i4qp (i1r1i1r1i1r1i1r1 coriolis Q(l+1)) operator"""
 
     above = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l + sympy.Rational(1,2))
 
     # Setup terms in recurrence
     terms = [
-            {'q':1, 'p':0, 'd':0, 'c':1},
+            {'q':1, 'p':0, 'd':0, 'c':(2*l + 1)},
             ]
     tmp = above.build_recurrence(terms, {0:1}, False)
     tmp2 = symbolic.spectral_decrease(tmp, False)
@@ -246,45 +216,11 @@ def i4qp_r():
     partA = symbolic.build_recurrence(terms, tmp2, True)
 
     # Compute starting terms
-    fs = symbolic.spectral_decrease({0:1}, False)
+    fs = symbolic.spectral_decrease({0:-(2*l-1)}, False)
 
     # Setup terms in recurrence
     terms = [
-            {'q':3, 'p':0, 'd':0, 'c':-1},
-            ]
-    partB = symbolic.build_recurrence(terms, fs, True)
-    r = partA
-    for k,v in partB.items():
-        r[k] = r[k] + v
-        r[k] = r[k].simplify().factor()
-
-    # Print recurrence relation per diagonals
-    for k,rec in sorted(r.items()):
-        print("\t" + str(k) + ": \t" + str(rec))
-    print("\n")
-
-def i4qpdr():
-    """Sphere i4qpdr (i1r1i1r1i1r1i1r1 coriolis Q(l+1) dr) operator"""
-
-    above = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l + sympy.Rational(1,2))
-
-    # Setup terms in recurrence
-    terms = [
-            {'q':1, 'p':0, 'd':0, 'c':(l-1)},
-            ]
-    tmp = above.build_recurrence(terms, {0:1}, False)
-    tmp = symbolic.spectral_decrease(tmp, False)
-    terms = [
-            {'q':2, 'p':0, 'd':0, 'c':1},
-            ]
-    partA = symbolic.build_recurrence(terms, tmp, True)
-
-    # Compute starting terms
-    fs = symbolic.spectral_decrease({0:1}, False)
-
-    # Setup terms in recurrence
-    terms = [
-            {'q':3, 'p':0, 'd':0, 'c':-(l-3)},
+            {'q':3, 'p':0, 'd':0, 'c':1},
             ]
     partB = symbolic.build_recurrence(terms, fs, True)
     r = partA

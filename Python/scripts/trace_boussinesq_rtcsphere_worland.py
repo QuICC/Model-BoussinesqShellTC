@@ -11,14 +11,48 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-bc_vel = 1 # 0: NS, 1: SF
-bc_temp = 0 # 0: FT 1: FF
+Rac = None
+mc = None
+
+# SF, FT, internal heating
+bc_vel = 1; bc_temp = 0
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
 #res = [32, 32, 0]
-Ta = 1e8
-res = [32, 32, 0]
+#Ta = 1e8
+#res = [32, 32, 0]
+#Ta = 1e9
+#res = [48, 48, 0]
+#Ta = 1e10
+#res = [64, 64, 0]
+#Ta = 1e11
+#res = [96, 96, 0]
+Ta = 1e12
+res = [256, 128, 0]
+#Ta = 1e13
+#res = [192, 192, 0]
+#Ta = 1e14
+#res = [256, 256, 0]
+#Ta = 1e15
+#res = [512, 512, 0]
+#Ta = 1e16
+#res = [512, 768, 0]
+#Ta = 1e17
+#res = [512, 1024, 0]
+#Ta = 1e18
+#res = [784, 1536, 0]
+#Ta = 1e19
+#res = [512, 512, 0]
+
+# NS, FT, internal heating
+#bc_vel = 0; bc_temp = 0
+#Ta = 1e6
+#res = [32, 32, 0]
+#Ta = 1e7
+#res = [32, 32, 0]
+#Ta = 1e8
+#res = [32, 32, 0]
 #Ta = 1e9
 #res = [48, 48, 0]
 #Ta = 1e10
@@ -39,14 +73,19 @@ res = [32, 32, 0]
 #res = [512, 1024, 0]
 #Ta = 1e18
 #res = [784, 1536, 0]
-#Ta = 1e19
-#res = [512, 512, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
-m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
+if mc is None:
+    m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
+else:
+    m = mc
+if Rac is None:
+    Ra = (4.1173*Ta**(2./3.) + 17.7815*Ta**(0.5))*Ta**(-0.5) # Asymptotic prediction for critical Rayleigh number
+else:
+    Ra = Rac
+
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
-Ra_th = 4.1173*Ta**(2./3.) + 17.7815*Ta**(0.5) # Asymptotic prediction for critical Rayleigh number
-eq_params = {'taylor':Ta, 'prandtl':1, 'rayleigh':Ra_th}
+eq_params = {'taylor':Ta, 'prandtl':1, 'rayleigh':Ra}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)
@@ -63,13 +102,13 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-16
 marginal_options['geometry'] = 'sphere'
 marginal_options['curve'] = False
-marginal_options['minimum'] = True
+marginal_options['minimum'] = False
+marginal_options['minimum_int'] = True
 marginal_options['plot_curve'] = False
 marginal_options['solve'] = True
-marginal_options['minimum_int'] = True
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = False
-marginal_options['plot_spy'] = True
+marginal_options['plot_spy'] = False
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['curve_points'] = np.arange(max(0, m-2), m+3, 1)
