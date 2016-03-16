@@ -149,6 +149,11 @@ namespace Timestep {
          void updateMatrices();
 
          /**
+          * @brief Minimum number of constant timestep before step size increase
+          */
+         const MHDFloat mcMinCnst;
+
+         /**
           * @brief Maximum timestep jump per step (See Soederlind)
           */
          const MHDFloat mcMaxJump;

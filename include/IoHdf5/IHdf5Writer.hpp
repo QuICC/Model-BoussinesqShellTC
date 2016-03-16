@@ -26,7 +26,6 @@
 #include "IoHdf5/Hdf5Types.hpp"
 #include "IoHdf5/Hdf5File.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace IoHdf5 {

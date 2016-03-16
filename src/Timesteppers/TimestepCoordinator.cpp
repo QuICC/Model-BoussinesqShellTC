@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMinCnst(2), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
       // Initialize timestepper
       TimeSchemeSelector::init();
@@ -77,8 +77,15 @@ namespace Timestep {
       MHDFloat newCflDt = 0.0;
       if(cfl > this->mcUpWindow*this->mDt)
       {
-         // Set new timestep
-         newCflDt = std::min(cfl, this->mcMaxJump*this->mDt);
+         if(this->mCnstSteps >= this->mcMinCnst)
+         {
+            // Set new timestep
+            newCflDt = std::min(cfl, this->mcMaxJump*this->mDt);
+         } else
+         {
+            // Reuse same timestep
+            newCflDt = this->mDt;
+         }
       
       // Check if CFL is below minimal timestep or downard jump is large
       } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
@@ -107,19 +114,23 @@ namespace Timestep {
       
       // No error control and no CFL condition
       MHDFloat newErrorDt = 0.0;
-      if(this->mError > this->mMaxError)
+
+      // Use what ever condition is used by CFL
+      if(this->mError < 0)
+      {
+         newErrorDt = -1.0;
+
+      // Error is too large, reduce timestep
+      } else if(this->mError > this->mMaxError)
       {
          newErrorDt = this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
 
-      } else if(this->mError < this->mMaxError/(this->mcMaxJump*0.9) && this->mCnstSteps > 10)
+      // Error is small, increase timestep
+      } else if(this->mError < this->mMaxError/(this->mcMaxJump*0.9) && this->mCnstSteps >= this->mcMinCnst)
       {
          newErrorDt = std::min(this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
 
       // Timestep should not be increased
-      } else if(this->mError < 0)
-      {
-         newErrorDt = cfl;
-
       } else
       {
          newErrorDt = this->mDt;

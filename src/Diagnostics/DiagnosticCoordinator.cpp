@@ -31,7 +31,6 @@
    #include "Diagnostics/SphericalCflWrapper.hpp"
 #endif //defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Diagnostics {
