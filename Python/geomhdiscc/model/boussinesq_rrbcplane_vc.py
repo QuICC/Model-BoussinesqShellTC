@@ -113,46 +113,67 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
             # No-slip / Fixed temperature
             if bcId == 0:
                 if self.use_galerkin:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
 
             # Stress-free / Fixed flux
             elif bcId == 1:
                 if self.use_galerkin:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:-21, 'rt':0}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:-21, 'rt':0}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:-20, 'rt':0}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:-21, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
+                    if field_row == ("velocity","x") and field_col == field_row:
                         bc = {0:21}
-                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
+                    elif field_row == ("velocity","y") and field_col == field_row:
                         bc = {0:21}
-                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                    elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
+
+            # Ekman pumping
+            elif bcId == 2:
+                if self.use_galerkin:
+                    raise RuntimeError("Cannot setup Galerkin basis with Ekman pumping!")
+
+                else:
+                    if field_row == ("velocity","x") and field_col == field_row:
+                        bc = {0:21}
+                    elif field_row == ("velocity","y") and field_col == field_row:
+                        bc = {0:21}
+                    elif field_row == ("velocity","z"):
+                        pump = (eq_params['taylor']**(-0.5)/2.0)**0.5
+                        k1 = eigs[0]
+                        k2 = eigs[1]
+                        if field_col == ("velocity","x"):
+                            bc = {0:20, 'c':[-pump*1j*k2, pump*1j*k2]}
+                        elif field_col == ("velocity","y"):
+                            bc = {0:20, 'c':[pump*1j*k1, -pump*1j*k1]}
+                        elif field_col == ("velocity","z"):
+                            bc = {0:20}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -386,6 +407,44 @@ class BoussinesqRRBCPlaneVC(base_model.BaseModel):
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block of boundary operator"""
+
+        k1 = eigs[0]
+        k2 = eigs[1]
+
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
+
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], bc)
+
+        if field_row == ("velocity","x") and field_col == field_row:
+            mat += utils.id_from_idx_1d(idx_u, res[0])
+
+        elif field_row == ("velocity","y") and field_col == field_row:
+            mat += utils.id_from_idx_1d(idx_v, res[0])
+
+        elif field_row == ("pressure",""):
+            if field_col == ("velocity","x"):
+                bc['rt'] = 1
+                bc['cr'] = 1
+                mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+1, bc, 1j*k1)
+
+            elif field_col == ("velocity","y"):
+                bc['rt'] = 1
+                bc['cr'] = 1
+                mat = utils.qid_from_idx(idx_p, res[0])*geo.i1(res[0]+1, bc, 1j*k2)
+
+            elif field_col == ("velocity","z"):
+                bc['rt'] = 1
+                bc['cr'] = 1
+                mat = utils.qid_from_idx(idx_p, res[0])*geo.i1d1(res[0]+1, bc, cscale = zscale)
+
+            elif field_col == ("pressure",""):
+                mat += utils.id_from_idx_1d(idx_p, res[0])
 
         return mat
 

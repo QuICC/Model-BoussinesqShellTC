@@ -27,15 +27,16 @@ kc = None
 #kp = 60
 
 # NS, FT,
-bc_vel = 0
+bc_vel = 2
 heating = 0
 bc_temp = 0
 phi = 0
 
-res = [30000, 0, 0]
-Ta = 1e28;
-Rac = 4.0154201784816e+19
-kc = 60402.637080637
+res = [256, 0, 0]
+Ta = 1e14;
+#Ta = 1e28;
+#Rac = 4.0154201784816e+19
+#kc = 60402.637080637
 #kc = 12975.
 #Rac = 8.5994892352444e+16
 #kc = 589.73789705466
@@ -131,7 +132,7 @@ marginal_options['show_physical'] = True
 marginal_options['save_hdf5'] = False
 marginal_options['save_spectra'] = False
 marginal_options['save_physical'] = False
-marginal_options['curve_points'] = np.arange(max(0, kp+10), kp+21, 1)
+marginal_options['curve_points'] = np.arange(max(0, kp-15), kp-5, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)
