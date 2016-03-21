@@ -25,6 +25,7 @@
 #include "FastTransforms/ParityTransformTools.hpp"
 #include "Python/PythonWrapper.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -195,6 +196,25 @@ namespace Transform {
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGS2, 1));
 
       //
+      // Initialise regularity operators
+      //
+      // 0th order Regularity constraint
+      this->mRegOp.insert(std::make_pair(RegularityType::REG0, opPair));
+      this->mRegularitySize.insert(std::make_pair(RegularityType::REG0, std::make_pair(1,0)));
+      // 1st order Regularity constraint
+      this->mRegOp.insert(std::make_pair(RegularityType::REG1, opPair));
+      this->mRegularitySize.insert(std::make_pair(RegularityType::REG1, std::make_pair(1,1)));
+      // 2nd order Regularity constraint
+      this->mRegOp.insert(std::make_pair(RegularityType::REG2, opPair));
+      this->mRegularitySize.insert(std::make_pair(RegularityType::REG2, std::make_pair(2,1)));
+      // 3rd order Regularity constraint
+      this->mRegOp.insert(std::make_pair(RegularityType::REG3, opPair));
+      this->mRegularitySize.insert(std::make_pair(RegularityType::REG3, std::make_pair(2,2)));
+      // 4th order Regularity constraint
+      this->mRegOp.insert(std::make_pair(RegularityType::REG4, opPair));
+      this->mRegularitySize.insert(std::make_pair(RegularityType::REG4, std::make_pair(3,2)));
+
+      //
       // Initialise solver operators
       //
       // Multiplication by R
@@ -205,6 +225,20 @@ namespace Transform {
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, opPair));
       // Second derivative
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, opPair));
+
+      //
+      // Initialise regularity solver operators
+      //
+      // 0th order Regularity constraint
+      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG0, opPair));
+      // 1st order Regularity constraint
+      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG1, opPair));
+      // 2nd order Regularity constraint
+      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG2, opPair));
+      // 3rd order Regularity constraint
+      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG3, opPair));
+      // 4th order Regularity constraint
+      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG4, opPair));
 
       //
       // Initialise solvers
@@ -222,12 +256,36 @@ namespace Transform {
       pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, std::make_pair(pSolE,pSolO)));
 
+      //
+      // Initialise regularity solvers
+      //
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mRegSolver.insert(std::make_pair(RegularityType::REG0, std::make_pair(pSolE,pSolO)));
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mRegSolver.insert(std::make_pair(RegularityType::REG1, std::make_pair(pSolE,pSolO)));
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mRegSolver.insert(std::make_pair(RegularityType::REG2, std::make_pair(pSolE,pSolO)));
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mRegSolver.insert(std::make_pair(RegularityType::REG3, std::make_pair(pSolE,pSolO)));
+      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mRegSolver.insert(std::make_pair(RegularityType::REG4, std::make_pair(pSolE,pSolO)));
+
+      //
+      // Initialise solvers
+      //
+
       // Initialise python wrapper
       PythonWrapper::import("geomhdiscc.geometry.spherical.sphere_radius");
 
       // Prepare arguments to Chebyshev matrices call
-      PyObject *pArgs, *pValue;
+      PyObject *pArgs, *pValue, *pRegArgs;
       pArgs = PyTuple_New(3);
+      pRegArgs = PyTuple_New(4);
       // ... get operator size
       pValue = PyLong_FromLong(this->mspSetup->specSize());
       PyTuple_SetItem(pArgs, 0, pValue);
@@ -326,6 +384,132 @@ namespace Transform {
          PythonWrapper::fillMatrix(this->solveOp(ProjectorType::DIFF2, parity), pValue);
          Py_DECREF(pValue);
 
+         // Prepare operators
+         pValue = PyLong_FromLong(this->mspSetup->specSize());
+         PyTuple_SetItem(pRegArgs, 0, pValue);
+         PyTuple_SetItem(pRegArgs, 1, PyLong_FromLong(parity));
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         PyTuple_SetItem(pRegArgs, 2, pValue);
+         PyTuple_SetItem(pRegArgs, 3, PyLong_FromLong(0));
+
+         if(parity == 0)
+         {
+            // Call stencil for regularity solver
+            // ... change boundary condition to 0th order regularity
+            pValue = PyTuple_GetItem(pRegArgs, 2);
+            PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-24));
+            PythonWrapper::setFunction("stencil");
+            pValue = PythonWrapper::callFunction(pRegArgs);
+            // Fill matrix
+            PythonWrapper::fillMatrix(this->regOp(RegularityType::REG0, parity), pValue);
+            Py_DECREF(pValue);
+         }
+
+         // Call stencil for regularity solver
+         // ... change boundary condition to 1st order regularity
+         pValue = PyTuple_GetItem(pRegArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-25));
+         PythonWrapper::setFunction("stencil");
+         pValue = PythonWrapper::callFunction(pRegArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG1, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call stencil for regularity solver
+         // ... change boundary condition to 2nd order regularity
+         pValue = PyTuple_GetItem(pRegArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-30));
+         PythonWrapper::setFunction("stencil");
+         pValue = PythonWrapper::callFunction(pRegArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG2, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call stencil for regularity solver
+         // ... change boundary condition to 3rd order regularity
+         pValue = PyTuple_GetItem(pRegArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-31));
+         PythonWrapper::setFunction("stencil");
+         pValue = PythonWrapper::callFunction(pRegArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG3, parity), pValue);
+         Py_DECREF(pValue);
+
+//         // Call stencil for regularity solver
+//         // ... change boundary condition to 4th order regularity
+//         pValue = PyTuple_GetItem(pRegArgs, 2);
+//         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-40));
+//         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(3));
+//         PythonWrapper::setFunction("stencil");
+//         pValue = PythonWrapper::callFunction(pRegArgs);
+//         // Fill matrix
+//         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG4, parity), pValue);
+//         Py_DECREF(pValue);
+
+         // Prepare regularity solvers
+         pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+         PyTuple_SetItem(pRegArgs, 0, pValue);
+         PyTuple_SetItem(pRegArgs, 3, PyLong_FromLong(1));
+
+         // Call stencil for regularity solver
+         // ... change boundary condition to 0th order regularity (only even harmonic)
+         if(parity == 0)
+         {
+            pValue = PyTuple_GetItem(pRegArgs, 2);
+            PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-24));
+            PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1-parity));
+            PythonWrapper::setFunction("stencil");
+            pValue = PythonWrapper::callFunction(pRegArgs);
+            // Fill matrix
+            PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG0, parity), pValue);
+            Py_DECREF(pValue);
+         }
+
+         // Call stencil for regularity solver
+         // ... change boundary condition to 1st order regularity
+         pValue = PyTuple_GetItem(pRegArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-25));
+         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
+         PythonWrapper::setFunction("stencil");
+         pValue = PythonWrapper::callFunction(pRegArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG1, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call stencil for regularity solver
+         // ... change boundary condition to 2nd order regularity
+         pValue = PyTuple_GetItem(pRegArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-30));
+         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2 - parity));
+         PythonWrapper::setFunction("stencil");
+         pValue = PythonWrapper::callFunction(pRegArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG2, parity), pValue);
+         Py_DECREF(pValue);
+
+         // Call stencil for regularity solver
+         // ... change boundary condition to 3rd order regularity
+         pValue = PyTuple_GetItem(pRegArgs, 2);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-31));
+         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2));
+         PythonWrapper::setFunction("stencil");
+         pValue = PythonWrapper::callFunction(pRegArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG3, parity), pValue);
+         Py_DECREF(pValue);
+
+//         // Call stencil for regularity solver
+//         // ... change boundary condition to 4th order regularity
+//         pValue = PyTuple_GetItem(pRegArgs, 2);
+//         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-40));
+//         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(3 - parity));
+//         PythonWrapper::setFunction("stencil");
+//         pValue = PythonWrapper::callFunction(pRegArgs);
+//         // Fill matrix
+//         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG4, parity), pValue);
+//         Py_DECREF(pValue);
+
          // Initialize solver storage
          this->tmpInS(parity).setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany(parity));
          this->tmpOutS(parity).setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany(parity));
@@ -361,6 +545,49 @@ namespace Transform {
          {
             throw Exception("Factorization of backward 2nd derivative failed!");
          }
+
+         // Initialize solver and factorize 0th order regularity stencil
+         if(parity == 0)
+         {
+            this->regSolver(RegularityType::REG0, parity).compute(this->regSolveOp(RegularityType::REG0, parity));
+            // Check for successful factorisation
+            if(this->regSolver(RegularityType::REG0, parity).info() != Eigen::Success)
+            {
+               throw Exception("Factorization of 0th order regularity stencil failed!");
+            }
+         }
+
+         // Initialize solver and factorize 1st order regularity stencil
+         this->regSolver(RegularityType::REG1, parity).compute(this->regSolveOp(RegularityType::REG1, parity));
+         // Check for successful factorisation
+         if(this->regSolver(RegularityType::REG1, parity).info() != Eigen::Success)
+         {
+            throw Exception("Factorization of 1st order regularity stencil failed!");
+         }
+
+         // Initialize solver and factorize 2nd order regularity stencil
+         this->regSolver(RegularityType::REG2, parity).compute(this->regSolveOp(RegularityType::REG2, parity));
+         // Check for successful factorisation
+         if(this->regSolver(RegularityType::REG2, parity).info() != Eigen::Success)
+         {
+            throw Exception("Factorization of 2nd order regularity stencil failed!");
+         }
+
+         // Initialize solver and factorize 3rd order regularity stencil
+         this->regSolver(RegularityType::REG3, parity).compute(this->regSolveOp(RegularityType::REG3, parity));
+         // Check for successful factorisation
+         if(this->regSolver(RegularityType::REG3, parity).info() != Eigen::Success)
+         {
+            throw Exception("Factorization of 3rd order regularity stencil failed!");
+         }
+
+//         // Initialize solver and factorize 4th order regularity stencil
+//         this->regSolver(RegularityType::REG4, parity).compute(this->regSolveOp(RegularityType::REG4, parity));
+//         // Check for successful factorisation
+//         if(this->regSolver(RegularityType::REG4, parity).info() != Eigen::Success)
+//         {
+//            throw Exception("Factorization of 4th order regularity stencil failed!");
+//         }
       }
 
       PythonWrapper::finalize();
@@ -612,7 +839,10 @@ namespace Transform {
             for(int parity = 0; parity < 2; ++parity)
             {
                // Rescale to remove FFT scaling
-               ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+               ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), physVal.rows());
+               ParityTransformTools::extractParityModes(this->mTmpIn, rChebVal, component, this->parityBlocks(parity), physVal.rows());
+               this->regularize(this->mTmpIn, parity);
+               ParityTransformTools::setParityModes(rChebVal, this->mTmpIn, component, this->parityBlocks(parity), physVal.rows());
             }
 
          } else
@@ -900,6 +1130,18 @@ namespace Transform {
          ParityTransformTools::scaleParityModes(rChebVal, 1, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
       }
       rChebVal.imag().setZero();
+   }
+
+   void SphereChebyshevFftwTransform::regularize(Matrix& rData, const int parity)
+   {
+      SphereChebyshevFftwTransform::RegularityType::Id reg = SphereChebyshevFftwTransform::RegularityType::REG2;
+
+      Matrix mRegIn = rData.bottomRows(rData.rows() - this->regularitySize(reg, parity));
+      Matrix mRegOut = Matrix::Zero(rData.rows() - this->regularitySize(reg, parity), rData.cols());
+
+      Solver::internal::solveWrapper(mRegOut, this->regSolver(reg, parity), mRegIn);
+
+      rData.topRows(this->mspSetup->specSize()) = this->regOp(reg, parity)*mRegOut.topRows(this->mspSetup->specSize() - this->regularitySize(reg, parity));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

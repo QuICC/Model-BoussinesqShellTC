@@ -79,6 +79,21 @@ namespace Transform {
          enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
       };
 
+      /**
+       * @brief Simple struct holding regularity stencil IDs
+       */
+      struct Stencils
+      {
+         /**
+          * @brief Enum of regularity constraints:
+          *    - REG0:  0th order regularity (i.e. f(0) = 0)
+          *    - REG1:  0th order regularity (i.e. f(0) = f'(0) = 0)
+          *    - REG2:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = 0)
+          *    - REG3:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = 0)
+          *    - REG4:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = 0)
+          */
+         enum Id {REG0, REG1, REG2, REG3, REG4};
+      };
    };
 
    /**
@@ -98,6 +113,9 @@ namespace Transform {
 
          /// Typedef for the Integrator type
          typedef SphereChebyshevFftIds::Integrators IntegratorType;
+
+         /// Typedef for the Integrator type
+         typedef SphereChebyshevFftIds::Stencils RegularityType;
 
          /**
           * @brief Generate a physical grid
@@ -292,6 +310,11 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
+          * @brief Regularity operators basis size
+          */
+         std::map<RegularityType::Id, std::pair<int, int> > mRegularitySize;
+
+         /**
           * @brief Does projector flip parity
           */
          std::map<ProjectorType::Id, int> mProjectorFlips;
@@ -300,6 +323,21 @@ namespace Transform {
           * @brief Does integrator flip parity
           */
          std::map<IntegratorType::Id, int> mIntegratorFlips;
+
+         /**
+          * @brief Storage for the regularity constraints operator
+          */
+         std::map<RegularityType::Id, std::pair<SparseMatrix,SparseMatrix> > mRegOp;
+
+         /**
+          * @brief Storage for the sparse solver matrices for the regularity constraints
+          */
+         std::map<RegularityType::Id, std::pair<SparseMatrix,SparseMatrix> > mRegSolveOp;
+
+         /**
+          * @brief Storage for the sparse solvers for the regularity constraints
+          */
+         std::map<RegularityType::Id, std::pair<SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>,SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > > mRegSolver;
 
          /**
           * @brief Storage for the projector operators
@@ -377,14 +415,29 @@ namespace Transform {
          SparseMatrix& intgOp(const IntegratorType::Id integrator, const int parity);
 
          /**
+          * @brief Get sparse regularity operator
+          */
+         SparseMatrix& regOp(const RegularityType::Id reg, const int parity);
+
+         /**
           * @brief Get sparse solver operator
           */
          SparseMatrix& solveOp(const ProjectorType::Id projector, const int parity);
 
          /**
+          * @brief Get sparse regularity solver operator
+          */
+         SparseMatrix& regSolveOp(const RegularityType::Id reg, const int parity);
+
+         /**
           * @brief Get sparse solver
           */
          Solver::SparseSelector<SparseMatrix>::Type& solver(const ProjectorType::Id projector, const int parity);
+
+         /**
+          * @brief Get sparse regularity solver
+          */
+         Solver::SparseSelector<SparseMatrix>::Type& regSolver(const RegularityType::Id reg, const int parity);
 
          /**
           * @brief Get temporary storage for solver
@@ -397,6 +450,11 @@ namespace Transform {
          Matrix& tmpOutS(const int parity);
 
          /**
+          * brief Size of regularity basis
+          */
+         int regularitySize(const RegularityType::Id reg, const int parity) const;
+
+         /**
           * brief Does operator flip parity?
           */
          int flipsParity(const ProjectorType::Id projector) const;
@@ -404,7 +462,12 @@ namespace Transform {
          /**
           * brief Does operator flip parity?
           */
-         int flipsParity(const IntegratorType::Id integrator) const;
+         int flipsParity(const IntegratorType::Id integrator) const; 
+
+         /**
+          * @brief Apply regularity filters
+          */
+         void regularize(Matrix& rData, const int parity);
    };
 
    inline const MatrixI& SphereChebyshevFftwTransform::parityBlocks(const int parity) const
@@ -463,6 +526,17 @@ namespace Transform {
       }
    }
 
+   inline SparseMatrix& SphereChebyshevFftwTransform::regOp(const RegularityType::Id reg, const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mRegOp.find(reg)->second.first;
+      } else
+      {
+         return this->mRegOp.find(reg)->second.second;
+      }
+   }
+
    inline SparseMatrix& SphereChebyshevFftwTransform::solveOp(const ProjectorType::Id projector, const int parity)
    {
       if(parity == 0)
@@ -474,6 +548,17 @@ namespace Transform {
       }
    }
 
+   inline SparseMatrix& SphereChebyshevFftwTransform::regSolveOp(const RegularityType::Id reg, const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mRegSolveOp.find(reg)->second.first;
+      } else
+      {
+         return this->mRegSolveOp.find(reg)->second.second;
+      }
+   }
+
    inline Solver::SparseSelector<SparseMatrix>::Type& SphereChebyshevFftwTransform::solver(const ProjectorType::Id projector, const int parity)
    {
       if(parity == 0)
@@ -482,6 +567,17 @@ namespace Transform {
       } else
       {
          return *this->mSolver.find(projector)->second.second;
+      }
+   }
+
+   inline Solver::SparseSelector<SparseMatrix>::Type& SphereChebyshevFftwTransform::regSolver(const RegularityType::Id reg, const int parity)
+   {
+      if(parity == 0)
+      {
+         return *this->mRegSolver.find(reg)->second.first;
+      } else
+      {
+         return *this->mRegSolver.find(reg)->second.second;
       }
    }
 
@@ -504,6 +600,19 @@ namespace Transform {
       } else
       {
          return this->mTmpOutSO;
+      }
+   }
+
+   inline int SphereChebyshevFftwTransform::regularitySize(const RegularityType::Id reg, const int parity) const
+   {
+      assert(this->mRegularitySize.count(reg) > 0);
+   
+      if(parity == 0)
+      {
+         return this->mRegularitySize.find(reg)->second.first;
+      } else
+      {
+         return this->mRegularitySize.find(reg)->second.second;
       }
    }
 

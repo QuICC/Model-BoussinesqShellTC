@@ -226,6 +226,16 @@ def stencil(nr, l, bc):
         mat = stencil_value_diff(nr, l%2, bc.get('c',None))
     elif bc[0] == -21:
         mat = stencil_value_diff2(nr, l%2, bc.get('c',None))
+    elif bc[0] == -24:
+        mat = stencil_zeroreg0(nr, l%2, bc.get('c',None))
+    elif bc[0] == -25:
+        mat = stencil_zeroreg1(nr, l%2, bc.get('c',None))
+    elif bc[0] == -30:
+        mat = stencil_zeroreg2(nr, l%2, bc.get('c',None))
+    elif bc[0] == -31:
+        mat = stencil_zeroreg3(nr, l%2, bc.get('c',None))
+    elif bc[0] == -40:
+        mat = stencil_zeroreg4(nr, l%2, bc.get('c',None))
     elif bc[0] < -1 and bc[0] > -5:
         mat = restrict_eye(nr, 'cr', -bc[0])
 
@@ -374,6 +384,194 @@ def stencil_insulating(nr, parity, coeffs = None):
     diags[-1] = diags[-1][0:nr+offsets[0]]
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg0(nr, parity, coeffs = None):
+    """Create stencil matrix for a 0th order regularity at the origin"""
+
+    assert(coeffs is None)
+    assert(parity == 0)
+
+    ns = np.arange(parity,2*nr,2)
+    offsets = [-1, 0]
+
+    # Generate subdiagonal
+    def d_1(n):
+        val = np.ones(n.shape)
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = 1.0/2.0
+                break
+            if j > 2:
+                break
+        return val
+
+    # Generate diagonal
+    def d0(n):
+        return np.ones(n.shape)
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg1(nr, parity, coeffs = None):
+    """Create stencil matrix for a 1st order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 0:
+        return stencil_zeroreg0(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-1, 0]
+
+        # Generate subdiagonal
+        def d_1(n):
+            val = (n - 2.0)/n
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg2(nr, parity, coeffs = None):
+    """Create stencil matrix for a 2nd order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 1:
+        return stencil_zeroreg1(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-2, -1, 0]
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            val = (n - 3.0)/(n - 1.0)
+            for i,j in enumerate(n):
+                if j == 4:
+                    val[i] = 1.0/6.0
+                    break
+                if j > 4:
+                    break
+            return val
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            val = 2.0*n/(n + 1.0)
+            for i,j in enumerate(n):
+                if j == 2:
+                    val[i] = 2.0/3.0
+                    break
+                if j > 2:
+                    break
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_2, d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg3(nr, parity, coeffs = None):
+    """Create stencil matrix for a 3rd order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 0:
+        return stencil_zeroreg2(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-2, -1, 0]
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            val = (n - 4.0)*(n - 3.0)/((n - 1.0)*n)
+            return val
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            val = 2.0*(n - 2.0)/(n + 1.0)
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_2, d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg4(nr, parity, coeffs = None):
+    """Create stencil matrix for a 4th order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 1:
+        return stencil_zeroreg3(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-3, -2, -1, 0]
+
+        # Generate 3rd subdiagonal
+        def d_3(n):
+            val = (n - 5.0)*(n - 4.0)/((n - 2.0)*(n - 1.0))
+            for i,j in enumerate(n):
+                if j == 6:
+                    val[i] = 1.0/20.0
+                    break
+                if j > 6:
+                    break
+            return val
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            val = 3.0*(n - 3.0)/(n + 1.0)
+            for i,j in enumerate(n):
+                if j == 4:
+                    val[i] = 3.0/10.0
+                    break
+                if j > 4:
+                    break
+            return val
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            val = 3.0*n/(n + 2.0)
+            for i,j in enumerate(n):
+                if j == 2:
+                    val[i] = 3.0/4.0
+                    break
+                if j > 2:
+                    break
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_3, d_2, d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
 def stencil_value_diff(nr, parity, coeffs = None):
     """Create stencil matrix for a zero boundary value and zero 1st derivative"""
