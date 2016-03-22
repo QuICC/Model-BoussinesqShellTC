@@ -222,20 +222,28 @@ def stencil(nr, l, bc):
         mat = stencil_rdiffdivr(nr, l%2, bc.get('c',None))
     elif bc[0] == -13:
         mat = stencil_insulating(nr, l%2, bc.get('c',None))
+    elif bc[0] == -14:
+        mat = stencil_zeroreg0(nr, l%2, bc.get('c',None))
+    elif bc[0] == -15:
+        mat = stencil_zeroreg1(nr, l%2, bc.get('c',None))
     elif bc[0] == -20:
         mat = stencil_value_diff(nr, l%2, bc.get('c',None))
     elif bc[0] == -21:
         mat = stencil_value_diff2(nr, l%2, bc.get('c',None))
-    elif bc[0] == -24:
-        mat = stencil_zeroreg0(nr, l%2, bc.get('c',None))
-    elif bc[0] == -25:
-        mat = stencil_zeroreg1(nr, l%2, bc.get('c',None))
-    elif bc[0] == -30:
+    elif bc[0] == -22:
         mat = stencil_zeroreg2(nr, l%2, bc.get('c',None))
-    elif bc[0] == -31:
+    elif bc[0] == -23:
         mat = stencil_zeroreg3(nr, l%2, bc.get('c',None))
-    elif bc[0] == -40:
+    elif bc[0] == -30:
         mat = stencil_zeroreg4(nr, l%2, bc.get('c',None))
+    elif bc[0] == -31:
+        mat = stencil_zeroreg5(nr, l%2, bc.get('c',None))
+    elif bc[0] == -40:
+        mat = stencil_zeroreg6(nr, l%2, bc.get('c',None))
+    elif bc[0] == -41:
+        mat = stencil_zeroreg7(nr, l%2, bc.get('c',None))
+    elif bc[0] == -50:
+        mat = stencil_zeroreg8(nr, l%2, bc.get('c',None))
     elif bc[0] < -1 and bc[0] > -5:
         mat = restrict_eye(nr, 'cr', -bc[0])
 
@@ -568,6 +576,228 @@ def stencil_zeroreg4(nr, parity, coeffs = None):
             return np.ones(n.shape)
 
         ds = [d_3, d_2, d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg5(nr, parity, coeffs = None):
+    """Create stencil matrix for a 5th order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 0:
+        return stencil_zeroreg4(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-3, -2, -1, 0]
+
+        # Generate 3rd subdiagonal
+        def d_3(n):
+            val = (n - 6.0)*(n - 5.0)*(n - 4.0)/((n - 2.0)*(n - 1.0)*n)
+            return val
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            val = 3.0*(n - 4.0)*(n - 3.0)/(n*(n + 1.0))
+            return val
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            val = 3.0*(n - 2.0)/(n + 2.0)
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_3, d_2, d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg6(nr, parity, coeffs = None):
+    """Create stencil matrix for a 6th order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 1:
+        return stencil_zeroreg5(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-4, -3, -2, -1, 0]
+
+        # Generate 4th subdiagonal
+        def d_4(n):
+            val = (n - 7.0)*(n - 6.0)*(n - 5.0)/((n - 3.0)*(n - 2.0)*(n - 1.0))
+            for i,j in enumerate(n):
+                if j == 8:
+                    val[i] = 1.0/70.0
+                    break
+                if j > 8:
+                    break
+            return val
+
+        # Generate 3rd subdiagonal
+        def d_3(n):
+            val = 4.0*(n - 5.0)*(n - 4.0)/((n - 1.0)*(n + 1.0))
+            for i,j in enumerate(n):
+                if j == 6:
+                    val[i] = 4.0/35.0
+                    break
+                if j > 6:
+                    break
+            return val
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            val = 6.0*(n - 3.0)*n/((n + 1.0)*(n + 2.0))
+            for i,j in enumerate(n):
+                if j == 4:
+                    val[i] = 2.0/5.0
+                    break
+                if j > 4:
+                    break
+            return val
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            val = 4.0*n/(n + 3.0)
+            for i,j in enumerate(n):
+                if j == 2:
+                    val[i] = 4.0/5.0
+                    break
+                if j > 2:
+                    break
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_4, d_3, d_2, d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg7(nr, parity, coeffs = None):
+    """Create stencil matrix for a 7th order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 0:
+        return stencil_zeroreg6(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-4, -3, -2, -1, 0]
+
+        # Generate 4th subdiagonal
+        def d_4(n):
+            val = (n - 8.0)*(n - 7.0)*(n - 6.0)*(n - 5.0)/((n - 3.0)*(n - 2.0)*(n - 1.0)*n)
+            return val
+
+        # Generate 3rd subdiagonal
+        def d_3(n):
+            val = 4.0*(n - 6.0)*(n - 5.0)*(n - 4.0)/((n - 1.0)*n*(n + 1.0))
+            return val
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            val = 6.0*(n - 4.0)*(n - 3.0)/((n + 1.0)*(n + 2.0))
+            return val
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            val = 4.0*(n - 2.0)/(n + 3.0)
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_4, d_3, d_2, d_1, d0]
+        diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+        diags[-1] = diags[-1][0:nr+offsets[0]]
+
+        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_zeroreg8(nr, parity, coeffs = None):
+    """Create stencil matrix for a 8th order regularity at the origin"""
+
+    assert(coeffs is None)
+
+    if parity == 1:
+        return stencil_zeroreg7(nr, parity, coeffs)
+
+    else:
+        ns = np.arange(parity,2*nr,2)
+        offsets = [-5, -4, -3, -2, -1, 0]
+
+        # Generate 5th subdiagonal
+        def d_5(n):
+            val = (n - 9.0)*(n - 8.0)*(n - 7.0)*(n - 6.0)/((n - 4.0)*(n - 3.0)*(n - 2.0)*(n - 1.0))
+            for i,j in enumerate(n):
+                if j == 10:
+                    val[i] = 1.0/252.0
+                    break
+                if j > 10:
+                    break
+            return val
+
+        # Generate 4th subdiagonal
+        def d_4(n):
+            val = 5.0*(n - 7.0)*(n - 6.0)*(n - 5.0)/((n - 2.0)*(n - 1.0)*(n + 1.0))
+            for i,j in enumerate(n):
+                if j == 8:
+                    val[i] = 5.0/126.0
+                    break
+                if j > 8:
+                    break
+            return val
+
+        # Generate 3rd subdiagonal
+        def d_3(n):
+            val = 10.0*(n - 5.0)*(n - 4.0)/((n + 1.0)*(n + 2.0))
+            for i,j in enumerate(n):
+                if j == 6:
+                    val[i] = 5.0/28.0
+                    break
+                if j > 6:
+                    break
+            return val
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            val = 10.0*(n - 3.0)*n/((n + 2.0)*(n + 3.0))
+            for i,j in enumerate(n):
+                if j == 4:
+                    val[i] = 10.0/21.0
+                    break
+                if j > 4:
+                    break
+            return val
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            val = 5.0*n/(n + 4.0)
+            for i,j in enumerate(n):
+                if j == 2:
+                    val[i] = 5.0/6.0
+                    break
+                if j > 2:
+                    break
+            return val
+
+        # Generate diagonal
+        def d0(n):
+            return np.ones(n.shape)
+
+        ds = [d_5, d_4, d_3, d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
         diags[-1] = diags[-1][0:nr+offsets[0]]
 

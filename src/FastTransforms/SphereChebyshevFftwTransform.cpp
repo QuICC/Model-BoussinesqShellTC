@@ -25,7 +25,6 @@
 #include "FastTransforms/ParityTransformTools.hpp"
 #include "Python/PythonWrapper.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -198,21 +197,11 @@ namespace Transform {
       //
       // Initialise regularity operators
       //
-      // 0th order Regularity constraint
-      this->mRegOp.insert(std::make_pair(RegularityType::REG0, opPair));
-      this->mRegularitySize.insert(std::make_pair(RegularityType::REG0, std::make_pair(1,0)));
-      // 1st order Regularity constraint
-      this->mRegOp.insert(std::make_pair(RegularityType::REG1, opPair));
-      this->mRegularitySize.insert(std::make_pair(RegularityType::REG1, std::make_pair(1,1)));
-      // 2nd order Regularity constraint
-      this->mRegOp.insert(std::make_pair(RegularityType::REG2, opPair));
-      this->mRegularitySize.insert(std::make_pair(RegularityType::REG2, std::make_pair(2,1)));
-      // 3rd order Regularity constraint
-      this->mRegOp.insert(std::make_pair(RegularityType::REG3, opPair));
-      this->mRegularitySize.insert(std::make_pair(RegularityType::REG3, std::make_pair(2,2)));
-      // 4th order Regularity constraint
-      this->mRegOp.insert(std::make_pair(RegularityType::REG4, opPair));
-      this->mRegularitySize.insert(std::make_pair(RegularityType::REG4, std::make_pair(3,2)));
+      for(int i = 0; i <= static_cast<int>(RegularityType::REGMAX); ++i)
+      {
+         this->mRegOp.insert(std::make_pair(static_cast<RegularityType::Id>(i), opPair));
+         this->mRegularitySize.insert(std::make_pair(static_cast<RegularityType::Id>(i), std::make_pair(1 + i/2, i/2 + i%2)));
+      }
 
       //
       // Initialise solver operators
@@ -229,16 +218,10 @@ namespace Transform {
       //
       // Initialise regularity solver operators
       //
-      // 0th order Regularity constraint
-      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG0, opPair));
-      // 1st order Regularity constraint
-      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG1, opPair));
-      // 2nd order Regularity constraint
-      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG2, opPair));
-      // 3rd order Regularity constraint
-      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG3, opPair));
-      // 4th order Regularity constraint
-      this->mRegSolveOp.insert(std::make_pair(RegularityType::REG4, opPair));
+      for(int i = 0; i <= static_cast<int>(RegularityType::REGMAX); ++i)
+      {
+         this->mRegSolveOp.insert(std::make_pair(static_cast<RegularityType::Id>(i), opPair));
+      }
 
       //
       // Initialise solvers
@@ -259,21 +242,12 @@ namespace Transform {
       //
       // Initialise regularity solvers
       //
-      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mRegSolver.insert(std::make_pair(RegularityType::REG0, std::make_pair(pSolE,pSolO)));
-      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mRegSolver.insert(std::make_pair(RegularityType::REG1, std::make_pair(pSolE,pSolO)));
-      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mRegSolver.insert(std::make_pair(RegularityType::REG2, std::make_pair(pSolE,pSolO)));
-      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mRegSolver.insert(std::make_pair(RegularityType::REG3, std::make_pair(pSolE,pSolO)));
-      pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mRegSolver.insert(std::make_pair(RegularityType::REG4, std::make_pair(pSolE,pSolO)));
+      for(int i = 0; i <= static_cast<int>(RegularityType::REGMAX); ++i)
+      {
+         pSolE = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+         pSolO = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+         this->mRegSolver.insert(std::make_pair(static_cast<RegularityType::Id>(i), std::make_pair(pSolE,pSolO)));
+      }
 
       //
       // Initialise solvers
@@ -384,7 +358,7 @@ namespace Transform {
          PythonWrapper::fillMatrix(this->solveOp(ProjectorType::DIFF2, parity), pValue);
          Py_DECREF(pValue);
 
-         // Prepare operators
+         // Prepare regularity operators
          pValue = PyLong_FromLong(this->mspSetup->specSize());
          PyTuple_SetItem(pRegArgs, 0, pValue);
          PyTuple_SetItem(pRegArgs, 1, PyLong_FromLong(parity));
@@ -393,59 +367,30 @@ namespace Transform {
          PyTuple_SetItem(pRegArgs, 2, pValue);
          PyTuple_SetItem(pRegArgs, 3, PyLong_FromLong(0));
 
-         if(parity == 0)
+         // Call stencil for regularity solver
+         std::vector<int> regBc;
+         regBc.push_back(-14); // Boundary condition for 0th order regularity
+         regBc.push_back(-15); // Boundary condition for 1st order regularity
+         regBc.push_back(-22); // Boundary condition for 2nd order regularity
+         regBc.push_back(-23); // Boundary condition for 3rd order regularity
+         regBc.push_back(-30); // Boundary condition for 4th order regularity
+         regBc.push_back(-31); // Boundary condition for 5th order regularity
+         regBc.push_back(-40); // Boundary condition for 6th order regularity
+         regBc.push_back(-41); // Boundary condition for 7th order regularity
+         regBc.push_back(-50); // Boundary condition for 8th order regularity
+         for(int i = 0; i <= static_cast<int>(RegularityType::REGMAX); ++i)
          {
-            // Call stencil for regularity solver
-            // ... change boundary condition to 0th order regularity
-            pValue = PyTuple_GetItem(pRegArgs, 2);
-            PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-24));
-            PythonWrapper::setFunction("stencil");
-            pValue = PythonWrapper::callFunction(pRegArgs);
-            // Fill matrix
-            PythonWrapper::fillMatrix(this->regOp(RegularityType::REG0, parity), pValue);
-            Py_DECREF(pValue);
+            if(this->regularitySize(static_cast<RegularityType::Id>(i), parity) > 0)
+            {
+               pValue = PyTuple_GetItem(pRegArgs, 2);
+               PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(regBc.at(i)));
+               PythonWrapper::setFunction("stencil");
+               pValue = PythonWrapper::callFunction(pRegArgs);
+               // Fill matrix
+               PythonWrapper::fillMatrix(this->regOp(static_cast<RegularityType::Id>(i), parity), pValue);
+               Py_DECREF(pValue);
+            }
          }
-
-         // Call stencil for regularity solver
-         // ... change boundary condition to 1st order regularity
-         pValue = PyTuple_GetItem(pRegArgs, 2);
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-25));
-         PythonWrapper::setFunction("stencil");
-         pValue = PythonWrapper::callFunction(pRegArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG1, parity), pValue);
-         Py_DECREF(pValue);
-
-         // Call stencil for regularity solver
-         // ... change boundary condition to 2nd order regularity
-         pValue = PyTuple_GetItem(pRegArgs, 2);
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-30));
-         PythonWrapper::setFunction("stencil");
-         pValue = PythonWrapper::callFunction(pRegArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG2, parity), pValue);
-         Py_DECREF(pValue);
-
-         // Call stencil for regularity solver
-         // ... change boundary condition to 3rd order regularity
-         pValue = PyTuple_GetItem(pRegArgs, 2);
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-31));
-         PythonWrapper::setFunction("stencil");
-         pValue = PythonWrapper::callFunction(pRegArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG3, parity), pValue);
-         Py_DECREF(pValue);
-
-//         // Call stencil for regularity solver
-//         // ... change boundary condition to 4th order regularity
-//         pValue = PyTuple_GetItem(pRegArgs, 2);
-//         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-40));
-//         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(3));
-//         PythonWrapper::setFunction("stencil");
-//         pValue = PythonWrapper::callFunction(pRegArgs);
-//         // Fill matrix
-//         PythonWrapper::fillMatrix(this->regOp(RegularityType::REG4, parity), pValue);
-//         Py_DECREF(pValue);
 
          // Prepare regularity solvers
          pValue = PyLong_FromLong(this->mspSetup->fwdSize());
@@ -453,62 +398,20 @@ namespace Transform {
          PyTuple_SetItem(pRegArgs, 3, PyLong_FromLong(1));
 
          // Call stencil for regularity solver
-         // ... change boundary condition to 0th order regularity (only even harmonic)
-         if(parity == 0)
+         for(int i = 0; i <= static_cast<int>(RegularityType::REGMAX); ++i)
          {
-            pValue = PyTuple_GetItem(pRegArgs, 2);
-            PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-24));
-            PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1-parity));
-            PythonWrapper::setFunction("stencil");
-            pValue = PythonWrapper::callFunction(pRegArgs);
-            // Fill matrix
-            PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG0, parity), pValue);
-            Py_DECREF(pValue);
+            if(this->regularitySize(static_cast<RegularityType::Id>(i), parity) > 0)
+            {
+               pValue = PyTuple_GetItem(pRegArgs, 2);
+               PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(regBc.at(i)));
+               PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(this->regularitySize(static_cast<RegularityType::Id>(i), parity)));
+               PythonWrapper::setFunction("stencil");
+               pValue = PythonWrapper::callFunction(pRegArgs);
+               // Fill matrix
+               PythonWrapper::fillMatrix(this->regSolveOp(static_cast<RegularityType::Id>(i), parity), pValue);
+               Py_DECREF(pValue);
+            }
          }
-
-         // Call stencil for regularity solver
-         // ... change boundary condition to 1st order regularity
-         pValue = PyTuple_GetItem(pRegArgs, 2);
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-25));
-         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
-         PythonWrapper::setFunction("stencil");
-         pValue = PythonWrapper::callFunction(pRegArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG1, parity), pValue);
-         Py_DECREF(pValue);
-
-         // Call stencil for regularity solver
-         // ... change boundary condition to 2nd order regularity
-         pValue = PyTuple_GetItem(pRegArgs, 2);
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-30));
-         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2 - parity));
-         PythonWrapper::setFunction("stencil");
-         pValue = PythonWrapper::callFunction(pRegArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG2, parity), pValue);
-         Py_DECREF(pValue);
-
-         // Call stencil for regularity solver
-         // ... change boundary condition to 3rd order regularity
-         pValue = PyTuple_GetItem(pRegArgs, 2);
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-31));
-         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2));
-         PythonWrapper::setFunction("stencil");
-         pValue = PythonWrapper::callFunction(pRegArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG3, parity), pValue);
-         Py_DECREF(pValue);
-
-//         // Call stencil for regularity solver
-//         // ... change boundary condition to 4th order regularity
-//         pValue = PyTuple_GetItem(pRegArgs, 2);
-//         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(-40));
-//         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(3 - parity));
-//         PythonWrapper::setFunction("stencil");
-//         pValue = PythonWrapper::callFunction(pRegArgs);
-//         // Fill matrix
-//         PythonWrapper::fillMatrix(this->regSolveOp(RegularityType::REG4, parity), pValue);
-//         Py_DECREF(pValue);
 
          // Initialize solver storage
          this->tmpInS(parity).setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany(parity));
@@ -546,48 +449,19 @@ namespace Transform {
             throw Exception("Factorization of backward 2nd derivative failed!");
          }
 
-         // Initialize solver and factorize 0th order regularity stencil
-         if(parity == 0)
+         // Initialize solver and factorize regularity stencil
+         for(int i = 0; i <= static_cast<int>(RegularityType::REGMAX); ++i)
          {
-            this->regSolver(RegularityType::REG0, parity).compute(this->regSolveOp(RegularityType::REG0, parity));
-            // Check for successful factorisation
-            if(this->regSolver(RegularityType::REG0, parity).info() != Eigen::Success)
+            if(this->regularitySize(static_cast<RegularityType::Id>(i), parity) > 0)
             {
-               throw Exception("Factorization of 0th order regularity stencil failed!");
+               this->regSolver(static_cast<RegularityType::Id>(i), parity).compute(this->regSolveOp(static_cast<RegularityType::Id>(i), parity));
+               // Check for successful factorisation
+               if(this->regSolver(static_cast<RegularityType::Id>(i), parity).info() != Eigen::Success)
+               {
+                  throw Exception("Factorization of regularity stencil failed!");
+               }
             }
          }
-
-         // Initialize solver and factorize 1st order regularity stencil
-         this->regSolver(RegularityType::REG1, parity).compute(this->regSolveOp(RegularityType::REG1, parity));
-         // Check for successful factorisation
-         if(this->regSolver(RegularityType::REG1, parity).info() != Eigen::Success)
-         {
-            throw Exception("Factorization of 1st order regularity stencil failed!");
-         }
-
-         // Initialize solver and factorize 2nd order regularity stencil
-         this->regSolver(RegularityType::REG2, parity).compute(this->regSolveOp(RegularityType::REG2, parity));
-         // Check for successful factorisation
-         if(this->regSolver(RegularityType::REG2, parity).info() != Eigen::Success)
-         {
-            throw Exception("Factorization of 2nd order regularity stencil failed!");
-         }
-
-         // Initialize solver and factorize 3rd order regularity stencil
-         this->regSolver(RegularityType::REG3, parity).compute(this->regSolveOp(RegularityType::REG3, parity));
-         // Check for successful factorisation
-         if(this->regSolver(RegularityType::REG3, parity).info() != Eigen::Success)
-         {
-            throw Exception("Factorization of 3rd order regularity stencil failed!");
-         }
-
-//         // Initialize solver and factorize 4th order regularity stencil
-//         this->regSolver(RegularityType::REG4, parity).compute(this->regSolveOp(RegularityType::REG4, parity));
-//         // Check for successful factorisation
-//         if(this->regSolver(RegularityType::REG4, parity).info() != Eigen::Success)
-//         {
-//            throw Exception("Factorization of 4th order regularity stencil failed!");
-//         }
       }
 
       PythonWrapper::finalize();
@@ -1132,16 +1006,58 @@ namespace Transform {
       rChebVal.imag().setZero();
    }
 
+   void SphereChebyshevFftwTransform::regularizeBlock(Matrix& rData, const int start, const int cols, const int parity, const SphereChebyshevFftwTransform::RegularityType::Id reg)
+   {
+      Matrix regIn = rData.block(this->regularitySize(reg, parity), start, rData.rows() - this->regularitySize(reg, parity), cols);
+      Matrix regOut = Matrix::Zero(rData.rows() - this->regularitySize(reg, parity), cols);
+
+      Solver::internal::solveWrapper(regOut, this->regSolver(reg, parity), regIn);
+
+      rData.block(0, start, this->mspSetup->specSize(), cols) = this->regOp(reg, parity)*regOut.topRows(this->mspSetup->specSize() - this->regularitySize(reg, parity));
+   }
+
    void SphereChebyshevFftwTransform::regularize(Matrix& rData, const int parity)
    {
-      SphereChebyshevFftwTransform::RegularityType::Id reg = SphereChebyshevFftwTransform::RegularityType::REG2;
+      int start = 0;
+      int cols = rData.cols();
 
-      Matrix mRegIn = rData.bottomRows(rData.rows() - this->regularitySize(reg, parity));
-      Matrix mRegOut = Matrix::Zero(rData.rows() - this->regularitySize(reg, parity), rData.cols());
+      // Even special cases
+      int idx = 0;
+      // Special case for l = 0, or l = 1
+      if(this->parityBlocks(parity)(idx, 2) == parity)
+      {
+         start += this->parityBlocks(parity)(idx,1);
+         cols -= this->parityBlocks(parity)(idx,1);
+         idx++;
+      }
 
-      Solver::internal::solveWrapper(mRegOut, this->regSolver(reg, parity), mRegIn);
+      bool hasSpecial = (cols > 0);
+      while(hasSpecial)
+      {
+         // Solution is less regular than max regularity
+         if(this->parityBlocks(parity)(idx,2) - 1 < static_cast<int>(SphereChebyshevFftwTransform::RegularityType::REGMAX))
+         {
+            this->regularizeBlock(rData, start, this->parityBlocks(parity)(idx,1), parity, static_cast<SphereChebyshevFftwTransform::RegularityType::Id>(this->parityBlocks(parity)(idx,2)-1));
+            start += this->parityBlocks(parity)(idx,1);
+            cols -= this->parityBlocks(parity)(idx,1);
+            idx++;
 
-      rData.topRows(this->mspSetup->specSize()) = this->regOp(reg, parity)*mRegOut.topRows(this->mspSetup->specSize() - this->regularitySize(reg, parity));
+            if(cols < 1)
+            {
+               hasSpecial = false;
+            }
+
+         // Special cases are done
+         } else
+         {
+            hasSpecial = false;
+         }
+      }
+
+      if(cols > 0)
+      {
+         this->regularizeBlock(rData, start, cols, parity, SphereChebyshevFftwTransform::RegularityType::REGMAX);
+      }
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

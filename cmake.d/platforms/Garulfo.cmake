@@ -18,7 +18,7 @@ set(GEOMHDISCC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
 #----------- AVAILABLE THREADS MODELS ------------#
 ###################################################
 
-set(GEOMHDISCC_THREADSMODELS "None" "OpenMP" PARENT_SCOPE)
+set(GEOMHDISCC_THREADSMODELS "None" "Pthreads" "OpenMP" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE FFT VERSIONS --------------#
@@ -26,6 +26,7 @@ set(GEOMHDISCC_THREADSMODELS "None" "OpenMP" PARENT_SCOPE)
 
 set(GEOMHDISCC_FFTS "FFTW" "cuFFT" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_FFTW_PTHREADS "fftw3_threads" "fftw3" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_FFTW_OPENMP "fftw3_omp" "fftw3" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_CUFFT "cudart" "cufft" "cufftw" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_CUFFT "/opt/cuda/include" "/opt/cuda/sdk/common/inc/" PARENT_SCOPE)
@@ -54,8 +55,8 @@ set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
 #set(GEOMHDISCC_LIBRARIES_SPARSELU "/usr/local/lib/libmetis.a" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "parmetis" "ptesmumps" "ptscotch" "ptscotcherr" "ptscotchparmetis" "ptscotcherrexit" "scotch" "scotcherr" "scotcherrexit" "pord" "scalapack" "metis" "atllapack" "f77blas" "mpi" "gfortran" "mpi_mpifh" "mpi_usempi" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_MUMPS "/usr/local/share/petsc-3.6.3_complex//arch-linux2-c-opt/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_MUMPS "/usr/local/share/petsc-3.6.3_complex//arch-linux2-c-opt/lib" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_MUMPS "/usr/local/share/petsc-3.6.3_complex/arch-linux2-c-opt/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_MUMPS "/usr/local/share/petsc-3.6.3_complex/arch-linux2-c-opt/lib" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_PARDISO "pardiso412-GNU450-X86-64" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_PARDISO "/usr/local/share/Pardiso/lib" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)

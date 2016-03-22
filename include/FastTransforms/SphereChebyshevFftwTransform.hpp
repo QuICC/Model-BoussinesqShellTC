@@ -91,8 +91,23 @@ namespace Transform {
           *    - REG2:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = 0)
           *    - REG3:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = 0)
           *    - REG4:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = 0)
+          *    - REG5:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG6:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG7:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG8:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
           */
-         enum Id {REG0, REG1, REG2, REG3, REG4};
+         enum Id {
+            REG0 = 0,
+            REG1,
+            REG2, 
+            REG3,
+            REG4,
+            REG5,
+            REG6,
+            REG7,
+            REG8,
+            REGMAX = REG2
+         };
       };
    };
 
@@ -463,6 +478,11 @@ namespace Transform {
           * brief Does operator flip parity?
           */
          int flipsParity(const IntegratorType::Id integrator) const; 
+
+         /**
+          * @brief Apply regularity filters on block of data
+          */
+         void regularizeBlock(Matrix& rData, const int start, const int cols, const int parity, const RegularityType::Id reg);
 
          /**
           * @brief Apply regularity filters

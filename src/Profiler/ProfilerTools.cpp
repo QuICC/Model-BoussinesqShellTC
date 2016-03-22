@@ -39,6 +39,8 @@ namespace Debug {
 
       if(FrameworkMacro::allowsIO())
       {
+         int digits = 2;
+
          // Create nice looking ouput header
          IoTools::Formatter::printNewline(std::cout);
          IoTools::Formatter::printLine(std::cout, '%');
@@ -50,11 +52,11 @@ namespace Debug {
          int base = 27;
          for(int i = 0; i < ProfilerMacro::NBREAKPOINT; i++)
          {
-            oss << ProfilerMacro::pointName(static_cast<ProfilerMacro::BreakPoint>(i)) << ": " << std::fixed << std::setprecision(1) << ts(i);
+            oss << ProfilerMacro::pointName(static_cast<ProfilerMacro::BreakPoint>(i)) << ": " << std::fixed << std::setprecision(digits) << ts(i);
 
             if(max.size() != 0)
             {
-               oss << " / " << std::fixed << std::setprecision(1) << max(i) << " / " << std::fixed << std::setprecision(1) << min(i);
+               oss << " / " << std::fixed << std::setprecision(digits) << max(i) << " / " << std::fixed << std::setprecision(digits) << min(i);
             }
 
             oss << " s";

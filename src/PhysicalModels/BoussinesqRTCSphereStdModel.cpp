@@ -79,7 +79,13 @@ namespace GeoMHDiSCC {
 //               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
 //               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
 //               tSH.push_back(std::tr1::make_tuple(30,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(3,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(4,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(5,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(6,0,MHDComplex(1,0)));
                spScalar->setHarmonicOptions(tSH);
                break;
 
