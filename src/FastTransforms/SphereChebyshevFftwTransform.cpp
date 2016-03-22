@@ -158,6 +158,12 @@ namespace Transform {
 
    void SphereChebyshevFftwTransform::initOperators()
    {
+      // Abort if the imposed regularity is too small
+      if(RegularityType::REGMAX < RegularityType::REG3)
+      {
+         throw Exception("Imposed regularity is too small for toroidal/poloidal operators!");
+      }
+
       //
       // Initialise projector operators
       //
@@ -175,24 +181,31 @@ namespace Transform {
       //
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTG, 0));
       std::pair<SparseMatrix,SparseMatrix> opPair = std::make_pair(SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize()),SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize()));
+      this->mRegularityShift.insert(std::make_pair(IntegratorType::INTG, std::make_pair(0,0)));
       // Multiplication by R
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGR, opPair));
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGR, 1));
+      this->mRegularityShift.insert(std::make_pair(IntegratorType::INTGR, std::make_pair(0,0)));
       // QST Q operator (4th order)
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ4, opPair));
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGQ4, 1));
+      this->mRegularityShift.insert(std::make_pair(IntegratorType::INTGQ4, std::make_pair(4,4)));
       // QST S operator (4th order)
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS4, opPair));
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGS4, 1));
+      this->mRegularityShift.insert(std::make_pair(IntegratorType::INTGS4, std::make_pair(4,4)));
       // QST T operator
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGT, opPair));
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGT, 0));
+      this->mRegularityShift.insert(std::make_pair(IntegratorType::INTGT, std::make_pair(2,2)));
       // QST Q operator (2th order)
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ2, opPair));
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGQ2, 1));
+      this->mRegularityShift.insert(std::make_pair(IntegratorType::INTGQ2, std::make_pair(2,2)));
       // QST S operator (2th order)
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS2, opPair));
       this->mIntegratorFlips.insert(std::make_pair(IntegratorType::INTGS2, 1));
+      this->mRegularityShift.insert(std::make_pair(IntegratorType::INTGS2, std::make_pair(2,2)));
 
       //
       // Initialise regularity operators
@@ -543,15 +556,23 @@ namespace Transform {
          for(int parity = 0; parity < 2; ++parity)
          {
             // Rescale to remove FFT scaling
-            ParityTransformTools::scaleParityModes(rChebVal, this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+            ParityTransformTools::scaleParityModes(rChebVal, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
          }
 
       } else
       {
          for(int parity = 0; parity < 2; ++parity)
          {
-            ParityTransformTools::applyOperator(rChebVal, this->intgOp(integrator, parity), this->parityBlocks((parity+1)%2), this->mspSetup->scale(), this->mspSetup->specSize());
+            ParityTransformTools::applyOperator(rChebVal, this->intgOp(integrator, parity), this->parityBlocks((parity+1)%2), this->mspSetup->scale(), rChebVal.rows());
          }
+      }
+
+      // Regularize solution
+      for(int parity = 0; parity < 2; ++parity)
+      {
+         ParityTransformTools::extractParityModes(this->mTmpIn, rChebVal, this->parityBlocks(parity), rChebVal.rows());
+         this->regularize(this->mTmpIn, parity, this->regularityShift(integrator, parity));
+         ParityTransformTools::setParityModes(rChebVal, this->mTmpIn, this->parityBlocks(parity), rChebVal.rows());
       }
 
       #ifdef GEOMHDISCC_DEBUG
@@ -584,47 +605,42 @@ namespace Transform {
       // Loop over parity
       for(int parity = 0; parity < 2; ++parity)
       {
+         ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
+         this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+         this->regularize(this->tmpInS(parity), parity, 0);
+
          // Compute first derivative
          if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
          {
-            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
             if((parity+1)%2 == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
             }
-            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
             Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
             this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
          // Compute second derivative
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
          {
-            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
             this->tmpInS(parity).topRows(1).setZero();
-            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
             Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
             this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
          // Compute division by R
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
          {
-            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
-            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
             Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
             this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
          // Compute division by R^2
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
          {
-            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
-            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
             Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
             this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
          // Compute D r projection
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
          {
-            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
             this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
             if(parity%2 == 1)
             {
@@ -636,7 +652,6 @@ namespace Transform {
          // Compute 1/r D r projection
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
          {
-            this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
             if(parity == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
@@ -648,12 +663,10 @@ namespace Transform {
          // Compute radial laplacian projection
          } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
          {
-            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
             if((parity+1)%2 == 1)
             {
                this->tmpInS(parity).topRows(1).setZero();
             }
-            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
             Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,(parity+1)%2), this->tmpInS(parity));
             this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR2, (parity+1)%2)*this->tmpOutS(parity);
             if(parity == 1)
@@ -667,9 +680,7 @@ namespace Transform {
          // Compute simple projection
          } else
          {
-            // Copy into other array
-            ParityTransformTools::extractParityModes(this->mTmpIn, chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
-            this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+            this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
          }
 
          // Do transform
@@ -713,18 +724,23 @@ namespace Transform {
             for(int parity = 0; parity < 2; ++parity)
             {
                // Rescale to remove FFT scaling
-               ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), physVal.rows());
-               ParityTransformTools::extractParityModes(this->mTmpIn, rChebVal, component, this->parityBlocks(parity), physVal.rows());
-               this->regularize(this->mTmpIn, parity);
-               ParityTransformTools::setParityModes(rChebVal, this->mTmpIn, component, this->parityBlocks(parity), physVal.rows());
+               ParityTransformTools::scaleParityModes(rChebVal, component, this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
             }
 
          } else
          {
             for(int parity = 0; parity < 2; ++parity)
             {
-               ParityTransformTools::applyOperator(rChebVal, component, this->intgOp(integrator,(parity+flip)%2), this->parityBlocks(parity), this->mspSetup->scale(), this->mspSetup->specSize());
+               ParityTransformTools::applyOperator(rChebVal, component, this->intgOp(integrator,(parity+flip)%2), this->parityBlocks(parity), this->mspSetup->scale(), rChebVal.rows());
             }
+         }
+
+         // Regularize solution
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            ParityTransformTools::extractParityModes(this->mTmpIn, rChebVal, component, this->parityBlocks(parity), rChebVal.rows());
+            this->regularize(this->mTmpIn, parity, this->regularityShift(integrator, parity));
+            ParityTransformTools::setParityModes(rChebVal, this->mTmpIn, component, this->parityBlocks(parity), rChebVal.rows());
          }
       }
 
@@ -760,53 +776,42 @@ namespace Transform {
          // Loop over parity
          for(int parity = 0; parity < 2; ++parity)
          {
+            ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
+            this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
+            this->regularize(this->tmpInS(parity), parity, 0);
+
             // Compute first derivative
             if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
             {
-               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                if((parity+1)%2 == 1)
                {
                   this->tmpInS(parity).topRows(1).setZero();
                }
-               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
             // Compute second derivative
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
             {
-               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                this->tmpInS(parity).topRows(1).setZero();
-               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
             // Compute division by R
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
             {
-               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
-               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
-
-               // With exact r^l value should be zero, compute and correct regularity error (without it it will generate a flat spectrum for c/r)
-               if(parity == 0)
-               {
-                  ParityTransformTools::correctRegularity(this->tmpInS(parity), this->mspSetup->specSize());
-               }
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,(parity+1)%2), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
                // Compute division by R^2
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
             {
-               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
-               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(projector,parity), this->tmpInS(parity));
                this->mTmpIn.leftCols(this->tmpOutS(parity).cols()) = this->tmpOutS(parity);
 
                // Compute D r projection
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
             {
-               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
                if(parity%2 == 1)
                {
@@ -818,7 +823,6 @@ namespace Transform {
                // Compute 1/r D r projection
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
             {
-               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR, parity).leftCols(this->mspSetup->specSize())*this->tmpInS(parity).topRows(this->mspSetup->specSize());
                if(parity == 1)
                {
@@ -831,12 +835,10 @@ namespace Transform {
                // Compute radial laplacian projection
             } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
             {
-               ParityTransformTools::extractParityModes(this->tmpInS(parity), chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
                if((parity+1)%2 == 1)
                {
                   this->tmpInS(parity).topRows(1).setZero();
                }
-               this->tmpInS(parity).bottomRows(this->mspSetup->padSize()).setZero();
                Solver::internal::solveWrapper(this->tmpOutS(parity), this->solver(ProjectorType::DIFF,(parity+1)%2), this->tmpInS(parity));
                this->tmpInS(parity) = this->solveOp(ProjectorType::DIVR2, (parity+1)%2)*this->tmpOutS(parity);
                if(parity == 1)
@@ -850,9 +852,7 @@ namespace Transform {
             // Compute simple projection
             } else
             {
-               // Copy into other array
-               ParityTransformTools::extractParityModes(this->mTmpIn, chebVal, component, this->parityBlocks(parity), this->mspSetup->specSize());
-               this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+               this->mTmpIn.leftCols(this->tmpInS(parity).cols()) = this->tmpInS(parity);
             }
 
             // Do transform
@@ -1016,7 +1016,7 @@ namespace Transform {
       rData.block(0, start, this->mspSetup->specSize(), cols) = this->regOp(reg, parity)*regOut.topRows(this->mspSetup->specSize() - this->regularitySize(reg, parity));
    }
 
-   void SphereChebyshevFftwTransform::regularize(Matrix& rData, const int parity)
+   void SphereChebyshevFftwTransform::regularize(Matrix& rData, const int parity, const int regShift)
    {
       int start = 0;
       int cols = rData.cols();
@@ -1024,7 +1024,7 @@ namespace Transform {
       // Even special cases
       int idx = 0;
       // Special case for l = 0, or l = 1
-      if(this->parityBlocks(parity)(idx, 2) == parity)
+      if(this->parityBlocks(parity)(idx, 2) == parity && regShift == 0)
       {
          start += this->parityBlocks(parity)(idx,1);
          cols -= this->parityBlocks(parity)(idx,1);
@@ -1035,9 +1035,9 @@ namespace Transform {
       while(hasSpecial)
       {
          // Solution is less regular than max regularity
-         if(this->parityBlocks(parity)(idx,2) - 1 < static_cast<int>(SphereChebyshevFftwTransform::RegularityType::REGMAX))
+         if(this->parityBlocks(parity)(idx,2) - 1 + regShift < static_cast<int>(SphereChebyshevFftwTransform::RegularityType::REGMAX))
          {
-            this->regularizeBlock(rData, start, this->parityBlocks(parity)(idx,1), parity, static_cast<SphereChebyshevFftwTransform::RegularityType::Id>(this->parityBlocks(parity)(idx,2)-1));
+            this->regularizeBlock(rData, start, this->parityBlocks(parity)(idx,1), parity, static_cast<SphereChebyshevFftwTransform::RegularityType::Id>(this->parityBlocks(parity)(idx,2) - 1 + regShift));
             start += this->parityBlocks(parity)(idx,1);
             cols -= this->parityBlocks(parity)(idx,1);
             idx++;
@@ -1058,6 +1058,17 @@ namespace Transform {
       {
          this->regularizeBlock(rData, start, cols, parity, SphereChebyshevFftwTransform::RegularityType::REGMAX);
       }
+   }
+
+   void SphereChebyshevFftwTransform::checkRegularity(const Matrix& data, const int rows)
+   {
+//      Array err = Array::Zero(data.cols());
+//      for(int i = rows-1; i > 0; --i)
+//      {
+//         err.transpose() += std::pow(-1,i+1)*data.row(i);
+//      }
+//      err *= 2.0;
+//      std::cerr << "l = 0: " << err(0) - data(0,0) << " l> 0: " << (err.bottomRows(err.rows()-1).transpose() - data.row(0).rightCols(data.cols()-1)).array().abs().maxCoeff() << std::endl;
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

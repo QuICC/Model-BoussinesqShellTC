@@ -86,15 +86,16 @@ namespace Transform {
       {
          /**
           * @brief Enum of regularity constraints:
-          *    - REG0:  0th order regularity (i.e. f(0) = 0)
-          *    - REG1:  0th order regularity (i.e. f(0) = f'(0) = 0)
-          *    - REG2:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = 0)
-          *    - REG3:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = 0)
-          *    - REG4:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = 0)
-          *    - REG5:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
-          *    - REG6:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
-          *    - REG7:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
-          *    - REG8:  0th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG0:     0th order regularity (i.e. f(0) = 0)
+          *    - REG1:     1st order regularity (i.e. f(0) = f'(0) = 0)
+          *    - REG2:     2nd order regularity (i.e. f(0) = f'(0) = f''(0) = 0)
+          *    - REG3:     3rd order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = 0)
+          *    - REG4:     4th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = 0)
+          *    - REG5:     5th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG6:     6th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG7:     7th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG8:     8th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REGMAX:   Maximum imposed regularity (should not be smaller than REG3)
           */
          enum Id {
             REG0 = 0,
@@ -106,7 +107,7 @@ namespace Transform {
             REG6,
             REG7,
             REG8,
-            REGMAX = REG2
+            REGMAX = REG3
          };
       };
    };
@@ -330,6 +331,11 @@ namespace Transform {
          std::map<RegularityType::Id, std::pair<int, int> > mRegularitySize;
 
          /**
+          * @brief Regularity shift due to integrators 
+          */
+         std::map<IntegratorType::Id, std::pair<int, int> > mRegularityShift;
+
+         /**
           * @brief Does projector flip parity
           */
          std::map<ProjectorType::Id, int> mProjectorFlips;
@@ -470,6 +476,11 @@ namespace Transform {
          int regularitySize(const RegularityType::Id reg, const int parity) const;
 
          /**
+          * brief Regularity shift due to integrator
+          */
+         int regularityShift(const IntegratorType::Id integrator, const int parity) const;
+
+         /**
           * brief Does operator flip parity?
           */
          int flipsParity(const ProjectorType::Id projector) const;
@@ -486,8 +497,20 @@ namespace Transform {
 
          /**
           * @brief Apply regularity filters
+          *
+          * @param rData      Spectrum to regularize
+          * @param parity     Harmonic degree parity
+          * @param regShift   Shift in regularity due to the use of an integrator
           */
-         void regularize(Matrix& rData, const int parity);
+         void regularize(Matrix& rData, const int parity, const int regShift);
+
+         /**
+          * @brief Check regularity of solution
+          *
+          * @param rData      Spectrum to check
+          * @param parity     Harmonic degree parity
+          */
+         void checkRegularity(const Matrix& data, const int rows);
    };
 
    inline const MatrixI& SphereChebyshevFftwTransform::parityBlocks(const int parity) const
@@ -633,6 +656,19 @@ namespace Transform {
       } else
       {
          return this->mRegularitySize.find(reg)->second.second;
+      }
+   }
+
+   inline int SphereChebyshevFftwTransform::regularityShift(const IntegratorType::Id integrator, const int parity) const
+   {
+      assert(this->mRegularityShift.count(integrator) > 0);
+   
+      if(parity == 0)
+      {
+         return this->mRegularityShift.find(integrator)->second.first;
+      } else
+      {
+         return this->mRegularityShift.find(integrator)->second.second;
       }
    }
 

@@ -76,16 +76,6 @@ namespace Transform {
           * @brief Apply matrix operator to data with proper parity
           */
          static void applyOperator(MatrixZ& rData, const bool isReal, const SparseMatrix& opPair, const MatrixI& infoPair, const MHDFloat scale, const int rows);
-         /**
-          * @brief Check regularity
-          */
-         static void checkRegularity(const Matrix& data, const int rows);
-         
-         /**
-          * @brief Correct regularity error
-          */
-         static void correctRegularity(Matrix& rData, const int rows);
-         
       protected:
 
       private:

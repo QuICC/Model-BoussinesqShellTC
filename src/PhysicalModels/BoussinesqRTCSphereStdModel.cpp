@@ -66,7 +66,7 @@ namespace GeoMHDiSCC {
          // Add temperature initial state generator
          spScalar = spGen->addScalarEquation<Equations::SphereExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         switch(0)
+         switch(1)
          {
             case 0:
                spScalar->setStateType(Equations::SphereExactStateIds::HARMONIC);

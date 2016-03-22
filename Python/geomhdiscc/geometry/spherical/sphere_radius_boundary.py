@@ -419,9 +419,10 @@ def stencil_zeroreg0(nr, parity, coeffs = None):
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-    diags[-1] = diags[-1][0:nr+offsets[0]]
 
-    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+    mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+    mat = mat[:,0:nr+offsets[0]]
+    return mat.tocoo()
 
 def stencil_zeroreg1(nr, parity, coeffs = None):
     """Create stencil matrix for a 1st order regularity at the origin"""
@@ -446,9 +447,10 @@ def stencil_zeroreg1(nr, parity, coeffs = None):
 
         ds = [d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_zeroreg2(nr, parity, coeffs = None):
     """Create stencil matrix for a 2nd order regularity at the origin"""
@@ -490,9 +492,10 @@ def stencil_zeroreg2(nr, parity, coeffs = None):
 
         ds = [d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_zeroreg3(nr, parity, coeffs = None):
     """Create stencil matrix for a 3rd order regularity at the origin"""
@@ -522,9 +525,10 @@ def stencil_zeroreg3(nr, parity, coeffs = None):
 
         ds = [d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_zeroreg4(nr, parity, coeffs = None):
     """Create stencil matrix for a 4th order regularity at the origin"""
@@ -577,9 +581,10 @@ def stencil_zeroreg4(nr, parity, coeffs = None):
 
         ds = [d_3, d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_zeroreg5(nr, parity, coeffs = None):
     """Create stencil matrix for a 5th order regularity at the origin"""
@@ -614,9 +619,10 @@ def stencil_zeroreg5(nr, parity, coeffs = None):
 
         ds = [d_3, d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_zeroreg6(nr, parity, coeffs = None):
     """Create stencil matrix for a 6th order regularity at the origin"""
@@ -680,9 +686,10 @@ def stencil_zeroreg6(nr, parity, coeffs = None):
 
         ds = [d_4, d_3, d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_zeroreg7(nr, parity, coeffs = None):
     """Create stencil matrix for a 7th order regularity at the origin"""
@@ -722,9 +729,10 @@ def stencil_zeroreg7(nr, parity, coeffs = None):
 
         ds = [d_4, d_3, d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_zeroreg8(nr, parity, coeffs = None):
     """Create stencil matrix for a 8th order regularity at the origin"""
@@ -799,9 +807,10 @@ def stencil_zeroreg8(nr, parity, coeffs = None):
 
         ds = [d_5, d_4, d_3, d_2, d_1, d0]
         diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
-        diags[-1] = diags[-1][0:nr+offsets[0]]
 
-        return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+        mat = spsp.diags(diags, offsets, (nr,nr)).tolil()
+        mat = mat[:,0:nr+offsets[0]]
+        return mat.tocoo()
 
 def stencil_value_diff(nr, parity, coeffs = None):
     """Create stencil matrix for a zero boundary value and zero 1st derivative"""

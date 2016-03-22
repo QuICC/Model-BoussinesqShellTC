@@ -51,10 +51,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row == ("temperature",""):
-                fields = [("temperature","")]
-            else:
-                fields = []
+            fields = [field_row]
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
@@ -131,11 +128,11 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
                         bc = {0:-10, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:10}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                             bc = {0:10}
 
             elif bcId == 1:
@@ -226,6 +223,12 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2r2(res[0], l, bc)
+
+        elif field_row == ("velocity","tor") and field_col == field_row:
+            mat = geo.qid(res[0], l, 1, bc)
+
+        elif field_row == ("velocity","pol") and field_col == field_row:
+            mat = geo.qid(res[0], l, 2, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
