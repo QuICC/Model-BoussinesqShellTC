@@ -54,6 +54,11 @@ namespace GeoMHDiSCC {
       MpiFramework::checkFramework(size);
    }
 
+   void MpiFramework::abort(const int code)
+   {
+      MPI_Abort(MPI_COMM_WORLD, code);
+   }
+
    void MpiFramework::synchronize()
    {
       // Create MPI barrier to force synchronisation

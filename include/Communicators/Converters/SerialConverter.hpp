@@ -62,7 +62,7 @@ namespace Parallel {
          /**
           * @brief Setup the converter
           */
-         virtual void setup(const Dimensions::Transform::Id transId);
+         virtual void setup();
 
          /**
           * @brief Get the converted data from TBwdA to TFwdB conversion
@@ -154,7 +154,7 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup(const Dimensions::Transform::Id transId)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup()
    {
    }
 

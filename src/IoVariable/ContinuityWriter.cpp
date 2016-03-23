@@ -72,9 +72,7 @@ namespace IoVariable {
       // Abort if continuity is NaN
       if(std::isnan(continuity))
       {
-         #ifdef GEOMHDISCC_MPI
-            MPI_Abort(MPI_COMM_WORLD, 99);
-         #endif //GEOMHDISCC_MPI
+         FrameworkMacro::abort(99);
 
          throw Exception("Continuity is NaN!");
       }

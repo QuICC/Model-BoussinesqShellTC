@@ -151,9 +151,7 @@ namespace IoVariable {
       // Abort if kinetic energy is NaN
       if(std::isnan(this->mEnergy))
       {
-         #ifdef GEOMHDISCC_MPI
-            MPI_Abort(MPI_COMM_WORLD, 99);
-         #endif //GEOMHDISCC_MPI
+         FrameworkMacro::abort(99);
 
          throw Exception("Scalar energy is NaN!");
       }

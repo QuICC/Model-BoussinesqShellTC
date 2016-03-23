@@ -46,6 +46,11 @@ namespace GeoMHDiSCC {
          static void synchronize();
 
          /**
+          * @brief Abort simulation
+          */
+         static void abort(const int code);
+
+         /**
           * @brief Finalise the MPI system
           */
          static void finalize();

@@ -137,7 +137,7 @@ namespace Parallel {
          /**
           * @brief Setup the MPI communication requests requests
           */
-         void setupRequests(const Dimensions::Transform::Id transId);
+         void setupRequests();
 
          /**
           * @brief Cleanup the MPI communication requests
@@ -169,14 +169,14 @@ namespace Parallel {
          int nBCpu() const;
 
          /**
-          * @brief Get global MPI rank of CPU from forward CPU group
+          * @brief Get MPI rank of CPU from forward CPU group
           *
           * @param id CPU group id
           */
          int fCpu(const int id) const;
 
          /**
-          * @brief Get global MPI rank of CPU from backward CPU group
+          * @brief Get MPI rank of CPU from backward CPU group
           *
           * @param id CPU group id
           */
@@ -196,6 +196,11 @@ namespace Parallel {
           * @brief Communication packs counter
           */
          int mPacks;
+
+         /**
+          * @brief Transform ID
+          */
+         Dimensions::Transform::Id mTraId;
 
          /**
           * @brief Active operations are for forward direction
@@ -414,7 +419,7 @@ namespace Parallel {
       return ((size - 1 - id + ref) % size);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests(const Dimensions::Transform::Id transId)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests()
    {
       // Storage for global location flags
       int dest;
@@ -426,16 +431,17 @@ namespace Parallel {
       int grpSrc;
 
       // Shift tag to produce unique tag in 2D distribution
+      // (Probably not required anymore but doesn't harm)
       int tagShift = 0;
-      if(transId == Dimensions::Transform::TRA2D)
+      if(this->mTraId == Dimensions::Transform::TRA1D)
       {
          tagShift = 0;
-      } else if(transId == Dimensions::Transform::TRA3D)
+      } else if(this->mTraId == Dimensions::Transform::TRA2D)
       {
          tagShift = FrameworkMacro::nCpu();
       } else
       {
-         MPI_Abort(MPI_COMM_WORLD, 999);
+         FrameworkMacro::abort(999);
       }
 
       // Storage for the number of packs
@@ -465,12 +471,12 @@ namespace Parallel {
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::id()));
+            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::transformId(this->mTraId)));
 
             // Get source index in CPU group
             grpSrc = this->recvSrc(id, grpMe, this->nFCpu());
 
-            // Get global MPI source rank
+            // Get source MPI rank in group
             src = this->fCpu(grpSrc);
 
             // Set shifted MPI tag to make it unique
@@ -481,22 +487,22 @@ namespace Parallel {
             assert(static_cast<size_t>(grpSrc) < this->mRecvFRequests.at(packs).size());
 
             // initialise the Recv request
-            MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvFRequests.at(packs).at(grpSrc)));
+            MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
          }
 
          // Create send backward requests
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
+            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::transformId(this->mTraId)));
 
             // Set shifted MPI tag to make it unique
-            tag = FrameworkMacro::id() + tagShift;
+            tag = FrameworkMacro::transformId(this->mTraId) + tagShift;
 
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nBCpu());
 
-            // Get global MPI destination rank
+            // Get destination MPI rank in group
             dest = this->bCpu(grpDest);
 
             //Safety asserts
@@ -504,7 +510,7 @@ namespace Parallel {
             assert(static_cast<size_t>(grpDest) < this->mSendBRequests.at(packs).size());
 
             // initialise the Send request
-            MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendBRequests.at(packs).at(grpDest)));
+            MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
          }
       }
 
@@ -532,38 +538,38 @@ namespace Parallel {
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
+            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::transformId(this->mTraId)));
 
             // Get source index in CPU group
             grpSrc = this->recvSrc(id, grpMe, this->nBCpu());
 
-            // Get global MPI source rank
+            // Get source MPI rank in group
             src = this->bCpu(grpSrc);
 
             // Set shifted MPI tag to make it unique
             tag = src + tagShift;
 
             // initialise the Recv request
-            MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvBRequests.at(packs).at(grpSrc)));
+            MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
          }
 
          // Create send forward requests
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::id()));
+            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::transformId(this->mTraId)));
 
             // Set shifted MPI tag to make it unique
-            tag = FrameworkMacro::id() + tagShift;
+            tag = FrameworkMacro::transformId(this->mTraId) + tagShift;
 
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nFCpu());
 
-            // Get global MPI destination rank
+            // Get destination MPI rank in group
             dest = this->fCpu(grpDest);
 
             // initialise the Send request
-            MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendFRequests.at(packs).at(grpDest)));
+            MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
          }
       }
    }

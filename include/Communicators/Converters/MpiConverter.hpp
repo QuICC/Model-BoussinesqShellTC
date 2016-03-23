@@ -62,7 +62,7 @@ namespace Parallel {
          /**
           * @brief Finish the setup of the converter
           */
-         virtual void setup(const Dimensions::Transform::Id transId);
+         virtual void setup();
 
          /**
           * @brief Convert data from TFwdA to TBwdB
@@ -145,16 +145,15 @@ namespace Parallel {
           * @brief Initialise the datatypes
           *
           * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
           * @param fTmp    TFwdA temporary
           * @param bTmp    TBwdB temporary
           */
-         void initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA& fTmp, TBwdB& bTmp);
+         void initTypes(SharedResolution spRes, TFwdA& fTmp, TBwdB& bTmp);
 
          /**
           * @brief Initialise the sizes and CPU lists
           */
-         void initLists(const Dimensions::Transform::Id fwdDim);
+         void initLists();
 
          /**
           * @brief Send forward data 
@@ -281,13 +280,13 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup(const Dimensions::Transform::Id transId)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup()
    {
       // initialise the send and receive positions
       this->initPositions();
 
       // setup the communication requests
-      this->setupRequests(transId);
+      this->setupRequests();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs, const TransformDirection::Id direction)
@@ -311,7 +310,7 @@ namespace Parallel {
          MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 999);
+            FrameworkMacro::abort(999);
          }
 
          // Prepost the receive calls
@@ -331,7 +330,7 @@ namespace Parallel {
          MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 999);
+            FrameworkMacro::abort(999);
          }
 
          // Post non blocking send calls 
@@ -360,7 +359,7 @@ namespace Parallel {
          MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 999);
+            FrameworkMacro::abort(999);
          }
 
          // Prepost the receive calls
@@ -380,7 +379,7 @@ namespace Parallel {
          MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 999);
+            FrameworkMacro::abort(999);
          }
 
          // Post non blocking send calls 
@@ -411,43 +410,46 @@ namespace Parallel {
       // Initialise the active packs
       this->mActiveSend = 0;
       this->mActiveReceive = 0;
+
+      // Store Transform ID
+      this->mTraId = fwdDim;
       
       // Create index converter
-      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(spRes, fwdDim));
+      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(spRes, this->mTraId));
 
       // initialise the data types
-      this->initTypes(spRes, fwdDim, fwdTmp, bwdTmp);
+      this->initTypes(spRes, fwdTmp, bwdTmp);
 
       stage.done();
       stage.start("cleaning empty datatypes",1);
 
       // initialise the size and CPU lists
-      this->initLists(fwdDim);
+      this->initLists();
       stage.done();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fTmp, TBwdB &bTmp)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initTypes(SharedResolution spRes, TFwdA &fTmp, TBwdB &bTmp)
    {
       std::map<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate, typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> localFwdMap;
-      MpiConverterTools<TFwdA::FieldDimension>::buildLocalFwdMap(localFwdMap, spRes, fwdDim);
+      MpiConverterTools<TFwdA::FieldDimension>::buildLocalFwdMap(localFwdMap, spRes, this->mTraId);
       std::map<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate, typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> localBwdMap;
-      MpiConverterTools<TBwdB::FieldDimension>::buildLocalBwdMap(localBwdMap, spRes, fwdDim, this->mspIdxConv);
+      MpiConverterTools<TBwdB::FieldDimension>::buildLocalBwdMap(localBwdMap, spRes, this->mTraId, this->mspIdxConv);
 
       // Loop over group cpus
-      for(int id = 0; id < FrameworkMacro::transformCpus(fwdDim).size(); id++)
+      for(int id = 0; id < FrameworkMacro::transformCpus(this->mTraId).size(); id++)
       {
       	 // Synchronize 
-     	   FrameworkMacro::syncTransform(fwdDim);
+     	   FrameworkMacro::syncTransform(this->mTraId);
 
          // Create TBwdB datatypes
-         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(localBwdMap, spRes, fwdDim, bTmp, id);
+         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(localBwdMap, spRes, this->mTraId, bTmp, id);
          this->mBTypes.push_back(type);
 
       	 // Synchronize 
-     	   FrameworkMacro::syncTransform(fwdDim);
+     	   FrameworkMacro::syncTransform(this->mTraId);
 
          // Create TFwdA datatypes
-         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(localFwdMap, spRes, fwdDim, fTmp, id);
+         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(localFwdMap, spRes, this->mTraId, fTmp, id);
          this->mFTypes.push_back(type);
       }
    }
@@ -573,7 +575,7 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
       {
-         MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
+         MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
       }
 
       // Stop detailed profiler
@@ -597,7 +599,7 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)
       {
-         MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
+         MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
       }
 
       // Stop detailed profiler
@@ -645,7 +647,7 @@ namespace Parallel {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
-               MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), MPI_COMM_WORLD);
+               MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
             }
 
             // Stop detailed profiler
@@ -668,7 +670,7 @@ namespace Parallel {
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             DebuggerMacro_msg("Unpacking FWD packs", 5);
-            MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), MPI_COMM_WORLD);
+            MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
          }
 
          // Stop detailed profiler
@@ -717,7 +719,7 @@ namespace Parallel {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
-               MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), MPI_COMM_WORLD);
+               MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
             }
 
             // Stop detailed profiler
@@ -740,7 +742,7 @@ namespace Parallel {
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             DebuggerMacro_msg("Unpacking BWD packs", 5);
-            MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), MPI_COMM_WORLD);
+            MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
          }
 
          // Stop detailed profiler
@@ -748,23 +750,21 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initLists(const Dimensions::Transform::Id fwdDim)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initLists()
    {
       int sze;
       std::vector<int> unusedF;
       std::vector<int> unusedB;
 
       // Loop over all CPUs
-      for(int i = 0; i < FrameworkMacro::transformCpus(fwdDim).size(); i++)
+      for(int i = 0; i < FrameworkMacro::transformCpus(this->mTraId).size(); i++)
       {
-         int id = FrameworkMacro::transformCpus(fwdDim)(i);
-
          // Compute buffer sizes for F group
-         MPI_Pack_size(1, this->mFTypes.at(i), MPI_COMM_WORLD, &sze);
+         MPI_Pack_size(1, this->mFTypes.at(i), FrameworkMacro::transformComm(this->mTraId), &sze);
          if(sze != 0)
          {
             this->mFSizes.push_back(sze);
-            this->mFCpuGroup.push_back(id);
+            this->mFCpuGroup.push_back(i);
 
          // Get a list of unused forward datatypes
          } else
@@ -773,11 +773,11 @@ namespace Parallel {
          }
 
          // Compute buffer sizes for B group
-         MPI_Pack_size(1, this->mBTypes.at(i), MPI_COMM_WORLD, &sze);
+         MPI_Pack_size(1, this->mBTypes.at(i), FrameworkMacro::transformComm(this->mTraId), &sze);
          if(sze != 0)
          {
             this->mBSizes.push_back(sze);
-            this->mBCpuGroup.push_back(id);
+            this->mBCpuGroup.push_back(i);
 
          // Get a list of unused backward datatypes
          } else
@@ -825,8 +825,8 @@ namespace Parallel {
       // General communication storage
       memComm += 4.0*5.0;
       memComm += 4.0*(this->mForwardPacks.size() + this->mBackwardPacks.size());
-      memComm += 4.0*(this->mFSizes.size() + this->mFCpuGroup.size());
-      memComm += 4.0*(this->mBSizes.size() + this->mBCpuGroup.size());
+      memComm += 4.0*(this->mFSizes.size() + this->nFCpu());
+      memComm += 4.0*(this->mBSizes.size() + this->nBCpu());
       memComm += 4.0*(this->mSendPositions.size() + this->mRecvPositions.size());
 
       // Requests communication storage
