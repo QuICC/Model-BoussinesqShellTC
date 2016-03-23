@@ -169,6 +169,9 @@ namespace Schemes {
          
          // Free communicator
          MPI_Comm_free(&comm);
+
+         // Synchronize
+         FrameworkMacro::synchronize();
       #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
    }
 

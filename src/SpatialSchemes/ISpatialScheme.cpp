@@ -141,7 +141,11 @@ namespace Schemes {
             }
 
             FrameworkMacro::addTransformComm(groupCpu);
+
+            // Synchronize
+            FrameworkMacro::synchronize();
          }
+
       #endif //defined GEOMHDISCC_MPI
    }
 

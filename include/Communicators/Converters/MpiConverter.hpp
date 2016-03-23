@@ -428,9 +428,6 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fTmp, TBwdB &bTmp)
    {
-      // Synchronize 
-      FrameworkMacro::synchronize();
-
       std::map<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate, typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> localFwdMap;
       MpiConverterTools<TFwdA::FieldDimension>::buildLocalFwdMap(localFwdMap, spRes, fwdDim);
       std::map<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate, typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> localBwdMap;
@@ -453,9 +450,6 @@ namespace Parallel {
          type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(localFwdMap, spRes, fwdDim, fTmp, id);
          this->mFTypes.push_back(type);
       }
-
-      // Synchronize 
-      FrameworkMacro::synchronize();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncFwdBuffer(const TransformDirection::Id direction)

@@ -108,7 +108,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Sleep MPI process for given number of seconds
           */
-         static void sleep(const int seconds);
+         static void sleep(const MHDFloat seconds);
          
       protected:
 

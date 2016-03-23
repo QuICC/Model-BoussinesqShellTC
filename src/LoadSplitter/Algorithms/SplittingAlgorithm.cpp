@@ -803,6 +803,9 @@ namespace Parallel {
             fwdMap.clear();
          }
       }
+
+      // Synchronize
+      FrameworkMacro::synchronize();
    }
 
 }

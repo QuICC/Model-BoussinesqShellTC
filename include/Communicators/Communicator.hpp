@@ -452,6 +452,9 @@ namespace Parallel {
                this->template storage<Dimensions::Transform::TRA1D>().freeFwd(rFTmp1D);
                this->template storage<Dimensions::Transform::TRA2D>().freeBwd(rBTmp2D);
 
+               // Synchronize
+               FrameworkMacro::synchronize();
+
                //Crate shared 2D/3D MPI converter
                SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv23(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
 
@@ -461,6 +464,9 @@ namespace Parallel {
                spConv23->init(spRes, Dimensions::Transform::TRA2D, rFTmp2D, rBTmp3D, packs2DFwd, packs2DBwd);
                this->template storage<Dimensions::Transform::TRA2D>().freeFwd(rFTmp2D);
                this->template storage<Dimensions::Transform::TRA3D>().freeBwd(rBTmp3D);
+
+               // Synchronize
+               FrameworkMacro::synchronize();
 
                // Create the communication buffers
                SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());

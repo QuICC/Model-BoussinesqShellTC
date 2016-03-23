@@ -195,7 +195,7 @@ namespace GeoMHDiSCC {
       MpiFramework::synchronize();
    }
 
-   void MpiFramework::sleep(const int seconds)
+   void MpiFramework::sleep(const MHDFloat seconds)
    {
       // Sleep MPI process for given amount of seconds
       MHDFloat start = MPI_Wtime();
