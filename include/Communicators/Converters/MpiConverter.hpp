@@ -400,6 +400,7 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
    {
+      FrameworkMacro::synchronize();
       StageTimer stage;
       stage.start("creating MPI datatypes",1);
 
@@ -420,11 +421,14 @@ namespace Parallel {
       // initialise the data types
       this->initTypes(spRes, fwdTmp, bwdTmp);
 
+      FrameworkMacro::synchronize();
       stage.done();
       stage.start("cleaning empty datatypes",1);
 
       // initialise the size and CPU lists
       this->initLists();
+
+      FrameworkMacro::synchronize();
       stage.done();
    }
 

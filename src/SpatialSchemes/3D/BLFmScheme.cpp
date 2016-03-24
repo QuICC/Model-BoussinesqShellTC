@@ -77,24 +77,30 @@ namespace Schemes {
                // Send the size
                size = modes.size();
                MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
+               MPI_Barrier(comm);
 
                // Send global CPU rank 
                globalCpu = FrameworkMacro::id();
                MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
+               MPI_Barrier(comm);
 
                // Send modes
                MPI_Bcast(modes.data(), modes.size(), MPI_INT, commCpu, comm);
+               MPI_Barrier(comm);
             } else
             {
                // Get size
                MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
+               MPI_Barrier(comm);
 
                // Get global CPU rank 
                MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
+               MPI_Barrier(comm);
 
                // Receive modes
                tmp.resize(size);
                MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, commCpu, comm);
+               MPI_Barrier(comm);
 
                std::map<int,int>::iterator mapIt;
                for(int i = 0; i < size; i++)
@@ -125,6 +131,7 @@ namespace Schemes {
                {
                   size = ranks.at(i).size();
                   MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
 
                   if(size > 0)
                   {
@@ -137,17 +144,20 @@ namespace Schemes {
                         subRanks.insert(*sIt);
                      }
                      MPI_Bcast(tmp.data(), size, MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
                   }
                } else
                {
                   // Get size
                   MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
 
                   // Receive ranks
                   if(size > 0)
                   {
                      tmp.resize(size);
                      MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
 
                      for(int j = 0; j < size; ++j)
                      {

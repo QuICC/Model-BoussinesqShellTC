@@ -464,19 +464,23 @@ namespace Parallel {
 
                   // Broadcast size
                   MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
 
                   // Broadcast data
                   MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  FrameworkMacro::synchronize();
 
                // Remote CPU   
                } else
                {
                   // Get size
                   MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
 
                   // Get remote keys as matrix
                   matRemote.resize(2, toMatch);
                   MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  FrameworkMacro::synchronize();
 
                   // Compare received data to stored indexes
                   for(int i = 0; i < toMatch; i++)
@@ -539,18 +543,22 @@ namespace Parallel {
 
                      // Get size
                      MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
                      MPI_Bcast(locFilter.data(), locFilter.cols()*locFilter.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     FrameworkMacro::synchronize();
 
                   } else
                   {
                      // Get size
                      MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
                      MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     FrameworkMacro::synchronize();
 
                      for(int i = 0; i < filterSize; ++i)
                      {
@@ -692,19 +700,23 @@ namespace Parallel {
 
                   // Broadcast size
                   MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
 
                   // Broadcast data
                   MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  FrameworkMacro::synchronize();
 
                // Remote CPU   
                } else
                {
                   // Get size
                   MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
 
                   // Get remote keys as matrix
                   matRemote.resize(3, toMatch);
                   MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  FrameworkMacro::synchronize();
 
                   // Compare received data to stored indexes
                   for(int i = 0; i < toMatch; i++)
@@ -767,18 +779,22 @@ namespace Parallel {
 
                      // Get size
                      MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
                      MPI_Bcast(locFilter.data(), locFilter.cols()*locFilter.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     FrameworkMacro::synchronize();
 
                   } else
                   {
                      // Get size
                      MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
                      MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     FrameworkMacro::synchronize();
 
                      for(int i = 0; i < filterSize; ++i)
                      {
