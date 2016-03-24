@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief Simple struct holding details about ChebyshevFFT transform
+    * @brief Simple struct holding details about associated Legendre transform
     */
    struct AssociatedLegendreIds {
 
@@ -61,7 +61,7 @@ namespace Transform {
    };
 
    /**
-    * @brief Implementation of the FFTW transform for a Chebyshev expansion
+    * @brief Implementation of the associated Legendre transform
     */ 
    class AssociatedLegendreTransform
    {
