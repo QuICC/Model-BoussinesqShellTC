@@ -59,6 +59,14 @@ namespace GeoMHDiSCC {
       MPI_Abort(MPI_COMM_WORLD, code);
    }
 
+   void MpiFramework::check(const int ierr, const int code)
+   {
+      if(ierr != MPI_SUCCESS)
+      {
+         MPI_Abort(MPI_COMM_WORLD, code);
+      }
+   }
+
    void MpiFramework::synchronize()
    {
       // Create MPI barrier to force synchronisation
@@ -69,23 +77,36 @@ namespace GeoMHDiSCC {
    {
       MpiFramework::mTransformCpus.push_back(ids);
 
+      // MPI error code
+      int ierr;
+
+      // Get world group
       MPI_Group world;
       MPI_Group group;
-      MPI_Comm_group(MPI_COMM_WORLD, &world);
+      ierr = MPI_Comm_group(MPI_COMM_WORLD, &world);
+      MpiFramework::check(ierr, 911);
+
+      // Create sub group
       #if defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
-         MPI_Group_incl(world, ids.size(), const_cast<int*>(ids.data()), &group);
+         ierr = MPI_Group_incl(world, ids.size(), const_cast<int*>(ids.data()), &group);
       #else
-         MPI_Group_incl(world, ids.size(), ids.data(), &group);
+         ierr = MPI_Group_incl(world, ids.size(), ids.data(), &group);
       #endif //defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
+      MpiFramework::check(ierr, 912);
+
+      // Create communicator for sub group
       MPI_Comm comm;
-      MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      ierr = MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      MpiFramework::check(ierr, 913);
 
       MpiFramework::mTransformGroups.push_back(group);
 
       MpiFramework::mTransformComms.push_back(comm);
 
+      // Get rank in sub group
       int rank;
-      MPI_Comm_rank(comm, &rank);
+      ierr = MPI_Comm_rank(comm, &rank);
+      MpiFramework::check(ierr, 914);
       MpiFramework::mTransformIds.push_back(rank);
    }
 
@@ -168,8 +189,13 @@ namespace GeoMHDiSCC {
       assert(mSubGroup.find(id) != mSubGroup.end());
       assert(mSubComm.find(id) != mSubComm.end());
 
+      // MPI error code
+      int ierr;
+
+      // Get world group
       MPI_Group   world;
-      MPI_Comm_group(MPI_COMM_WORLD, &world);
+      ierr = MPI_Comm_group(MPI_COMM_WORLD, &world);
+      MpiFramework::check(ierr, 921);
 
       MPI_Group group;
       MPI_Comm comm;
@@ -184,9 +210,11 @@ namespace GeoMHDiSCC {
       }
 
       // Create sub group
-      MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
+      ierr = MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
+      MpiFramework::check(ierr, 922);
       // Create sub communicator
-      MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      ierr = MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      MpiFramework::check(ierr, 923);
 
       if(comm != MPI_COMM_NULL)
       {

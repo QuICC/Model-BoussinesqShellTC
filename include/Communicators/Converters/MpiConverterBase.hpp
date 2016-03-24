@@ -444,6 +444,9 @@ namespace Parallel {
          FrameworkMacro::abort(999);
       }
 
+      // MPI error code
+      int ierr;
+
       // Storage for the number of packs
       int packs;
 
@@ -487,7 +490,8 @@ namespace Parallel {
             assert(static_cast<size_t>(grpSrc) < this->mRecvFRequests.at(packs).size());
 
             // initialise the Recv request
-            MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
+            ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
+            FrameworkMacro::check(ierr, 981);
          }
 
          // Create send backward requests
@@ -510,7 +514,8 @@ namespace Parallel {
             assert(static_cast<size_t>(grpDest) < this->mSendBRequests.at(packs).size());
 
             // initialise the Send request
-            MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
+            ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
+            FrameworkMacro::check(ierr, 982);
          }
       }
 
@@ -550,7 +555,8 @@ namespace Parallel {
             tag = src + tagShift;
 
             // initialise the Recv request
-            MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
+            ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
+            FrameworkMacro::check(ierr, 983);
          }
 
          // Create send forward requests
@@ -569,7 +575,8 @@ namespace Parallel {
             dest = this->fCpu(grpDest);
 
             // initialise the Send request
-            MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
+            ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
+            FrameworkMacro::check(ierr, 984);
          }
       }
    }

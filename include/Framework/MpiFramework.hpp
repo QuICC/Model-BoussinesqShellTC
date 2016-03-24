@@ -51,6 +51,11 @@ namespace GeoMHDiSCC {
          static void abort(const int code);
 
          /**
+          * @brief Check error code for success
+          */
+         static void check(const int ierr, const int code);
+
+         /**
           * @brief Finalise the MPI system
           */
          static void finalize();
