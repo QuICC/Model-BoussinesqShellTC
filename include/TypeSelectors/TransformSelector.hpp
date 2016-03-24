@@ -259,7 +259,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef Fft::CylinderWorlandSelector Type;
+               typedef CylinderWorlandTransform Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
@@ -286,7 +286,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef Fft::SpherWorlandSelector Type;
+               typedef SphereWorlandTransform Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>

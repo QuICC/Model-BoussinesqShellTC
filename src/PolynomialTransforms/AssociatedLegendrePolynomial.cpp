@@ -526,7 +526,7 @@ namespace Polynomial {
          op.array() *= isin_1pmm.array(); 
       }
    }
-#endif //defined GEOMHDISCC_NORMALIZED_SH
+#endif //defined GEOMHDISCC_SHNORM_SCHMIDT
 
    AssociatedLegendrePolynomial::AssociatedLegendrePolynomial()
    {
