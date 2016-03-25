@@ -195,7 +195,11 @@ namespace GeoMHDiSCC {
    // Configure code to use BLF scheme
    #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
 
-      #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
+      #if defined GEOMHDISCC_ALEGTRA_MATRIX
+         #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
+      #elif defined GEOMHDISCC_ALEGTRA_FLY 
+         #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
+      #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -209,7 +213,11 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef AssociatedLegendreTransform Type;
+               #if defined GEOMHDISCC_ALEGTRA_MATRIX
+                  typedef AssociatedLegendreTransform Type;
+               #elif defined GEOMHDISCC_ALEGTRA_FLY 
+                  typedef AssociatedLegendreFlyTransform Type;
+               #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
@@ -224,7 +232,11 @@ namespace GeoMHDiSCC {
    // Configure code to use SLF scheme
    #if defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
 
-      #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
+      #if defined GEOMHDISCC_ALEGTRA_MATRIX
+         #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
+      #elif defined GEOMHDISCC_ALEGTRA_FLY 
+         #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
+      #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -238,7 +250,11 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef AssociatedLegendreTransform Type;
+               #if defined GEOMHDISCC_ALEGTRA_MATRIX
+                  typedef AssociatedLegendreTransform Type;
+               #elif defined GEOMHDISCC_ALEGTRA_FLY 
+                  typedef AssociatedLegendreFlyTransform Type;
+               #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
@@ -280,6 +296,12 @@ namespace GeoMHDiSCC {
    // Configure code to use WLF scheme
    #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
 
+      #if defined GEOMHDISCC_ALEGTRA_MATRIX
+         #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
+      #elif defined GEOMHDISCC_ALEGTRA_FLY 
+         #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
+      #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
+
       namespace GeoMHDiSCC {
          namespace Transform {
 
@@ -292,7 +314,11 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef AssociatedLegendreTransform Type;
+               #if defined GEOMHDISCC_ALEGTRA_MATRIX
+                  typedef AssociatedLegendreTransform Type;
+               #elif defined GEOMHDISCC_ALEGTRA_FLY 
+                  typedef AssociatedLegendreFlyTransform Type;
+               #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>

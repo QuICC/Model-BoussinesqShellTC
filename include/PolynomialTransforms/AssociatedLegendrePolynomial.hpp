@@ -34,6 +34,91 @@ namespace Polynomial {
    {
       public:
          /**
+          * @brief Compute the associated Legendre \f$P_l^m (\cos\theta)\f$ for all l
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void Plm(Matrix& poly, internal::Matrix& ipoly, const int m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_l^m (\cos\theta)\f$ for all l
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dPlm(Matrix& diff, internal::Matrix& idiff, const int m, const internal::Matrix& ipoly, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{P_l^m (\cos\theta)}{\sin\theta}\f$ for all l
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void sin_1Plm(Matrix& poly, internal::Matrix& ipoly, const int m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$P_l^m (\cos\theta)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_l^m (\cos\theta)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dPlm(Eigen::Ref<internal::Matrix> idplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& idpl_1m, const Eigen::Ref<const internal::Matrix>& idpl_2m, const Eigen::Ref<const internal::Matrix>& ipl_1m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{P_l^m (\cos\theta)}{\sin\theta}\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void sin_1Plm(Eigen::Ref<internal::Matrix> ipl1m, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$P_m^m (\cos\theta)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void Pmm(Eigen::Ref<internal::Matrix> op, const int m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$P_{m+1}^m (\cos\theta)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void Pmm1(Eigen::Ref<internal::Matrix> op, const int m, const Eigen::Ref<const internal::Matrix>& ipmm, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^m (\cos\theta)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dPmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^{m+1} (\cos\theta)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dPmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& ipmm, const Eigen::Ref<const internal::Array>& idpmm, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{P_m^m(\cos\theta)}{\sin\theta}\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void sin_1Pmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{P_m^{m+1}(\cos\theta)}{\sin\theta}\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void sin_1Pmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& isin_1pmm, const internal::Array& igrid);
+
+      private:
+         /**
           * @brief Constructor
           */
          AssociatedLegendrePolynomial();
@@ -43,70 +128,6 @@ namespace Polynomial {
           */
          ~AssociatedLegendrePolynomial();
 
-         /**
-          * @brief Compute the associated Legendre \f$P_m^l (\cos\theta)\f$ for all l
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void Plm(Matrix& poly, internal::Matrix& ipoly, const int m, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^l (\cos\theta)\f$ for all l
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void dPlm(Matrix& diff, internal::Matrix& idiff, const int m, const internal::Matrix& ipoly, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{P_m^l (\cos\theta)}{\sin\theta}\f$ for all l
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void sin_1Plm(Matrix& poly, internal::Matrix& ipoly, const int m, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$P_m^m (\cos\theta)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void Pmm(internal::Array& op, const int m, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$P_m^{m+1} (\cos\theta)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void Pmm1(internal::Array& op, const int m, const internal::Array& ipmm, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^m (\cos\theta)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void dPmm(internal::Array& op, const int m, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^{m+1} (\cos\theta)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void dPmm1(internal::Array& op, const int m, const internal::Array& ipmm, const internal::Array& idpmm, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{P_m^m(\cos\theta)}{\sin\theta}\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void sin_1Pmm(internal::Array& op, const int m, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{P_m^{m+1}(\cos\theta)}{\sin\theta}\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void sin_1Pmm1(internal::Array& op, const int m, const internal::Array& isin_1pmm, const internal::Array& igrid);
-
-      private:
    };
 }
 }

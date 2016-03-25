@@ -17,7 +17,6 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
-#include "Quadratures/LegendreRule.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -41,15 +40,11 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      internal::Array ipmm(gN);
-      AssociatedLegendrePolynomial::Pmm(ipmm, m, igrid);
-      ipoly.col(0) = ipmm;
+      AssociatedLegendrePolynomial::Pmm(ipoly.col(0), m, igrid);
 
       if(nPoly > 1)
       {
-         internal::Array ipmm1(gN);
-         AssociatedLegendrePolynomial::Pmm1(ipmm1, m, ipmm, igrid);
-         ipoly.col(1) = ipmm1;
+         AssociatedLegendrePolynomial::Pmm1(ipoly.col(1), m, ipoly.col(0), igrid);
       }
 
       if(nPoly > 2)
@@ -82,18 +77,14 @@ namespace Polynomial {
       }
 
       idiff.resize(gN, nPoly);
-      internal::Array idpmm(gN);
-      AssociatedLegendrePolynomial::dPmm(idpmm, m, igrid);
-      idiff.col(0) = idpmm;
+      AssociatedLegendrePolynomial::dPmm(idiff.col(0), m, igrid);
 
       if(nPoly > 1)
       {
          internal::Array ipmm(gN);
          AssociatedLegendrePolynomial::Pmm(ipmm, m, igrid);
 
-         internal::Array idpmm1(gN);
-         AssociatedLegendrePolynomial::dPmm1(idpmm1, m, ipmm, idpmm, igrid);
-         idiff.col(1) = idpmm1;
+         AssociatedLegendrePolynomial::dPmm1(idiff.col(1), m, ipmm, idiff.col(0), igrid);
       }
 
       if(nPoly > 2)
@@ -129,15 +120,11 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      internal::Array isin_1pmm(gN);
-      AssociatedLegendrePolynomial::sin_1Pmm(isin_1pmm, m, igrid);
-      ipoly.col(0) = isin_1pmm;
+      AssociatedLegendrePolynomial::sin_1Pmm(ipoly.col(0), m, igrid);
 
       if(nPoly > 1)
       {
-         internal::Array isin_1pmm1(gN);
-         AssociatedLegendrePolynomial::sin_1Pmm1(isin_1pmm1, m, isin_1pmm, igrid);
-         ipoly.col(1) = isin_1pmm1;
+         AssociatedLegendrePolynomial::sin_1Pmm1(ipoly.col(1), m, ipoly.col(0), igrid);
       }
 
       if(nPoly > 2)
@@ -154,7 +141,41 @@ namespace Polynomial {
       poly = Precision::cast(ipoly);
    }
 
-   void AssociatedLegendrePolynomial::Pmm(internal::Array& op, const int m, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid)
+   {
+      // Safety assert
+      assert(l-m > 1);
+
+      iplm.array() = -precision::sqrt(internal::MHDFloat(l + m - 1)*internal::MHDFloat(l - m - 1))*ipl_2m.array();
+      iplm.array() += (internal::MHDFloat(2*l) - MHD_MP(1.0))*igrid.array()*ipl_1m.array();
+      iplm.array() /= precision::sqrt(internal::MHDFloat(l + m)*internal::MHDFloat(l - m));
+   }
+
+   void AssociatedLegendrePolynomial::dPlm(Eigen::Ref<internal::Matrix> idplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& idpl_1m, const Eigen::Ref<const internal::Matrix>& idpl_2m, const Eigen::Ref<const internal::Matrix>& ipl_1m, const internal::Array& igrid)
+   {
+      // Safety assert
+      assert(l-m > 1);
+
+      internal::Array isin = igrid.array().acos();
+      isin = isin.array().sin();
+
+      idplm.array() = -precision::sqrt(internal::MHDFloat(l + m - 1)*internal::MHDFloat(l - m - 1))*idpl_2m.array();
+      idplm.array() += (internal::MHDFloat(2*l) - MHD_MP(1.0))*igrid.array()*idpl_1m.array();
+      idplm.array() -= (internal::MHDFloat(2*l) - MHD_MP(1.0))*isin.array()*ipl_1m.array();
+      idplm.array() /= precision::sqrt(internal::MHDFloat(l + m)*internal::MHDFloat(l - m));
+   }
+
+   void AssociatedLegendrePolynomial::sin_1Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid)
+   {
+      // Safety assert
+      assert(l-m > 1);
+
+      iplm.array() = -precision::sqrt(internal::MHDFloat(l + m - 1)*internal::MHDFloat(l - m - 1))*ipl_2m.array();
+      iplm.array() += (internal::MHDFloat(2*l) - MHD_MP(1.0))*igrid.array()*ipl_1m.array();
+      iplm.array() /= precision::sqrt(internal::MHDFloat(l + m)*internal::MHDFloat(l - m));
+   }
+
+   void AssociatedLegendrePolynomial::Pmm(Eigen::Ref<internal::Matrix> op, const int m, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -175,11 +196,11 @@ namespace Polynomial {
          op = igrid.array().acos();
          op = op.array().sin();
          op = op.array().pow(m);
-         op *= factor;
+         op.array() *= factor;
       }
    }
 
-   void AssociatedLegendrePolynomial::Pmm1(internal::Array& op, const int m, const internal::Array& ipmm, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::Pmm1(Eigen::Ref<internal::Matrix> op, const int m, const Eigen::Ref<const internal::Matrix>& ipmm, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -187,12 +208,12 @@ namespace Polynomial {
       } else
       {
          op = igrid;
-         op *= precision::sqrt(internal::MHDFloat(2*m + 1));
+         op.array() *= precision::sqrt(internal::MHDFloat(2*m + 1));
          op.array() *= ipmm.array(); 
       }
    }
 
-   void AssociatedLegendrePolynomial::dPmm(internal::Array& op, const int m, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::dPmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -214,11 +235,11 @@ namespace Polynomial {
          op = op.array().sin();
          op = op.array().pow(m-1);
          op.array() *= igrid.array();
-         op *= factor;
+         op.array() *= factor;
       }
    }
 
-   void AssociatedLegendrePolynomial::dPmm1(internal::Array& op, const int m, const internal::Array& ipmm, const internal::Array& idpmm, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::dPmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& ipmm, const Eigen::Ref<const internal::Array>& idpmm, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -231,11 +252,11 @@ namespace Polynomial {
 
          op.array() += igrid.array()*idpmm.array();
 
-         op *= precision::sqrt(internal::MHDFloat(2*m + 1));
+         op.array() *= precision::sqrt(internal::MHDFloat(2*m + 1));
       }
    }
 
-   void AssociatedLegendrePolynomial::sin_1Pmm(internal::Array& op, const int m, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::sin_1Pmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -257,11 +278,11 @@ namespace Polynomial {
          op = igrid.array().acos();
          op = op.array().sin();
          op = op.array().pow(m-1);
-         op *= factor;
+         op.array() *= factor;
       }
    }
 
-   void AssociatedLegendrePolynomial::sin_1Pmm1(internal::Array& op, const int m, const internal::Array& isin_1pmm, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::sin_1Pmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& isin_1pmm, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -269,7 +290,7 @@ namespace Polynomial {
       } else
       {
          op = igrid;
-         op *= precision::sqrt(internal::MHDFloat(2*m + 1));
+         op.array() *= precision::sqrt(internal::MHDFloat(2*m + 1));
          op.array() *= isin_1pmm.array(); 
       }
    }
@@ -292,15 +313,11 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      internal::Array ipmm(gN);
-      AssociatedLegendrePolynomial::Pmm(ipmm, m, igrid);
-      ipoly.col(0) = ipmm;
+      AssociatedLegendrePolynomial::Pmm(ipoly.col(0), m, igrid);
 
       if(nPoly > 1)
       {
-         internal::Array ipmm1(gN);
-         AssociatedLegendrePolynomial::Pmm1(ipmm1, m, ipmm, igrid);
-         ipoly.col(1) = ipmm1;
+         AssociatedLegendrePolynomial::Pmm1(ipoly.col(1), m, ipoly.col(0), igrid);
       }
 
       if(nPoly > 2)
@@ -333,18 +350,14 @@ namespace Polynomial {
       }
 
       idiff.resize(gN, nPoly);
-      internal::Array idpmm(gN);
-      AssociatedLegendrePolynomial::dPmm(idpmm, m, igrid);
-      idiff.col(0) = idpmm;
+      AssociatedLegendrePolynomial::dPmm(idiff.col(0), m, igrid);
 
       if(nPoly > 1)
       {
          internal::Array ipmm(gN);
          AssociatedLegendrePolynomial::Pmm(ipmm, m, igrid);
 
-         internal::Array idpmm1(gN);
-         AssociatedLegendrePolynomial::dPmm1(idpmm1, m, ipmm, idpmm, igrid);
-         idiff.col(1) = idpmm1;
+         AssociatedLegendrePolynomial::dPmm1(idiff.col(1), m, ipmm, idiff.col(0), igrid);
       }
 
       if(nPoly > 2)
@@ -381,15 +394,11 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      internal::Array isin_1pmm(gN);
-      AssociatedLegendrePolynomial::sin_1Pmm(isin_1pmm, m, igrid);
-      ipoly.col(0) = isin_1pmm;
+      AssociatedLegendrePolynomial::sin_1Pmm(ipoly.col(0), m, igrid);
 
       if(nPoly > 1)
       {
-         internal::Array isin_1pmm1(gN);
-         AssociatedLegendrePolynomial::sin_1Pmm1(isin_1pmm1, m, isin_1pmm, igrid);
-         ipoly.col(1) = isin_1pmm1;
+         AssociatedLegendrePolynomial::sin_1Pmm1(ipoly.col(1), m, ipoly.col(0), igrid);
       }
 
       if(nPoly > 2)
@@ -406,7 +415,42 @@ namespace Polynomial {
       poly = Precision::cast(ipoly);
    }
 
-   void AssociatedLegendrePolynomial::Pmm(internal::Array& op, const int m, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid)
+   {
+      // Safety assert
+      assert(l-m > 1);
+
+      iplm.array() = -precision::sqrt(internal::MHDFloat(l + m - 1)*internal::MHDFloat(l - m - 1))/precision::sqrt(internal::MHDFloat(2*l) - MHD_MP(3.0))*ipl_2m.array();
+      iplm.array() += precision::sqrt(internal::MHDFloat(2*l) - MHD_MP(1.0))*igrid.array()*ipl_1m.array();
+      iplm.array() *= precision::sqrt(internal::MHDFloat(2*l) + MHD_MP(1.0))/precision::sqrt(internal::MHDFloat(l + m)*internal::MHDFloat(l - m));
+   }
+
+   void AssociatedLegendrePolynomial::dPlm(Eigen::Ref<internal::Matrix> idplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& idpl_1m, const Eigen::Ref<const internal::Matrix>& idpl_2m, const Eigen::Ref<const internal::Matrix>& ipl_1m, const internal::Array& igrid)
+   {
+      // Safety assert
+      assert(l-m > 1);
+
+      internal::Array isin = igrid.array().acos();
+      isin = isin.array().sin();
+
+      idplm.array() = -precision::sqrt(internal::MHDFloat(l + m - 1)*internal::MHDFloat(l - m - 1))/precision::sqrt(internal::MHDFloat(2*l) - MHD_MP(3.0))*idpl_2m.array();
+      idplm.array() += precision::sqrt(internal::MHDFloat(2*l) - MHD_MP(1.0))*igrid.array()*idpl_1m.array();
+      idplm.array() -= precision::sqrt(internal::MHDFloat(2*l) - MHD_MP(1.0))*isin.array()*ipl_1m.array();
+
+      idplm.array() *= precision::sqrt(internal::MHDFloat(2*l) + MHD_MP(1.0))/precision::sqrt(internal::MHDFloat(l + m)*internal::MHDFloat(l - m));
+   }
+
+   void AssociatedLegendrePolynomial::sin_1Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid)
+   {
+      // Safety assert
+      assert(l-m > 1);
+
+      iplm.array() = -precision::sqrt(internal::MHDFloat(l + m - 1)*internal::MHDFloat(l - m - 1))/precision::sqrt(internal::MHDFloat(2*l) - MHD_MP(3.0))*ipl_2m.array();
+      iplm.array() += precision::sqrt(internal::MHDFloat(2*l) - MHD_MP(1.0))*igrid.array()*ipl_1m.array();
+      iplm.array() *= precision::sqrt(internal::MHDFloat(2*l) + MHD_MP(1.0))/precision::sqrt(internal::MHDFloat(l + m)*internal::MHDFloat(l - m));
+   }
+
+   void AssociatedLegendrePolynomial::Pmm(Eigen::Ref<internal::Matrix> op, const int m, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -427,11 +471,11 @@ namespace Polynomial {
          op = igrid.array().acos();
          op = op.array().sin();
          op = op.array().pow(m);
-         op *= factor;
+         op.array() *= factor;
       }
    }
 
-   void AssociatedLegendrePolynomial::Pmm1(internal::Array& op, const int m, const internal::Array& ipmm, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::Pmm1(Eigen::Ref<internal::Matrix> op, const int m, const Eigen::Ref<const internal::Matrix>& ipmm, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -439,12 +483,12 @@ namespace Polynomial {
       } else
       {
          op = igrid;
-         op *= precision::sqrt(internal::MHDFloat(2*m + 3));
+         op.array() *= precision::sqrt(internal::MHDFloat(2*m + 3));
          op.array() *= ipmm.array(); 
       }
    }
 
-   void AssociatedLegendrePolynomial::dPmm(internal::Array& op, const int m, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::dPmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -466,11 +510,11 @@ namespace Polynomial {
          op = op.array().sin();
          op = op.array().pow(m-1);
          op.array() *= igrid.array();
-         op *= factor;
+         op.array() *= factor;
       }
    }
 
-   void AssociatedLegendrePolynomial::dPmm1(internal::Array& op, const int m, const internal::Array& ipmm, const internal::Array& idpmm, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::dPmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& ipmm, const Eigen::Ref<const internal::Array>& idpmm, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -483,11 +527,11 @@ namespace Polynomial {
 
          op.array() += igrid.array()*idpmm.array();
 
-         op *= precision::sqrt(internal::MHDFloat(2*m + 3));
+         op.array() *= precision::sqrt(internal::MHDFloat(2*m + 3));
       }
    }
 
-   void AssociatedLegendrePolynomial::sin_1Pmm(internal::Array& op, const int m, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::sin_1Pmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -496,7 +540,7 @@ namespace Polynomial {
       {
          op = igrid.array().acos();
          op = op.array().sin().pow(-1);
-         op *= precision::sqrt(MHD_MP(1.0)/(MHD_MP(4.0)*Precision::PI));
+         op.array() *= precision::sqrt(MHD_MP(1.0)/(MHD_MP(4.0)*Precision::PI));
       } else
       {
          internal::MHDFloat di;
@@ -510,11 +554,11 @@ namespace Polynomial {
          op = igrid.array().acos();
          op = op.array().sin();
          op = op.array().pow(m-1);
-         op *= factor;
+         op.array() *= factor;
       }
    }
 
-   void AssociatedLegendrePolynomial::sin_1Pmm1(internal::Array& op, const int m, const internal::Array& isin_1pmm, const internal::Array& igrid)
+   void AssociatedLegendrePolynomial::sin_1Pmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& isin_1pmm, const internal::Array& igrid)
    {
       if(m < 0)
       {
@@ -522,7 +566,7 @@ namespace Polynomial {
       } else
       {
          op = igrid;
-         op *= precision::sqrt(internal::MHDFloat(2*m + 3));
+         op.array() *= precision::sqrt(internal::MHDFloat(2*m + 3));
          op.array() *= isin_1pmm.array(); 
       }
    }
