@@ -327,7 +327,7 @@ namespace Transform {
          for(int i = 0; i < specRows/this->mOpCols; i++)
          {
             // Build operator 
-            builder(this, iM, i0, std::min(this->mOpCols, specRows - i0), true);
+            builder(this, iM, i0, std::min(this->mOpCols, specRows - i0), false);
 
             // Compute quadrature integration
             rPhysVal.block(0, start, physRows, cols) += this->mOp*specVal.block(i0, start, this->mOpCols, cols);
@@ -340,7 +340,7 @@ namespace Transform {
          if(rem > 0)
          {
             // Build operator 
-            builder(this, iM, i0, rem, true);
+            builder(this, iM, i0, rem, false);
 
             rPhysVal.block(0, start, physRows, cols) += this->mOp.leftCols(rem)*specVal.block(i0, start, this->mOpCols, cols);
          }
@@ -367,7 +367,7 @@ namespace Transform {
          for(int i = 0; i < specRows/this->mOpCols; i++)
          {
             // Build operator 
-            builder(this, iM, i0, std::min(this->mOpCols, specRows - i0), true);
+            builder(this, iM, i0, std::min(this->mOpCols, specRows - i0), false);
 
             // Compute quadrature integration
             rPhysVal.block(0, start, physRows, cols) += this->mOp*(mult.segment(l0 + i0, this->mOpCols).asDiagonal()*specVal.block(i0, start, this->mOpCols, cols));
@@ -380,7 +380,7 @@ namespace Transform {
          if(rem > 0)
          {
             // Build operator 
-            builder(this, iM, i0, rem, true);
+            builder(this, iM, i0, rem, false);
 
             rPhysVal.block(0, start, physRows, cols) += this->mOp.leftCols(rem)*(mult.segment(l0 + i0, this->mOpCols).asDiagonal()*specVal.block(i0, start, this->mOpCols, cols));
          }
