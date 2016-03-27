@@ -314,10 +314,13 @@ namespace Transform {
       int start = 0;
       int physRows = this->mspSetup->fwdSize(); 
 
+      rPhysVal.setZero();
       for(int iM = 0; iM < this->mspSetup->slow().size(); iM++)
       {
          int cols = this->mspSetup->mult()(iM);
          int specRows = this->mspSetup->fast().at(iM).size();
+
+
 
          // Main loop
          int i0 = 0;
@@ -327,7 +330,7 @@ namespace Transform {
             builder(this, iM, i0, std::min(this->mOpCols, specRows - i0), true);
 
             // Compute quadrature integration
-            rPhysVal.block(0, start, physRows, cols) = this->mOp*specVal.block(i0, start, this->mOpCols, cols);
+            rPhysVal.block(0, start, physRows, cols) += this->mOp*specVal.block(i0, start, this->mOpCols, cols);
 
             i0 = (i+1)*this->mOpCols;
          }
@@ -339,7 +342,7 @@ namespace Transform {
             // Build operator 
             builder(this, iM, i0, rem, true);
 
-            rPhysVal.block(0, start, physRows, cols) = this->mOp.leftCols(rem)*specVal.block(i0, start, this->mOpCols, cols);
+            rPhysVal.block(0, start, physRows, cols) += this->mOp.leftCols(rem)*specVal.block(i0, start, this->mOpCols, cols);
          }
 
          start += cols;
@@ -351,6 +354,7 @@ namespace Transform {
       int start = 0;
       int physRows = this->mspSetup->fwdSize(); 
 
+      rPhysVal.setZero();
       for(int iM = 0; iM < this->mspSetup->slow().size(); iM++)
       {
          int cols = this->mspSetup->mult()(iM);
@@ -366,7 +370,7 @@ namespace Transform {
             builder(this, iM, i0, std::min(this->mOpCols, specRows - i0), true);
 
             // Compute quadrature integration
-            rPhysVal.block(0, start, physRows, cols) = this->mOp*(mult.segment(l0 + i0, this->mOpCols).asDiagonal()*specVal.block(i0, start, this->mOpCols, cols));
+            rPhysVal.block(0, start, physRows, cols) += this->mOp*(mult.segment(l0 + i0, this->mOpCols).asDiagonal()*specVal.block(i0, start, this->mOpCols, cols));
 
             i0 = (i+1)*this->mOpCols;
          }
@@ -378,7 +382,7 @@ namespace Transform {
             // Build operator 
             builder(this, iM, i0, rem, true);
 
-            rPhysVal.block(0, start, physRows, cols) = this->mOp.leftCols(rem)*(mult.segment(l0 + i0, this->mOpCols).asDiagonal()*specVal.block(i0, start, this->mOpCols, cols));
+            rPhysVal.block(0, start, physRows, cols) += this->mOp.leftCols(rem)*(mult.segment(l0 + i0, this->mOpCols).asDiagonal()*specVal.block(i0, start, this->mOpCols, cols));
          }
 
          start += cols;
