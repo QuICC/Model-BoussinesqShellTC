@@ -49,6 +49,11 @@ namespace IoAscii {
          virtual void init();
 
          /**
+          * @brief Initialise the file without header
+          */
+         void initNoHeader();
+
+         /**
           * @brief This call does nothing in this case
           */
          virtual void write() {};

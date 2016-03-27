@@ -49,6 +49,16 @@ namespace IoAscii {
       }
    }
 
+   void DirectAsciiWriter::initNoHeader()
+   {
+      // Check if the workflow allows IO to be performed
+      if(FrameworkMacro::allowsIO())
+      {
+         // Create file
+         this->open();
+      }
+   }
+
    void DirectAsciiWriter::finalize()
    {
       // Check if the workflow allows IO to be performed

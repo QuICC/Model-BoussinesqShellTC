@@ -104,16 +104,32 @@ endif(mpiimplTest)
 #-------- ASSOCIATED LEGENDRE TRANSFORM ----------#
 ###################################################
 
-set(GEOMHDISCC_ALEGTRA "Fly")
-geomhdiscc_add_definition(GEOMHDISCC_ALEGTRA)
+set(GEOMHDISCC_ALEGTRAS "Matrix" "Fly")
+if(GEOMHDISCC_ALEGTRA STREQUAL "")
+   set(GEOMHDISCC_ALEGTRA "Matrix")
+endif(GEOMHDISCC_ALEGTRA STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_ALEGTRA)
+geomhdiscc_provide_choice(GEOMHDISCC_ALEGTRAS "Associated Legendre implementation" GEOMHDISCC_ALEGTRA alegtraTest)
+
+if(alegtraTest)
+   geomhdiscc_add_definition(GEOMHDISCC_ALEGTRA)
+endif(alegtraTest)
 
 
 ###################################################
 #----------------- SH NORMALIZATION --------------#
 ###################################################
 
-set(GEOMHDISCC_SHNORM "Unity")
-geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
+set(GEOMHDISCC_SHNORMS "Unity" "Schmidt")
+if(GEOMHDISCC_SHNORM STREQUAL "")
+   set(GEOMHDISCC_SHNORM "Unity")
+endif(GEOMHDISCC_SHNORM STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_SHNORM)
+geomhdiscc_provide_choice(GEOMHDISCC_SHNORMS "Spherical harmonics normalization" GEOMHDISCC_SHNORM shnormTest)
+
+if(shnormTest)
+   geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
+endif(shnormTest)
 
 
 ###################################################

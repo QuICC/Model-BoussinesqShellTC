@@ -73,7 +73,7 @@ namespace Polynomial {
           *
           * Internal computation can be done in multiple precision
           */
-         static void sin_1Plm(Eigen::Ref<internal::Matrix> ipl1m, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid);
+         static void sin_1Plm(Eigen::Ref<internal::Matrix> ipl1m, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl1m1, const Eigen::Ref<const internal::Matrix>& ipl1m_1);
 
          /**
           * @brief Compute the associated Legendre \f$P_m^m (\cos\theta)\f$
@@ -87,7 +87,7 @@ namespace Polynomial {
           *
           * Internal computation can be done in multiple precision
           */
-         static void Pmm1(Eigen::Ref<internal::Matrix> op, const int m, const Eigen::Ref<const internal::Matrix>& ipmm, const internal::Array& igrid);
+         static void Pm1m(Eigen::Ref<internal::Matrix> op, const int m, const Eigen::Ref<const internal::Matrix>& ipmm, const internal::Array& igrid);
 
          /**
           * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^m (\cos\theta)\f$
@@ -97,25 +97,11 @@ namespace Polynomial {
          static void dPmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid);
 
          /**
-          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^{m+1} (\cos\theta)\f$
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_{m+1}^m (\cos\theta)\f$
           *
           * Internal computation can be done in multiple precision
           */
-         static void dPmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& ipmm, const Eigen::Ref<const internal::Array>& idpmm, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{P_m^m(\cos\theta)}{\sin\theta}\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void sin_1Pmm(Eigen::Ref<internal::Array> op, const int m, const internal::Array& igrid);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{P_m^{m+1}(\cos\theta)}{\sin\theta}\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void sin_1Pmm1(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& isin_1pmm, const internal::Array& igrid);
+         static void dPm1m(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& ipmm, const Eigen::Ref<const internal::Array>& idpmm, const internal::Array& igrid);
 
       private:
          /**

@@ -19,6 +19,7 @@
 //
 #include <set>
 #include <map>
+#include <tr1/functional>
 
 // External includes
 //
@@ -77,6 +78,9 @@ namespace Transform {
 
          /// Typedef for the Integrator type
          typedef AssociatedLegendreIds::Integrators IntegratorType;
+
+         /// Typedef for the function signature of an operator builder
+         typedef std::tr1::function<void(AssociatedLegendreFlyTransform*, const int, const int, const int, const bool)> OperatorBuilder;
 
          /**
           * @brief Generate a physical grid
@@ -151,24 +155,39 @@ namespace Transform {
          void initOperators();
 
          /**
-          * @brief Compute integration with vector of operators
+          * @brief Compute integration
           */
-         void setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal);
+         void setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, OperatorBuilder builder);
 
          /**
-          * @brief Compute projection with vector of operators
+          * @brief Compute integration with f(l) prefactor
           */
-         void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal);
+         void setMultLIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const Array& mult, OperatorBuilder builder);
+
+         /**
+          * @brief Compute projection
+          */
+         void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, OperatorBuilder builder);
+
+         /**
+          * @brief Compute projection with f(l) prefactor
+          */
+         void setMultLProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const Array& mult, OperatorBuilder builder);
 
          /**
           * @brief Build Plm operator for m+start to m+start+nL-1 
           */
-         void buildPlm(const int idx, const int start, const int nL);
+         void buildPlm(const int idx, const int start, const int nL, const bool isWeighted);
 
          /**
-          * @brief Build weighted Plm operator for m+start to m+start+nL-1 
+          * @brief Build \partial_\theta Plm operator for m+start to m+start+nL-1 
           */
-         void buildWeightedPlm(const int idx, const int start, const int nL);
+         void buildDPlm(const int idx, const int start, const int nL, const bool isWeighted);
+
+         /**
+          * @brief Build \frac{1}{\sin(\theta)} Plm operator for m+start to m+start+nL-1 
+          */
+         void buildSin_1Plm(const int idx, const int start, const int nL, const bool isWeighted);
 
          /**
           * @brief Max size of the operator
@@ -216,9 +235,19 @@ namespace Transform {
          SharedPolySetup    mspSetup;
 
          /**
-          * @brief Storage for A recurrence term
+          * @brief Storage for operator
           */
          Matrix mOp;
+
+         /**
+          * @brief Temporary storage for running recurrence A 
+          */
+         Eigen::Matrix<MHDFloat, Eigen::Dynamic, 2> mTmpA;
+
+         /**
+          * @brief Temporary storage for running recurrence B 
+          */
+         Eigen::Matrix<MHDFloat, Eigen::Dynamic, 2> mTmpB;
    };
 
 }
