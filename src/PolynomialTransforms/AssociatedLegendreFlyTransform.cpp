@@ -320,8 +320,6 @@ namespace Transform {
          int cols = this->mspSetup->mult()(iM);
          int specRows = this->mspSetup->fast().at(iM).size();
 
-
-
          // Main loop
          int i0 = 0;
          for(int i = 0; i < specRows/this->mOpCols; i++)

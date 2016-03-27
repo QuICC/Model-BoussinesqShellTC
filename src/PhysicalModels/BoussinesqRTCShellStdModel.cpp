@@ -71,10 +71,10 @@ namespace GeoMHDiSCC {
             case 0:
                spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
                tSH.clear(); 
-               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
                tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
                tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
@@ -86,7 +86,7 @@ namespace GeoMHDiSCC {
                break;
          }
 
-         // Add temperature initial state generator
+         // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          switch(3)

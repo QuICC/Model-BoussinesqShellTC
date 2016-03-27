@@ -294,7 +294,13 @@ namespace GeoMHDiSCC {
    #endif //GEOMHDISCC_SPATIALSCHEME_WFT
 
    // Configure code to use WLF scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
+   #if defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+
+      #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+         #include "PolynomialTransforms/SphereWorlandTransform.hpp"
+      #elif defined GEOMHDISCC_WORLANDTRA_FLY
+         #include "PolynomialTransforms/SphereWorlandFlyTransform.hpp"
+      #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
 
       #if defined GEOMHDISCC_ALEGTRA_MATRIX
          #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
@@ -308,7 +314,11 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef SphereWorlandTransform Type;
+               #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+                  typedef SphereWorlandTransform Type;
+               #elif defined GEOMHDISCC_WORLANDTRA_FLY 
+                  typedef SphereWorlandFlyTransform Type;
+               #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
@@ -328,7 +338,7 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_WLF
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
 
    // Configure code to use TT scheme
    #ifdef GEOMHDISCC_SPATIALSCHEME_TT

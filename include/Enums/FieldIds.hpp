@@ -201,7 +201,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLF
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
             /// First vector component
             ONE = R,
             /// Second vector component
@@ -302,7 +302,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
                /// First vector component
                ONE = TOR,
                /// Second vector component
@@ -310,7 +310,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = NOTUSED,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_SLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_WLF_QST
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_SLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_WLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_WLFM_QST
                /// First vector component
                ONE = Q,
                /// Second vector component
@@ -318,7 +318,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = T,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLF
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
                /// First vector component
                ONE = R,
                /// Second vector component

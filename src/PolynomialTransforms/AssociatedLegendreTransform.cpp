@@ -51,7 +51,7 @@ namespace Transform {
       // Store the shared pointer to setup object
       this->mspSetup = spSetup;
 
-      // Initialise the quadrature grid and weights
+      // Initialise the quadrature grid and weights and operators
       this->initOperators();
    }
 

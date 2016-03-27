@@ -133,6 +133,22 @@ endif(shnormTest)
 
 
 ###################################################
+#-------------- WORLAND TRANSFORM ----------------#
+###################################################
+
+set(GEOMHDISCC_WORLANDTRAS "Matrix" "Fly")
+if(GEOMHDISCC_WORLANDTRA STREQUAL "")
+   set(GEOMHDISCC_WORLANDTRA "Matrix")
+endif(GEOMHDISCC_WORLANDTRA STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_WORLANDTRA)
+geomhdiscc_provide_choice(GEOMHDISCC_WORLANDTRAS "Worland implementation" GEOMHDISCC_WORLANDTRA worlandtraTest)
+
+if(worlandtraTest)
+   geomhdiscc_add_definition(GEOMHDISCC_WORLANDTRA)
+endif(worlandtraTest)
+
+
+###################################################
 #-------------- MULTIPLE PRECISION ---------------#
 ###################################################
 

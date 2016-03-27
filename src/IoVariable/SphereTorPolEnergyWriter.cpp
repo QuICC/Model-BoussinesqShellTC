@@ -127,7 +127,7 @@ namespace IoVariable {
       this->mPolEnergy = 0.0;
 
       MHDFloat lfactor = 0.0;
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
          double factor = 1.0;
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -149,8 +149,8 @@ namespace IoVariable {
                this->mTorEnergy += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
             }
          }
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -165,7 +165,7 @@ namespace IoVariable {
             }
             this->mTorEnergy += 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).rightCols(rInVarTor.slice(k).cols()-start).real()).sum();
          }
-      #endif //GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif // defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
@@ -195,7 +195,7 @@ namespace IoVariable {
       coord.transform1D().integrate_energy(rInVarPolQ.rData(), rOutVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
       // Compute energy in Q component of QST decomposition
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -216,8 +216,8 @@ namespace IoVariable {
                this->mPolEnergy += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
             }
          }
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
          lfactor = 0.0;
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -233,7 +233,7 @@ namespace IoVariable {
             }
             this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).rightCols(rInVarPolQ.slice(k).cols()-start).real()).sum();
          }
-      #endif //GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif // defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPolQ);
@@ -260,7 +260,7 @@ namespace IoVariable {
       coord.transform1D().integrate_energy(rInVarPolS.rData(), rOutVarPolS.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
       // Compute energy in S component of QST decomposition
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -281,8 +281,8 @@ namespace IoVariable {
                this->mPolEnergy += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
             }
          }
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
          lfactor = 0.0;
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -298,7 +298,7 @@ namespace IoVariable {
             }
             this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).rightCols(rInVarPolS.slice(k).cols()-start).real()).sum();
          }
-      #endif //GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPolS);

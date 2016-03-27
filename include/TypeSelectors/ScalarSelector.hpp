@@ -253,7 +253,7 @@ namespace GeoMHDiSCC {
       #endif //GEOMHDISCC_SPATIALSCHEME_WFT
 
       // Configure code to use WLF scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
+      #if defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -274,7 +274,7 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_WLF
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
 
       // Configure code to use TT scheme
       #ifdef GEOMHDISCC_SPATIALSCHEME_TT

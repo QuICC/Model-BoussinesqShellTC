@@ -1,11 +1,11 @@
 /** 
- * @file WLFScheme.hpp
- * @brief Implementation of the spherical Worland(poly) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+ * @file WLFmScheme.hpp
+ * @brief Implementation of the sphere Worland(poly) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral m ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef WLFSCHEME_HPP
-#define WLFSCHEME_HPP
+#ifndef WLFMSCHEME_HPP
+#define WLFMSCHEME_HPP
 
 // Configuration includes
 //
@@ -22,7 +22,7 @@
 #include "TypeSelectors/FftSelector.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/3D/IRegularSHScheme.hpp"
+#include "SpatialSchemes/3D/IRegularSHmScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
 
@@ -31,9 +31,9 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * @brief Implementation of the spherical Worland(poly) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+    * @brief Implementation of the sphere Worland(poly) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral m ordering
     */
-   class WLFScheme: public IRegularSHScheme
+   class WLFmScheme: public IRegularSHmScheme
    {
       public:
          /**
@@ -42,16 +42,21 @@ namespace Schemes {
          static std::string type();
 
          /**
+          * @brief Tune the shared resolution used by simulation
+          */
+         static void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
+
+         /**
           * @brief Constructor
           *
           * @param dim     Chebyshev truncations 
           */
-         explicit WLFScheme(const ArrayI& dim);
+         explicit WLFmScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~WLFScheme(); 
+         virtual ~WLFmScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -104,4 +109,4 @@ namespace Schemes {
 }
 }
 
-#endif // WLFSCHEME_HPP
+#endif // WLFMSCHEME_HPP

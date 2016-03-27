@@ -23,7 +23,7 @@
    // include transform steps for the spherical shell geometry
    #include "TransformConfigurators/ShellTransformSteps.hpp"
 
-#elif defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLF
+#elif defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
    // include transform steps for the whole sphere geometry
    #include "TransformConfigurators/SphereTransformSteps.hpp"
 
