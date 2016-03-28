@@ -42,6 +42,7 @@
 #include "IoVariable/IVariableHdf5Reader.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "Diagnostics/DiagnosticCoordinator.hpp"
+//#include "Statistics/StatisticCoordinator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -306,6 +307,11 @@ namespace GeoMHDiSCC {
           * @brief Diagnostic coordinator
           */
          Diagnostics::DiagnosticCoordinator  mDiagnostics;
+
+         /**
+          * @brief Statistics coordinator
+          */
+         //Statistics::StatisticsCoordinator  mStatistics;
 
          /**
           * @brief Flag for forward transform
