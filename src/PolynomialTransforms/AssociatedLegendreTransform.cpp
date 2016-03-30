@@ -145,7 +145,7 @@ namespace Transform {
          }
 
          // Loop over harmonic degrees for derivative
-         Polynomial::AssociatedLegendrePolynomial::dPlm(op, itmp, m, ipoly, igrid);
+         Polynomial::AssociatedLegendrePolynomial::dPlmA(op, itmp, m, ipoly, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFF);
          for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
          {

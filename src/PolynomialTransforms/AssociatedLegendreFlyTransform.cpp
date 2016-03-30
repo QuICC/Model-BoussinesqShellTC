@@ -447,13 +447,13 @@ namespace Transform {
       // Set P_m^m
       if(start == 0)
       {
-         Polynomial::AssociatedLegendrePolynomial::dPmm(this->mOp.col(0), m, this->mXGrid);
+         Polynomial::AssociatedLegendrePolynomial::dPmmA(this->mOp.col(0), m, this->mXGrid);
 
          // Set P_{m+1}^m
          if(nL >= 1) 
          {
             Polynomial::AssociatedLegendrePolynomial::Pmm(this->mTmpA.col(0), m, this->mXGrid);
-            Polynomial::AssociatedLegendrePolynomial::dPm1m(this->mOp.col(1), m, this->mTmpA.col(0), this->mOp.col(0), this->mXGrid);
+            Polynomial::AssociatedLegendrePolynomial::dPm1mA(this->mOp.col(1), m, this->mTmpA.col(0), this->mOp.col(0), this->mXGrid);
          }
 
          if(nL >= 2)
@@ -487,14 +487,14 @@ namespace Transform {
          if(this->mOpCols > 2)
          {
             // Increment derivative
-            Polynomial::AssociatedLegendrePolynomial::dPlm(this->mOp.col(0), m, m+start, this->mOp.col(this->mOpCols-1), this->mOp.col(this->mOpCols-2), this->mTmpA.col(0), this->mXGrid);
-            Polynomial::AssociatedLegendrePolynomial::dPlm(this->mOp.col(1), m, m+start+1, this->mOp.col(0), this->mOp.col(this->mOpCols-1), this->mTmpA.col(1), this->mXGrid);
+            Polynomial::AssociatedLegendrePolynomial::dPlmA(this->mOp.col(0), m, m+start, this->mOp.col(this->mOpCols-1), this->mOp.col(this->mOpCols-2), this->mTmpA.col(0), this->mXGrid);
+            Polynomial::AssociatedLegendrePolynomial::dPlmA(this->mOp.col(1), m, m+start+1, this->mOp.col(0), this->mOp.col(this->mOpCols-1), this->mTmpA.col(1), this->mXGrid);
 
          } else
          {
             // Increment derivative
-            Polynomial::AssociatedLegendrePolynomial::dPlm(this->mOp.col(0), m, m+start, this->mOp.col(1), this->mOp.col(0), this->mTmpA.col(0), this->mXGrid);
-            Polynomial::AssociatedLegendrePolynomial::dPlm(this->mOp.col(1), m, m+start+1, this->mOp.col(0), this->mOp.col(1), this->mTmpA.col(1), this->mXGrid);
+            Polynomial::AssociatedLegendrePolynomial::dPlmA(this->mOp.col(0), m, m+start, this->mOp.col(1), this->mOp.col(0), this->mTmpA.col(0), this->mXGrid);
+            Polynomial::AssociatedLegendrePolynomial::dPlmA(this->mOp.col(1), m, m+start+1, this->mOp.col(0), this->mOp.col(1), this->mTmpA.col(1), this->mXGrid);
          }
 
          // Increment polynomial and swap columns
@@ -505,7 +505,7 @@ namespace Transform {
       for(int j = 2; j < nL; ++j)
       {
          // Increment derivative
-         Polynomial::AssociatedLegendrePolynomial::dPlm(this->mOp.col(j), m, m+start+j, this->mOp.col(j-1), this->mOp.col(j-2), this->mTmpA.col(1), this->mXGrid);
+         Polynomial::AssociatedLegendrePolynomial::dPlmA(this->mOp.col(j), m, m+start+j, this->mOp.col(j-1), this->mOp.col(j-2), this->mTmpA.col(1), this->mXGrid);
 
          if(j < nL-1)
          {
