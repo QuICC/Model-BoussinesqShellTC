@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Python/PythonTools.hpp"
 #include "Python/PythonModelWrapper.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
@@ -206,7 +207,7 @@ namespace Equations {
       pArgs = PyTuple_New(2);
 
       // Get resolution
-      pValue = PythonModelWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      pValue = PythonTools::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Get field
@@ -229,22 +230,22 @@ namespace Equations {
       // Get Implicit fields
       pTmp = PyTuple_GetItem(pValue, 1);
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  imFields;
-      PythonModelWrapper::getList(imFields, pTmp);
+      PythonTools::getList(imFields, pTmp);
 
       // Get Explicit linear fields
       pTmp = PyTuple_GetItem(pValue, 2);
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  exLFields;
-      PythonModelWrapper::getList(exLFields, pTmp);
+      PythonTools::getList(exLFields, pTmp);
 
       // Get Explicit nonlinear fields
       pTmp = PyTuple_GetItem(pValue, 3);
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  exNLFields;
-      PythonModelWrapper::getList(exNLFields, pTmp);
+      PythonTools::getList(exNLFields, pTmp);
 
       // Get Explicit nextstep fields
       pTmp = PyTuple_GetItem(pValue, 4);
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  exNSFields;
-      PythonModelWrapper::getList(exNSFields, pTmp);
+      PythonTools::getList(exNSFields, pTmp);
 
       // Get index mode
       pTmp = PyTuple_GetItem(pValue, 5);
@@ -374,7 +375,7 @@ namespace Equations {
       pArgs = PyTuple_New(tupleSize);
 
       // Get resolution
-      pValue = PythonModelWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      pValue = PythonTools::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Get equation parameters
@@ -385,17 +386,17 @@ namespace Equations {
       {
          eq_vals.push_back(this->eqParams().nd(eq_ids.at(i)));
       }
-      pValue = PythonModelWrapper::makeDict(eq_names, eq_vals);
+      pValue = PythonTools::makeDict(eq_names, eq_vals);
       PyTuple_SetItem(pArgs, 1, pValue);
 
       // Get the eigen direction values
-      pValue = PythonModelWrapper::makeTuple(eigs);
+      pValue = PythonTools::makeTuple(eigs);
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Get boundary conditions
       std::map<std::string,int> bcMap = this->bcIds().getTagMap();
       bcMap.insert(std::make_pair("bcType", bcType));
-      pValue = PythonModelWrapper::makeDict(bcMap);
+      pValue = PythonTools::makeDict(bcMap);
       PyTuple_SetItem(pArgs, 3, pValue);
 
       return pArgs;
@@ -436,14 +437,14 @@ namespace Equations {
 
             if(middle.size() > 0)
             {
-               pSlow = PythonModelWrapper::makeList(slow);
-               pMiddle = PythonModelWrapper::makeList(middle);
+               pSlow = PythonTools::makeList(slow);
+               pMiddle = PythonTools::makeList(middle);
                pTmp = PyTuple_New(2);
                PyTuple_SetItem(pTmp, 0, pSlow);
                PyTuple_SetItem(pTmp, 1, pMiddle);
             } else
             {
-               pTmp = PythonModelWrapper::makeList(slow);
+               pTmp = PythonTools::makeList(slow);
             }
 
             PyTuple_SetItem(pArgs, 5, pTmp);
@@ -544,14 +545,14 @@ namespace Equations {
 
             if(middle.size() > 0)
             {
-               pSlow = PythonModelWrapper::makeList(slow);
-               pMiddle = PythonModelWrapper::makeList(middle);
+               pSlow = PythonTools::makeList(slow);
+               pMiddle = PythonTools::makeList(middle);
                pTmp = PyTuple_New(2);
                PyTuple_SetItem(pTmp, 0, pSlow);
                PyTuple_SetItem(pTmp, 1, pMiddle);
             } else
             {
-               pTmp = PythonModelWrapper::makeList(slow);
+               pTmp = PythonTools::makeList(slow);
             }
 
             PyTuple_SetItem(pArgs, 6, pTmp);
