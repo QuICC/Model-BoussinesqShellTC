@@ -83,56 +83,6 @@ namespace GeoMHDiSCC {
          static PyObject* callMethod(PyObject* pArgs);
 
          /**
-          * @brief Make a tuple from integer array
-          */
-         static PyObject* makeTuple(const ArrayI& val);
-
-         /**
-          * @brief Make a tuple from vector of double
-          */
-         static PyObject* makeTuple(const std::vector<MHDFloat>& val);
-
-         /**
-          * @brief Make a list from vector of int
-          */
-         static PyObject* makeList(const std::vector<int>& val);
-
-         /**
-          * @brief Make a list of list from vector of vector of int
-          */
-         static PyObject* makeList(const std::vector<std::vector<int> >& val);
-
-         /**
-          * @brief Make a dictironary
-          */
-         static PyObject* makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val);
-
-         /**
-          * @brief Make a dictironary
-          */
-         static PyObject* makeDict(const std::map<std::string,int>& map);
-
-         /**
-          * @brief Get data from list
-          */
-         static void getList(std::vector<bool> &rList, PyObject *pList);
-
-         /**
-          * @brief Get data from list
-          */
-         static void getList(std::vector<NonDimensional::Id> &rList, PyObject *pList);
-
-         /**
-          * @brief Get data from list
-          */
-         static void getList(std::vector<PhysicalNames::Id> &rList, PyObject *pList);
-
-         /**
-          * @brief Get data from list
-          */
-         static void getList(std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> > &rList, PyObject *pList);
-
-         /**
           * @brief Fill sparse matrix with data from Python call
           */
          static void fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat);
