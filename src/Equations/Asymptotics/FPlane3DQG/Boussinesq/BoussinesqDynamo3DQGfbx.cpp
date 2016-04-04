@@ -56,7 +56,7 @@ namespace Equations {
       /// Computation:
       ///   \f$ MPr(Bx dxy\Psi + By dyy\Psi) \f$
       ///
-      rNLComp.setData((MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array() + this->scalar(PhysicalNames::BY).dom(0).phys().data().array*this->scalar(PhysicalNames:STREAMFUNCTION).dom().grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix());
+      rNLComp.setData((MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGfbx::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -84,7 +84,7 @@ namespace Equations {
       this->setName(PhysicalNames::FBX);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::DIAGNOSTIC);
+      this->setSolveTiming(SolveTiming::AFTER);
 
       // Add fBX requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, false));

@@ -53,9 +53,8 @@ namespace Equations {
 
       /// 
       /// Computation:
-      ///   \f$ Pr w \theta\f$
       ///
-      rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data.array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data.array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array())).matrix());
+      rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array())).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGfbz::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -83,7 +82,7 @@ namespace Equations {
       this->setName(PhysicalNames::FBZ);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::DIAGNOSTIC);
+      this->setSolveTiming(SolveTiming::AFTER);
 
       // Add fbz requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, false));
