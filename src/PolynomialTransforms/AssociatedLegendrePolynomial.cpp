@@ -447,7 +447,7 @@ namespace Polynomial {
    void AssociatedLegendrePolynomial::dPl0B(Eigen::Ref<internal::Matrix> idplm, const int l, const Eigen::Ref<const internal::Matrix>& iplm1)
    {
       // Safety assert
-      assert(l-m > 1);
+      assert(l > 1);
 
       internal::MHDFloat dl = internal::MHDFloat(l);
 

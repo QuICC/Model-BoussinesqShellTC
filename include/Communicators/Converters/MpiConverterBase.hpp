@@ -441,7 +441,7 @@ namespace Parallel {
          tagShift = FrameworkMacro::nCpu();
       } else
       {
-         FrameworkMacro::abort(999);
+         FrameworkMacro::abort(991);
       }
 
       // MPI error code
