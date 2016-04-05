@@ -108,6 +108,9 @@ namespace GeoMHDiSCC {
       ierr = MPI_Comm_rank(comm, &rank);
       MpiFramework::check(ierr, 914);
       MpiFramework::mTransformIds.push_back(rank);
+
+      // Free world group
+      MPI_Group_free(&world);
    }
 
    void MpiFramework::syncTransform(const int traId)
@@ -165,6 +168,39 @@ namespace GeoMHDiSCC {
 
       // Finalize HDF5 MPI data
       IoHdf5::finalizeHdf5();
+
+      // Free communicators
+      for(int i = 0; i < MpiFramework::mTransformComms.size(); i++)
+      {
+         MPI_Comm_free(&MpiFramework::mTransformComms.at(i));
+      }
+
+      // Free groups
+      for(int i = 0; i < MpiFramework::mTransformGroups.size(); i++)
+      {
+         MPI_Group_free(&MpiFramework::mTransformGroups.at(i));
+      }
+
+      // Free sub communicators
+      for(std::map<SubCommId, std::vector<MPI_Comm> >::iterator subCommIt = MpiFramework::mSubComm.begin(); subCommIt != MpiFramework::mSubComm.end(); ++subCommIt)
+      {
+         for(int i = 0; i < subCommIt->second.size(); i++)
+         {
+            MPI_Comm_free(&subCommIt->second.at(i));
+         }
+      }
+
+      // Free sub groups
+      for(std::map<SubCommId, std::vector<MPI_Group> >::iterator subGroupIt = MpiFramework::mSubGroup.begin(); subGroupIt != MpiFramework::mSubGroup.end(); ++subGroupIt)
+      {
+         for(int i = 0; i < subGroupIt->second.size(); i++)
+         {
+            MPI_Group_free(&subGroupIt->second.at(i));
+         }
+      }
+
+      // Make sure all finished and are synchronised
+      MPI_Barrier(MPI_COMM_WORLD);
 
       // Finalise MPI system
       MPI_Finalize();
