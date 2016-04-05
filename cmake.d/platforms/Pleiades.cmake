@@ -51,11 +51,8 @@ set(GEOMHDISCC_LIBDIR_MUMPS "/nobackupp9/nfeather/marti/libs/lib" "$ENV{MKLROOT}
 #set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "mkl_scalapack_lp64" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "mpifort" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "mkl_scalapack_lp64" "mkl_intel_lp64" "mkl_core" "mkl_sequential" "mkl_blacs_sgimpt_lp64" "pthread" "m" "dl" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
-#set(GEOMHDISCC_LIBRARIES_SUPERLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "superlu_4.3" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "$ENV{HOME}/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL $ENV{TACC_MKL_LIB} "$ENV{HOME}/local/lib" PARENT_SCOPE)
-#set(GEOMHDISCC_INCLUDES_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/SRC" PARENT_SCOPE)
-#set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#

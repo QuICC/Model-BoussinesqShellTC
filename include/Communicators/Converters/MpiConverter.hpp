@@ -308,9 +308,11 @@ namespace Parallel {
          // Make sure calls are posted at the right moment
          int flag;
          MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
          if(!flag)
          {
-            FrameworkMacro::abort(992);
+            MPI_Waitall(this->nFCpu(), this->pRecvFRequests(this->mPacks), MPI_STATUSES_IGNORE);
          }
 
          // Prepost the receive calls
@@ -328,9 +330,11 @@ namespace Parallel {
          // Make sure calls are posted at the right moment
          int flag;
          MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
          if(!flag)
          {
-            FrameworkMacro::abort(993);
+            MPI_Waitall(this->nBCpu(), this->pSendBRequests(this->mPacks), MPI_STATUSES_IGNORE);
          }
 
          // Post non blocking send calls 
@@ -357,9 +361,11 @@ namespace Parallel {
          // Make sure calls are posted at the right moment
          int flag;
          MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
          if(!flag)
          {
-            FrameworkMacro::abort(994);
+            MPI_Waitall(this->nBCpu(), this->pRecvBRequests(this->mPacks), MPI_STATUSES_IGNORE);
          }
 
          // Prepost the receive calls
@@ -377,9 +383,11 @@ namespace Parallel {
          // Make sure calls are posted at the right moment
          int flag;
          MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
          if(!flag)
          {
-            FrameworkMacro::abort(995);
+            MPI_Waitall(this->nFCpu(), this->pSendFRequests(this->mPacks), MPI_STATUSES_IGNORE);
          }
 
          // Post non blocking send calls 
