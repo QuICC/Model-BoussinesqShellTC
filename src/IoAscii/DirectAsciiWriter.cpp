@@ -49,6 +49,17 @@ namespace IoAscii {
       }
    }
 
+   void DirectAsciiWriter::initDebug()
+   {
+      // Create file
+      this->openDebug();
+
+      // Add header information
+      this->mFile << this->header() << std::endl;
+      this->mFile << this->type() << std::endl;
+      this->mFile << this->version() << std::endl;
+   }
+
    void DirectAsciiWriter::initNoHeader()
    {
       // Check if the workflow allows IO to be performed
@@ -67,6 +78,12 @@ namespace IoAscii {
          // Close the file
          this->close();
       }
+   }
+
+   void DirectAsciiWriter::finalizeDebug()
+   {
+      // Close the file
+      this->closeDebug();
    }
 
    std::ofstream& DirectAsciiWriter::file()

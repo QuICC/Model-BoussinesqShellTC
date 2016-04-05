@@ -51,6 +51,18 @@ namespace IoAscii {
       }
    }
 
+   void IAsciiWriter::openDebug()
+   {
+      // Get file handle
+      this->mFile.open(this->filename().c_str());
+
+      // Check that opening file was successful
+      if(! this->mFile.is_open())
+      {
+         throw Exception("Couldn't open ASCII file " + this->filename() + "!");
+      }
+   }
+
    void IAsciiWriter::close()
    {
       // Check if the workflow allows IO to be performed
@@ -58,6 +70,11 @@ namespace IoAscii {
       {
          this->mFile.close();
       }
+   }
+
+   void IAsciiWriter::closeDebug()
+   {
+      this->mFile.close();
    }
 
 }
