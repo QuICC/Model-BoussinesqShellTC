@@ -91,23 +91,23 @@ def r4(nr, a, b, bc, coeff = 1.0, zr = 0):
 
     # Generate 4th subdiagonal
     def d_4(n):
-        return numpy.full(n.shape, a**4/16.0)
+        return np.full(n.shape, a**4/16.0)
 
     # Generate 3rd subdiagonal
     def d_3(n):
-        return numpy.full(n.shape, a**3*b/2.0)
+        return np.full(n.shape, a**3*b/2.0)
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return numpy.full(n.shape, a**2*(a**2 + 6.0*b**2)/4.0)
+        return np.full(n.shape, a**2*(a**2 + 6.0*b**2)/4.0)
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return numpy.full(n.shape, a*b*(3.0*a**2 + 4.0*b**2)/2.0)
+        return np.full(n.shape, a*b*(3.0*a**2 + 4.0*b**2)/2.0)
 
     # Generate diagonal
     def d0(n):
-        return numpy.full(n.shape, (3.0*a**4 + 24.0*a**2*b**2 + 8.0*b**4)/8.0)
+        return np.full(n.shape, (3.0*a**4 + 24.0*a**2*b**2 + 8.0*b**4)/8.0)
 
     # Generate 1st superdiagonal
     def d1(n):

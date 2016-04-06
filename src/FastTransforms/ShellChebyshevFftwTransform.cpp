@@ -408,10 +408,6 @@ namespace Transform {
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-
       // Compute second derivative
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
@@ -559,10 +555,6 @@ namespace Transform {
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
@@ -637,10 +629,6 @@ namespace Transform {
          this->mTmpInS.topRows(1).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative by R of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
