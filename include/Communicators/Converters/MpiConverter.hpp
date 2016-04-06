@@ -307,16 +307,18 @@ namespace Parallel {
       {
          // Make sure calls are posted at the right moment
          int flag;
-         MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         FrameworkMacro::check(ierr, 712);
 
-         // If not all are ready yet wait for completion
+         // Can only happen if something went really wrong
          if(!flag)
          {
-            MPI_Waitall(this->nFCpu(), this->pRecvFRequests(this->mPacks), MPI_STATUSES_IGNORE);
+            FrameworkMacro::abort(982+10*static_cast<int>(this->mTraId));
          }
 
          // Prepost the receive calls
-         MPI_Startall(this->nFCpu(), this->pRecvFRequests(this->mPacks));
+         ierr = MPI_Startall(this->nFCpu(), this->pRecvFRequests(this->mPacks));
+         FrameworkMacro::check(ierr, 722);
          this->resetRecvPositions();
          this->mIsReceiving = true;
       }
@@ -329,16 +331,18 @@ namespace Parallel {
       {
          // Make sure calls are posted at the right moment
          int flag;
-         MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         FrameworkMacro::check(ierr, 713);
 
-         // If not all are ready yet wait for completion
+         // Can only happen if something went really wrong
          if(!flag)
          {
-            MPI_Waitall(this->nBCpu(), this->pSendBRequests(this->mPacks), MPI_STATUSES_IGNORE);
+            FrameworkMacro::abort(983+10*static_cast<int>(this->mTraId));
          }
 
          // Post non blocking send calls 
-         MPI_Startall(this->nBCpu(), this->pSendBRequests(this->mPacks));
+         ierr = MPI_Startall(this->nBCpu(), this->pSendBRequests(this->mPacks));
+         FrameworkMacro::check(ierr, 723);
          this->resetSendPositions();
          this->mIsSending = true;
       }
@@ -360,16 +364,18 @@ namespace Parallel {
       {
          // Make sure calls are posted at the right moment
          int flag;
-         MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         FrameworkMacro::check(ierr, 714);
 
-         // If not all are ready yet wait for completion
+         // Can only happen if something went really wrong
          if(!flag)
          {
-            MPI_Waitall(this->nBCpu(), this->pRecvBRequests(this->mPacks), MPI_STATUSES_IGNORE);
+            FrameworkMacro::abort(984+10*static_cast<int>(this->mTraId));
          }
 
          // Prepost the receive calls
-         MPI_Startall(this->nBCpu(), this->pRecvBRequests(this->mPacks));
+         ierr = MPI_Startall(this->nBCpu(), this->pRecvBRequests(this->mPacks));
+         FrameworkMacro::check(ierr, 724);
          this->resetRecvPositions();
          this->mIsReceiving = true;
       }
@@ -382,16 +388,18 @@ namespace Parallel {
       {
          // Make sure calls are posted at the right moment
          int flag;
-         MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         FrameworkMacro::check(ierr, 715);
 
-         // If not all are ready yet wait for completion
+         // Can only happen if something went really wrong
          if(!flag)
          {
-            MPI_Waitall(this->nFCpu(), this->pSendFRequests(this->mPacks), MPI_STATUSES_IGNORE);
+            FrameworkMacro::abort(985+10*static_cast<int>(this->mTraId));
          }
 
          // Post non blocking send calls 
-         MPI_Startall(this->nFCpu(), this->pSendFRequests(this->mPacks));
+         ierr = MPI_Startall(this->nFCpu(), this->pSendFRequests(this->mPacks));
+         FrameworkMacro::check(ierr, 725);
          this->resetSendPositions();
          this->mIsSending = true;
       }
@@ -408,7 +416,6 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
    {
-      FrameworkMacro::synchronize();
       StageTimer stage;
       stage.start("creating MPI datatypes",1);
 
@@ -429,14 +436,12 @@ namespace Parallel {
       // initialise the data types
       this->initTypes(spRes, fwdTmp, bwdTmp);
 
-      FrameworkMacro::synchronize();
       stage.done();
       stage.start("cleaning empty datatypes",1);
 
       // initialise the size and CPU lists
       this->initLists();
 
-      FrameworkMacro::synchronize();
       stage.done();
    }
 
@@ -497,12 +502,14 @@ namespace Parallel {
       {
          int flag;
          // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mActiveReceive), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mActiveReceive), &flag, MPI_STATUSES_IGNORE);
+         FrameworkMacro::check(ierr, 731);
 
          // If not all are ready yet wait for completion
          if(! flag)
          {
-            MPI_Waitall(this->nFCpu(), this->pRecvFRequests(this->mActiveReceive), MPI_STATUSES_IGNORE);
+            ierr = MPI_Waitall(this->nFCpu(), this->pRecvFRequests(this->mActiveReceive), MPI_STATUSES_IGNORE);
+            FrameworkMacro::check(ierr, 741);
          }
 
          // Clear active packs
@@ -517,12 +524,14 @@ namespace Parallel {
       {
          int flag;
          // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mActiveReceive), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mActiveReceive), &flag, MPI_STATUSES_IGNORE);
+        	FrameworkMacro::check(ierr, 732);
 
          // If not all are ready yet wait for completion
          if(! flag)
          {
-            MPI_Waitall(this->nBCpu(), this->pRecvBRequests(this->mActiveReceive), MPI_STATUSES_IGNORE);
+            ierr = MPI_Waitall(this->nBCpu(), this->pRecvBRequests(this->mActiveReceive), MPI_STATUSES_IGNORE);
+        	   FrameworkMacro::check(ierr, 742);
          }
 
          // Clear active packs
@@ -537,12 +546,14 @@ namespace Parallel {
       {
          int flag;
          // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nBCpu(), this->pSendFRequests(this->mActiveSend), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nBCpu(), this->pSendFRequests(this->mActiveSend), &flag, MPI_STATUSES_IGNORE);
+        	FrameworkMacro::check(ierr, 733);
 
          // If not all are ready yet wait for completion
          if(! flag)
          {
-            MPI_Waitall(this->nBCpu(), this->pSendFRequests(this->mActiveSend), MPI_STATUSES_IGNORE);
+            ierr = MPI_Waitall(this->nBCpu(), this->pSendFRequests(this->mActiveSend), MPI_STATUSES_IGNORE);
+        	   FrameworkMacro::check(ierr, 743);
          }
 
          // Clear active packs
@@ -557,12 +568,14 @@ namespace Parallel {
       {
          int flag;
          // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nFCpu(), this->pSendBRequests(this->mActiveSend), &flag, MPI_STATUSES_IGNORE);
+         int ierr = MPI_Testall(this->nFCpu(), this->pSendBRequests(this->mActiveSend), &flag, MPI_STATUSES_IGNORE);
+        	FrameworkMacro::check(ierr, 734);
 
          // If not all are ready yet wait for completion
          if(! flag)
          {
-            MPI_Waitall(this->nFCpu(), this->pSendBRequests(this->mActiveSend), MPI_STATUSES_IGNORE);
+            ierr = MPI_Waitall(this->nFCpu(), this->pSendBRequests(this->mActiveSend), MPI_STATUSES_IGNORE);
+        	   FrameworkMacro::check(ierr, 744);
          }
 
          // Clear active packs
@@ -587,7 +600,8 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
       {
-         MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
+         int ierr = MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
+         FrameworkMacro::check(ierr, 761);
       }
 
       // Stop detailed profiler
@@ -611,7 +625,8 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)
       {
-         MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
+         int ierr = MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
+         FrameworkMacro::check(ierr, 762);
       }
 
       // Stop detailed profiler
@@ -641,10 +656,11 @@ namespace Parallel {
             #ifdef GEOMHDISCC_DEBUG
                MPI_Status stats[this->nFCpu()];
                int ierr = MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), stats);
-               assert(ierr == MPI_SUCCESS);
+               FrameworkMacro::check(ierr, 771);
                DebuggerMacro_msg("Received FWD packs", 5);
             #else
-               MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+               int ierr = MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+               FrameworkMacro::check(ierr, 771);
             #endif //GEOMHDISCC_DEBUG
 
             // Stop detailed profiler
@@ -659,7 +675,8 @@ namespace Parallel {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
-               MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
+               int ierr = MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
+               FrameworkMacro::check(ierr, 763);
             }
 
             // Stop detailed profiler
@@ -682,7 +699,8 @@ namespace Parallel {
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             DebuggerMacro_msg("Unpacking FWD packs", 5);
-            MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
+            int ierr = MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
+            FrameworkMacro::check(ierr, 764);
          }
 
          // Stop detailed profiler
@@ -713,10 +731,11 @@ namespace Parallel {
             #ifdef GEOMHDISCC_DEBUG
                MPI_Status stats[this->nBCpu()];
                int ierr = MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), stats);
-               assert(ierr == MPI_SUCCESS);
+               FrameworkMacro::check(ierr, 772);
                DebuggerMacro_msg("Received BWD packs", 5);
             #else 
-               MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+               int ierr = MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+               FrameworkMacro::check(ierr, 772);
             #endif //GEOMHDISCC_DEBUG
 
             // Stop detailed profiler
@@ -731,7 +750,8 @@ namespace Parallel {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
-               MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
+               int ierr = MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
+               FrameworkMacro::check(ierr, 765);
             }
 
             // Stop detailed profiler
@@ -754,7 +774,8 @@ namespace Parallel {
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             DebuggerMacro_msg("Unpacking BWD packs", 5);
-            MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
+            int ierr = MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
+            FrameworkMacro::check(ierr, 766);
          }
 
          // Stop detailed profiler

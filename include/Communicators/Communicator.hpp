@@ -289,6 +289,8 @@ namespace Parallel {
             this->template storage<Dimensions::Transform::TRA1D>().freeFwd(rFTmp);
             this->template storage<Dimensions::Transform::TRA2D>().freeBwd(rBTmp);
 
+            FrameworkMacro::synchronize();
+
             // Create the communication buffers
             SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
             SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
@@ -403,6 +405,8 @@ namespace Parallel {
                spConv->init(spRes, Dimensions::Transform::TRA2D, rFTmp, rBTmp, packs2DFwd, packs2DBwd);
                this->template storage<Dimensions::Transform::TRA2D>().freeFwd(rFTmp);
                this->template storage<Dimensions::Transform::TRA3D>().freeBwd(rBTmp);
+
+               FrameworkMacro::synchronize();
 
                // Create the communication buffers
                SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());

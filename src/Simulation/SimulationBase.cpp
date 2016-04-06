@@ -145,6 +145,8 @@ namespace GeoMHDiSCC {
       this->mExecutionTimer.stop();
       this->mExecutionTimer.update(ExecutionTimer::PRERUN);
 
+      // Synchronize computation nodes
+      FrameworkMacro::synchronize();
       StageTimer::completed("Simulation initialisation successfull");
 
       // Start timer
