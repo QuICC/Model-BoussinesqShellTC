@@ -32,11 +32,13 @@ namespace Transform {
 
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
+      DetailedProfilerMacro_start(ProfilerMacro::BWDDEALIAS);
 
       // Put scalar into temporary hold storage
       coord.communicator().dealiasSpectral(rScalar.rDom(0).rTotal());
 
       // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWDDEALIAS);
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 

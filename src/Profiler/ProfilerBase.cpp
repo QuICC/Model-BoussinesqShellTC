@@ -24,13 +24,7 @@ namespace GeoMHDiSCC {
 
 namespace Debug {
 
-   #ifdef GEOMHDISCC_PROFILER_DETAILED
-      const int ProfilerBase::NBREAKPOINT = ProfilerBase::TSTEPOUT + 1;
-   #else
-      const int ProfilerBase::NBREAKPOINT = ProfilerBase::IO + 1;
-   #endif // GEOMHDISCC_PROFILER_DETAILED
-
-   Array ProfilerBase::timings = Array::Zero(ProfilerBase::NBREAKPOINT);
+   Array ProfilerBase::timings = Array::Zero(static_cast<int>(ProfilerBase::NBREAKPOINT));
 
    MHDFloat ProfilerBase::time(ProfilerBase::BreakPoint point)
    {
@@ -79,6 +73,8 @@ namespace Debug {
             return "Fwd ND";
 
          // Below this line are the "detailed" break points level 2
+         case BWDDEALIAS:
+            return "Bwd dealias";
          case BWD1DTRA:
             return "Bwd 1D Transform";
          case BWD2DTRA:
@@ -115,6 +111,14 @@ namespace Debug {
             return "timestep solve";
          case TSTEPOUT:
             return "timestep output";
+
+         // Below this line are the "detailed" break points level 3
+         case BWD1DTRAA:
+            return "Bwd 1D Transform A";
+         case BWD1DTRAB:
+            return "Bwd 1D Transform B";
+         case BWD1DTRAC:
+            return "Bwd 1D Transform C";
          default:
             return "Unknown break point";
       }

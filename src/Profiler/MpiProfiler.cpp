@@ -31,7 +31,7 @@ namespace Debug {
 
    void MpiProfiler::init()
    {
-      for(int i = 0; i < ProfilerBase::NBREAKPOINT; i++)
+      for(int i = 0; i < static_cast<int>(ProfilerBase::NBREAKPOINT); i++)
       {
          t_starts.insert(std::make_pair(static_cast<ProfilerBase::BreakPoint>(i), 0));
          t_stops.insert(std::make_pair(static_cast<ProfilerBase::BreakPoint>(i), 0));
@@ -55,7 +55,7 @@ namespace Debug {
 
    void MpiProfiler::analyze(Array& ts, Array& min, Array& max)
    {
-      ts.resize(ProfilerBase::NBREAKPOINT);
+      ts.resize(static_cast<int>(ProfilerBase::NBREAKPOINT));
       for(int i = 0; i < ts.size(); ++i)
       {
          ts(i) = ProfilerBase::time(static_cast<ProfilerBase::BreakPoint>(i));

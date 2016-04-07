@@ -327,31 +327,31 @@ namespace Parallel {
    
          // Broadcast size
          i = remoteKeys.size();
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 951);
-         FrameworkMacro::syncTransform(fwdDim);
 
          // Broadcast data
-         ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 952);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 952);
 
       // Remote CPU needs to generate list 
       } else
       {
          // Get size
          int nCoords;
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 953);
-         FrameworkMacro::syncTransform(fwdDim);
 
          // Resize storage
          matRemote.resize(3, nCoords);
 
          // Get remote keys as matrix
-         ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 954);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 954);
 
          // Convert matrix to remoteKeys set
          for(int i = 0; i < matRemote.cols(); i++)
@@ -433,30 +433,30 @@ namespace Parallel {
 
          // Broadcast size
          i = remoteKeys.size();
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 961);
-         FrameworkMacro::syncTransform(fwdDim);
 
          // Broadcast data
-         ierr = MPI_Bcast(matRemote.data(), matRemote.rows()*matRemote.cols(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 962);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 962);
 
       // Remote CPU needs to generate list 
       } else
       {
          // Get size
          int nCoords;
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 963);
-         FrameworkMacro::syncTransform(fwdDim);
 
          matRemote.resize(3, nCoords);
 
          // Get remot ekeys as matrix
-         ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 964);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 964);
 
          // Convert matrix to remoteKeys set
          for(int i = 0; i < matRemote.cols(); i++)
@@ -737,30 +737,30 @@ namespace Parallel {
    
          // Broadcast size
          i = remoteKeys.size();
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 951);
-         FrameworkMacro::syncTransform(fwdDim);
 
          // Broadcast data
-         ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 952);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 952);
 
       // Remote CPU needs to generate list 
       } else
       {
          // Get size
          int nCoords;
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 953);
-         FrameworkMacro::syncTransform(fwdDim);
 
          matRemote.resize(2, nCoords);
 
          // Get remote keys as matrix
-         ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 954);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 954);
 
          // Convert matrix to remoteKeys set
          for(int i = 0; i < matRemote.cols(); i++)
@@ -834,30 +834,30 @@ namespace Parallel {
 
          // Broadcast size
          i = remoteKeys.size();
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 961);
-         FrameworkMacro::syncTransform(fwdDim);
 
          // Broadcast data
-         ierr = MPI_Bcast(matRemote.data(), matRemote.rows()*matRemote.cols(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 962);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 962);
 
       // Remote CPU needs to generate list 
       } else
       {
          // Get size
          int nCoords;
+         FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 963);
-         FrameworkMacro::syncTransform(fwdDim);
 
          matRemote.resize(2, nCoords);
 
          // Get remot ekeys as matrix
-         ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-         FrameworkMacro::check(ierr, 964);
          FrameworkMacro::syncTransform(fwdDim);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
+         FrameworkMacro::check(ierr, 964);
 
          // Convert matrix to remoteKeys set
          for(int i = 0; i < matRemote.cols(); i++)

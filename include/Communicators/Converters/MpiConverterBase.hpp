@@ -198,12 +198,17 @@ namespace Parallel {
          int mPacks;
 
          /**
+          * @brief Direction of operations
+          */
+         TransformDirection::Id   mDirection;
+
+         /**
           * @brief Transform ID
           */
          Dimensions::Transform::Id mTraId;
 
          /**
-          * @brief Active operations are for forward direction
+          * @brief Direction of active operation
           */
          TransformDirection::Id   mActiveDirection;
 

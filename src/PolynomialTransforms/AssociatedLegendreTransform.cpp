@@ -406,21 +406,21 @@ namespace Transform {
       std::map<ProjectorType::Id,std::vector<Matrix> >::const_iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
       for(size_t i = 0; i < projIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).rows()*projIt->second.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).size();
       }
 
       // Storage for the derivative
       projIt = this->mProjOp.find(ProjectorType::DIFF);
       for(size_t i = 0; i < projIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).rows()*projIt->second.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).size();
       }
 
       // Storage for the 1/\sin\theta
       projIt = this->mProjOp.find(ProjectorType::DIVSIN);
       for(size_t i = 0; i < projIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).rows()*projIt->second.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).size();
       }
 
       #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
@@ -428,21 +428,21 @@ namespace Transform {
       std::map<IntegratorType::Id,std::vector<Matrix> >::const_iterator intgIt = this->mIntgOp.find(IntegratorType::INTG);
       for(size_t i = 0; i < intgIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).rows()*intgIt->second.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).size();
       }
 
       // Storage for the derivative
       intgIt = this->mIntgOp.find(IntegratorType::INTGDIFF);
       for(size_t i = 0; i < intgIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).rows()*intgIt->second.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).size();
       }
 
       // Storage for the 1/\sin\theta
       intgIt = this->mIntgOp.find(IntegratorType::INTGDIVSIN);
       for(size_t i = 0; i < intgIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).rows()*intgIt->second.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).size();
       }
       #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 

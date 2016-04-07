@@ -473,7 +473,7 @@ namespace Parallel {
                   FrameworkMacro::synchronize();
 
                   // Broadcast data
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 712);
                   FrameworkMacro::synchronize();
 
@@ -487,7 +487,7 @@ namespace Parallel {
 
                   // Get remote keys as matrix
                   matRemote.resize(2, toMatch);
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 714);
                   FrameworkMacro::synchronize();
 
@@ -557,7 +557,7 @@ namespace Parallel {
                      FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
-                     ierr = MPI_Bcast(locFilter.data(), locFilter.cols()*locFilter.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 717);
                      FrameworkMacro::synchronize();
 
@@ -570,7 +570,7 @@ namespace Parallel {
 
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
-                     ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 719);
                      FrameworkMacro::synchronize();
 
@@ -718,7 +718,7 @@ namespace Parallel {
                   FrameworkMacro::synchronize();
 
                   // Broadcast data
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 721);
                   FrameworkMacro::synchronize();
 
@@ -732,7 +732,7 @@ namespace Parallel {
 
                   // Get remote keys as matrix
                   matRemote.resize(3, toMatch);
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 723);
                   FrameworkMacro::synchronize();
 
@@ -802,7 +802,7 @@ namespace Parallel {
                      FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
-                     ierr = MPI_Bcast(locFilter.data(), locFilter.cols()*locFilter.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 726);
                      FrameworkMacro::synchronize();
 
@@ -815,7 +815,7 @@ namespace Parallel {
 
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
-                     ierr = MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 728);
                      FrameworkMacro::synchronize();
 
