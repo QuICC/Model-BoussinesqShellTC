@@ -85,6 +85,13 @@ namespace Equations {
       if(typeId == ShellExactStateIds::CONSTANT)
       {
          rNLComp.rData().setConstant(42);
+
+      } else if(typeId == ShellExactStateIds::NOISE)
+      {
+         // Make random contant
+         rNLComp.rData().setRandom();
+         rNLComp.rData() *= 1e-15;
+
       } else if(typeId == ShellExactStateIds::HARMONIC)
       {
          throw Exception("HARMONIC state is not implemented for vector states");
