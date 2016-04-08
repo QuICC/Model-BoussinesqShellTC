@@ -65,7 +65,7 @@ set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(GEOMHDISCC_SPSPDLINALGS "UmfPack" "SparseLU" "MUMPS" "SimplicialLLT" "SimplicialLDLT" PARENT_SCOPE)
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLLT" "SimplicialLDLT" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
