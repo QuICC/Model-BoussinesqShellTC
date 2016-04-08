@@ -52,16 +52,20 @@ namespace Debug {
          int base = 27;
          for(int i = 0; i < static_cast<int>(ProfilerMacro::NBREAKPOINT); i++)
          {
-            oss << ProfilerMacro::pointName(static_cast<ProfilerMacro::BreakPoint>(i)) << ": " << std::fixed << std::setprecision(digits) << ts(i);
-
-            if(max.size() != 0)
+            // Only print timing if actually used
+            if(ts(i) > 0.0)
             {
-               oss << " / " << std::fixed << std::setprecision(digits) << max(i) << " / " << std::fixed << std::setprecision(digits) << min(i);
-            }
+               oss << ProfilerMacro::pointName(static_cast<ProfilerMacro::BreakPoint>(i)) << ": " << std::fixed << std::setprecision(digits) << ts(i);
 
-            oss << " s";
-            IoTools::Formatter::printCentered(std::cout, oss.str(), ' ', base);
-            oss.str("");
+               if(max.size() != 0)
+               {
+                  oss << " / " << std::fixed << std::setprecision(digits) << max(i) << " / " << std::fixed << std::setprecision(digits) << min(i);
+               }
+
+               oss << " s";
+               IoTools::Formatter::printCentered(std::cout, oss.str(), ' ', base);
+               oss.str("");
+            }
          }
 
          IoTools::Formatter::printLine(std::cout, '%');

@@ -199,4 +199,97 @@
    }
 #endif //GEOMHDISCC_SPLINALG_BICGSTAB
 
+// UmfPack Version
+#ifdef GEOMHDISCC_SPSPDLINALG_UMFPACK
+   // Include the right header
+   #include <Eigen/UmfPackSupport>
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up the UmfPack version. 
+          */
+         template <typename TMatrix> struct SparseSpdSelector
+         {
+            typedef Eigen::UmfPackLU<TMatrix> Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPSPDLINALG_UMFPACK
+
+// SparseLU Version
+#ifdef GEOMHDISCC_SPSPDLINALG_SPARSELU
+   // Include the right header
+   #include <Eigen/SparseLU>
+   #include <Eigen/OrderingMethods>
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up Eigen's SparseLU version. 
+          */
+         template <typename TMatrix> struct SparseSpdSelector
+         {
+            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPLINALG_SPARSELU
+
+// MUMPS Version
+#ifdef GEOMHDISCC_SPSPDLINALG_MUMPS
+   // Include the right header
+   #include "../External/Interfaces/MumpsLU.hpp"
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up the MUMPS version. 
+          */
+         template<typename TMatrix> struct SparseSpdSelector
+         {
+            typedef Eigen::MumpsLU<TMatrix> Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPSPDLINALG_MUMPS
+
+// SparseLU Version
+#ifdef GEOMHDISCC_SPSPDLINALG_SIMPLICIALLLT
+   // Include the right header
+   #include <Eigen/SparseCholesky>
+   #include <Eigen/OrderingMethods>
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up Eigen's SimplicialLLT version. 
+          */
+         template <typename TMatrix> struct SparseSpdSelector
+         {
+            typedef Eigen::SimplicialLLT<TMatrix, Eigen::Lower, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPSPDLINALG_SIMPLICIALLLT
+
+// SimplicialLDLT Version
+#ifdef GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
+   // Include the right header
+   #include <Eigen/SparseCholesky>
+   #include <Eigen/OrderingMethods>
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up Eigen's SimplicialLLT version. 
+          */
+         template <typename TMatrix> struct SparseSpdSelector
+         {
+            typedef Eigen::SimplicialLDLT<TMatrix, Eigen::Lower, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
+
 #endif // SPARSESOLVERSELECTOR_HPP

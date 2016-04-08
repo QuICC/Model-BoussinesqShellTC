@@ -59,6 +59,9 @@ geomhdiscc_link_external(GEOMHDISCC_LINALG)
 # Sparse linear algebra libraries and includes
 geomhdiscc_link_external(GEOMHDISCC_SPLINALG)
 
+# Sparse SPD linear algebra libraries and includes
+geomhdiscc_link_external(GEOMHDISCC_SPSPDLINALG)
+
 # Large IO format libraries and includes
 geomhdiscc_link_external(GEOMHDISCC_LARGEIO)
 

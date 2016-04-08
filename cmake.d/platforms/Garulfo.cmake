@@ -62,6 +62,12 @@ set(GEOMHDISCC_LIBDIR_PARDISO "/usr/local/share/Pardiso/lib" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 
 ###################################################
+#- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPSPDLINALGS "UmfPack" "SparseLU" "MUMPS" "SimplicialLLT" "SimplicialLDLT" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

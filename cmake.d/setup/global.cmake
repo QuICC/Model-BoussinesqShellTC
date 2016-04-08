@@ -79,6 +79,17 @@ endif(splinalgTest)
 
 
 ###################################################
+#---- SPARSE SPD LINEAR ALGEBRA IMPLEMENTATION ---#
+###################################################
+
+geomhdiscc_provide_choice(GEOMHDISCC_SPSPDLINALGS "Sparse SPD linear algebra" GEOMHDISCC_SPSPDLINALG spspdlinalgTest)
+
+if(spspdlinalgTest)
+   geomhdiscc_add_definition(GEOMHDISCC_SPSPDLINALG)
+endif(spspdlinalgTest)
+
+
+###################################################
 #------------------ LARGE IO FORMAT --------------#
 ###################################################
 

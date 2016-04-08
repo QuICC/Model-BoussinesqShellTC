@@ -268,6 +268,11 @@ namespace Transform {
          std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
 
          /**
+          * @brief Storage for the sparse SPD solvers
+          */
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSpdSelector<SparseMatrix>::Type> > mSpdSolver;
+
+         /**
           * @brief Storage for the backward operators input data
           */
          Matrix mTmpInS;

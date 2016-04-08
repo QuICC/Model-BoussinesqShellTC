@@ -193,6 +193,23 @@ def d1(nr, a, b, rg):
     ssol = sy.diff(sphys,x)
     test_forward(A, sphys, ssol, rg, 1)
 
+    print("solve i1 (991):")
+    x = sy.Symbol('x')
+    A = shell.i1(nr, a, b, {0:991})
+    B = shell.qid(nr, 1, {0:0})
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.diff(sphys,x)
+    test_backward_tau(A, B, sphys, ssol, rg)
+
+    print("solve i1 (perm):")
+    x = sy.Symbol('x')
+    A = shell.i1(nr+1, a, b, {0:0, 'rt':1, 'cr':1})
+    print(A.diagonal())
+    B = shell.qid(nr+1, 0, {0:0, 'rt':1, 'cr':1})
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.diff(sphys,x)
+    test_backward_tau(A, B, sphys, ssol, rg)
+
 def d2(nr, a, b, rg):
     """Accuracy test for d^2 operator"""
 
@@ -812,7 +829,7 @@ def qid(nr, a, b, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 14
+    nr = 32
     a, b = shell.linear_r2x(1.0, 0.35)
     #a, b = shell.linear_r2x(20.0/13.0, 0.35)
     print((a, b))
@@ -821,9 +838,9 @@ if __name__ == "__main__":
 
     # run tests
 #    all_bc(nr, a, b, rg)
-    integral(nr, a, b, rg)
+#    integral(nr, a, b, rg)
 #    zblk(nr, a, b, rg)
-#    d1(nr, a, b, rg)
+    d1(nr, a, b, rg)
 #    d2(nr, a, b, rg)
 #    r1(nr, a, b, rg)
 #    r2(nr, a, b, rg)
