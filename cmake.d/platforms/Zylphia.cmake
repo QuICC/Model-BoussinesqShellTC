@@ -55,6 +55,12 @@ set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "SparseLU" PARENT_SCOPE)
 
 ###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "UmfPack" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

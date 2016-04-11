@@ -274,8 +274,8 @@ namespace Timestep {
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");
 
-      // Linear solver
-      oss << "Solver: ";
+      // General linear solver
+      oss << "General solver: ";
       #if defined GEOMHDISCC_SPLINALG_MUMPS
          oss << "MUMPS";
       #elif defined GEOMHDISCC_SPLINALG_UMFPACK
@@ -285,6 +285,40 @@ namespace Timestep {
       #else
          oss << "(unknown)";
       #endif //defined GEOMHDISCC_SPLINALG_MUMPS
+
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      // Triangular linear solver
+      oss << "Triangular solver: ";
+      #if defined GEOMHDISCC_SPTRILINALG_SPARSELU
+         oss << "SparseLU";
+      #elif defined GEOMHDISCC_SPTRILINALG_MUMPS
+         oss << "MUMPS";
+      #elif defined GEOMHDISCC_SPTRILINALG_UMFPACK
+         oss << "UmfPack";
+      #else
+         oss << "(unknown)";
+      #endif //defined GEOMHDISCC_SPTRILINALG_SPARSELU
+
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      // SPD linear solver
+      oss << "SPD solver: ";
+      #if defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
+         oss << "SimplicialLDLT";
+      #elif defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLLT
+         oss << "SimplicialLLT";
+      #elif defined GEOMHDISCC_SPSPDLINALG_MUMPS
+         oss << "MUMPS";
+      #elif defined GEOMHDISCC_SPSPDLINALG_UMFPACK
+         oss << "UmfPack";
+      #elif defined GEOMHDISCC_SPSPDLINALG_SPARSELU
+         oss << "SparseLU";
+      #else
+         oss << "(unknown)";
+      #endif //defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
 
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");

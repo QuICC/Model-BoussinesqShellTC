@@ -59,6 +59,12 @@ set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" PARENT_SCOPE)
 set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "SuperLU" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
 
 ###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "SuperLU" "UmfPack" "MUMPS" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

@@ -69,6 +69,12 @@ set(GEOMHDISCC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/mumps_5/lib" "/hom
 set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "MUMPS" "SparseLU" PARENT_SCOPE)
 
 ###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

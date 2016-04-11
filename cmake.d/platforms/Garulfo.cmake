@@ -65,7 +65,13 @@ set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(GEOMHDISCC_SPSPDLINALGS "SimplicialLLT" "SimplicialLDLT" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#

@@ -61,6 +61,12 @@ set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL $ENV{TACC_MKL_LIB} "$ENV{HOME}/local/lib" PA
 set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "MUMPS" "SparseLU" "UmfPack" PARENT_SCOPE)
 
 ###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "MUMPS" "UmfPack" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

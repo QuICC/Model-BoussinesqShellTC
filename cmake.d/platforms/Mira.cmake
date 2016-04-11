@@ -60,6 +60,12 @@ set(GEOMHDISCC_LIBDIR_MUMPS_CLANG "/soft/compilers/bgclang/xlsmp-nonconflicting/
 set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
 
 ###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

@@ -7,7 +7,7 @@
 #ifndef SPARSESOLVERSELECTOR_HPP
 #define SPARSESOLVERSELECTOR_HPP
 
-// SuperLU sparse solver
+// SuperLU Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_SUPERLU
    // Include the right header
    #include <Eigen/SuperLUSupport>
@@ -25,7 +25,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_SUPERLU
 
-// UmfPack Version
+// UmfPack Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_UMFPACK
    // Include the right header
    #include <Eigen/UmfPackSupport>
@@ -43,7 +43,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_UMFPACK
 
-// SparseLU Version
+// SparseLU Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_SPARSELU
    // Include the right header
    #include <Eigen/SparseLU>
@@ -66,7 +66,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_SPARSELU
 
-// KLU Version
+// KLU Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_KENTLU
    // Include the right header
    #include <Eigen/KentLUSupport>
@@ -84,7 +84,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_KENTLU
 
-// SparseQR Version
+// SparseQR Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_SPARSEQR
    // Include the right header
    #include <Eigen/SparseQR>
@@ -107,7 +107,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_SPARSEQR
 
-// SuiteSparseQR Version
+// SuiteSparseQR Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_SPQR
    // Include the right header
    #include <Eigen/SPQRSupport>
@@ -125,7 +125,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_SPQR
 
-// Pardiso Version
+// Pardiso Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_PARDISO
    // Include the right header
    #include "../External/Interfaces/PardisoLU.hpp"
@@ -143,7 +143,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_PARDISO
 
-// MKL Pardiso Version
+// MKL Pardiso Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_MKLPARDISO
    // Include the right header
    #include <Eigen/PardisoSupport>
@@ -161,7 +161,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_MKLPARDISO
 
-// MUMPS Version
+// MUMPS Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_MUMPS
    // Include the right header
    #include "../External/Interfaces/MumpsLU.hpp"
@@ -179,7 +179,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_MUMPS
 
-// BiCGSTAB Version
+// BiCGSTAB Version for general solve
 #ifdef GEOMHDISCC_SPLINALG_BICGSTAB
    // Include the right header
    #include <Eigen/IterativeLinearSolvers>   
@@ -199,7 +199,7 @@
    }
 #endif //GEOMHDISCC_SPLINALG_BICGSTAB
 
-// UmfPack Version
+// UmfPack Version for SPD solve
 #ifdef GEOMHDISCC_SPSPDLINALG_UMFPACK
    // Include the right header
    #include <Eigen/UmfPackSupport>
@@ -217,7 +217,7 @@
    }
 #endif //GEOMHDISCC_SPSPDLINALG_UMFPACK
 
-// SparseLU Version
+// SparseLU Version for SPD solve
 #ifdef GEOMHDISCC_SPSPDLINALG_SPARSELU
    // Include the right header
    #include <Eigen/SparseLU>
@@ -234,9 +234,9 @@
          };
       }
    }
-#endif //GEOMHDISCC_SPLINALG_SPARSELU
+#endif //GEOMHDISCC_SPSPDLINALG_SPARSELU
 
-// MUMPS Version
+// MUMPS Version for SPD solve
 #ifdef GEOMHDISCC_SPSPDLINALG_MUMPS
    // Include the right header
    #include "../External/Interfaces/MumpsLU.hpp"
@@ -254,7 +254,7 @@
    }
 #endif //GEOMHDISCC_SPSPDLINALG_MUMPS
 
-// SparseLU Version
+// SparseLU Version for SPD solve
 #ifdef GEOMHDISCC_SPSPDLINALG_SIMPLICIALLLT
    // Include the right header
    #include <Eigen/SparseCholesky>
@@ -273,7 +273,7 @@
    }
 #endif //GEOMHDISCC_SPSPDLINALG_SIMPLICIALLLT
 
-// SimplicialLDLT Version
+// SimplicialLDLT Version for SPD solve
 #ifdef GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
    // Include the right header
    #include <Eigen/SparseCholesky>
@@ -291,5 +291,60 @@
       }
    }
 #endif //GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
+
+// UmfPack Version for triangular solve
+#ifdef GEOMHDISCC_SPTRILINALG_UMFPACK
+   // Include the right header
+   #include <Eigen/UmfPackSupport>
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for triangular matrices. Sets up the UmfPack version. 
+          */
+         template <typename TMatrix> struct SparseTriSelector
+         {
+            typedef Eigen::UmfPackLU<TMatrix> Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPTRILINALG_UMFPACK
+
+// SparseLU Version for triangular solve
+#ifdef GEOMHDISCC_SPTRILINALG_SPARSELU
+   // Include the right header
+   #include <Eigen/SparseLU>
+   #include <Eigen/OrderingMethods>
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for triangular matrices. Sets up Eigen's SparseLU version. 
+          */
+         template <typename TMatrix> struct SparseTriSelector
+         {
+            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPTRILINALG_SPARSELU
+
+// MUMPS Version for triangular solve
+#ifdef GEOMHDISCC_SPTRILINALG_MUMPS
+   // Include the right header
+   #include "../External/Interfaces/MumpsLU.hpp"
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers for triangular matrices. Sets up the MUMPS version. 
+          */
+         template<typename TMatrix> struct SparseTriSelector
+         {
+            typedef Eigen::MumpsLU<TMatrix> Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPTRILINALG_MUMPS
 
 #endif // SPARSESOLVERSELECTOR_HPP

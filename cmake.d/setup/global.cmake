@@ -90,6 +90,17 @@ endif(spspdlinalgTest)
 
 
 ###################################################
+#---- SPARSE TRI LINEAR ALGEBRA IMPLEMENTATION ---#
+###################################################
+
+geomhdiscc_provide_choice(GEOMHDISCC_SPTRILINALGS "Sparse triangular linear algebra" GEOMHDISCC_SPTRILINALG sptrilinalgTest)
+
+if(sptrilinalgTest)
+   geomhdiscc_add_definition(GEOMHDISCC_SPTRILINALG)
+endif(sptrilinalgTest)
+
+
+###################################################
 #------------------ LARGE IO FORMAT --------------#
 ###################################################
 

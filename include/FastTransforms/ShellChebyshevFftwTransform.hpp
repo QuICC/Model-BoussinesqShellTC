@@ -263,9 +263,9 @@ namespace Transform {
          std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
 
          /**
-          * @brief Storage for the sparse solvers
+          * @brief Storage for the sparse triangular solvers
           */
-         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> > mTriSolver;
 
          /**
           * @brief Storage for the sparse SPD solvers
