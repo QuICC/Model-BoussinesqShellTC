@@ -21,6 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
+#include "Enums/FieldIdsTools.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -56,7 +57,7 @@ namespace Equations {
       /// Computation:
       ///   \f$ MPr(Bx dxy\Psi + By dyy\Psi) \f$
       ///
-      rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() + this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array())).matrix());
+      rNLComp.setData(-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() + this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGfby::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -80,7 +81,7 @@ namespace Equations {
 
    void BoussinesqDynamo3DQGfby::setRequirements()
    {
-      // Set fluctuating bx field as equation unknown
+      // Set fluctuating by field as equation unknown
       this->setName(PhysicalNames::FBY);
 
       // Set solver timing
@@ -96,8 +97,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false, true));
-   }
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false, false, true));
 
 //      // Restrict components of 2nd order gradient
 //      // Make upper triangular matrix
@@ -110,11 +110,12 @@ namespace Equations {
       idx = fieldPairSym(FieldComponents::Physical::Y,FieldComponents::Physical::Z);
       compsTen(idx.first, idx.second) = false;
       // Don't compute DzDz derivative (order doesn't matter, but use fieldPairSym)
-      std::pair<int,int> idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::Z);
+      idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::Z);
       compsTen(idx.first, idx.second) = false;
       std::map<FieldComponents::Spectral::Id,MatrixB>  grad2Comps;
       grad2Comps.insert(std::make_pair(FieldComponents::Spectral::SCALAR, compsTen));
 //
       this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient2(grad2Comps);
+   }
 }
 }

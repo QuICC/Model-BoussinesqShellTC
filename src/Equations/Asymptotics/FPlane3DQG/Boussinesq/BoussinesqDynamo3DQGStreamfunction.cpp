@@ -21,6 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
+#include "Enums/FieldIdsTools.hpp"
 #include "PhysicalOperators/StreamAdvection.hpp"
 
 namespace GeoMHDiSCC {
@@ -52,9 +53,9 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
-      Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0)
+      Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
       
-      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() - this->scalar(PhyiscalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix())   
+      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix())   
       ;
    }
 
@@ -107,7 +108,8 @@ namespace Equations {
       idx = fieldPairSym(FieldComponents::Physical::Y,FieldComponents::Physical::Z);
       compsTen(idx.first, idx.second) = false;
       // Don't compute DzDz derivative (order doesn't matter, but use fieldPairSym)
-      std::pair<int,int> idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::Z);
+     // std::pair<int,int> idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::Z);
+      idx = fieldPairSym(FieldComponents::Physical::Z,FieldComponents::Physical::Z);
       compsTen(idx.first, idx.second) = false;
       std::map<FieldComponents::Spectral::Id,MatrixB>  grad2Comps;
       grad2Comps.insert(std::make_pair(FieldComponents::Spectral::SCALAR, compsTen));
