@@ -104,9 +104,6 @@ namespace Transform {
       // Setup the grouped first exchange communication
       this->setupGrouped1DCommunication(coord);
 
-      // Sychronize 
-      FrameworkMacro::synchronize();
-
       //
       // Compute first step of backward transform
       //
@@ -146,9 +143,6 @@ namespace Transform {
          {
             scalIt = scalars.find(it->name());
 
-            // Sychronize 
-            FrameworkMacro::synchronize();
-
             // Setup the second exchange communication step for scalar fields
             this->setupGrouped2DCommunication(*it, coord);
 
@@ -164,9 +158,6 @@ namespace Transform {
          } else
          {
             vectIt = vectors.find(it->name());
-
-            // Sychronize 
-            FrameworkMacro::synchronize();
 
             // Setup the second exchange communication step for vector fields
             this->setupGrouped2DCommunication(*it, coord);

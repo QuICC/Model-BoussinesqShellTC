@@ -151,9 +151,6 @@ namespace Transform {
          {
             scalIt = scalars.find(it->name());
 
-            // Sychronize 
-            FrameworkMacro::synchronize();
-
             // Compute second step of transform for scalar fields
             TConfigurator::secondStep(*it, *(scalIt->second), coord);
 

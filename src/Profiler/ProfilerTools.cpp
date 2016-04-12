@@ -39,7 +39,7 @@ namespace Debug {
 
       if(FrameworkMacro::allowsIO())
       {
-         int digits = 2;
+         int digits = 3;
 
          // Create nice looking ouput header
          IoTools::Formatter::printNewline(std::cout);

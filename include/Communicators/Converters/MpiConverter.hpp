@@ -323,6 +323,9 @@ namespace Parallel {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
       {
+      	// Synchronize 
+     	   FrameworkMacro::syncTransform(this->mTraId);
+
          // Make sure calls are posted at the right moment
          int flag;
          int ierr = MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
@@ -374,6 +377,9 @@ namespace Parallel {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
       {
+      	// Synchronize 
+     	   FrameworkMacro::syncTransform(this->mTraId);
+
          // Make sure calls are posted at the right moment
          int flag;
          int ierr = MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);

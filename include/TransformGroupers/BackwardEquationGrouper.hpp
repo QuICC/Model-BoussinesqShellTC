@@ -107,9 +107,6 @@ namespace Transform {
          {
             scalIt = scalars.find(it->name());
 
-            // Sychronize 
-            FrameworkMacro::synchronize();
-
             // Setup the first exchange communication step for scalar fields
             this->setupGrouped1DCommunication(*it, coord);
             // Setup the second exchange communication step for scalar fields
@@ -132,9 +129,6 @@ namespace Transform {
          } else
          {
             vectIt = vectors.find(it->name());
-
-            // Sychronize 
-            FrameworkMacro::synchronize();
 
             // Setup the first exchange communication step for vector fields
             this->setupGrouped1DCommunication(*it, coord);

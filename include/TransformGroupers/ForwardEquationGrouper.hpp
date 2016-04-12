@@ -112,9 +112,6 @@ namespace Transform {
             // Presolve might not provide all equations
             if(scalEqIt != scalEqs.end())
             {
-               // Sychronize 
-               FrameworkMacro::synchronize();
-
                // Setup the first exchange communication step for scalar fields
                this->setupGrouped2DCommunication(*it, coord);
                // Setup the second exchange communication step for scalar fields
@@ -142,9 +139,6 @@ namespace Transform {
             // Presolve might not provide all equations
             if(vectEqIt != vectEqs.end())
             {
-               // Sychronize 
-               FrameworkMacro::synchronize();
-
                // Setup the first exchange communication step for vector fields
                this->setupGrouped2DCommunication(*it, coord);
                // Setup the second exchange communication step for vector fields
