@@ -72,10 +72,12 @@ namespace Debug {
             TSTEPSOLVE,
             TSTEPOUT,
             // Detailed profiling points level 3 (included in level 2)
+            BWD1DTRAFFT,
             BWD1DTRAR,
             BWD1DTRAR2,
             BWD1DTRADIFF,
             BWD1DTRADIFF2,
+            FWD1DTRAFFT,
             // Break point bounding value
             #ifdef GEOMHDISCC_PROFILER_DETAILED
             NBREAKPOINT

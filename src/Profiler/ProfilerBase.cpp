@@ -113,6 +113,8 @@ namespace Debug {
             return "timestep output";
 
          // Below this line are the "detailed" break points level 3
+         case BWD1DTRAFFT:
+            return "Bwd 1D FFT";
          case BWD1DTRAR:
             return "Bwd 1D Solve R x = y";
          case BWD1DTRAR2:
@@ -121,6 +123,8 @@ namespace Debug {
             return "Bwd 1D Solve D^-1 x = y";
          case BWD1DTRADIFF2:
             return "Bwd 1D Solve D^-2 x = y";
+         case FWD1DTRAFFT:
+            return "Fwd 1D FFT";
          default:
             return "Unknown break point";
       }

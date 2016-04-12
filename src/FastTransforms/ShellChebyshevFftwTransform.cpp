@@ -381,7 +381,9 @@ namespace Transform {
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
       // Do transform
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRAFFT);
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRAFFT);
 
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
@@ -515,7 +517,9 @@ namespace Transform {
       }
 
       // Do transform
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAFFT);
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAFFT);
    }
 
    void ShellChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
@@ -538,7 +542,9 @@ namespace Transform {
       //
       this->mTmpIn = physVal.real();
 
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRAFFT);
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRAFFT);
 
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
@@ -554,7 +560,9 @@ namespace Transform {
       //
       this->mTmpIn = physVal.imag();
 
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRAFFT);
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRAFFT);
 
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
@@ -686,7 +694,9 @@ namespace Transform {
       }
 
       // Do transform of real part
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAFFT);
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAFFT);
       rPhysVal.real() = this->mTmpOut;
 
       // Compute first derivative of imaginary part
@@ -787,7 +797,9 @@ namespace Transform {
       }
 
       // Do transform of imaginary part
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAFFT);
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAFFT);
       rPhysVal.imag() = this->mTmpOut;
    }
 
