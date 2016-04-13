@@ -145,9 +145,11 @@ namespace GeoMHDiSCC {
 
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
+               break;
 
             case 4:
                spVector->setStateType(Equations::ShellExactStateIds::NOISE);
+               break;
          }
 
          // Add magnetic initial state generator
@@ -201,9 +203,11 @@ namespace GeoMHDiSCC {
 
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHMAGC1);
+               break;
 
             case 4:
                spVector->setStateType(Equations::ShellExactStateIds::NOISE);
+               break;
          }
 
       // Generate random spectrum
