@@ -157,7 +157,9 @@ namespace Parallel {
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(DIMENSION) >();
 
-      return EndDispatcher<(static_cast<int>(DIMENSION) == static_cast<int>(TID)), TID>::receiveForward(*this);
+      typedef typename TTypes<TID>::FwdType DataType;
+
+      return EndDispatcher<(static_cast<int>(DIMENSION) == static_cast<int>(TID)), TID>::template receiveForward<DataType>(*this);
    }
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> typename TTypes<TID>::BwdType&  Communicator<DIMENSION,TTypes>::receiveBackward()
