@@ -28,7 +28,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["streamfunction", "velocityz", "temperature"]
+        return ["streamfunction", "velocityz", "temperature", "bx", "by"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -41,7 +41,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
         """Get the list of coupled fields in solve"""
 
         if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by","")]:
-            fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
+            fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by","")]
 
         else:
             fields = [field_row]
@@ -135,6 +135,10 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                             bc = {0:10}
                         elif field_row == ("temperature","") and field_col == field_row:
                             bc = {0:991}
+                        elif field_row == ("bx","") and field_col == ("bx",""):
+                            bc = {0:20}
+                        elif field_row == ("by","") and field_col == ("by",""):
+                            bc = {0:20}
                     else:
                         bc = no_bc()
 
@@ -212,6 +216,8 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
 
+        tau = eq_params['tau']
+        zscale = eq_params['scale1d']
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
@@ -289,6 +295,12 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
 
+            elif field_col == ("bx",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("by",""):
+                mat = geo.zblk(res[0], bc)
+
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
                 mat = geo.i1d1(res[0], bc, -1.0, cscale = zscale)
@@ -301,6 +313,12 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                     mat = geo.zblk(res[0], bc)
                 else:
                     mat = geo.i1(res[0], bc, (Ra/Pr))*utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
+
+            elif field_col == ("bx",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("by",""):
+                mat = geo.zblk(res[0], bc)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
@@ -321,12 +339,42 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                 else:
                     mat = geo.sid(res[0],1, bc, -(1.0/Pr)*(kx**2 + ky**2))
 
+            elif field_col == ("bx",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("by",""):
+                mat = geo.zblk(res[0], bc)
+
         elif field_row == ("bx",""):
-            if field_col == ("bx",""):
+            if field_col == ("streamfunction",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("velocityz",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("temperature",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("bx",""):
                 mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
 
+            elif field_col == ("by",""):
+                mat = geo.zblk(res[0], bc)
+
         elif field_row == ("by",""):
-            if field_col == ("by",""):
+            if field_col == ("streamfunction",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("velocityz",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("temperature",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("bx",""):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("by",""):
                 mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
 
         if mat is None:
@@ -348,17 +396,17 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
         elif field_row == ("velocityz",""):
             mat = geo.i1(res[0], bc)
 
-        elif field_row == ("bx",""):
-            mat = geo.i2(res[0], bc)
-
-        elif field_row == ("by",""):
-            mat = geo.i2(res[0], bc)
-
         elif field_row == ("temperature",""):
             if bcs["temperature"] == 1 and not self.use_galerkin:
                 mat = geo.sid(res[0],2, bc)
             else:
                 mat = geo.sid(res[0],1, bc)
+
+        elif field_row == ("bx",""):
+            mat = geo.i2(res[0], bc)
+
+        elif field_row == ("by",""):
+            mat = geo.i2(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

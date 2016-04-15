@@ -161,10 +161,10 @@ namespace IoTools {
             return "codensity";
 
          case PhysicalNames::BX:
-            return "Bx";
+            return "bx";
 
          case PhysicalNames::BY:
-            return "By";
+            return "by";
 
          case PhysicalNames::DENSITY:
             return "density";

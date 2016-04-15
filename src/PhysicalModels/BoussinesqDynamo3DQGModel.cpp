@@ -114,6 +114,18 @@ namespace GeoMHDiSCC {
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
+         // Add BX initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::BX);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
+         // Add BY initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::BY);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
       // Generate random spectrum
       } else
       {
@@ -161,6 +173,8 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::BX);
+      spOut->expect(PhysicalNames::BY);
       spGen->addHdf5OutputFile(spOut);
    }
 
