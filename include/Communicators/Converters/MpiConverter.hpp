@@ -211,12 +211,20 @@ namespace Parallel {
          /**
           * @brief Storage for the forward datatypes
           */
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         std::vector<std::vector<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> >  mFTypes;
+         #else
          std::vector<MPI_Datatype>  mFTypes;
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
          /**
           * @brief Storage for the backward datatypes
           */
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         std::vector<std::vector<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> > mBTypes;
+         #else
          std::vector<MPI_Datatype> mBTypes;
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
    };
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::MpiConverter()
@@ -439,21 +447,33 @@ namespace Parallel {
       MpiConverterTools<TBwdB::FieldDimension>::buildLocalBwdMap(localBwdMap, spRes, this->mTraId, this->mspIdxConv);
 
       // Loop over group cpus
+      this->mBTypes.reserve(FrameworkMacro::transformCpus(this->mTraId).size());
+      this->mFTypes.reserve(FrameworkMacro::transformCpus(this->mTraId).size());
       for(int id = 0; id < FrameworkMacro::transformCpus(this->mTraId).size(); id++)
       {
       	 // Synchronize 
      	   FrameworkMacro::syncTransform(this->mTraId);
 
          // Create TBwdB datatypes
-         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(localBwdMap, spRes, this->mTraId, bTmp, id);
-         this->mBTypes.push_back(type);
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            this->mBTypes.push_back(std::vector<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate>());
+            MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(this->mBTypes.back(), localBwdMap, spRes, this->mTraId, bTmp, id);
+         #else
+            MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(localBwdMap, spRes, this->mTraId, bTmp, id);
+            this->mBTypes.push_back(type);
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
       	 // Synchronize 
      	   FrameworkMacro::syncTransform(this->mTraId);
 
          // Create TFwdA datatypes
-         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(localFwdMap, spRes, this->mTraId, fTmp, id);
-         this->mFTypes.push_back(type);
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            this->mFTypes.push_back(std::vector<typename MpiConverterTools<TFwdA::FieldDimension>::Coordinate>());
+            MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(this->mFTypes.back(), localFwdMap, spRes, this->mTraId, fTmp, id);
+         #else
+            type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(localFwdMap, spRes, this->mTraId, fTmp, id);
+            this->mFTypes.push_back(type);
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
       }
    }
 
@@ -605,8 +625,12 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
       {
-         int ierr = MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
-         FrameworkMacro::check(ierr, 761);
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            MpiConverterTools<TFwdA::FieldDimension>::template pack<typename TFwdA::PointType>(this->mspFBuffers->at(id), this->mSendPositions.at(id), data, this->mFTypes.at(id));
+         #else
+            int ierr = MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
+            FrameworkMacro::check(ierr, 761);
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
       }
 
       // Stop detailed profiler
@@ -633,8 +657,12 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)
       {
-         int ierr = MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
-         FrameworkMacro::check(ierr, 762);
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            MpiConverterTools<TBwdB::FieldDimension>::template pack<typename TBwdB::PointType>(this->mspBBuffers->at(id), this->mSendPositions.at(id), data, this->mBTypes.at(id));
+         #else
+            int ierr = MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), FrameworkMacro::transformComm(this->mTraId));
+            FrameworkMacro::check(ierr, 762);
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
       }
 
       // Stop detailed profiler
@@ -683,8 +711,13 @@ namespace Parallel {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
-               int ierr = MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
-               FrameworkMacro::check(ierr, 763);
+
+               #if defined GEOMHDISCC_MPIPACK_MANUAL
+                  MpiConverterTools<TFwdA::FieldDimension>::template unpack<typename TFwdA::PointType>(rData, this->mFTypes.at(pos), this->mspFBuffers->at(pos), this->mRecvPositions.at(pos));
+               #else
+                  int ierr = MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
+                  FrameworkMacro::check(ierr, 763);
+               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
             }
 
             // Stop detailed profiler
@@ -707,8 +740,14 @@ namespace Parallel {
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             DebuggerMacro_msg("Unpacking FWD packs", 5);
-            int ierr = MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
-            FrameworkMacro::check(ierr, 764);
+
+            #if defined GEOMHDISCC_MPIPACK_MANUAL
+               MpiConverterTools<TFwdA::FieldDimension>::template unpack<typename TFwdA::PointType>(rData, this->mFTypes.at(id), this->mspFBuffers->at(id), this->mRecvPositions.at(id));
+            #else
+               int ierr = MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
+               FrameworkMacro::check(ierr, 764);
+            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+
          }
 
          // Stop detailed profiler
@@ -758,8 +797,13 @@ namespace Parallel {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
-               int ierr = MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
-               FrameworkMacro::check(ierr, 765);
+
+               #if defined GEOMHDISCC_MPIPACK_MANUAL
+                  MpiConverterTools<TBwdB::FieldDimension>::template unpack<typename TBwdB::PointType>(rData, this->mBTypes.at(pos), this->mspBBuffers->at(pos), this->mRecvPositions.at(pos));
+               #else
+                  int ierr = MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
+                  FrameworkMacro::check(ierr, 765);
+               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
             }
 
             // Stop detailed profiler
@@ -782,8 +826,13 @@ namespace Parallel {
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             DebuggerMacro_msg("Unpacking BWD packs", 5);
-            int ierr = MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
-            FrameworkMacro::check(ierr, 766);
+
+            #if defined GEOMHDISCC_MPIPACK_MANUAL
+               MpiConverterTools<TBwdB::FieldDimension>::template unpack<typename TBwdB::PointType>(rData, this->mBTypes.at(id), this->mspBBuffers->at(id), this->mRecvPositions.at(id));
+            #else
+               int ierr = MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
+               FrameworkMacro::check(ierr, 766);
+            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
          }
 
          // Stop detailed profiler
@@ -801,7 +850,11 @@ namespace Parallel {
       for(int i = 0; i < FrameworkMacro::transformCpus(this->mTraId).size(); i++)
       {
          // Compute buffer sizes for F group
-         MPI_Pack_size(1, this->mFTypes.at(i), FrameworkMacro::transformComm(this->mTraId), &sze);
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            sze = this->mFTypes.at(i).size();
+         #else
+            MPI_Pack_size(1, this->mFTypes.at(i), FrameworkMacro::transformComm(this->mTraId), &sze);
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
          if(sze != 0)
          {
             this->mFSizes.push_back(sze);
@@ -814,7 +867,11 @@ namespace Parallel {
          }
 
          // Compute buffer sizes for B group
-         MPI_Pack_size(1, this->mBTypes.at(i), FrameworkMacro::transformComm(this->mTraId), &sze);
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            sze = this->mBTypes.at(i).size();
+         #else
+            MPI_Pack_size(1, this->mBTypes.at(i), FrameworkMacro::transformComm(this->mTraId), &sze);
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
          if(sze != 0)
          {
             this->mBSizes.push_back(sze);
@@ -843,18 +900,23 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::cleanupTypes()
    {
-      // Cleanup the F Types
-      typename std::vector<MPI_Datatype>::iterator  it;
+      #if defined GEOMHDISCC_MPIPACK_MANUAL
+         // No cleanup is required
+         
+      #else
+         // Cleanup the F Types
+         typename std::vector<MPI_Datatype>::iterator  it;
 
-      for(it = this->mFTypes.begin(); it != this->mFTypes.end(); ++it)
-      {
-         MPI_Type_free(&(*it));
-      }
+         for(it = this->mFTypes.begin(); it != this->mFTypes.end(); ++it)
+         {
+            MPI_Type_free(&(*it));
+         }
 
-      for(it = this->mBTypes.begin(); it != this->mBTypes.end(); ++it)
-      {
-         MPI_Type_free(&(*it));
-      }
+         for(it = this->mBTypes.begin(); it != this->mBTypes.end(); ++it)
+         {
+            MPI_Type_free(&(*it));
+         }
+      #endif //defined GEOMHDISCC_MPIPACK_MANUAL
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

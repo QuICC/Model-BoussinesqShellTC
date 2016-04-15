@@ -294,8 +294,13 @@ namespace Parallel {
             FrameworkMacro::synchronize();
 
             // Create the communication buffers
-            SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
-            SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
+            #if defined GEOMHDISCC_MPIPACK_MANUAL
+               SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType> >  spBufferOne(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType>());
+               SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType> >  spBufferTwo(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType>());
+            #else
+               SharedPtrMacro<CommunicationBuffer<char> >  spBufferOne(new CommunicationBuffer<char>());
+               SharedPtrMacro<CommunicationBuffer<char> >  spBufferTwo(new CommunicationBuffer<char>());
+            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
             // Get maximum number of packs
             int p1DFwd;
@@ -411,8 +416,13 @@ namespace Parallel {
                FrameworkMacro::synchronize();
 
                // Create the communication buffers
-               SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
-               SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
+               #if defined GEOMHDISCC_MPIPACK_MANUAL
+                  SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType> > spBufferOne(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType>());
+                  SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType> >  spBufferTwo(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType>());
+               #else
+                  SharedPtrMacro<CommunicationBuffer<char> >  spBufferOne(new CommunicationBuffer<char>());
+                  SharedPtrMacro<CommunicationBuffer<char> >  spBufferTwo(new CommunicationBuffer<char>());
+               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
                // Get maximum number of packs
                int p2DFwd;
@@ -475,15 +485,27 @@ namespace Parallel {
                FrameworkMacro::synchronize();
 
                // Create the communication buffers
-               SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
-               SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
-               SharedCommunicationBuffer  spBufferThree(new CommunicationBuffer());
-               #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
-                  SharedCommunicationBuffer  spBufferFour(new CommunicationBuffer());
+               #if defined GEOMHDISCC_MPIPACK_MANUAL
+                  SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType> >  spBufferOne(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType>());
+                  SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType> >  spBufferTwo(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType>());
+                  SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType> >  spBufferThree(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType>());
+                  #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+                     SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType> >  spBufferFour(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType>());
+                  #else
+                     // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
+                     SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType> >  spBufferFour(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType>());
+                  #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
                #else
-                  // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
-                  SharedCommunicationBuffer  spBufferFour(new CommunicationBuffer());
-               #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+                  SharedPtrMacro<CommunicationBuffer<char> >  spBufferOne(new CommunicationBuffer<char>());
+                  SharedPtrMacro<CommunicationBuffer<char> >  spBufferTwo(new CommunicationBuffer<char>());
+                  SharedPtrMacro<CommunicationBuffer<char> >  spBufferThree(new CommunicationBuffer<char>());
+                  #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+                     SharedPtrMacro<CommunicationBuffer<char> >  spBufferFour(new CommunicationBuffer<char>());
+                  #else
+                     // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
+                     SharedPtrMacro<CommunicationBuffer<char> >  spBufferFour(new CommunicationBuffer<char>());
+                  #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
                // Get maximum number of packs
                int p1DFwd;

@@ -60,7 +60,11 @@ namespace Parallel {
           * @brief spFwd Forward communication buffers
           * @brief spBwd Backward communication buffers
           */
-         void setBuffers(SharedCommunicationBuffer spFwd, SharedCommunicationBuffer spBwd);
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         void setBuffers(SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > spFwd, SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > spBwd);
+         #else
+         void setBuffers(SharedPtrMacro<CommunicationBuffer<char> > spFwd, SharedPtrMacro<CommunicationBuffer<char> > spBwd);
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
          /**
           * @brief Get forward buffer sizes
@@ -245,12 +249,20 @@ namespace Parallel {
          /**
           * @brief Forward communication
           */
-         SharedCommunicationBuffer mspFBuffers;
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > mspFBuffers;
+         #else
+         SharedPtrMacro<CommunicationBuffer<char> > mspFBuffers;
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
          /**
           * @brief Backward communication buffer pointer
           */
-         SharedCommunicationBuffer mspBBuffers;
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > mspBBuffers;
+         #else
+         SharedPtrMacro<CommunicationBuffer<char> > mspBBuffers;
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
 
          /**
           * @brief List of the forward buffer sizes
@@ -304,7 +316,11 @@ namespace Parallel {
       return this->mBSizes;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(SharedCommunicationBuffer spFwd, SharedCommunicationBuffer spBwd)
+   #if defined GEOMHDISCC_MPIPACK_MANUAL
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > spFwd, SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > spBwd)
+   #else
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(SharedPtrMacro<CommunicationBuffer<char> > spFwd, SharedPtrMacro<CommunicationBuffer<char> > spBwd)
+   #endif //defined GEOMHDISCC_MPIPACK_MANUAL
    {
       // Set the forward buffers
       this->mspFBuffers = spFwd;
@@ -495,8 +511,13 @@ namespace Parallel {
             assert(static_cast<size_t>(grpSrc) < this->mRecvFRequests.at(packs).size());
 
             // initialise the Recv request
-            ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
-            FrameworkMacro::check(ierr, 981);
+            #if defined GEOMHDISCC_MPIPACK_MANUAL
+               ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MpiTypes::template type<typename TFwdA::PointType>(), src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
+               FrameworkMacro::check(ierr, 981);
+            #else
+               ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
+               FrameworkMacro::check(ierr, 981);
+            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
          }
 
          // Create send backward requests
@@ -519,8 +540,13 @@ namespace Parallel {
             assert(static_cast<size_t>(grpDest) < this->mSendBRequests.at(packs).size());
 
             // initialise the Send request
-            ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
-            FrameworkMacro::check(ierr, 982);
+            #if defined GEOMHDISCC_MPIPACK_MANUAL
+               ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MpiTypes::template type<typename TBwdB::PointType>(), dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
+               FrameworkMacro::check(ierr, 982);
+            #else
+               ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
+               FrameworkMacro::check(ierr, 982);
+            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
          }
       }
 
@@ -560,7 +586,11 @@ namespace Parallel {
             tag = src + tagShift;
 
             // initialise the Recv request
-            ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
+            #if defined GEOMHDISCC_MPIPACK_MANUAL
+               ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MpiTypes::template type<typename TBwdB::PointType>(), src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
+            #else
+               ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
+            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
             FrameworkMacro::check(ierr, 983);
          }
 
@@ -580,8 +610,12 @@ namespace Parallel {
             dest = this->fCpu(grpDest);
 
             // initialise the Send request
-            ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
-            FrameworkMacro::check(ierr, 984);
+            #if defined GEOMHDISCC_MPIPACK_MANUAL
+               ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MpiTypes::template type<typename TFwdA::PointType>(), dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
+            #else
+               ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
+               FrameworkMacro::check(ierr, 984);
+            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
          }
       }
    }
