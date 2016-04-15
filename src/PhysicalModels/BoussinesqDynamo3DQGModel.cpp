@@ -29,6 +29,8 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGTransport.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVorticityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGMeanHeat.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBx.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBy.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbx.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfby.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbz.hpp"
@@ -63,6 +65,12 @@ namespace GeoMHDiSCC {
 
       // Add mean heat computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGMeanHeat>();
+
+      // Add Bx computation
+      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBx>();
+
+      // Add By computation
+      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBy>();
 
       // Add fbx computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfbx>();

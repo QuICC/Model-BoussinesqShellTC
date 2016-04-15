@@ -83,7 +83,7 @@ namespace Equations {
       this->setName(PhysicalNames::BX);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::AFTER);
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));

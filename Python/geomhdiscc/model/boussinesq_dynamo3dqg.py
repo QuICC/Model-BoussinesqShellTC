@@ -23,7 +23,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "magnetic_prandtl", "rayleigh", "scale1d"]
+        return ["prandtl", "magnetic_prandtl", "tau", "rayleigh", "scale1d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -40,7 +40,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature","")]:
+        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by","")]:
             fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         else:
@@ -60,7 +60,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature","")]:
+            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("bx",""), ("by","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -232,6 +232,18 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
+        elif field_row == ("bx","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.i2d1(res[0], bc, -tau, cscale = zscale)
+            else:
+                mat = geo.zblk(res[0], bc)
+
+        elif field_row == ("by","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.i2d1(res[0], bc, tau, cscale = zscale)
+            else:
+                mat = geo.zblk(res[0], bc)
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
@@ -258,7 +270,9 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         Pr = eq_params['prandtl']
+        MPr = eq_params['magnetic_prandtl']
         Ra = eq_params['rayleigh']
+        tau = eq_params['tau']
         zscale = eq_params['scale1d']
         kx = eigs[0]
         ky = eigs[1]
@@ -307,6 +321,14 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                 else:
                     mat = geo.sid(res[0],1, bc, -(1.0/Pr)*(kx**2 + ky**2))
 
+        elif field_row == ("bx",""):
+            if field_col == ("bx",""):
+                mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
+
+        elif field_row == ("by",""):
+            if field_col == ("by",""):
+                mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
@@ -325,6 +347,12 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         elif field_row == ("velocityz",""):
             mat = geo.i1(res[0], bc)
+
+        elif field_row == ("bx",""):
+            mat = geo.i2(res[0], bc)
+
+        elif field_row == ("by",""):
+            mat = geo.i2(res[0], bc)
 
         elif field_row == ("temperature",""):
             if bcs["temperature"] == 1 and not self.use_galerkin:

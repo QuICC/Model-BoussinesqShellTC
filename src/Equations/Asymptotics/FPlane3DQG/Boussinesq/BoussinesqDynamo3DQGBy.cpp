@@ -53,9 +53,9 @@ namespace Equations {
 
       /// 
       /// Computation:
-      ///   \f$ dz E_Y \f$
+      ///   \f$ E_X \f$
       ///
-      rNLComp.setData((this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBX).dom(0).phys().data().array() + this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()*this->scalar(PhysicalNames::FBZ).dom(0).phys().data().array()).matrix());
+      rNLComp.setData((-this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBY).dom(0).phys().data().array() + this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::X).data().array()*this->scalar(PhysicalNames::FBZ).dom(0).phys().data().array()).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGBy::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -80,13 +80,13 @@ namespace Equations {
    void BoussinesqDynamo3DQGBy::setRequirements()
    {
       // Set streamfunction as equation unknown
-      this->setName(PhysicalNames::BX);
+      this->setName(PhysicalNames::BY);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::AFTER);
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
       // Add temperature requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, false, true, false));
@@ -98,7 +98,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, false, true, false));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, false, true, false));
+      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, false, true, false));
    }
 
 }
