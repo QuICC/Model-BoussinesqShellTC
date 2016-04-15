@@ -252,7 +252,7 @@ namespace Solver {
    template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::zeroSolver()
    {
       // Set solver RHS to zero
-      for(int i = 0; i < this->mRHSData.size(); ++i)
+      for(unsigned int i = 0; i < this->mRHSData.size(); ++i)
       {
          this->mRHSData.at(i).setZero();
       }
