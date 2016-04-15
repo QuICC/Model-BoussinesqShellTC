@@ -44,6 +44,14 @@ namespace Parallel {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class MpiConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>
    {
       public:
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            typedef SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > SharedFwdBufferType;
+            typedef SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > SharedBwdBufferType;
+         #else
+            typedef SharedPtrMacro<CommunicationBuffer<char> > SharedFwdBufferType;
+            typedef SharedPtrMacro<CommunicationBuffer<char> > SharedBwdBufferType;
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+
          /**
           * @brief Constructor
           */
@@ -60,11 +68,7 @@ namespace Parallel {
           * @brief spFwd Forward communication buffers
           * @brief spBwd Backward communication buffers
           */
-         #if defined GEOMHDISCC_MPIPACK_MANUAL
-         void setBuffers(SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > spFwd, SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > spBwd);
-         #else
-         void setBuffers(SharedPtrMacro<CommunicationBuffer<char> > spFwd, SharedPtrMacro<CommunicationBuffer<char> > spBwd);
-         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+         void setBuffers(SharedFwdBufferType spFwd, SharedBwdBufferType spBwd);
 
          /**
           * @brief Get forward buffer sizes
@@ -78,14 +82,14 @@ namespace Parallel {
          
       protected:
          /**
-          * @brief Reset Receive positions
+          * @brief Reset Fwe buffer positions
           */
-         void resetRecvPositions();
+         void resetFwdPositions();
 
          /**
-          * @brief Reset Send positions
+          * @brief Reset Bwd buffer positions
           */
-         void resetSendPositions();
+         void resetBwdPositions();
 
          /**
           * @brief Get a pointer to the receive backward requests
@@ -132,11 +136,6 @@ namespace Parallel {
           * @param size Size of the CPU group
           */
          int  sendDest(const int id, const int ref, const int size) const;
-
-         /**
-          * @brief Initialise the positions
-          */
-         void initPositions();
 
          /**
           * @brief Setup the MPI communication requests requests
@@ -229,12 +228,12 @@ namespace Parallel {
          /**
           * @brief Storage for the receive position pointers
           */
-         std::vector<int>  mRecvPositions;
+         //std::vector<int>  mRecvPositions;
 
          /**
           * @brief Storage for the send position pointers
           */
-         std::vector<int>  mSendPositions;
+         //std::vector<int>  mSendPositions;
 
          /**
           * @brief List of CPU ranks involved in the forward conversion
@@ -249,20 +248,12 @@ namespace Parallel {
          /**
           * @brief Forward communication
           */
-         #if defined GEOMHDISCC_MPIPACK_MANUAL
-         SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > mspFBuffers;
-         #else
-         SharedPtrMacro<CommunicationBuffer<char> > mspFBuffers;
-         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+         SharedFwdBufferType mspFBuffers;
 
          /**
           * @brief Backward communication buffer pointer
           */
-         #if defined GEOMHDISCC_MPIPACK_MANUAL
-         SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > mspBBuffers;
-         #else
-         SharedPtrMacro<CommunicationBuffer<char> > mspBBuffers;
-         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+         SharedBwdBufferType mspBBuffers;
 
          /**
           * @brief List of the forward buffer sizes
@@ -316,11 +307,7 @@ namespace Parallel {
       return this->mBSizes;
    }
 
-   #if defined GEOMHDISCC_MPIPACK_MANUAL
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > spFwd, SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > spBwd)
-   #else
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(SharedPtrMacro<CommunicationBuffer<char> > spFwd, SharedPtrMacro<CommunicationBuffer<char> > spBwd)
-   #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(typename MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::SharedFwdBufferType spFwd, typename MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::SharedBwdBufferType spBwd)
    {
       // Set the forward buffers
       this->mspFBuffers = spFwd;
@@ -390,42 +377,14 @@ namespace Parallel {
       this->cleanupRequests();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetFwdPositions()
    {
-      // Get maximum position size
-      int maxSize = std::max(this->nFCpu(), this->nBCpu());
-
-      // Initialise the position values
-      for(int i = 0; i < maxSize; ++i)
-      {
-         this->mRecvPositions.push_back(0);
-
-         this->mSendPositions.push_back(0);
-      }
+      this->mspFBuffers->resetPositions();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetRecvPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetBwdPositions()
    {
-      // Create position iterator
-      std::vector<int>::iterator it;
-
-      // Reset all positions to zero
-      for(it = this->mRecvPositions.begin(); it != this->mRecvPositions.end(); ++it)
-      {
-         (*it) = 0;
-      }
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetSendPositions()
-   {
-      // Create position iterator
-      std::vector<int>::iterator it;
-
-      // Reset all positions to zero
-      for(it = this->mSendPositions.begin(); it != this->mSendPositions.end(); ++it)
-      {
-         (*it) = 0;
-      }
+      this->mspBBuffers->resetPositions();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendDest(const int id, const int ref, const int size) const

@@ -101,6 +101,24 @@ endif(mpiTest)
 
 
 ###################################################
+#------------- DATA PACKING FOR MPI --------------#
+###################################################
+
+if(GEOMHDISCC_MPI)
+   set(GEOMHDISCC_MPIPACKS "MPI" "Manual")
+   if(GEOMHDISCC_MPIPACK STREQUAL "")
+      set(GEOMHDISCC_MPIPACK "MPI")
+   endif(GEOMHDISCC_MPIPACK STREQUAL "")
+   mark_as_advanced(FORCE GEOMHDISCC_MPIPACK)
+   geomhdiscc_provide_choice(GEOMHDISCC_MPIPACKS "MPI data packing" GEOMHDISCC_MPIPACK mpipackTest)
+
+   if(mpipackTest)
+      geomhdiscc_add_definition(GEOMHDISCC_MPIPACK)
+   endif(mpipackTest)
+endif(GEOMHDISCC_MPI)
+
+
+###################################################
 #------------- BOUNDARY CONDITIONS ---------------#
 ###################################################
 

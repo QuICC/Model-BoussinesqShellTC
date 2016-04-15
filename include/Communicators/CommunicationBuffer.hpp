@@ -65,7 +65,27 @@ namespace Parallel {
          /**
           * @brief Get pointer to raw buffer storage
           */
+         TData* data();
+
+         /**
+          * @brief Get pointer to raw sub buffer start
+          */
          TData* at(const int id);
+
+         /**
+          * @brief Get current position in sub buffer
+          */
+         int& pos(const int id);
+
+         /**
+          * @brief Reset positions in sub buffers
+          */
+         void resetPositions();
+
+         /**
+          * @brief Get total available storage
+          */
+         int total() const;
          
       protected:
 
@@ -76,9 +96,24 @@ namespace Parallel {
          void cleanupBuffers();
 
          /**
+          * @brief Total memory in buffer
+          */
+         int mTotal;
+
+         /**
           * @brief MPI communication buffers
           */
-         std::vector<TData *> mData;
+         TData * mData;
+
+         /**
+          * @brief Start position for sub buffers
+          */
+         std::vector<int>  mZero;
+
+         /**
+          * @brief Current position in sub buffers
+          */
+         std::vector<int>  mPos;
    };
 
    template <typename TData> CommunicationBuffer<TData>::CommunicationBuffer()
@@ -94,18 +129,23 @@ namespace Parallel {
    template <typename TData> void CommunicationBuffer<TData>::allocate(const std::vector<int>& sizes, const int maxPacks)
    {
       // Create CPU group buffers
-      for(size_t id = 0; id < sizes.size(); ++id)
+      this->mTotal = 0;
+      for(std::vector<int>::const_iterator it = sizes.begin(); it != sizes.end(); ++it)
       {
-         this->mData.push_back(new TData[maxPacks*sizes.at(id)]);
+         // Create zero position and initialize position
+         this->mZero.push_back(this->mTotal);
+         this->mPos.push_back(0);
+
+         this->mTotal += (*it)*maxPacks;
       }
+
+      // Allocate large buffer
+      this->mData = new TData[this->mTotal];
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem = 0.0;
 
-         for(size_t id = 0; id < sizes.size(); ++id)
-         {
-            mem += Debug::MemorySize<TData>::BYTES*maxPacks*sizes.at(id);
-         }
+         mem += Debug::MemorySize<TData>::BYTES*this->mTotal;
 
          StorageProfilerMacro_update(StorageProfilerMacro::MPI, mem);
 
@@ -118,9 +158,14 @@ namespace Parallel {
    template <typename TData> void CommunicationBuffer<TData>::allocateMax(const std::vector<int>& aSizes, const int maxAPacks, const std::vector<int>& bSizes, const int maxBPacks)
    {
       // Create CPU group buffers
+      this->mTotal = 0;
       for(size_t id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
       {
-         this->mData.push_back(new TData[std::max(maxAPacks*aSizes.at(id), maxBPacks*bSizes.at(id))]);
+         // Create zero position and initialize position
+         this->mZero.push_back(this->mTotal);
+         this->mPos.push_back(0);
+
+         this->mTotal += std::max(maxAPacks*aSizes.at(id), maxBPacks*bSizes.at(id));
       }
 
       // Deal with different number of CPUs in groups
@@ -128,38 +173,30 @@ namespace Parallel {
       {
          for(size_t id = bSizes.size(); id < aSizes.size(); ++id)
          {
-            this->mData.push_back(new TData[maxAPacks*aSizes.at(id)]);
+            // Create zero position and initialize position
+            this->mZero.push_back(this->mTotal);
+            this->mPos.push_back(0);
+
+            this->mTotal += maxAPacks*aSizes.at(id);
          }
       } else if(bSizes.size() > aSizes.size())
       {
          for(size_t id = aSizes.size(); id < bSizes.size(); ++id)
          {
-            this->mData.push_back(new TData[maxBPacks*bSizes.at(id)]);
+            // Create zero position and initialize position
+            this->mZero.push_back(this->mTotal);
+            this->mPos.push_back(0);
+
+            this->mTotal += maxBPacks*bSizes.at(id);
          }
       }
+
+      this->mData = new TData[this->mTotal];
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem = 0.0;
 
-         for(size_t id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
-         {
-            mem += std::max(maxAPacks*aSizes.at(id), maxBPacks*bSizes.at(id));
-         }
-
-         // Deal with different number of CPUs in groups
-         if(aSizes.size() > bSizes.size())
-         {
-            for(size_t id = bSizes.size(); id < aSizes.size(); ++id)
-            {
-               mem += maxAPacks*aSizes.at(id);
-            }
-         } else if(bSizes.size() > aSizes.size())
-         {
-            for(size_t id = aSizes.size(); id < bSizes.size(); ++id)
-            {
-               mem += maxBPacks*bSizes.at(id);
-            }
-         }
+         mem += Debug::MemorySize<TData>::BYTES*this->mTotal;
 
          StorageProfilerMacro_update(StorageProfilerMacro::MPI, mem);
 
@@ -169,21 +206,41 @@ namespace Parallel {
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
-   template <typename TData> TData* CommunicationBuffer<TData>::at(const int id)
+   template <typename TData> inline int CommunicationBuffer<TData>::total() const
+   {
+      return this->mTotal;
+   }
+
+   template <typename TData> inline TData* CommunicationBuffer<TData>::data()
+   {
+      return this->mData;
+   }
+
+   template <typename TData> inline TData* CommunicationBuffer<TData>::at(const int id)
+   {
+      return (this->mData + this->mZero.at(id));
+   }
+
+   template <typename TData> void CommunicationBuffer<TData>::resetPositions()
+   {
+      for(std::vector<int>::iterator it = this->mPos.begin(); it != this->mPos.end(); ++it)
+      {
+         *it = 0;
+      }
+   }
+
+   template <typename TData> inline int& CommunicationBuffer<TData>::pos(const int id)
    {
       // Safety assert
-      assert(this->mData.size() > static_cast<size_t>(id));
+      assert(this->mPos.size() > static_cast<size_t>(id));
 
-      return this->mData.at(id);
+      return this->mPos.at(id);
    }
 
    template <typename TData> void CommunicationBuffer<TData>::cleanupBuffers()
    {
       // Free the buffers memory
-      for(size_t id = 0; id < this->mData.size(); ++id)
-      {
-         delete[] this->mData.at(id);
-      }
+      delete[] this->mData;
    }
 
 }
