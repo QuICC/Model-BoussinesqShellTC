@@ -34,6 +34,21 @@ namespace Debug {
       }
    }
 
+   void SerialProfiler::reset()
+   {
+      ProfilerBase::reset();
+
+      for(std::map<ProfilerBase::BreakPoint, MHDFloat>::iterator it = t_starts.begin(); it != t_starts.end(); ++it)
+      {
+         it->second = timespec();
+      }
+
+      for(std::map<ProfilerBase::BreakPoint, MHDFloat>::iterator it = t_stops.begin(); it != t_stops.end(); ++it)
+      {
+         it->second = timespec();
+      }
+   }
+
    void SerialProfiler::start(ProfilerBase::BreakPoint point)
    {
       // Get the starting timespec

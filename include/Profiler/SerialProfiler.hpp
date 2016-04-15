@@ -30,9 +30,14 @@ namespace Debug {
    {
       public:
          /**
-          * @brief initialise the timers
+          * @brief Initialise the timers
           */
          static void init();
+
+         /**
+          * @brief Reset the timers
+          */
+         static void reset();
 
          /**
           * @brief Start clock

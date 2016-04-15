@@ -69,6 +69,7 @@ namespace Debug {
          }
 
          IoTools::Formatter::printLine(std::cout, '%');
+         IoTools::Formatter::printNewline(std::cout);
       }
    }
 

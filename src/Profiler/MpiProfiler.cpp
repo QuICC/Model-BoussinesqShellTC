@@ -38,6 +38,21 @@ namespace Debug {
       }
    }
 
+   void MpiProfiler::reset()
+   {
+      ProfilerBase::reset();
+
+      for(std::map<ProfilerBase::BreakPoint, MHDFloat>::iterator it = t_starts.begin(); it != t_starts.end(); ++it)
+      {
+         it->second = 0;
+      }
+
+      for(std::map<ProfilerBase::BreakPoint, MHDFloat>::iterator it = t_stops.begin(); it != t_stops.end(); ++it)
+      {
+         it->second = 0;
+      }
+   }
+
    void MpiProfiler::start(ProfilerBase::BreakPoint point)
    {
       // Get starting MPI time

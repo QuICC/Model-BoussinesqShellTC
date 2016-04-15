@@ -62,6 +62,11 @@ namespace GeoMHDiSCC {
 
    void Simulation::mainRun()
    {
+      // Reset the profiler if needed
+      ProfilerMacro_printInfo();
+      ProfilerMacro_reset();
+      ProfilerMacro_init();
+
       StageTimer::stage("Starting simulation");
 
       // Start main loop of simulation

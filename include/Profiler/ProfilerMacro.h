@@ -30,6 +30,9 @@
    /// Define profiler initialisation macro function
    #define ProfilerMacro_init()  ProfilerMacro::init()
 
+   /// Reset profiler reset macro function
+   #define ProfilerMacro_reset()  ProfilerMacro::reset()
+
    /// Define profiler start macro function
    #define ProfilerMacro_start(P)  ProfilerMacro::start(P)
 
@@ -56,6 +59,9 @@
 #else
    /// Define profiler initialisation macro function
    #define ProfilerMacro_init()
+
+   /// Define profiler reset macro function
+   #define ProfilerMacro_reset()
 
    /// Define empty profiler start macro function
    #define ProfilerMacro_start(P)  
