@@ -26,60 +26,68 @@
 #include "IoTools/Formatter.hpp"
 #include "IoAscii/DirectAsciiWriter.hpp"
 
-//#define GEOMHDISCC_PERCORE_PROFILING
-
 namespace GeoMHDiSCC {
 
 namespace Debug {
 
    void ProfilerTools::writeTimings()
    {
-      #ifdef GEOMHDISCC_PERCORE_PROFILING
-      Array ts;
-      ProfilerMacro::getTimings(ts);
+      #ifdef GEOMHDISCC_PROFILE_PERCORE
+         Array ts;
+         ProfilerMacro::getTimings(ts);
 
-      // Initialize output file
-      int rank;
-      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-      std::stringstream ext;
-      ext << "." << rank;
-      IoAscii::DirectAsciiWriter prof_out("prof_out", ext.str(), "Detailed per core profiling output", "ASCII", "1.0");
-      prof_out.initDebug();
+         // Initialize output file
+         std::stringstream sid;
+         sid << FrameworkMacro::id();
+         IoAscii::DirectAsciiWriter prof_out("prof_out", "." + sid.str(), "Detailed profiling for rank " + sid.str(), "ASCII", "1.0");
+         prof_out.initDebug();
 
-      int digits = 3;
+         // Output communcation structure
+         IoTools::Formatter::printNewline(prof_out.file());
+         IoTools::Formatter::printLine(prof_out.file(), '%');
+         IoTools::Formatter::printCentered(prof_out.file(), "Communication structure", '%');
+         IoTools::Formatter::printLine(prof_out.file(), '%');
 
-      // Create nice looking ouput header
-      IoTools::Formatter::printNewline(prof_out.file());
-      IoTools::Formatter::printLine(prof_out.file(), '%');
-      IoTools::Formatter::printCentered(prof_out.file(), "Profiling information", '%');
-      IoTools::Formatter::printLine(prof_out.file(), '%');
+         IoTools::Formatter::printNewline(prof_out.file());
+         IoTools::Formatter::printCentered(prof_out.file(), "First data exchange", '-');
+         prof_out.file() << FrameworkMacro::transformCpus(0).transpose() << std::endl;
+         IoTools::Formatter::printCentered(prof_out.file(), "Second data exchange", '-');
+         prof_out.file() << FrameworkMacro::transformCpus(1).transpose() << std::endl;
 
-      // Output the timinigs
-      std::stringstream oss;
-      int base = 27;
-      for(int i = 0; i < static_cast<int>(ProfilerMacro::NBREAKPOINT); i++)
-      {
-         // Only print timing if actually used
-         if(ts(i) > 0.0)
+         int digits = 3;
+
+         // Create nice looking ouput header
+         IoTools::Formatter::printNewline(prof_out.file());
+         IoTools::Formatter::printLine(prof_out.file(), '%');
+         IoTools::Formatter::printCentered(prof_out.file(), "Profiling information", '%');
+         IoTools::Formatter::printLine(prof_out.file(), '%');
+
+         // Output the timinigs
+         std::stringstream oss;
+         int base = 27;
+         for(int i = 0; i < static_cast<int>(ProfilerMacro::NBREAKPOINT); i++)
          {
-            oss << ProfilerMacro::pointName(static_cast<ProfilerMacro::BreakPoint>(i)) << ": " << std::fixed << std::setprecision(digits) << ts(i) << " s";
-            IoTools::Formatter::printCentered(prof_out.file(), oss.str(), ' ', base);
-            oss.str("");
+            // Only print timing if actually used
+            if(ts(i) > 0.0)
+            {
+               oss << ProfilerMacro::pointName(static_cast<ProfilerMacro::BreakPoint>(i)) << ": " << std::fixed << std::setprecision(digits) << ts(i) << " s";
+               IoTools::Formatter::printCentered(prof_out.file(), oss.str(), ' ', base);
+               oss.str("");
+            }
          }
-      }
 
-      IoTools::Formatter::printLine(prof_out.file(), '%');
-      IoTools::Formatter::printNewline(prof_out.file());
+         IoTools::Formatter::printLine(prof_out.file(), '%');
+         IoTools::Formatter::printNewline(prof_out.file());
 
-      prof_out.finalizeDebug();
-      #endif //GEOMHDISCC_PERCORE_PROFILING
+         prof_out.finalizeDebug();
+      #endif //GEOMHDISCC_PROFILE_PERCORE
    }
 
    void ProfilerTools::printInfo()
    {
-      #ifdef GEOMHDISCC_PERCORE_PROFILING
-      ProfilerTools::writeTimings();
-      #endif //GEOMHDISCC_PERCORE_PROFILING
+      #ifdef GEOMHDISCC_PROFILE_PERCORE
+         ProfilerTools::writeTimings();
+      #endif //GEOMHDISCC_PROFILE_PERCORE
 
       // Analyze the data
       Array ts;
