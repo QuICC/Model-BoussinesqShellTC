@@ -54,6 +54,13 @@ namespace Debug {
          static void stop(ProfilerBase::BreakPoint point);
 
          /**
+          * @brief Get the measured times among whole framework
+          *
+          * @param ts   Timings for the breakpoints
+          */
+         static void getTimings(Array& ts);
+
+         /**
           * @brief Analyze the measured times among whole framework
           *
           * @param ts   Timings for the breakpoints

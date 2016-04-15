@@ -68,13 +68,18 @@ namespace Debug {
       ProfilerBase::update(point, t_stops.at(point)-t_starts.at(point));
    }
 
-   void MpiProfiler::analyze(Array& ts, Array& min, Array& max)
+   void MpiProfiler::getTimings(Array& ts)
    {
       ts.resize(static_cast<int>(ProfilerBase::NBREAKPOINT));
       for(int i = 0; i < ts.size(); ++i)
       {
          ts(i) = ProfilerBase::time(static_cast<ProfilerBase::BreakPoint>(i));
       }
+   }
+
+   void MpiProfiler::analyze(Array& ts, Array& min, Array& max)
+   {
+      MpiProfiler::getTimings(ts);
 
       // Resize the storage
       min.resize(ts.size());
