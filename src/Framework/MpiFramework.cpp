@@ -113,21 +113,26 @@ namespace GeoMHDiSCC {
       MPI_Group_free(&world);
 
       // Check newly created communicator
-      for(int i = 0; i < MpiFramework::mTransformCpus.back().size(); ++i)
+      MpiFramework::checkTransformComm(MpiFramework::mTransformComms.size()-1);
+   }
+
+   void MpiFramework::checkTransformComm(const int traId)
+   {
+      for(int i = 0; i < MpiFramework::transformCpus(traId).size(); ++i)
       {
          int rank = -1;
-         if(MpiFramework::mTransformCpus.back()(i) == MpiFramework::id())
+         if(MpiFramework::transformCpus(traId)(i) == MpiFramework::id())
          {
             rank = MpiFramework::id();
 
-            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::mTransformComms.back());
+            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::transformComm(traId));
 
          } else
          {
-            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::mTransformComms.back());
+            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::transformComm(traId));
          }
 
-         if(rank != MpiFramework::mTransformCpus.back()(i))
+         if(rank != MpiFramework::transformCpus(traId)(i))
          {
             MpiFramework::abort(111);
          }

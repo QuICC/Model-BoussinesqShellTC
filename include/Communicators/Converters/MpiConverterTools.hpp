@@ -718,6 +718,9 @@ namespace Parallel {
       // MPI error code
       int ierr;
 
+      // Number of coordinates
+      int nCoords = -1;
+
       //
       // Create the list of remote indexes
       //
@@ -727,13 +730,13 @@ namespace Parallel {
       if(cpuId == FrameworkMacro::transformId(fwdDim))
       {
          // Loop over middle data dimension
-         for(int j=0; j < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(); ++j)
+         for(int j = 0; j < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
             // Extract "physical" index of middle data dimension
             j_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j);
 
             // Loop over forward data dimension
-            for(int i=0; i < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(); ++i)
+            for(int i = 0; i < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(); ++i)
             {
                // Extract "physical" index of forward data dimension
                i_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i);
@@ -748,18 +751,18 @@ namespace Parallel {
 
          // Convert remote keys to matrix to send through MPI
          matRemote.resize(2, remoteKeys.size());
-         int i = 0; 
+         int col = 0; 
          for(std::set<Coordinate>::iterator it = remoteKeys.begin(); it != remoteKeys.end(); ++it)
          {
-            matRemote(0,i) = it->first;
-            matRemote(1,i) = it->second;
-            i++;
+            matRemote(0,col) = it->first;
+            matRemote(1,col) = it->second;
+            col++;
          }
 
          // Broadcast size
-         i = remoteKeys.size();
+         nCoords = remoteKeys.size();
          FrameworkMacro::syncTransform(fwdDim);
-         ierr = MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
+         ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 961);
 
          // Broadcast data
@@ -771,7 +774,6 @@ namespace Parallel {
       } else
       {
          // Get size
-         int nCoords;
          FrameworkMacro::syncTransform(fwdDim);
          ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
          FrameworkMacro::check(ierr, 963);

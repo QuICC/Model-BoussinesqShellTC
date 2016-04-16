@@ -116,6 +116,11 @@ namespace GeoMHDiSCC {
          static void setSubComm(const SubCommId id, const int idx, const std::set<int>& ranks);
 
          /**
+          * @brief Check transform MPI communiator
+          */
+         static void checkTransformComm(const int traId);
+
+         /**
           * @brief Sleep MPI process for given number of seconds
           */
          static void sleep(const MHDFloat seconds);
