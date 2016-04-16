@@ -73,6 +73,11 @@ namespace Parallel {
          TData* at(const int id);
 
          /**
+          * @brief Get zero positions for sub buffer
+          */
+         int* zero();
+
+         /**
           * @brief Get current position in sub buffer
           */
          int& pos(const int id);
@@ -214,6 +219,11 @@ namespace Parallel {
    template <typename TData> inline TData* CommunicationBuffer<TData>::data()
    {
       return this->mData;
+   }
+
+   template <typename TData> inline int* CommunicationBuffer<TData>::zero()
+   {
+      return &this->mZero[0];
    }
 
    template <typename TData> inline TData* CommunicationBuffer<TData>::at(const int id)

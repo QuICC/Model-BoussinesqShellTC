@@ -101,7 +101,7 @@ endif(mpiTest)
 
 
 ###################################################
-#------------- DATA PACKING FOR MPI --------------#
+#--------------- MPI DATA PACKING ----------------#
 ###################################################
 
 if(GEOMHDISCC_MPI)
@@ -115,6 +115,24 @@ if(GEOMHDISCC_MPI)
    if(mpipackTest)
       geomhdiscc_add_definition(GEOMHDISCC_MPIPACK)
    endif(mpipackTest)
+endif(GEOMHDISCC_MPI)
+
+
+###################################################
+#--------------- MPI COMMUNICATION ---------------#
+###################################################
+
+if(GEOMHDISCC_MPI)
+   set(GEOMHDISCC_MPICOMMS "SendRecv" "AllToAll")
+   if(GEOMHDISCC_MPICOMM STREQUAL "")
+      set(GEOMHDISCC_MPICOMM "SendRecv")
+   endif(GEOMHDISCC_MPICOMM STREQUAL "")
+   mark_as_advanced(FORCE GEOMHDISCC_MPICOMM)
+   geomhdiscc_provide_choice(GEOMHDISCC_MPICOMMS "MPI communication" GEOMHDISCC_MPICOMM mpicommTest)
+
+   if(mpicommTest)
+      geomhdiscc_add_definition(GEOMHDISCC_MPICOMM)
+   endif(mpicommTest)
 endif(GEOMHDISCC_MPI)
 
 
