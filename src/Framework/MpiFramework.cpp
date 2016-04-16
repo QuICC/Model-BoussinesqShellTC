@@ -111,6 +111,27 @@ namespace GeoMHDiSCC {
 
       // Free world group
       MPI_Group_free(&world);
+
+      // Check newly created communicator
+      for(int i = 0; i < MpiFramework::mTransformCpus.back().size(); ++i)
+      {
+         int rank = -1;
+         if(MpiFramework::mTransformCpus.back()(i) == MpiFramework::id())
+         {
+            rank = MpiFramework::id();
+
+            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::mTransformComms.back());
+
+         } else
+         {
+            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::mTransformComms.back());
+         }
+
+         if(rank != MpiFramework::mTransformCpus.back()(i))
+         {
+            MpiFramework::abort(111);
+         }
+      }
    }
 
    void MpiFramework::syncTransform(const int traId)
