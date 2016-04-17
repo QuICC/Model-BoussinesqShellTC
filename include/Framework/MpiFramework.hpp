@@ -61,6 +61,11 @@ namespace GeoMHDiSCC {
          static void finalize();
 
          /**
+          * @brief Init transform MPI storage
+          */
+         static void initTransformComm(const int size);
+
+         /**
           * @brief Add CPU group IDs
           */
          static void addTransformComm(const ArrayI& ids);

@@ -73,6 +73,14 @@ namespace GeoMHDiSCC {
       MPI_Barrier(MPI_COMM_WORLD);
    }
 
+   void MpiFramework::initTransformComm(const int size)
+   {
+      MpiFramework::mTransformCpus.reserve(size);
+      MpiFramework::mTransformGroups.reserve(size);
+      MpiFramework::mTransformComms.reserve(size);
+      MpiFramework::mTransformIds.reserve(size);
+   }
+
    void MpiFramework::addTransformComm(const ArrayI& ids)
    {
       MpiFramework::mTransformCpus.push_back(ids);
@@ -82,30 +90,26 @@ namespace GeoMHDiSCC {
 
       // Get world group
       MPI_Group world;
-      MPI_Group group;
+      MpiFramework::mTransformGroups.push_back(MPI_Group());
       ierr = MPI_Comm_group(MPI_COMM_WORLD, &world);
       MpiFramework::check(ierr, 911);
 
       // Create sub group
       #if defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
-         ierr = MPI_Group_incl(world, ids.size(), const_cast<int*>(ids.data()), &group);
+         ierr = MPI_Group_incl(world, ids.size(), const_cast<int*>(ids.data()), &MpiFramework::mTransformGroups.back());
       #else
-         ierr = MPI_Group_incl(world, ids.size(), ids.data(), &group);
+         ierr = MPI_Group_incl(world, ids.size(), ids.data(), &MpiFramework::mTransformGroups.back());
       #endif //defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
       MpiFramework::check(ierr, 912);
 
       // Create communicator for sub group
-      MPI_Comm comm;
-      ierr = MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      MpiFramework::mTransformComms.push_back(MPI_Comm());
+      ierr = MPI_Comm_create(MPI_COMM_WORLD, MpiFramework::mTransformGroups.back(), &MpiFramework::mTransformComms.back());
       MpiFramework::check(ierr, 913);
-
-      MpiFramework::mTransformGroups.push_back(group);
-
-      MpiFramework::mTransformComms.push_back(comm);
 
       // Get rank in sub group
       int rank;
-      ierr = MPI_Comm_rank(comm, &rank);
+      ierr = MPI_Comm_rank(MpiFramework::mTransformComms.back(), &rank);
       MpiFramework::check(ierr, 914);
       MpiFramework::mTransformIds.push_back(rank);
 
