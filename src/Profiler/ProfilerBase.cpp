@@ -125,6 +125,8 @@ namespace Debug {
             return "Bwd 1D Solve D^-2 x = y";
          case FWD1DTRAFFT:
             return "Fwd 1D FFT";
+         case TSTEPMPI:
+            return "timestep MPI";
          default:
             return "Unknown break point";
       }
