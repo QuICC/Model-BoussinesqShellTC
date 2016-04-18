@@ -86,11 +86,6 @@ namespace GeoMHDiSCC {
          static const ArrayI& transformCpus(const int traId);
 
          /**
-          * @brief Get transform MPI group
-          */
-         static MPI_Group transformGroup(const int traId);
-
-         /**
           * @brief Get transform MPI comm
           */
          static MPI_Comm transformComm(const int traId);
@@ -152,11 +147,6 @@ namespace GeoMHDiSCC {
           * @brief IDs of the CPUs in transform communication groups
           */
          static std::vector<ArrayI> mTransformCpus;
-
-         /**
-          * @brief MPI groups of the CPUs in transform communication groups
-          */
-         static std::vector<MPI_Group> mTransformGroups;
 
          /**
           * @brief MPI communicators of the CPUs in transform communication groups
