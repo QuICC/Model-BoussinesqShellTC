@@ -117,10 +117,10 @@ namespace GeoMHDiSCC {
       MPI_Group_free(&world);
 
       // Check newly created communicator
-      MpiFramework::checkTransformComm(MpiFramework::mTransformComms.size()-1);
+      MpiFramework::checkTransformComm(MpiFramework::mTransformComms.size()-1, 111);
    }
 
-   void MpiFramework::checkTransformComm(const int traId)
+   void MpiFramework::checkTransformComm(const int traId, const int code)
    {
       for(int i = 0; i < MpiFramework::transformCpus(traId).size(); ++i)
       {
@@ -138,7 +138,7 @@ namespace GeoMHDiSCC {
 
          if(rank != MpiFramework::transformCpus(traId)(i))
          {
-            MpiFramework::abort(111);
+            MpiFramework::abort(code);
          }
       }
    }

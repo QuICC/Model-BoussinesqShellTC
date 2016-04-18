@@ -123,7 +123,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Check transform MPI communiator
           */
-         static void checkTransformComm(const int traId);
+         static void checkTransformComm(const int traId, const int code);
 
          /**
           * @brief Sleep MPI process for given number of seconds

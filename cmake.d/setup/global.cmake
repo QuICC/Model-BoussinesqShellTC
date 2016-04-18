@@ -82,6 +82,10 @@ endif(splinalgTest)
 #---- SPARSE SPD LINEAR ALGEBRA IMPLEMENTATION ---#
 ###################################################
 
+if(GEOMHDISCC_SPSPDLINALG STREQUAL "")
+   set(GEOMHDISCC_SPSPDLINALG "SimplicialLDLT")
+endif(GEOMHDISCC_SPSPDLINALG STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_SPSPDLINALG)
 geomhdiscc_provide_choice(GEOMHDISCC_SPSPDLINALGS "Sparse SPD linear algebra" GEOMHDISCC_SPSPDLINALG spspdlinalgTest)
 
 if(spspdlinalgTest)
@@ -93,6 +97,10 @@ endif(spspdlinalgTest)
 #---- SPARSE TRI LINEAR ALGEBRA IMPLEMENTATION ---#
 ###################################################
 
+if(GEOMHDISCC_SPTRILINALG STREQUAL "")
+   set(GEOMHDISCC_SPTRILINALG "SparseLU")
+endif(GEOMHDISCC_SPTRILINALG STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_SPTRILINALG)
 geomhdiscc_provide_choice(GEOMHDISCC_SPTRILINALGS "Sparse triangular linear algebra" GEOMHDISCC_SPTRILINALG sptrilinalgTest)
 
 if(sptrilinalgTest)
