@@ -109,6 +109,7 @@ namespace Parallel {
             SharedTransformResolution  spTRes = this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id, status);
 
             #ifdef GEOMHDISCC_MPI
+               FrameworkMacro::synchronize();
                MPI_Allreduce(MPI_IN_PLACE, &status, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
             #endif //GEOMHDISCC_MPI
 
@@ -468,28 +469,28 @@ namespace Parallel {
                   }
 
                   // Broadcast size
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   FrameworkMacro::check(ierr, 711);
-                  FrameworkMacro::synchronize();
 
                   // Broadcast data
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 712);
-                  FrameworkMacro::synchronize();
 
                // Remote CPU   
                } else
                {
                   // Get size
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   FrameworkMacro::check(ierr, 713);
-                  FrameworkMacro::synchronize();
 
                   // Get remote keys as matrix
                   matRemote.resize(2, toMatch);
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 714);
-                  FrameworkMacro::synchronize();
 
                   // Compare received data to stored indexes
                   for(int i = 0; i < toMatch; i++)
@@ -513,8 +514,6 @@ namespace Parallel {
                   }
                }
 
-               // Synchronize
-               FrameworkMacro::synchronize();
                #else
                }
                #endif // GEOMHDISCC_MPI
@@ -522,6 +521,7 @@ namespace Parallel {
 
             #ifdef GEOMHDISCC_MPI
                // Gather total number of match entries
+               FrameworkMacro::synchronize();
                ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
                FrameworkMacro::check(ierr, 715);
             #endif // GEOMHDISCC_MPI
@@ -552,36 +552,33 @@ namespace Parallel {
                      filterSize = locFilter.cols();
 
                      // Get size
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                      FrameworkMacro::check(ierr, 716);
-                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 717);
-                     FrameworkMacro::synchronize();
 
                   } else
                   {
                      // Get size
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                      FrameworkMacro::check(ierr, 718);
-                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 719);
-                     FrameworkMacro::synchronize();
 
                      for(int i = 0; i < filterSize; ++i)
                      {
                         filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
                      }
                   }
-
-                  // Synchronize
-                  FrameworkMacro::synchronize();
                }
             #endif // GEOMHDISCC_MPI
 
@@ -713,28 +710,28 @@ namespace Parallel {
                   }
 
                   // Broadcast size
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   FrameworkMacro::check(ierr, 720);
-                  FrameworkMacro::synchronize();
 
                   // Broadcast data
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 721);
-                  FrameworkMacro::synchronize();
 
                // Remote CPU   
                } else
                {
                   // Get size
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   FrameworkMacro::check(ierr, 722);
-                  FrameworkMacro::synchronize();
 
                   // Get remote keys as matrix
                   matRemote.resize(3, toMatch);
+                  FrameworkMacro::synchronize();
                   ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   FrameworkMacro::check(ierr, 723);
-                  FrameworkMacro::synchronize();
 
                   // Compare received data to stored indexes
                   for(int i = 0; i < toMatch; i++)
@@ -758,8 +755,6 @@ namespace Parallel {
                   }
                }
 
-               // Synchronize
-               FrameworkMacro::synchronize();
                #else
                }
                #endif // GEOMHDISCC_MPI
@@ -767,6 +762,7 @@ namespace Parallel {
 
             #ifdef GEOMHDISCC_MPI
                // Gather total number of match entries
+               FrameworkMacro::synchronize();
                ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
                FrameworkMacro::check(ierr, 724);
             #endif // GEOMHDISCC_MPI
@@ -797,36 +793,33 @@ namespace Parallel {
                      filterSize = locFilter.cols();
 
                      // Get size
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                      FrameworkMacro::check(ierr, 725);
-                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 726);
-                     FrameworkMacro::synchronize();
 
                   } else
                   {
                      // Get size
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                      FrameworkMacro::check(ierr, 727);
-                     FrameworkMacro::synchronize();
 
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
+                     FrameworkMacro::synchronize();
                      ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                      FrameworkMacro::check(ierr, 728);
-                     FrameworkMacro::synchronize();
 
                      for(int i = 0; i < filterSize; ++i)
                      {
                         filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
                      }
                   }
-
-                  // Synchronize
-                  FrameworkMacro::synchronize();
                }
             #endif // GEOMHDISCC_MPI
 
