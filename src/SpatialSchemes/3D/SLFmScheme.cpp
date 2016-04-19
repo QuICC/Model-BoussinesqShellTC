@@ -38,13 +38,11 @@ namespace Schemes {
       
       // Create spectral space sub communicators
       #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-         // Transform ID to use for parallelization
-         int traId = 0;
 
          // MPI error code
          int ierr;
 
-         // Initialise the ranks with local rank
+         // Extract modes available on local rank
          std::vector<std::set<int> >  ranks;
          ArrayI modes(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
          std::map<int, int>  mapModes;
@@ -61,7 +59,8 @@ namespace Schemes {
             }
          }
 
-         // Loop over all cpus
+         // Share modes information with CPUs in first transform group
+         int traId = 0;
          ArrayI tmp;
          for(int commCpu = 0; commCpu < FrameworkMacro::transformCpus(0).size(); ++commCpu)
          {
@@ -93,6 +92,7 @@ namespace Schemes {
                ierr = MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, commCpu, FrameworkMacro::transformComm(traId));
                FrameworkMacro::check(ierr, 820);
 
+               // Expand modes to rank map
                std::map<int,int>::iterator mapIt;
                for(int i = 0; i < iData(0); i++)
                {
@@ -108,6 +108,7 @@ namespace Schemes {
          // Synchronize
          FrameworkMacro::synchronize();
 
+         // Initialize storage for SPECTRAL sub communicators
          FrameworkMacro::initSubComm(FrameworkMacro::SPECTRAL, spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
 
          std::set<int>  subRanks;

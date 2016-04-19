@@ -299,7 +299,8 @@ namespace Eigen {
 
             // increase memory relaxation
             //m_id.icntl[14-1] = 700;
-            m_id.icntl[14-1] = 70;
+            m_id.icntl[14-1] = 150;
+            //m_id.icntl[14-1] = 70;
 
             // Set drop threshold
             //m_id.cntl[1-1] = 1.0;
