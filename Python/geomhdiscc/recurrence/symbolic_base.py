@@ -7,6 +7,7 @@ import sympy
 import copy
 
 class SymbolicBase:
+    """Base class to compute the symbolic recurrence relation"""
 
     def spectral_monomial(self, p, f, asrow = True):
         """This needs to be defined in polynomial specific implementation"""
@@ -19,6 +20,8 @@ class SymbolicBase:
         raise NotImplementedError("Integral operation not defined")
 
     def integrate(self, term, base = None):
+        """Compute a symbolic integration by parts"""
+
         # Some assertion for safety
         assert (term['q'] >= 0)
         assert (term['p'] >= 0)
@@ -39,9 +42,12 @@ class SymbolicBase:
             if term['p'] - 1 >= 0:
                 t = {'q':term['q'], 'p':term['p'] - 1, 'd':term['d'] - 1, 'c':-term['p']*term['c']}
                 base = self.integrate(t, base)
+
         return base
 
     def spectral_intgxmult(self, q, p, f, finish = True):
+        """Symbolic integration and multiplication by monomial"""
+
         # Some assertion for safety
         assert (q >= 0)
         assert (p >= 0)
@@ -56,6 +62,8 @@ class SymbolicBase:
         return recurrence
 
     def build_recurrence(self, terms, fs, finish = True):
+        """Recursively build the full recurrence relation"""
+
         ops = dict();
 
         # Integrate and sum all terms
@@ -74,4 +82,5 @@ class SymbolicBase:
 
         for i in recurrence.keys():
             recurrence[i] = recurrence[i].simplify().factor()
+
         return recurrence
