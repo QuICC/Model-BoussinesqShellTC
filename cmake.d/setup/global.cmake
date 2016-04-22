@@ -120,6 +120,22 @@ endif(largeioTest)
 
 
 ###################################################
+#-------------- HDF5 COMPLEX FORMAT --------------#
+###################################################
+
+set(GEOMHDISCC_HDF5_CMPLXS "Array" "Struct")
+if(GEOMHDISCC_HDF5_CMPLX STREQUAL "")
+   set(GEOMHDISCC_HDF5_CMPLX "Array")
+endif(GEOMHDISCC_HDF5_CMPLX STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_HDF5_CMPLX)
+geomhdiscc_provide_choice(GEOMHDISCC_HDF5_CMPLXS "HDF5 complex format" GEOMHDISCC_HDF5_CMPLX h5cmplxTest)
+
+if(h5cmplxTest)
+   geomhdiscc_add_definition(GEOMHDISCC_HDF5_CMPLX)
+endif(h5cmplxTest)
+
+
+###################################################
 #--------------- MPI IMPLEMENTATION --------------#
 ###################################################
 

@@ -127,6 +127,12 @@ namespace Debug {
             return "Fwd 1D FFT";
          case TSTEPMPI:
             return "timestep MPI";
+
+         // Below this line are the unspecific probing break points
+         case PROBEA:
+            return "proble A";
+
+         // Default output for unknown break point
          default:
             return "Unknown break point";
       }

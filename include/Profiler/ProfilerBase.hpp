@@ -79,6 +79,8 @@ namespace Debug {
             BWD1DTRADIFF2,
             FWD1DTRAFFT,
             TSTEPMPI,
+            // Unspecific probes
+            PROBEA,
             // Break point bounding value
             #ifdef GEOMHDISCC_PROFILER_DETAILED
             NBREAKPOINT
