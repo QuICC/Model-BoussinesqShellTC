@@ -85,7 +85,7 @@ namespace GeoMHDiSCC {
    void BoussinesqDynamo3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;
@@ -136,17 +136,17 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add streamfunction initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add vertical velocity initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
@@ -203,12 +203,24 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
+      // Add background temperature profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::BX);
+
+      // Add background temperature profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::BY);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::BX);
+      spOut->expect(PhysicalNames::BY);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -222,6 +234,8 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::STREAMFUNCTION);
       spIn->expect(PhysicalNames::VELOCITYZ);
       spIn->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spIn->expect(PhysicalNames::BX);
+      spIn->expect(PhysicalNames::BY);
 
       // Set simulation state
       spVis->setInitialState(spIn);

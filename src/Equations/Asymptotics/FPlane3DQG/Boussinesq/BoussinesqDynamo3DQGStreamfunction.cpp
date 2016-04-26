@@ -55,8 +55,7 @@ namespace Equations {
       ///
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
       
-      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix())   
-      ;
+      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix());
    }
 
    void BoussinesqDynamo3DQGStreamfunction::setRequirements()

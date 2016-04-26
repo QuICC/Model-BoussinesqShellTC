@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqDynamo3DQGfbz::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 1, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, true);
    }
 
    void BoussinesqDynamo3DQGfbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

@@ -40,8 +40,8 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by","")]:
-            fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by","")]
+        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature","")]:
+            fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         else:
             fields = [field_row]
@@ -407,6 +407,22 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         elif field_row == ("by",""):
             mat = geo.i2(res[0], bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+
+        if field_row == ("temperature","") and field_col == field_row:
+            mat = geo.zblk(res[0], bc, location = 'b')
+        else:
+            mat = geo.zblk(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
