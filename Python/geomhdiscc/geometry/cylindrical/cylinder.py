@@ -31,98 +31,98 @@ def convert_bc(bc):
 
     return (bcr, bcz)
 
-def r1d1(nr, nz, parity, bc, coeff = 1.0, sr = 1, sz = 0):
+def r1d1(nr, nz, parity, bc, coeff = 1.0, sr = 1, sz = 0, restriction = None):
     """Create a r1d1 in R kronecker with an identity in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), rad.r1d1(nr, parity, bcr, zr = sr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, sr, sz, bc, location = 'b')
 
-def r1div(nr, nz, parity, bc, coeff = 1.0, sr = 1, sz = 0):
+def r1div(nr, nz, parity, bc, coeff = 1.0, sr = 1, sz = 0, restriction = None):
     """Create a xdiv in R kronecker with an identity in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), rad.r1div(nr, parity, bcr, zr = sr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, sr, sz, bc, location = 'b')
 
-def r1e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0, sr = 0, sz = 1):
+def r1e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0, sr = 0, sz = 1, restriction = None):
     """Create operator for x in R and 1st derivative in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.d1(nz, bcz, cscale = zscale, zr = sz), rad.r1(nr, parity, bcr, zr = sr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, sr, sz, bc, location = 'b')
 
-def r2e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0, sr = 0, sz = 1):
+def r2e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0, sr = 0, sz = 1, restriction = None):
     """Create operator for r^2 in R and 1st derivative in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.d1(nz, bcz, cscale = zscale, zr = sz), rad.r2(nr, parity, bcr, zr = sr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, sr, sz, bc, location = 'b')
 
-def zblk(nr, nz, parity, qr, qz, bc):
+def zblk(nr, nz, parity, qr, qz, bc, restriction = None):
     """Create a block of zeros"""
 
     bcr, bcz = convert_bc(bc)
     mat = spsp.kron(c1d.zblk(nz,bcz),rad.zblk(nr,parity,bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, qr, qz, bc)
 
-def i1j1(nr, nz, parity, bc, coeff = 1.0):
+def i1j1(nr, nz, parity, bc, coeff = 1.0, restriction = None):
     """Create a i1 in R kronecker with i1 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i1(nz, bcz), rad.i1(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 0, 1, bc)
 
-def i1j1r1d1(nr, nz, parity, bc, coeff = 1.0):
+def i1j1r1d1(nr, nz, parity, bc, coeff = 1.0, restriction = None):
     """Create a i1r1d1 in R kronecker with i1 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i1(nz, bcz), rad.i1r1d1(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 0, 1, bc)
 
-def i1j1r1div(nr, nz, parity, bc, coeff = 1.0):
+def i1j1r1div(nr, nz, parity, bc, coeff = 1.0, restriction = None):
     """Create a i1r1div in R kronecker with i1 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i1(nz, bcz), rad.i1r1div(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 0, 1, bc)
 
-def i1j1r1e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0):
+def i1j1r1e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     """Create a i1r1 in R kronecker with i1d1 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i1d1(nz, bcz, cscale = zscale), rad.i1r1(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 0, 1, bc)
 
-def i1j1r2e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0):
+def i1j1r2e1(nr, nz, parity, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     """Create a i1r2 in R kronecker with i1d1 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i1d1(nz, bcz, cscale = zscale), rad.i1r2(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 0, 1, bc)
 
-def i2j2(nr, nz, parity, bc, coeff = 1.0):
+def i2j2(nr, nz, parity, bc, coeff = 1.0, restriction = None):
     """Create a i2 in R kronecker with i2 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(nz, bcz), rad.i2(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 1, 2, bc)
 
-def i2j2r1(nr, nz, parity, bc, coeff = 1.0):
+def i2j2r1(nr, nz, parity, bc, coeff = 1.0, restriction = None):
     """Create a i2r1 in R kronecker with i2 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(nz, bcz), rad.i2r1(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 1, 2, bc)
 
-def i2j2r2(nr, nz, parity, bc, coeff = 1.0):
+def i2j2r2(nr, nz, parity, bc, coeff = 1.0, restriction = None):
     """Create a i2r2 in R kronecker with i2 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2r2(nr, parity, bcr), format ='coo')
     return cylbc.constrain(mat, nr, nz, parity, 1, 2, bc)
 
-def i2j2r3(nr, nz, parity, bc, coeff = 1.0):
+def i2j2r3(nr, nz, parity, bc, coeff = 1.0, restriction = None):
     """Create a i2r2 in R kronecker with i2 in Z"""
 
     bcr, bcz = convert_bc(bc)

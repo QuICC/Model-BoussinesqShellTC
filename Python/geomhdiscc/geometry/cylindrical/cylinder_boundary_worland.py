@@ -8,6 +8,7 @@ import scipy.sparse as spsp
 
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary_worland as radbc
+import geomhdiscc.base.utils as utils
 
 
 def no_bc():
@@ -61,7 +62,7 @@ def bzid(n, q, d, bc, location = 't'):
 
     return c1dbc.constrain(mat,tbc)
 
-def constrain(mat, nr, nz, m, qr, qz, bc, location = 't'):
+def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
     """Contrain the matrix with the Tau boundary condition"""
 
     priority = bc.get('priority', 'r')
@@ -89,11 +90,17 @@ def constrain(mat, nr, nz, m, qr, qz, bc, location = 't'):
     if bc['r'][0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
         bcMat = radbc.constrain(bcMat, m, bc['r'], location = location)
-        bc_mat = bc_mat + spsp.kron(bzid(nz, sz, 0, bc['z'], location = location), bcMat, format = 'coo')
+        if bc['r'].get('kron',0) == 0 or bc['r']['kron'] == "id":
+            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location), bcMat, restriction = restriction)
+        else:
+            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location)*bc['r']['kron'](nz, c1dbc.no_bc()), bcMat, restriction = restriction)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
-        bc_mat = bc_mat + spsp.kron(bcMat, brid(nr, m, sr, 0, bc['r'], location = location), format = 'coo')
+        if bc['z'].get('kron',0) == 0 or bc['z']['kron'] == "id":
+            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location), restriction = restriction)
+        else:
+            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location)*bc['z']['kron'](nr, m, radbc.no_bc()), restriction = restriction)
 
     return bc_mat

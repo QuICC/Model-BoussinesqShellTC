@@ -119,12 +119,12 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
                         bc = {'r':{0:27}, 'z':{0:20}, 'priority':'r'}
-                    if field_row == ("velocity","tor") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
                         bc = {'r':{0:17}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
                         bc = {'r':{0:38}, 'z':{0:40}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        bc = {'r':{0:18}, 'z':{0:00}, 'priority':'r'}
+                        bc = {'r':{0:18}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
 
@@ -141,11 +141,11 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r']['rt'] = 1
+                    bc['r']['rt'] = 2
                     bc['z']['rt'] = 2
                 elif field_row == ("velocity","pol"):
-                    bc['r']['rt'] = 1
-                    bc['z']['rt'] = 2
+                    bc['r']['rt'] = 3
+                    bc['z']['rt'] = 4
                 elif field_row == ("temperature",""):
                     bc['r']['rt'] = 1
                     bc['z']['rt'] = 2
@@ -241,7 +241,10 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
+                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
+                    mat = geo.i2laplhj2(res[0], res[2], m, bc)
+                else:
+                    mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = geo.i2j2lapl(res[0], res[2], m, bc, 1.0/Pr, zscale = zscale)
