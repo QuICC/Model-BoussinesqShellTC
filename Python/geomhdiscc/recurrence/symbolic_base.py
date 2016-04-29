@@ -9,6 +9,9 @@ import copy
 class SymbolicBase:
     """Base class to compute the symbolic recurrence relation"""
 
+    # Use SymPy simplify before factor
+    useSimplify = False
+
     def spectral_monomial(self, p, f, asrow = True):
         """This needs to be defined in polynomial specific implementation"""
 
@@ -81,6 +84,9 @@ class SymbolicBase:
                     recurrence[i] = recurrence.get(i,0) + ops[tup]*rec[i]
 
         for i in recurrence.keys():
-            recurrence[i] = recurrence[i].simplify().factor()
+            if self.useSimplify:
+                recurrence[i] = recurrence[i].simplify().factor()
+            else:
+                recurrence[i] = recurrence[i].factor()
 
         return recurrence

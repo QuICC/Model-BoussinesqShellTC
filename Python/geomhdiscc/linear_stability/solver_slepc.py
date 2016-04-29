@@ -59,7 +59,7 @@ class GEVPSolver:
             opts['rg_type'] = 'ellipse'
             opts['rg_ellipse_center'] = 0
             opts['rg_ellipse_radius'] = self.ellipse_radius
-            opts['rg_ellipse_vscale'] = 1e-4
+            opts['rg_ellipse_vscale'] = 1.0
 
         self.E = SLEPc.EPS()
         self.E.create()

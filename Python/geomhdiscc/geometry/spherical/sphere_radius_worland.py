@@ -1,4 +1,4 @@
-"""Module provides functions to generate sparse operators for the radial direction in a sphere using r^ P_n^{-1/2,l - 1/2}(2r^2 -1)."""
+"""Module provides functions to generate sparse operators for the radial direction in a sphere using r^m P_n^{-1/2,l - 1/2}(2r^2 -1)."""
 
 from __future__ import division
 from __future__ import unicode_literals
