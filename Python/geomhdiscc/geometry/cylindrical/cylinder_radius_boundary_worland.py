@@ -213,27 +213,41 @@ def worland_divrdiffr(nr, l):
 
     return val
 
-def worland_laplh_cyl(nr, l):
+def worland_laplh_cyl(nr, m):
     """Compute the horizontal laplacian in a cylinder at endpoint for Worland polynomials"""
 
     val = np.zeros(nr)
     if nr > 0:
-        val[2:] = 4.0*(l+np.arange(2,nr)+1)*(l+np.arange(2,nr))*worland_value(nr-2, l+2, 2)
-        val[1:] += 4.0*(l+1.0)*(l+np.arange(1,nr))*worland_value(nr-1, l+1, 1)
+        val[2:] = 4.0*(m+np.arange(2,nr)+1)*(m+np.arange(2,nr))*worland_value(nr-2, m+2, 2)
+        val[1:] += 4.0*(m+1.0)*(m+np.arange(1,nr))*worland_value(nr-1, m+1, 1)
 
     return val
 
-def worland_lapl2_cyl(nr, l):
+def worland_dlaplh_cyl(nr, m):
+    """Compute the radial derivative of bilaplacian in a cylinder at endpoint for Worland polynomials"""
+
+    val = np.zeros(nr)
+    if nr > 0:
+        val[3:] = 8.0*(m+np.arange(3,nr)+2)*(m+np.arange(3,nr)+1)*(m+np.arange(3,nr))*worland_value(nr-3, m+3, 3)
+        val[2:] += 4.0*(3.0*m + 4.0)*(m+np.arange(2,nr)+1)*(m+np.arange(2,nr))*worland_value(nr-2, m+2, 2)
+        if m > 0:
+            val[1:] += 2.0*m*(3*m+2.0)*(m+np.arange(1,nr))*worland_value(nr-1, m+1, 1)
+        if m > 0:
+            val += m**2*(m-2.0)*worland_value(nr, m, 0)
+
+    return val
+
+def worland_lapl2_cyl(nr, m):
     """Compute the bilaplacian in a cylinder at endpoint for Worland polynomials"""
 
     val = np.zeros(nr)
     if nr > 0:
-        val[4:] = 16.0*(l+np.arange(4,nr)+3)*(l+np.arange(4,nr)+2)*(l+np.arange(4,nr)+1)*(l+np.arange(4,nr))*worland_value(nr-4, l+4, 4)
-        val[3:] += 32.0*(l + 2.0)*(l+np.arange(3,nr)+2)*(l+np.arange(3,nr)+1)*(l+np.arange(3,nr))*worland_value(nr-3, l+3, 3)
-        val[2:] += 4.0*(5.0*l**2 + 12.0*l + 8.0)*(l+np.arange(2,nr)+1)*(l+np.arange(2,nr))*worland_value(nr-2, l+2, 2)
-        if l > 1:
-            val[1:] += 4.0*l**2*(l-1.0)*(l+np.arange(1,nr))*worland_value(nr-1, l+1, 1)
-            val += -4.0*l**2*(l-1.0)*worland_value(nr, l, 0)
+        val[4:] = 16.0*(m+np.arange(4,nr)+3)*(m+np.arange(4,nr)+2)*(m+np.arange(4,nr)+1)*(m+np.arange(4,nr))*worland_value(nr-4, m+4, 4)
+        val[3:] += 32.0*(m + 2.0)*(m+np.arange(3,nr)+2)*(m+np.arange(3,nr)+1)*(m+np.arange(3,nr))*worland_value(nr-3, m+3, 3)
+        val[2:] += 4.0*(5.0*m**2 + 12.0*m + 8.0)*(m+np.arange(2,nr)+1)*(m+np.arange(2,nr))*worland_value(nr-2, m+2, 2)
+        if m > 1:
+            val[1:] += 4.0*m**2*(m-1.0)*(m+np.arange(1,nr))*worland_value(nr-1, m+1, 1)
+            val += -4.0*m**2*(m-1.0)*worland_value(nr, m, 0)
 
     return val
 
@@ -326,10 +340,11 @@ def tau_value_diff(nr, m, coeffs = None):
 def tau_noslip_tor_tor(nr, m, coeffs = None):
     """Create the no-slip tau line(s) for toroidal component on toroidal"""
 
-    assert(coeffs is None)
+    assert(coeffs is not None)
+    c = coeffs
 
     cond = []
-    cond.append(worland_diff(nr,m))
+    cond.append(c*worland_dlaplh_cyl(nr,m))
     cond.append(worland_diff(nr,m))
 
     return np.array(cond)
@@ -366,10 +381,11 @@ def tau_value_diff_diff2(nr, m, coeffs = None):
 def tau_noslip_pol_pol(nr, m, coeffs = None):
     """Create the no penetration and no-slip tau line(s) for poloidal component on poloidal"""
 
-    assert(coeffs is None)
+    assert(coeffs is not None)
+    c = coeffs
 
     cond = []
-    cond.append(worland_diff(nr,m))
+    cond.append(c*worland_diff(nr,m))
     cond.append(worland_value(nr,m))
     cond.append(worland_laplh_cyl(nr,m))
 

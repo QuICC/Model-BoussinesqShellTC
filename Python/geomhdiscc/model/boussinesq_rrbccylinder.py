@@ -23,7 +23,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "scale3d"]
+        return ["taylor", "prandtl", "rayleigh", "gamma"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -107,6 +107,8 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             m = eigs[0]
+            Ra = eq_params['rayleigh']
+            zscale = 2
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -118,13 +120,15 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:27}, 'z':{0:20}, 'priority':'r'}
+                        bc = {'r':{0:27, 'c':zscale, 'kron':'id'}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
-                        bc = {'r':{0:17}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:17, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
+                    elif field_row == ("velocity","tor") and field_col == ("temperature",""):
+                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:38}, 'z':{0:40}, 'priority':'r'}
+                        bc = {'r':{0:38, 'c':zscale, 'kron':'id'}, 'z':{0:40}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        bc = {'r':{0:18}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:18, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
 
@@ -137,6 +141,8 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                 else:
                     if field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
+                    elif field_row == ("velocity","tor") and field_col == ("temperature",""):
+                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -209,10 +215,11 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         Ta = eq_params['taylor']
+        G = eq_params['gamma']
         T = Ta**0.5
         m = eigs[0]
 
-        zscale = eq_params['scale3d']
+        zscale = 2.0
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -234,7 +241,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                 mat = geo.i6j4lapl3(res[0], res[2], m, bc, zscale = zscale)
 
             elif field_col == ("temperature",""):
-                mat = geo.i6laplhj4(res[0], res[2], m, bc)
+                mat = geo.i6laplhj4(res[0], res[2], m, bc, -Ra)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -242,12 +249,12 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
             elif field_col == ("velocity","pol"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
-                    mat = geo.i2laplhj2(res[0], res[2], m, bc)
+                    mat = geo.i2laplhj2(res[0], res[2], m, bc, -1.0)
                 else:
                     mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2lapl(res[0], res[2], m, bc, 1.0/Pr, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[2], m, bc, 1.0, zscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -257,17 +264,18 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
+        Pr = eq_params['prandtl']
         m = eigs[0]
 
-        zscale = eq_params['scale3d']
+        zscale = 2.0
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i4laplhj2(res[0], res[2], m, bc, 1.0)
+            mat = geo.i4laplhj2(res[0], res[2], m, bc, 1.0/Pr)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i6j4lapl2(res[0], res[2], m, bc, 1.0, zscale = zscale)
+            mat = geo.i6j4lapl2(res[0], res[2], m, bc, 1.0/Pr, zscale = zscale)
 
         elif field_row == ("temperature",""):
             mat = geo.i2j2(res[0], res[2], m, bc)

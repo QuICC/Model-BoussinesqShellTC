@@ -54,7 +54,7 @@ def i2j2(nr, nz, m, bc, coeff = 1.0, restriction = None):
     mat = coeff*utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i2(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 1, 2, bc, restriction = restriction)
 
-def i2laplhj2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+def i2laplhj2(nr, nz, m, bc, coeff = 1.0, restriction = None):
     """Create a i2laph in R kronecker with i2 in Z"""
 
     bcr, bcz = convert_bc(bc)
