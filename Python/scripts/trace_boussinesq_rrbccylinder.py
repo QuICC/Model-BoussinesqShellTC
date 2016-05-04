@@ -16,7 +16,7 @@ bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 3 
-res = [64, 0, 64]
+res = [16, 0, 16]
 eq_params = {'taylor':(2e2)**2, 'prandtl':6.7, 'rayleigh':1.0e4, 'gamma':1.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 

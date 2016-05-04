@@ -115,6 +115,10 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
         import geomhdiscc.transform.annulus as transf
         nD = 2
 
+    elif geometry == "cylinder":
+        import geomhdiscc.transform.cylinder_worland as transf
+        nD = 2
+
     elif geometry == 'c3d':
         import geomhdiscc.transform.cartesian as transf
         nD = 3
@@ -179,6 +183,10 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
         res_1d = (res[0], a, b)
         res_2d = (res[-1],)
+
+    elif geometry == 'cylinder':
+        res_1d = (res[0],)
+        res_2d = (int(eigs[0]), res[-1])
 
     viz_res = res_1d + res_2d
 
