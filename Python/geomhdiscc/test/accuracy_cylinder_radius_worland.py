@@ -11,6 +11,7 @@ import scipy.special as special
 
 import geomhdiscc.transform.cylinder_worland as transf
 import geomhdiscc.geometry.cylindrical.cylinder_radius_worland as geo
+import geomhdiscc.geometry.worland.worland_basis as wb
 
 
 def x_to_phys(expr, grid):
@@ -24,14 +25,19 @@ def test_forward(op, m, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
 
     x = sy.Symbol('x')
-    lhs = transf.toworland(x_to_phys(res_expr,grid), m)
+    lhs = transf.torspec(x_to_phys(res_expr,grid), m, nr)
+    print("LHS:")
+    print(lhs.T)
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
-    sol = transf.toworland(t, m)
+    sol = transf.torspec(t, m, nr)
     print("solution:")
-    print(sol)
+    print(sol.T)
     print("computation:")
-    print(rhs)
+    print(rhs.T)
+    print("ratio:")
+    print(rhs.T/sol.T)
+    print(rhs[0:-2].T/sol[1:-1].T)
     print("-----------------------------------------")
     err = np.abs(rhs - sol)
     relerr = err/(1.0 + np.abs(sol))
@@ -64,10 +70,12 @@ def i2(nr, rg):
     for i in range(0,2):
         m = np.random.randint(1, nr-1)
         m = m + (m+i)%2
+        m = 3
         print("\tTest for m = " + str(m))
         A = geo.i2(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)])
-        ssol = sy.integrate(sphys,x,x)
+        #sphys = np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,1,2)])
+        sphys = x**m*wb.worland_norm(0,m)
+        ssol = 16*sy.integrate(sy.integrate(sphys*x**(1-m),x)*x,x)*x**m
         test_forward(A, m, sphys, ssol, rg, 1)
 
 def i2laplh(nr, rg):
@@ -195,9 +203,9 @@ def test_worland(nr, m):
     """Test Worland transform"""
 
     # Create physical space test function
-    t = transf.norm_worland(0, m, nr)
+    t = wb.worland_poly(0, m, nr)
     for i in range(1, nr-m):
-        t += np.random.ranf()*transf.norm_worland(i, m, nr)
+        t += np.random.ranf()*wb.worland_poly(i, m, nr)
     t = np.matrix(t).T
     
     # Compute spectral expansion
@@ -212,13 +220,13 @@ def test_worland(nr, m):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 120
-    rg = transf.rgrid(nr)
+    nr = 16
+    rg = wb.worland_grid(np.ceil(5*nr))
 
     # run tests
-    test_worland(nr, 110)
+#    test_worland(nr, 110)
 #    zblk(nr, rg)
-#    i2(nr, rg)
+    i2(nr, rg)
 #    i2laplh(nr, rg)
 #    i4(nr, rg)
 #    i4laplh(nr, rg)

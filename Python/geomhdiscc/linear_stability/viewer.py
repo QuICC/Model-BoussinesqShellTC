@@ -185,13 +185,13 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         res_2d = (res[-1],)
 
     elif geometry == 'cylinder':
-        res_1d = (res[0],)
-        res_2d = (int(eigs[0]), res[-1])
+        res_1d = (res[0], int(eigs[0]))
+        res_2d = (res[-1],)
 
     viz_res = res_1d + res_2d
 
     for k,f in specs.items():
-        sol_slice[k] = transf.toslice(f, res_1d[0], *res_2d) 
+        sol_slice[k] = transf.toslice(f, *viz_res) 
 
     if show or save:
         # Plot physical field as solution slice
@@ -217,7 +217,10 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
             saveProfileData(prof_fast, grid_fast, fid = pfid)
 
         # Plot profile extruded along periodic direction
-        grid_per = transf.grid_fast_per(*res_1d, m = np.ceil(eigs[0]))
+        if geometry == "cylinder":
+            grid_per = transf.grid_fast_per(*res_1d)
+        else:
+            grid_per = transf.grid_fast_per(*res_1d, m = np.ceil(eigs[0]))
         phi = eigs[0]*transf.eqgrid(np.ceil(eigs[0]))
         viewPeriodic(prof_fast, grid_per, phi, show = show, save = save, fid = pfid, max_cols = max_cols)
 

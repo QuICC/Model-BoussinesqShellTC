@@ -6,27 +6,24 @@ from __future__ import unicode_literals
 import scipy.fftpack as fftpack
 import numpy as np
 import scipy.special as sp
+import geomhdiscc.geometry.worland.worland_basis as wb
 
 min_r_points = 50
 min_th_points = 50
 min_z_points = 50
 
-def rgrid(nr):
+def nrgrid(nr):
+    return max(min_r_points, nr)
+
+def rgrid(nr, m):
     """Create the Chebyshev grid"""
 
-    return np.sqrt((np.cos(np.pi*(np.arange(0,2*nr)+0.5)/(2*nr)) + 1.0)/2.0)
-
-def norm_worland(n, m, nr):
-
-    rg = rgrid(nr)
-    norm = np.sqrt((2.0*n+m)*np.exp(-sp.gammaln(n+0.5) - sp.gammaln(n+m+0.5) + sp.gammaln(n+m) + sp.gammaln(n+1.0)))
-
-    return rg**m*sp.eval_jacobi(n, -0.5, m - 0.5, 2.0*rg**2 - 1.0)*norm
+    return wb.worland_grid(nrgrid(nr))
 
 def zgrid(nz):
     """Create the z Chebyshev grid"""
 
-    gN = max(min_r_points, nz)
+    gN = max(min_z_points, nz)
 
     return np.cos(np.pi*(np.arange(0,gN)+0.5)/gN)
 
@@ -42,7 +39,7 @@ grid_slow = zgrid
 def grid_2d(nr, m, nz):
     """Compute the 2D grid for the contours"""
 
-    r = rgrid(nr)
+    r = rgrid(nr, m)
     z = zgrid(nz)
     X, Y = np.meshgrid(r, z)
 
@@ -52,10 +49,19 @@ def grid_fast_per(nr, m):
     """Create 2D grid"""
 
     phi = eqgrid(m)
-    r = rgrid(nr)
+    r = rgrid(nr, m)
     rmesh, phimesh = np.meshgrid(r, phi)
     X = rmesh * np.cos(phimesh)
     Y = rmesh * np.sin(phimesh)
+
+    return (X, Y)
+
+def grid_slow_per(nz, m):
+    """Compute the 2D grid for the equatorial contours"""
+
+    z = zgrid(nz)
+    phi = eqgrid(m)
+    X, Y = np.meshgrid(z, phi)
 
     return (X, Y)
 
@@ -65,7 +71,7 @@ def torphys(spec, m, nr):
     mat = []
     n = spec.shape[0]
     for i in range(0, n):
-        mat.append(norm_worland(i,m, nr))
+        mat.append(wb.worland_poly(i, m, nrgrid(nr)))
     mat = np.array(mat)
 
     return mat.T*np.matrix(spec)
@@ -75,12 +81,12 @@ def torspec(phys, m, n):
 
     mat = []
     nr = phys.shape[0]/2
-    w = np.pi/(2.0*nr)
     for i in range(0, n):
-        mat.append(w*norm_worland(i, m, nr))
+        w = wb.worland_weight(i, nr)
+        mat.append(w*wb.worland_poly(i, m, nr))
     mat = np.matrix(mat)
 
-    return mat*phys
+    return mat*np.matrix(phys).reshape((phys.shape[0], 1))
 
 def tozphys(spec):
     """Transform Z spectral coefficients to physical values"""

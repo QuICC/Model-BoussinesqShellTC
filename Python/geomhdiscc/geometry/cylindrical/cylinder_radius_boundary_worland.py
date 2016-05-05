@@ -7,6 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
+import geomhdiscc.geometry.worland.worland_basis as wb 
 
 
 def no_bc():
@@ -113,144 +114,6 @@ def apply_tau(mat, m, bc, location = 't'):
 
     return mat
 
-def worland_value(nr, l, k = 0):
-    """Compute the endpoint value for Worland polynomials"""
-
-    val = np.zeros(nr)
-    val[0] = 1.0
-    if nr > 0:
-        for i in range(1,nr):
-            val[i] = val[i-1]*(2.0*i-1.0 + 2*k)/(2.0*i)
-
-    return val
-
-def worland_diff(nr, l):
-    """Compute the first derivative at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[1:] = 2.0*(l+np.arange(1,nr))*worland_value(nr-1, l+1, 1)
-        if l > 0:
-            val += l*worland_value(nr, l)
-
-    return val
-
-def worland_diff2(nr, l):
-    """Compute the second derivative at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[2:] = 4.0*(l+np.arange(2,nr)+1)*(l+np.arange(2,nr))*worland_value(nr-2, l+2, 2)
-        if l > 0:
-            val[1:] += (2.0*(l+np.arange(1,nr)) + 4.0*l*(l+np.arange(1,nr)))*worland_value(nr-1, l+1, 1)
-        else:
-            val[1:] += 2.0*(l+np.arange(1,nr))*worland_value(nr-1, l+1, 1)
-        if l > 1:
-            val += l*(l-1.0)*worland_value(nr, l, 0)
-
-    return val
-
-def worland_diff3(nr, l):
-    """Compute the third derivative at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[3:] = 8.0*(l+np.arange(3,nr)+2)*(l+np.arange(3,nr)+1)*(l+np.arange(3,nr))*worland_value(nr-3, l+3, 3)
-        val[2:] += 12.0*(l+np.arange(2,nr))*(l+np.arange(2,nr)+1.0)*(1.0 + l)*worland_value(nr-2, l+2, 2)
-        if l > 0:
-            val[1:] += 6.0*l*(l+np.arange(1,nr))*l*worland_value(nr-1, l+1, 1)
-        if l > 2:
-            val += (l-1.0)*(l-2.0)*l*worland_value(nr, l, 0)
-
-    return val
-
-def worland_diff4(nr, l):
-    """Compute the fourth derivative at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[4:] = 16.0*(l+np.arange(4,nr)+3)*(l+np.arange(4,nr)+2)*(l+np.arange(4,nr)+1)*(l+np.arange(4,nr))*worland_value(nr-4, l+4, 4)
-        val[3:] += 16.0*(2.0*l + 3.0)*(l+np.arange(3,nr))*(l+np.arange(3,nr)+1.0)*(l+np.arange(3,nr)+2.0)*worland_value(nr-3, l+3, 3)
-        val[2:] += 12.0*(2.0*l**2 + 2.0*l + 1.0)*(l+np.arange(2,nr))*(l+np.arange(2,nr)+1)*worland_value(nr-2, l+2, 2)
-        if l > 1:
-            val[1:] += 4.0*(l-1.0)*l*(2.0*l-1.0)*(l+np.arange(1,nr))*worland_value(nr-1, l, 1)
-        if l > 3:
-            val += l*(l-1.0)*(l-2.0)*(l-3.0)*worland_value(nr, l, 0)
-
-    return val
-
-def worland_rdiffdivr(nr, l):
-    """Compute the stress-free condition at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[1] = 1.0
-        for i in range(1,nr-1):
-            val[i+1] = val[i]*(2.0*i+1.0)/(2.0*i)
-        val = val*2.0*(l+np.arange(0,nr))
-        
-        if l > 0:
-            val += (l-1.0)*worland_value(nr, l)
-        else:
-            val -= worland_value(nr, l)
-
-    return val
-
-def worland_divrdiffr(nr, l):
-    """Compute the insulating magnetic condition at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[1] = 1.0
-        for i in range(1,nr-1):
-            val[i+1] = val[i]*(2.0*i+1.0)/(2.0*i)
-        val = val*2.0*(l+np.arange(0,nr))
-        
-        if l > 0:
-            val += (2.0*l+1.0)*worland_value(nr, l)
-        else:
-            val += 1.0*worland_value(nr, l)
-
-    return val
-
-def worland_laplh_cyl(nr, m):
-    """Compute the horizontal laplacian in a cylinder at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[2:] = 4.0*(m+np.arange(2,nr)+1)*(m+np.arange(2,nr))*worland_value(nr-2, m+2, 2)
-        val[1:] += 4.0*(m+1.0)*(m+np.arange(1,nr))*worland_value(nr-1, m+1, 1)
-
-    return val
-
-def worland_dlaplh_cyl(nr, m):
-    """Compute the radial derivative of bilaplacian in a cylinder at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[3:] = 8.0*(m+np.arange(3,nr)+2)*(m+np.arange(3,nr)+1)*(m+np.arange(3,nr))*worland_value(nr-3, m+3, 3)
-        val[2:] += 4.0*(3.0*m + 4.0)*(m+np.arange(2,nr)+1)*(m+np.arange(2,nr))*worland_value(nr-2, m+2, 2)
-        if m > 0:
-            val[1:] += 2.0*m*(3*m+2.0)*(m+np.arange(1,nr))*worland_value(nr-1, m+1, 1)
-        if m > 0:
-            val += m**2*(m-2.0)*worland_value(nr, m, 0)
-
-    return val
-
-def worland_lapl2_cyl(nr, m):
-    """Compute the bilaplacian in a cylinder at endpoint for Worland polynomials"""
-
-    val = np.zeros(nr)
-    if nr > 0:
-        val[4:] = 16.0*(m+np.arange(4,nr)+3)*(m+np.arange(4,nr)+2)*(m+np.arange(4,nr)+1)*(m+np.arange(4,nr))*worland_value(nr-4, m+4, 4)
-        val[3:] += 32.0*(m + 2.0)*(m+np.arange(3,nr)+2)*(m+np.arange(3,nr)+1)*(m+np.arange(3,nr))*worland_value(nr-3, m+3, 3)
-        val[2:] += 4.0*(5.0*m**2 + 12.0*m + 8.0)*(m+np.arange(2,nr)+1)*(m+np.arange(2,nr))*worland_value(nr-2, m+2, 2)
-        if m > 1:
-            val[1:] += 4.0*m**2*(m-1.0)*(m+np.arange(1,nr))*worland_value(nr-1, m+1, 1)
-            val += -4.0*m**2*(m-1.0)*worland_value(nr, m, 0)
-
-    return val
-
 def tau_value(nr, l, coeffs = None):
     """Create the boundary value tau line(s)"""
 
@@ -260,7 +123,7 @@ def tau_value(nr, l, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append(c*worland_value(nr, l))
+    cond.append(c*wb.worland_value(nr, l))
 
     return np.array(cond)
 
@@ -273,7 +136,7 @@ def tau_diff(nr, l, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append(c*worland_diff(nr,l))
+    cond.append(c*wb.worland_diff(nr,l))
 
     return np.array(cond)
 
@@ -286,7 +149,7 @@ def tau_diff2(nr, m, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append(c*worland_diff2(nr,m))
+    cond.append(c*wb.worland_diff2(nr,m))
 
     return np.array(cond)
 
@@ -299,7 +162,7 @@ def tau_rdiffdivr(nr, m, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append(c*worland_rdiffdivr(nr,m))
+    cond.append(c*wb.worland_rdiffdivr(nr,m))
 
     return np.array(cond)
 
@@ -309,7 +172,7 @@ def tau_noslip_tor_pol(nr, m, coeffs = None):
     assert(coeffs is None)
 
     cond = []
-    cond.append(-1j*m*worland_lapl2_cyl(nr,m))
+    cond.append(-1j*m*wb.worland_lapl2_cyl(nr,m))
 
     return np.array(cond)
 
@@ -319,7 +182,7 @@ def tau_noslip_pol_tor(nr, m, coeffs = None):
     assert(coeffs is None)
 
     cond = []
-    cond.append(1j*m*worland_value(nr,m))
+    cond.append(1j*m*wb.worland_value(nr,m))
 
     return np.array(cond)
 
@@ -332,8 +195,8 @@ def tau_value_diff(nr, m, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append(c*worland_value(nr,m))
-    cond.append(c*worland_diff(nr,m))
+    cond.append(c*wb.worland_value(nr,m))
+    cond.append(c*wb.worland_diff(nr,m))
 
     return np.array(cond)
 
@@ -344,8 +207,8 @@ def tau_noslip_tor_tor(nr, m, coeffs = None):
     c = coeffs
 
     cond = []
-    cond.append(c*worland_dlaplh_cyl(nr,m))
-    cond.append(worland_diff(nr,m))
+    cond.append(c*wb.worland_dlaplh_cyl(nr,m))
+    cond.append(wb.worland_diff(nr,m))
 
     return np.array(cond)
 
@@ -358,8 +221,8 @@ def tau_value_diff2(nr, m, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append(c*worland_value(nr,m))
-    cond.append(c*worland_diff2(nr,m))
+    cond.append(c*wb.worland_value(nr,m))
+    cond.append(c*wb.worland_diff2(nr,m))
 
     return np.array(cond)
 
@@ -372,9 +235,9 @@ def tau_value_diff_diff2(nr, m, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append(c*worland_value(nr,m))
-    cond.append(c*worland_diff(nr,m))
-    cond.append(c*worland_diff2(nr,m))
+    cond.append(c*wb.worland_value(nr,m))
+    cond.append(c*wb.worland_diff(nr,m))
+    cond.append(c*wb.worland_diff2(nr,m))
 
     return np.array(cond)
 
@@ -385,9 +248,9 @@ def tau_noslip_pol_pol(nr, m, coeffs = None):
     c = coeffs
 
     cond = []
-    cond.append(c*worland_diff(nr,m))
-    cond.append(worland_value(nr,m))
-    cond.append(worland_laplh_cyl(nr,m))
+    cond.append(c*wb.worland_diff(nr,m))
+    cond.append(wb.worland_value(nr,m))
+    cond.append(wb.worland_laplh_cyl(nr,m))
 
     return np.array(cond)
 

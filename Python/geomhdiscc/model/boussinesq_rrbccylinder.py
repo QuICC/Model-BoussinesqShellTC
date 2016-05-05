@@ -130,7 +130,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
                         bc = {'r':{0:18, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == field_row:
-                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'sz'}
 
             # Stress-free/No-slip, Fixed flux/Fixed temperature
             elif bcId == 2:
@@ -140,7 +140,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
                 else:
                     if field_row == ("temperature","") and field_col == field_row:
-                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'sz'}
                     elif field_row == ("velocity","tor") and field_col == ("temperature",""):
                         bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
             
