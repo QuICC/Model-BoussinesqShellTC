@@ -130,7 +130,11 @@ namespace Debug {
 
          // Below this line are the unspecific probing break points
          case PROBEA:
-            return "proble A";
+            return "probe A";
+         case PROBEB:
+            return "probe B";
+         case PROBEC:
+            return "probe C";
 
          // Default output for unknown break point
          default:

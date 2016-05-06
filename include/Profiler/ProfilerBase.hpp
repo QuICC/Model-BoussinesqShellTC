@@ -81,6 +81,8 @@ namespace Debug {
             TSTEPMPI,
             // Unspecific probes
             PROBEA,
+            PROBEB,
+            PROBEC,
             // Break point bounding value
             #ifdef GEOMHDISCC_PROFILER_DETAILED
             NBREAKPOINT

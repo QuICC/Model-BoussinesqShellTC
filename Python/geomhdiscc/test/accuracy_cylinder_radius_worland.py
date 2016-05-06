@@ -217,16 +217,51 @@ def test_worland(nr, m):
     # Print error for transform loop
     print(np.abs(st.T-t.T))
 
+def test_fft(n, m):
+    """Test Worland transform"""
+
+    nr = np.ceil(3.0*n/2. + 3.0*m/4.0 + 1.0)
+    # Create physical space test function
+    t = wb.worland_poly(0, m, nr)
+    for i in range(1, n):
+        t += np.random.ranf()*wb.worland_poly(i, m, nr)
+    t = np.matrix(t).T
+    
+    # Compute spectral expansion
+    s = transf.torspec(t, m, n)
+
+    # Project spectral expansion to physical space
+    st = transf.torphys(s, m, nr)
+
+    # Print error for transform loop
+    print(np.max(np.abs(st.T-t.T)))
+
+    import scipy.fftpack as fft
+    import scipy.linalg as linalg
+    cheb2worl  = []
+    for i in range(0, n):
+        cheb2worl.append(fft.dct(wb.worland_poly(i, m, nr))/(2*nr))
+    cheb2worl = np.matrix(cheb2worl)
+    f = fft.dct(t.T).T/(2*nr)
+    mat = cheb2worl[:,m//2:m//2+n].T
+    print(cheb2worl[:,16].T)
+    print(cheb2worl[:,17].T)
+    fs = linalg.solve_triangular(mat, f[m//2:m//2+n])
+
+    # Print error for FFT transform loop
+    print(np.max(np.abs(s.T-fs.T)))
+
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 16
+    nr = 32
     rg = wb.worland_grid(np.ceil(5*nr))
 
     # run tests
 #    test_worland(nr, 110)
+    test_fft(nr, 32)
 #    zblk(nr, rg)
-    i2(nr, rg)
+#    i2(nr, rg)
 #    i2laplh(nr, rg)
 #    i4(nr, rg)
 #    i4laplh(nr, rg)
