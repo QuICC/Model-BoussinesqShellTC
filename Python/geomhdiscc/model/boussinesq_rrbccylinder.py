@@ -120,15 +120,15 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:27, 'c':zscale, 'kron':'id'}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'r':{0:27, 'c':zscale, 'kron':'id'}, 'z':{0:20}, 'priority':'r'}
                     elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
-                        bc = {'r':{0:17, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:17, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("velocity","tor") and field_col == ("temperature",""):
-                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:38, 'c':zscale, 'kron':'id'}, 'z':{0:40}, 'priority':'z'}
+                        bc = {'r':{0:38, 'c':zscale, 'kron':'id'}, 'z':{0:40}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        bc = {'r':{0:18, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:18, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'sz'}
 
@@ -142,7 +142,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                     if field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:11}, 'z':{0:20}, 'priority':'sz'}
                     elif field_row == ("velocity","tor") and field_col == ("temperature",""):
-                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:

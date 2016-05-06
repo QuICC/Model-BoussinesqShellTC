@@ -9,7 +9,7 @@ import scipy.special as sp
 import geomhdiscc.geometry.worland.worland_basis as wb
 
 min_r_points = 50
-min_th_points = 50
+min_th_points = 200
 min_z_points = 50
 
 def nrgrid(nr):

@@ -15,9 +15,9 @@ bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # Create parameters
-m = 3 
+m = 1 
 res = [32, 0, 32]
-eq_params = {'taylor':(2e2)**2, 'prandtl':6.7, 'rayleigh':1.0e4, 'gamma':1.0}
+eq_params = {'taylor':0, 'prandtl':1.0, 'rayleigh':1.8e3, 'gamma':1.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)

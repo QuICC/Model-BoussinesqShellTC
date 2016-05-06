@@ -97,7 +97,7 @@ def i4j2lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     """Create a i4 in R kronecker with i2 in Z of the bilaplacian"""
 
     bcr, bcz = convert_bc(bc)
-    mat = coeff*utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i4lapl2h(nr, m, bcr), restriction = restriction)
+    mat = utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i4lapl2h(nr, m, bcr), restriction = restriction)
     bcr[0] = min(bcr[0], 0)
     bcz[0] = min(bcz[0], 0)
     mat = mat + utils.restricted_kron_2d(c1d.i2d2(nz, bcz, cscale = zscale), rad.i4laplh(nr, m, bcr), restriction = restriction)
@@ -129,7 +129,7 @@ def i6j4lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     """Create a i6 in R kronecker with i4 in Z of the bilaplacian"""
 
     bcr, bcz = convert_bc(bc)
-    mat = coeff*utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i6lapl2h(nr, m, bcr), restriction = restriction)
+    mat = utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i6lapl2h(nr, m, bcr), restriction = restriction)
     bcr[0] = min(bcr[0], 0)
     bcz[0] = min(bcz[0], 0)
     mat = mat + utils.restricted_kron_2d(c1d.i4d2(nz, bcz, cscale = zscale), rad.i6laplh(nr, m, bcr), restriction = restriction)
@@ -140,7 +140,7 @@ def i6j4lapl3(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     """Create a i6 in R kronecker with i4 in Z of the trilaplacian"""
 
     bcr, bcz = convert_bc(bc)
-    mat = coeff*utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i6lapl3h(nr, m, bcr), restriction = restriction)
+    mat = utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i6lapl3h(nr, m, bcr), restriction = restriction)
     bcr[0] = min(bcr[0], 0)
     bcz[0] = min(bcz[0], 0)
     mat = mat + utils.restricted_kron_2d(c1d.i4d2(nz, bcz, 2.0, cscale = zscale), rad.i6lapl2h(nr, m, bcr), restriction = restriction)
