@@ -90,6 +90,8 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_rdiffdivr(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 23:
         cond = tau_insulating(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 24:
+        cond = tau_couette(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
@@ -268,6 +270,15 @@ def tau_insulating(nr, pos, coeffs = None):
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
+
+def tau_couette(nr, pos, coeffs = None):
+    """Create the toroidal Couette boundray tau line(s)"""
+
+    assert(coeffs.get('c', None) is not None)
+    assert(coeffs.get('l', None) is not None)
+    assert(pos == 0)
+
+    return tau_value(nr, 0, None)
 
 def tau_value_diff(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
@@ -724,4 +735,33 @@ def alt_ones(nr, parity):
         return np.cumprod(-np.ones(nr))
     else:
         return -np.cumprod(-np.ones(nr))
+
+def apply_inhomogeneous(mat, bc, location = 't'):
+    """Add inhomogeneous conditions to the matrix"""
+
+    mat = mat.tolil()
+
+    if location == 't':
+        s = 0
+    elif location == 'b':
+        s = mat.shape[0]-nbc
+
+    if bc[0] == 24:
+        mat = inh_couette(mat, s, bc.get('c',None))
+
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo()
+
+    return mat
+
+def inh_couette(mat, s, coeffs):
+    """Set inhomogeneous constrain for toroidal Couette"""
+
+    assert(coeffs.get('c', None) is not None)
+    assert(coeffs.get('l', None) is not None)
+
+    if coeffs['l'] == 1:
+        mat[s+1,0] += coeffs['c']
+
+    return mat
 

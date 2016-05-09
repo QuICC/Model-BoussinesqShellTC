@@ -212,8 +212,14 @@ namespace Timestep {
 
          /**
           * @brief Build the scheme operators
+          *
+          * @param idx  Solver index
+          * @param opA  A operator
+          * @param opB  B operator
+          * @param opC  Boundary operator
+          * @param opD  Inhomogeneous boundary operator
           */
-         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size);
+         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size);
 
          /**
           * @brief Finished timestep?
@@ -368,6 +374,9 @@ namespace Timestep {
 
          this->mRegisterId = IMPLICIT_REGISTER;
 
+         // Include inhomogeneous boundary conditions
+         //this->addInhomogeneous();
+
          return true;
       
       // Last step has no implicit solve
@@ -388,6 +397,9 @@ namespace Timestep {
 
                // Set explicit store register for solution
                this->mRegisterId = ERROR_REGISTER; 
+
+               // Include inhomogeneous boundary conditions
+               //this->addInhomogeneous();
                
                return true;
             } else
@@ -445,6 +457,9 @@ namespace Timestep {
             // Set explicit store register for solution
             this->mRegisterId = SOLUTION_REGISTER;
 
+            // Include inhomogeneous boundary conditions
+            //this->addInhomogeneous();
+
             return true;
          }
       } else
@@ -480,6 +495,9 @@ namespace Timestep {
             // Set implicit store register for solution
             this->mRegisterId = IMPLICIT_REGISTER;
          }
+
+         // Include inhomogeneous boundary conditions
+         //this->addInhomogeneous();
 
          return true;
       }
@@ -715,7 +733,7 @@ namespace Timestep {
       }
    }
 
-   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size)
+   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size)
    {
       // Update timestep
       this->mDt = dt;
@@ -731,11 +749,15 @@ namespace Timestep {
       // Set implicit matrix
       for(int i = 0; i < TimeSchemeSelector::STEPS; ++i)
       {
+         // Set LHS matrix
          this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx).resize(size, size);
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), 1.0, opB);
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), -TimeSchemeSelector::aIm(i,i)*this->mDt, opA);
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), 1.0, opC);
       }
+         
+      // Set inhomogeneous boundary values
+      this->setInhomogeneous(idx, opD);
    }
 
    namespace internal
