@@ -374,9 +374,6 @@ namespace Timestep {
 
          this->mRegisterId = IMPLICIT_REGISTER;
 
-         // Include inhomogeneous boundary conditions
-         //this->addInhomogeneous();
-
          return true;
       
       // Last step has no implicit solve
@@ -399,7 +396,7 @@ namespace Timestep {
                this->mRegisterId = ERROR_REGISTER; 
 
                // Include inhomogeneous boundary conditions
-               //this->addInhomogeneous();
+               this->addInhomogeneous();
                
                return true;
             } else
@@ -458,7 +455,7 @@ namespace Timestep {
             this->mRegisterId = SOLUTION_REGISTER;
 
             // Include inhomogeneous boundary conditions
-            //this->addInhomogeneous();
+            this->addInhomogeneous();
 
             return true;
          }
@@ -481,6 +478,9 @@ namespace Timestep {
             // Set explicit store register for solution
             this->mRegisterId = EXPLICIT_REGISTER;
 
+            // Include inhomogeneous boundary conditions
+            this->addInhomogeneous();
+
          } else if(this->mRegisterId == EXPLICIT_REGISTER)
          {
             // Update explicit term
@@ -495,9 +495,6 @@ namespace Timestep {
             // Set implicit store register for solution
             this->mRegisterId = IMPLICIT_REGISTER;
          }
-
-         // Include inhomogeneous boundary conditions
-         //this->addInhomogeneous();
 
          return true;
       }

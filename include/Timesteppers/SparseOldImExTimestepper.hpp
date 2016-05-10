@@ -264,7 +264,7 @@ namespace Timestep {
       }
 
       // Include inhomogeneous boundary conditions
-      //this->addInhomogeneous();
+      this->addInhomogeneous();
 
       return true;
    }

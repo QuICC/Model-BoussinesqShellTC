@@ -761,7 +761,8 @@ def inh_couette(mat, s, coeffs):
     assert(coeffs.get('l', None) is not None)
 
     if coeffs['l'] == 1:
-        mat[s+1,0] += coeffs['c']
+        norm = np.sqrt(3.0/(4.0*np.pi))
+        mat[s+1,0] += coeffs['c']/norm
 
     return mat
 

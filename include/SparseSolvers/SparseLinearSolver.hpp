@@ -36,6 +36,10 @@ namespace Solver {
       void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
 
       void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat);
+
+      void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr);
+
+      template <typename TData, typename TCorr> void addCorrection(TData& rVal, const TCorr& corr);
    }
 
    /**
@@ -248,7 +252,7 @@ namespace Solver {
       {
          if(this->mInhomogeneous.at(i).nonZeros() > 0)
          {
-            this->mRHSData.at(i) += this->mInhomogeneous.at(i);
+            Solver::internal::addCorrection(this->mRHSData.at(i), this->mInhomogeneous.at(i));
          }
       }
    }
@@ -491,6 +495,24 @@ namespace Solver {
          {
             mat += decMat.real().cast<MHDComplex>() + Math::cI*decMat.imag();
          }
+      }
+
+      inline void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr)
+      {
+         assert(rVal.real().rows() > 0);
+         assert(rVal.real().cols() > 0);
+         assert(rVal.imag().rows() > 0);
+         assert(rVal.imag().cols() > 0);
+         assert(rVal.real().rows() == rVal.imag().rows());
+         assert(rVal.real().cols() == rVal.imag().cols());
+
+         rVal.real() += corr.real();
+         rVal.imag() += corr.imag();
+      }
+
+      template <typename TData, typename TCorr> inline void addCorrection(TData& rVal, const TCorr& corr)
+      {
+         rVal += corr;
       }
    }
 }
