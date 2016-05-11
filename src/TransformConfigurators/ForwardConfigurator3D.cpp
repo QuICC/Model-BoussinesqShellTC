@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardConfigurator3D::integrate2D(const IntegratorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void ForwardConfigurator3D::integrate2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate 2D", 4);
@@ -51,7 +51,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWD2DTRA);
 
       // Compute integration transform of second dimension
-      coord.transform2D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+      coord.transform2D().integrate(rOutVar.rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType::Id>(), Arithmetics::SET);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD2DTRA);

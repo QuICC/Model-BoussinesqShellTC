@@ -353,7 +353,7 @@ namespace Parallel {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterAllToAll<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setFwdCommSizes()
    {
       // All-to-all data FWD sizes
-      for(int i = 0; i < this->mFSizes.size(); i++)
+      for(size_t i = 0; i < this->mFSizes.size(); i++)
       {
          this->mFCommSizes(i) = this->mPacks*this->mFSizes.at(i);
       }
@@ -362,7 +362,7 @@ namespace Parallel {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterAllToAll<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBwdCommSizes()
    {
       // All-to-all data FWD sizes
-      for(int i = 0; i < this->mBSizes.size(); i++)
+      for(size_t i = 0; i < this->mBSizes.size(); i++)
       {
          this->mBCommSizes(i) = this->mPacks*this->mBSizes.at(i);
       }
@@ -375,12 +375,12 @@ namespace Parallel {
 
          this->mBCommTypes.push_back(MpiTypes::template type<typename TBwdB::PointType>());
       #else
-         for(int i = 0; i < this->mFSizes.size(); i++)
+         for(size_t i = 0; i < this->mFSizes.size(); i++)
          {
             this->mFCommTypes.push_back(MPI_PACKED);
          }
 
-         for(int i = 0; i < this->mBSizes.size(); i++)
+         for(size_t i = 0; i < this->mBSizes.size(); i++)
          {
             this->mBCommTypes.push_back(MPI_PACKED);
          }

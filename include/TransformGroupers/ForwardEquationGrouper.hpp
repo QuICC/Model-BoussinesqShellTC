@@ -59,7 +59,7 @@ namespace Transform {
           *
           * @param integratorTree Transform integrator tree
           */
-         virtual ArrayI packs1D(const std::vector<IntegratorTree>& integratorTree);
+         virtual ArrayI packs1D(const std::vector<TransformTree>& integratorTree);
 
          #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
             /**
@@ -67,19 +67,19 @@ namespace Transform {
              *
              * @param integratorTree Transform integrator tree
              */
-            virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree);
+            virtual ArrayI packs2D(const std::vector<TransformTree>& integratorTree);
          #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       protected:
          /**
           * @brief Setup grouped first exchange communication
           */
-         void setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
+         void setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup grouped second exchange communication
           */
-         void setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
+         void setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
 
       private: 
    };
@@ -101,11 +101,11 @@ namespace Transform {
       //
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
       std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
-      std::vector<Transform::IntegratorTree>::const_iterator it;
+      std::vector<Transform::TransformTree>::const_iterator it;
       for(it = coord.integratorTree().begin(); it != coord.integratorTree().end(); ++it)
       {
          // Transform scalar equation variable
-         if(it->comp() == FieldComponents::Physical::SCALAR)
+         if(it->comp<FieldComponents::Physical::Id>() == FieldComponents::Physical::SCALAR)
          {
             scalEqIt = this->findEquation(scalEqs,it->name());
 
@@ -161,29 +161,29 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      int packs = this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp()));
+      int packs = this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Physical::Id>()));
 
       TConfigurator::setup1DCommunication(packs, coord);
    }
 
-   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
       #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
-         int packs = this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp()));
+         int packs = this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Physical::Id>()));
 
          TConfigurator::setup2DCommunication(packs, coord);
       #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
-   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const std::vector<IntegratorTree>& integratorTree)
+   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const std::vector<TransformTree>& integratorTree)
    {
       return this->namePacks1D(integratorTree);
    }
 
    #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
-      template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const std::vector<IntegratorTree>& integratorTree)
+      template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const std::vector<TransformTree>& integratorTree)
       {  
          return this->namePacks2D(integratorTree);
       }

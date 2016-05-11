@@ -51,7 +51,10 @@ namespace IoXml {
           * @brief Read content of configuration file
           */
          virtual void write();
-
+         
+         /**
+          * @brief Create communication graph
+          */
          void graphCommunication(const std::vector<std::multimap<int,int> >& structure);
          
       protected:

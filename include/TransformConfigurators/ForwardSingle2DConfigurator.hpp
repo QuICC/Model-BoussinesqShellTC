@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/ForwardConfigurator3D.hpp"
 
 namespace GeoMHDiSCC {
@@ -45,7 +45,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void firstStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Second step in transform
@@ -53,7 +53,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void secondStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Last step in transform
@@ -61,7 +61,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void lastStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief First exchange communication setup
@@ -129,13 +129,13 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   template <typename TSharedEquation> void ForwardSingle2DConfigurator::firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSingle2DConfigurator::firstStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorPhysEdge_iterator it3D;
+      TransformTreeEdge::EdgeType_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorPhysEdge_range range3D = tree.edgeRange();
+      TransformTreeEdge::EdgeType_range range3D = tree.root().edgeRange();
 
       // Compute the nonlinear interaction
       ForwardConfigurator3D::nonlinearTerm(tree, spEquation, coord);
@@ -155,22 +155,22 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   template <typename TSharedEquation> void ForwardSingle2DConfigurator::secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSingle2DConfigurator::secondStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
    
-   template <typename TSharedEquation> void ForwardSingle2DConfigurator::lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSingle2DConfigurator::lastStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorSpecEdge_iterator it1D;
-      IntegratorPartEdge_iterator it2D;
-      IntegratorPhysEdge_iterator it3D;
+      TransformTreeEdge::EdgeType_iterator it1D;
+      TransformTreeEdge::EdgeType_iterator it2D;
+      TransformTreeEdge::EdgeType_iterator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorSpecEdge_range range1D;
-      IntegratorPartEdge_range range2D;
-      IntegratorPhysEdge_range range3D = tree.edgeRange();
+      TransformTreeEdge::EdgeType_range range1D;
+      TransformTreeEdge::EdgeType_range range2D;
+      TransformTreeEdge::EdgeType_range range3D = tree.root().edgeRange();
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);

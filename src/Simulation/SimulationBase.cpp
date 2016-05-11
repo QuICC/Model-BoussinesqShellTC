@@ -79,7 +79,7 @@ namespace GeoMHDiSCC {
       StageTimer stage;
 
       // Transform projector tree
-      std::vector<Transform::ProjectorTree> projectorTree;
+      std::vector<Transform::TransformTree> projectorTree;
 
       stage.start("initializing variables");
 
@@ -87,7 +87,7 @@ namespace GeoMHDiSCC {
       RequirementTools::initVariables(projectorTree, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
 
       // Transform integrator tree
-      std::vector<Transform::IntegratorTree> integratorTree;
+      std::vector<Transform::TransformTree> integratorTree;
 
       // Map variables to the equations and set nonlinear requirements
       RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables, this->mForwardIsNonlinear);
@@ -292,7 +292,7 @@ namespace GeoMHDiSCC {
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
    }
       
-   void SimulationBase::initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)
+   void SimulationBase::initTransformCoordinator(const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree)
    {
       // Extract the run options for the equation parameters
       std::map<NonDimensional::Id,MHDFloat> runOptions;

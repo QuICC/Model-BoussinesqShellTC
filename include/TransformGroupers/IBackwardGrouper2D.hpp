@@ -10,7 +10,6 @@
 // Configuration includes
 // 
 #include "TypeSelectors/TransformCommSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 // System includes
@@ -23,6 +22,7 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -51,7 +51,7 @@ namespace Transform {
           *
           * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree) = 0;
+         virtual ArrayI packs1D(const std::vector<TransformTree>& projectorTree) = 0;
 
          /**
           * @brief Location of the split in the configurator
@@ -69,14 +69,14 @@ namespace Transform {
           *
           * @param projectorTree Transform projector tree
           */
-         ArrayI namePacks1D(const std::vector<ProjectorTree>& projectorTree);
+         ArrayI namePacks1D(const std::vector<TransformTree>& projectorTree);
 
          /**
           * @brief Get the grouped pack number for the first exchange
           *
           * @param projectorTree Transform projector tree
           */
-         ArrayI groupPacks1D(const std::vector<ProjectorTree>& projectorTree);
+         ArrayI groupPacks1D(const std::vector<TransformTree>& projectorTree);
 
          /**
           * @brief Empty constructor

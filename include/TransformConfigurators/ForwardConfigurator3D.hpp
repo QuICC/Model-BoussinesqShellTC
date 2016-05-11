@@ -23,7 +23,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/ForwardConfigurator2D.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
@@ -44,7 +44,7 @@ namespace Transform {
           *
           * @param coord   Transform coordinator
           */
-         static void integrate2D(const IntegratorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void integrate2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Empty constructor

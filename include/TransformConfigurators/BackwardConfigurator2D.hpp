@@ -21,7 +21,7 @@
 //
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
@@ -42,7 +42,7 @@ namespace Transform {
           * @param rScalar Scalar variable
           * @param coord   Transform coordinator
           */
-         static void prepareSpectral(const ProjectorTree& tree, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+         static void prepareSpectral(const TransformTree& tree, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
           * @brief Prepare computation of projection for a vector variable
@@ -50,7 +50,7 @@ namespace Transform {
           * @param rVector Vector variable
           * @param coord   Transform coordinator
           */
-         static void prepareSpectral(const ProjectorTree& tree, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+         static void prepareSpectral(const TransformTree& tree, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Prepare computation of physical projection for a scalar variable
@@ -58,7 +58,7 @@ namespace Transform {
           * @param rScalar Scalar variable
           * @param coord   Transform coordinator
           */
-         static void preparePhysical(const ProjectorTree& tree, const ProjectorPhysEdge& edge, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+         static void preparePhysical(const TransformTree& tree, const TransformTreeEdge& edge, Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
           * @brief Prepare computation of physical projection for a vector variable
@@ -66,7 +66,7 @@ namespace Transform {
           * @param rVector Vector variable
           * @param coord   Transform coordinator
           */
-         static void preparePhysical(const ProjectorTree& tree, const ProjectorPhysEdge& edge, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+         static void preparePhysical(const TransformTree& tree, const TransformTreeEdge& edge, Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the projection transform of the first dimension
@@ -75,7 +75,7 @@ namespace Transform {
           * @param coord   Transform coordinator
           * @param hold    Hold input data?
           */
-         static void project1D(const ProjectorSpecEdge& edge, TransformCoordinatorType& coord, const bool hold);
+         static void project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool hold);
 
          /**
           * @brief Compute the projection transform of the third dimension
@@ -85,7 +85,7 @@ namespace Transform {
           * @param recover Recover input data?
           * @param hold    Hold input data?
           */
-         static void projectND(const ProjectorPhysEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Empty constructor

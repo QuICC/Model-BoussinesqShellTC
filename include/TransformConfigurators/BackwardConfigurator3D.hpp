@@ -21,7 +21,7 @@
 //
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/BackwardConfigurator2D.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
@@ -45,7 +45,7 @@ namespace Transform {
           * @param recover Recover input data?
           * @param hold    Hold input data?
           */
-         static void project2D(const ProjectorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Empty constructor

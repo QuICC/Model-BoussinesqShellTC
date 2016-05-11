@@ -33,7 +33,7 @@
 #include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/ParallelSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformGroupers/IForwardGrouperMacro.h"
 #include "TransformGroupers/IBackwardGrouperMacro.h"
 #include "LoadSplitter/LoadSplitter.hpp"
@@ -352,7 +352,7 @@ namespace GeoMHDiSCC {
           * @param integratorTree   Transform integrator tree
           * @param projectorTree    Transform projector tree
           */
-         void initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
+         void initTransformCoordinator(const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree);
 
          /**
           * @brief Initialise the equations (generate operators, etc)

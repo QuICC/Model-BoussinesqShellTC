@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void BackwardConfigurator3D::project2D(const ProjectorPartEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void BackwardConfigurator3D::project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Project 2D", 4);
@@ -52,7 +52,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::BWD2DTRA);
 
       // Compute projection transform for second dimension 
-      coord.transform2D().project(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+      coord.transform2D().project(rOutVar.rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id>(), Arithmetics::SET);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2DTRA);

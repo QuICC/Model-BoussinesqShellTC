@@ -58,20 +58,20 @@ namespace Transform {
           *
           * @param integratorTree Transform integrator tree
           */
-         virtual ArrayI packs1D(const std::vector<IntegratorTree>& integratorTree);
+         virtual ArrayI packs1D(const std::vector<TransformTree>& integratorTree);
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
           * @param integratorTree Transform integrator tree
           */
-         virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree);
+         virtual ArrayI packs2D(const std::vector<TransformTree>& integratorTree);
 
       protected:
          /**
           * @brief Setup grouped first exchange communication
           */
-         void setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
+         void setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup grouped second exchange communication
@@ -107,11 +107,11 @@ namespace Transform {
       //
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
       std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
-      std::vector<Transform::IntegratorTree>::const_iterator it;
+      std::vector<Transform::TransformTree>::const_iterator it;
       for(it = coord.integratorTree().begin(); it != coord.integratorTree().end(); ++it)
       {
          // Transform scalar equation variable
-         if(it->comp() == FieldComponents::Physical::SCALAR)
+         if(it->comp<FieldComponents::Physical::Id>() == FieldComponents::Physical::SCALAR)
          {
             scalEqIt = this->findEquation(scalEqs,it->name());
 
@@ -145,7 +145,7 @@ namespace Transform {
       for(it = coord.integratorTree().begin(); it != coord.integratorTree().end(); ++it)
       {
          // Transform scalar equation variable
-         if(it->comp() == FieldComponents::Physical::SCALAR)
+         if(it->comp<FieldComponents::Physical::Id>() == FieldComponents::Physical::SCALAR)
          {
             scalEqIt = this->findEquation(scalEqs,it->name());
 
@@ -187,9 +187,9 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> void ForwardSingle2DGrouper<TConfigurator>::setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardSingle2DGrouper<TConfigurator>::setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      int packs = this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp()));
+      int packs = this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Physical::Id>()));
 
       TConfigurator::setup1DCommunication(packs, coord);
    }
@@ -199,12 +199,12 @@ namespace Transform {
       TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
    }
 
-   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs1D(const std::vector<IntegratorTree>& integratorTree)
+   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs1D(const std::vector<TransformTree>& integratorTree)
    {
       return this->namePacks1D(integratorTree);
    }
 
-   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs2D(const std::vector<IntegratorTree>& integratorTree)
+   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs2D(const std::vector<TransformTree>& integratorTree)
    { 
       // Get size of grouped communication
       ArrayI packs = this->groupPacks2D(integratorTree);

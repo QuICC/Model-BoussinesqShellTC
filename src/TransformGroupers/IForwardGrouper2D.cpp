@@ -35,22 +35,22 @@ namespace Transform {
    {
    }
 
-   ArrayI IForwardGrouper2D::namePacks1D(const std::vector<IntegratorTree>& integratorTree)
+   ArrayI IForwardGrouper2D::namePacks1D(const std::vector<TransformTree>& integratorTree)
    {
       // Create list of packet sizes
       std::set<int>  list;
 
-      std::vector<IntegratorTree>::const_iterator treeIt;
+      std::vector<TransformTree>::const_iterator treeIt;
       for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
       {
          #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
-            int counter = treeIt->nPartEdges();
+            int counter = treeIt->nEdges(1);
          #else
-            int counter = treeIt->nPhysEdges();
+            int counter = treeIt->nEdges(0);
          #endif //GEOMHDISCC_SPATIALDIMENSION_3D
          list.insert(counter);
 
-         this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));
+         this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp<FieldComponents::Physical::Id>()), counter));
       }
 
       // Initialise the number of packs
@@ -67,7 +67,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper2D::groupPacks1D(const std::vector<IntegratorTree>& integratorTree)
+   ArrayI IForwardGrouper2D::groupPacks1D(const std::vector<TransformTree>& integratorTree)
    {
       // Initialise the number of packs
       ArrayI packs = this->namePacks1D(integratorTree);

@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardConfigurator2D::nonlinearTerm(const IntegratorTree& tree, Equations::SharedIEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator2D::nonlinearTerm(const TransformTree& tree, Equations::SharedIEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::NONLINEAR);
@@ -34,8 +34,8 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::FwdNDType &rNLComp = coord.communicator().providePhysical();
 
       // Compute nonlinear term component
-      spEquation->computeNonlinear(rNLComp, tree.comp());
-      spEquation->useNonlinear(rNLComp, tree.comp());
+      spEquation->computeNonlinear(rNLComp, tree.comp<FieldComponents::Physical::Id>());
+      spEquation->useNonlinear(rNLComp, tree.comp<FieldComponents::Physical::Id>());
 
       // Transfer physical storage to next step
       coord.communicator().holdPhysical(rNLComp);
@@ -44,7 +44,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   void ForwardConfigurator2D::integrateND(const IntegratorPhysEdge& edge, TransformCoordinatorType& coord, const bool hold)
+   void ForwardConfigurator2D::integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate ND", 4);
@@ -62,7 +62,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWDNDTRA);
 
       // Compute integration transform of third dimension
-      coord.transformND().integrate(rOutVar.rData(), rInVar.data(), edge.opId(), Arithmetics::SET);
+      coord.transformND().integrate(rOutVar.rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::IntegratorType::Id>(), Arithmetics::SET);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWDNDTRA);
@@ -85,7 +85,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::FWDND);
    }
 
-   void ForwardConfigurator2D::integrate1D(const IntegratorSpecEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void ForwardConfigurator2D::integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate 1D", 4);
@@ -113,7 +113,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRA);
 
       // Compute integration transform of first dimension
-      coord.transform1D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+      coord.transform1D().integrate(rOutVar.rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType::Id>(), Arithmetics::SET);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRA);

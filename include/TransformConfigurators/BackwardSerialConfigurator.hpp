@@ -20,7 +20,7 @@
 //
 #include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/BackwardConfiguratorMacro.h"
 
 namespace GeoMHDiSCC {
@@ -47,7 +47,7 @@ namespace Transform {
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the second step in the backward transform
@@ -58,7 +58,7 @@ namespace Transform {
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void secondStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the last step in the backward transform
@@ -69,7 +69,7 @@ namespace Transform {
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void lastStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup first exchange communication
@@ -121,25 +121,25 @@ namespace Transform {
    {
    }
 
-   template <typename TVariable> void BackwardSerialConfigurator::firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardSerialConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       // Iterators for the transforms
-      ProjectorSpecEdge_iterator itSpec;
-      ProjectorPhysEdge_iterator itPhys;
+      TransformTreeEdge::EdgeType_iterator itSpec;
+      TransformTreeEdge::EdgeType_iterator itPhys;
 
       // Ranges for the vector of edges for the three transforms
-      ProjectorSpecEdge_range rangeSpec = tree.edgeRange();
-      ProjectorPhysEdge_range rangePhys;
+      TransformTreeEdge::EdgeType_range rangeSpec = tree.root().edgeRange();
+      TransformTreeEdge::EdgeType_range rangePhys;
 
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
 
       #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
-         ProjectorPartEdge_iterator it2D;
+         TransformTreeEdge::EdgeType_iterator it2D;
 
          // Ranges for the vector of edges for the second transforms
-         ProjectorPartEdge_range range2D;
+         TransformTreeEdge::EdgeType_range range2D;
 
          // Loop over first transform
          int holdSpec = std::distance(rangeSpec.first, rangeSpec.second) - 1;
@@ -192,11 +192,11 @@ namespace Transform {
       #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
-   template <typename TVariable> void BackwardSerialConfigurator::secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardSerialConfigurator::secondStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
    }
 
-   template <typename TVariable> void BackwardSerialConfigurator::lastStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardSerialConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
    }
 

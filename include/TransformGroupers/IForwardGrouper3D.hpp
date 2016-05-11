@@ -10,7 +10,6 @@
 // Configuration includes
 // 
 #include "TypeSelectors/TransformCommSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
 
 // System includes
 //
@@ -22,6 +21,7 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformGroupers/IForwardGrouper2D.hpp"
 
 namespace GeoMHDiSCC {
@@ -39,7 +39,7 @@ namespace Transform {
           *
           * @param integratorTree Transform integrator tree 
           */
-         virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree) = 0;
+         virtual ArrayI packs2D(const std::vector<TransformTree>& integratorTree) = 0;
 
       protected:
          /**
@@ -52,14 +52,14 @@ namespace Transform {
           *
           * @param integratorTree Transform integrator tree 
           */
-         ArrayI namePacks2D(const std::vector<IntegratorTree>& integratorTree);
+         ArrayI namePacks2D(const std::vector<TransformTree>& integratorTree);
 
          /**
           * @brief Get the grouped pack number for the second exchange
           *
           * @param integratorTree Transform integrator tree 
           */
-         ArrayI groupPacks2D(const std::vector<IntegratorTree>& integratorTree);
+         ArrayI groupPacks2D(const std::vector<TransformTree>& integratorTree);
 
          /**
           * @brief Empty constructor
