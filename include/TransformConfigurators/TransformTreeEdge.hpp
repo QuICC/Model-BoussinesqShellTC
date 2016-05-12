@@ -36,7 +36,9 @@ namespace Transform {
    {
       public:
          /// Useful typedefs
-         typedef std::vector<TransformTreeEdge>::const_iterator EdgeType_iterator;
+         typedef std::vector<TransformTreeEdge>::const_iterator EdgeType_citerator;
+         typedef std::pair<EdgeType_citerator,EdgeType_citerator> EdgeType_crange;
+         typedef std::vector<TransformTreeEdge>::iterator EdgeType_iterator;
          typedef std::pair<EdgeType_iterator,EdgeType_iterator> EdgeType_range;
 
          /**
@@ -62,7 +64,12 @@ namespace Transform {
          /**
           * @brief Get vector ranges of edges
           */
-         EdgeType_range edgeRange() const;
+         EdgeType_crange edgeRange() const;
+
+         /**
+          * @brief Get vector ranges of edges
+          */
+         EdgeType_range rEdgeRange();
 
          /**
           * @brief Add a edge to tree
@@ -70,19 +77,59 @@ namespace Transform {
          TransformTreeEdge& addEdge(const int op, const int n);
 
          /**
-          * @brief Get end component
+          * @brief Get out component id
           */
-          template <typename TId> TId endId(const int i = 0) const;
+         template <typename TId> TId outId(const int i = 0) const;
 
-          /**
-           * @brief Get the field type
-           */
-          FieldType::Id fieldId() const;
+         /**
+          * @brief Get all output component ids
+          */
+         const std::vector<int>& outIds() const;
 
-          /**
-           * @brief Get the arithmetic operation
-           */
-          Arithmetics::Id arithId() const;
+         /**
+          * @brief Recover input from other calculations
+          */
+         bool recoverInput() const;
+
+         /**
+          * @brief Hold input for other calculations
+          */
+         bool holdInput() const;
+
+         /**
+          * @brief Recover output from other calculations
+          */
+         int recoverOutId() const;
+
+         /**
+          * @brief Output ID to hold combined calculation
+          */
+         int combinedOutId() const;
+
+         /**
+          * @brief Get the field type
+          */
+         FieldType::Id fieldId() const;
+
+         /**
+          * @brief Get the arithmetic operation
+          */
+         Arithmetics::Id arithId() const;
+
+         /**
+          * @brief Get the arithmetic operation on the combined field
+          */
+         Arithmetics::Id combinedArithId() const;
+
+         /**
+          * @brief Set the arithmetic operation
+          */
+         void setArithId(const Arithmetics::Id);
+
+         /**
+          * @brief Set recovery and hold information for input data
+          */
+         void setInputInfo(const int recover, const int hold); 
 
          /**
           * @brief Set end component as vector of IDs
@@ -106,6 +153,26 @@ namespace Transform {
          int mN;
 
          /**
+          * @brief Recover input from other computations
+          */
+         bool mRecoverInput;
+
+         /**
+          * @brief Hold input for other computations
+          */
+         bool mHoldInput;
+
+         /**
+          * @brief Recover output from other computations (ID >= 0 if recovery is necessary)
+          */
+         int mRecoverOutId;
+
+         /**
+          * @brief Hold combined output for other computations (ID >= 0 if hold is necessary)
+          */
+         int mCombinedOutId;
+
+         /**
           * @brief Field type
           */
          FieldType::Id  mFieldId;
@@ -116,9 +183,14 @@ namespace Transform {
          Arithmetics::Id   mArithId;
 
          /**
-          * @brief Physical output component
+          * @brief Arithmetic operation for combined output
           */
-         std::vector<int> mEndId;
+         Arithmetics::Id   mCombinedArithId;
+
+         /**
+          * @brief Output Id components
+          */
+         std::vector<int> mOutId;
 
          /**
           * @brief Vector of connected egdes
@@ -131,9 +203,9 @@ namespace Transform {
       return static_cast<TId>(this->mOpId);
    }
 
-   template <typename TId> inline TId TransformTreeEdge::endId(const int i) const
+   template <typename TId> inline TId TransformTreeEdge::outId(const int i) const
    {
-      return static_cast<TId>(this->mEndId.at(i));
+      return static_cast<TId>(this->mOutId.at(i));
    }
 }
 }

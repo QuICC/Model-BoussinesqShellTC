@@ -45,7 +45,7 @@ namespace Transform {
          /**
           * @brief Add an edge to the tranform path with single ID for output field
           */
-         void addEdge(const int projId, const int outId, Arithmetics::Id arithId);
+         void addEdge(const int projId, const int outId = -1, Arithmetics::Id arithId = Arithmetics::SET);
 
          /**
           * @brief Add an edge to the transform path with ID pair for output field

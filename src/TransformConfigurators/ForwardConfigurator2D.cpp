@@ -20,6 +20,7 @@
 
 // Project includes
 //
+#include "ScalarFields/FieldTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -44,7 +45,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   void ForwardConfigurator2D::integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool hold)
+   void ForwardConfigurator2D::integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate ND", 4);
@@ -55,20 +56,35 @@ namespace Transform {
       // Get recover input data from hold
       TransformCoordinatorType::CommunicatorType::FwdNDType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRAND>();
 
-      // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::BwdNDType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRAND>().provideBwd();
+      // Get output storage
+      TransformCoordinatorType::CommunicatorType::BwdNDType *pOutVar = 0;
+      TransformCoordinatorType::CommunicatorType::BwdNDType *pRecOutVar = 0;
+      if(edge.recoverOutId() >= 0)
+      {
+         if(edge.combinedArithId() == Arithmetics::SET || edge.combinedArithId() == Arithmetics::SETNEG)
+         {
+            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().recoverBwd(edge.recoverOutId());
+         } else
+         {
+            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().provideBwd();
+            pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().recoverBwd(edge.recoverOutId());
+         }
+      } else
+      {
+         pOutVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().provideBwd();
+      }
 
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWDNDTRA);
 
       // Compute integration transform of third dimension
-      coord.transformND().integrate(rOutVar.rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::IntegratorType::Id>(), Arithmetics::SET);
+      coord.transformND().integrate(pOutVar->rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::IntegratorType::Id>(), Arithmetics::SET);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWDNDTRA);
 
       // Hold temporary input storage
-      if(hold)
+      if(edge.holdInput())
       {
          coord.communicator().storage<Dimensions::Transform::TRAND>().holdFwd(rInVar);
 
@@ -78,14 +94,46 @@ namespace Transform {
          coord.communicator().storage<Dimensions::Transform::TRAND>().freeFwd(rInVar);
       }
 
-      // Transfer output data to next step
-      coord.communicator().transferBackward<Dimensions::Transform::TRAND>(rOutVar);
+      // Combine recovered output with new calculation
+      if(pRecOutVar != 0)
+      {
+         Datatypes::FieldTools::combine(*pRecOutVar, *pOutVar, edge.combinedArithId());
+
+         if(edge.combinedOutId() >= 0)
+         {
+            coord.communicator().storage<Dimensions::Transform::TRAND>().holdBwd(*pRecOutVar, edge.combinedOutId());
+         } else
+         {
+            coord.communicator().transferBackward<Dimensions::Transform::TRAND>(*pRecOutVar);
+         }
+      }
+
+      // Transfer calculation
+      if(edge.arithId() != Arithmetics::NONE)
+      {
+         if(edge.arithId() == Arithmetics::SETNEG)
+         {
+            Datatypes::FieldTools::negative(*pOutVar);
+         }
+
+         if(edge.outId<int>() >= 0)
+         {
+            coord.communicator().storage<Dimensions::Transform::TRAND>().holdBwd(*pOutVar, edge.outId<int>());
+         } else
+         {
+            coord.communicator().transferBackward<Dimensions::Transform::TRAND>(*pOutVar);
+         }
+
+      } else
+      {
+            coord.communicator().storage<Dimensions::Transform::TRAND>().freeBwd(*pOutVar);
+      }
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWDND);
    }
 
-   void ForwardConfigurator2D::integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void ForwardConfigurator2D::integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
       DebuggerMacro_msg("Integrate 1D", 4);
@@ -96,7 +144,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd1DType* pInVar;
 
       // Recover hold input data
-      if(recover)
+      if(edge.recoverInput())
       {
          pInVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd();
 
@@ -119,7 +167,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRA);
 
       // Hold temporary storage
-      if(hold)
+      if(edge.holdInput())
       {
          coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(*pInVar);
 

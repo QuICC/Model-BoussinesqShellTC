@@ -25,8 +25,10 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    TransformTreeEdge::TransformTreeEdge(const int op, const int n)
-      :mOpId(op), mN(n), mFieldId(FieldType::SCALAR), mArithId(Arithmetics::SET)
+      :mOpId(op), mN(n), mRecoverInput(false), mHoldInput(false), mRecoverOutId(-1), mCombinedOutId(-1), mFieldId(FieldType::SCALAR), mArithId(Arithmetics::SET), mCombinedArithId(Arithmetics::NONE)
    {
+      // Initialize output id
+      this->mOutId.push_back(-1);
    }
 
    TransformTreeEdge::~TransformTreeEdge()
@@ -51,7 +53,12 @@ namespace Transform {
       }
    }
 
-   TransformTreeEdge::EdgeType_range TransformTreeEdge::edgeRange() const
+   TransformTreeEdge::EdgeType_crange TransformTreeEdge::edgeRange() const
+   {
+      return std::make_pair(this->mEdges.begin(), this->mEdges.end());
+   }
+
+   TransformTreeEdge::EdgeType_range TransformTreeEdge::rEdgeRange()
    {
       return std::make_pair(this->mEdges.begin(), this->mEdges.end());
    }
@@ -61,6 +68,31 @@ namespace Transform {
       this->mEdges.push_back(TransformTreeEdge(op, n));
 
       return this->mEdges.back();
+   }
+
+   bool TransformTreeEdge::recoverInput() const
+   {
+      return this->mRecoverInput;
+   }
+
+   bool TransformTreeEdge::holdInput() const
+   {
+      return this->mHoldInput;
+   }
+
+   int TransformTreeEdge::recoverOutId() const
+   {
+      return this->mRecoverOutId;
+   }
+
+   int TransformTreeEdge::combinedOutId() const
+   {
+      return this->mCombinedOutId;
+   }
+
+   const std::vector<int>& TransformTreeEdge::outIds() const
+   {
+      return this->mOutId;
    }
 
    FieldType::Id TransformTreeEdge::fieldId() const
@@ -73,9 +105,28 @@ namespace Transform {
       return this->mArithId;
    }
 
+   Arithmetics::Id TransformTreeEdge::combinedArithId() const
+   {
+      return this->mCombinedArithId;
+   }
+
+   void TransformTreeEdge::setInputInfo(const int recover, const int hold)
+   {
+      this->mRecoverInput = recover;
+
+      this->mHoldInput = hold;
+   }
+
+   void TransformTreeEdge::setArithId(const Arithmetics::Id arithId)
+   {
+      this->mArithId = arithId;
+   }
+
    void TransformTreeEdge::setEnd(const int id, const FieldType::Id type, const Arithmetics::Id arith)
    {
-      this->mEndId.push_back(id);
+      // Make sure output IDs is empty
+      this->mOutId.clear();
+      this->mOutId.push_back(id);
 
       this->mFieldId = type;
 
@@ -84,7 +135,9 @@ namespace Transform {
 
    void TransformTreeEdge::setEnd(const std::vector<int>& id, const FieldType::Id type, const Arithmetics::Id arith)
    {
-      this->mEndId = id;
+      // Make sure output IDs is empty
+      this->mOutId.clear();
+      this->mOutId = id;
 
       this->mFieldId = type;
 

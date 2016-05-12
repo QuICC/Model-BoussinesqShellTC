@@ -42,10 +42,8 @@ namespace Transform {
           *
           * @param edge    Transform tree edge
           * @param coord   Transform coordinator
-          * @param recover Recover input data?
-          * @param hold    Hold input data?
           */
-         static void project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor

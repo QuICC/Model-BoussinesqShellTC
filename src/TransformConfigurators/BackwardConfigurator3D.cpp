@@ -20,12 +20,13 @@
 
 // Project includes
 //
+#include "ScalarFields/FieldTools.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void BackwardConfigurator3D::project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void BackwardConfigurator3D::project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
       DebuggerMacro_msg("Project 2D", 4);
@@ -35,7 +36,7 @@ namespace Transform {
 
       // Get the input data from hold
       TransformCoordinatorType::CommunicatorType::Bwd2DType* pInVar;
-      if(recover)
+      if(edge.recoverInput())
       {
          pInVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverBwd();
 
@@ -45,20 +46,35 @@ namespace Transform {
          pInVar = &coord.communicator().receiveBackward<Dimensions::Transform::TRA2D>();
       }
 
-      // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Fwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
+      // Get output storage
+      TransformCoordinatorType::CommunicatorType::Fwd2DType *pOutVar = 0;
+      TransformCoordinatorType::CommunicatorType::Fwd2DType *pRecOutVar = 0;
+      if(edge.recoverOutId() >= 0)
+      {
+         if(edge.combinedArithId() == Arithmetics::SET || edge.combinedArithId() == Arithmetics::SETNEG)
+         {
+            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverFwd(edge.recoverOutId());
+         } else
+         {
+            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
+            pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverFwd(edge.recoverOutId());
+         }
+      } else
+      {
+         pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
+      }
 
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD2DTRA);
 
       // Compute projection transform for second dimension 
-      coord.transform2D().project(rOutVar.rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id>(), Arithmetics::SET);
+      coord.transform2D().project(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id>(), Arithmetics::SET);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2DTRA);
 
       // Hold temporary storage
-      if(hold)
+      if(edge.holdInput())
       {
          coord.communicator().storage<Dimensions::Transform::TRA2D>().holdBwd(*pInVar);
 
@@ -68,8 +84,40 @@ namespace Transform {
          coord.communicator().storage<Dimensions::Transform::TRA2D>().freeBwd(*pInVar);
       }
 
-      // Transfer output data to next step
-      coord.communicator().transferForward<Dimensions::Transform::TRA2D>(rOutVar);
+      // Combine recovered output with new calculation
+      if(pRecOutVar != 0)
+      {
+         Datatypes::FieldTools::combine(*pRecOutVar, *pOutVar, edge.combinedArithId());
+
+         if(edge.combinedOutId() >= 0)
+         {
+            coord.communicator().storage<Dimensions::Transform::TRA2D>().holdFwd(*pRecOutVar, edge.combinedOutId());
+         } else
+         {
+            coord.communicator().transferForward<Dimensions::Transform::TRA2D>(*pRecOutVar);
+         }
+      }
+
+      // Transfer calculation
+      if(edge.arithId() != Arithmetics::NONE)
+      {
+         if(edge.arithId() == Arithmetics::SETNEG)
+         {
+            Datatypes::FieldTools::negative(*pOutVar);
+         }
+
+         if(edge.outId<int>() >= 0)
+         {
+            coord.communicator().storage<Dimensions::Transform::TRA2D>().holdFwd(*pOutVar, edge.outId<int>());
+         } else
+         {
+            coord.communicator().transferForward<Dimensions::Transform::TRA2D>(*pOutVar);
+         }
+
+      } else
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA2D>().freeFwd(*pOutVar);
+      }
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);

@@ -20,6 +20,7 @@
 
 // Project includes
 //
+#include "ScalarFields/FieldTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -70,12 +71,12 @@ namespace Transform {
       // Put gradient component into temporary hold storage
       } else if(edge.fieldId() == FieldType::GRADIENT)
       {
-         coord.communicator().holdPhysical(rScalar.rDom(0).rGrad().rComp(edge.endId<FieldComponents::Physical::Id>()));
+         coord.communicator().holdPhysical(rScalar.rDom(0).rGrad().rComp(edge.outId<FieldComponents::Physical::Id>()));
 
       // Put 2nd order gradient component into temporary hold storage
       } else if(edge.fieldId() == FieldType::GRADIENT2)
       {
-         coord.communicator().holdPhysical(rScalar.rDom(0).rGrad2().rComp(edge.endId<FieldComponents::Physical::Id>(0),edge.endId<FieldComponents::Physical::Id>(1)));
+         coord.communicator().holdPhysical(rScalar.rDom(0).rGrad2().rComp(edge.outId<FieldComponents::Physical::Id>(0),edge.outId<FieldComponents::Physical::Id>(1)));
       }
 
       // Stop detailed profiler
@@ -90,24 +91,24 @@ namespace Transform {
       // Put vector component into temporary hold storage
       if(edge.fieldId() == FieldType::VECTOR)
       {
-         coord.communicator().holdPhysical(rVector.rDom(0).rPhys().rComp(edge.endId<FieldComponents::Physical::Id>()));
+         coord.communicator().holdPhysical(rVector.rDom(0).rPhys().rComp(edge.outId<FieldComponents::Physical::Id>()));
 
       // Put vector gradient component into temporary hold storage
       } else if(edge.fieldId() == FieldType::GRADIENT)
       {
-         coord.communicator().holdPhysical(rVector.rDom(0).rGrad(tree.comp<FieldComponents::Spectral::Id>()).rComp(edge.endId<FieldComponents::Physical::Id>()));
+         coord.communicator().holdPhysical(rVector.rDom(0).rGrad(tree.comp<FieldComponents::Spectral::Id>()).rComp(edge.outId<FieldComponents::Physical::Id>()));
 
       // Put curl component into temporary hold storage
       } else if(edge.fieldId() == FieldType::CURL)
       {
-         coord.communicator().holdPhysical(rVector.rDom(0).rCurl().rComp(edge.endId<FieldComponents::Physical::Id>()));
+         coord.communicator().holdPhysical(rVector.rDom(0).rCurl().rComp(edge.outId<FieldComponents::Physical::Id>()));
       }
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWDND);
    }
 
-   void BackwardConfigurator2D::project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool hold)
+   void BackwardConfigurator2D::project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
       DebuggerMacro_msg("Project 1D", 4);
@@ -118,20 +119,35 @@ namespace Transform {
       // Get the input data from hold
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
-      // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+      // Get output storage
+      TransformCoordinatorType::CommunicatorType::Fwd1DType *pOutVar = 0;
+      TransformCoordinatorType::CommunicatorType::Fwd1DType *pRecOutVar = 0;
+      if(edge.recoverOutId() >= 0)
+      {
+         if(edge.combinedArithId() == Arithmetics::SET || edge.combinedArithId() == Arithmetics::SETNEG)
+         {
+            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd(edge.recoverOutId());
+         } else
+         {
+            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+            pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd(edge.recoverOutId());
+         }
+      } else
+      {
+         pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+      }
 
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRA);
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project(rOutVar.rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType::Id>(), Arithmetics::SET);
+      coord.transform1D().project(pOutVar->rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType::Id>(), Arithmetics::SET);
       
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRA);
 
       // Hold spectral input
-      if(hold)
+      if(edge.holdInput())
       {
          coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rInVar);
 
@@ -141,14 +157,46 @@ namespace Transform {
          coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
       }
 
-      // Transfer output data to next step
-      coord.communicator().transferForward<Dimensions::Transform::TRA1D>(rOutVar);
+      // Combine recovered output with new calculation
+      if(pRecOutVar != 0)
+      {
+         Datatypes::FieldTools::combine(*pRecOutVar, *pOutVar, edge.combinedArithId());
+
+         if(edge.combinedOutId() >= 0)
+         {
+            coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(*pRecOutVar, edge.combinedOutId());
+         } else
+         {
+            coord.communicator().transferForward<Dimensions::Transform::TRA1D>(*pRecOutVar);
+         }
+      }
+
+      // Transfer calculation
+      if(edge.arithId() != Arithmetics::NONE)
+      {
+         if(edge.arithId() == Arithmetics::SETNEG)
+         {
+            Datatypes::FieldTools::negative(*pOutVar);
+         }
+
+         if(edge.outId<int>() >= 0)
+         {
+            coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(*pOutVar, edge.outId<int>());
+         } else
+         {
+            coord.communicator().transferForward<Dimensions::Transform::TRA1D>(*pOutVar);
+         }
+
+      } else
+      {
+            coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(*pOutVar);
+      }
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 
-   void BackwardConfigurator2D::projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void BackwardConfigurator2D::projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
       DebuggerMacro_msg("Project ND", 4);
@@ -159,7 +207,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::BwdNDType *pInVar;
 
       // Get the input data from hold
-      if(recover)
+      if(edge.recoverInput())
       {
          pInVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().recoverBwd();
 
@@ -169,20 +217,29 @@ namespace Transform {
          pInVar = &coord.communicator().receiveBackward<Dimensions::Transform::TRAND>();
       }
 
-      // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::FwdNDType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRAND>().recoverFwd();
+      // Get output storage
+      TransformCoordinatorType::CommunicatorType::FwdNDType *pOutVar = 0;
+      TransformCoordinatorType::CommunicatorType::FwdNDType *pRecOutVar = 0;
+      if(edge.arithId() == Arithmetics::SET || edge.arithId() == Arithmetics::SETNEG)
+      {
+         pOutVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().recoverFwd();
+      } else
+      {
+         pOutVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().provideFwd();
+         pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRAND>().recoverFwd();
+      }
 
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWDNDTRA);
 
       // Compute projection transform for third dimension 
-      coord.transformND().project(rOutVar.rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::ProjectorType::Id>(),  edge.arithId());
+      coord.transformND().project(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::ProjectorType::Id>(), Arithmetics::SET);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWDNDTRA);
 
       // Hold temporary storage
-      if(hold)
+      if(edge.holdInput())
       {
          coord.communicator().storage<Dimensions::Transform::TRAND>().holdBwd(*pInVar);
 
@@ -192,8 +249,21 @@ namespace Transform {
          coord.communicator().storage<Dimensions::Transform::TRAND>().freeBwd(*pInVar);
       }
 
-      // Hold temporary storage
-      coord.communicator().transferForward<Dimensions::Transform::TRAND>(rOutVar);
+      // Combine recovered output with new calculation
+      if(pRecOutVar != 0)
+      {
+         Datatypes::FieldTools::combine(*pRecOutVar, *pOutVar, edge.arithId());
+         coord.communicator().transferForward<Dimensions::Transform::TRAND>(*pRecOutVar);
+         coord.communicator().storage<Dimensions::Transform::TRAND>().freeFwd(*pOutVar);
+      } else
+      {
+         if(edge.arithId() == Arithmetics::SETNEG)
+         {
+            Datatypes::FieldTools::negative(*pOutVar);
+         }
+
+         coord.communicator().transferForward<Dimensions::Transform::TRAND>(*pOutVar);
+      }
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWDND);

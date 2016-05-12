@@ -73,19 +73,16 @@ namespace Transform {
           *
           * @param edge    Transform tree edge
           * @param coord   Transform coordinator
-          * @param hold    Hold input data?
           */
-         static void project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool hold);
+         static void project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the projection transform of the third dimension
           *
           * @param edge    Transform tree edge
           * @param coord   Transform coordinator
-          * @param recover Recover input data?
-          * @param hold    Hold input data?
           */
-         static void projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor

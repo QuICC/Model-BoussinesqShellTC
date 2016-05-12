@@ -56,11 +56,6 @@ namespace Transform {
          int nEdges(const int depth) const;
 
          /**
-          * @brief Get vector range for spectral edges
-          */
-         TransformTreeEdge::EdgeType_range edgeRange() const;
-
-         /**
           * @brief Get root of the tree
           */
          const TransformTreeEdge& root() const;

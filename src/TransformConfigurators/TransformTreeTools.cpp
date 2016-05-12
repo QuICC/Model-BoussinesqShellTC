@@ -27,10 +27,27 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
+
+   void TransformTreeTools::generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches)
+   {
+      //
+      // First stage: Collapse calculations with same input into same tree branch
+      //
+      buildTrees(rTrees, branches);
+
+      //
+      // Second stage: Set proper recovery and hold flags on the tree nodes
+      //
+      finalizeTrees(rTrees);
+
+      // Third stage: Combine arithmetic operations into single tree branch
+      optimizeTrees(rTrees);
+   }
 
    void TransformTreeTools::growTree(std::map<PhysicalNames::Id, std::vector<TransformPath> >::const_iterator nameIt, std::set<int>::const_iterator compIt, const int dim, std::vector<int>& path, TransformTreeEdge &rPrev)
    {
@@ -102,9 +119,11 @@ namespace Transform {
       }
    }
 
-   void TransformTreeTools::generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches)
+   void TransformTreeTools::buildTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches)
    {
-      // Loop over all physical fields
+      //
+      // Construct the trees from the transfrom paths
+      //
       std::map<PhysicalNames::Id, std::vector<TransformPath> >::const_iterator nameIt;
       for(nameIt = branches.begin(); nameIt != branches.end(); ++nameIt)
       {
@@ -129,6 +148,95 @@ namespace Transform {
             growTree(nameIt, compIt, 0, path, rTrees.back().rRoot()); 
          }
       }
+   }
+
+   void TransformTreeTools::setInputInfoEdge(TransformTreeEdge& edge)
+   {
+      // Get range of edges
+      TransformTreeEdge::EdgeType_range rangeIt = edge.rEdgeRange();
+
+      // Initialize recover and hold
+      int recover = 0;
+      int hold = std::distance(rangeIt.first, rangeIt.second) - 1;
+
+      // Loop over edges
+      for(TransformTreeEdge::EdgeType_iterator edgeIt = rangeIt.first; edgeIt != rangeIt.second; ++edgeIt, ++recover, --hold)
+      {
+         // Set recover and hold info
+         edgeIt->setInputInfo(recover, hold);
+
+         // Recursively go to next level
+         setInputInfoEdge(*edgeIt);
+      }
+   }
+
+   void TransformTreeTools::setOutputOrder(TransformTreeEdge& edge, std::set<std::pair<FieldType::Id,std::vector<int> > >& outIds)
+   {
+      // Get range of edges
+      TransformTreeEdge::EdgeType_range rangeIt = edge.rEdgeRange();
+
+      // Check for last recurrence
+      if(std::distance(rangeIt.first->edgeRange().first, rangeIt.first->edgeRange().second) > 0)
+      {
+         // Loop over edges
+         for(TransformTreeEdge::EdgeType_iterator edgeIt = rangeIt.first; edgeIt != rangeIt.second; ++edgeIt)
+         {
+            // Recursively go to next level
+            setOutputOrder(*edgeIt, outIds);
+         }
+      
+      // Reached last level
+      } else
+      {
+         // Loop over edges
+         for(TransformTreeEdge::EdgeType_iterator edgeIt = rangeIt.first; edgeIt != rangeIt.second; ++edgeIt)
+         {
+            // Try to add to unique output fields
+            std::pair<std::set<std::pair<FieldType::Id,std::vector<int> > >::iterator,bool> outIt = outIds.insert(std::make_pair(edgeIt->fieldId(), edgeIt->outIds()));
+
+            // If first entry, replace arithmetics with SET or SETNEG
+            if(outIt.second)
+            {
+               if(edgeIt->arithId() == Arithmetics::ADD)
+               {
+                  edgeIt->setArithId(Arithmetics::SET);
+
+               } else if(edgeIt->arithId() == Arithmetics::SUB)
+               {
+                  edgeIt->setArithId(Arithmetics::SETNEG);
+               } else
+               {
+                  throw Exception("Unknown arithmetic operation during transform tree construction!");
+               }
+            } else
+            {
+                  throw Exception("tHIS HAPPENS!");
+            }
+         }
+      }
+   }
+
+   void TransformTreeTools::finalizeTrees(std::vector<TransformTree>& rTrees)
+   {
+      // Loop over all trees
+      std::set<std::pair<FieldType::Id,std::vector<int> > > outIds;
+      PhysicalNames::Id curName = static_cast<PhysicalNames::Id>(0);
+      for(std::vector<TransformTree>::iterator treeIt = rTrees.begin(); treeIt != rTrees.end(); ++treeIt)
+      {
+         // Recursively set hold and recovery flags
+         setInputInfoEdge(treeIt->rRoot());
+
+         // Recursively order operations by replacing first by SET or SETNEG
+         if(curName != treeIt->name())
+         {
+            outIds.clear();
+         }
+         setOutputOrder(treeIt->rRoot(), outIds);
+      }
+   }
+
+   void TransformTreeTools::optimizeTrees(std::vector<TransformTree>& rTrees)
+   {
    }
 }
 }

@@ -108,20 +108,19 @@ namespace Transform {
    template <typename TVariable> void BackwardSingle1DConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      TransformTreeEdge::EdgeType_iterator itSpec;
+      TransformTreeEdge::EdgeType_citerator itSpec;
 
       // Ranges for the vector of edges for the three transforms
-      TransformTreeEdge::EdgeType_range rangeSpec = tree.root().edgeRange();
+      TransformTreeEdge::EdgeType_crange rangeSpec = tree.root().edgeRange();
 
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
 
       // Loop over first transform
-      int holdSpec = std::distance(rangeSpec.first, rangeSpec.second) - 1;
-      for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec, --holdSpec)
+      for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
       {
          // Compute first transform
-         BackwardConfigurator::project1D(*itSpec, coord, holdSpec);
+         BackwardConfigurator::project1D(*itSpec, coord);
       }
    }
 
@@ -132,41 +131,37 @@ namespace Transform {
    template <typename TVariable> void BackwardSingle1DConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       // Iterators for the transforms
-      TransformTreeEdge::EdgeType_iterator itSpec;
-      TransformTreeEdge::EdgeType_iterator itPhys;
+      TransformTreeEdge::EdgeType_citerator itSpec;
+      TransformTreeEdge::EdgeType_citerator itPhys;
 
       // Ranges for the vector of edges for the transforms
-      TransformTreeEdge::EdgeType_range rangeSpec = tree.root().edgeRange();
-      TransformTreeEdge::EdgeType_range rangePhys;
+      TransformTreeEdge::EdgeType_crange rangeSpec = tree.root().edgeRange();
+      TransformTreeEdge::EdgeType_crange rangePhys;
 
       #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
-         TransformTreeEdge::EdgeType_iterator it2D;
+         TransformTreeEdge::EdgeType_citerator it2D;
 
          // Ranges for the vector of edges for the second transforms
-         TransformTreeEdge::EdgeType_range range2D;
+         TransformTreeEdge::EdgeType_crange range2D;
 
          // Loop over first transform
          for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
          {
             range2D = itSpec->edgeRange();
-            int recover2D = 0;
-            int hold2D = std::distance(range2D.first, range2D.second) - 1;
-            for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+            for(it2D = range2D.first; it2D != range2D.second; ++it2D)
             {
                // Compute second transform
-               BackwardConfigurator3D::project2D(*it2D, coord, recover2D, hold2D);
+               BackwardConfigurator3D::project2D(*it2D, coord);
 
                rangePhys = it2D->edgeRange();
-               int recoverPhys = 0;
-               int holdPhys = std::distance(rangePhys.first, rangePhys.second) - 1;
-               for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys, ++recoverPhys, --holdPhys)
+               for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
                {
                   // Prepare physical output data
                   BackwardConfigurator3D::preparePhysical(tree, *itPhys, rVariable, coord);
 
                   // Compute third transform
-                  BackwardConfigurator3D::projectND(*itPhys, coord, recoverPhys, holdPhys);
+                  BackwardConfigurator3D::projectND(*itPhys, coord);
                }
             }
          }
@@ -175,15 +170,13 @@ namespace Transform {
          for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
          {
             rangePhys = itSpec->edgeRange();
-            int recoverPhys = 0;
-            int holdPhys = std::distance(rangePhys.first, rangePhys.second) - 1;
-            for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys, ++recoverPhys, --holdPhys)
+            for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
             {
                // Prepare physical output data
                BackwardConfigurator2D::preparePhysical(tree, *itPhys, rVariable, coord);
 
                // Compute third transform
-               BackwardConfigurator2D::projectND(*itPhys, coord, recoverPhys, holdPhys);
+               BackwardConfigurator2D::projectND(*itPhys, coord);
             }
          }
       #endif //GEOMHDISCC_SPATIALDIMENSION_3D

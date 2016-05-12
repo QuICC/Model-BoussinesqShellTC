@@ -47,6 +47,31 @@ namespace Transform {
          static void growTree(std::map<PhysicalNames::Id, std::vector<TransformPath> >::const_iterator nameIt, std::set<int>::const_iterator compIt, const int dim, std::vector<int>& path, TransformTreeEdge& rPrev);
 
          /**
+          * @brief Build the trees recursively
+          */
+         static void buildTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches);
+
+         /**
+          * @brief Set edge input information
+          */
+         static void setInputInfoEdge(TransformTreeEdge& edge);
+
+         /**
+          * @brief Set edge input information
+          */
+         static void setOutputOrder(TransformTreeEdge& edge, std::set<std::pair<FieldType::Id,std::vector<int> > >& outIds);
+
+         /**
+          * @brief Finalize the trees
+          */
+         static void finalizeTrees(std::vector<TransformTree>& rTrees);
+
+         /**
+          * @brief Finalize the trees
+          */
+         static void optimizeTrees(std::vector<TransformTree>& rTrees);
+
+         /**
           * @brief Constructor
           */
          TransformTreeTools();

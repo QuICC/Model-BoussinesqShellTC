@@ -44,7 +44,7 @@ namespace Transform {
           *
           * @param coord   Transform coordinator
           */
-         static void integrate2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void integrate2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor

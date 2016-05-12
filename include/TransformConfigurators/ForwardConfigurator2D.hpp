@@ -51,14 +51,14 @@ namespace Transform {
           *
           * @param coord   Transform coordinator
           */
-         static void integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the last dimension
           *
           * @param coord   Transform coordinator
           */
-         static void integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const bool hold);
+         static void integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Update variable values from dealiased data
@@ -66,7 +66,7 @@ namespace Transform {
           * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void updateEquation(const TransformTreeEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold);
+         template <typename TSharedEquation> static void updateEquation(const TransformTreeEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor
@@ -81,7 +81,7 @@ namespace Transform {
       private: 
    };
 
-   template <typename TSharedEquation> void ForwardConfigurator2D::updateEquation(const TransformTreeEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
+   template <typename TSharedEquation> void ForwardConfigurator2D::updateEquation(const TransformTreeEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
@@ -90,10 +90,10 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
-      spEquation->updateDealiasedUnknown(rInVar, edge.endId<FieldComponents::Spectral::Id>(), edge.arithId());
+      spEquation->updateDealiasedUnknown(rInVar, edge.outId<FieldComponents::Spectral::Id>(), edge.arithId());
 
       // Hold temporary storage
-      if(hold)
+      if(edge.holdInput())
       {
          coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(rInVar);
 

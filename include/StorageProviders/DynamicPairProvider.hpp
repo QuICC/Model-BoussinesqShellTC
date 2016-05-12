@@ -273,7 +273,7 @@ namespace GeoMHDiSCC {
 
    template <typename TForward, typename TBackward> inline void DynamicPairProvider<TForward, TBackward>::holdBwd(TBackward &tmp, const int id)
    {
-      this->mUsedBMap.inser(std::make_pair(id, &tmp));
+      this->mUsedBMap.insert(std::make_pair(id, &tmp));
    }
 
    template <typename TForward, typename TBackward> TForward&  DynamicPairProvider<TForward, TBackward>::provideFwd()
