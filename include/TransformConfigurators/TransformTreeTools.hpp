@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Enums/TransformDirection.hpp"
 #include "TransformConfigurators/TransformPath.hpp"
 #include "TransformConfigurators/TransformTree.hpp"
 
@@ -35,8 +36,9 @@ namespace Transform {
           *
           * @param rTrees     Output transform trees
           * @param branches   Input transfrom paths
+          * @param dir        Direction of transform (only needed for graph output)
           */
-         static void generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches);
+         static void generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches, const TransformDirection::Id dir);
          
       protected:
 

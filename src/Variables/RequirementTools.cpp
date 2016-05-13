@@ -173,7 +173,7 @@ namespace GeoMHDiSCC {
       }
 
       // Create the projector tree(s)
-      Transform::TransformTreeTools::generateTrees(projectorTree, branches);
+      Transform::TransformTreeTools::generateTrees(projectorTree, branches, TransformDirection::BACKWARD);
    }
 
    void RequirementTools::mapEquationVariables(std::vector<Transform::TransformTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear)
@@ -281,6 +281,6 @@ namespace GeoMHDiSCC {
       }
 
       // Create the integrator tree(s)
-      Transform::TransformTreeTools::generateTrees(integratorTree, branches);
+      Transform::TransformTreeTools::generateTrees(integratorTree, branches, TransformDirection::FORWARD);
    }
 }

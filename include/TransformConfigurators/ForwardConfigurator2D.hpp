@@ -93,9 +93,9 @@ namespace Transform {
       spEquation->updateDealiasedUnknown(rInVar, edge.outId<FieldComponents::Spectral::Id>(), edge.arithId());
 
       // Hold temporary storage
-      if(edge.holdInput())
+      if(edge.combinedOutId() >= 0)
       {
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(rInVar);
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rInVar, edge.combinedOutId());
 
       // Free the temporary storage
       } else

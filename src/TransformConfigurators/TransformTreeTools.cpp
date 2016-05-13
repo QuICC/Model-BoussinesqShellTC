@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include <tr1/tuple>
+#include <string>
 
 // External includes
 //
@@ -28,13 +29,32 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
+#include "IoXml/GxlWriter.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void TransformTreeTools::generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches)
+   void TransformTreeTools::generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches, const TransformDirection::Id dir)
    {
+      std::string dirName;
+      if(dir == TransformDirection::FORWARD)
+      {
+         dirName = "forward";
+      } else
+      {
+         dirName = "backward";
+      }
+
+      //
+      // Output transform branches as a graph
+      //
+      IoXml::GxlWriter gxlPath(dirName + "_transform_paths");
+      gxlPath.init();
+      gxlPath.graphTransformPath(branches, dir);
+      gxlPath.write();
+      gxlPath.finalize();
+
       //
       // First stage: Collapse calculations with same input into same tree branch
       //
@@ -45,8 +65,27 @@ namespace Transform {
       //
       finalizeTrees(rTrees);
 
+      //
+      // Output transfrom tree as a graph
+      //
+      IoXml::GxlWriter gxlTree(dirName + "_transform_trees");
+      gxlTree.init();
+      gxlTree.graphTransformTree(rTrees, dir);
+      gxlTree.write();
+      gxlTree.finalize();
+
+
       // Third stage: Combine arithmetic operations into single tree branch
       optimizeTrees(rTrees);
+
+      //
+      // Output transfrom tree as a graph
+      //
+      IoXml::GxlWriter gxlOpti(dirName + "_transform_optimized_trees");
+      gxlOpti.init();
+      gxlOpti.graphTransformTree(rTrees, dir);
+      gxlOpti.write();
+      gxlOpti.finalize();
    }
 
    void TransformTreeTools::growTree(std::map<PhysicalNames::Id, std::vector<TransformPath> >::const_iterator nameIt, std::set<int>::const_iterator compIt, const int dim, std::vector<int>& path, TransformTreeEdge &rPrev)

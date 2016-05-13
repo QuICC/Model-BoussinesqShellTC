@@ -25,6 +25,7 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "Enums/DimensionTools.hpp"
+#include "IoTools/IdToHuman.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -122,6 +123,278 @@ namespace IoXml {
             this->createAttr(pEdge, "color", color.at(i));
             pSubgraph->append_node(pEdge);
          }
+      }
+   }
+
+   void GxlWriter::graphTransformPath(const std::map<PhysicalNames::Id, std::vector<Transform::TransformPath> >& paths, const TransformDirection::Id dir)
+   {
+      std::stringstream oss;
+
+      // Set subgraph colors
+      std::vector<std::string> color;
+      color.push_back("blue");
+      color.push_back("green");
+      color.push_back("red");
+
+      // Get master GXL tag
+      rapidxml::xml_node<> *pGxl = this->mXML.first_node(this->GXLTAG.c_str());
+
+      // Create master graph
+      rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
+      pGraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string("master",0)));
+      pGxl->append_node(pGraph);
+
+      // Loop over the paths
+      int unid = 0;
+      for(std::map<PhysicalNames::Id,std::vector<Transform::TransformPath> >::const_iterator nameIt = paths.begin(); nameIt != paths.end(); ++nameIt)
+      {
+         for(std::vector<Transform::TransformPath>::const_iterator pathIt = nameIt->second.begin(); pathIt != nameIt->second.end(); ++pathIt)
+         {
+            std::string field;
+
+            rapidxml::xml_node<> *pNode = this->mXML.allocate_node(rapidxml::node_element, "node");
+            oss << "p" << unid << "_" << nameIt->first << "_" << pathIt->startId();
+            field = oss.str();
+            oss.str("");
+            pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(field.c_str(),0)));
+
+            oss << IoTools::IdToHuman::toString(nameIt->first) << " ";
+            if(dir == TransformDirection::FORWARD)
+            {
+               oss << IoTools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(pathIt->startId()));
+            } else
+            {
+               oss << IoTools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(pathIt->startId()));
+            }
+            this->createAttr(pNode, "label", oss.str());
+            oss.str("");
+
+            pGraph->append_node(pNode);
+
+            // Add all path nodes
+            std::string curNode = field;
+            for(int i = 0; i < pathIt->nEdges(); ++i)
+            {
+               rapidxml::xml_node<> *pNode = this->mXML.allocate_node(rapidxml::node_element, "node");
+               oss << field << "_" << i;
+               pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(oss.str().c_str(),0)));
+
+               // Set "from" attribute
+               rapidxml::xml_node<> *pEdge = this->mXML.allocate_node(rapidxml::node_element, "edge");
+               pEdge->append_attribute(this->mXML.allocate_attribute("from", this->mXML.allocate_string(curNode.c_str(),0)));
+
+               // Set "to" attribute
+               pEdge->append_attribute(this->mXML.allocate_attribute("to", this->mXML.allocate_string(oss.str().c_str(),0)));
+               curNode = oss.str();
+               oss.str("");
+
+               // Add edge
+               this->createAttr(pEdge, "color", color.at(i));
+               oss << pathIt->edge(i).opId();
+               this->createAttr(pEdge, "label", oss.str());
+               oss.str("");
+               pGraph->append_node(pEdge);
+
+               if(pathIt->edge(i).arithId() == Arithmetics::SET)
+               {
+                  oss << "=";
+               } else if(pathIt->edge(i).arithId() == Arithmetics::SETNEG)
+               {
+                  oss << "=-";
+               } else if(pathIt->edge(i).arithId() == Arithmetics::ADD)
+               {
+                  oss << "+";
+               } else if(pathIt->edge(i).arithId() == Arithmetics::SUB)
+               {
+                  oss << "-";
+               }
+               if(pathIt->edge(i).outId().at(0) != -1)
+               {
+                  if(pathIt->fieldId() == FieldType::SCALAR)
+                  {
+                     oss << std::endl << "Scalar";
+                  } else if(pathIt->fieldId() == FieldType::CURL)
+                  {
+                     oss << std::endl << "Curl";
+                  } else if(pathIt->fieldId() == FieldType::GRADIENT)
+                  {
+                     oss << std::endl << "Gradient";
+                  } else if(pathIt->fieldId() == FieldType::GRADIENT2)
+                  {
+                     oss << std::endl << "Gradient2";
+                  } else
+                  {
+                     oss << std::endl;
+                  }
+
+                  for(std::vector<int>::const_iterator outIt = pathIt->edge(i).outId().begin(); outIt != pathIt->edge(i).outId().end(); ++outIt)
+                  {
+                     if(dir == TransformDirection::FORWARD)
+                     {
+                        oss << " " << IoTools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(*outIt));
+                     } else
+                     {
+                        oss << " " << IoTools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(*outIt));
+                     }
+                  }
+               }
+               this->createAttr(pNode, "label", oss.str());
+               oss.str("");
+
+               pGraph->append_node(pNode);
+            }
+
+            unid++;
+         }
+      }
+   }
+
+   void GxlWriter::graphTransformTree(const std::vector<Transform::TransformTree>& trees, const TransformDirection::Id dir)
+   {
+      std::stringstream oss;
+
+      // Set subgraph colors
+      std::vector<std::string> color;
+      color.push_back("blue");
+      color.push_back("green");
+      color.push_back("red");
+      std::vector<std::string>::const_iterator colorIt = color.begin();
+
+      // Get master GXL tag
+      rapidxml::xml_node<> *pGxl = this->mXML.first_node(this->GXLTAG.c_str());
+
+      // Create master graph
+      rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
+      pGraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string("master",0)));
+      pGxl->append_node(pGraph);
+
+      // Loop over the trees
+      for(std::vector<Transform::TransformTree>::const_iterator treeIt = trees.begin(); treeIt != trees.end(); ++treeIt)
+      {
+         rapidxml::xml_node<> *pNode = this->mXML.allocate_node(rapidxml::node_element, "node");
+         oss << "t" << "_" << treeIt->name() << "_" << treeIt->comp<int>();
+         std::string root = oss.str();
+         oss.str("");
+         pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(root.c_str(),0)));
+
+         oss << IoTools::IdToHuman::toString(treeIt->name()) << " ";
+         if(dir == TransformDirection::FORWARD)
+         {
+            oss << IoTools::IdToHuman::toString(treeIt->comp<FieldComponents::Physical::Id>());
+         } else
+         {
+            oss << IoTools::IdToHuman::toString(treeIt->comp<FieldComponents::Spectral::Id>());
+         }
+         this->createAttr(pNode, "label", oss.str());
+         oss.str("");
+
+         pGraph->append_node(pNode);
+
+         graphTransformTreeEdge(treeIt->root(), root, colorIt, pGraph, dir);
+      }
+   }
+
+   void GxlWriter::graphTransformTreeEdge(const Transform::TransformTreeEdge& edge, const std::string& root, std::vector<std::string>::const_iterator colorIt, rapidxml::xml_node<> * pGraph, const TransformDirection::Id dir)
+   {
+      std::stringstream oss;
+
+      for(Transform::TransformTreeEdge::EdgeType_citerator edgeIt = edge.edgeRange().first; edgeIt != edge.edgeRange().second; ++edgeIt)
+      {
+         rapidxml::xml_node<> *pNode = this->mXML.allocate_node(rapidxml::node_element, "node");
+         oss << root << edgeIt->opId<int>();
+         std::string nextRoot = oss.str();
+         oss.str("");
+         pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(nextRoot.c_str(),0)));
+
+         // Set "from" attribute
+         rapidxml::xml_node<> *pEdge = this->mXML.allocate_node(rapidxml::node_element, "edge");
+         pEdge->append_attribute(this->mXML.allocate_attribute("from", this->mXML.allocate_string(root.c_str(),0)));
+
+         // Set "to" attribute
+         pEdge->append_attribute(this->mXML.allocate_attribute("to", this->mXML.allocate_string(nextRoot.c_str(),0)));
+
+         // Add edge
+         this->createAttr(pEdge, "color", *colorIt);
+         oss << edgeIt->opId<int>();
+         if(edgeIt->recoverInput() && edgeIt->holdInput())
+         {
+            oss << std::endl << "(R,H)";
+         } else if(edgeIt->recoverInput())
+         {
+            oss << std::endl << "(R)";
+         } else if(edgeIt->holdInput())
+         {
+            oss << std::endl << "(H)";
+         }
+         if(edgeIt->recoverOutId() >= 0 && edgeIt->combinedOutId() >= 0)
+         {
+            oss << std::endl << "}" << edgeIt->recoverOutId() << "," << edgeIt->combinedOutId() << "{";
+         } else if(edgeIt->recoverOutId() >= 0)
+         {
+            oss << std::endl << "}" << edgeIt->recoverOutId() << "{";
+         } else if(edgeIt->combinedOutId() >= 0)
+         {
+            oss << std::endl << "}" << edgeIt->combinedOutId() << "{";
+         }
+         this->createAttr(pEdge, "label", oss.str());
+         oss.str("");
+         pGraph->append_node(pEdge);
+
+         if(edgeIt->arithId() == Arithmetics::SET)
+         {
+            oss << "=";
+         } else if(edgeIt->arithId() == Arithmetics::SETNEG)
+         {
+            oss << "=-";
+         } else if(edgeIt->arithId() == Arithmetics::ADD)
+         {
+            oss << "+";
+         } else if(edgeIt->arithId() == Arithmetics::SUB)
+         {
+            oss << "-";
+         }
+         if(edgeIt->outId<int>() != -1)
+         {
+            oss << std::endl;
+            if(edgeIt->fieldId() == FieldType::SCALAR)
+            {
+               oss << "Scalar";
+            } else if(edgeIt->fieldId() == FieldType::VECTOR)
+            {
+               // Just use name
+            } else if(edgeIt->fieldId() == FieldType::CURL)
+            {
+               oss << "Curl";
+            } else if(edgeIt->fieldId() == FieldType::GRADIENT)
+            {
+               oss << "Gradient";
+            } else if(edgeIt->fieldId() == FieldType::GRADIENT2)
+            {
+               oss << "Gradient2";
+            } else
+            {
+               throw Exception("Unknown field type ID in tree");
+            }
+
+            for(std::vector<int>::const_iterator outIt = edgeIt->outIds().begin(); outIt != edgeIt->outIds().end(); ++outIt)
+            {
+               if(dir == TransformDirection::FORWARD)
+               {
+                  oss << " " << IoTools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(*outIt));
+               } else
+               {
+                  oss << " " << IoTools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(*outIt));
+               }
+            }
+         }
+         this->createAttr(pNode, "label", oss.str());
+         oss.str("");
+
+         pGraph->append_node(pNode);
+
+         colorIt++;
+         graphTransformTreeEdge(*edgeIt, nextRoot, colorIt, pGraph, dir);
+         colorIt--;
       }
    }
 

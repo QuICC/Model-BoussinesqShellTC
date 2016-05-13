@@ -24,6 +24,9 @@
 #include "Resolutions/Resolution.hpp"
 #include "IoXml/IXmlWriter.hpp"
 #include "IoXml/IGxlFile.hpp"
+#include "Enums/TransformDirection.hpp"
+#include "TransformConfigurators/TransformPath.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -57,6 +60,16 @@ namespace IoXml {
           */
          void graphCommunication(const std::vector<std::multimap<int,int> >& structure);
          
+         /**
+          * @brief Create transform path graph
+          */
+         void graphTransformPath(const std::map<PhysicalNames::Id,std::vector<Transform::TransformPath> >& paths, const TransformDirection::Id dir);
+         
+         /**
+          * @brief Create transform tree graph
+          */
+         void graphTransformTree(const std::vector<Transform::TransformTree>& trees, const TransformDirection::Id dir);
+         
       protected:
          /**
           * @brief Create an attr tag in the xml tree
@@ -66,6 +79,11 @@ namespace IoXml {
           * @param value   Value to store in string child
           */
          void createAttr(rapidxml::xml_node<>* parent, const std::string& name, const std::string& value);
+
+         /**
+          * @brief Build tree recursively
+          */
+         void graphTransformTreeEdge(const Transform::TransformTreeEdge& edge, const std::string& root, std::vector<std::string>::const_iterator colorIt, rapidxml::xml_node<> * pGraph, const TransformDirection::Id dir);
 
       private:
    };

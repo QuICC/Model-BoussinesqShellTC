@@ -24,6 +24,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/Arithmetics.hpp"
 
@@ -127,6 +128,9 @@ namespace Datatypes {
       } else if(arithId == Arithmetics::SUB)
       {
          rRhs.subData(lhs.data());
+      } else
+      {
+         throw Exception("Unknown arithmetic operation in combine!");
       }
    }
 
