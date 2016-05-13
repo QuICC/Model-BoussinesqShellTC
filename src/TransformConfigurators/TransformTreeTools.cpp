@@ -208,9 +208,6 @@ namespace Transform {
                {
                   throw Exception("Unknown arithmetic operation during transform tree construction!");
                }
-            } else
-            {
-                  throw Exception("tHIS HAPPENS!");
             }
          }
       }
@@ -223,14 +220,16 @@ namespace Transform {
       PhysicalNames::Id curName = static_cast<PhysicalNames::Id>(0);
       for(std::vector<TransformTree>::iterator treeIt = rTrees.begin(); treeIt != rTrees.end(); ++treeIt)
       {
+         if(curName != treeIt->name())
+         {
+            outIds.clear();
+            curName = treeIt->name();
+         }
+
          // Recursively set hold and recovery flags
          setInputInfoEdge(treeIt->rRoot());
 
          // Recursively order operations by replacing first by SET or SETNEG
-         if(curName != treeIt->name())
-         {
-            outIds.clear();
-         }
          setOutputOrder(treeIt->rRoot(), outIds);
       }
    }

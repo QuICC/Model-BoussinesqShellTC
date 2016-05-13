@@ -189,7 +189,7 @@ namespace Transform {
 
       } else
       {
-            coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(*pOutVar);
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(*pOutVar);
       }
 
       // Stop detailed profiler
