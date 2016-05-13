@@ -46,7 +46,7 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
-         enum Id {PROJ, PROJLL, DIFF, DIFFLL, DIVSIN, DIVSINLL, DIVSINDIFFSIN};
+         enum Id {PROJ, PROJLL, DIFF, DIFFLL, DIVSIN, DIVSINLL, DIVSINDIFFSIN, DIVSINDPHI, DIVSINLLDPHI};
       };
 
       /**
@@ -55,7 +55,7 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG, INTGDIVLL, INTGLL, INTGLL2, INTGDIVSIN, INTGDIVLLDIVSIN, INTGLLDIVSIN, INTGDIFF, INTGDIVLLDIFF, INTGLLDIFF};
+         enum Id {INTG, INTGDIVLL, INTGLL, INTGLL2, INTGDIVSIN, INTGDIVLLDIVSIN, INTGLLDIVSIN, INTGDIFF, INTGDIVLLDIFF, INTGLLDIFF, INTGDIVSINDPHI, INTGDIVLLDIVSINDPHI, INTGLLDIVSINDPHI};
       };
 
    };
@@ -161,6 +161,16 @@ namespace Transform {
          void setMultLIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops, const Array& mult);
 
          /**
+          * @brief Compute integration with vector of operators
+          */
+         void setIntegratorDPhi(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief f(l) Compute integration with vector of operators
+          */
+         void setMultLIntegratorDPhi(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops, const Array& mult);
+
+         /**
           * @brief Compute projection with vector of operators
           */
          void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
@@ -169,6 +179,16 @@ namespace Transform {
           * @brief Compute f(l) projection with vector of operators
           */
          void setMultLProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops, const Array& mult);
+
+         /**
+          * @brief Compute projection of \f$\partial_{\phi}\f$ with vector of operators
+          */
+         void setProjectorDPhi(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief Compute f(l) projection of \f$\partial_{\phi}\f$ with vector of operators
+          */
+         void setMultLProjectorDPhi(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops, const Array& mult);
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1]
