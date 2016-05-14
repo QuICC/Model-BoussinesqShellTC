@@ -76,7 +76,7 @@ namespace Equations {
 
       // Compute forward transform
       MatrixZ tmp(spSetup->bwdSize(), spSetup->howmany());
-      transform.integrate(tmp, this->scalar(this->mDataField).dom(0).phys().data(), Transform::Fft::FftSelector::IntegratorType::INTG, Arithmetics::SET);
+      transform.integrate(tmp, this->scalar(this->mDataField).dom(0).phys().data(), Transform::Fft::FftSelector::IntegratorType::INTG);
 
       // Get Z grid
       int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
@@ -103,7 +103,7 @@ namespace Equations {
       }
 
       // Compute backward transform
-      transform.project(rNLComp.rData(), tmp, Transform::FftIds::Projectors::PROJ, Arithmetics::SET);
+      transform.project(rNLComp.rData(), tmp, Transform::FftIds::Projectors::PROJ);
    }
 
    void TiltedScalarFieldVisualizer::useNonlinear(const Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId)

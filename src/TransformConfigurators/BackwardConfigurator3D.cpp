@@ -62,7 +62,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::BWD2DTRA);
 
       // Compute projection transform for second dimension 
-      coord.transform2D().project(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id>(), Arithmetics::SET);
+      coord.transform2D().project(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::ProjectorType::Id>());
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2DTRA);

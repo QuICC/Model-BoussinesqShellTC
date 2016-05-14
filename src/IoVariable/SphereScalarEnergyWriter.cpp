@@ -106,13 +106,13 @@ namespace IoVariable {
       Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
+      coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
       // Compute |f|^2
       rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate_energy(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+      coord.transform1D().integrate_energy(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mEnergy = 0.0;

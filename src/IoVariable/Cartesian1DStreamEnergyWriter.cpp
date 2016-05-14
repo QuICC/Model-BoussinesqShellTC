@@ -270,7 +270,7 @@ namespace IoVariable {
          Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
          // Compute projection transform for first dimension 
-         coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
+         coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
          if(cIt->first == FieldComponents::Spectral::Z)
          {
@@ -304,7 +304,7 @@ namespace IoVariable {
          }
 
          // Compute integration transform for first dimension 
-         coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+         coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
          MHDFloat *pEnergy;
          if(cIt->first == FieldComponents::Spectral::X)

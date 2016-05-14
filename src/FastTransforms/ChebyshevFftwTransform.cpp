@@ -260,10 +260,8 @@ namespace Transform {
       FftwLibrary::cleanupFft();
    }
 
-   void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -293,10 +291,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -346,10 +342,8 @@ namespace Transform {
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -398,10 +392,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -486,10 +478,8 @@ namespace Transform {
       rPhysVal.imag() = this->mTmpOut;
    }
 
-   void ChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -515,10 +505,8 @@ namespace Transform {
       }
    }
 
-   void ChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 

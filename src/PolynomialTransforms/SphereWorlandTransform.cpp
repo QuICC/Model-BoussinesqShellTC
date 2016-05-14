@@ -105,10 +105,8 @@ namespace Transform {
       #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
    }
 
-   void SphereWorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, SphereWorlandTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void SphereWorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, SphereWorlandTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
       assert(physVal.cols() == this->mspSetup->howmany());
@@ -140,10 +138,8 @@ namespace Transform {
 
    }
 
-   void SphereWorlandTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, SphereWorlandTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void SphereWorlandTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, SphereWorlandTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // assert right sizes for input  matrix
       assert(specVal.cols() == this->mspSetup->howmany());
 

@@ -61,7 +61,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWD2DTRA);
 
       // Compute integration transform of second dimension
-      coord.transform2D().integrate(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType::Id>(), Arithmetics::SET);
+      coord.transform2D().integrate(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA2D>::Type::IntegratorType::Id>());
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD2DTRA);

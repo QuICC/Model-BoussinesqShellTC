@@ -121,10 +121,8 @@ namespace Transform {
       this->mTmpB.resize(this->mspSetup->fwdSize(), 2);
    }
 
-   void AssociatedLegendreFlyTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreFlyTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void AssociatedLegendreFlyTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreFlyTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
       assert(physVal.cols() == this->mspSetup->howmany());
@@ -179,10 +177,8 @@ namespace Transform {
       }
    }
 
-   void AssociatedLegendreFlyTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, AssociatedLegendreFlyTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void AssociatedLegendreFlyTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, AssociatedLegendreFlyTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // assert right sizes for input  matrix
       assert(specVal.cols() == this->mspSetup->howmany());
 

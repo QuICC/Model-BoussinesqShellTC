@@ -27,7 +27,6 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
-#include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
 
@@ -121,9 +120,8 @@ namespace Transform {
           * @param rSpecVal   Output spectral coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute polynomial projection
@@ -131,9 +129,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param specVal    Input spectral coefficients
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**

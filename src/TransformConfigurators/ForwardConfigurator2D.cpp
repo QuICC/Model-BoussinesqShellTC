@@ -72,7 +72,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWDNDTRA);
 
       // Compute integration transform of third dimension
-      coord.transformND().integrate(pOutVar->rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::IntegratorType::Id>(), Arithmetics::SET);
+      coord.transformND().integrate(pOutVar->rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::IntegratorType::Id>());
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWDNDTRA);
@@ -159,7 +159,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRA);
 
       // Compute integration transform of first dimension
-      coord.transform1D().integrate(rOutVar.rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType::Id>(), Arithmetics::SET);
+      coord.transform1D().integrate(rOutVar.rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRA1D>::Type::IntegratorType::Id>());
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRA);

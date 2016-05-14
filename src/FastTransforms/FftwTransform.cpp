@@ -145,10 +145,8 @@ namespace Transform {
       FftwLibrary::cleanupFft();
    }
 
-   void FftwTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, FftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void FftwTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, FftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::MIXED);
 
@@ -180,7 +178,7 @@ namespace Transform {
       }
    }
 
-   void FftwTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void FftwTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
    {
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::MIXED);
@@ -228,29 +226,12 @@ namespace Transform {
       // Set the padded values to zero
       this->mTmpRIn.bottomRows(this->mspSetup->padSize()).setZero();
 
-      // Do transform with corresponding arithmetics
-      if(arithId == Arithmetics::SET)
-      {
-         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
-      } else if(arithId == Arithmetics::SETNEG)
-      {
-         this->mTmpRIn = -this->mTmpRIn;
-         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
-      } else if(arithId == Arithmetics::ADD)
-      {
-         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), this->mTmpROut.data());
-         rPhysVal += this->mTmpROut;
-      } else if(arithId == Arithmetics::SUB)
-      {
-         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), this->mTmpROut.data());
-         rPhysVal -= this->mTmpROut;
-      }
+      // Do transform
+      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
    }
 
-   void FftwTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, FftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void FftwTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, FftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a non mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPLEX);
 
@@ -282,7 +263,7 @@ namespace Transform {
       }
    }
 
-   void FftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void FftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
    {
       // Assert that a non mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPLEX);
@@ -339,26 +320,8 @@ namespace Transform {
       // Set the padded values to zero
       this->mTmpZIn.block(posN, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
 
-      // Do transform with corresponding arithmetics
-      if(arithId == Arithmetics::SET)
-      {
-         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
-
-      } else if(arithId == Arithmetics::SETNEG)
-      {
-         this->mTmpZIn = -this->mTmpZIn;
-         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
-
-      } else if(arithId == Arithmetics::ADD)
-      {
-         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(this->mTmpZOut.data()));
-         rPhysVal += this->mTmpZOut;
-
-      } else if(arithId == Arithmetics::SUB)
-      {
-         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(this->mTmpZOut.data()));
-         rPhysVal -= this->mTmpZOut;
-      }
+      // Do transform
+      fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
    }
 
    void FftwTransform::forceConjugate(MatrixZ& rFFTVal)

@@ -29,7 +29,6 @@
 #include "Base/Typedefs.hpp"
 #include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
-#include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
@@ -148,9 +147,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -160,9 +158,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (R2R)
@@ -172,9 +169,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -184,9 +180,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute forward FFT (R2R) provide full output without spectral truncation
@@ -196,9 +191,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -208,9 +202,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**

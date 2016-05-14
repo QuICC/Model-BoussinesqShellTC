@@ -178,10 +178,8 @@ namespace Transform {
 
    }
 
-   void AssociatedLegendreTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void AssociatedLegendreTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
       assert(physVal.cols() == this->mspSetup->howmany());
@@ -300,10 +298,8 @@ namespace Transform {
       }
    }
 
-   void AssociatedLegendreTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, AssociatedLegendreTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void AssociatedLegendreTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, AssociatedLegendreTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // assert right sizes for input  matrix
       assert(specVal.cols() == this->mspSetup->howmany());
 

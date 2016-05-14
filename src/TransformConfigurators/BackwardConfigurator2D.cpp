@@ -135,7 +135,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRA);
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project(pOutVar->rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType::Id>(), Arithmetics::SET);
+      coord.transform1D().project(pOutVar->rData(), rInVar.data(), edge.opId<TransformSelector<Dimensions::Transform::TRA1D>::Type::ProjectorType::Id>());
       
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRA);
@@ -231,7 +231,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::BWDNDTRA);
 
       // Compute projection transform for third dimension 
-      coord.transformND().project(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::ProjectorType::Id>(), Arithmetics::SET);
+      coord.transformND().project(pOutVar->rData(), pInVar->data(), edge.opId<TransformSelector<Dimensions::Transform::TRAND>::Type::ProjectorType::Id>());
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWDNDTRA);
