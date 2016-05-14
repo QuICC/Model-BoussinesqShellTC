@@ -74,8 +74,9 @@ namespace Transform {
       gxlTree.write();
       gxlTree.finalize();
 
-
+      //
       // Third stage: Combine arithmetic operations into single tree branch
+      //
       optimizeTrees(rTrees);
 
       //
@@ -209,7 +210,7 @@ namespace Transform {
       }
    }
 
-   void TransformTreeTools::setOutputOrder(TransformTreeEdge& edge, std::set<std::pair<FieldType::Id,std::vector<int> > >& outIds)
+   void TransformTreeTools::setOutputOrder(TransformTreeEdge& edge, TransformTreeTools::SetOutIds& outIds)
    {
       // Get range of edges
       TransformTreeEdge::EdgeType_range rangeIt = edge.rEdgeRange();
@@ -231,7 +232,7 @@ namespace Transform {
          for(TransformTreeEdge::EdgeType_iterator edgeIt = rangeIt.first; edgeIt != rangeIt.second; ++edgeIt)
          {
             // Try to add to unique output fields
-            std::pair<std::set<std::pair<FieldType::Id,std::vector<int> > >::iterator,bool> outIt = outIds.insert(std::make_pair(edgeIt->fieldId(), edgeIt->outIds()));
+            std::pair<SetOutIds::iterator,bool> outIt = outIds.insert(std::make_pair(edgeIt->fieldId(), edgeIt->outIds()));
 
             // If first entry, replace arithmetics with SET or SETNEG
             if(outIt.second)
@@ -255,7 +256,7 @@ namespace Transform {
    void TransformTreeTools::finalizeTrees(std::vector<TransformTree>& rTrees)
    {
       // Loop over all trees
-      std::set<std::pair<FieldType::Id,std::vector<int> > > outIds;
+      SetOutIds outIds;
       PhysicalNames::Id curName = static_cast<PhysicalNames::Id>(0);
       for(std::vector<TransformTree>::iterator treeIt = rTrees.begin(); treeIt != rTrees.end(); ++treeIt)
       {
@@ -273,8 +274,169 @@ namespace Transform {
       }
    }
 
+   void TransformTreeTools::optimizeOutputCount(TransformTreeEdge& edge, TransformTreeTools::MapOptIds& optIds, SetOutIds& outIds, int& counter)
+   {
+      // Get range of edges
+      TransformTreeEdge::EdgeType_range rangeIt = edge.rEdgeRange();
+
+      // Check for last recurrence
+      if(std::distance(rangeIt.first->edgeRange().first, rangeIt.first->edgeRange().second) > 0)
+      {
+         // Loop over edges
+         for(TransformTreeEdge::EdgeType_iterator edgeIt = rangeIt.first; edgeIt != rangeIt.second; ++edgeIt)
+         {
+            // Recursively go to next level
+            optimizeOutputCount(*edgeIt, optIds, outIds, counter);
+         }
+      
+      // Reached last level
+      } else
+      {
+         // Loop over edges
+         for(TransformTreeEdge::EdgeType_iterator edgeIt = rangeIt.first; edgeIt != rangeIt.second; ++edgeIt)
+         {
+            // Add to set of output keys
+            OutKey outKey = std::make_pair(edgeIt->fieldId(), edgeIt->outIds());
+            std::pair<SetOutIds::iterator,bool> outIt = outIds.insert(outKey);
+
+            // Add to map or increase count
+            OptKey optKey = std::tr1::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
+            std::pair<MapOptIds::iterator,bool> optIt = optIds.insert(std::make_pair(optKey, std::tr1::make_tuple(0,counter,outIt.second)));
+            std::tr1::get<0>(optIt.first->second) += 1;
+
+            // Increment counter used as index
+            counter++;
+         }
+      }
+   }
+
+   void TransformTreeTools::pruneOutput(TransformTreeEdge& edge, TransformTreeTools::MapOptIds& optIds)
+   {
+      // Get range of edges
+      TransformTreeEdge::EdgeType_range rangeIt = edge.rEdgeRange();
+
+      // Check for last recurrence
+      if(std::distance(rangeIt.first->edgeRange().first, rangeIt.first->edgeRange().second) > 0)
+      {
+         // Loop over edges
+         for(TransformTreeEdge::EdgeType_iterator edgeIt = rangeIt.first; edgeIt != rangeIt.second; ++edgeIt)
+         {
+            // Recursively go to next level
+            pruneOutput(*edgeIt, optIds);
+         }
+      
+      // Reached last level
+      } else
+      {
+         // Algorithm only works for single branch
+         if(std::distance(edge.edgeRange().first, edge.edgeRange().second) == 1)
+         {
+            // Get edge iterator and make key
+            TransformTreeEdge::EdgeType_iterator edgeIt = edge.rEdgeRange().first;
+            OptKey optKey = std::tr1::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
+
+            // Setup first element of combined field
+            if(std::tr1::get<0>(optIds.find(optKey)->second) > 1)
+            {
+               // Make counter negative to identify them later on
+               std::tr1::get<0>(optIds.find(optKey)->second) = -std::tr1::get<0>(optIds.find(optKey)->second) + 1;
+
+               // Convert to set
+               Arithmetics::Id arithId;
+               if(edgeIt->arithId() == Arithmetics::ADD)
+               {
+                  arithId = Arithmetics::SET;
+               } else if(edgeIt->arithId() == Arithmetics::SUB)
+               {
+                  arithId = Arithmetics::SETNEG;
+               } else
+               {
+                  arithId = edgeIt->arithId();
+               }
+
+               edge.setCombinedInfo(arithId, -1, std::tr1::get<1>(optIds.find(optKey)->second));
+               edge.setArithId(Arithmetics::NONE);
+               edgeIt = edge.delEdge(edgeIt);
+
+            // Setup other elements in combination   
+            } else if(std::tr1::get<0>(optIds.find(optKey)->second) < 0)
+            {
+               if(edgeIt->arithId() == Arithmetics::SET || edgeIt->arithId() == Arithmetics::SETNEG)
+               {
+                  throw Exception("The tree to optimize is not properly setup!");
+               }
+               Arithmetics::Id arithId = edgeIt->arithId();
+               edge.setArithId(Arithmetics::NONE);
+
+               int holdId;
+               // Setup intermediate elements
+               if(std::tr1::get<0>(optIds.find(optKey)->second) < -1)
+               {
+                  holdId = std::tr1::get<1>(optIds.find(optKey)->second);
+                  edgeIt = edge.delEdge(edgeIt);
+
+               // Setup last element
+               } else
+               {
+                  holdId = -1;
+                  if(std::tr1::get<2>(optIds.find(optKey)->second))
+                  {
+                     edgeIt->setArithId(Arithmetics::SET);
+                  } else
+                  {
+                     edgeIt->setArithId(Arithmetics::ADD);
+                  }
+               }
+               edge.setCombinedInfo(arithId, std::tr1::get<1>(optIds.find(optKey)->second), holdId);
+               std::tr1::get<0>(optIds.find(optKey)->second) += 1;
+            }
+         } else
+         {
+            throw Exception("Tree optimization algorithm doesn't work on this tree!");
+         }
+      }
+   }
+
    void TransformTreeTools::optimizeTrees(std::vector<TransformTree>& rTrees)
    {
+      // Loop over all trees
+      if(rTrees.size() > 0)
+      {
+         SetOutIds outIds;
+         MapOptIds optIds;
+         PhysicalNames::Id curName = rTrees.begin()->name();
+         std::vector<TransformTree>::iterator subBegin = rTrees.begin();
+         int counter = 0;
+         for(std::vector<TransformTree>::iterator treeIt = rTrees.begin(); treeIt != rTrees.end(); ++treeIt)
+         {
+            if(curName != treeIt->name())
+            {
+               curName = treeIt->name();
+               if(optIds.size() > 0)
+               { 
+                  for(std::vector<TransformTree>::iterator subIt = subBegin; subIt != treeIt; ++subIt)
+                  {
+                     pruneOutput(subIt->rRoot(), optIds);
+                  }
+                  subBegin = treeIt;
+               }
+               outIds.clear();
+               optIds.clear();
+            }
+
+            // Recursively set hold and recovery flags
+            optimizeOutputCount(treeIt->rRoot(), optIds, outIds, counter);
+         }
+
+         // Prune last field
+         if(optIds.size() > 0)
+         { 
+            for(std::vector<TransformTree>::iterator subIt = subBegin; subIt != rTrees.end(); ++subIt)
+            {
+               pruneOutput(subIt->rRoot(), optIds);
+            }
+         }
+      }
    }
 }
 }

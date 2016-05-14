@@ -197,16 +197,16 @@ namespace IoXml {
 
                if(pathIt->edge(i).arithId() == Arithmetics::SET)
                {
-                  oss << "=";
+                  oss << "==";
                } else if(pathIt->edge(i).arithId() == Arithmetics::SETNEG)
                {
                   oss << "=-";
                } else if(pathIt->edge(i).arithId() == Arithmetics::ADD)
                {
-                  oss << "+";
+                  oss << "++";
                } else if(pathIt->edge(i).arithId() == Arithmetics::SUB)
                {
-                  oss << "-";
+                  oss << "--";
                }
                if(pathIt->edge(i).outId().at(0) != -1)
                {
@@ -326,32 +326,48 @@ namespace IoXml {
          {
             oss << std::endl << "(H)";
          }
-         if(edgeIt->recoverOutId() >= 0 && edgeIt->combinedOutId() >= 0)
-         {
-            oss << std::endl << "}" << edgeIt->recoverOutId() << "," << edgeIt->combinedOutId() << "{";
-         } else if(edgeIt->recoverOutId() >= 0)
-         {
-            oss << std::endl << "}" << edgeIt->recoverOutId() << "{";
-         } else if(edgeIt->combinedOutId() >= 0)
-         {
-            oss << std::endl << "}" << edgeIt->combinedOutId() << "{";
-         }
          this->createAttr(pEdge, "label", oss.str());
          oss.str("");
          pGraph->append_node(pEdge);
 
          if(edgeIt->arithId() == Arithmetics::SET)
          {
-            oss << "=";
+            oss << "==";
          } else if(edgeIt->arithId() == Arithmetics::SETNEG)
          {
             oss << "=-";
          } else if(edgeIt->arithId() == Arithmetics::ADD)
          {
-            oss << "+";
+            oss << "++";
          } else if(edgeIt->arithId() == Arithmetics::SUB)
          {
-            oss << "-";
+            oss << "--";
+         }
+         if(edgeIt->combinedOutId() >= 0 || edgeIt->recoverOutId() >= 0)
+         {
+            oss << "[";
+            if(edgeIt->recoverOutId() >= 0)
+            {
+               oss << edgeIt->recoverOutId() << ", ";
+            }
+            if(edgeIt->combinedArithId() == Arithmetics::SET)
+            {
+               oss << "==";
+            } else if(edgeIt->combinedArithId() == Arithmetics::SETNEG)
+            {
+               oss << "=-";
+            } else if(edgeIt->combinedArithId() == Arithmetics::ADD)
+            {
+               oss << "++";
+            } else if(edgeIt->combinedArithId() == Arithmetics::SUB)
+            {
+               oss << "--";
+            }
+            if(edgeIt->combinedOutId() >= 0)
+            {
+               oss << ", ->" << edgeIt->combinedOutId();
+            }
+            oss << "]";
          }
          if(edgeIt->outId<int>() != -1)
          {

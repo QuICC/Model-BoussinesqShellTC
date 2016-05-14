@@ -50,14 +50,8 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd2DType *pRecOutVar = 0;
       if(edge.recoverOutId() >= 0)
       {
-         if(edge.combinedArithId() == Arithmetics::SET || edge.combinedArithId() == Arithmetics::SETNEG)
-         {
-            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverBwd(edge.recoverOutId());
-         } else
-         {
-            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
-            pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverBwd(edge.recoverOutId());
-         }
+         pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
+         pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverBwd(edge.recoverOutId());
       } else
       {
          pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
@@ -95,6 +89,16 @@ namespace Transform {
          {
             coord.communicator().transferBackward<Dimensions::Transform::TRA2D>(*pRecOutVar);
          }
+
+      // Hold data for combination   
+      } else if(edge.combinedOutId() >= 0)
+      {
+         if(edge.combinedArithId() == Arithmetics::SETNEG)
+         {
+            Datatypes::FieldTools::negative(*pOutVar);
+         }
+
+         coord.communicator().storage<Dimensions::Transform::TRA2D>().holdBwd(*pOutVar, edge.combinedOutId());
       }
 
       // Transfer calculation
@@ -105,17 +109,11 @@ namespace Transform {
             Datatypes::FieldTools::negative(*pOutVar);
          }
 
-         if(edge.outId<int>() >= 0)
-         {
-            coord.communicator().storage<Dimensions::Transform::TRA2D>().holdBwd(*pOutVar, edge.outId<int>());
-         } else
-         {
-            coord.communicator().transferBackward<Dimensions::Transform::TRA2D>(*pOutVar);
-         }
+         coord.communicator().transferBackward<Dimensions::Transform::TRA2D>(*pOutVar);
 
-      } else
+      } else if(edge.combinedOutId() < 0 || pRecOutVar != 0)
       {
-            coord.communicator().storage<Dimensions::Transform::TRA2D>().freeBwd(*pOutVar);
+         coord.communicator().storage<Dimensions::Transform::TRA2D>().freeBwd(*pOutVar);
       }
 
       // Stop detailed profiler

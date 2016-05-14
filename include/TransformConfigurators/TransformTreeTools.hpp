@@ -43,6 +43,11 @@ namespace Transform {
       protected:
 
       private:
+         typedef std::pair<FieldType::Id,std::vector<int> >  OutKey;
+         typedef std::set<OutKey> SetOutIds;
+         typedef std::tr1::tuple<int,FieldType::Id,std::vector<int> > OptKey;
+         typedef std::map<OptKey,std::tr1::tuple<int,int,bool> > MapOptIds;
+
          /**
           * @brief Recursive grows of the tree
           */
@@ -59,9 +64,19 @@ namespace Transform {
          static void setInputInfoEdge(TransformTreeEdge& edge);
 
          /**
-          * @brief Set edge input information
+          * @brief Set edge output order
           */
-         static void setOutputOrder(TransformTreeEdge& edge, std::set<std::pair<FieldType::Id,std::vector<int> > >& outIds);
+         static void setOutputOrder(TransformTreeEdge& edge, SetOutIds& outIds);
+
+         /**
+          * @brief Optimize output count
+          */
+         static void optimizeOutputCount(TransformTreeEdge& edge, MapOptIds& optIds, SetOutIds& outIds, int& counter);
+
+         /**
+          * @brief Optimize output by pruning extra outputs
+          */
+         static void pruneOutput(TransformTreeEdge& edge, MapOptIds& optIds);
 
          /**
           * @brief Finalize the trees

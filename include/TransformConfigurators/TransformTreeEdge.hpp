@@ -77,6 +77,11 @@ namespace Transform {
          TransformTreeEdge& addEdge(const int op, const int n);
 
          /**
+          * @brief Delete an edge to tree
+          */
+         EdgeType_iterator delEdge(EdgeType_iterator edgeIt);
+
+         /**
           * @brief Get out component id
           */
          template <typename TId> TId outId(const int i = 0) const;
@@ -130,6 +135,11 @@ namespace Transform {
           * @brief Set recovery and hold information for input data
           */
          void setInputInfo(const int recover, const int hold); 
+
+         /**
+          * @brief Set output recovery and combination inforation
+          */
+         void setCombinedInfo(const Arithmetics::Id, const int recoverId, const int holdId); 
 
          /**
           * @brief Set end component as vector of IDs

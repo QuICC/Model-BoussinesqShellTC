@@ -124,14 +124,8 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd1DType *pRecOutVar = 0;
       if(edge.recoverOutId() >= 0)
       {
-         if(edge.combinedArithId() == Arithmetics::SET || edge.combinedArithId() == Arithmetics::SETNEG)
-         {
-            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd(edge.recoverOutId());
-         } else
-         {
-            pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
-            pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd(edge.recoverOutId());
-         }
+         pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+         pRecOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd(edge.recoverOutId());
       } else
       {
          pOutVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
@@ -169,6 +163,16 @@ namespace Transform {
          {
             coord.communicator().transferForward<Dimensions::Transform::TRA1D>(*pRecOutVar);
          }
+
+      // Hold data for combination   
+      } else if(edge.combinedOutId() >= 0)
+      {
+         if(edge.combinedArithId() == Arithmetics::SETNEG)
+         {
+            Datatypes::FieldTools::negative(*pOutVar);
+         }
+
+         coord.communicator().storage<Dimensions::Transform::TRA2D>().holdFwd(*pOutVar, edge.combinedOutId());
       }
 
       // Transfer calculation
@@ -179,15 +183,9 @@ namespace Transform {
             Datatypes::FieldTools::negative(*pOutVar);
          }
 
-         if(edge.outId<int>() >= 0)
-         {
-            coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(*pOutVar, edge.outId<int>());
-         } else
-         {
-            coord.communicator().transferForward<Dimensions::Transform::TRA1D>(*pOutVar);
-         }
+         coord.communicator().transferForward<Dimensions::Transform::TRA1D>(*pOutVar);
 
-      } else
+      } else if(edge.combinedOutId() < 0 || pRecOutVar != 0)
       {
          coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(*pOutVar);
       }
@@ -253,6 +251,7 @@ namespace Transform {
       if(pRecOutVar != 0)
       {
          Datatypes::FieldTools::combine(*pRecOutVar, *pOutVar, edge.arithId());
+
          coord.communicator().transferForward<Dimensions::Transform::TRAND>(*pRecOutVar);
          coord.communicator().storage<Dimensions::Transform::TRAND>().freeFwd(*pOutVar);
       } else

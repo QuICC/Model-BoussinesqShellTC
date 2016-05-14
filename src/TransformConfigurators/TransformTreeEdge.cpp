@@ -70,6 +70,11 @@ namespace Transform {
       return this->mEdges.back();
    }
 
+   TransformTreeEdge::EdgeType_iterator TransformTreeEdge::delEdge(TransformTreeEdge::EdgeType_iterator edgeIt)
+   {
+      return this->mEdges.erase(edgeIt);
+   }
+
    bool TransformTreeEdge::recoverInput() const
    {
       return this->mRecoverInput;
@@ -115,6 +120,15 @@ namespace Transform {
       this->mRecoverInput = recover;
 
       this->mHoldInput = hold;
+   }
+
+   void TransformTreeEdge::setCombinedInfo(const Arithmetics::Id arithId, const int recoverId, const int holdId)
+   {
+      this->mCombinedArithId = arithId;
+
+      this->mRecoverOutId = recoverId;
+
+      this->mCombinedOutId = holdId;
    }
 
    void TransformTreeEdge::setArithId(const Arithmetics::Id arithId)
