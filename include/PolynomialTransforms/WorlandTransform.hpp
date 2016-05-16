@@ -1,11 +1,11 @@
 /** 
- * @file SphereWorlandTransform.hpp
+ * @file WorlandTransform.hpp
  * @brief Implementation of the Worland transform in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPHEREWORLANDTRANSFORM_HPP
-#define SPHEREWORLANDTRANSFORM_HPP
+#ifndef WORLANDTRANSFORM_HPP
+#define WORLANDTRANSFORM_HPP
 
 // Debug includes
 //
@@ -35,9 +35,9 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief Simple struct holding details about SphereWorland transform
+    * @brief Simple struct holding details about Worland transform
     */
-   struct SphereWorlandIds {
+   struct WorlandIds {
 
       /**
        * @brief Simple struct holding the projector IDs
@@ -80,7 +80,7 @@ namespace Transform {
    /**
     * @brief Implementation of the Worland transform in a sphere
     */ 
-   class SphereWorlandTransform
+   class WorlandTransform
    {
       public:
          /// Typedef for the configuration class
@@ -90,10 +90,10 @@ namespace Transform {
          typedef SharedPolySetup SharedSetupType;
 
          /// Typedef for the Projector type
-         typedef SphereWorlandIds::Projectors ProjectorType;
+         typedef WorlandIds::Projectors ProjectorType;
 
          /// Typedef for the Integrator type
-         typedef SphereWorlandIds::Integrators IntegratorType;
+         typedef WorlandIds::Integrators IntegratorType;
 
          /**
           * @brief Generate a physical grid
@@ -103,12 +103,12 @@ namespace Transform {
          /**
           * @brief Constructor
           */
-         SphereWorlandTransform();
+         WorlandTransform();
 
          /**
           * @brief Destructor
           */
-         ~SphereWorlandTransform();
+         ~WorlandTransform();
 
          /**
           * @brief Initialise the polynomial transform (matrices, weights, grid, etc)
@@ -204,4 +204,4 @@ namespace Transform {
 }
 }
 
-#endif // SPHEREWORLANDTRANSFORM_HPP
+#endif // WORLANDTRANSFORM_HPP

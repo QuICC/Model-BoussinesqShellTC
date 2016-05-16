@@ -1,5 +1,5 @@
 /** 
- * @file SphereWorlandTransform.cpp
+ * @file WorlandTransform.cpp
  * @brief Source of the implementation of the Worland transform in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PolynomialTransforms/SphereWorlandTransform.hpp"
+#include "PolynomialTransforms/WorlandTransform.hpp"
 
 // Project includes
 //
@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   Array SphereWorlandTransform::generateGrid(const int size)
+   Array WorlandTransform::generateGrid(const int size)
    {
       // Initialise grid storage
       Array grid(size);
@@ -40,15 +40,15 @@ namespace Transform {
       return grid;
    }
 
-   SphereWorlandTransform::SphereWorlandTransform()
+   WorlandTransform::WorlandTransform()
    {
    }
 
-   SphereWorlandTransform::~SphereWorlandTransform()
+   WorlandTransform::~WorlandTransform()
    {
    }
 
-   void SphereWorlandTransform::init(SphereWorlandTransform::SharedSetupType spSetup)
+   void WorlandTransform::init(WorlandTransform::SharedSetupType spSetup)
    {
       // Store the shared pointer to setup object
       this->mspSetup = spSetup;
@@ -57,37 +57,37 @@ namespace Transform {
       this->initOperators();
    }
 
-   void SphereWorlandTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
+   void WorlandTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
       //
       // No possible options
       //
    }
 
-   void SphereWorlandTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
+   void WorlandTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
       //
       // No possible options
       //
    }
 
-   const Array& SphereWorlandTransform::meshGrid() const
+   const Array& WorlandTransform::meshGrid() const
    {
       if(this->mGrid.size() == 0 || this->mWeights.size() == 0)
       {
-         throw Exception("SphereWorlandTransform has not been initialised!");
+         throw Exception("WorlandTransform has not been initialised!");
       }
 
       return this->mGrid;
    }
 
-   void SphereWorlandTransform::initOperators()
+   void WorlandTransform::initOperators()
    {
       this->mGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
 
       // Set the grid
-      this->mGrid = SphereWorlandTransform::generateGrid(this->mspSetup->fwdSize());
+      this->mGrid = WorlandTransform::generateGrid(this->mspSetup->fwdSize());
 
       // Set the weights
       this->mWeights.setConstant(Math::PI/this->mspSetup->fwdSize());
@@ -105,7 +105,7 @@ namespace Transform {
       #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
    }
 
-   void SphereWorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, SphereWorlandTransform::IntegratorType::Id integrator)
+   void WorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, WorlandTransform::IntegratorType::Id integrator)
    {
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
@@ -138,7 +138,7 @@ namespace Transform {
 
    }
 
-   void SphereWorlandTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, SphereWorlandTransform::ProjectorType::Id projector)
+   void WorlandTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, WorlandTransform::ProjectorType::Id projector)
    {
       // assert right sizes for input  matrix
       assert(specVal.cols() == this->mspSetup->howmany());
@@ -163,7 +163,7 @@ namespace Transform {
       }
    }
 
-   void SphereWorlandTransform::setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
+   void WorlandTransform::setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
    {
       // Compute integration
       int start = 0;
@@ -182,7 +182,7 @@ namespace Transform {
       }
    }
 
-   void SphereWorlandTransform::setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops)
+   void WorlandTransform::setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops)
    {
       int start = 0;
       int physRows = this->mspSetup->fwdSize(); 
@@ -196,7 +196,7 @@ namespace Transform {
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   MHDFloat SphereWorlandTransform::requiredStorage() const
+   MHDFloat WorlandTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
