@@ -22,38 +22,6 @@ namespace GeoMHDiSCC {
 
 namespace Polynomial {
 
-   JacobiPolynomial::NormalizerNAB JacobiPolynomial::mpNormPnab = &JacobiPolynomial::naturalPnab;
-   JacobiPolynomial::NormalizerAB JacobiPolynomial::mpNormP0ab = &JacobiPolynomial::naturalP0ab;
-   JacobiPolynomial::NormalizerAB JacobiPolynomial::mpNormP1ab = &JacobiPolynomial::naturalP1ab;
-
-   JacobiPolynomial::NormalizerNAB JacobiPolynomial::mpNormDPnab = &JacobiPolynomial::naturalDPnab;
-   JacobiPolynomial::NormalizerAB JacobiPolynomial::mpNormDP0ab = &JacobiPolynomial::naturalDP0ab;
-   JacobiPolynomial::NormalizerAB JacobiPolynomial::mpNormDP1ab = &JacobiPolynomial::naturalDP1ab;
-
-   void JacobiPolynomial::setNormalization(const JacobiPolynomial::NormalizationId id)
-   {
-      if(id == JacobiPolynomial::NATURAL)
-      {
-         JacobiPolynomial::mpNormPnab = &JacobiPolynomial::naturalPnab;
-         JacobiPolynomial::mpNormP0ab = &JacobiPolynomial::naturalP0ab;
-         JacobiPolynomial::mpNormP1ab = &JacobiPolynomial::naturalP1ab;
-
-         JacobiPolynomial::mpNormDPnab = &JacobiPolynomial::naturalDPnab;
-         JacobiPolynomial::mpNormDP0ab = &JacobiPolynomial::naturalDP0ab;
-         JacobiPolynomial::mpNormDP1ab = &JacobiPolynomial::naturalDP1ab;
-
-      } else if(id == JacobiPolynomial::UNITWORLAND)
-      {
-         JacobiPolynomial::mpNormPnab = &JacobiPolynomial::unitWPnab;
-         JacobiPolynomial::mpNormP0ab = &JacobiPolynomial::unitWP0ab;
-         JacobiPolynomial::mpNormP1ab = &JacobiPolynomial::unitWP1ab;
-
-         JacobiPolynomial::mpNormDPnab = &JacobiPolynomial::unitWDPnab;
-         JacobiPolynomial::mpNormDP0ab = &JacobiPolynomial::unitWDP0ab;
-         JacobiPolynomial::mpNormDP1ab = &JacobiPolynomial::unitWDP1ab;
-      }
-   }
-
    void JacobiPolynomial::Pnab(Matrix& poly, internal::Matrix& ipoly, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid)
    {
       int gN = poly.rows();
@@ -70,16 +38,16 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      JacobiPolynomial::P0ab(ipoly.col(0), alpha, beta, igrid, JacobiPolynomial::mpNormP0ab);
+      JacobiPolynomial::P0ab(ipoly.col(0), alpha, beta, igrid, &JacobiPolynomial::naturalP0ab);
 
       if(nPoly > 1)
       {
-         JacobiPolynomial::P1ab(ipoly.col(1), alpha, beta, ipoly.col(0), igrid, JacobiPolynomial::mpNormP1ab);
+         JacobiPolynomial::P1ab(ipoly.col(1), alpha, beta, ipoly.col(0), igrid, &JacobiPolynomial::naturalP1ab);
       }
 
       for(int i = 2; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(ipoly.col(i), i, alpha, beta, ipoly.col(i-1), ipoly.col(i-2), igrid, JacobiPolynomial::mpNormPnab);
+         JacobiPolynomial::Pnab(ipoly.col(i), i, alpha, beta, ipoly.col(i-1), ipoly.col(i-2), igrid, &JacobiPolynomial::naturalPnab);
       }
 
       poly = Precision::cast(ipoly);
@@ -100,33 +68,36 @@ namespace Polynomial {
          throw Exception("Operator matrix should have at least 1 column");
       }
 
+      internal::MHDFloat a1 = alpha + MHD_MP(1.0);
+      internal::MHDFloat b1 = beta + MHD_MP(1.0);
+
       idiff.resize(gN, nPoly);
       idiff.col(0).setZero();
 
       if(nPoly > 1)
       {
-         JacobiPolynomial::P0ab(idiff.col(1), alpha + MHD_MP(1.0), beta + MHD_MP(1.0), igrid, JacobiPolynomial::mpNormDP0ab);
+         JacobiPolynomial::P0ab(idiff.col(1), a1, b1, igrid, &JacobiPolynomial::naturalDP0ab);
       }
 
       if(nPoly > 2)
       {
-         JacobiPolynomial::P1ab(idiff.col(2), alpha + MHD_MP(1.0), beta + MHD_MP(1.0), idiff.col(1), igrid, JacobiPolynomial::mpNormDP1ab);
+         JacobiPolynomial::P1ab(idiff.col(2), a1, b1, idiff.col(1), igrid, &JacobiPolynomial::naturalDP1ab);
       }
 
       for(int i = 3; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(idiff.col(i), i-1, alpha + MHD_MP(1.0), beta + MHD_MP(1.0), idiff.col(i-1), idiff.col(i-2), igrid, JacobiPolynomial::mpNormDPnab);
+         JacobiPolynomial::Pnab(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), igrid, &JacobiPolynomial::naturalDPnab);
       }
 
       diff = Precision::cast(idiff);
    }
 
-   void JacobiPolynomial::drrPnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat e, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid)
+   void JacobiPolynomial::d2Pnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid)
    {
       int gN = diff.rows();
       int nPoly = diff.cols();
 
-      if(alpha < -1 || beta < -1)
+      if (alpha < -1 || beta < -1)
       {
          throw Exception("Tried to compute Jacobi polynomial P_n^{(alpha,beta)} with alpha < -1 or beta < -1");
       }
@@ -136,113 +107,30 @@ namespace Polynomial {
          throw Exception("Operator matrix should have at least 1 column");
       }
 
-      // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
-      internal::Matrix ipnab(gN,2);
-      internal::Matrix idpnab(gN,2);
+      internal::MHDFloat a2 = alpha + MHD_MP(2.0);
+      internal::MHDFloat b2 = beta + MHD_MP(2.0);
 
-      // Compute P_0
-      JacobiPolynomial::P0ab(ipnab.col(0), alpha, beta, igrid, JacobiPolynomial::mpNormP0ab);
-
-      // Compute DP_0
-      idpnab.col(0).setZero();
-
-      // Compute e P + 2(x+1) DP
-      idiff.resize(gN, nPoly);
-      JacobiPolynomial::drrP0ab(idiff.col(0), e, ipnab.col(0));
-
-      if(nPoly > 1)
-      {
-         // Compute P_1
-         JacobiPolynomial::P1ab(ipnab.col(1), alpha, beta, ipnab.col(0), igrid, JacobiPolynomial::mpNormP1ab);
-
-         // Compute DP_1
-         JacobiPolynomial::P0ab(idpnab.col(0), alpha + MHD_MP(1.0), beta + MHD_MP(1.0), igrid, JacobiPolynomial::mpNormDP0ab);
-
-         // Compute e P + 2(x+1) DP
-         JacobiPolynomial::drrPnab(idiff.col(1), e, ipnab.col(1), idpnab.col(0), igrid);
-      }
-
-      if(nPoly > 2)
-      {
-         // Increment P_n
-         JacobiPolynomial::Pnab(ipnab.col(0), 2, alpha, beta, ipnab.col(1), idiff.col(0), igrid, JacobiPolynomial::mpNormPnab);
-         ipnab.col(0).swap(ipnab.col(1));
-
-         // Compute DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), alpha + MHD_MP(1.0), beta + MHD_MP(1.0), idpnab.col(0), igrid, JacobiPolynomial::mpNormDP1ab);
-
-         // Compute e P + 2(x+1) DP
-         JacobiPolynomial::drrPnab(idiff.col(2), e, ipnab.col(1), idpnab.col(1), igrid);
-      }
-
-      for(int i = 3; i < nPoly; ++i)
-      {
-         // Increment P_n
-         JacobiPolynomial::Pnab(ipnab.col(0), i, alpha, beta, idiff.col(1), ipnab.col(0), igrid, JacobiPolynomial::mpNormPnab);
-         ipnab.col(0).swap(ipnab.col(1));
-
-         // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, alpha + MHD_MP(1.0), beta + MHD_MP(1.0), idpnab.col(1), idpnab.col(0), igrid, JacobiPolynomial::mpNormDPnab);
-         idpnab.col(0).swap(idpnab.col(1));
-
-         // Compute e P + 2(x+1) DP
-         JacobiPolynomial::drrPnab(idiff.col(i), e, ipnab.col(1), idpnab.col(1), igrid);
-      }
-
-      diff = Precision::cast(idiff);
-   }
-
-   void JacobiPolynomial::drPnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid)
-   {
-      int gN = diff.rows();
-      int nPoly = diff.cols();
-
-      if(alpha < -1 || beta < -1)
-      {
-         throw Exception("Tried to compute Jacobi polynomial P_n^{(alpha,beta)} with alpha < -1 or beta < -1");
-      }
-
-      if (nPoly < 1)
-      {
-         throw Exception("Operator matrix should have at least 1 column");
-      }
-
-      // Storage for dP_n{(alpha,beta)}
-      internal::Matrix idpnab(gN,2);
-
-      // Compute DP_0
-      idpnab.col(0).setZero();
-
-      // Compute 2(x+1) DP
       idiff.resize(gN, nPoly);
       idiff.col(0).setZero();
 
       if(nPoly > 1)
       {
-         // Compute DP_1
-         JacobiPolynomial::P0ab(idpnab.col(0), alpha + MHD_MP(1.0), beta + MHD_MP(1.0), igrid, JacobiPolynomial::mpNormDP0ab);
-
-         // Compute 2(x+1) DP
-         JacobiPolynomial::drPnab(idiff.col(1), idpnab.col(0), igrid);
+         idiff.col(1).setZero();
       }
 
       if(nPoly > 2)
       {
-         // Compute DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), alpha + MHD_MP(1.0), beta + MHD_MP(1.0), idpnab.col(0), igrid, JacobiPolynomial::mpNormDP1ab);
-
-         // Compute 2(x+1) DP
-         JacobiPolynomial::drPnab(idiff.col(2), idpnab.col(1), igrid);
+         JacobiPolynomial::P0ab(idiff.col(2), a2, b2, igrid, &JacobiPolynomial::naturalD2P0ab);
       }
 
-      for(int i = 3; i < nPoly; ++i)
+      if(nPoly > 3)
       {
-         // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, alpha + MHD_MP(1.0), beta + MHD_MP(1.0), idpnab.col(1), idpnab.col(0), igrid, JacobiPolynomial::mpNormDPnab);
-         idpnab.col(0).swap(idpnab.col(1));
+         JacobiPolynomial::P1ab(idiff.col(3), a2, b2, idiff.col(2), igrid, &JacobiPolynomial::naturalD2P1ab);
+      }
 
-         // Compute 2(x+1) DP
-         JacobiPolynomial::drPnab(idiff.col(i), idpnab.col(1), igrid);
+      for(int i = 4; i < nPoly; ++i)
+      {
+         JacobiPolynomial::Pnab(idiff.col(i), i-2, a2, b2, idiff.col(i-1), idiff.col(i-2), igrid, &JacobiPolynomial::naturalD2Pnab);
       }
 
       diff = Precision::cast(idiff);
@@ -273,21 +161,6 @@ namespace Polynomial {
       ip0ab.setConstant(cs(0));
    }
 
-   void JacobiPolynomial::drrPnab(Eigen::Ref<internal::Matrix> idrrpnab, const internal::MHDFloat e, const Eigen::Ref<const internal::Matrix>& ipnab, const Eigen::Ref<const internal::Matrix>& idpnab, const internal::Array& igrid)
-   {
-      idrrpnab.array() = e*ipnab.array() + MHD_MP(2.0)*(igrid.array() + MHD_MP(1.0))*idpnab.array();
-   }
-
-   void JacobiPolynomial::drrP0ab(Eigen::Ref<internal::Matrix> idrrp0ab, const internal::MHDFloat e, const Eigen::Ref<const internal::Matrix>& ipnab)
-   {
-      idrrp0ab.array() = e*ipnab;
-   }
-
-   void JacobiPolynomial::drPnab(Eigen::Ref<internal::Matrix> idrpnab, const Eigen::Ref<const internal::Matrix>& idpnab, const internal::Array& igrid)
-   {
-      idrpnab.array() = MHD_MP(2.0)*(igrid.array() + MHD_MP(1.0))*idpnab.array();
-   }
-
    //
    // Natural polynomial normalizer
    //
@@ -307,9 +180,9 @@ namespace Polynomial {
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta)/MHD_MP(2.0);
-      cs(1) = (alpha - beta)/MHD_MP(2.0);
-      cs(2) = MHD_MP(1.0);
+      cs(0) = (MHD_MP(2.0) + alpha + beta);
+      cs(1) = (alpha - beta);
+      cs(2) = MHD_MP(0.5);
 
       return cs;
    }
@@ -324,17 +197,17 @@ namespace Polynomial {
    }
 
    //
-   // Natural polynomial normalizer
+   // Natural first derivative normalizer
    //
    internal::Array JacobiPolynomial::naturalDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
    {
       internal::Array cs(4);
 
-      cs(0) = -((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta));
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0);
-
+      cs(0) = -((alpha + beta + dn - MHD_MP(1.0))/(alpha + beta + dn - MHD_MP(2.0)))*((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
+      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(alpha + beta + dn - MHD_MP(1.0));
+      
       return cs;
    }
 
@@ -342,9 +215,9 @@ namespace Polynomial {
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta)/MHD_MP(2.0);
-      cs(1) = (alpha - beta)/MHD_MP(2.0);
-      cs(2) = MHD_MP(1.0);
+      cs(0) = (MHD_MP(2.0) + alpha + beta);
+      cs(1) = (alpha - beta);
+      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta));
 
       return cs;
    }
@@ -353,78 +226,42 @@ namespace Polynomial {
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(1.0);
+      cs(0) = MHD_MP(0.5)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta));
 
       return cs;
    }
 
    //
-   // Unit Worland polynomial normalizers
+   // Natural second derivative normalizer
    //
-
-   internal::Array JacobiPolynomial::unitWPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
    {
       internal::Array cs(4);
 
-      cs(0) = -((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta));
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0);
-
+      cs(0) = -((dn + alpha + beta - MHD_MP(1.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/((dn + alpha + beta - MHD_MP(3.0))*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
+      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(dn + alpha + beta - MHD_MP(2.0));
+      
       return cs;
    }
 
-   internal::Array JacobiPolynomial::unitWP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta)/MHD_MP(2.0);
-      cs(1) = (alpha - beta)/MHD_MP(2.0);
-      cs(2) = MHD_MP(1.0);
+      cs(0) = (MHD_MP(2.0) + alpha + beta);
+      cs(1) = (alpha - beta);
+      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta - MHD_MP(1.0)));
 
       return cs;
    }
 
-   internal::Array JacobiPolynomial::unitWP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalD2P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(1.0);
-
-      return cs;
-   }
-
-   //
-   // Unit Worland derivative normalizers
-   //
-   internal::Array JacobiPolynomial::unitWDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
-   {
-      internal::Array cs(4);
-
-      cs(0) = -((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta));
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0);
-
-      return cs;
-   }
-
-   internal::Array JacobiPolynomial::unitWDP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
-   {
-      internal::Array cs(3);
-
-      cs(0) = (MHD_MP(2.0) + alpha + beta)/MHD_MP(2.0);
-      cs(1) = (alpha - beta)/MHD_MP(2.0);
-      cs(2) = MHD_MP(1.0);
-
-      return cs;
-   }
-
-   internal::Array JacobiPolynomial::unitWDP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
-   {
-      internal::Array cs(1);
-
-      cs(0) = MHD_MP(1.0);
+      cs(0) = MHD_MP(0.25)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD(1.0)));
 
       return cs;
    }

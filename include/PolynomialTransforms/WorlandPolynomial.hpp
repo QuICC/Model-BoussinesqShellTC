@@ -22,6 +22,7 @@
 // Project includes
 //
 #include "Base/Precision.hpp"
+#include "PolynomialTransforms/JacobiPolynomial.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -48,11 +49,69 @@ namespace Polynomial {
          static void dWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid);
 
          /**
+          * @brief Compute \f$\frac{d}{dr} r W_n^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void drWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid);
+
+         /**
+          * @brief Compute \f$\frac{1}{r}\frac{d}{dr} r W_n^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void r_1drWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid);
+
+         /**
+          * @brief Compute \f$\frac{d}{dr} W_n^0 (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dWn0(Matrix& diff, internal::Matrix& idiff, const internal::Array& igrid);
+
+         /**
           * @brief Compute \f$\frac{W_n^l (r)}{r}\f$
           *
           * Internal computation can be done in multiple precision
           */
-         static void Wnl_r(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
+         static void r_1Wnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
+
+         /**
+          * @brief Compute \f$W_0^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void W0l(Eigen::Ref<internal::Matrix> iw0ab, const int l, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, JacobiPolynomial::NormalizerAB norm);
+
+         /**
+          * @brief Polynomial normalizer for unit Worland normalization
+          */
+         static internal::Array unitWPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Polynomial n=0 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Polynomial n=1 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief First derivative normalizer for unit Worland normalization
+          */
+         static internal::Array unitWDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief First derivative n=0 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWDP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief First derivative n=1 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWDP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
       private:
          /**
@@ -64,13 +123,6 @@ namespace Polynomial {
           * @brief Get beta parameter of Jacobi polynomial
           */
          static internal::MHDFloat beta(const int l);
-
-         /**
-          * @brief Multiply Jacobi polynomial by \f$r^l\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void rl(internal::Matrix& ipoly, const int l, const internal::Array& igrid);
 
          /**
           * @brief Constructor

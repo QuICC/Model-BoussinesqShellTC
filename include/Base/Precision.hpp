@@ -26,6 +26,7 @@
    /// Define a small macro to replace float constants to strings in the case of MP computations
    #define MHD_MP(c) #c
 #else
+   #include <tr1/cmath>
    /// For normal computations the macro does nothing
    #define MHD_MP(c) c
 #endif // GEOMHDISCC_MULTPRECISION
@@ -212,9 +213,11 @@ namespace GeoMHDiSCC {
 #ifdef GEOMHDISCC_MULTPRECISION
    /// Create a namespace alias for the internal precision stuff pointing to mpfr namespace
    namespace  precision = mpfr;
+   namespace  precisiontr1 = mpfr;
 #else
    /// Create a namespace alias for the internal precision stuff pointing to std namespace
    namespace  precision = std;
+   namespace  precisiontr1 = std::tr1;
 #endif // GEOMHDISCC_MULTPRECISION
 }
 
