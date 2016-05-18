@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 
-import geomhdiscc.geometry.spherical.sphere_radius_worland_boundary as radbc
-from geomhdiscc.geometry.spherical.sphere_radius_worland_boundary import no_bc
+import geomhdiscc.geometry.spherical.sphere_radius_boundary_worland as radbc
+from geomhdiscc.geometry.spherical.sphere_radius_boundary_worland import no_bc
 
 
 def no_bc():

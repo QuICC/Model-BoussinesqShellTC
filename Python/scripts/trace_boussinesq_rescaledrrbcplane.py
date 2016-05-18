@@ -13,7 +13,7 @@ model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
 res = [512, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':8.6957, 'ekman':1e-6, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':8.6957, 'ekman':1e-11, 'scale1d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'velocityz':1, 'temperature':0, 'pressure':1}
 phi = 0
 kp = 1.3048
@@ -34,8 +34,10 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['curve'] = False
+marginal_options['ellipse_radius'] = 1e2
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
+marginal_options['solve_nev'] = 5
 marginal_options['point_k'] = kp
 marginal_options['plot_curve'] = True
 marginal_options['plot_point'] = True

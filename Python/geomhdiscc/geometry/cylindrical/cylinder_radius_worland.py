@@ -1,4 +1,4 @@
-"""Module provides functions to generate sparse operators for the radial direction in a cylinder using r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
+"""Module provides functions to generate sparse operators for the radial direction in a cylinder with Worland expansion."""
 
 from __future__ import division
 from __future__ import unicode_literals

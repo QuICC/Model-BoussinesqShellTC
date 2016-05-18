@@ -1,4 +1,4 @@
-"""Module provides functions to generate the radial boundary conditions in a sphere with r^l P_n^{-1/2, l-1/2}(2r^2 - 1)"""
+"""Module provides functions to generate the radial boundary conditions in a sphere with Worland expansion"""
 
 from __future__ import division
 from __future__ import unicode_literals

@@ -1,8 +1,8 @@
-"""Script to run a marginal curve trace for the Boussinesq thermal convection in a sphere (Toroidal/Poloidal formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq thermal convection in a sphere with Chebyshev expansion (Toroidal/Poloidal formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_tcsphere_std as mod
+import geomhdiscc.model.boussinesq_tcsphere_std_chebyshev as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization

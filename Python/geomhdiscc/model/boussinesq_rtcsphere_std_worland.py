@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq rotating thermal convection in a sphere with Worland expansion (Toroidal/Poloidal formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating thermal convection in a sphere with Worland expansion (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,13 +7,13 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.sphere_worland as geo
+import geomhdiscc.geometry.spherical.sphere_radius_worland as geo
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.spherical.sphere_boundary_worland import no_bc
+from geomhdiscc.geometry.spherical.sphere_radius_boundary_worland import no_bc
 
 
-class BoussinesqRTCSphere(base_model.BaseModel):
-    """Class to setup the Boussinesq rotating thermal convection in a sphere with Worland expansion (Toroidal/Poloidal formulation)"""
+class BoussinesqRTCSphereStd(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating thermal convection in a sphere with Worland expansion (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -30,17 +30,10 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         return ["velocity", "temperature"]
 
-    def stability_fields(self):
-        """Get the list of fields needed for linear stability calculations"""
-
-        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
-
-        return fields
-
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
-
-        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+    
+        fields = [field_row]
 
         return fields
 
@@ -49,17 +42,16 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            if field_row == ("temperature",""):
+            if field_row == ("velocity","pol"):
+                fields = [("temperature","")]
+            elif field_row == ("temperature",""):
                 fields = [("velocity","pol")]
             else:
                 fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row == ("temperature",""):
-                fields = [("temperature","")]
-            else:
-                fields = []
+            fields = [field_row]
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
@@ -92,41 +84,26 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         """Create the galerkin stencil"""
         
         assert(eigs[0].is_integer())
-
-        m = int(eigs[0])
+        l = eigs[0]
 
         # Get boundary condition
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return geo.stencil(res[0], res[1], m, bc, make_square)
+        mat = geo.stencil(res[0], l, bc, make_square)
 
-    def stability_sizes(self, res, eigs):
-        """Get the block sizes in the stability calculation matrix"""
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
 
-        assert(eigs[0].is_integer())
-
-        m = int(eigs[0])
-
-        # Block sizes
-        blocks = []
-        for f in self.stability_fields():
-            blocks.append(self.block_size(res, f)[1]*(res[1]-m))
-
-        # Invariant size (local dimension in spectral space, no restriction)
-        invariant = (res[0],)*len(self.stability_fields())
-
-        # Index shift
-        shift = m
-
-        return (blocks, invariant, shift)
+        return mat
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
-        is_complex = True
+        # Matrix operator is real
+        is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.SLOWEST_SINGLE_RHS
+        index_mode = self.SLOWEST_MULTI_RHS
 
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
@@ -151,11 +128,11 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                         bc = {0:-10, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:10}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                             bc = {0:10}
 
             elif bcId == 1:
@@ -218,13 +195,18 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         """Create matrix block for explicit linear term"""
 
         assert(eigs[0].is_integer())
+        l = eigs[0]
 
-        m = int(eigs[0])
+        Ra = eq_params['rayleigh']
+        T = eq_params['taylor']**0.5
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("temperature","") and field_col == ("velocity","pol"):
-            mat = geo.i2(res[0], res[1], m, bc, -1.0, with_sh_coeff = 'laplh', restriction = restriction)
+        if field_row == ("velocity","pol") and field_col == ("temperature",""):
+            mat = geo.i4(res[0], l, bc, Ra*T*l*(l+1.0))
+
+        elif field_row == ("temperature","") and field_col == ("velocity","pol"):
+            mat = geo.i2(res[0], l, bc, -l*(l+1.0))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -232,16 +214,21 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         return mat
 
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
-        """Create the explicit nonlinear operator"""
+        """Create matrix block for explicit nonlinear term"""
 
         assert(eigs[0].is_integer())
-
-        m = int(eigs[0])
+        l = eigs[0]
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2(res[0], res[1], m, bc, restriction = restriction)
+            mat = geo.i2(res[0], l, bc)
+
+        elif field_row == ("velocity","tor") and field_col == field_row:
+            mat = geo.qid(res[0], l, 1, bc)
+
+        elif field_row == ("velocity","pol") and field_col == field_row:
+            mat = geo.qid(res[0], l, 2, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -252,58 +239,20 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         assert(eigs[0].is_integer())
+        l = eigs[0]
 
         Pr = eq_params['prandtl']
-        Ra = eq_params['rayleigh']
-        T = eq_params['taylor']**0.5
-
-        # Rescale time for eigensolver
-        if self.linearize:
-            c_dt = self.rescale_time(eq_params)
-        else:
-            c_dt = 1.0
-
-        m = int(eigs[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor"):
-            if field_col == ("velocity","tor"):
-                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
-                bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2(res[0], res[1], m, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
+        if field_row == ("velocity","tor") and field_col == field_row:
+            mat = geo.i2lapl(res[0], l, bc, l*(l+1.0))
 
-            elif field_col == ("velocity","pol"):
-                mat = geo.i2coriolis(res[0], res[1], m, bc, -T/c_dt, l_zero_fix = 'zero', restriction = restriction)
+        elif field_row == ("velocity","pol") and field_col == field_row:
+            mat = geo.i4lapl2(res[0], l, bc, l*(l+1.0))
 
-            elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], res[1], m, bc)
-
-        elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","tor"):
-                mat = geo.i4coriolis(res[0], res[1], m, bc, T/c_dt, l_zero_fix = 'zero', restriction = restriction)
-
-            elif field_col == ("velocity","pol"):
-                mat = geo.i4lapl2(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
-                bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4lapl(res[0], res[1], m, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
-
-            elif field_col == ("temperature",""):
-                mat = geo.i4(res[0], res[1], m, bc, -Ra*T/c_dt**2, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
-
-        elif field_row == ("temperature",""):
-            if field_col == ("velocity","tor"):
-                mat = geo.zblk(res[0], res[1], m, bc)
-
-            elif field_col == ("velocity","pol"):
-                if self.linearize:
-                    mat = geo.i2(res[0], res[1], m, bc, 1.0/Pr, with_sh_coeff = 'laplh', restriction = restriction)
-
-                else:
-                    mat = geo.zblk(res[0], res[1], m, bc)
-
-            elif field_col == ("temperature",""):
-                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0/(Pr*c_dt), restriction = restriction)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2lapl(res[0], l, bc, 1.0/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -314,19 +263,18 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         """Create matrix block of time operator"""
 
         assert(eigs[0].is_integer())
-
-        m = int(eigs[0])
+        l = eigs[0]
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+            mat = geo.i2(res[0], l, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+            mat = geo.i4lapl(res[0], l, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
-            mat = geo.i2(res[0], res[1], m, bc, restriction = restriction)
+            mat = geo.i2(res[0], l, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -334,28 +282,16 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         return mat
 
     def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
-        """Create matrix block of boundary operator"""
+        """Create matrix block linear operator"""
 
         assert(eigs[0].is_integer())
-
-        m = int(eigs[0])
+        l = eigs[0]
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row in [("velocity","tor"), ("velocity","tor")] and field_row == field_col:
-            mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix = 'zero', restriction = restriction)
-        else:
-            mat = geo.zblk(res[0], res[1], m, bc, restriction = restriction)
+        mat = geo.zblk(res[0], l, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
-
-    def rescale_time(self, eq_params):
-        """Rescale time for linear stability calculation"""
-
-        T = eq_params['taylor']**0.5
-        #c_dt = T**(2./3.)*(0.4715 - 0.6089*T**(-1/3.))
-        c_dt = T**(2./3.)*(0.3144 - 0.6089*T**(-1./3.)) + T**(1./3.)*0.5186*int(0.3029*T**(1./3.))
-        return c_dt

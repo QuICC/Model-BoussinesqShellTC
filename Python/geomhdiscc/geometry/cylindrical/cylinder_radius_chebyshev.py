@@ -1,4 +1,4 @@
-"""Module provides functions to generate sparse operators for the radial direction in a cylinder."""
+"""Module provides functions to generate sparse operators for the radial direction in a cylinder with Chebyshev expansion in radius."""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary as radbc
+import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary_chebyshev as radbc
 
 
 def zblk(nr, parity, bc):

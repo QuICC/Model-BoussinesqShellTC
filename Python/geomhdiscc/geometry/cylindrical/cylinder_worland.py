@@ -1,4 +1,4 @@
-"""Module provides functions to generate sparse operators in a cylinder with Worland polynomials in radius and Chebyshev in the vertical."""
+"""Module provides functions to generate sparse operators in a cylinder with Worland expansion in radius and Chebyshev in the vertical."""
 
 from __future__ import division
 from __future__ import unicode_literals

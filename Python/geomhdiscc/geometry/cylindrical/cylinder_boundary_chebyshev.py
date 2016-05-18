@@ -1,4 +1,4 @@
-"""Module provides functions to generate the boundary conditions in a cylinder"""
+"""Module provides functions to generate the boundary conditions in a cylinder with Chebyshev expansion in radius"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
-import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary as radbc
+import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary_chebyshev as radbc
 
 
 def no_bc():

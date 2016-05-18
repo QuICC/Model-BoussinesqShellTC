@@ -1,13 +1,13 @@
-"""Module provides functions to generate sparse operators in a sphere using a spherical harmonics expansion in the angular directions."""
+"""Module provides functions to generate sparse operators in a sphere with Chebyshev polynomials in radius using a spherical harmonics expansion in the angular directions."""
 
 from __future__ import division
 from __future__ import unicode_literals
 
 import scipy.sparse as spsp
 
-import geomhdiscc.geometry.spherical.sphere_radius as rad
+import geomhdiscc.geometry.spherical.sphere_radius_chebyshev as rad
 import geomhdiscc.geometry.spherical.sphere_sh as sh
-import geomhdiscc.geometry.spherical.sphere_boundary as sphbc
+import geomhdiscc.geometry.spherical.sphere_boundary_chebyshev as sphbc
 
 
 def convert_bc(bc):

@@ -1,4 +1,4 @@
-"""Module provides functions to generate sparse operators for the radial direction in a sphere."""
+"""Module provides functions to generate sparse operators for the radial direction in a sphere with Chebyshev expansion."""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.sphere_radius_boundary as radbc
+import geomhdiscc.geometry.spherical.sphere_radius_boundary_chebyshev as radbc
 
 
 def zblk(nr, l, bc):

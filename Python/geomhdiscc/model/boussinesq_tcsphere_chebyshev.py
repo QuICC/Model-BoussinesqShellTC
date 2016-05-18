@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq thermal convection in a sphere (Toroidal/Poloidal formulation)"""
+"""Module provides the functions to generate the Boussinesq thermal convection in a sphere with Chebyshev expansion (Toroidal/Poloidal formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,13 +7,13 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.sphere as geo
+import geomhdiscc.geometry.spherical.sphere_chebyshev as geo
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.spherical.sphere_boundary import no_bc
+from geomhdiscc.geometry.spherical.sphere_boundary_chebyshev import no_bc
 
 
 class BoussinesqTCSphere(base_model.BaseModel):
-    """Class to setup the Boussinesq thermal convection in a sphere (Toroidal/Poloidal formulation)"""
+    """Class to setup the Boussinesq thermal convection in a sphere with Chebyshev expansion (Toroidal/Poloidal formulation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""

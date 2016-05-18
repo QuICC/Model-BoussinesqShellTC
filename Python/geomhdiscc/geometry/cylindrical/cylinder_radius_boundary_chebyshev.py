@@ -1,4 +1,4 @@
-"""Module provides functions to generate the radial boundary conditions in a cylinder"""
+"""Module provides functions to generate the radial boundary conditions in a cylinder with Chebyshev expansion in radius"""
 
 from __future__ import division
 from __future__ import unicode_literals

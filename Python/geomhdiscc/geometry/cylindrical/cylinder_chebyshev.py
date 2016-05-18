@@ -1,4 +1,4 @@
-"""Module provides functions to generate sparse operators in a cylinder."""
+"""Module provides functions to generate sparse operators in a cylinder with Chebyshev expansion in radius."""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 import scipy.sparse as spsp
 
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
-import geomhdiscc.geometry.cylindrical.cylinder_radius as rad
-import geomhdiscc.geometry.cylindrical.cylinder_boundary as cylbc
+import geomhdiscc.geometry.cylindrical.cylinder_radius_chebyshev as rad
+import geomhdiscc.geometry.cylindrical.cylinder_boundary_chebyshev as cylbc
 
 
 def convert_bc(bc):

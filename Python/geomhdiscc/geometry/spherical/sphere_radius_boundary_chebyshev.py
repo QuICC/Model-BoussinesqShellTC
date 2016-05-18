@@ -1,4 +1,4 @@
-"""Module provides functions to generate the radial boundary conditions in a sphere"""
+"""Module provides functions to generate the radial boundary conditions in a sphere with Chebyshev expansion"""
 
 from __future__ import division
 from __future__ import unicode_literals

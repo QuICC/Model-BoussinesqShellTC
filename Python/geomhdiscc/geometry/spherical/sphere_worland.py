@@ -7,7 +7,7 @@ import scipy.sparse as spsp
 
 import geomhdiscc.geometry.spherical.sphere_radius_worland as rad
 import geomhdiscc.geometry.spherical.sphere_sh as sh
-import geomhdiscc.geometry.spherical.sphere_worland_boundary as sphbc
+import geomhdiscc.geometry.spherical.sphere_boundary_worland as sphbc
 
 
 def convert_bc(bc):

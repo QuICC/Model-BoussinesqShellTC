@@ -1,4 +1,4 @@
-"""Module provides functions to generate the boundary conditions in a sphere"""
+"""Module provides functions to generate the boundary conditions in a sphere with Chebyshev expansion"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 
-import geomhdiscc.geometry.spherical.sphere_radius_boundary as radbc
-from geomhdiscc.geometry.spherical.sphere_radius_boundary import no_bc
+import geomhdiscc.geometry.spherical.sphere_radius_boundary_chebyshev as radbc
+from geomhdiscc.geometry.spherical.sphere_radius_boundary_chebyshev import no_bc
 
 
 def no_bc():
