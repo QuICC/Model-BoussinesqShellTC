@@ -83,7 +83,7 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
         import geomhdiscc.transform.cartesian as transf
         nD = 1
 
-        if ("pressure","") in fields:
+        if ("pressure","") in fields and ("velocity","z") in fields:
             addContinuityC1D(fields, res, eigs, eq_params)
             viewSpectra(fields, show = show, save = save, fid=fid, max_cols = max_cols)
 
