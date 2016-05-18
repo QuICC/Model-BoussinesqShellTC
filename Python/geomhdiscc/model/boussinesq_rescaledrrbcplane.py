@@ -33,8 +33,8 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        #fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("pressure","")]
-        fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
+        fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("pressure","")]
+        #fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         return fields
 
@@ -146,7 +146,7 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
                     if field_col == ("streamfunction",""):
                         bc = {0:-21, 'rt':0}
                     elif field_col == ("velocityz",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-21, 'rt':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-21, 'rt':0}
                     elif field_col == ("pressure",""):
@@ -156,7 +156,7 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
                     if field_row == ("streamfunction","") and field_col == field_row:
                         bc = {0:21}
                     elif field_row == ("velocityz","") and field_col == field_row:
-                        bc = {0:20}
+                        bc = {0:21}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
                     elif field_row == ("pressure","") and field_col == field_row:
@@ -191,7 +191,7 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
                     if field_col == ("streamfunction",""):
                         bc = {0:-21, 'rt':0}
                     elif field_col == ("velocityz",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-21, 'rt':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-21, 'rt':0}
                     elif field_col == ("pressure",""):
@@ -282,8 +282,8 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                #mat = geo.i2d1(res[0], bc, -1.0, cscale = zscale)
-                mat = geo.i2d1(res[0], bc, -(1.0 + Ro**2), cscale = zscale)
+                mat = geo.i2d1(res[0], bc, -1.0, cscale = zscale)
+                #mat = geo.i2d1(res[0], bc, -(1.0 - Ro**2), cscale = zscale)
 
             elif field_col == ("velocityz",""):
                 mat = geo.i2(res[0], bc, -(kx**2 + ky**2))

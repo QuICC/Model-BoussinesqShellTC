@@ -547,6 +547,8 @@ class GEVP:
                         fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
                     if 'taylor' in self.eq_params:
                         fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                    if 'ekman' in self.eq_params:
+                        fid = fid + "E{:g}".format(self.eq_params['ekman'])
                     viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
             else:
                 for i in range(0, len(self.evp_vec)):
@@ -561,6 +563,17 @@ class GEVP:
                         # Save spectra to HDF5
                         if save_hdf5:
                             self.saveHdf5_tables(sol_spec, geometry, postfix = '_mode_' + str(i))
+
+                        Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[i]))
+                        fid = ""
+                        if 'prandtl' in self.eq_params:
+                            fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                        if 'taylor' in self.eq_params:
+                            fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                        if 'ekman' in self.eq_params:
+                            fid = fid + "E{:g}".format(self.eq_params['ekman'])
+                        fid += "_" + str(i)
+                        viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
 
     def apply_stencil(self, sol_vec):
         """Apply Galerkin stencil to recover physical fields"""
