@@ -77,6 +77,13 @@ namespace Polynomial {
          static void r_1Wnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
 
          /**
+          * @brief Compute spherical \f$\nabla2 W_n^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void slaplWnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
+
+         /**
           * @brief Compute \f$W_0^l (r)\f$
           *
           * Internal computation can be done in multiple precision
@@ -112,6 +119,21 @@ namespace Polynomial {
           * @brief First derivative n=1 normalizer for unit Worland normalization
           */
          static internal::Array unitWDP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Second derivative normalizer for unit Worland normalization
+          */
+         static internal::Array unitWD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Second derivative n=0 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWD2P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Second derivative n=1 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
       private:
          /**

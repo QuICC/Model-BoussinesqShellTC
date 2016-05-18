@@ -261,7 +261,7 @@ namespace Polynomial {
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(0.25)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD(1.0)));
+      cs(0) = MHD_MP(0.25)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD_MP(1.0)));
 
       return cs;
    }

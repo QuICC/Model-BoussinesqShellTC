@@ -374,6 +374,96 @@ namespace Polynomial {
       diff = Precision::cast(idiff);
    }
 
+   void WorlandPolynomial::slaplWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   {
+      int gN = diff.rows();
+      int nPoly = diff.cols();
+
+      if(l < 0)
+      {
+         throw Exception("Tried to compute Worland spherical laplacian with l < 0");
+      }
+
+      if (nPoly < 1)
+      {
+         throw Exception("Operator matrix should have at least 1 column");
+      }
+
+      if (gN != igrid.size())
+      {
+         throw Exception("Operator matrix does not mach grid size");
+      }
+
+      internal::MHDFloat a1 = WorlandPolynomial::alpha(l) + MHD_MP(1.0);
+      internal::MHDFloat b1 = WorlandPolynomial::beta(l) + MHD_MP(1.0);
+      internal::MHDFloat a2 = WorlandPolynomial::alpha(l) + MHD_MP(2.0);
+      internal::MHDFloat b2 = WorlandPolynomial::beta(l) + MHD_MP(2.0);
+      internal::MHDFloat dl = internal::MHDFloat(l);
+
+      // Make X grid in [-1, 1]
+      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+
+      // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
+      internal::Matrix idpnab(gN,2);
+      internal::Matrix id2pnab(gN,2);
+      idiff.resize(gN, nPoly);
+
+      // Compute spherical laplacian P_0
+      idiff.col(0).setZero();
+
+      if(nPoly > 1)
+      {
+         // Compute DP_1
+         WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
+         idpnab.col(0) *= MHD_MP(4.0)*(MHD_MP(2.0)*dl + MHD_MP(3.0)); 
+
+         // Compute spherical laplacian P_1
+         idiff.col(1) = idpnab.col(0);
+      }
+
+      if(nPoly > 2)
+      {
+         // Increment DP_2
+         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+
+         // Compute D2P_2
+         WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
+         id2pnab.col(0) *= MHD_MP(16.0); 
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(2) = id2pnab.col(0) + idpnab.col(1);
+      }
+
+      if(nPoly > 3)
+      {
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Compute D2P_2
+         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
+      }
+
+      for(int i = 4; i < nPoly; ++i)
+      {
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Increment D2P_n
+         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         id2pnab.col(0).swap(id2pnab.col(1));
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(i) = id2pnab.col(1) + idpnab.col(1);
+      }
+
+      diff = Precision::cast(idiff);
+   }
+
    void WorlandPolynomial::r_1Wnl(Matrix& poly, internal::Matrix& ipoly, const int l, const internal::Array& igrid)
    {
       int gN = poly.rows();
@@ -486,7 +576,7 @@ namespace Polynomial {
    }
 
    //
-   // Unit Worland derivative normalizers
+   // Unit Worland first derivative normalizers
    //
    internal::Array WorlandPolynomial::unitWDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
    {
@@ -525,6 +615,49 @@ namespace Polynomial {
       cs(0) = MHD_MP(0.5)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta));
 
       cs(0) *= precision::sqrt(alpha + beta + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
+
+      return cs;
+   }
+
+   //
+   // Unit Worland second derivative normalizers
+   //
+   internal::Array WorlandPolynomial::unitWD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   {
+      internal::Array cs(4);
+
+      cs(0) = -((dn + alpha + beta - MHD_MP(1.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/((dn + alpha + beta - MHD_MP(3.0))*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
+      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(dn + alpha + beta - MHD_MP(2.0));
+
+      cs(0) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))*(dn + alpha + beta - MHD_MP(3.0))*(dn + MHD_MP(1.0))/((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(3.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
+      cs(1) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
+      cs(2) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
+      cs(3) *= precision::sqrt((dn + alpha + beta - MHD_MP(2.0))*(dn + MHD_MP(2.0))/((dn + alpha)*(dn + beta)));
+
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::unitWD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   {
+      internal::Array cs(3);
+
+      cs(0) = (MHD_MP(2.0) + alpha + beta);
+      cs(1) = (alpha - beta);
+      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta - MHD_MP(1.0)));
+
+      cs(2) *= precision::sqrt((alpha + beta + MHD_MP(3.0))*(alpha + beta - MHD_MP(1.0))*(MHD_MP(3.0))/((alpha + beta + MHD_MP(1.0))*(alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))));
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::unitWD2P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   {
+      internal::Array cs(1);
+
+      cs(0) = MHD_MP(0.25)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD_MP(1.0)));
+
+      cs(0) *= precision::sqrt(alpha + beta + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta - MHD_MP(1.0)) + precisiontr1::lgamma(MHD_MP(3.0)) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
 
       return cs;
    }
