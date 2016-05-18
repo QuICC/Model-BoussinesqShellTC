@@ -47,14 +47,12 @@ namespace Transform {
          /** Enum of projector IDs
           *    - PROJ: projection
           *    - DIVR: 1/r
-          *    - DIVR2: 1/r^2
           *    - DIFF: D
-          *    - DIFF2: D^2
           *    - DIFFR: D r
           *    - DIVRDIFFR: 1/r D r
-          *    - RADLAPL: radial laplacian: D^2 + 2/r D
+          *    - SLAPL: spherical laplacian: D^2 + 2/r D - l(l+1)/r^2
           */
-         enum Id {PROJ, DIVR, DIVR2, DIFF, DIFF2, DIFFR, DIVRDIFFR, RADLAPL};
+         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL};
       };
 
       /**
