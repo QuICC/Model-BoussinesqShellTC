@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import sympy as sy
+#import mpmath as mp
 import numpy as np
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
@@ -13,15 +14,14 @@ import geomhdiscc.transform.shell as transf
 transf.min_r_points = 1
 import geomhdiscc.geometry.spherical.shell_radius as shell
 
-#import mpmath
-#mpmath.mp.dps = 200
+#mp.mp.dps = 200
 
 
 def x_to_phys(expr, grid):
     """Convert sympy expression to grid values"""
 
     x = sy.Symbol('x')
-    func = sy.lambdify(x, expr)
+    func = sy.lambdify(x, expr, "numpy")
     return func(grid)
 
 def test_bc(op, res_expr, sol, grid):
@@ -84,6 +84,26 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
         print(relerr)
     print("\t\tMax tau backward relative error: " + str(np.max(relerr)))
 
+def test_backward_projector(opA, opB, res_expr, sol_expr, grid):
+    """Perform a tau backward operation test"""
+
+    x = sy.Symbol('x')
+    rhs = transf.torcheb(x_to_phys(res_expr,grid))
+    rhs = rhs[0:opA.shape[0]]
+    lhs = spsplin.spsolve(opA,opB*rhs)
+    pad = np.zeros(grid.shape)
+    pad[0:opA.shape[0]] = lhs
+    lhs = transf.torphys(pad)
+    sol = x_to_phys(sol_expr,grid)
+    err = np.abs(lhs - sol)
+    relerr = err/(1.0 + np.abs(sol))
+    #if np.max(err) > 10*np.spacing(1):
+    #    print(err)
+    print("\t\tMax backward projector error: " + str(np.max(err)))
+    if np.max(relerr) > 10*np.spacing(1):
+        print(relerr)
+    print("\t\tMax backward projector relative error: " + str(np.max(relerr)))
+
 def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     """Perform a galerkin backward operation test"""
 
@@ -91,7 +111,7 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     x = sy.Symbol('x')
     rhs = transf.torcheb(x_to_phys(res_expr,grid))
     rhs = rhs[0:opB.shape[1]]
-    lhs = spsplin.spsolve(opA,opB*rhs)
+    lhs = spsplin.spsolve(opA,opB*rhs, use_umfpack=True)
     sol = transf.torcheb(x_to_phys(sol_expr,grid))
     sol = sol[0:opB.shape[1]]
     tmpOp = opS[0:opS.shape[1],:]
@@ -186,89 +206,58 @@ def zblk(nr, a, b, rg):
 def d1(nr, a, b, rg):
     """Accuracy test for d1 operator"""
 
-    print("d1:")
-    x = sy.Symbol('x')
-    A = shell.d1(nr, a, b, shell.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
-    ssol = sy.diff(sphys,x)
-    test_forward(A, sphys, ssol, rg, 1)
-
-    print("solve i1 (991):")
-    x = sy.Symbol('x')
-    A = shell.i1(nr, a, b, {0:991})
-    B = shell.qid(nr, 1, {0:0})
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
-    ssol = sy.diff(sphys,x)
-    test_backward_tau(A, B, sphys, ssol, rg)
-
     print("solve i1 (perm):")
     x = sy.Symbol('x')
     A = shell.i1(nr+1, a, b, {0:0, 'rt':1, 'cr':1})
-    print(A.diagonal())
     B = shell.qid(nr+1, 0, {0:0, 'rt':1, 'cr':1})
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([(-1.0)**np.round(np.random.ranf())*np.random.ranf()**i*sy.cos(int(i)*sy.acos((x-b)/a)) for i in np.arange(0,nr,1)])
     ssol = sy.diff(sphys,x)
-    test_backward_tau(A, B, sphys, ssol, rg)
+    test_backward_projector(A, B, sphys, ssol, rg)
 
 def d2(nr, a, b, rg):
     """Accuracy test for d^2 operator"""
 
-    print("d2:")
+    print("solve i2 (perm):")
     x = sy.Symbol('x')
-    A = shell.d2(nr, a, b, shell.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    A = shell.i2(nr+2, a, b, {0:0, 'rt':2, 'cr':2})
+    B = shell.qid(nr+2, 0, {0:0, 'rt':2, 'cr':2})
+    sphys = np.sum([(-1.0)**np.round(np.random.ranf())*np.random.ranf()**i*sy.cos(int(i)*sy.acos((x-b)/a)) for i in np.arange(0,nr,1)])
     ssol = sy.diff(sphys,x,x)
-    test_forward(A, sphys, ssol, rg, 2)
+    test_backward_projector(A, B, sphys, ssol, rg)
 
 def divr(nr, a, b, rg):
     """Accuracy test for 1/x operator"""
 
-    print("1/x:")
-    print("\t Forward: (full spectrum):")
-    A = shell.r1(nr, a, b, shell.radbc.no_bc()).tocsr()
-    lhs = np.ones(rg.shape[0])
-    sol = transf.torcheb(transf.torphys(lhs)/rg)
-    rhs = spsplin.spsolve(A,lhs)
-    print(sol-rhs)
-    print("\t\tMax error for A^n: " + str(np.max(np.abs(sol-rhs))))
-    pl.semilogy(abs(A*sol - np.ones(rg.shape[0]))+1e-16)
-    pl.show()
+    print("solve r (perm):")
+    x = sy.Symbol('x')
+    A = shell.r1(nr, a, b, {0:0})
+    B = shell.qid(nr, 0, {0:0})
+    #sphys = np.sum([(-1.0)**np.round(np.random.ranf())*np.random.ranf()**i*sy.cos(int(i)*sy.acos((x-b)/a)) for i in np.arange(0,nr,1)])
+    sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.cos(int(i)*sy.acos((x-b)/a)) for i in np.arange(0,np.ceil(2.0*nr/3.0),1)])
+    ssol = sphys/x
+    test_backward_projector(A, B, sphys, ssol, rg)
 
 def divr2(nr, a, b, rg):
     """Accuracy test for 1/x^2 operator"""
 
-    print("1/x^2:")
-    print("\t Forward: (full spectrum):")
-    A = shell.r1(nr, a, b, shell.radbc.no_bc()).tocsr()
-    B = shell.r2(nr, a, b, shell.radbc.no_bc()).tocsr()
-    lhs = np.ones(rg.shape[0])
-    sol = transf.torcheb(transf.torphys(lhs)/(rg*rg))
-    tmp = spsplin.spsolve(A,lhs)
-    rhsA = spsplin.spsolve(A,tmp)
-    rhsB = spsplin.spsolve(B,lhs)
-    print("\t\tMax error for A^n: " + str(np.max(np.abs(sol-rhsA))))
-    print("\t\tMax error for B: " + str(np.max(np.abs(sol-rhsB))))
-    pl.semilogy(abs(B*sol - np.ones(rg.shape[0]))+1e-16)
-    pl.show()
+    print("solve r^2 (perm):")
+    x = sy.Symbol('x')
+    A = shell.r2(nr, a, b, {0:0})
+    B = shell.qid(nr, 0, {0:0})
+    sphys = np.sum([(-1.0)**np.round(np.random.ranf())*np.random.ranf()**i*sy.cos(int(i)*sy.acos((x-b)/a)) for i in np.arange(0,nr,1)])
+    ssol = sphys/(x*x)
+    test_backward_projector(A, B, sphys, ssol, rg)
 
 def divr4(nr, a, b, rg):
     """Accuracy test for 1/x^4 operator"""
 
-    print("1/x^4:")
-    print("\t Forward: (full spectrum):")
-    A = shell.r1(nr, a, b, shell.radbc.no_bc()).tocsr()
-    B = shell.r4(nr, a, b, shell.radbc.no_bc()).tocsr()
-    lhs = np.ones(rg.shape[0])
-    sol = transf.torcheb(transf.torphys(lhs)/(rg*rg*rg*rg))
-    tmp = spsplin.spsolve(A,lhs)
-    tmp = spsplin.spsolve(A,tmp)
-    tmp = spsplin.spsolve(A,tmp)
-    rhsA = spsplin.spsolve(A,tmp)
-    rhsB = spsplin.spsolve(B,lhs)
-    print("\t\tMax error for A^n: " + str(np.max(np.abs(sol-rhsA))))
-    print("\t\tMax error for B: " + str(np.max(np.abs(sol-rhsB))))
-    pl.semilogy(abs(B*sol - np.ones(rg.shape[0]))+1e-16)
-    pl.show()
+    print("solve r^4 (perm):")
+    x = sy.Symbol('x')
+    A = shell.r4(nr, a, b, {0:0})
+    B = shell.qid(nr, 0, {0:0})
+    sphys = np.sum([(-1.0)**np.round(np.random.ranf())*np.random.ranf()**i*sy.cos(int(i)*sy.acos((x-b)/a)) for i in np.arange(0,nr,1)])
+    ssol = sphys/(x*x*x*x)
+    test_backward_projector(A, B, sphys, ssol, rg)
 
 def r1(nr, a, b, rg):
     """Accuracy test for r1 operator"""
@@ -829,7 +818,7 @@ def qid(nr, a, b, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 32
+    nr = 512
     a, b = shell.linear_r2x(1.0, 0.35)
     #a, b = shell.linear_r2x(20.0/13.0, 0.35)
     print((a, b))
@@ -840,8 +829,11 @@ if __name__ == "__main__":
 #    all_bc(nr, a, b, rg)
 #    integral(nr, a, b, rg)
 #    zblk(nr, a, b, rg)
-    d1(nr, a, b, rg)
+#    d1(nr, a, b, rg)
 #    d2(nr, a, b, rg)
+    divr(nr, a, b, rg)
+#    divr2(nr, a, b, rg)
+#    divr4(nr, a, b, rg)
 #    r1(nr, a, b, rg)
 #    r2(nr, a, b, rg)
 #    r4(nr, a, b, rg)
