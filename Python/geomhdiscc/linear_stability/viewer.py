@@ -92,7 +92,11 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
         nD = 1
 
     elif geometry == 'b1d':
-        import geomhdiscc.transform.sphere as transf
+        import geomhdiscc.transform.sphere_chebyshev as transf
+        nD = 1
+
+    elif geometry == 'w1d':
+        import geomhdiscc.transform.sphere_worland as transf
         nD = 1
 
     elif geometry == 'c2d':
@@ -107,15 +111,19 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
         import geomhdiscc.transform.shell as transf
         nD = 2
 
-    elif geometry == "sphere":
-        import geomhdiscc.transform.sphere as transf
+    elif geometry == "sphere_chebyshev":
+        import geomhdiscc.transform.sphere_chebyshev as transf
+        nD = 2
+
+    elif geometry == "sphere_worland":
+        import geomhdiscc.transform.sphere_worland as transf
         nD = 2
 
     elif geometry == "annulus":
         import geomhdiscc.transform.annulus as transf
         nD = 2
 
-    elif geometry == "cylinder":
+    elif geometry == "cylinder_worland":
         import geomhdiscc.transform.cylinder_worland as transf
         nD = 2
 
@@ -148,7 +156,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         viz_res = (res[0], a, b)
         prof_opt = ()
 
-    elif geometry == 'b1d':
+    elif geometry in ['b1d', 'w1d']:
         viz_res = (res[0],)
         prof_opt = (int(eigs[0])%2,)
 
@@ -174,7 +182,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         res_1d = (res[0], a, b)
         res_2d = (res[1]-1, int(eigs[0]))
 
-    elif geometry == 'sphere':
+    elif geometry in ['sphere_chebyshev', 'sphere_worland']:
         res_1d = (res[0],)
         res_2d = (res[1]-1, int(eigs[0]))
 

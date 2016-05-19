@@ -36,7 +36,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-16
-marginal_options['geometry'] = 'b1d'
+marginal_options['geometry'] = 'w1d'
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True

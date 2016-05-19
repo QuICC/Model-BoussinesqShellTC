@@ -115,7 +115,7 @@ class GEVPSolver:
         data = v.getArray()
         rstart, rend = v.getOwnershipRange()
         start = 0
-        if self.geometry in ['sphere', 'shell']: 
+        if self.geometry in ['sphere_chebyshev', 'sphere_worland', 'shell']: 
             par = [1, 0, 0]
             gal = [2, 4, 2]
             for i, sze in enumerate(sizes[0]):
@@ -175,7 +175,7 @@ class GEVPSolver:
     def eigenvalues(self, system, nev, initial_vector = None):
         """Compute eigenvalues using SLEPc"""
 
-        if self.geometry in ['shell', 'sphere']:
+        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland']:
             return self.eigenvalues_spherical(system, nev, initial_vector = initial_vector)
         else:
             return self.eigenvalues_simple(system, nev, initial_vector = initial_vector)
@@ -183,7 +183,7 @@ class GEVPSolver:
     def eigenpairs(self, system, nev, initial_vector = None):
         """Compute eigenpairs using SLEPc"""
 
-        if self.geometry in ['shell', 'sphere']:
+        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland']:
             return self.eigenpairs_spherical(system, nev, initial_vector = initial_vector)
         else:
             return self.eigenpairs_simple(system, nev, initial_vector = initial_vector)

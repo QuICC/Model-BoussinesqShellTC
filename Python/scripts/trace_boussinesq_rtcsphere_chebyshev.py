@@ -98,12 +98,12 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-16
-marginal_options['geometry'] = 'sphere'
-marginal_options['curve'] = True
+marginal_options['geometry'] = 'sphere_chebyshev'
+marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['minimum_int'] = True
 marginal_options['plot_curve'] = False
-marginal_options['solve'] = False
+marginal_options['solve'] = True
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = False
 marginal_options['plot_spy'] = False

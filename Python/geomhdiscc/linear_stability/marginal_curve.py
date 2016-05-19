@@ -381,8 +381,10 @@ class GEVP:
         h5_file.attrs['header'] = np.string_('StateFile'.encode('ascii')) 
         if geometry == 'shell':
             h5_file.attrs['type'] = np.string_('SLFm'.encode('ascii'))
-        elif geometry == 'sphere': 
+        elif geometry == 'sphere_chebyshev': 
             h5_file.attrs['type'] = np.string_('BLFm'.encode('ascii'))
+        elif geometry == 'sphere_worland': 
+            h5_file.attrs['type'] = np.string_('WLFm'.encode('ascii'))
         h5_file.attrs['version'] = np.string_('1.0'.encode('ascii'))
 
         # Create physical group
@@ -436,8 +438,10 @@ class GEVP:
         h5_file.set_node_attr('/', 'header', 'StateFile'.encode('ascii')) 
         if geometry == 'shell':
             h5_file.set_node_attr('/', 'type', 'SLFm'.encode('ascii')) 
-        elif geometry == 'sphere': 
+        elif geometry == 'sphere_chebyshev': 
             h5_file.set_node_attr('/', 'type', 'BLFm'.encode('ascii')) 
+        elif geometry == 'sphere_worland': 
+            h5_file.set_node_attr('/', 'type', 'WLFm'.encode('ascii')) 
         h5_file.set_node_attr('/', 'version', '1.0'.encode('ascii')) 
 
         # Create physical group
