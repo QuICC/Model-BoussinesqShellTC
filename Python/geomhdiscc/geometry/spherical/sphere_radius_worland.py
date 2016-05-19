@@ -50,7 +50,7 @@ def i1(nr, l, bc, coeff = 1.0):
         return -wb.worland_norm_row(n,l,1)*(2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)/(2.0*(l + n)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
 
     ds = [d_1, d0, d1]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -146,7 +146,7 @@ def i4(nr, l, bc, coeff = 1.0):
         return wb.worland_norm_row(n,l,4)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)*(2.0*l + 2.0*n + 7.0)/(16.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + n + 3.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0)*(l + 2.0*n + 7.0)*(l + 2.0*n + 8.0))
 
     ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -178,7 +178,7 @@ def i2lapl(nr, l, bc, coeff = 1.0):
         return wb.worland_norm_row(n,l,1)*2.0*(2.0*n + 1.0)**2*(2.0*l + 2.0*n + 1.0)/((l + n)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
 
     ds = [d_1, d0, d1]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -214,7 +214,7 @@ def i2qm(nr, l, bc, coeff = 1.0):
         return wb.worland_norm_row(n,l,2)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l + 2.0*n + 1.0)/((l + n)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0))
 
     ds = [d_1, d0, d1, d2]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -250,7 +250,7 @@ def i2qp(nr, l, bc, coeff = 1.0):
         return -wb.worland_norm_row(n,l,1)*(2.0*n + 1.0)**2*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)/(2.0*(l + n)*(l + n + 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0))
 
     ds = [d_2, d_1, d0, d1]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -298,7 +298,7 @@ def i4lapl(nr, l, bc, coeff = 1.0):
         return wb.worland_norm_row(n,l,3)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)**2*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)/(2.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0))
 
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -338,7 +338,7 @@ def i4lapl2(nr, l, bc, coeff = 1.0):
         return wb.worland_norm_row(n,l,2)*4.0*(2.0*n + 1.0)*(2.0*n + 3.0)**2*(2.0*n + 5.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)/((l + n)*(l + n + 1.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0))
 
     ds = [d_2, d_1, d0, d1, d2]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -390,7 +390,7 @@ def i4qm(nr, l, bc, coeff = 1.0):
         return  wb.worland_norm_row(n,l,4)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)/(4.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0)*(l + 2.0*n + 7.0))
 
     ds = [d_3, d_2, d_1, d0, d1, d2, d3, d4]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
@@ -442,7 +442,7 @@ def i4qp(nr, l, bc, coeff = 1.0):
         return -wb.worland_norm_row(n,l,3)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)**2*(2.0*l + 2.0*n + 1.0)*(2.0*l + 2.0*n + 3.0)*(2.0*l + 2.0*n + 5.0)*(2.0*l + 2.0*n + 7.0)/(8.0*(l + n)*(l + n + 1.0)*(l + n + 2.0)*(l + n + 3.0)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0)*(l + 2.0*n + 3.0)*(l + 2.0*n + 4.0)*(l + 2.0*n + 5.0)*(l + 2.0*n + 6.0)*(l + 2.0*n + 7.0))
 
     ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)

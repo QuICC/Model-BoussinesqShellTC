@@ -28,29 +28,19 @@ def constrain(mat, nr, maxnl, m, bc, zero_l_zero = False, restriction = None):
     """Contrain the matrix with the tau boundary condition"""
 
     if bc[0] > 0:
-        # Copy BC dict as we modify it!
-        bc = dict(bc)
-
-        # Compute extension
-        pr = bc[0]//10
-
-        # Remove extra column and unused boundary row
-        bc['cr'] = bc.get('cr',0) + pr
-        bc['rt'] = bc.get('rt',0) + pr
-
         if m == 0 and zero_l_zero:
             bc_mat = spsp.coo_matrix((nr,nr))
         else:
             if restriction is None or m in restriction:
                 bc = ldependent_bc(bc, m)
-                bcMat = spsp.coo_matrix((nr+pr,nr+pr))
+                bcMat = spsp.coo_matrix((nr,nr))
                 bc_mat = radbc.constrain(bcMat, m, bc)
             else:
                 bc_mat = spsp.coo_matrix((nr,nr))
         for l in range(m+1, maxnl):
             if restriction is None or l in restriction:
                 bc = ldependent_bc(bc, l)
-                bcMat = spsp.coo_matrix((nr+pr,nr+pr))
+                bcMat = spsp.coo_matrix((nr,nr))
                 bcMat = radbc.constrain(bcMat, l, bc)
             else:
                 bcMat = spsp.coo_matrix((nr,nr))

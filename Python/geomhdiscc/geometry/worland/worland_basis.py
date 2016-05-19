@@ -13,7 +13,7 @@ def worland_norm(n , l):
     if l == 0 and n == 0:
         return np.sqrt(np.pi/2.0)
     else:
-        return np.sqrt((2.0*n+l)*np.exp(special.gammaln(n+l) + special.gammaln(n+1.0)-special.gammaln(n+0.5) - special.gammaln(n+l+0.5)))
+        return np.sqrt((2.0*n+l)*np.exp(special.gammaln(n+l) + special.gammaln(n+1.0) - special.gammaln(n+0.5) - special.gammaln(n+l+0.5)))
 
 def worland_grid(nr):
     """Physical space grid"""

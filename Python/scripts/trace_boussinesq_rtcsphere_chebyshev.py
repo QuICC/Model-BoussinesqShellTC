@@ -8,7 +8,7 @@ import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 # Create the model and activate linearization
 model = mod.BoussinesqRTCSphere()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
 Rac = None
@@ -24,12 +24,12 @@ bc_vel = 1; bc_temp = 0
 #res = [64, 64, 0]
 #Ta = 1e9
 #res = [48, 48, 0]
-#Ta = 1e10
-#res = [64, 64, 0]
+Ta = 1e10
+res = [64, 64, 0]
 #Ta = 1e11
 #res = [96, 96, 0]
-Ta = 1e12
-res = [128, 128, 0]
+#Ta = 1e12
+#res = [128, 128, 0]
 #Ta = 1e13
 #res = [192, 192, 0]
 #Ta = 1e14
@@ -100,9 +100,9 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-16
 marginal_options['geometry'] = 'sphere'
 marginal_options['curve'] = True
-marginal_options['minimum'] = False
+marginal_options['minimum'] = True
 marginal_options['minimum_int'] = True
-marginal_options['plot_curve'] = True
+marginal_options['plot_curve'] = False
 marginal_options['solve'] = False
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = False

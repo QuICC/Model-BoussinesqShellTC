@@ -257,39 +257,33 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         T = eq_params['taylor']**0.5
 
-        # Rescale time for eigensolver
-        if self.linearize:
-            c_dt = self.rescale_time(eq_params)
-        else:
-            c_dt = 1.0
-
         m = int(eigs[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2(res[0], res[1], m, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i2(res[0], res[1], m, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2coriolis(res[0], res[1], m, bc, -T/c_dt, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i2coriolis(res[0], res[1], m, bc, -T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4coriolis(res[0], res[1], m, bc, T/c_dt, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4coriolis(res[0], res[1], m, bc, T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4lapl2(res[0], res[1], m, bc, 1.0/c_dt, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4lapl2(res[0], res[1], m, bc, 1.0, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4lapl(res[0], res[1], m, bc, 1j*m*T/c_dt, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i4lapl(res[0], res[1], m, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = geo.i4(res[0], res[1], m, bc, -Ra*T/c_dt**2, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4(res[0], res[1], m, bc, -Ra*T, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -303,7 +297,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                     mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0/(Pr*c_dt), restriction = restriction)
+                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0/Pr, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -351,11 +345,3 @@ class BoussinesqRTCSphere(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
-
-    def rescale_time(self, eq_params):
-        """Rescale time for linear stability calculation"""
-
-        T = eq_params['taylor']**0.5
-        #c_dt = T**(2./3.)*(0.4715 - 0.6089*T**(-1/3.))
-        c_dt = T**(2./3.)*(0.3144 - 0.6089*T**(-1./3.)) + T**(1./3.)*0.5186*int(0.3029*T**(1./3.))
-        return c_dt

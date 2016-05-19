@@ -41,7 +41,7 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields =  [("streamfunction","x"), ("velocityz",""), ("temperature",""), ("pressure","")]
+        fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -137,8 +137,10 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
                         bc = {0:20}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("pressure","") and field_col == field_row:
-                        bc = {0:20}
+                    #elif field_row == ("pressure","") and field_col == field_row:
+                    #    bc = {0:20}
+                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
+                        bc = {0:23}
 
             # Stress-free / Fixed flux
             elif bcId == 1:
@@ -159,8 +161,8 @@ class BoussinesqRescaledRRBCPlane(base_model.BaseModel):
                         bc = {0:21}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
-                    elif field_row == ("pressure","") and field_col == field_row:
-                        bc = {0:21}
+                    #elif field_row == ("pressure","") and field_col == field_row:
+                    #    bc = {0:21}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:

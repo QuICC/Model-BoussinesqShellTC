@@ -19,16 +19,9 @@ def convert_bc(bc):
     else:
         bcr = rad.radbc.no_bc()
 
-        # Compute extension
-        pr = bc['r'][0]//10
-
         for key, val in bc['r'].items():
             if key != 0:
                 bcr[key] = val
-            elif key == 'cr':
-                bcr[key] = val + pr
-            elif key == 'rt':
-                bcr[key] = val +pr
 
     if bc['z'][0] < 0:
         bcz = bc['z']
