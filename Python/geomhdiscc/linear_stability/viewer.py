@@ -192,7 +192,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         res_1d = (res[0], a, b)
         res_2d = (res[-1],)
 
-    elif geometry == 'cylinder':
+    elif geometry == 'cylinder_worland':
         res_1d = (res[0], int(eigs[0]))
         res_2d = (res[-1],)
 
@@ -225,7 +225,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
             saveProfileData(prof_fast, grid_fast, fid = pfid)
 
         # Plot profile extruded along periodic direction
-        if geometry == "cylinder":
+        if geometry == "cylinder_worland":
             grid_per = transf.grid_fast_per(*res_1d)
         else:
             grid_per = transf.grid_fast_per(*res_1d, m = np.ceil(eigs[0]))

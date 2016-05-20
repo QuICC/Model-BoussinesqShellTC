@@ -16,7 +16,7 @@ bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 1 
-res = [32, 0, 32]
+res = [12, 0, 12]
 eq_params = {'taylor':0, 'prandtl':1.0, 'rayleigh':1.8e3, 'gamma':1.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -32,8 +32,8 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-10
-marginal_options['geometry'] = 'cylinder'
-marginal_options['ellipse_radius'] = 1e3
+marginal_options['geometry'] = 'cylinder_worland'
+#marginal_options['ellipse_radius'] = 1e3
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True

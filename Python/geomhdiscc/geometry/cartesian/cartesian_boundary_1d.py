@@ -10,7 +10,7 @@ import itertools
 import geomhdiscc.base.utils as utils
 
 
-use_parity_bc = True
+use_parity_bc = False
 
 def no_bc():
     """Get a no boundary condition flag"""
@@ -273,12 +273,18 @@ def tau_value_diff2(nx, pos, coeffs = None):
     """Create tau lines for a zero boundary value and a zero 2nd derivative """
 
     cond = []
-    if pos >= 0:
+    if pos > 0:
         cond.append(tau_value(nx,1,coeffs)[0])
         cond.append(tau_diff2(nx,1,coeffs)[0])
 
-    if pos <= 0:
+    if pos < 0:
         cond.append(tau_value(nx,-1,coeffs)[0])
+        cond.append(tau_diff2(nx,-1,coeffs)[0])
+
+    if pos == 0:
+        cond.append(tau_value(nx,1,coeffs)[0])
+        cond.append(tau_value(nx,-1,coeffs)[0])
+        cond.append(tau_diff2(nx,1,coeffs)[0])
         cond.append(tau_diff2(nx,-1,coeffs)[0])
 
     if use_parity_bc and pos == 0:

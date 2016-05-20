@@ -185,7 +185,7 @@ def worland_laplh_cyl(nr, m):
     return val
 
 def worland_dlaplh_cyl(nr, m):
-    """Compute the radial derivative of bilaplacian in a cylinder at endpoint for Worland polynomials"""
+    """Compute the radial derivative of horizontal laplacian in a cylinder at endpoint for Worland polynomials"""
 
     val = np.zeros(nr)
     if nr > 0:

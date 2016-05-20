@@ -87,20 +87,31 @@ def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
         raise RuntimeError("Unknown boundary condition priority!")
 
     bc_mat = mat
-    if bc['r'][0] > 0:
+    if bc['r'][0] > 0 or bc['r'].get('mixed',None) is not None:
         bcMat = spsp.lil_matrix((nr,nr))
         bcMat = radbc.constrain(bcMat, m, bc['r'], location = location)
-        if bc['r'].get('kron',0) == 0 or bc['r']['kron'] == "id":
-            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location), bcMat, restriction = restriction)
-        else:
-            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location)*bc['r']['kron'](nz, c1dbc.no_bc()), bcMat, restriction = restriction)
+        bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location), bcMat, restriction = restriction)
+        # Implement mixed boundary conditions
+        if bc['r'].get('mixed', None) is not None:
+            mix = bc['r']['mixed']
+            bcMat = spsp.lil_matrix((nr,nr))
+            bcMat = radbc.constrain(bcMat, m, mix, pad_zeros = mix.get('pad',0), location = location)
+            s = mix.get('kron_shift',0)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location)*mix['kron'](nz+s, {0:0, 'rt':s, 'cr':s}), bcMat, restriction = restriction)
+
+
+#        if bc['r'].get('kron',0) == 0 or bc['r']['kron'] == "id":
+#            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location), bcMat, restriction = restriction)
+#        else:
+#            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location)*bc['r']['kron'](nz, c1dbc.no_bc()), bcMat, restriction = restriction)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
-        if bc['z'].get('kron',0) == 0 or bc['z']['kron'] == "id":
-            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location), restriction = restriction)
-        else:
-            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location)*bc['z']['kron'](nr, m, radbc.no_bc()), restriction = restriction)
+        bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location), restriction = restriction)
+#        if bc['z'].get('kron',0) == 0 or bc['z']['kron'] == "id":
+#            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location), restriction = restriction)
+#        else:
+#            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location)*bc['z']['kron'](nr, m, radbc.no_bc()), restriction = restriction)
 
     return bc_mat

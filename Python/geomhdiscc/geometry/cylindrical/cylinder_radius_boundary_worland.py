@@ -15,11 +15,11 @@ def no_bc():
 
     return {0:0}
 
-def constrain(mat, m, bc, location = 't'):
+def constrain(mat, m, bc, pad_zeros = 0, location = 't'):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
 
     if bc[0] > 0:
-        bc_mat = apply_tau(mat, m, bc, location = location)
+        bc_mat = apply_tau(mat, m, bc, pad_zeros = pad_zeros, location = location)
     elif bc[0] < 0:
         bc_mat = apply_galerkin(mat, m, bc)
     else:
@@ -67,7 +67,7 @@ def constrain(mat, m, bc, location = 't'):
 
     return bc_mat
 
-def apply_tau(mat, m, bc, location = 't'):
+def apply_tau(mat, m, bc, pad_zeros = 0, location = 't'):
     """Add Tau lines to the matrix"""
     
     nbc = bc[0]//10
@@ -80,20 +80,16 @@ def apply_tau(mat, m, bc, location = 't'):
         cond = tau_rdiffdivr(mat.shape[0], m, bc.get('c',None))
     elif bc[0] == 14:
         cond = tau_diff2(mat.shape[0], m, bc.get('c',None))
-    elif bc[0] == 17:
-        cond = tau_noslip_tor_pol(mat.shape[0], m, bc.get('c',None))
-    elif bc[0] == 18:
-        cond = tau_noslip_pol_tor(mat.shape[0], m, bc.get('c',None))
+    elif bc[0] == 15:
+        cond = tau_dlaplh(mat.shape[0], m, bc.get('c',None))
+    elif bc[0] == 16:
+        cond = tau_lapl2(mat.shape[0], m, bc.get('c',None))
     elif bc[0] == 20:
         cond = tau_value_diff(mat.shape[0], m, bc.get('c',None))
     elif bc[0] == 21:
         cond = tau_value_diff2(mat.shape[0], m, bc.get('c',None))
-    elif bc[0] == 27:
-        cond = tau_noslip_tor_tor(mat.shape[0], m, bc.get('c',None))
-    elif bc[0] == 30:
-        cond = tau_value_diff_diff2(mat.shape[0], m, bc.get('c',None))
-    elif bc[0] == 38:
-        cond = tau_noslip_pol_pol(mat.shape[0], m, bc.get('c',None))
+    elif bc[0] == 22:
+        cond = tau_value_laplh(mat.shape[0], m, bc.get('c',None))
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)
@@ -107,6 +103,10 @@ def apply_tau(mat, m, bc, location = 't'):
         s = mat.shape[0]-nbc
 
     conc = np.concatenate
+    if pad_zeros > 0:
+        cond = conc((np.zeros((pad_zeros,cond.shape[1])),cond))
+    elif pad_zeros < 0:
+        cond = conc((cond, np.zeros((pad_zeros,cond.shape[1]))))
     for i,c in enumerate(cond):
         mat.data = conc((mat.data, c))
         mat.row = conc((mat.row, [s+i]*mat.shape[1]))
@@ -166,23 +166,16 @@ def tau_rdiffdivr(nr, m, coeffs = None):
 
     return np.array(cond)
 
-def tau_noslip_tor_pol(nr, m, coeffs = None):
+def tau_lapl2(nr, m, coeffs = None):
     """Create the no-slip tau line(s) for toroidal component on poloidal"""
 
-    assert(coeffs is None)
+    if coeffs is None:
+        c = 1.0
+    else:
+        c = coeffs
 
     cond = []
-    cond.append(-1j*m*wb.worland_lapl2_cyl(nr,m))
-
-    return np.array(cond)
-
-def tau_noslip_pol_tor(nr, m, coeffs = None):
-    """Create the no-penetration and no-slip tau line(s) for poloidal component on toroidal"""
-
-    assert(coeffs is None)
-
-    cond = []
-    cond.append(1j*m*wb.worland_value(nr,m))
+    cond.append(c*wb.worland_lapl2_cyl(nr,m))
 
     return np.array(cond)
 
@@ -200,15 +193,16 @@ def tau_value_diff(nr, m, coeffs = None):
 
     return np.array(cond)
 
-def tau_noslip_tor_tor(nr, m, coeffs = None):
+def tau_dlaplh(nr, m, coeffs = None):
     """Create the no-slip tau line(s) for toroidal component on toroidal"""
 
-    assert(coeffs is not None)
-    c = coeffs
+    if coeffs is None:
+        c = 1.0
+    else:
+        c = coeffs
 
     cond = []
     cond.append(c*wb.worland_dlaplh_cyl(nr,m))
-    cond.append(wb.worland_diff(nr,m))
 
     return np.array(cond)
 
@@ -226,8 +220,8 @@ def tau_value_diff2(nr, m, coeffs = None):
 
     return np.array(cond)
 
-def tau_value_diff_diff2(nr, m, coeffs = None):
-    """Create the no penetration and no-slip tau line(s)"""
+def tau_value_laplh(nr, m, coeffs = None):
+    """Create the no penetration and no-slip tau line(s) for poloidal component"""
 
     if coeffs is None:
         c = 1.0
@@ -236,21 +230,7 @@ def tau_value_diff_diff2(nr, m, coeffs = None):
 
     cond = []
     cond.append(c*wb.worland_value(nr,m))
-    cond.append(c*wb.worland_diff(nr,m))
-    cond.append(c*wb.worland_diff2(nr,m))
-
-    return np.array(cond)
-
-def tau_noslip_pol_pol(nr, m, coeffs = None):
-    """Create the no penetration and no-slip tau line(s) for poloidal component on poloidal"""
-
-    assert(coeffs is not None)
-    c = coeffs
-
-    cond = []
-    cond.append(c*wb.worland_diff(nr,m))
-    cond.append(wb.worland_value(nr,m))
-    cond.append(wb.worland_laplh_cyl(nr,m))
+    cond.append(c*wb.worland_laplh_cyl(nr,m))
 
     return np.array(cond)
 

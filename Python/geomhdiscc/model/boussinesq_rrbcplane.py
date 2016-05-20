@@ -154,6 +154,21 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                         bc = {0:41}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
+
+            # Ekman-pumping
+            elif bcId == 2:
+                if self.use_galerkin:
+                    raise RuntimeError("Equations are not setup properly!")
+
+                else:
+                    if field_row == ("velocity","tor") and field_col == field_row:
+                        bc = {0:21}
+                    elif field_row == ("velocity","pol") and field_col == field_row:
+                        bc = {0:41}
+                    elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
+                        E = eq_params['ekman']
+                        c = E**(1./6.)/2**(1./2.)
+                        bc = {0:20, 'c':[c, -c]}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:

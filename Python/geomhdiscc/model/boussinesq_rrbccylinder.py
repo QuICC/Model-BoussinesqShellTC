@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+import functools
 
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cylindrical.cylinder_worland as geo
@@ -69,7 +70,13 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
         tau_n = res[0]*res[2]
         if self.use_galerkin:
-            if field_row == ("velocity","tor") or field_row == ("velocity","pol") or field_row == ("temperature",""):
+            if field_row == ("velocity","tor"):
+                shift_r = 2
+                shift_z = 2
+            elif field_row == ("velocity","pol"):
+                shift_r = 3
+                shift_z = 4
+            elif field_row == ("temperature",""):
                 shift_r = 1
                 shift_z = 2
             else:
@@ -120,15 +127,15 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:27, 'c':zscale, 'kron':'id'}, 'z':{0:20}, 'priority':'r'}
+                        bc = {'r':{0:11, 'mixed':{0:15, 'pad':1, 'kron_shift':2, 'kron':functools.partial(geo.c1d.i2d1, cscale=zscale)}}, 'z':{0:20}, 'priority':'r'}
                     elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
-                        bc = {'r':{0:17, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:0, 'mixed':{0:16, 'c':-1j*m, 'pad':1, 'kron_shift':2, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("velocity","tor") and field_col == ("temperature",""):
-                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':1, 'kron_shift':2, 'kron':geo.c1d.i2, 'c':1j*m*Ra}}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:38, 'c':zscale, 'kron':'id'}, 'z':{0:40}, 'priority':'r'}
+                        bc = {'r':{0:22, 'mixed':{0:11, 'pad':2, 'kron_shift':1, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:40}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        bc = {'r':{0:18, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:0, 'mixed':{0:10, 'c':1j*m*Ra, 'pad':2, 'kron_shift':1, 'kron':geo.c1d.i1}}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'sz'}
 
@@ -142,7 +149,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                     if field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:11}, 'z':{0:20}, 'priority':'sz'}
                     elif field_row == ("velocity","tor") and field_col == ("temperature",""):
-                        bc = {'r':{0:10, 'c':1j*m*Ra, 'kron':geo.c1d.i1}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':1, 'c':1j*m*Ra, 'kron_shift':2, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'r'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
