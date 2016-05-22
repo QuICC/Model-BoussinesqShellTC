@@ -15,9 +15,9 @@ bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # Create parameters
-m = 1 
-res = [12, 0, 12]
-eq_params = {'taylor':0, 'prandtl':1.0, 'rayleigh':1.8e3, 'gamma':1.0}
+m = 3 
+res = [32, 0, 32]
+eq_params = {'taylor':(2*200)**2, 'prandtl':1.0, 'rayleigh':1.0e4, 'gamma':1.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)
@@ -31,21 +31,21 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['evp_tol'] = 1e-10
+marginal_options['evp_tol'] = 1e-6
 marginal_options['geometry'] = 'cylinder_worland'
 #marginal_options['ellipse_radius'] = 1e3
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True
-marginal_options['plot_curve'] = True
+marginal_options['plot_curve'] = False
 marginal_options['solve'] = True
 marginal_options['point_k'] = m
-marginal_options['plot_point'] = True
-marginal_options['plot_spy'] = True
-marginal_options['write_mtx'] = True
+marginal_options['plot_point'] = False
+marginal_options['plot_spy'] = False
+marginal_options['write_mtx'] = False
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(0, m-2), m+3, 1)
+marginal_options['curve_points'] = np.arange(max(0, m-0), m+1, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

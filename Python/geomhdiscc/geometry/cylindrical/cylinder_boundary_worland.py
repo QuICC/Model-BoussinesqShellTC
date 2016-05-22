@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+import itertools
 
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary_worland as radbc
@@ -94,24 +95,36 @@ def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
         # Implement mixed boundary conditions
         if bc['r'].get('mixed', None) is not None:
             mix = bc['r']['mixed']
-            bcMat = spsp.lil_matrix((nr,nr))
-            bcMat = radbc.constrain(bcMat, m, mix, pad_zeros = mix.get('pad',0), location = location)
+            pad = mix.get('pad',0)
             s = mix.get('kron_shift',0)
-            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location)*mix['kron'](nz+s, {0:0, 'rt':s, 'cr':s}), bcMat, restriction = restriction)
+            for mbc, mc, mkron in mixed_iterator(mix):
+                bcMat = spsp.lil_matrix((nr,nr))
+                bcMat = radbc.constrain(bcMat, m, {0:mbc, 'c':mc}, pad_zeros = pad, location = location)
+                bc_mat += utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location)*mkron(nz+s, {0:0, 'rt':s, 'cr':s}), bcMat, restriction = restriction)
 
-
-#        if bc['r'].get('kron',0) == 0 or bc['r']['kron'] == "id":
-#            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location), bcMat, restriction = restriction)
-#        else:
-#            bc_mat = bc_mat + utils.restricted_kron_2d(bzid(nz,sz,dz,bc['z'], location = location)*bc['r']['kron'](nz, c1dbc.no_bc()), bcMat, restriction = restriction)
-
-    if bc['z'][0] > 0:
+    if bc['z'][0] > 0 or bc['z'].get('mixed',None) is not None:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
         bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location), restriction = restriction)
-#        if bc['z'].get('kron',0) == 0 or bc['z']['kron'] == "id":
-#            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location), restriction = restriction)
-#        else:
-#            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location)*bc['z']['kron'](nr, m, radbc.no_bc()), restriction = restriction)
+        # Implement mixed boundary conditions
+        if bc['z'].get('mixed', None) is not None:
+            mix = bc['z']['mixed']
+            bcMat = spsp.lil_matrix((nr,nr))
+            bcMat = radbc.constrain(bcMat, m, mix, pad_zeros = mix.get('pad',0), location = location)
+            s = mix.get('kron_shift',0)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr,m,sr,dr,bc['r'], location = location)*mix['kron'](nr+s, {0:0, 'rt':s, 'cr':s}), restriction = restriction)
 
     return bc_mat
+
+def mixed_iterator(mixed):
+    """Return an iterator over the constants"""
+
+    try:
+        if len(mixed[0]) == len(mixed['kron']) and len(mixed[0]) == len(mixed['c']):
+            it = itertools.izip(mixed[0], mixed['c'], mixed['kron'])
+        else:
+            raise RuntimeError
+    except:
+        it = itertools.izip([mixed[0]], [mixed.get('c',1)], [mixed['kron']])
+
+    return it

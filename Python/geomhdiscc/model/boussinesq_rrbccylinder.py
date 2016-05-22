@@ -126,18 +126,30 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                         bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
+#                    if field_row == ("velocity","tor") and field_col == field_row:
+#                        bc = {'r':{0:11, 'mixed':{0:16, 'pad':1, 'kron_shift':0, 'kron':functools.partial(geo.c1d.i2d1, cscale=zscale)}}, 'z':{0:20}, 'priority':'z'}
+#                    elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
+#                        bc = {'r':{0:0, 'mixed':{0:[17,15], 'c':[-1j*m,-1j*m], 'pad':1, 'kron_shift':0, 'kron':[geo.c1d.i2, functools.partial(geo.c1d.i2d2, cscale=zscale)]}}, 'z':{0:0}, 'priority':'z'}
+#                    elif field_row == ("velocity","tor") and field_col == ("temperature",""):
+#                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':1, 'kron_shift':0, 'kron':geo.c1d.i2, 'c':1j*m*Ra}}, 'z':{0:0}, 'priority':'z'}
+#                    elif field_row == ("velocity","pol") and field_col == field_row:
+#                        bc = {'r':{0:22, 'mixed':{0:11, 'pad':2, 'kron_shift':0, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:40}, 'priority':'z'}
+#                    elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
+#                        bc = {'r':{0:0, 'mixed':{0:10, 'c':1j*m, 'pad':2, 'kron_shift':0, 'kron':geo.c1d.i1}}, 'z':{0:0}, 'priority':'z'}
+#                    elif field_row == ("temperature","") and field_col == field_row:
+#                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:11, 'mixed':{0:15, 'pad':1, 'kron_shift':2, 'kron':functools.partial(geo.c1d.i2d1, cscale=zscale)}}, 'z':{0:20}, 'priority':'r'}
+                        bc = {'r':{0:11, 'mixed':{0:10, 'c':1j*m, 'pad':1, 'kron_shift':0, 'kron':geo.c1d.i1}}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
-                        bc = {'r':{0:0, 'mixed':{0:16, 'c':-1j*m, 'pad':1, 'kron_shift':2, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'r'}
-                    elif field_row == ("velocity","tor") and field_col == ("temperature",""):
-                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':1, 'kron_shift':2, 'kron':geo.c1d.i2, 'c':1j*m*Ra}}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:0, 'mixed':{0:11, 'pad':1, 'kron_shift':0, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:22, 'mixed':{0:11, 'pad':2, 'kron_shift':1, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:40}, 'priority':'r'}
+                        bc = {'r':{0:22, 'mixed':{0:[17,15], 'c':[-1j*m,-1j*m], 'pad':2, 'kron_shift':0, 'kron':[geo.c1d.i2, functools.partial(geo.c1d.i2d2, cscale=zscale)]}}, 'z':{0:40}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        bc = {'r':{0:0, 'mixed':{0:10, 'c':1j*m*Ra, 'pad':2, 'kron_shift':1, 'kron':geo.c1d.i1}}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'kron_shift':0, 'kron':geo.c1d.i2, 'c':1j*m*Ra}}, 'z':{0:0}, 'priority':'z'}
+                    elif field_row == ("velocity","pol") and field_col == ("temperature",""):
+                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'kron_shift':0, 'kron':geo.c1d.i2, 'c':1j*m*Ra}}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == field_row:
-                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'sz'}
+                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
 
             # Stress-free/No-slip, Fixed flux/Fixed temperature
             elif bcId == 2:
@@ -147,9 +159,9 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
                 else:
                     if field_row == ("temperature","") and field_col == field_row:
-                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'sz'}
-                    elif field_row == ("velocity","tor") and field_col == ("temperature",""):
-                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':1, 'c':1j*m*Ra, 'kron_shift':2, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
+                    elif field_row == ("velocity","pol") and field_col == ("temperature",""):
+                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'c':1j*m*Ra, 'kron_shift':0, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'z'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -235,14 +247,14 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                 mat = geo.i4j2lapl2(res[0], res[2], m, bc, zscale = zscale)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4laplhj2e1(res[0], res[2], m, bc, -T, zscale = zscale)
+                mat = geo.i4laplhj2e1(res[0], res[2], m, bc, T, zscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i6laplhj4e1(res[0], res[2], m, bc, T, zscale = zscale)
+                mat = geo.i6laplhj4e1(res[0], res[2], m, bc, -T, zscale = zscale)
 
             elif field_col == ("velocity","pol"):
                 mat = geo.i6j4lapl3(res[0], res[2], m, bc, zscale = zscale)

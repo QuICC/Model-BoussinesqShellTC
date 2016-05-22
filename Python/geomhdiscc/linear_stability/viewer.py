@@ -369,6 +369,7 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3,
             fname = fname + ".pdf"
             pl.savefig(fname, bbox_inches='tight', dpi=200)
             if show:
+                pl.axis('equal')
                 pl.show()
             pl.clf()
     if subplot:
