@@ -62,7 +62,7 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG};
+         enum Id {INTG, INTGT, INTGQ4, INTGS4, INTGQ2, INTGS2};
       };
 
    };

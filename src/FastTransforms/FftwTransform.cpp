@@ -170,6 +170,16 @@ namespace Transform {
          // Rescale results
          rFFTVal = factor.asDiagonal()*rFFTVal;
 
+      // Compute first derivative integration
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFF2)
+      {
+         // Get differentiation factors
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         factor = factor.array().pow(2);
+
+         // Rescale results
+         rFFTVal = factor.asDiagonal()*rFFTVal;
+
       // Compute simple projection
       } else
       {
@@ -213,6 +223,15 @@ namespace Transform {
          // Rescale results
          this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
 
+      } else if(projector == FftwTransform::ProjectorType::DIFF3)
+      {
+         // Get differentiation factors
+         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+         factor = factor.array().pow(3);
+
+         // Rescale results
+         this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
+
       // Compute simple projection
       } else
       {
@@ -246,14 +265,31 @@ namespace Transform {
       // Do transform
       fftw_execute_dft(this->mFPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(physVal.data())), reinterpret_cast<fftw_complex* >(rFFTVal.data()));
 
+      // Get size of positive and negative frequency parts
+      int negN = this->mspSetup->specSize()/2;
+      int posN = negN + (this->mspSetup->specSize()%2);
+
       // Compute first derivative integration
       if(integrator == FftwTransform::IntegratorType::INTGDIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         ArrayZ factor = -this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = -this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
-         // Rescale results
-         rFFTVal = factor.asDiagonal()*rFFTVal;
+         // Split positive and negative frequencies and compute derivative
+         rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
+         rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
+
+      // Compute second derivative integration
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFF2)
+      {
+         // Get differentiation factors
+         Array factor = -(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = -(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+
+         // Split positive and negative frequencies and compute derivative
+         rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
+         rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
 
       // Compute simple projection
       } else
@@ -295,12 +331,23 @@ namespace Transform {
          this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
          this->mTmpZIn.bottomRows(negN) = rfactor.asDiagonal()*fftVal.bottomRows(negN);
 
-      // Compute first derivative
+      // Compute second derivative
       } else if(projector == FftwTransform::ProjectorType::DIFF2)
       {
          // Get differentiation factors
          Array factor = -(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
          Array rfactor = -(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+
+         // Split positive and negative frequencies and compute derivative
+         this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
+         this->mTmpZIn.bottomRows(negN) = rfactor.asDiagonal()*fftVal.bottomRows(negN);
+
+      // Compute second derivative
+      } else if(projector == FftwTransform::ProjectorType::DIFF3)
+      {
+         // Get differentiation factors
+         Array factor = -(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(3);
+         Array rfactor = -(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(3);
 
          // Split positive and negative frequencies and compute derivative
          this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);

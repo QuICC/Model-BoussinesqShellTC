@@ -47,7 +47,7 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
-         enum Id {PROJ, DIFF, DIFF2};
+         enum Id {PROJ, DIFF, DIFF2, DIFF3};
       };
 
       /**
@@ -56,7 +56,7 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG, INTGDIFF};
+         enum Id {INTG, INTGDIFF, INTGDIFF2};
       };
 
    };
