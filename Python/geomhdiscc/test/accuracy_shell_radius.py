@@ -468,7 +468,6 @@ def i2r2lapl(nr, a, b, rg):
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
-
     print("\t Forward: (full Chebyshev):")
     A = shell.i2r2lapl(nr, l, a, b, shell.radbc.no_bc())
     sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])

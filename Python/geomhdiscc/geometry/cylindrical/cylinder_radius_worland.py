@@ -17,17 +17,7 @@ def zblk(nr, m, bc):
     # Copy BC dict as we modify it!
     bc = dict(bc)
 
-    if bc[0] > 0:
-        # Compute extension
-        pr = bc[0]//10
-
-        # Remove extra column and unused boundary row
-        bc['cr'] = bc.get('cr',0) + pr
-        bc['rt'] = bc.get('rt',0) + pr
-    else:
-        pr = 0
-
-    mat = spsp.coo_matrix((nr+pr,nr+pr))
+    mat = spsp.coo_matrix((nr,nr))
     return radbc.constrain(mat,m,bc)
 
 def i2(nr, m, bc, coeff = 1.0):
@@ -39,10 +29,6 @@ def i2(nr, m, bc, coeff = 1.0):
     ns = np.arange(0, nr+1)
     offsets = np.arange(-2,3)
     nzrow = 1
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 1
-    bc['rt'] = bc.get('rt',0) + 1
 
     # Generate 2nd subdiagonal
     def d_2(n):
@@ -68,21 +54,15 @@ def i2(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
     return radbc.constrain(mat, m, bc)
 
 def i2laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 2nd integral of laplh r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+1)
     offsets = np.arange(-1,2)
     nzrow = 1
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 1
-    bc['rt'] = bc.get('rt',0) + 1
 
     # Generate 1st subdiagonal
     def d_1(n):
@@ -100,21 +80,15 @@ def i2laplh(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
     return radbc.constrain(mat, m, bc)
 
 def i4(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+2)
     offsets = np.arange(-4,5)
     nzrow = 3
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 2
-    bc['rt'] = bc.get('rt',0) + 2
 
     # Generate 4th subdiagonal
     def d_4(n):
@@ -156,21 +130,15 @@ def i4(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 2)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 2)
     return radbc.constrain(mat, m, bc)
 
 def i4laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral of laplh r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+2)
     offsets = np.arange(-3,4)
     nzrow = 3
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 2
-    bc['rt'] = bc.get('rt',0) + 2
 
     # Generate 3rd subdiagonal
     def d_3(n):
@@ -204,21 +172,15 @@ def i4laplh(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 2)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 2)
     return radbc.constrain(mat, m, bc)
 
 def i4lapl2h(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral of lapl2h r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+2)
     offsets = np.arange(-2,3)
     nzrow = 3
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 2
-    bc['rt'] = bc.get('rt',0) + 2
 
     # Generate 2nd subdiagonal
     def d_2(n):
@@ -244,21 +206,15 @@ def i4lapl2h(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 2)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 2)
     return radbc.constrain(mat, m, bc)
 
 def i6(nr, m, bc, coeff = 1.0):
     """Create operator for 6th integral r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+3)
     offsets = np.arange(-6,7)
     nzrow = 5
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 3
-    bc['rt'] = bc.get('rt',0) + 3
 
     # Generate 6th subdiagonal
     def d_6(n):
@@ -316,21 +272,15 @@ def i6(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 3)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 3)
     return radbc.constrain(mat, m, bc)
 
 def i6laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 6th integral of laplh r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+3)
     offsets = np.arange(-5,6)
     nzrow = 5
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 3
-    bc['rt'] = bc.get('rt',0) + 3
 
     # Generate 5th subdiagonal
     def d_5(n):
@@ -380,21 +330,15 @@ def i6laplh(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 3)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 3)
     return radbc.constrain(mat, m, bc)
 
 def i6lapl2h(nr, m, bc, coeff = 1.0):
     """Create operator for 6th integral of lapl2h r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+3)
     offsets = np.arange(-4,5)
     nzrow = 5
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 3
-    bc['rt'] = bc.get('rt',0) + 3
 
     # Generate 4th subdiagonal
     def d_4(n):
@@ -436,21 +380,15 @@ def i6lapl2h(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 3)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 3)
     return radbc.constrain(mat, m, bc)
 
 def i6lapl3h(nr, m, bc, coeff = 1.0):
     """Create operator for 6th integral of lapl3h r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+3)
     offsets = np.arange(-3,4)
     nzrow = 5
-
-    # Remove extra column and unused boundary row
-    bc['cr'] = bc.get('cr',0) + 3
-    bc['rt'] = bc.get('rt',0) + 3
 
     # Generate 3rd subdiagonal
     def d_3(n):
@@ -484,4 +422,5 @@ def i6lapl3h(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 3)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 3)
     return radbc.constrain(mat, m, bc)

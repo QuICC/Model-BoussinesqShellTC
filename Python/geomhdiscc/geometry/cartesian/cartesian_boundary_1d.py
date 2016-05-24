@@ -10,8 +10,6 @@ import itertools
 import geomhdiscc.base.utils as utils
 
 
-use_parity_bc = False
-
 def no_bc():
     """Get a no boundary condition flag"""
 
@@ -75,33 +73,33 @@ def apply_tau(mat, bc, pad_zeros = 0, location = 't'):
     nbc = bc[0]//10
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 1, bc)
     elif bc[0] == 11:
-        cond = tau_value(mat.shape[1], -1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], -1, bc)
     elif bc[0] == 12:
-        cond = tau_diff(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 1, bc)
     elif bc[0] == 13:
-        cond = tau_diff(mat.shape[1], -1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], -1, bc)
     elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], 1, bc)
     elif bc[0] == 15:
-        cond = tau_diff2(mat.shape[1], -1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], -1, bc)
     elif bc[0] == 16:
-        cond = tau_integral(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_integral(mat.shape[1], 1, bc)
     elif bc[0] == 20:
-        cond = tau_value(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 0, bc)
     elif bc[0] == 21:
-        cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 0, bc)
     elif bc[0] == 22:
-        cond = tau_valuediff(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_valuediff(mat.shape[1], 0, bc)
     elif bc[0] == 23:
-        cond = tau_diff2(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], 0, bc)
     elif bc[0] == 40:
-        cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_value_diff(mat.shape[1], 0, bc)
     elif bc[0] == 41:
-        cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[1], 0, bc)
     elif bc[0] == 42:
-        cond = tau_diff_diff2(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_diff_diff2(mat.shape[1], 0, bc)
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)
@@ -126,10 +124,10 @@ def apply_tau(mat, bc, pad_zeros = 0, location = 't'):
 
     return mat
 
-def tau_value(nx, pos, coeffs = None):
+def tau_value(nx, pos, bc):
     """Create the tau line(s) for a zero boundary value"""
     
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
     c = next(it)
@@ -144,17 +142,17 @@ def tau_value(nx, pos, coeffs = None):
         cond.append(cnst*alt_ones(nx, 1))
         cond[-1][0] /= tau_c()
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
         cond[0] = (cond[0] + cond[1])/2.0
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
-def tau_diff(nx, pos, coeffs = None):
+def tau_diff(nx, pos, bc):
     """Create the tau line(s) for a zero 1st derivative"""
 
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
     c = next(it)
@@ -166,17 +164,17 @@ def tau_diff(nx, pos, coeffs = None):
     if pos <= 0:
         cond.append(c*ns**2*alt_ones(nx, 0))
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
         cond[0] = (cond[0] + cond[1])/2.0
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
-def tau_diff2(nx, pos, coeffs = None):
+def tau_diff2(nx, pos, bc):
     """Create the tau line(s) for a zero 2nd derivative"""
 
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
     c = next(it)
@@ -188,17 +186,17 @@ def tau_diff2(nx, pos, coeffs = None):
     if pos <= 0:
         cond.append((c/3.0)*(ns**4 - ns**2)*alt_ones(nx, 1))
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
         cond[0] = (cond[0] + cond[1])/2.0
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
-def tau_integral(nx, pos, coeffs = None):
+def tau_integral(nx, pos, bc):
     """Create the boundary integral tau line(s)"""
 
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
     c = next(it)
@@ -218,30 +216,30 @@ def tau_integral(nx, pos, coeffs = None):
 
     return np.array(cond)
 
-def tau_valuediff(nx, pos, coeffs = None):
+def tau_valuediff(nx, pos, bc):
     """Create the tau lines for a zero boundary value at top and a zero 1st derivative at bottom"""
 
     assert(pos == 0)
 
     cond = []
-    cond.append(tau_value(nx,1,coeffs)[0])
-    cond.append(tau_diff(nx,-1,coeffs)[0])
+    cond.append(tau_value(nx,1,bc)[0])
+    cond.append(tau_diff(nx,-1,bc)[0])
 
     return np.array(cond)
 
-def tau_value_diff(nx, pos, coeffs = None):
+def tau_value_diff(nx, pos, bc):
     """Create the tau lines for a zero boundary value and a zero 1st derivative"""
 
     cond = []
     if pos >= 0:
-        cond.append(tau_value(nx,1,coeffs)[0])
-        cond.append(tau_diff(nx,1,coeffs)[0])
+        cond.append(tau_value(nx,1,bc)[0])
+        cond.append(tau_diff(nx,1,bc)[0])
 
     if pos <= 0:
-        cond.append(tau_value(nx,-1,coeffs)[0])
-        cond.append(tau_diff(nx,-1,coeffs)[0])
+        cond.append(tau_value(nx,-1,bc)[0])
+        cond.append(tau_diff(nx,-1,bc)[0])
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         tv = cond[0].copy()
         td = cond[1].copy()
         cond[0] = (cond[0] + cond[2])/2.0
@@ -251,19 +249,19 @@ def tau_value_diff(nx, pos, coeffs = None):
 
     return np.array(cond)
 
-def tau_diff_diff2(nx, pos, coeffs = None):
+def tau_diff_diff2(nx, pos, bc):
     """Create tau lines for a zero 1st derivative and a zero 2nd derivative """
 
     cond = []
     if pos >= 0:
-        cond.append(tau_diff(nx,1,coeffs)[0])
-        cond.append(tau_diff2(nx,1,coeffs)[0])
+        cond.append(tau_diff(nx,1,bc)[0])
+        cond.append(tau_diff2(nx,1,bc)[0])
 
     if pos <= 0:
-        cond.append(tau_diff(nx,-1,coeffs)[0])
-        cond.append(tau_diff2(nx,-1,coeffs)[0])
+        cond.append(tau_diff(nx,-1,bc)[0])
+        cond.append(tau_diff2(nx,-1,bc)[0])
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         tv = cond[0].copy()
         td = cond[1].copy()
         cond[0] = (cond[0] + cond[2])/2.0
@@ -273,25 +271,25 @@ def tau_diff_diff2(nx, pos, coeffs = None):
 
     return np.array(cond)
 
-def tau_value_diff2(nx, pos, coeffs = None):
+def tau_value_diff2(nx, pos, bc):
     """Create tau lines for a zero boundary value and a zero 2nd derivative """
 
     cond = []
     if pos > 0:
-        cond.append(tau_value(nx,1,coeffs)[0])
-        cond.append(tau_diff2(nx,1,coeffs)[0])
+        cond.append(tau_value(nx,1,bc)[0])
+        cond.append(tau_diff2(nx,1,bc)[0])
 
     if pos < 0:
-        cond.append(tau_value(nx,-1,coeffs)[0])
-        cond.append(tau_diff2(nx,-1,coeffs)[0])
+        cond.append(tau_value(nx,-1,bc)[0])
+        cond.append(tau_diff2(nx,-1,bc)[0])
 
     if pos == 0:
-        cond.append(tau_value(nx,1,coeffs)[0])
-        cond.append(tau_value(nx,-1,coeffs)[0])
-        cond.append(tau_diff2(nx,1,coeffs)[0])
-        cond.append(tau_diff2(nx,-1,coeffs)[0])
+        cond.append(tau_value(nx,1,bc)[0])
+        cond.append(tau_value(nx,-1,bc)[0])
+        cond.append(tau_diff2(nx,1,bc)[0])
+        cond.append(tau_diff2(nx,-1,bc)[0])
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         tv = cond[0].copy()
         td = cond[1].copy()
         cond[0] = (cond[0] + cond[2])/2.0

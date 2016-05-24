@@ -144,7 +144,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 #                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
                     if field_row == ("velocity","tor") and field_col == field_row:
                         #bc = {'r':{0:11, 'mixed':{0:10, 'c':1j*m, 'pad':1, 'kron_shift':1, 'kron':geo.c1d.i1}}, 'z':{0:20}, 'priority':'r'}
-                        bc = {'r':{0:20}, 'z':{0:20}, 'priority':'r'}
+                        bc = {'r':{0:20}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
                         bc = {'r':{0:0, 'mixed':{0:11, 'pad':1, 'kron_shift':1, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == field_row:

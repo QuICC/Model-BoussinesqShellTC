@@ -27,23 +27,35 @@ def test_forward(op, m, res_expr, sol_expr, grid, q):
     x = sy.Symbol('x')
     lhs = transf.torspec(x_to_phys(res_expr,grid), m, op.shape[0])
     rhs = op*lhs
-    print(op.todense())
     t = x_to_phys(sol_expr,grid)
     sol = transf.torspec(t, m, op.shape[0])
-    print(rhs.T)
-    print(sol.T)
-    #print(rhs[0:-(1+q)].T)
-    #print(sol[q:-1].T)
-    #err = np.abs(rhs[0:-(1+q)] - sol[q:-1])
-    err = np.abs(rhs - sol)
-    #relerr = err/(1.0 + np.abs(sol[q:-1]))
-    relerr = err/(1.0 + np.abs(sol))
+    err = np.abs(rhs[0:-(1+q)] - sol[q:-1])
+    relerr = err/(1.0 + np.abs(sol[q:-1]))
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err.T)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
     if np.max(relerr[q:]) > 10*np.spacing(1):
         print(relerr.T)
     print("\t\tMax forward relative error: " + str(np.max(relerr[q:])))
+
+def test_backward_tau(opA, opB, m, res_expr, sol_expr, grid):
+    """Perform a tau backward operation test"""
+
+    x = sy.Symbol('x')
+    rhs = transf.torspec(x_to_phys(res_expr,grid), m, opA.shape[0])
+    rhs = rhs[0:opA.shape[0]]
+    lhs = spsplin.spsolve(opA,opB*rhs)
+    lhs = np.reshape(lhs, (lhs.shape[0],1))
+    sol = transf.torspec(x_to_phys(sol_expr,grid), m, opA.shape[0])
+    sol = sol[0:opA.shape[0]]
+    err = np.abs(lhs - sol)
+    relerr = err/(1.0 + np.abs(sol))
+    if np.max(err) > 10*np.spacing(1):
+        print(err.T)
+    print("\t\tMax tau backward error: " + str(np.max(err)))
+    if np.max(relerr) > 10*np.spacing(1):
+        print(relerr.T)
+    print("\t\tMax tau backward relative error: " + str(np.max(relerr)))
 
 def zblk(nr, rg):
     """Accuracy test for zblk operator"""
@@ -69,7 +81,7 @@ def i2(nr, rg):
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i2(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,2*nr,2)])
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,1,2)])
         ssol = 4**2*sy.integrate(sy.integrate(sphys*x,x)*x,x)*x**m
         sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 1)
@@ -79,6 +91,8 @@ def i2laplh(nr, rg):
 
     print("i2laplh:")
     x = sy.Symbol('x')
+
+    print("\tForward:")
     for i in range(0,2):
         m = np.random.randint(1, nr-1)
         m = m + (m+i)%2
@@ -88,6 +102,28 @@ def i2laplh(nr, rg):
         ssol = 4**2*sy.integrate(sy.integrate(sphys*x,x)*x,x)*x**m
         sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 1)
+
+    print("\tbc = 10:")
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        print("\tTest for m = " + str(m))
+        A = geo.i2laplh(nr, m, {0:10}).tocsr()
+        B = geo.i2(nr, m, {0:0}).tocsr()
+        ssol = sy.expand((x**2-1)*np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)]))
+        sphys = sy.expand(sy.diff(ssol,x,x) + sy.diff(ssol,x)/x - m**2*ssol/x**2)
+        test_backward_tau(A, B, m, sphys, ssol, rg)
+
+    print("\tbc = 11:")
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        print("\tTest for m = " + str(m))
+        A = geo.i2laplh(nr, m, {0:11}).tocsr()
+        B = geo.i2(nr, m, {0:0}).tocsr()
+        ssol = sy.expand((x**2-1)**2*np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)]))
+        sphys = sy.expand(sy.diff(ssol,x,x) + sy.diff(ssol,x)/x - m**2*ssol/x**2)
+        test_backward_tau(A, B, m, sphys, ssol, rg)
 
 def i4(nr, rg):
     """Accuracy test for i4 operator"""
@@ -109,6 +145,7 @@ def i4laplh(nr, rg):
 
     print("i4laplh:")
     x = sy.Symbol('x')
+    print("\tForward:")
     for i in range(0,2):
         m = np.random.randint(1, nr-1)
         m = m + (m+i)%2
@@ -249,7 +286,7 @@ def test_fft(n, m):
 
 if __name__ == "__main__":
     # Set test parameters
-    n = 6
+    n = 32
     nr = int(np.ceil(3.0*n/2.0 + 3.0*n/4.0 + 1))
     print("Grid: " + str((n, nr)))
     rg = wb.worland_grid(nr)
@@ -258,8 +295,8 @@ if __name__ == "__main__":
 #    test_worland(nr, 110)
 #    test_fft(nr, 32)
 #    zblk(nr, rg)
-    i2(n, rg)
-#    i2laplh(nr, rg)
+#    i2(n, rg)
+    i2laplh(nr, rg)
 #    i4(n, rg)
 #    i4laplh(nr, rg)
 #    i4lapl2h(nr, rg)
