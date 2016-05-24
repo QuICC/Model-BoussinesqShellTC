@@ -17,11 +17,11 @@ def no_bc():
 
     return {0:0}
 
-def constrain(mat, bc, location = 't'):
+def constrain(mat, bc, pad_zeros = 0, location = 't'):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
 
     if bc[0] > 0:
-        bc_mat = apply_tau(mat, bc, location = location)
+        bc_mat = apply_tau(mat, bc, pad_zeros = pad_zeros, location = location)
     elif bc[0] < 0:
         bc_mat = apply_galerkin(mat, bc)
     else:
@@ -69,7 +69,7 @@ def constrain(mat, bc, location = 't'):
 
     return bc_mat
 
-def apply_tau(mat, bc, location = 't'):
+def apply_tau(mat, bc, pad_zeros = 0, location = 't'):
     """Add Tau lines to the matrix"""
     
     nbc = bc[0]//10
@@ -115,6 +115,10 @@ def apply_tau(mat, bc, location = 't'):
         s = mat.shape[0]-nbc
 
     conc = np.concatenate
+    if pad_zeros > 0:
+        cond = conc((np.zeros((pad_zeros,cond.shape[1])),cond))
+    elif pad_zeros < 0:
+        cond = conc((cond, np.zeros((pad_zeros,cond.shape[1]))))
     for i,c in enumerate(cond):
         mat.data = conc((mat.data, c))
         mat.row = conc((mat.row, [s+i]*mat.shape[1]))

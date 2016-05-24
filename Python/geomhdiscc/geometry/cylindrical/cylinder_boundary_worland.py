@@ -105,14 +105,16 @@ def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
     if bc['z'][0] > 0 or bc['z'].get('mixed',None) is not None:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
-        bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr, m, sr, dr, bc['r'], location = location), restriction = restriction)
+        bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr,m,sr,dr,bc['r'], location = location), restriction = restriction)
         # Implement mixed boundary conditions
         if bc['z'].get('mixed', None) is not None:
             mix = bc['z']['mixed']
-            bcMat = spsp.lil_matrix((nr,nr))
-            bcMat = radbc.constrain(bcMat, m, mix, pad_zeros = mix.get('pad',0), location = location)
+            pad = mix.get('pad',0)
             s = mix.get('kron_shift',0)
-            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, brid(nr,m,sr,dr,bc['r'], location = location)*mix['kron'](nr+s, {0:0, 'rt':s, 'cr':s}), restriction = restriction)
+            for mbc, mc, mkron in mixed_iterator(mix):
+                bcMat = spsp.lil_matrix((nz,nz))
+                bcMat = c1dbc.constrain(bcMat, mix, pad_zeros = pad, location = location)
+                bc_mat += utils.restricted_kron_2d(bcMat, brid(nr,m,sr,dr,bc['r'], location = location)*mkron(nr+s, {0:0, 'rt':s, 'cr':s}), restriction = restriction)
 
     return bc_mat
 
