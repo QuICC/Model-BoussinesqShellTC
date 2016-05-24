@@ -23,12 +23,12 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "ro", "rratio"]
+        return ["ekman", "rossby", "magnetic_prandtl", "ro", "rratio"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocity"]
+        return ["velocity", "magnetic"]
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
@@ -59,7 +59,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","tor"):
+            if field_row in [("velocity","tor"),("magnetic","tor"),("magnetic","pol")]:
                 shift_r = 2
             elif field_row == ("velocity","pol"):
                 shift_r = 4
@@ -124,10 +124,14 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
                     raise RuntimeError("Inhomogeneous boundary conditions cannot use Galerkin scheme!")
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                         bc = {0:24, 'c':{'c':sgn*ri, 'l':l}}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                         bc = {0:40, 'c':{'a':a, 'b':b}}
+                    elif field_row == ("magnetic","tor") and field_col == field_row:
+                        bc = {0:20}
+                    elif field_row == ("magnetic","pol") and field_col == field_row:
+                        bc = {0:23, 'c':{'a':a, 'b':b 'l':l}}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -142,7 +146,14 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
-                raise RuntimeError("Inhomogeneous boundary conditions cannot used Galerkin scheme!")
+                if field_row == ("velocity","tor"):
+                    bc['rt'] = 2
+                elif field_row == ("velocity","pol"):
+                    bc['rt'] = 4
+                elif field_row == ("magnetic","tor"):
+                    bc['rt'] = 2
+                elif field_row == ("magnetic","pol"):
+                    bc['rt'] = 2
 
         else:
             bc = no_bc()
@@ -177,7 +188,10 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
-        E = np.sign(eq_params['ekman'])
+        E = eq_params['ekman']
+        Ro = eq_params['rossby']
+        Pm = eq_params['magnetic_prandtl']
+        Rm = Pm*abs(Ro)/E
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -191,6 +205,12 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         elif field_row == ("velocity","pol") and field_col == field_row:
             mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0)*E)
 
+        elif field_row == ("magnetic","tor") and field_col == field_row:
+            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0)/Rm)
+
+        elif field_row == ("magnetic","pol") and field_col == field_row:
+            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0)/Rm)
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
@@ -199,6 +219,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
+        Ro = eq_params['rossby']
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -211,6 +232,12 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
 
         elif field_row == ("velocity","pol"):
             mat = geo.i4r4lapl(res[0], l, a, b, bc, l*(l+1.0))
+
+        elif field_row == ("magnetic","tor"):
+            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0)/abs(Ro))
+
+        elif field_row == ("magnetic","pol"):
+            mat = geo.i2r2(res[0], l, a, b, bc, l*(l+1.0)/abs(Ro))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

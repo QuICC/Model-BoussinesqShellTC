@@ -138,15 +138,15 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                         bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:40, 'c':{'a':a, 'b':b}}
-                    elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
+                    elif field_row == ("magnetic","tor") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
+                    elif field_row == ("magnetic","pol") and field_col == field_row:
                             bc = {0:23, 'c':{'a':a, 'b':b, 'l':float("nan")}}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                             bc = {0:20}
 
             elif bcId == 1:
