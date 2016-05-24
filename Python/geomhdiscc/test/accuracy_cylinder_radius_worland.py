@@ -27,10 +27,17 @@ def test_forward(op, m, res_expr, sol_expr, grid, q):
     x = sy.Symbol('x')
     lhs = transf.torspec(x_to_phys(res_expr,grid), m, op.shape[0])
     rhs = op*lhs
+    print(op.todense())
     t = x_to_phys(sol_expr,grid)
     sol = transf.torspec(t, m, op.shape[0])
-    err = np.abs(rhs[0:-(1+q)] - sol[q:-1])
-    relerr = err/(1.0 + np.abs(sol[q:-1]))
+    print(rhs.T)
+    print(sol.T)
+    #print(rhs[0:-(1+q)].T)
+    #print(sol[q:-1].T)
+    #err = np.abs(rhs[0:-(1+q)] - sol[q:-1])
+    err = np.abs(rhs - sol)
+    #relerr = err/(1.0 + np.abs(sol[q:-1]))
+    relerr = err/(1.0 + np.abs(sol))
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err.T)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
@@ -242,7 +249,7 @@ def test_fft(n, m):
 
 if __name__ == "__main__":
     # Set test parameters
-    n = 32
+    n = 6
     nr = int(np.ceil(3.0*n/2.0 + 3.0*n/4.0 + 1))
     print("Grid: " + str((n, nr)))
     rg = wb.worland_grid(nr)
@@ -253,10 +260,10 @@ if __name__ == "__main__":
 #    zblk(nr, rg)
     i2(n, rg)
 #    i2laplh(nr, rg)
-    i4(n, rg)
+#    i4(n, rg)
 #    i4laplh(nr, rg)
 #    i4lapl2h(nr, rg)
-    i6(nr, rg)
+#    i6(nr, rg)
 #    i6laplh(nr, rg)
 #    i6lapl2h(nr, rg)
 #    i6lapl3h(nr, rg)

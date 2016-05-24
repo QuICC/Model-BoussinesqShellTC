@@ -35,6 +35,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         """Get the list of fields needed for linear stability calculations"""
 
         fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+        fields =  [("velocity","tor")]
 
         return fields
 
@@ -115,7 +116,10 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             m = eigs[0]
             Ra = eq_params['rayleigh']
-            zscale = 2
+            G = eq_params['gamma']
+            zscale = 2.0*G
+            Ta = eq_params['taylor']
+            T = Ta**0.5
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -139,15 +143,16 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 #                    elif field_row == ("temperature","") and field_col == field_row:
 #                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:11, 'mixed':{0:10, 'c':1j*m, 'pad':1, 'kron_shift':0, 'kron':geo.c1d.i1}}, 'z':{0:20}, 'priority':'z'}
+                        #bc = {'r':{0:11, 'mixed':{0:10, 'c':1j*m, 'pad':1, 'kron_shift':1, 'kron':geo.c1d.i1}}, 'z':{0:20}, 'priority':'r'}
+                        bc = {'r':{0:20}, 'z':{0:20}, 'priority':'r'}
                     elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
-                        bc = {'r':{0:0, 'mixed':{0:11, 'pad':1, 'kron_shift':0, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:0, 'mixed':{0:11, 'pad':1, 'kron_shift':1, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:22, 'mixed':{0:[17,15], 'c':[-1j*m,-1j*m], 'pad':2, 'kron_shift':0, 'kron':[geo.c1d.i2, functools.partial(geo.c1d.i2d2, cscale=zscale)]}}, 'z':{0:40}, 'priority':'z'}
+                        bc = {'r':{0:22, 'mixed':{0:[17,15,11], 'c':[-1j*m,-1j*m,T], 'pad':2, 'kron_shift':2, 'kron':[geo.c1d.i2, functools.partial(geo.c1d.i2d2, cscale=zscale), functools.partial(geo.c1d.i2d2, cscale=zscale)]}}, 'z':{0:40}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'kron_shift':0, 'kron':geo.c1d.i2, 'c':1j*m*Ra}}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:0, 'mixed':{0:[16,10], 'pad':2, 'c':[1.0,1j*m*T], 'kron_shift':2, 'kron':[functools.partial(geo.c1d.i2d1, cscale = zscale),functools.partial(geo.c1d.i2d1, cscale = zscale)]}}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == ("temperature",""):
-                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'kron_shift':0, 'kron':geo.c1d.i2, 'c':1j*m*Ra}}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'c':1j*m*Ra, 'kron_shift':2, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
 
@@ -161,7 +166,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                     if field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == ("temperature",""):
-                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'c':1j*m*Ra, 'kron_shift':0, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:0, 'mixed':{0:10, 'pad':2, 'c':1j*m*Ra, 'kron_shift':2, 'kron':geo.c1d.i2}}, 'z':{0:0}, 'priority':'z'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -233,12 +238,12 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        Ta = eq_params['taylor']
         G = eq_params['gamma']
+        Ta = eq_params['taylor']
         T = Ta**0.5
         m = eigs[0]
 
-        zscale = 2.0
+        zscale = 2.0*G
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -284,9 +289,10 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         """Create matrix block of time operator"""
 
         Pr = eq_params['prandtl']
+        G = eq_params['gamma']
         m = eigs[0]
 
-        zscale = 2.0
+        zscale = 2.0*G
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
