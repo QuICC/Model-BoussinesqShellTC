@@ -21,6 +21,7 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "IoTools/HumanToId.hpp"
+#include "IoTools/IdToHuman.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -115,6 +116,24 @@ namespace GeoMHDiSCC {
       return pDict;
    }
 
+   PyObject* PythonTools::makeDict(const std::map<NonDimensional::Id, MHDFloat>& map)
+   {
+      PyObject *pDict, *pKey, *pValue;
+
+      pDict = PyDict_New();
+      std::map<NonDimensional::Id,MHDFloat>::const_iterator mapIt;
+      for(mapIt = map.begin(); mapIt != map.end(); ++mapIt)
+      {
+         pKey = PyUnicode_FromString(IoTools::IdToHuman::toTag(mapIt->first).c_str());
+         pValue = PyFloat_FromDouble(mapIt->second);
+         PyDict_SetItem(pDict, pKey, pValue);
+         Py_DECREF(pValue);
+         Py_DECREF(pKey);
+      }
+
+      return pDict;
+   }
+
    void PythonTools::getList(std::vector<bool> &rList, PyObject *pList)
    {
       PyObject *pValue;
@@ -184,6 +203,31 @@ namespace GeoMHDiSCC {
          Py_DECREF(pTmp2);
 
          rList.push_back(std::make_pair(phys, comp));
+      }
+   }
+
+   void PythonTools::getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict)
+   {
+      PyObject *pValue, *pKey, *pList, *pTmp;
+
+      pList = PyDict_Keys(pDict);
+
+      long int len = PyList_Size(pList);
+      for(int i = 0; i < len; ++i)
+      {
+         pKey = PyList_GetItem(pList, i);
+         pValue = PyDict_GetItem(pDict, pKey);
+
+         pTmp = PyUnicode_AsASCIIString(pKey);
+         NonDimensional::Id nd = IoTools::HumanToId::toNd(std::string(PyBytes_AsString(pTmp)));
+         Py_DECREF(pTmp);
+
+         if(rMap.count(nd) > 0)
+         {
+            throw Exception("Map key already existed!");
+         }
+
+         rMap.insert(std::make_pair(nd,PyFloat_AsDouble(pValue)));
       }
    }
 

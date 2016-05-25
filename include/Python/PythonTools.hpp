@@ -53,14 +53,19 @@ namespace GeoMHDiSCC {
          static PyObject* makeList(const std::vector<std::vector<int> >& val);
 
          /**
-          * @brief Make a dictironary
+          * @brief Make a dictionary
           */
          static PyObject* makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val);
 
          /**
-          * @brief Make a dictironary
+          * @brief Make a dictionary
           */
          static PyObject* makeDict(const std::map<std::string,int>& map);
+
+         /**
+          * @brief Make a dictionary
+          */
+         static PyObject* makeDict(const std::map<NonDimensional::Id,MHDFloat>& map);
 
          /**
           * @brief Get data from list
@@ -81,6 +86,11 @@ namespace GeoMHDiSCC {
           * @brief Get data from list
           */
          static void getList(std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> > &rList, PyObject *pList);
+
+         /**
+          * @brief Get data from dict
+          */
+         static void getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict);
 
          /**
           * @brief Fill sparse matrix with data from Python call

@@ -32,6 +32,8 @@
 #include "Variables/RequirementTools.hpp"
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "Equations/Tools/EquationTools.hpp"
+#include "Python/PythonModelWrapper.hpp"
+#include "Python/PythonTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -302,6 +304,27 @@ namespace GeoMHDiSCC {
       {
          runOptions.insert(std::make_pair(*it, this->mspEqParams->nd(*it)));
       }
+
+      //
+      // Extend options with automatically computed values
+      //
+      PyObject *pValue;
+      PyObject *pTmp = PythonTools::makeDict(runOptions);
+
+      // Call model operator Python routine
+      PyObject *pArgs = PyTuple_New(1);
+      PyTuple_SetItem(pArgs, 0, pTmp);
+      PythonModelWrapper::setMethod((char *)"automatic_parameters");
+      pValue = PythonModelWrapper::callMethod(pArgs);
+
+      // Create storage
+      PythonTools::getDict(runOptions, pValue);
+      Py_DECREF(pValue);
+      Py_DECREF(pTmp);
+      Py_DECREF(pArgs);
+
+      // Cleanup Python interpreter
+      PythonModelWrapper::cleanup();
 
       // Initialise the transform coordinator
       Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, integratorTree, projectorTree, this->mspRes, runOptions);

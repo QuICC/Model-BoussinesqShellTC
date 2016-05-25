@@ -25,6 +25,13 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
 
         return ["ekman", "rossby", "rratio"]
 
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
+
+        return d
+
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 

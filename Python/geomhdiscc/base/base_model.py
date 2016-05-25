@@ -160,6 +160,11 @@ class BaseModel:
 
         return (blocks, invariant, shift)
 
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        return dict()
+
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
