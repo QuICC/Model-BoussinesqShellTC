@@ -23,7 +23,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ekman", "heating", "scale1d"]
+        return ["prandtl", "rayleigh", "ekman", "scale1d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -56,7 +56,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("velocity","tor"), ("velocity","pol"), ("temperature","")]:
+            if field_row in [("temperature","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -164,11 +164,11 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                     if field_row == ("velocity","tor") and field_col == field_row:
                         bc = {0:21}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {0:41}
+                        bc = {0:41, 'use_parity':False}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
                         E = eq_params['ekman']
                         c = E**(1./6.)/2**(1./2.)
-                        bc = {0:20, 'c':[c, -c]}
+                        bc = {0:20, 'c':[c, -c], 'use_parity':False}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -215,14 +215,13 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
     def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit linear term"""
 
+        kx = eigs[0]
+        ky = eigs[1]
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == ("velocity","pol"):
-            if eq_params['heating'] == 0:
-                mat = geo.i2(res[0], bc, -1.0)
-
-            elif eq_params['heating'] == 1:
-                mat = geo.i2x1(res[0], bc, -1.0)
+            mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -234,13 +233,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2(res[0], bc)
-
-        elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4(res[0], bc)
-
-        elif field_row == ("temperature","") and field_col == field_row:
+        if field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2(res[0], bc)
 
         if mat is None:
@@ -264,31 +257,31 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
+                mat = geo.i2(res[0], bc, (kx**2 + ky**2)**2)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2d2(res[0], bc, Ro**2, cscale = zscale)
+                mat += geo.i2d2(res[0], bc, -(kx**2 + ky**2)*Ro**2, cscale = zscale)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2d1(res[0], bc, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4d1(res[0], bc, -1.0, cscale = zscale)
+                mat = geo.i4d1(res[0], bc, (kx**2 + ky**2), cscale = zscale)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4(res[0], bc, (kx**2 + ky**2)**2)
+                mat = geo.i4(res[0], bc, -(kx**2 + ky**2)**3)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i4d2(res[0], bc, -2.0*Ro**2*(kx**2 + ky**2), cscale = zscale)
-                mat += geo.i4d4(res[0], bc, Ro**4, cscale = zscale)
+                mat += geo.i4d2(res[0], bc, 2.0*Ro**2*(kx**2 + ky**2)**2, cscale = zscale)
+                mat += geo.i4d4(res[0], bc, -(kx**2 + ky**2)*Ro**4, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 if kx == 0 and ky == 0:
                     mat = geo.zblk(res[0], bc)
                 else:
-                    mat = geo.i4(res[0], bc, -(Ra/Pr))
+                    mat = geo.i4(res[0], bc, (kx**2 + ky**2)*(Ra/Pr))
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -322,12 +315,12 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2(res[0], bc, 1.0)
+            mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4(res[0], bc, -(kx**2 + ky**2))
+            mat = geo.i4(res[0], bc, (kx**2 + ky**2)**2)
             bc[0] = min(bc[0], 0)
-            mat += geo.i4d2(res[0], bc, Ro**2, cscale = zscale)
+            mat += geo.i4d2(res[0], bc, -(kx**2 + ky**2)*Ro**2, cscale = zscale)
 
         elif field_row == ("temperature",""):
             mat = geo.i2(res[0], bc, 1.0)

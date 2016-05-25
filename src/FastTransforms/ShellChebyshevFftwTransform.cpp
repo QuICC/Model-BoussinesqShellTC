@@ -320,7 +320,7 @@ namespace Transform {
          throw Exception("Factorization of backward division by R^2 failed!");
       }
 
-      // Initialize solver and factorize division by d1 operator (upper triangular)
+      // Initialize solver and factorize d^1 operator (upper triangular)
       SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseTriSelector<SparseMatrix>::Type());
       this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
       this->mTriSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
@@ -330,7 +330,7 @@ namespace Transform {
          throw Exception("Factorization of backward 1st derivative failed!");
       }
 
-      // Initialize solver and factorize division by d2 operator (upper triangular)
+      // Initialize solver and factorize D^2 operator (upper triangular)
       pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
       this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
       this->mTriSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);

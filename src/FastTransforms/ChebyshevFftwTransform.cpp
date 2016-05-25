@@ -149,6 +149,16 @@ namespace Transform {
       //
       // Initialise integrator operators
       //
+      // QST Q operator (4th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST S operator (4th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST T operator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGT, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST Q operator (2nd order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST S operator (2nd order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       //
       // Initialise solver operators
@@ -156,6 +166,8 @@ namespace Transform {
       //---------------------------------------------------------------
       // First derivative
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // Second derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
       PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
@@ -163,58 +175,87 @@ namespace Transform {
       // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;
       pArgs = PyTuple_New(3);
-      // ... create boundray condition (last mode is zero)
+      // ... create boundray condition (none)
       pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0/this->mCScale);
+      // ... set coefficient to 1.0/cscale
+      pValue = PyFloat_FromDouble(1.0);
       PyTuple_SetItem(pArgs, 2, pValue);
 
-      // ... set resoluton for solver matrices
+      // ... set resolution for solver matrices
       pValue = PyLong_FromLong(this->mspSetup->fwdSize());
       PyTuple_SetItem(pArgs, 0, pValue);
 
+      // Call QST Q componet (4th order)
+      PythonWrapper::setFunction("i4");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ4)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call QST T component
+      PythonWrapper::setFunction("i2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGT)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call QST Q componet (2nd order)
+      PythonWrapper::setFunction("i2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ2)->second, pValue);
+      Py_DECREF(pValue);
+
+      // ... set coefficient to cscale
+      pValue = PyFloat_FromDouble(this->mCScale);
+      PyTuple_SetItem(pArgs, 2, pValue);
+
+      // Call QST S component (4th order)
+      PythonWrapper::setFunction("i4d1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS4)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call QST S component (2nd order)
+      PythonWrapper::setFunction("i2d1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS2)->second, pValue);
+      Py_DECREF(pValue);
+
       // Call i1 for solver
+      // Change resolution
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize()+1);
+      PyTuple_SetItem(pArgs, 0, pValue);
+      // ... set coefficient to cscale
+      pValue = PyFloat_FromDouble(1.0/this->mCScale);
+      PyTuple_SetItem(pArgs, 2, pValue);
+      // ... change boundary condition to zero last modes
+      pValue = PyTuple_GetItem(pArgs, 3);
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
+      PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(1));
       PythonWrapper::setFunction("i1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF)->second, pValue);
       Py_DECREF(pValue);
 
-      // Initialize solver storage
-      this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
-      this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
-
-      // Initialize solver and factorize division by d1 operator
-      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
-      this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
-      // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
-      {
-         throw Exception("Factorization of backward 1st derivative failed!");
-      }
-
-      //---------------------------------------------------------------
-      // Second derivative
-      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-
-      // Prepare arguments to Chebyshev matrices call
-      pArgs = PyTuple_New(3);
-      // ... create boundray condition (last mode is zero)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(992));
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0/this->mCScale);
-      PyTuple_SetItem(pArgs, 2, pValue);
-
-      // ... set resoluton for solver matrices
-      pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+      // Call i2 for solver
+      // Change resolution
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize()+2);
       PyTuple_SetItem(pArgs, 0, pValue);
-
-      // Call i1 for solver
+      // ... set coefficient to cscale
+      pValue = PyFloat_FromDouble(1.0/(this->mCScale*this->mCScale));
+      PyTuple_SetItem(pArgs, 2, pValue);
+      // ... change boundary condition to zero last modes
+      pValue = PyTuple_GetItem(pArgs, 3);
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2));
+      PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(2));
       PythonWrapper::setFunction("i2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
@@ -225,14 +266,24 @@ namespace Transform {
       this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
       this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
 
-      // Initialize solver and factorize division by d1 operator
-      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
-      this->mSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      // Initialize solver and factorize d^1 operator (upper triangular)
+      SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>  pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
+      this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
+      this->mTriSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
       // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
+      if(this->mTriSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
       {
          throw Exception("Factorization of backward 1st derivative failed!");
+      }
+
+      // Initialize solver and factorize d^2 operator (upper triangular)
+      pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
+      this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
+      this->mTriSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      // Check for successful factorisation
+      if(this->mTriSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward 2nd derivative failed!");
       }
 
       // Cleanup
@@ -314,7 +365,7 @@ namespace Transform {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
          this->mTmpInS.topRows(1).setZero();
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
 //         // Recurrence relation
@@ -327,7 +378,7 @@ namespace Transform {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
          this->mTmpInS.topRows(2).setZero();
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection
@@ -415,7 +466,7 @@ namespace Transform {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
          this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
 //         // Recurrence relation
@@ -428,7 +479,7 @@ namespace Transform {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
          this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection of real part
@@ -449,7 +500,7 @@ namespace Transform {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
          this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
 //         // Recurrence relation
@@ -462,7 +513,7 @@ namespace Transform {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
          this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection of imaginary part

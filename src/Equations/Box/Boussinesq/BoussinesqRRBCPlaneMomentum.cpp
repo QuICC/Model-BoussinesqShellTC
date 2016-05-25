@@ -41,9 +41,9 @@ namespace Equations {
 
    void BoussinesqRRBCPlaneMomentum::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, 1, true, false);
 
-      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void BoussinesqRRBCPlaneMomentum::setNLComponents()
