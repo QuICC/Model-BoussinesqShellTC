@@ -23,7 +23,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "ro", "rratio"]
+        return ["ekman", "rossby", "rratio"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -106,8 +106,9 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         """Convert simulation input boundary conditions to ID"""
 
         sgn = np.sign(eq_params['rossby'])
-        ri = eq_params['ro']*eq_params['rratio']
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = 1.0/(1.0 - eq_params['rratio'])
+        ri = ro*eq_params['rratio']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -181,7 +182,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.linear_r2x(1.0/(1.0 - eq_params['rratio']), eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -202,7 +203,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.linear_r2x(1.0/(1.0 - eq_params['rratio']), eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)

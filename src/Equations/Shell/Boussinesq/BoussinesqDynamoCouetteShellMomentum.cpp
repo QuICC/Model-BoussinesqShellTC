@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqDynamoCouetteShellMomentum.cpp
- * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq spherical Couette dynamo in a spherical shell model
+ * @file BoussinesqCouetteShellMomentum.cpp
+ * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq spherical Couette in a spherical shell model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -16,7 +16,7 @@
 
 // Class include
 //
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoCouetteShellMomentum.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.hpp"
 
 // Project includes
 //
@@ -30,18 +30,18 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqDynamoCouetteShellMomentum::BoussinesqDynamoCouetteShellMomentum(SharedEquationParameters spEqParams)
+   BoussinesqCouetteShellMomentum::BoussinesqCouetteShellMomentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamoCouetteShellMomentum::~BoussinesqDynamoCouetteShellMomentum()
+   BoussinesqCouetteShellMomentum::~BoussinesqCouetteShellMomentum()
    {
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::setCoupling()
+   void BoussinesqCouetteShellMomentum::setCoupling()
    {
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
          int start = 1;
@@ -62,14 +62,14 @@ namespace Equations {
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::setNLComponents()
+   void BoussinesqCouetteShellMomentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void BoussinesqCouetteShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {  
       MHDFloat Ro = std::abs(this->eqParams().nd(NonDimensional::ROSSBY));
 
@@ -80,12 +80,15 @@ namespace Equations {
       {
          case(FieldComponents::Physical::R):
             Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), Ro);
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
             break;
          case(FieldComponents::Physical::THETA):
             Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), Ro);
+            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
             break;
          case(FieldComponents::Physical::PHI):
             Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), Ro);
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
             break;
          default:
             assert(false);
@@ -100,7 +103,7 @@ namespace Equations {
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::setRequirements()
+   void BoussinesqCouetteShellMomentum::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -110,6 +113,9 @@ namespace Equations {
 
       // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
+
+      // Add magnetic to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
+      this->mRequirements.addField(PhysicalNames::MAGNETIC, FieldRequirement(false, true, true, false, true));
    }
 
 }

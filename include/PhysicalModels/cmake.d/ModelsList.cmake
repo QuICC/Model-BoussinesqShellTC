@@ -33,6 +33,7 @@ set(MHDPhysicalModels
    BoussinesqDynamoSphereModel.hpp
    BoussinesqDynamoSphereStdModel.hpp
    BoussinesqCouetteShellStdModel.hpp
+   BoussinesqDynamoCouetteShellStdModel.hpp
    )
 
 set(MHDTestModels 

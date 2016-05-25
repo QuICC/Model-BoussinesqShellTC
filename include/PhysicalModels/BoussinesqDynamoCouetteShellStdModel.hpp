@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqCouetteShellStdModel.hpp
- * @brief Implementation of the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
+ * @file BoussinesqDynamoCouetteShellStdModel.hpp
+ * @brief Implementation of the Boussinesq spherical Couette dynamo in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQCOUETTESHELLSTDMODEL_HPP
-#define BOUSSINESQCOUETTESHELLSTDMODEL_HPP
+#ifndef BOUSSINESQDYNAMOCOUETTESHELLSTDMODEL_HPP
+#define BOUSSINESQDYNAMOCOUETTESHELLSTDMODEL_HPP
 
 // Configuration includes
 //
@@ -30,9 +30,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
+    * @brief Implementation of the Boussinesq spherical Couette dynamo in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
     */
-   class BoussinesqCouetteShellStdModel
+   class BoussinesqDynamoCouetteShellStdModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -102,14 +102,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqCouetteShellStdModel();
+         BoussinesqDynamoCouetteShellStdModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqCouetteShellStdModel();
+         ~BoussinesqDynamoCouetteShellStdModel();
    };
 
 }
 
-#endif // BOUSSINESQCOUETTESHELLSTDMODEL_HPP
+#endif // BOUSSINESQDYNAMOCOUETTESHELLSTDMODEL_HPP

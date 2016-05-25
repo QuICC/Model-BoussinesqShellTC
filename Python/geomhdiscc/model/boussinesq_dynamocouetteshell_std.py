@@ -12,7 +12,7 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.shell_radius_boundary import no_bc
 
 
-class BoussinesqCouetteShellStd(base_model.BaseModel):
+class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
@@ -23,7 +23,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "magnetic_prandtl", "ro", "rratio"]
+        return ["ekman", "rossby", "magnetic_prandtl", "rratio"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -106,8 +106,9 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         """Convert simulation input boundary conditions to ID"""
 
         sgn = np.sign(eq_params['rossby'])
-        ri = eq_params['ro']*eq_params['rratio']
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = 1.0/(1.0 - eq_params['rratio'])
+        ri = ro*eq_params['rratio']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -131,7 +132,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
                     elif field_row == ("magnetic","tor") and field_col == field_row:
                         bc = {0:20}
                     elif field_row == ("magnetic","pol") and field_col == field_row:
-                        bc = {0:23, 'c':{'a':a, 'b':b 'l':l}}
+                        bc = {0:23, 'c':{'a':a, 'b':b, 'l':l}}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -195,7 +196,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.linear_r2x(1.0/(1.0 - eq_params['rratio']), eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -223,7 +224,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.linear_r2x(1.0/(1.0 - eq_params['rratio']), eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
