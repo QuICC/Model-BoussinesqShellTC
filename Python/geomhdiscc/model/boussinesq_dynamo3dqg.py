@@ -240,13 +240,13 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         elif field_row == ("bx","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
-                mat = geo.i2d1(res[0], bc, -tau, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, tau, cscale = zscale)
             else:
                 mat = geo.zblk(res[0], bc)
 
         elif field_row == ("by","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
-                mat = geo.i2d1(res[0], bc, tau, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, -tau, cscale = zscale)
             else:
                 mat = geo.zblk(res[0], bc)
 

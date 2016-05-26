@@ -37,6 +37,7 @@
 #include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DMagneticEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -155,16 +156,15 @@ namespace GeoMHDiSCC {
          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
          // Add BX initial state generation equation
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-         spExact->setIdentity(PhysicalNames::BX);
-         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::BX);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
          // Add BY initial state generation equation
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-         spExact->setIdentity(PhysicalNames::BY);
-         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::BY);
+         spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
+
       }
 
       // Add output file
@@ -263,6 +263,18 @@ namespace GeoMHDiSCC {
       spStream->expect(PhysicalNames::STREAMFUNCTION);
       spStream->expect(PhysicalNames::VELOCITYZ);
       spSim->addAsciiOutputFile(spStream);
+
+      // Create magnetic energy writer
+      IoVariable::SharedCartesian1DMagneticEnergyWriter spMag(new IoVariable::Cartesian1DMagneticEnergyWriter("magnetic", SchemeType::type()));
+      spMag->expect(PhysicalNames::BX);
+      spMag->expect(PhysicalNames::BY);
+      spSim->addAsciiOutputFile(spMag);
+     
+     // Create temperature energy writer
+   //   IoVariable::SharedCartesian1DScalarEnergyWriter spMag(new IoVariable::Cartesian1DScalarEnergyWriter("magX", SchemeType::type()));
+   //   spMag->expect(PhysicalNames::BX);
+   //   spSim->addAsciiOutputFile(spMag);
+
    }
 
    void BoussinesqDynamo3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
