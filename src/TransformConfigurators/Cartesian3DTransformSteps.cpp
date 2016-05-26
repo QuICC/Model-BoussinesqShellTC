@@ -66,10 +66,10 @@ namespace TransformSteps {
          // Integrate for standard second order equation
          if(curlFlag == 0)
          {
-            // Compute curl component
+            // Compute curl component and mean in Y
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGDIFF);
-            transform.back().addEdge(Integrator2DType::INTG);
+            transform.back().addEdge(IntegratorNDType::INTGDIFFM);
+            transform.back().addEdge(Integrator2DType::INTGNEGM);
             transform.back().addEdge(Integrator1DType::INTGT, curlId, Arithmetics::SUB);
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
@@ -84,16 +84,16 @@ namespace TransformSteps {
          // Integrate for standard fourth order double curl equation
          if(curlcurlFlag == 0)
          {
-            // Compute curlcurl with Dz component
+            // Compute curlcurl with Dz component and mean in X
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
             transform.back().addEdge(Integrator1DType::INTGS4, curlcurlId, Arithmetics::ADD);
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGDIFF);
-            transform.back().addEdge(Integrator2DType::INTG);
-            transform.back().addEdge(Integrator1DType::INTGS4, curlcurlId, Arithmetics::ADD);
+            transform.back().addEdge(IntegratorNDType::INTGDIFFM);
+            transform.back().addEdge(Integrator2DType::INTGM);
+            transform.back().addEdge(Integrator1DType::INTGS4M, curlcurlId, Arithmetics::ADD);
 
             // Compute curlcurl without Dz component
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
@@ -116,8 +116,8 @@ namespace TransformSteps {
             transform.back().addEdge(Integrator1DType::INTGS2, curlcurlId, Arithmetics::ADD);
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGDIFF);
-            transform.back().addEdge(Integrator2DType::INTG);
+            transform.back().addEdge(IntegratorNDType::INTGDIFFM);
+            transform.back().addEdge(Integrator2DType::INTGM);
             transform.back().addEdge(Integrator1DType::INTGS2, curlcurlId, Arithmetics::ADD);
 
             // Compute curlcurl without Dz component
@@ -140,12 +140,12 @@ namespace TransformSteps {
       {
          transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
          transform.back().addEdge(IntegratorNDType::INTG);
-         transform.back().addEdge(Integrator2DType::INTGDIFF);
+         transform.back().addEdge(Integrator2DType::INTGDIFFM);
          transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::ADD);
 
          transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
-         transform.back().addEdge(IntegratorNDType::INTGDIFF);
-         transform.back().addEdge(Integrator2DType::INTG);
+         transform.back().addEdge(IntegratorNDType::INTGDIFFM);
+         transform.back().addEdge(Integrator2DType::INTGNEGM);
          transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::SUB);
 
          transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));

@@ -362,22 +362,16 @@ namespace Transform {
       // Compute first derivative
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(1).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative
       } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(2).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
@@ -463,22 +457,16 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative of real part
       } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
@@ -497,22 +485,16 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols().imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative of imaginary part
       } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 

@@ -276,34 +276,10 @@ namespace Transform {
          void initOperators();
 
          /**
-          * @brief Compute derivative by recurrence relation
-          */
-         template <typename TDerived> void recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
-
-         /**
           * @brief Cleanup memory used by FFTW on destruction
           */
          void cleanupFft();
    };
-
-   template <typename TDerived> void ChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
-   {
-      int i = chebVal.rows()-1;
-
-      // Set T_N to zero
-      rDealiased.row(i).setConstant(0.0);
-      --i;
-
-      // Compute T_N-1
-      rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
-      --i;
-
-      // Compute remaining modes
-      for(; i >= 0; --i)
-      {
-         rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
-      }
-   }
 
 }
 }
