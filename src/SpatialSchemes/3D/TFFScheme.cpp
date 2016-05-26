@@ -19,6 +19,7 @@
 //
 #include "Resolutions/Tools/DoublePeriodicIndexCounter.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Schemes {
@@ -100,6 +101,7 @@ namespace Schemes {
          specialBlocks(i,0) = special.at(i).first;
          specialBlocks(i,1) = special.at(i).second;
       }
+      std::cerr << "SPECIAL BLOCKS: " << specialBlocks.rows() << " x " << specialBlocks.cols() << std::endl;
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specialBlocks, specSize, Transform::FftSetup::COMPLEX));
    }

@@ -61,10 +61,12 @@ namespace Transform {
       {
          /// Enum of integrator IDs
          // INTG: Integrator
+         // INTGM: Integrator and zero k2 = 0, k1 != 0 modes (only complex - complex)
          // INTGDIFF: First derivative integrator
          // INTGDIFF2: Second derivative integrator
          // INTGDIFFM: First derivative integrator and mean (k = 0 mode is not zeroed)
-         enum Id {INTG, INTGDIFF, INTGDIFF2};
+         // INTGDIFFNEGM: First derivative integrator and negative mean (k = 0 mode is not zeroed)
+         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGM, INTGDIFFM, INTGDIFFNEGM};
       };
 
    };

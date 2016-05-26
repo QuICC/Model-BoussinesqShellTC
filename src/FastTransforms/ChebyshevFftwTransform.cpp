@@ -179,7 +179,7 @@ namespace Transform {
       pValue = PyDict_New();
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0/cscale
+      // ... set coefficient to 1.0
       pValue = PyFloat_FromDouble(1.0);
       PyTuple_SetItem(pArgs, 2, pValue);
 
@@ -234,7 +234,7 @@ namespace Transform {
       pValue = PyFloat_FromDouble(1.0/this->mCScale);
       PyTuple_SetItem(pArgs, 2, pValue);
       // ... change boundary condition to zero last modes
-      pValue = PyTuple_GetItem(pArgs, 3);
+      pValue = PyTuple_GetItem(pArgs, 1);
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
       PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(1));
@@ -252,7 +252,7 @@ namespace Transform {
       pValue = PyFloat_FromDouble(1.0/(this->mCScale*this->mCScale));
       PyTuple_SetItem(pArgs, 2, pValue);
       // ... change boundary condition to zero last modes
-      pValue = PyTuple_GetItem(pArgs, 3);
+      pValue = PyTuple_GetItem(pArgs, 1);
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2));
       PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(2));
@@ -279,7 +279,7 @@ namespace Transform {
       // Initialize solver and factorize d^2 operator (upper triangular)
       pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
       this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
-      this->mTriSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      this->mTriSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
       // Check for successful factorisation
       if(this->mTriSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
       {
@@ -485,7 +485,7 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols().imag(); 
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).imag(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;

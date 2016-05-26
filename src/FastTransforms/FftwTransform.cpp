@@ -179,6 +179,26 @@ namespace Transform {
 
          // Rescale results
          rFFTVal = factor.asDiagonal()*rFFTVal;
+      
+      // Compute first derivative integration and mean (k = 0 is not zeroed)
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFFM)
+      {
+         // Get differentiation factors
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         factor(0) = this->mspSetup->scale();
+
+         // Rescale results
+         rFFTVal = factor.asDiagonal()*rFFTVal;
+      
+      // Compute first derivative integration and negative mean (k = 0 is not zeroed)
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFFNEGM)
+      {
+         // Get differentiation factors
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         factor(0) = -this->mspSetup->scale();
+
+         // Rescale results
+         rFFTVal = factor.asDiagonal()*rFFTVal;
 
       // Compute simple projection
       } else
@@ -290,6 +310,75 @@ namespace Transform {
          // Split positive and negative frequencies and compute derivative
          rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
          rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
+
+      // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFFM)
+      {
+         // Get differentiation factors
+         ArrayZ factor = -this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = -this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+
+         // Get number of special blocks
+         int zRows = this->mspSetup->specialBlocks().rows();
+         std::vector<ArrayZ> mean;
+
+         // Extract the mean
+         for(int j = 0; j < zRows; j++)
+         {
+            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)));
+         }
+
+         // Split positive and negative frequencies and compute derivative
+         rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
+         rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
+
+         // Set the mean
+         for(int j = 0; j < zRows; j++)
+         {
+            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = this->mspSetup->boxScale()*mean.at(j);
+         }
+
+      // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFFNEGM)
+      {
+         // Get differentiation factors
+         ArrayZ factor = -this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = -this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+
+         // Get number of special blocks
+         int zRows = this->mspSetup->specialBlocks().rows();
+         std::vector<ArrayZ> mean;
+
+         // Extract the mean
+         for(int j = 0; j < zRows; j++)
+         {
+            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)));
+         }
+
+         // Split positive and negative frequencies and compute derivative
+         rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
+         rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
+
+         // Set the mean
+         for(int j = 0; j < zRows; j++)
+         {
+            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = -this->mspSetup->boxScale()*mean.at(j);
+         }
+
+      // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
+      } else if(integrator == FftwTransform::IntegratorType::INTGM)
+      {
+         // Get number of special blocks
+         int zRows = this->mspSetup->specialBlocks().rows();
+
+         // Extract the mean
+         for(int j = 0; j < zRows; j++)
+         {
+            rFFTVal.block(1, this->mspSetup->specialBlocks()(j,0), rFFTVal.rows()-1, this->mspSetup->specialBlocks()(j,1)).setZero();
+         }
+
+         // Rescale output from FFT
+         rFFTVal *= this->mspSetup->scale();
 
       // Compute simple projection
       } else
