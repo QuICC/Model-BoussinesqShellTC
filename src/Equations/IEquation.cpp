@@ -404,11 +404,40 @@ namespace Equations {
 
    void  IEquation::dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id compId, const int matIdx, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Get first four standard arguments in a tuple of size 6
-      PyObject *pArgs = this->dispatchBaseArguments(6, bcType, spRes, eigs);
+      // Get first four standard arguments in a tuple of size 6 (7 for inhomogeneous boundary condition)
+      PyObject *pArgs;
+      int argStart;
+      if(opId == ModelOperator::INHOMOGENEOUS)
+      {
+         pArgs = this->dispatchBaseArguments(7, bcType, spRes, eigs);
+         argStart = 5;
+      } else
+      {
+         pArgs = this->dispatchBaseArguments(6, bcType, spRes, eigs);
+         argStart = 4;
+      }
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue, *pList;
+
+      // Add list of modes
+      if(opId == ModelOperator::INHOMOGENEOUS)
+      {
+         if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+         {
+            pTmp = PyList_New(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx));
+            for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx); ++i)
+            {
+               PyList_SetItem(pTmp, i, PyFloat_FromDouble(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(i,matIdx)));
+            }
+            PyTuple_SetItem(pArgs, 4, pTmp);
+
+         } else
+         {
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(pArgs, 4, Py_None);
+         }
+      }
 
       // Get list of implicit fields
       CouplingInformation::FieldId_range impRange = this->couplingInfo(compId).implicitRange();
@@ -424,7 +453,7 @@ namespace Equations {
          PyList_Append(pList, pTmp);
          Py_DECREF(pTmp);
       }
-      PyTuple_SetItem(pArgs, 4, pList);
+      PyTuple_SetItem(pArgs, argStart, pList);
 
       // Set the restriction option
       #ifdef GEOMHDISCC_MPI
@@ -447,16 +476,16 @@ namespace Equations {
                pTmp = PythonTools::makeList(slow);
             }
 
-            PyTuple_SetItem(pArgs, 5, pTmp);
+            PyTuple_SetItem(pArgs, argStart+1, pTmp);
          #else
             // MPI code with serial sparse solver
             Py_INCREF(Py_None);
-            PyTuple_SetItem(pArgs, 5, Py_None);
+            PyTuple_SetItem(pArgs, argStart+1, Py_None);
          #endif //GEOMHDISCC_MPISPSOLVE
       #else
          // Serial code can't have any restriction
          Py_INCREF(Py_None);
-         PyTuple_SetItem(pArgs, 5, Py_None);
+         PyTuple_SetItem(pArgs, argStart+1, Py_None);
       #endif //GEOMHDISCC_MPI
 
       // Call model operator Python routine

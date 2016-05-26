@@ -47,6 +47,10 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
+         // PROJ: Projector
+         // DIFF: First derivative
+         // DIFF2: Second derivative
+         // DIFF3: Third derivative
          enum Id {PROJ, DIFF, DIFF2, DIFF3};
       };
 
@@ -56,6 +60,10 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
+         // INTG: Integrator
+         // INTGDIFF: First derivative integrator
+         // INTGDIFF2: Second derivative integrator
+         // INTGDIFFM: First derivative integrator and mean (k = 0 mode is not zeroed)
          enum Id {INTG, INTGDIFF, INTGDIFF2};
       };
 

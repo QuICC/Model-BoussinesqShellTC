@@ -1359,9 +1359,9 @@ def avg(nr, a, b):
 
     return mat
 
-def inhomogeneous_bc(nr, l, maxM, bc):
+def inhomogeneous_bc(nr, l, modes, bc):
     """Create a inhomogeneous boundary operator"""
 
-    mat = spsp.lil_matrix((nr, min(maxM+1, l+1)))
-    return radbc.apply_inhomogeneous(mat,bc)
+    mat = spsp.lil_matrix((nr, len(modes)))
+    return radbc.apply_inhomogeneous(mat, modes, bc)
 

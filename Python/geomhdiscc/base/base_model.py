@@ -74,10 +74,10 @@ class BaseModel:
             io.mmwrite(fname  + ".mtx", mat)
         return mat
 
-    def inhomogeneous(self, res, eq_params, eigs, bcs, fields, restriction = None):
+    def inhomogeneous(self, res, eq_params, eigs, bcs, modes, fields, restriction = None):
         """Create the boundary operator"""
 
-        mat = utils.build_block_matrix(fields, self.inhomogeneous_block, (res,eq_params,eigs,bcs), restriction = restriction)
+        mat = utils.build_block_matrix(fields, self.inhomogeneous_block, (res,eq_params,eigs,bcs,modes), restriction = restriction)
         if verbose_write_mtx:
             fname = "matrix_inhomogeneous_" + make_single_name(fields, bcs)
             for e in eigs:
@@ -220,7 +220,7 @@ class BaseModel:
         
         raise NotImplementedError("Stencil needs to be implemented in model!")
 
-    def inhomogeneous_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):
         """Create matrix block for inhomogeneous boundary operator"""
 
         return spsp.lil_matrix((1,1))

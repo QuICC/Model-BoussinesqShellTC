@@ -264,7 +264,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
 
         return mat
 
-    def inhomogeneous_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         if field_row == ("velocity","tor"):
@@ -273,11 +273,11 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
 
             mat = None
             bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-            mat = geo.inhomogeneous_bc(res[0], l, res[2], bc)
+            mat = geo.inhomogeneous_bc(res[0], l, modes, bc)
 
             if mat is None:
                 raise RuntimeError("Equations are not setup properly!")
 
             return mat
         else:
-            return base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction)
+            return base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
