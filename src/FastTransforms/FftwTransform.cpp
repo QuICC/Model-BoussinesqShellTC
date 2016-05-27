@@ -293,8 +293,8 @@ namespace Transform {
       if(integrator == FftwTransform::IntegratorType::INTGDIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = -this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
          // Split positive and negative frequencies and compute derivative
          rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
@@ -304,8 +304,8 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFF2)
       {
          // Get differentiation factors
-         Array factor = -(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
-         Array rfactor = -(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+         Array factor = this->mspSetup->scale()*(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = this->mspSetup->scale()*(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
 
          // Split positive and negative frequencies and compute derivative
          rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
@@ -315,8 +315,8 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFM)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = -this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
          // Get number of special blocks
          int zRows = this->mspSetup->specialBlocks().rows();
@@ -325,7 +325,7 @@ namespace Transform {
          // Extract the mean
          for(int j = 0; j < zRows; j++)
          {
-            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)));
+            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).transpose());
          }
 
          // Split positive and negative frequencies and compute derivative
@@ -335,15 +335,15 @@ namespace Transform {
          // Set the mean
          for(int j = 0; j < zRows; j++)
          {
-            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = this->mspSetup->boxScale()*mean.at(j);
+            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = this->mspSetup->scale()*mean.at(j).transpose();
          }
 
       // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFNEGM)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = -this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
          // Get number of special blocks
          int zRows = this->mspSetup->specialBlocks().rows();
@@ -352,7 +352,7 @@ namespace Transform {
          // Extract the mean
          for(int j = 0; j < zRows; j++)
          {
-            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)));
+            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).transpose());
          }
 
          // Split positive and negative frequencies and compute derivative
@@ -362,7 +362,7 @@ namespace Transform {
          // Set the mean
          for(int j = 0; j < zRows; j++)
          {
-            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = -this->mspSetup->boxScale()*mean.at(j);
+            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = -this->mspSetup->scale()*mean.at(j).transpose();
          }
 
       // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)

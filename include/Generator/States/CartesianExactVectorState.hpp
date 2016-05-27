@@ -73,6 +73,11 @@ namespace Equations {
          /**
           * @brief Set the state type id
           */
+         void setStateType(const CartesianExactStateIds::Id id);
+
+         /**
+          * @brief Set the state type id
+          */
          void setStateType(const FieldComponents::Physical::Id compId, const CartesianExactStateIds::Id id);
 
          /**

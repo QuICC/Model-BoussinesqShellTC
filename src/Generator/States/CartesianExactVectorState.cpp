@@ -46,6 +46,24 @@ namespace Equations {
       this->setRequirements();
    }
 
+   void CartesianExactVectorState::setStateType(const CartesianExactStateIds::Id id)
+   {
+      if(FieldComponents::Physical::ONE != FieldComponents::Physical::NOTUSED)
+      {
+         this->mTypeId.insert(std::make_pair(FieldComponents::Physical::ONE, id));
+      }
+
+      if(FieldComponents::Physical::TWO != FieldComponents::Physical::NOTUSED)
+      {
+         this->mTypeId.insert(std::make_pair(FieldComponents::Physical::TWO, id));
+      }
+
+      if(FieldComponents::Physical::THREE != FieldComponents::Physical::NOTUSED)
+      {
+         this->mTypeId.insert(std::make_pair(FieldComponents::Physical::THREE, id));
+      }
+   }
+
    void CartesianExactVectorState::setStateType(const FieldComponents::Physical::Id compId, const CartesianExactStateIds::Id id)
    {
       this->mTypeId.insert(std::make_pair(compId, id));
@@ -98,14 +116,74 @@ namespace Equations {
    void CartesianExactVectorState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       CartesianExactStateIds::Id typeId = this->mTypeId.find(compId)->second;
-      Array modeA = this->mModeA.find(compId)->second;
-      Array modeK = this->mModeK.find(compId)->second;
 
       if(typeId == CartesianExactStateIds::CONSTANT)
       {
+         Array modeA = this->mModeA.find(compId)->second;
          rNLComp.rData().setConstant(modeA.prod());
+
+      // Generate divergence free state for toroidal/poloidal decomposition test
+      } else if(typeId == CartesianExactStateIds::TORPOLTFF)
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
+         MHDFloat k_;
+         MHDFloat j_;
+         MHDFloat i_;
+         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
+         for(int iK = 0; iK < nK; ++iK)
+         {
+            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
+            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
+            for(int iJ = 0; iJ < nJ; ++iJ)
+            {
+               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               for(int iI = 0; iI < nI; ++iI)
+               {
+                  i_ = gI(iI);
+
+                  MHDFloat val = 0.0;
+
+                  if(compId == FieldComponents::Physical::X)
+                  {
+                     //val = -k_*(std::cos(j_) + 4.0*std::sin(j_))*std::sin(i_);
+                     val = -4.0*k_*std::sin(4.0*i_);
+                     rNLComp.setPoint(val, iI, iJ, iK);
+                  } else if(compId == FieldComponents::Physical::Y)
+                  {
+                     //val = k_*(4.0*std::cos(j_) + std::sin(j_))*std::cos(i_);
+                     val = 4.0*k_*std::cos(i_);
+                     rNLComp.setPoint(val, iI, iJ, iK);
+                  } else if(compId == FieldComponents::Physical::Z)
+                  {
+                     //val = 2.0*(-1.0 + 2.0*k_*k_)*std::cos(j_)*std::sin(i_);
+                     val = (-1.0 + 2.0*k_*k_)*std::sin(i_);
+                     rNLComp.setPoint(val, iI, iJ, iK);
+                  }
+               }
+            }
+         }
+
       } else
       {
+         Array modeA = this->mModeA.find(compId)->second;
+         Array modeK = this->mModeK.find(compId)->second;
          #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
             int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
             int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
