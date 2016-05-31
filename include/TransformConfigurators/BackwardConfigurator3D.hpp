@@ -48,12 +48,12 @@ namespace Transform {
          /**
           * @brief Empty constructor
           */
-         BackwardConfigurator3D();
+         BackwardConfigurator3D() {};
 
          /**
           * @brief Empty destructor
           */
-         virtual ~BackwardConfigurator3D();
+         virtual ~BackwardConfigurator3D() {};
 
       private: 
    };

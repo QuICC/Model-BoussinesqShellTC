@@ -95,12 +95,12 @@ namespace Transform {
          /**
           * @brief Empty constructor
           */
-         BackwardSerialConfigurator();
+         BackwardSerialConfigurator() {};
 
          /**
           * @brief Empty destructor
           */
-         virtual ~BackwardSerialConfigurator();
+         virtual ~BackwardSerialConfigurator() {};
 
       private:
    };

@@ -87,12 +87,12 @@ namespace Transform {
          /**
           * @brief Empty constructor
           */
-         BackwardConfigurator2D();
+         BackwardConfigurator2D() {};
 
          /**
           * @brief Empty destructor
           */
-         virtual ~BackwardConfigurator2D();
+         virtual ~BackwardConfigurator2D() {};
 
       private: 
    };
