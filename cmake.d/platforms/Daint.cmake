@@ -7,7 +7,8 @@
 ###################################################
 
 set(GEOMHDISCC_COMPILERS "Cray" "GCC" "Intel" PARENT_SCOPE)
-set(GEOMHDISCC_DISABLE_DYNAMIC ON PARENT_SCOPE)
+#set(GEOMHDISCC_DISABLE_RDYNAMIC ON PARENT_SCOPE)
+set(GEOMHDISCC_ENABLE_DYNAMIC ON PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
@@ -46,19 +47,21 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SparseLU" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SparseLU" "MUMPS" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" PARENT_SCOPE)
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "MUMPS" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_MUMPS "$ENV{CRAY_TPSL_PREFIX_DIR}/include" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(GEOMHDISCC_SPTRILINALGS "SparseLU" PARENT_SCOPE)
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "MUMPS" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
@@ -118,15 +121,19 @@ set(GEOMHDISCC_CC_LIB_MPI_INTEL "${GEOMHDISCC_CC_LIB_INTEL}" PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_PYTHONS "python27" "python34" PARENT_SCOPE)
+set(GEOMHDISCC_PYTHONS "python27" "python34" "python35" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBRARIES_PYTHON27 "python2.7" "util" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON27 "$ENV{PYTHON_DIR}/include/python2.7" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_PYTHON27 "$ENV{PYTHONPATH}" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON27 "$ENV{EBROOTPYTHON}/include/python2.7" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_PYTHON27 "$ENV{EBROOTPYTHON}/lib" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBRARIES_PYTHON34 "python3.4m" "util" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON34 "$ENV{PYTHON_DIR}/include/python3.4m" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_PYTHON34 "$ENV{PYTHONPATH}" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON34 "$ENV{EBROOTPYTHON}/include/python3.4m" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_PYTHON34 "$ENV{EBROOTPYTHON}/lib" PARENT_SCOPE)
+
+set(GEOMHDISCC_LIBRARIES_PYTHON35 "python3.5m" "util" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON35 "$ENV{EBROOTPYTHON}/include/python3.5m" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_PYTHON35 "$ENV{EBROOTPYTHON}/lib" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
