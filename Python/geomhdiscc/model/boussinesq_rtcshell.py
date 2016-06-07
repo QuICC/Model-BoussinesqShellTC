@@ -22,7 +22,17 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
+        return ["taylor", "prandtl", "rayleigh", "rratio", "heating"]
+
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        # Unit gap width
+        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
+        # Unit radius
+        #d = {"ro":1.0}
+
+        return d
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -132,7 +142,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -195,7 +206,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+                        ro = self.automatic_parameters(eq_params)['ro']
+                        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
                         bc = {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-41, 'rt':4}
@@ -225,7 +237,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -247,7 +260,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -279,7 +293,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -339,7 +354,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -386,13 +402,14 @@ class BoussinesqRTCShell(base_model.BaseModel):
         #c_dt = T**(2./3.)*(0.4715 - 0.6089*T**(-1/3.))
         c_dt = T**(2./3.)*(0.3144 - 0.6089*T**(-1./3.)) + T**(1./3.)*0.5186*int(0.3029*T**(1./3.))
         c_dt = c_dt*(1.0-eq_params['rratio'])**2
+        c_dt = 1.0
         return c_dt
 
     def nondimensional_factors(self, eq_params):
         """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
 
         Ra = eq_params['rayleigh']
-        ro = eq_params['ro']
+        ro = self.automatic_parameters(eq_params)['ro']
         rratio = eq_params['rratio']
         T = eq_params['taylor']**0.5
 

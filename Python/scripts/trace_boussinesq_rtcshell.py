@@ -15,7 +15,7 @@ Rac = None
 mc = None
 
 # SF/SF, FT/FT, internal heating
-#bc_vel = 1; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
+#bc_vel = 1; bc_temp = 0; heating = 0; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -44,7 +44,7 @@ mc = None
 #res = [1024, 384, 0]
 
 # NS/NS, FT/FT, internal heating
-bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
+#bc_vel = 0; bc_temp = 0; heating = 0; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -72,7 +72,37 @@ bc_vel = 0; bc_temp = 0; heating = 0; ro = 20./13.; rratio = 0.35
 #Ta = 1e18
 #res = [1024, 1024, 0]
 
+# NS/NS, FT/FT, differential heating
+bc_vel = 0; bc_temp = 0; heating = 1; rratio = 0.35
+#Ta = 1e6
+#res = [32, 32, 0]
+#Ta = 1e7
+#res = [32, 32, 0]
+#Ta = 1e8; Rac = 28.93487228774; mc = 5 
+#res = [48, 48, 0]
+#Ta = 1e9; Rac = 32.817417129811; mc = 7
+#res = [48, 48, 0]
+#Ta = 1e10; Rac = 39.148927020559; mc = 9
+#res = [96, 96, 0]
+#Ta = 1e11; Rac = 84.487326687693; mc = 20
+#res = [128, 128, 0]
+Ta = 1e12; Rac = 105; mc = 25
+res = [192, 192, 0]
+#Ta = 1e13; Rac = 176.79656879674; mc = 44
+#res = [256, 256, 0]
+#Ta = 1e14; Rac = 257.45628575047; mc = 65
+#res = [384, 256, 0]
+#Ta = 1e15; Rac = 375.86277729259; mc = 95
+#res = [512, 384, 0]
+#Ta = 1e16
+#res = [768, 512, 0]
+#Ta = 1e17
+#res = [768, 768, 0]
+#Ta = 1e18
+#res = [1024, 1024, 0]
+
 # Create parameters (rescaling to proper nondimensionalisation)
+ro = model.automatic_parameters({'rratio':rratio})
 if mc is None:
     m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
 else:
@@ -83,7 +113,7 @@ else:
     Ra = Rac
 
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
-eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra, 'ro':ro, 'rratio':rratio, 'heating':heating}
+eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra, 'rratio':rratio, 'heating':heating}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)
@@ -108,7 +138,7 @@ marginal_options['point_k'] = m
 marginal_options['plot_point'] = False
 marginal_options['show_spectra'] = False
 marginal_options['show_physical'] = False
-marginal_options['curve_points'] = np.arange(max(1,m-15), m+15, 1)
+marginal_options['curve_points'] = np.arange(max(1,m-5), m+6, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)
