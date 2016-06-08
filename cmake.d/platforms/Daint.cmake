@@ -6,7 +6,7 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(GEOMHDISCC_COMPILERS "Cray" "GCC" "Intel" PARENT_SCOPE)
+set(GEOMHDISCC_COMPILERS "GCC" PARENT_SCOPE)
 #set(GEOMHDISCC_DISABLE_RDYNAMIC ON PARENT_SCOPE)
 set(GEOMHDISCC_ENABLE_DYNAMIC ON PARENT_SCOPE)
 
@@ -76,7 +76,7 @@ set(GEOMHDISCC_LIBRARIES_HDF5 "hdf5" PARENT_SCOPE)
 #-------------- MPI IMPLEMENTATION ---------------#
 ###################################################
 
-set(GEOMHDISCC_MPIIMPLS "MPICH2" PARENT_SCOPE)
+set(GEOMHDISCC_MPIIMPLS "CRAYMPICH" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#
@@ -121,7 +121,7 @@ set(GEOMHDISCC_CC_LIB_MPI_INTEL "${GEOMHDISCC_CC_LIB_INTEL}" PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_PYTHONS "python27" "python34" "python35" PARENT_SCOPE)
+set(GEOMHDISCC_PYTHONS "python27" "python35" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBRARIES_PYTHON27 "python2.7" "util" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_PYTHON27 "$ENV{EBROOTPYTHON}/include/python2.7" PARENT_SCOPE)
