@@ -84,26 +84,25 @@ namespace Schemes {
 
       // Get number of transforms
       int howmany = 0;
-      std::vector<std::pair<int,int> > special;
+      std::vector<std::pair<int,int> > idPairs;
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
-         if(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT3D>(i) == 0)
-         {
-            special.push_back(std::make_pair(howmany, spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i)));
-         }
+         // Store 3D ID and block size
+         idPairs.push_back(std::make_pair(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT3D>(i), spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i)));
+
+         // Increment counter
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      // fill special block matrix
-      MatrixI specialBlocks(special.size(), 2);
-      for(size_t i = 0; i < special.size(); i++)
+      // Fill matrix of block sizes for 3D ID
+      MatrixI idBlocks(idPairs.size(), 2);
+      for(size_t i = 0; i < idPairs.size(); ++i)
       {
-         specialBlocks(i,0) = special.at(i).first;
-         specialBlocks(i,1) = special.at(i).second;
+         idBlocks(i,0) = idPairs.at(i).first;
+         idBlocks(i,1) = idPairs.at(i).second;
       }
-      std::cerr << "SPECIAL BLOCKS: " << specialBlocks.rows() << " x " << specialBlocks.cols() << std::endl;
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specialBlocks, specSize, Transform::FftSetup::COMPLEX));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, idBlocks, specSize, Transform::FftSetup::COMPLEX));
    }
 
    Transform::SharedFftSetup TFFScheme::spSetup3D(SharedResolution spRes) const

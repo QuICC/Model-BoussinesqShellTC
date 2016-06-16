@@ -66,7 +66,9 @@ namespace Transform {
          // INTGDIFF2: Second derivative integrator
          // INTGDIFFM: First derivative integrator and mean (k = 0 mode is not zeroed)
          // INTGDIFFNEGM: First derivative integrator and negative mean (k = 0 mode is not zeroed)
-         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGM, INTGDIFFM, INTGDIFFNEGM};
+         // INTGINVGRADH: Inverse horizontal gradient
+         // INTGINVLAPLH: Inverse horizontal laplacian
+         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGM, INTGDIFFM, INTGDIFFNEGM, INTGINVGRADH, INTGINVLAPLH};
       };
 
    };
@@ -221,6 +223,11 @@ namespace Transform {
           * @brief Temporary storage used in the projections (complex -> complex)
           */
          MatrixZ  mTmpZOut;
+
+         /**
+          * @brief Storage for the mean block sizes
+          */
+         std::vector<std::pair<int,int> > mMeanBlocks;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)

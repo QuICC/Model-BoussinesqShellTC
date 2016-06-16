@@ -138,25 +138,26 @@ namespace TransformSteps {
       // The following assumes the physical values are obtained from a Toroidal/Poloidal decomposition
       } else
       {
-         transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
-         transform.back().addEdge(IntegratorNDType::INTG);
-         transform.back().addEdge(Integrator2DType::INTGDIFFM);
-         transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::ADD);
+         if(curlFlag == 0 && curlcurlFlag == 0)
+         {
+            transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGINVGRADH);
+            transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::ADD);
 
-         transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
-         transform.back().addEdge(IntegratorNDType::INTGDIFFNEGM);
-         transform.back().addEdge(Integrator2DType::INTGM);
-         transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::SUB);
+            transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGINVGRADH);
+            transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::SUB);
 
-         transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
-         transform.back().addEdge(IntegratorNDType::INTG);
-         transform.back().addEdge(Integrator2DType::INTGDIFF2);
-         transform.back().addEdge(Integrator1DType::INTG, curlcurlId, Arithmetics::SUB);
-
-         transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
-         transform.back().addEdge(IntegratorNDType::INTGDIFF2);
-         transform.back().addEdge(Integrator2DType::INTG);
-         transform.back().addEdge(Integrator1DType::INTG, curlcurlId, Arithmetics::SUB);
+            transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGINVLAPLH);
+            transform.back().addEdge(Integrator1DType::INTG, curlcurlId, Arithmetics::ADD);
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
       }
 
       return transform;

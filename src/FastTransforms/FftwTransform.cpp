@@ -20,6 +20,7 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -122,6 +123,20 @@ namespace Transform {
       this->mTmpROut.setZero(fwdSize, howmany);
       this->mTmpZIn.setZero(bwdSize, howmany);
       this->mTmpROut.setZero(fwdSize, howmany);
+
+      // Extract block sizes of mean values
+      if(this->mspSetup->type() == FftSetup::COMPLEX)
+      {
+         int start = 0;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            if(this->mspSetup->idBlocks()(i,0) == 0)
+            {
+               this->mMeanBlocks.push_back(std::make_pair(start, this->mspSetup->idBlocks()(i,1)));
+            }
+            start += this->mspSetup->idBlocks()(i,1);
+         }
+      }
    }
 
    void FftwTransform::cleanupFft()
@@ -318,14 +333,11 @@ namespace Transform {
          ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
          ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
-         // Get number of special blocks
-         int zRows = this->mspSetup->specialBlocks().rows();
-         std::vector<ArrayZ> mean;
-
          // Extract the mean
-         for(int j = 0; j < zRows; j++)
+         std::vector<ArrayZ> mean;
+         for(std::vector<std::pair<int,int> >::const_iterator it = this->mMeanBlocks.begin(); it != this->mMeanBlocks.end(); ++it)
          {
-            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).transpose());
+            mean.push_back(rFFTVal.block(0, it->first, 1, it->second).transpose());
          }
 
          // Split positive and negative frequencies and compute derivative
@@ -333,9 +345,9 @@ namespace Transform {
          rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
 
          // Set the mean
-         for(int j = 0; j < zRows; j++)
+         for(size_t j = 0; j < mean.size(); ++j)
          {
-            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = this->mspSetup->scale()*mean.at(j).transpose();
+            rFFTVal.block(0, this->mMeanBlocks.at(j).first, 1, this->mMeanBlocks.at(j).second) = this->mspSetup->scale()*mean.at(j).transpose();
          }
 
       // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
@@ -345,14 +357,11 @@ namespace Transform {
          ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
          ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
-         // Get number of special blocks
-         int zRows = this->mspSetup->specialBlocks().rows();
-         std::vector<ArrayZ> mean;
-
          // Extract the mean
-         for(int j = 0; j < zRows; j++)
+         std::vector<ArrayZ> mean;
+         for(std::vector<std::pair<int,int> >::const_iterator it = this->mMeanBlocks.begin(); it != this->mMeanBlocks.end(); ++it)
          {
-            mean.push_back(rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).transpose());
+            mean.push_back(rFFTVal.block(0, it->first, 1, it->second).transpose());
          }
 
          // Split positive and negative frequencies and compute derivative
@@ -360,21 +369,72 @@ namespace Transform {
          rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
 
          // Set the mean
-         for(int j = 0; j < zRows; j++)
+         for(size_t j = 0; j < mean.size(); ++j)
          {
-            rFFTVal.block(0, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = -this->mspSetup->scale()*mean.at(j).transpose();
+            rFFTVal.block(0, this->mMeanBlocks.at(j).first, 1, this->mMeanBlocks.at(j).second) = -this->mspSetup->scale()*mean.at(j).transpose();
          }
 
-      // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
+      // Compute inverse horizontal gradient integration
+      } else if(integrator == FftwTransform::IntegratorType::INTGINVGRADH)
+      {
+         // Get k1 factors
+         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+
+         int start = 0;
+         int negRow = rFFTVal.rows() - negN;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            MHDComplex k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale()*Math::cI;
+            ArrayZ factor2 = this->mspSetup->scale()*(k2 + factor.array()).inverse();
+            // Fix k1 == k2 == 0 mode
+            if(this->mspSetup->idBlocks()(i,0) == 0)
+            {
+               factor2(0) = 0.0;
+            }
+            // Split positive and negative frequencies to compute rescaling
+            rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
+            factor2 = this->mspSetup->scale()*(k2 + rfactor.array()).inverse();
+            rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
+            start +=this->mspSetup->idBlocks()(i,1);
+
+         }
+
+      // Compute inverse horizontal laplacian integration
+      } else if(integrator == FftwTransform::IntegratorType::INTGINVLAPLH)
+      {
+         // Get k1^2 factors
+         Array factor = (this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = (this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+
+         int start = 0;
+         int negRow = rFFTVal.rows() - negN;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            MHDFloat k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale();
+            k2 *= k2;
+
+            // Split positive and negative frequencies to compute rescaling
+            Array factor2 = -this->mspSetup->scale()*(k2 + factor.array()).inverse();
+            // Fix k1 == k2 == 0 mode
+            if(this->mspSetup->idBlocks()(i,0) == 0)
+            {
+               factor2(0) = 0.0;
+            }
+            rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
+            factor2 = -this->mspSetup->scale()*(k2 + rfactor.array()).inverse();
+            rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
+            start +=this->mspSetup->idBlocks()(i,1);
+
+         }
+
+      // Compute integration and zero k2 = 0, k1 != 0
       } else if(integrator == FftwTransform::IntegratorType::INTGM)
       {
-         // Get number of special blocks
-         int zRows = this->mspSetup->specialBlocks().rows();
-
          // Extract the mean
-         for(int j = 0; j < zRows; j++)
+         for(std::vector<std::pair<int,int> >::const_iterator it = this->mMeanBlocks.begin(); it != this->mMeanBlocks.end(); ++it)
          {
-            rFFTVal.block(1, this->mspSetup->specialBlocks()(j,0), rFFTVal.rows()-1, this->mspSetup->specialBlocks()(j,1)).setZero();
+            rFFTVal.block(1, it->first, rFFTVal.rows()-1, it->second).setZero();
          }
 
          // Rescale output from FFT
@@ -467,16 +527,13 @@ namespace Transform {
       int posN = negN + (this->mspSetup->specSize()%2);
       int endN = rFFTVal.rows();
 
-      // Get number of special blocks
-      int rows = this->mspSetup->specialBlocks().rows();
-
       // Loop over special blocks
-      for(int j = 0; j < rows; j++)
+      for(std::vector<std::pair<int,int> >::const_iterator it = this->mMeanBlocks.begin(); it != this->mMeanBlocks.end(); ++it)
       {
          // Copy complex conjugate into negative frequency part
          for(int i = 1; i < posN; i++)
          {
-            rFFTVal.block(endN - i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)) = rFFTVal.block(i, this->mspSetup->specialBlocks()(j,0), 1, this->mspSetup->specialBlocks()(j,1)).conjugate();
+            rFFTVal.block(endN - i, it->first, 1, it->second) = rFFTVal.block(i, it->first, 1, it->second).conjugate();
          }
       }
    }

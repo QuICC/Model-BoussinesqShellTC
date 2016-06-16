@@ -172,8 +172,13 @@ namespace Equations {
                      rNLComp.setPoint(val, iI, iJ, iK);
                   } else if(compId == FieldComponents::Physical::Z)
                   {
-                     //val = 2.0*(-1.0 + 2.0*k_*k_)*std::cos(j_)*std::sin(i_);
-                     val = (-1.0 + 2.0*k_*k_)*std::sin(i_);
+                     for(int sI = 0; sI < 5; sI++)
+                     {
+                        for(int sJ = 0; sJ < 5; sJ++)
+                        {
+                           val += -(sI*sI + sJ*sJ)*(std::cos(sI*i_)+std::sin(sI*i_))*(std::cos(sJ*j_)+std::sin(sJ*j_));
+                        }
+                     }
                      rNLComp.setPoint(val, iI, iJ, iK);
                   }
                }
