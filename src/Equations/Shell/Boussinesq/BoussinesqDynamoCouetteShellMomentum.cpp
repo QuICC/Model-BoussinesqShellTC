@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqCouetteShellMomentum.cpp
- * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq spherical Couette in a spherical shell model
+ * @file BoussinesqDynamoCouetteShellMomentum.cpp
+ * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq spherical Couette dynamo in a spherical shell model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -16,7 +16,7 @@
 
 // Class include
 //
-#include "Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqDynamoCouetteShellMomentum.hpp"
 
 // Project includes
 //
@@ -30,18 +30,18 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqCouetteShellMomentum::BoussinesqCouetteShellMomentum(SharedEquationParameters spEqParams)
+   BoussinesqDynamoCouetteShellMomentum::BoussinesqDynamoCouetteShellMomentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqCouetteShellMomentum::~BoussinesqCouetteShellMomentum()
+   BoussinesqDynamoCouetteShellMomentum::~BoussinesqDynamoCouetteShellMomentum()
    {
    }
 
-   void BoussinesqCouetteShellMomentum::setCoupling()
+   void BoussinesqDynamoCouetteShellMomentum::setCoupling()
    {
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
          int start = 1;
@@ -62,14 +62,14 @@ namespace Equations {
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqCouetteShellMomentum::setNLComponents()
+   void BoussinesqDynamoCouetteShellMomentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqCouetteShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void BoussinesqDynamoCouetteShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {  
       MHDFloat Ro = std::abs(this->eqParams().nd(NonDimensional::ROSSBY));
 
@@ -103,7 +103,7 @@ namespace Equations {
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqCouetteShellMomentum::setRequirements()
+   void BoussinesqDynamoCouetteShellMomentum::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);

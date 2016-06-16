@@ -132,9 +132,9 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
                     raise RuntimeError("Inhomogeneous boundary conditions cannot use Galerkin scheme!")
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                         bc = {0:24, 'c':{'c':sgn*ri, 'l':l}}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                         bc = {0:40, 'c':{'a':a, 'b':b}}
             
             # Set LHS galerkin restriction
@@ -185,7 +185,7 @@ class BoussinesqCouetteShellStd(base_model.BaseModel):
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
-        E = np.sign(eq_params['ekman'])
+        E = eq_params['ekman']
         assert(eigs[0].is_integer())
         l = eigs[0]
 

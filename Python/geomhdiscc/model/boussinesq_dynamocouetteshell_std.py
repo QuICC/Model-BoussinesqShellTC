@@ -113,7 +113,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
         """Convert simulation input boundary conditions to ID"""
 
         sgn = np.sign(eq_params['rossby'])
-        ro = 1.0/(1.0 - eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
         ri = ro*eq_params['rratio']
         a, b = geo.linear_r2x(ro, eq_params['rratio'])
         assert(eigs[0].is_integer())
@@ -203,7 +203,8 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(1.0/(1.0 - eq_params['rratio']), eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -231,7 +232,8 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(1.0/(1.0 - eq_params['rratio']), eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
