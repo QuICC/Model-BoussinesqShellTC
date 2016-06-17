@@ -110,7 +110,7 @@ namespace GeoMHDiSCC {
 
       // Add velocity fields visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, false);
+      spVector->setFields(true, false, true);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
       // Add output file

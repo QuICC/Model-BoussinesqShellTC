@@ -53,7 +53,7 @@ namespace Transform {
           *    - DIFF: D
           *    - DIFF2: D^2
           */
-         enum Id {PROJ, DIFF, DIFF2};
+         enum Id {PROJ, DIFF, DIFF2, DIFFM};
       };
 
       /**

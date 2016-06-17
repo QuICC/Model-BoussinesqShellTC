@@ -17,10 +17,10 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -134,6 +134,7 @@ namespace Transform {
             {
                this->mMeanBlocks.push_back(std::make_pair(start, this->mspSetup->idBlocks()(i,1)));
             }
+
             start += this->mspSetup->idBlocks()(i,1);
          }
       }
@@ -180,7 +181,7 @@ namespace Transform {
       if(integrator == FftwTransform::IntegratorType::INTGDIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
 
          // Rescale results
          rFFTVal = factor.asDiagonal()*rFFTVal;
@@ -189,7 +190,7 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFF2)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
          factor = factor.array().pow(2);
 
          // Rescale results
@@ -199,7 +200,7 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFM)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
          factor(0) = this->mspSetup->scale();
 
          // Rescale results
@@ -209,7 +210,7 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFNEGM)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
          factor(0) = -this->mspSetup->scale();
 
          // Rescale results
@@ -267,6 +268,11 @@ namespace Transform {
          // Rescale results
          this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
 
+      // Compute mean only projection
+      } else if(projector == FftwTransform::ProjectorType::PROJMEANONLY)
+      {
+         throw Exception("Mean only call is not possible here!");
+
       // Compute simple projection
       } else
       {
@@ -308,8 +314,8 @@ namespace Transform {
       if(integrator == FftwTransform::IntegratorType::INTGDIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
          // Split positive and negative frequencies and compute derivative
          rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
@@ -319,8 +325,8 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFF2)
       {
          // Get differentiation factors
-         Array factor = this->mspSetup->scale()*(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
-         Array rfactor = this->mspSetup->scale()*(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+         Array factor = -this->mspSetup->scale()*(this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = -this->mspSetup->scale()*(this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
 
          // Split positive and negative frequencies and compute derivative
          rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
@@ -330,8 +336,8 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFM)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
          // Extract the mean
          std::vector<ArrayZ> mean;
@@ -354,8 +360,8 @@ namespace Transform {
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFNEGM)
       {
          // Get differentiation factors
-         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
          // Extract the mean
          std::vector<ArrayZ> mean;
@@ -375,18 +381,23 @@ namespace Transform {
          }
 
       // Compute inverse horizontal gradient integration
-      } else if(integrator == FftwTransform::IntegratorType::INTGINVGRADH)
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFFINVLAPLH)
       {
          // Get k1 factors
          ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
          ArrayZ rfactor = this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+         // Get k1^2 factors
+         Array lfactor = (this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rlfactor = (this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
 
          int start = 0;
          int negRow = rFFTVal.rows() - negN;
          for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
          {
-            MHDComplex k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale()*Math::cI;
-            ArrayZ factor2 = this->mspSetup->scale()*(k2 + factor.array()).inverse();
+            MHDFloat k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale();
+            k2 *= k2;
+
+            ArrayZ factor2 = -this->mspSetup->scale()*factor.array()*(k2 + lfactor.array()).inverse().array();
             // Fix k1 == k2 == 0 mode
             if(this->mspSetup->idBlocks()(i,0) == 0)
             {
@@ -394,9 +405,11 @@ namespace Transform {
             }
             // Split positive and negative frequencies to compute rescaling
             rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
-            factor2 = this->mspSetup->scale()*(k2 + rfactor.array()).inverse();
+            factor2 = -this->mspSetup->scale()*rfactor.array()*(k2 + rlfactor.array()).inverse();
             rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
-            start +=this->mspSetup->idBlocks()(i,1);
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
 
          }
 
@@ -424,14 +437,16 @@ namespace Transform {
             rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
             factor2 = -this->mspSetup->scale()*(k2 + rfactor.array()).inverse();
             rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
-            start +=this->mspSetup->idBlocks()(i,1);
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
 
          }
 
       // Compute integration and zero k2 = 0, k1 != 0
       } else if(integrator == FftwTransform::IntegratorType::INTGM)
       {
-         // Extract the mean
+         // Zero the mean
          for(std::vector<std::pair<int,int> >::const_iterator it = this->mMeanBlocks.begin(); it != this->mMeanBlocks.end(); ++it)
          {
             rFFTVal.block(1, it->first, rFFTVal.rows()-1, it->second).setZero();
@@ -439,6 +454,26 @@ namespace Transform {
 
          // Rescale output from FFT
          rFFTVal *= this->mspSetup->scale();
+
+      // Compute integration and zero k2 = 0, k1 != 0
+      } else if(integrator == FftwTransform::IntegratorType::INTGMEANONLY)
+      {
+         // Z
+         int start = 0;
+         int rows = rFFTVal.rows();
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            if(this->mspSetup->idBlocks()(i,0) == 0)
+            {
+               rFFTVal.block(0, start, rows, this->mspSetup->idBlocks()(i,1)) *= this->mspSetup->scale();
+            } else
+            {
+               rFFTVal.block(0, start, rows, this->mspSetup->idBlocks()(i,1)).setZero();
+            }
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
+         }
 
       // Compute simple projection
       } else
@@ -501,6 +536,19 @@ namespace Transform {
          // Split positive and negative frequencies and compute derivative
          this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
          this->mTmpZIn.bottomRows(negN) = rfactor.asDiagonal()*fftVal.bottomRows(negN);
+
+      // Compute mean only projection
+      } else if(projector == FftwTransform::ProjectorType::PROJMEANONLY)
+      {
+         // Initialize to zero
+         this->mTmpZIn.setZero();
+
+         // Set the mean
+         std::vector<ArrayZ> mean;
+         for(std::vector<std::pair<int,int> >::const_iterator it = this->mMeanBlocks.begin(); it != this->mMeanBlocks.end(); ++it)
+         {
+            this->mTmpZIn.block(0, it->first, 1, it->second) = fftVal.block(0, it->first, 1, it->second);
+         }
 
       // Compute simple projection
       } else

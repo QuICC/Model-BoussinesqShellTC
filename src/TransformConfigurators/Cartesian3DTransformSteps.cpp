@@ -140,19 +140,33 @@ namespace TransformSteps {
       {
          if(curlFlag == 0 && curlcurlFlag == 0)
          {
+            // Extract Toroidal component
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTG);
-            transform.back().addEdge(Integrator2DType::INTGINVGRADH);
+            transform.back().addEdge(IntegratorNDType::INTGDIFF);
+            transform.back().addEdge(Integrator2DType::INTGINVLAPLH);
             transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::ADD);
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
-            transform.back().addEdge(Integrator2DType::INTGINVGRADH);
+            transform.back().addEdge(Integrator2DType::INTGDIFFINVLAPLH);
             transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::SUB);
 
+            // Extract Poloidal component
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTGINVLAPLH);
+            transform.back().addEdge(Integrator1DType::INTG, curlcurlId, Arithmetics::SUB);
+
+            // Extract X mean into Toroidal component
+            transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGMEANONLY);
+            transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::ADD);
+
+            // Extract Y mean into Poloidal component
+            transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGMEANONLY);
             transform.back().addEdge(Integrator1DType::INTG, curlcurlId, Arithmetics::ADD);
          } else
          {
@@ -322,32 +336,49 @@ namespace TransformSteps {
 
       if(req.find(FieldComponents::Physical::X)->second)
       {
+         // Toroidal contribution
          transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
          transform.back().addEdge(Projector1DType::PROJ);
          transform.back().addEdge(Projector2DType::PROJ);
          transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::X, Arithmetics::ADD);
 
+         // Mean contribution
+         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJMEANONLY);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::X, Arithmetics::ADD);
+
+         // Poloidal contribution
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
          transform.back().addEdge(Projector1DType::DIFF);
-         transform.back().addEdge(Projector2DType::PROJ);
-         transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::X, Arithmetics::ADD);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::X, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::Y)->second)
       {
+         // Toroidal contribution
          transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
          transform.back().addEdge(Projector1DType::PROJ);
          transform.back().addEdge(Projector2DType::DIFF);
          transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::Y, Arithmetics::SUB);
 
+         // Poloidal contribution
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
          transform.back().addEdge(Projector1DType::DIFF);
-         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::Y, Arithmetics::ADD);
+
+         // Mean contribution
+         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJMEANONLY);
          transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::Y, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::Z)->second)
       {
+         // Poloidal contributions
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
          transform.back().addEdge(Projector1DType::PROJ);
          transform.back().addEdge(Projector2DType::DIFF2);
@@ -400,11 +431,13 @@ namespace TransformSteps {
 
       if(req.find(FieldComponents::Physical::X)->second)
       {
+         // Toroidal contribution
          transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
          transform.back().addEdge(Projector1DType::DIFF);
          transform.back().addEdge(Projector2DType::DIFF);
          transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::X, Arithmetics::ADD);
 
+         // Poloidal contributions
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
          transform.back().addEdge(Projector1DType::DIFF2);
          transform.back().addEdge(Projector2DType::PROJ);
@@ -419,15 +452,29 @@ namespace TransformSteps {
          transform.back().addEdge(Projector1DType::PROJ);
          transform.back().addEdge(Projector2DType::DIFF2);
          transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::X, Arithmetics::SUB);
+
+         // Mean contribution
+         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIFF);
+         transform.back().addEdge(Projector2DType::PROJMEANONLY);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::X, Arithmetics::SUB);
       }
 
       if(req.find(FieldComponents::Physical::TWO)->second)
       {
+         // Toroidal contribution
          transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
          transform.back().addEdge(Projector1DType::DIFF);
          transform.back().addEdge(Projector2DType::PROJ);
          transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::Y, Arithmetics::ADD);
 
+         // Mean contribution
+         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIFF);
+         transform.back().addEdge(Projector2DType::PROJMEANONLY);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::Y, Arithmetics::ADD);
+
+         // Poloidal contributions
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
          transform.back().addEdge(Projector1DType::DIFF2);
          transform.back().addEdge(Projector2DType::DIFF);

@@ -106,6 +106,11 @@ namespace Equations {
       static MHDFloat poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
 
       /**
+       * @brief Compute Chebyshev mode
+       */
+      static MHDFloat chebyshev(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
        * @brief Compute galerkin polynomial mode (zero at boundary)
        */
       static MHDFloat zero(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);

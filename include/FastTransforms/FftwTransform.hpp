@@ -51,7 +51,8 @@ namespace Transform {
          // DIFF: First derivative
          // DIFF2: Second derivative
          // DIFF3: Third derivative
-         enum Id {PROJ, DIFF, DIFF2, DIFF3};
+         // PROJMEANONLY: Only project mean component (WARNING: implementation is slow)
+         enum Id {PROJ, DIFF, DIFF2, DIFF3, PROJMEANONLY};
       };
 
       /**
@@ -66,9 +67,10 @@ namespace Transform {
          // INTGDIFF2: Second derivative integrator
          // INTGDIFFM: First derivative integrator and mean (k = 0 mode is not zeroed)
          // INTGDIFFNEGM: First derivative integrator and negative mean (k = 0 mode is not zeroed)
-         // INTGINVGRADH: Inverse horizontal gradient
          // INTGINVLAPLH: Inverse horizontal laplacian
-         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGM, INTGDIFFM, INTGDIFFNEGM, INTGINVGRADH, INTGINVLAPLH};
+         // INTGINVDIFFLAPLHH: Derivative of inverse horizontal laplacian
+         // INTGMEANONLY: Only compute the mean component (WARNING implementation is slow!)
+         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGM, INTGDIFFM, INTGDIFFNEGM, INTGINVLAPLH, INTGDIFFINVLAPLH, INTGMEANONLY};
       };
 
    };
