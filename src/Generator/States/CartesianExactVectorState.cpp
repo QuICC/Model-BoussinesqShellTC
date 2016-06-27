@@ -148,11 +148,14 @@ namespace Equations {
          MHDFloat j_;
          MHDFloat i_;
 
-         MHDFloat az = 1.0;
-         MHDFloat bz = 1.0;
-         MHDFloat cz = 1.0;
-         MHDFloat dz = 1.0;
-         MHDFloat ez = 1.0;
+         Array aT(5); aT(0) = -3.0; aT(1) = 2.0; aT(2) = 3.0; aT(3) = -1.0; aT(4) = 5.0;
+         Array mT(5); mT(0) = 2.0; mT(1) = 1.0; mT(2) = 2.0; mT(3) = 1.0; mT(4) = 3.0;
+         Array aP(5); aP(0) = 6.0; aP(1) = -7.0; aP(2) = 5.0; aP(3) = 2.0; aP(4) = 5.0;
+         Array mP(5); mP(0) = -5.0; mP(1) = 4.0; mP(2) = 3.0; mP(3) = -3.0; mP(4) = 1.0;
+
+         // Chebyshev rescaling
+         MHDFloat scale = this->eqParams().nd(NonDimensional::SCALE1D);
+
          nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
          for(int iK = 0; iK < nK; ++iK)
          {
@@ -177,11 +180,11 @@ namespace Equations {
                         {
                            MHDFloat valJ = (std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                           val += CartesianExactStateIds::chebyshev(az,0,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(bz,1,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(cz,2,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(dz,3,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(ez,4,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(0),0,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(1),1,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(2),2,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(3),3,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(4),4,k_)*valI*valJ;
                         }
                      }
 
@@ -192,21 +195,21 @@ namespace Equations {
 
                         for(int sJ = 0; sJ < 5; sJ++)
                         {
-                           MHDFloat valJ = sJ*(-std::sin(sJ*j_)+std::cos(sJ*j_));
+                           MHDFloat valJ = scale*sJ*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
-                           val += (bz)*valI*valJ;
-                           val += (4.0*cz*k_)*valI*valJ;
-                           val += dz*(-3.0 + 12.0*k_*k_)*valI*valJ;
-                           val += ez*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                           val += (aP(1))*valI*valJ;
+                           val += (4.0*aP(2)*k_)*valI*valJ;
+                           val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
+                           val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
                         }
                      }
 
                      // X mean component
-                     val += CartesianExactStateIds::chebyshev(az,0,k_);
-                     val += CartesianExactStateIds::chebyshev(bz,1,k_);
-                     val += CartesianExactStateIds::chebyshev(cz,2,k_);
-                     val += CartesianExactStateIds::chebyshev(dz,3,k_);
-                     val += CartesianExactStateIds::chebyshev(ez,4,k_);
+                     val += CartesianExactStateIds::chebyshev(mT(0),0,k_);
+                     val += CartesianExactStateIds::chebyshev(mT(1),1,k_);
+                     val += CartesianExactStateIds::chebyshev(mT(2),2,k_);
+                     val += CartesianExactStateIds::chebyshev(mT(3),3,k_);
+                     val += CartesianExactStateIds::chebyshev(mT(4),4,k_);
 
                   } else if(compId == FieldComponents::Physical::Y)
                   {
@@ -218,11 +221,11 @@ namespace Equations {
                         {
                            MHDFloat valJ = -sJ*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
-                           val += CartesianExactStateIds::chebyshev(az,0,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(bz,1,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(cz,2,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(dz,3,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(ez,4,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(0),0,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(1),1,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(2),2,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(3),3,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aT(4),4,k_)*valI*valJ;
                         }
                      }
 
@@ -233,21 +236,21 @@ namespace Equations {
 
                         for(int sJ = 0; sJ < 5; sJ++)
                         {
-                           MHDFloat valJ = (std::cos(sJ*j_)+std::sin(sJ*j_));
+                           MHDFloat valJ = scale*(std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                           val += (bz)*valI*valJ;
-                           val += (4.0*cz*k_)*valI*valJ;
-                           val += dz*(-3.0 + 12.0*k_*k_)*valI*valJ;
-                           val += ez*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                           val += (aP(1))*valI*valJ;
+                           val += (4.0*aP(2)*k_)*valI*valJ;
+                           val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
+                           val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
                         }
                      }
 
                      // Y mean component
-                     val += CartesianExactStateIds::chebyshev(-az,0,k_);
-                     val += CartesianExactStateIds::chebyshev(-bz,1,k_);
-                     val += CartesianExactStateIds::chebyshev(-cz,2,k_);
-                     val += CartesianExactStateIds::chebyshev(-dz,3,k_);
-                     val += CartesianExactStateIds::chebyshev(-ez,4,k_);
+                     val += CartesianExactStateIds::chebyshev(mP(0),0,k_);
+                     val += CartesianExactStateIds::chebyshev(mP(1),1,k_);
+                     val += CartesianExactStateIds::chebyshev(mP(2),2,k_);
+                     val += CartesianExactStateIds::chebyshev(mP(3),3,k_);
+                     val += CartesianExactStateIds::chebyshev(mP(4),4,k_);
 
                   } else if(compId == FieldComponents::Physical::Z)
                   {
@@ -259,11 +262,11 @@ namespace Equations {
                         {
                            MHDFloat valJ = (sI*sI + sJ*sJ)*(std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                           val += CartesianExactStateIds::chebyshev(az,0,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(bz,1,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(cz,2,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(dz,3,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(ez,4,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aP(0),0,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aP(1),1,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aP(2),2,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aP(3),3,k_)*valI*valJ;
+                           val += CartesianExactStateIds::chebyshev(aP(4),4,k_)*valI*valJ;
                         }
                      }
                   }

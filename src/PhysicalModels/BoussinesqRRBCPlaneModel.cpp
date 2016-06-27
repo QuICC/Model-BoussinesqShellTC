@@ -69,7 +69,7 @@ namespace GeoMHDiSCC {
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
          spScalar->setStateType(Equations::CartesianExactStateIds::POLYSINSIN);
-         spScalar->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+         spScalar->setModeOptions(1e0, 10.0, 1e0, 10.0, 1e0, 10.0);
 
       // Generate random spectrum
       } else

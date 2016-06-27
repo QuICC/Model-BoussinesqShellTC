@@ -148,7 +148,7 @@ namespace TransformSteps {
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
-            transform.back().addEdge(Integrator2DType::INTGDIFFINVLAPLH);
+            transform.back().addEdge(Integrator2DType::INTGDIFFFINVLAPLH);
             transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::SUB);
 
             // Extract Poloidal component
@@ -381,13 +381,8 @@ namespace TransformSteps {
          // Poloidal contributions
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
          transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::DIFF2);
+         transform.back().addEdge(Projector2DType::LAPLH);
          transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::Z, Arithmetics::SUB);
-
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
-         transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::PROJ);
-         transform.back().addEdge(ProjectorNDType::DIFF2, FieldComponents::Physical::Z, Arithmetics::SUB);
       }
 
       return transform;
@@ -445,13 +440,8 @@ namespace TransformSteps {
 
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
          transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::PROJ);
-         transform.back().addEdge(ProjectorNDType::DIFF3, FieldComponents::Physical::X, Arithmetics::SUB);
-
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
-         transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::DIFF2);
-         transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::X, Arithmetics::SUB);
+         transform.back().addEdge(Projector2DType::DIFFSLAPLH);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::X, Arithmetics::SUB);
 
          // Mean contribution
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
@@ -482,12 +472,7 @@ namespace TransformSteps {
 
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
          transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::DIFF);
-         transform.back().addEdge(ProjectorNDType::DIFF2, FieldComponents::Physical::Y, Arithmetics::ADD);
-
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
-         transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::DIFF3);
+         transform.back().addEdge(Projector2DType::DIFFFLAPLH);
          transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::Y, Arithmetics::ADD);
       }
 
@@ -495,13 +480,8 @@ namespace TransformSteps {
       {
          transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
          transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::DIFF2);
+         transform.back().addEdge(Projector2DType::LAPLH);
          transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::Z, Arithmetics::SUB);
-
-         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
-         transform.back().addEdge(Projector1DType::PROJ);
-         transform.back().addEdge(Projector2DType::PROJ);
-         transform.back().addEdge(ProjectorNDType::DIFF2, FieldComponents::Physical::Z, Arithmetics::SUB);
       }
 
       return transform;
