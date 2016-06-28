@@ -68,12 +68,13 @@ namespace Transform {
          // INTGM: Integrator and zero k2 = 0, k1 != 0 modes (only complex - complex)
          // INTGDIFF: First derivative integrator
          // INTGDIFF2: Second derivative integrator
+         // INTGLAPLH: Horizontal laplacian
          // INTGDIFFM: First derivative integrator and mean (k = 0 mode is not zeroed)
          // INTGDIFFNEGM: First derivative integrator and negative mean (k = 0 mode is not zeroed)
          // INTGINVLAPLH: Inverse horizontal laplacian
          // INTGINVDIFFFLAPLH: Fast derivative of inverse horizontal laplacian
          // INTGMEANONLY: Only compute the mean component (WARNING implementation is slow!)
-         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGM, INTGDIFFM, INTGDIFFNEGM, INTGINVLAPLH, INTGDIFFFINVLAPLH, INTGMEANONLY};
+         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGLAPLH, INTGM, INTGDIFFM, INTGDIFFNEGM, INTGINVLAPLH, INTGDIFFFINVLAPLH, INTGMEANONLY};
       };
 
    };

@@ -105,7 +105,7 @@ namespace GeoMHDiSCC {
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spScalar->setFields(true, false);
+      spScalar->setFields(false, true);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity fields visualization

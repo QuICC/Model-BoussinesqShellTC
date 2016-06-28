@@ -62,7 +62,14 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG, INTGT, INTGQ4, INTGS4, INTGQ2, INTGS2};
+         // INTG: Standard Chebyshev integrator
+         // INTGI2: Chebyshev integrator with i1
+         // INTGI4: Chebyshev integrator with i4
+         // INTGI2D1: Chebyshev integrator with i2d1
+         // INTGI4D1: Chebyshev integrator with i4d1
+         // INTGI2D1MI2: Chebyshev integrator with i2d1 and i2 for mean
+         // INTGI4D1MI2: Chebyshev integrator with i4d1 and i2 for mean
+         enum Id {INTG, INTGI2, INTGI4, INTGI2D1, INTGI4D1, INTGI2D1MI2, INTGI4D1MI2};
       };
 
    };

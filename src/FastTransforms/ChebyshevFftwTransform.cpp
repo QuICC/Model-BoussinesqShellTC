@@ -149,16 +149,14 @@ namespace Transform {
       //
       // Initialise integrator operators
       //
-      // QST Q operator (4th order)
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-      // QST S operator (4th order)
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-      // QST T operator
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGT, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-      // QST Q operator (2nd order)
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-      // QST S operator (2nd order)
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // i2 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // i4 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // i2d1 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI2D1, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // i4d1 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI4D1, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       //
       // Initialise solver operators
@@ -187,43 +185,36 @@ namespace Transform {
       pValue = PyLong_FromLong(this->mspSetup->fwdSize());
       PyTuple_SetItem(pArgs, 0, pValue);
 
-      // Call QST Q componet (4th order)
+      // Call i2
+      PythonWrapper::setFunction("i2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI2)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call i4
       PythonWrapper::setFunction("i4");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
-      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ4)->second, pValue);
-      Py_DECREF(pValue);
-
-      // Call QST T component
-      PythonWrapper::setFunction("i2");
-      pValue = PythonWrapper::callFunction(pArgs);
-      // Fill matrix
-      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGT)->second, pValue);
-      Py_DECREF(pValue);
-
-      // Call QST Q componet (2nd order)
-      PythonWrapper::setFunction("i2");
-      pValue = PythonWrapper::callFunction(pArgs);
-      // Fill matrix
-      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ2)->second, pValue);
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI4)->second, pValue);
       Py_DECREF(pValue);
 
       // ... set coefficient to cscale
       pValue = PyFloat_FromDouble(this->mCScale);
       PyTuple_SetItem(pArgs, 2, pValue);
 
-      // Call QST S component (4th order)
-      PythonWrapper::setFunction("i4d1");
-      pValue = PythonWrapper::callFunction(pArgs);
-      // Fill matrix
-      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS4)->second, pValue);
-      Py_DECREF(pValue);
-
-      // Call QST S component (2nd order)
+      // Call i2d1
       PythonWrapper::setFunction("i2d1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
-      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS2)->second, pValue);
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI2D1)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call i4d1
+      PythonWrapper::setFunction("i4d1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI4D1)->second, pValue);
       Py_DECREF(pValue);
 
       // Call i1 for solver
@@ -411,6 +402,30 @@ namespace Transform {
       {
          rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
+
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI4D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
+
       } else
       {
          rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
@@ -426,6 +441,30 @@ namespace Transform {
       if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
       {
          rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
+
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI4D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
 
       } else
       {

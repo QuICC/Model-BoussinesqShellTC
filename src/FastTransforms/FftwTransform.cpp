@@ -332,6 +332,30 @@ namespace Transform {
          rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
          rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
 
+      // Compute horizontal laplacian integration
+      } else if(integrator == FftwTransform::IntegratorType::INTGLAPLH)
+      {
+         // Get k1^2 factors
+         Array factor = (this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = (this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+
+         int start = 0;
+         int negRow = rFFTVal.rows() - negN;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            MHDFloat k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale();
+            k2 *= k2;
+
+            // Split positive and negative frequencies to compute rescaling
+            Array factor2 = -this->mspSetup->scale()*(k2 + factor.array());
+            rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
+            factor2 = -this->mspSetup->scale()*(k2 + rfactor.array());
+            rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
+         }
+
       // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFM)
       {
@@ -410,7 +434,6 @@ namespace Transform {
 
             // Increment block counter
             start += this->mspSetup->idBlocks()(i,1);
-
          }
 
       // Compute inverse horizontal laplacian integration
@@ -440,7 +463,6 @@ namespace Transform {
 
             // Increment block counter
             start += this->mspSetup->idBlocks()(i,1);
-
          }
 
       // Compute integration and zero k2 = 0, k1 != 0

@@ -133,7 +133,10 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                     if field_col == ("velocity","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:-20, 'rt':0}
+                        else:
+                            bc = {0:-40, 'rt':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
@@ -141,7 +144,10 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                     if field_row == ("velocity","tor") and field_col == field_row:
                         bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {0:40}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:20}
+                        else:
+                            bc = {0:40}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
 
@@ -157,9 +163,15 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {0:21}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:21}
+                        else:
+                            bc = {0:21}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {0:41}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:21}
+                        else:
+                            bc = {0:41}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
 
@@ -170,20 +182,32 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {0:21}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:20}
+                        else:
+                            bc = {0:21}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {0:41, 'use_parity':False}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:20}
+                        else:
+                            bc = {0:41, 'use_parity':False}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        E = eq_params['ekman']
-                        c = E**(1./6.)/2**(1./2.)
-                        bc = {0:20, 'c':[c, -c], 'use_parity':False}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:0}
+                        else:
+                            E = eq_params['ekman']
+                            c = E**(1./6.)/2**(1./2.)
+                            bc = {0:20, 'c':[c, -c], 'use_parity':False}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
                     bc['rt'] = 2
                 elif field_row == ("velocity","pol"):
-                    bc['rt'] = 4
+                    if eigs[0] == 0 and eigs[1] == 0:
+                        bc['rt'] = 2
+                    else:
+                        bc['rt'] = 4
                 elif field_row == ("temperature",""):
                     bc['rt'] = 2
 
@@ -195,15 +219,24 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                     if field_col == ("velocity","tor"):
                         bc = {0:-20}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:-20}
+                        else:
+                            bc = {0:-40}
                     elif field_col == ("temperature",""):
                         bc = {0:-20}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-21}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:-21}
+                        else:
+                            bc = {0:-21}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41}
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:-21}
+                        else:
+                            bc = {0:-41}
                     elif field_col == ("temperature",""):
                         bc = {0:-21}
 
@@ -214,7 +247,10 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                 if field_row == ("velocity","tor"):
                     bc['rt'] = 2
                 elif field_row == ("velocity","pol"):
-                    bc['rt'] = 4
+                    if eigs[0] == 0 and eigs[1] == 0:
+                        bc['rt'] = 2
+                    else:
+                        bc['rt'] = 4
                 elif field_row == ("temperature",""):
                     bc['rt'] = 2
 
@@ -264,31 +300,49 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
-            if field_col == ("velocity","tor"):
-                mat = geo.i2(res[0], bc, (kx**2 + ky**2)**2)
-                bc[0] = min(bc[0], 0)
-                mat += geo.i2d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+            if kx == 0 and ky == 0:
+                if field_col == ("velocity","tor"):
+                    mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
 
-            elif field_col == ("velocity","pol"):
-                mat = geo.i2d1(res[0], bc, -(kx**2 + ky**2)/Ro, cscale = zscale)
+                elif field_col == ("velocity","pol"):
+                    mat = geo.i2(res[0], bc, -1.0/Ro)
 
-            elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], bc)
+                elif field_col == ("temperature",""):
+                    mat = geo.zblk(res[0], bc)
+            else:
+                if field_col == ("velocity","tor"):
+                    mat = geo.i2(res[0], bc, (kx**2 + ky**2)**2)
+                    bc[0] = min(bc[0], 0)
+                    mat += geo.i2d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+
+                elif field_col == ("velocity","pol"):
+                    mat = geo.i2d1(res[0], bc, -(kx**2 + ky**2)/Ro, cscale = zscale)
+
+                elif field_col == ("temperature",""):
+                    mat = geo.zblk(res[0], bc)
 
         elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","tor"):
-                mat = geo.i4d1(res[0], bc, (kx**2 + ky**2)/Ro, cscale = zscale)
+            if kx == 0 and ky == 0:
+                if field_col == ("velocity","tor"):
+                    mat = geo.i2(res[0], bc, 1.0/Ro)
 
-            elif field_col == ("velocity","pol"):
-                mat = geo.i4(res[0], bc, -(kx**2 + ky**2)**3)
-                bc[0] = min(bc[0], 0)
-                mat += geo.i4d2(res[0], bc, 2.0*(kx**2 + ky**2)**2, cscale = zscale)
-                mat += geo.i4d4(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+                elif field_col == ("velocity","pol"):
+                    mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
 
-            elif field_col == ("temperature",""):
-                if kx == 0 and ky == 0:
+                elif field_col == ("temperature",""):
                     mat = geo.zblk(res[0], bc)
-                else:
+
+            else:
+                if field_col == ("velocity","tor"):
+                    mat = geo.i4d1(res[0], bc, (kx**2 + ky**2)/Ro, cscale = zscale)
+
+                elif field_col == ("velocity","pol"):
+                    mat = geo.i4(res[0], bc, -(kx**2 + ky**2)**3)
+                    bc[0] = min(bc[0], 0)
+                    mat += geo.i4d2(res[0], bc, 2.0*(kx**2 + ky**2)**2, cscale = zscale)
+                    mat += geo.i4d4(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+
+                elif field_col == ("temperature",""):
                     mat = geo.i4(res[0], bc, (kx**2 + ky**2)*(Ra/Pr))
 
         elif field_row == ("temperature",""):
@@ -316,21 +370,31 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         kx = eigs[0]
         ky = eigs[1]
-        E = eq_params['ekman']
         zscale = eq_params['scale1d']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","tor"):
-            mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
+        if kx == 0 and ky == 0:
+            if field_row == ("velocity","tor"):
+                mat = geo.i2(res[0], bc, 1.0)
 
-        elif field_row == ("velocity","pol"):
-            mat = geo.i4(res[0], bc, (kx**2 + ky**2)**2)
-            bc[0] = min(bc[0], 0)
-            mat += geo.i4d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+            elif field_row == ("velocity","pol"):
+                mat = geo.i2(res[0], bc, 1.0)
 
-        elif field_row == ("temperature",""):
-            mat = geo.i2(res[0], bc, 1.0)
+            elif field_row == ("temperature",""):
+                mat = geo.i2(res[0], bc, 1.0)
+
+        else:
+            if field_row == ("velocity","tor"):
+                mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
+
+            elif field_row == ("velocity","pol"):
+                mat = geo.i4(res[0], bc, (kx**2 + ky**2)**2)
+                bc[0] = min(bc[0], 0)
+                mat += geo.i4d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+
+            elif field_row == ("temperature",""):
+                mat = geo.i2(res[0], bc, 1.0)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
