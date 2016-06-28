@@ -90,7 +90,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get data from dict
           */
-         static void getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict);
+         static void getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict, const bool replace);
 
          /**
           * @brief Fill sparse matrix with data from Python call

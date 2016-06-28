@@ -206,7 +206,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonTools::getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict)
+   void PythonTools::getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict, const bool replace)
    {
       PyObject *pValue, *pKey, *pList, *pTmp;
 
@@ -222,12 +222,17 @@ namespace GeoMHDiSCC {
          NonDimensional::Id nd = IoTools::HumanToId::toNd(std::string(PyBytes_AsString(pTmp)));
          Py_DECREF(pTmp);
 
-         if(rMap.count(nd) > 0)
+         if(replace && rMap.count(nd) > 0)
+         {
+            rMap.find(nd)->second = PyFloat_AsDouble(pValue);
+
+         } else if(rMap.count(nd) > 0)
          {
             throw Exception("Map key already existed!");
+         } else
+         {
+            rMap.insert(std::make_pair(nd,PyFloat_AsDouble(pValue)));
          }
-
-         rMap.insert(std::make_pair(nd,PyFloat_AsDouble(pValue)));
       }
    }
 

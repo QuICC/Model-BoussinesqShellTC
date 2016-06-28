@@ -318,7 +318,7 @@ namespace GeoMHDiSCC {
       pValue = PythonModelWrapper::callMethod(pArgs);
 
       // Create storage
-      PythonTools::getDict(runOptions, pValue);
+      PythonTools::getDict(runOptions, pValue, true);
       Py_DECREF(pValue);
       Py_DECREF(pTmp);
       Py_DECREF(pArgs);
