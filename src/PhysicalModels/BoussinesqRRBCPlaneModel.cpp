@@ -54,7 +54,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBCPlaneModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -105,7 +105,7 @@ namespace GeoMHDiSCC {
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spScalar->setFields(false, true);
+      spScalar->setFields(true, false);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity fields visualization

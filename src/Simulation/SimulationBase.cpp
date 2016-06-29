@@ -56,6 +56,27 @@ namespace GeoMHDiSCC {
          // Initialise the equation parameters
          this->mspEqParams->init(this->mSimIoCtrl.configPhysical());
 
+         //
+         // Extend/modify parameters with automatically computed values
+         //
+         PyObject *pValue;
+         PyObject *pTmp = PythonTools::makeDict(this->mspEqParams->map());
+
+         // Call model operator Python routine
+         PyObject *pArgs = PyTuple_New(1);
+         PyTuple_SetItem(pArgs, 0, pTmp);
+         PythonModelWrapper::setMethod((char *)"automatic_parameters");
+         pValue = PythonModelWrapper::callMethod(pArgs);
+
+         // Create storage
+         PythonTools::getDict(this->mspEqParams->rMap(), pValue, true);
+         Py_DECREF(pValue);
+         Py_DECREF(pTmp);
+         Py_DECREF(pArgs);
+
+         // Cleanup Python interpreter
+         PythonModelWrapper::cleanup();
+
          // Get number CPU from configuration file
          int nCpu = this->mSimIoCtrl.configNCpu();
 
@@ -304,27 +325,6 @@ namespace GeoMHDiSCC {
       {
          runOptions.insert(std::make_pair(*it, this->mspEqParams->nd(*it)));
       }
-
-      //
-      // Extend options with automatically computed values
-      //
-      PyObject *pValue;
-      PyObject *pTmp = PythonTools::makeDict(runOptions);
-
-      // Call model operator Python routine
-      PyObject *pArgs = PyTuple_New(1);
-      PyTuple_SetItem(pArgs, 0, pTmp);
-      PythonModelWrapper::setMethod((char *)"automatic_parameters");
-      pValue = PythonModelWrapper::callMethod(pArgs);
-
-      // Create storage
-      PythonTools::getDict(runOptions, pValue, true);
-      Py_DECREF(pValue);
-      Py_DECREF(pTmp);
-      Py_DECREF(pArgs);
-
-      // Cleanup Python interpreter
-      PythonModelWrapper::cleanup();
 
       // Initialise the transform coordinator
       Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, integratorTree, projectorTree, this->mspRes, runOptions);

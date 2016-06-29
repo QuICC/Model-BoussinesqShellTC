@@ -66,6 +66,16 @@ namespace Equations {
           * @param name Name of the parameter
           */
          MHDFloat nd(NonDimensional::Id name) const;
+
+         /**
+          * @brief Get full map of parameters
+          */
+         const std::map<NonDimensional::Id,MHDFloat>& map() const;
+
+         /**
+          * @brief Update full map of parameters
+          */
+         std::map<NonDimensional::Id,MHDFloat>& rMap();
          
       protected:
          /**

@@ -68,14 +68,14 @@ namespace TransformSteps {
          {
             // Compute curl component and mean in Y
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGDIFFNEGM);
+            transform.back().addEdge(IntegratorNDType::INTGDIFFM);
             transform.back().addEdge(Integrator2DType::INTGM);
-            transform.back().addEdge(Integrator1DType::INTGI2, curlId, Arithmetics::SUB);
+            transform.back().addEdge(Integrator1DType::INTGI2, curlId, Arithmetics::ADD);
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
-            transform.back().addEdge(Integrator1DType::INTGI2, curlId, Arithmetics::ADD);
+            transform.back().addEdge(Integrator1DType::INTGI2, curlId, Arithmetics::SUB);
 
          } else
          {
