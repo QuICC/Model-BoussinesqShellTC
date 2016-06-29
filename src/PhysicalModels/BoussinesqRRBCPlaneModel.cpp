@@ -26,6 +26,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DTorPolEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltDZWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -144,6 +145,11 @@ namespace GeoMHDiSCC {
       IoVariable::SharedCartesian1DTorPolEnergyWriter spKinetic(new IoVariable::Cartesian1DTorPolEnergyWriter("kinetic", SchemeType::type()));
       spKinetic->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spKinetic);
+
+      // Create nusselt number writer
+      IoVariable::SharedCartesian1DNusseltDZWriter spNusselt(new IoVariable::Cartesian1DNusseltDZWriter(SchemeType::type()));
+      spNusselt->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spNusselt);
    }
 
    void BoussinesqRRBCPlaneModel::addHdf5OutputFiles(SharedSimulation spSim)

@@ -12,4 +12,6 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DScalarEnergyWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DTorPolEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DNusseltDZWriter.cpp
 )
