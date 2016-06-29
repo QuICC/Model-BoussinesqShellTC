@@ -138,6 +138,12 @@ namespace IoVariable {
          }
       }
 
+      // Free BWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
+
+      // Free FWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
+
       // Dealias poloidal variable data
       coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
       
@@ -188,6 +194,12 @@ namespace IoVariable {
          }
       }
 
+      // Free BWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPol);
+
+      // Free FWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPol);
+
       // Dealias poloidal variable data
       coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
       
@@ -237,6 +249,12 @@ namespace IoVariable {
             }
          }
       }
+
+      // Free BWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPolDz);
+
+      // Free FWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPolDz);
 
       // Normalize by the Cartesian volume
       this->mXEnergy /= 2.0*this->mVolume;

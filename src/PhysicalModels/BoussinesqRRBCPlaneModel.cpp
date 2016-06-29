@@ -55,7 +55,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBCPlaneModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;

@@ -64,6 +64,8 @@ namespace IoVariable {
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(21));
       pTmp = PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::SCALE1D))->second);
       PyDict_SetItem(pValue, PyUnicode_FromString("c"), pTmp);
+      Py_INCREF(Py_False);
+      PyDict_SetItem(pValue, PyUnicode_FromString("use_parity"), Py_False);
       PyTuple_SetItem(pArgs, 1, pValue);
 
       // Call zblk and use derivative boundary condition
