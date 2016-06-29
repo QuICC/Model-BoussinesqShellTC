@@ -76,19 +76,24 @@ namespace IoVariable {
          MHDFloat mVolume;
 
          /**
-          * @brief Storage for the X component energy
+          * @brief Storage for the mean X component energy
           */
          MHDFloat mXEnergy;
 
          /**
-          * @brief Storage for the Y component energy
+          * @brief Storage for the mean Y component energy
           */
          MHDFloat mYEnergy;
 
          /**
-          * @brief Storage for the Z component energy
+          * @brief Storage for the toroidal component energy
           */
-         MHDFloat mZEnergy;
+         MHDFloat mTorEnergy;
+
+         /**
+          * @brief Storage for the poloidal component energy
+          */
+         MHDFloat mPolEnergy;
 
          /**
           * @brief Chebyshev operator to integrate

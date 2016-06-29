@@ -148,6 +148,10 @@ namespace Equations {
          MHDFloat j_;
          MHDFloat i_;
 
+         int nSI = 3;
+         int nSJ = 3;
+         int nSK = 2;
+
          Array aT(5); aT(0) = -3.0; aT(1) = 2.0; aT(2) = 3.0; aT(3) = -1.0; aT(4) = 5.0;
          Array mT(5); mT(0) = 2.0; mT(1) = 1.0; mT(2) = 2.0; mT(3) = 1.0; mT(4) = 3.0;
          Array aP(5); aP(0) = 6.0; aP(1) = -7.0; aP(2) = 5.0; aP(3) = 2.0; aP(4) = 5.0;
@@ -173,100 +177,119 @@ namespace Equations {
                   if(compId == FieldComponents::Physical::X)
                   {
                      // Toroidal component
-                     for(int sI = 0; sI < 5; sI++)
+                     for(int sI = 0; sI < nSI; sI++)
                      {
                         MHDFloat valI = sI*(-std::sin(sI*i_)+std::cos(sI*i_));
-                        for(int sJ = 0; sJ < 5; sJ++)
+                        for(int sJ = 0; sJ < nSJ; sJ++)
                         {
                            MHDFloat valJ = (std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                           val += CartesianExactStateIds::chebyshev(aT(0),0,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(1),1,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(2),2,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(3),3,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(4),4,k_)*valI*valJ;
+                           for(int sK = 0; sK < nSK; sK++)
+                           {
+                              val += CartesianExactStateIds::chebyshev(aT(sK),sK,k_)*valI*valJ;
+                           }
                         }
                      }
 
                      // Poloidal component
-                     for(int sI = 0; sI < 5; sI++)
+                     for(int sI = 0; sI < nSI; sI++)
                      {
                         MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
 
-                        for(int sJ = 0; sJ < 5; sJ++)
+                        for(int sJ = 0; sJ < nSJ; sJ++)
                         {
                            MHDFloat valJ = scale*sJ*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
-                           val += (aP(1))*valI*valJ;
-                           val += (4.0*aP(2)*k_)*valI*valJ;
-                           val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
-                           val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                           if(nSK > 1)
+                           {
+                              val += (aP(1))*valI*valJ;
+                              if(nSK > 2)
+                              {
+                                 val += (4.0*aP(2)*k_)*valI*valJ;
+                                 if(nSK > 3)
+                                 {
+                                    val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
+                                    if(nSK > 4)
+                                    {
+                                       val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                                    }
+                                 }
+                              }
+                           }
                         }
                      }
 
                      // X mean component
-                     val += CartesianExactStateIds::chebyshev(mT(0),0,k_);
-                     val += CartesianExactStateIds::chebyshev(mT(1),1,k_);
-                     val += CartesianExactStateIds::chebyshev(mT(2),2,k_);
-                     val += CartesianExactStateIds::chebyshev(mT(3),3,k_);
-                     val += CartesianExactStateIds::chebyshev(mT(4),4,k_);
+                     for(int sK = 0; sK < nSK; sK++)
+                     {
+                        val += CartesianExactStateIds::chebyshev(mT(sK),sK,k_);
+                     }
 
                   } else if(compId == FieldComponents::Physical::Y)
                   {
                      // Toroidal component
-                     for(int sI = 0; sI < 5; sI++)
+                     for(int sI = 0; sI < nSI; sI++)
                      {
                         MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
-                        for(int sJ = 0; sJ < 5; sJ++)
+                        for(int sJ = 0; sJ < nSJ; sJ++)
                         {
                            MHDFloat valJ = -sJ*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
-                           val += CartesianExactStateIds::chebyshev(aT(0),0,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(1),1,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(2),2,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(3),3,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aT(4),4,k_)*valI*valJ;
+                           for(int sK = 0; sK < nSK; sK++)
+                           {
+                              val += CartesianExactStateIds::chebyshev(aT(sK),sK,k_)*valI*valJ;
+                           }
                         }
                      }
 
                      // Poloidal component
-                     for(int sI = 0; sI < 5; sI++)
+                     for(int sI = 0; sI < nSI; sI++)
                      {
                         MHDFloat valI = sI*(-std::sin(sI*i_)+std::cos(sI*i_));
 
-                        for(int sJ = 0; sJ < 5; sJ++)
+                        for(int sJ = 0; sJ < nSJ; sJ++)
                         {
                            MHDFloat valJ = scale*(std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                           val += (aP(1))*valI*valJ;
-                           val += (4.0*aP(2)*k_)*valI*valJ;
-                           val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
-                           val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                           if(nSK > 1)
+                           {
+                              val += (aP(1))*valI*valJ;
+                              if(nSK > 2)
+                              {
+                                 val += (4.0*aP(2)*k_)*valI*valJ;
+                                 if(nSK > 3)
+                                 {
+                                    val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
+                                    if(nSK > 4)
+                                    {
+                                       val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                                    }
+                                 }
+                              }
+                           }
                         }
                      }
 
                      // Y mean component
-                     val += CartesianExactStateIds::chebyshev(mP(0),0,k_);
-                     val += CartesianExactStateIds::chebyshev(mP(1),1,k_);
-                     val += CartesianExactStateIds::chebyshev(mP(2),2,k_);
-                     val += CartesianExactStateIds::chebyshev(mP(3),3,k_);
-                     val += CartesianExactStateIds::chebyshev(mP(4),4,k_);
+                     for(int sK = 0; sK < nSK; sK++)
+                     {
+                        val += CartesianExactStateIds::chebyshev(mP(sK),sK,k_);
+                     }
 
                   } else if(compId == FieldComponents::Physical::Z)
                   {
                      // Poloidal component
-                     for(int sI = 0; sI < 5; sI++)
+                     for(int sI = 0; sI < nSI; sI++)
                      {
                         MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
-                        for(int sJ = 0; sJ < 5; sJ++)
+                        for(int sJ = 0; sJ < nSJ; sJ++)
                         {
                            MHDFloat valJ = (sI*sI + sJ*sJ)*(std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                           val += CartesianExactStateIds::chebyshev(aP(0),0,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aP(1),1,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aP(2),2,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aP(3),3,k_)*valI*valJ;
-                           val += CartesianExactStateIds::chebyshev(aP(4),4,k_)*valI*valJ;
+                           for(int sK = 0; sK < nSK; sK++)
+                           {
+                              val += CartesianExactStateIds::chebyshev(aP(sK),sK,k_)*valI*valJ;
+                           }
                         }
                      }
                   }
