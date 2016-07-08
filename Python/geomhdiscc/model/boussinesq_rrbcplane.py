@@ -264,6 +264,11 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        # Mean temperature
+        if field_row == ("temperature","") and field_col == ("velocity","pol") and kx == 0 and ky == 0:
+            mat = geo.zblk(res[0], bc)
+
+        # temperature 
         if field_row == ("temperature","") and field_col == ("velocity","pol"):
             mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
 
@@ -299,52 +304,67 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor"):
-            if kx == 0 and ky == 0:
-                if field_col == ("velocity","tor"):
-                    mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
+        # Mean X velocity
+        if field_row == ("velocity","tor") and kx == 0 and ky == 0:
+            if field_col == ("velocity","tor"):
+                mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
 
-                elif field_col == ("velocity","pol"):
-                    mat = geo.i2(res[0], bc, -1.0/Ro)
+            elif field_col == ("velocity","pol"):
+                mat = geo.i2(res[0], bc, -1.0/Ro)
 
-                elif field_col == ("temperature",""):
-                    mat = geo.zblk(res[0], bc)
-            else:
-                if field_col == ("velocity","tor"):
-                    mat = geo.i2(res[0], bc, (kx**2 + ky**2)**2)
-                    bc[0] = min(bc[0], 0)
-                    mat += geo.i2d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+            elif field_col == ("temperature",""):
+                mat = geo.zblk(res[0], bc)
 
-                elif field_col == ("velocity","pol"):
-                    mat = geo.i2d1(res[0], bc, -(kx**2 + ky**2)/Ro, cscale = zscale)
+        # Mean Y velocity
+        elif field_row == ("velocity","pol") and kx == 0 and ky == 0:
+            if field_col == ("velocity","tor"):
+                mat = geo.i2(res[0], bc, 1.0/Ro)
 
-                elif field_col == ("temperature",""):
-                    mat = geo.zblk(res[0], bc)
+            elif field_col == ("velocity","pol"):
+                mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
 
+            elif field_col == ("temperature",""):
+                mat = geo.zblk(res[0], bc)
+    
+        # Mean temperature
+        elif field_row == ("temperature","") and kx == 0 and ky == 0:
+            if field_col == ("velocity","tor"):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("velocity","pol"):
+                mat = geo.zblk(res[0], bc)
+
+            elif field_col == ("temperature",""):
+                mat = geo.i2d2(res[0], bc, 1.0/Pr, cscale = zscale)
+
+        # Toroidal velocity
+        elif field_row == ("velocity","tor"):
+            if field_col == ("velocity","tor"):
+                mat = geo.i2(res[0], bc, (kx**2 + ky**2)**2)
+                bc[0] = min(bc[0], 0)
+                mat += geo.i2d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+
+            elif field_col == ("velocity","pol"):
+                mat = geo.i2d1(res[0], bc, -(kx**2 + ky**2)/Ro, cscale = zscale)
+
+            elif field_col == ("temperature",""):
+                mat = geo.zblk(res[0], bc)
+
+        # Poloidal velocity
         elif field_row == ("velocity","pol"):
-            if kx == 0 and ky == 0:
-                if field_col == ("velocity","tor"):
-                    mat = geo.i2(res[0], bc, 1.0/Ro)
+            if field_col == ("velocity","tor"):
+                mat = geo.i4d1(res[0], bc, (kx**2 + ky**2)/Ro, cscale = zscale)
 
-                elif field_col == ("velocity","pol"):
-                    mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
+            elif field_col == ("velocity","pol"):
+                mat = geo.i4(res[0], bc, -(kx**2 + ky**2)**3)
+                bc[0] = min(bc[0], 0)
+                mat += geo.i4d2(res[0], bc, 2.0*(kx**2 + ky**2)**2, cscale = zscale)
+                mat += geo.i4d4(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
 
-                elif field_col == ("temperature",""):
-                    mat = geo.zblk(res[0], bc)
+            elif field_col == ("temperature",""):
+                mat = geo.i4(res[0], bc, (kx**2 + ky**2)*(Ra/Pr))
 
-            else:
-                if field_col == ("velocity","tor"):
-                    mat = geo.i4d1(res[0], bc, (kx**2 + ky**2)/Ro, cscale = zscale)
-
-                elif field_col == ("velocity","pol"):
-                    mat = geo.i4(res[0], bc, -(kx**2 + ky**2)**3)
-                    bc[0] = min(bc[0], 0)
-                    mat += geo.i4d2(res[0], bc, 2.0*(kx**2 + ky**2)**2, cscale = zscale)
-                    mat += geo.i4d4(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
-
-                elif field_col == ("temperature",""):
-                    mat = geo.i4(res[0], bc, (kx**2 + ky**2)*(Ra/Pr))
-
+        # temperature
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
                 mat = geo.zblk(res[0], bc)
@@ -374,27 +394,31 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if kx == 0 and ky == 0:
-            if field_row == ("velocity","tor"):
-                mat = geo.i2(res[0], bc, 1.0)
+        # Mean X velocity
+        if field_row == ("velocity","tor") and kx == 0 and ky == 0:
+            mat = geo.i2(res[0], bc, 1.0)
 
-            elif field_row == ("velocity","pol"):
-                mat = geo.i2(res[0], bc, 1.0)
+        # Mean Y velocity
+        elif field_row == ("velocity","pol") and kx == 0 and ky == 0:
+            mat = geo.i2(res[0], bc, 1.0)
 
-            elif field_row == ("temperature",""):
-                mat = geo.i2(res[0], bc, 1.0)
+        # Mean temperature
+        elif field_row == ("temperature","") and kx == 0 and ky == 0:
+            mat = geo.i2(res[0], bc, 1.0)
 
-        else:
-            if field_row == ("velocity","tor"):
-                mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
+        # Toroidal velocity
+        elif field_row == ("velocity","tor"):
+            mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
 
-            elif field_row == ("velocity","pol"):
-                mat = geo.i4(res[0], bc, (kx**2 + ky**2)**2)
-                bc[0] = min(bc[0], 0)
-                mat += geo.i4d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
+        # Poloidal velocity
+        elif field_row == ("velocity","pol"):
+            mat = geo.i4(res[0], bc, (kx**2 + ky**2)**2)
+            bc[0] = min(bc[0], 0)
+            mat += geo.i4d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
 
-            elif field_row == ("temperature",""):
-                mat = geo.i2(res[0], bc, 1.0)
+        # Temperature
+        elif field_row == ("temperature",""):
+            mat = geo.i2(res[0], bc, 1.0)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
