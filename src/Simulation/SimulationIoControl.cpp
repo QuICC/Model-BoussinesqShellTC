@@ -289,6 +289,14 @@ namespace GeoMHDiSCC {
       return this->mspCfgFile->spPhysical()->fMap();
    }
 
+   std::map<std::string, MHDFloat>& SimulationIoControl::rConfigPhysical()
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      return this->mspCfgFile->rspPhysical()->rFMap();
+   }
+
    const std::map<std::string, int>& SimulationIoControl::configBoundary() const
    {
       // Safety assert for non NULL pointer

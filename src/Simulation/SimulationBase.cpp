@@ -53,14 +53,11 @@ namespace GeoMHDiSCC {
          // Initialise the IO system
          this->mSimIoCtrl.init();
 
-         // Initialise the equation parameters
-         this->mspEqParams->init(this->mSimIoCtrl.configPhysical());
-
          //
          // Extend/modify parameters with automatically computed values
          //
          PyObject *pValue;
-         PyObject *pTmp = PythonTools::makeDict(this->mspEqParams->map());
+         PyObject *pTmp = PythonTools::makeDict(this->mSimIoCtrl.configPhysical());
 
          // Call model operator Python routine
          PyObject *pArgs = PyTuple_New(1);
@@ -69,13 +66,16 @@ namespace GeoMHDiSCC {
          pValue = PythonModelWrapper::callMethod(pArgs);
 
          // Create storage
-         PythonTools::getDict(this->mspEqParams->rMap(), pValue, true);
+         PythonTools::getDict(this->mSimIoCtrl.rConfigPhysical(), pValue, true);
          Py_DECREF(pValue);
          Py_DECREF(pTmp);
          Py_DECREF(pArgs);
 
          // Cleanup Python interpreter
          PythonModelWrapper::cleanup();
+
+         // Initialise the equation parameters
+         this->mspEqParams->init(this->mSimIoCtrl.configPhysical());
 
          // Get number CPU from configuration file
          int nCpu = this->mSimIoCtrl.configNCpu();
@@ -419,10 +419,10 @@ namespace GeoMHDiSCC {
    void SimulationBase::sortEquations()
    {
       // Sort scalar equations
-      Equations::Tools::sortByType(this->mScalarEquations, this->mScalarPrognosticRange, this->mScalarDiagnosticRange, this->mScalarTrivialRange);
+      Equations::Tools::sortByType(this->mScalarEquations, this->mScalarPrognosticRange, this->mScalarDiagnosticRange, this->mScalarTrivialRange, this->mScalarWrapperRange);
 
       // Sort vector equations
-      Equations::Tools::sortByType(this->mVectorEquations, this->mVectorPrognosticRange, this->mVectorDiagnosticRange, this->mVectorTrivialRange);
+      Equations::Tools::sortByType(this->mVectorEquations, this->mVectorPrognosticRange, this->mVectorDiagnosticRange, this->mVectorTrivialRange, this->mVectorWrapperRange);
 
       // Identifiy the solver indexes by analysing the coupling between the equations
       Equations::Tools::identifySolver(this->mScalarPrognosticRange, this->mVectorPrognosticRange);

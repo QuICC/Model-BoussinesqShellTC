@@ -109,6 +109,11 @@ namespace GeoMHDiSCC {
          const std::map<std::string, MHDFloat>& configPhysical() const;
 
          /**
+          * @brief Update the map of physical values read from the configuration file
+          */
+         std::map<std::string, MHDFloat>& rConfigPhysical();
+
+         /**
           * @brief Get the map of boundary conditions read from the configuration file
           */
          const std::map<std::string, int>& configBoundary() const;

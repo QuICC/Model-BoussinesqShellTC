@@ -249,6 +249,16 @@ namespace GeoMHDiSCC {
          VectorEquation_range mVectorTrivialRange;
 
          /**
+          * @brief Storage for the range of scalar wrapper equations
+          */
+         ScalarEquation_range mScalarWrapperRange;
+
+         /**
+          * @brief Storage for the range of vectort wrapper equations
+          */
+         VectorEquation_range mVectorWrapperRange;
+
+         /**
           * @brief Simulation run control
           */
          SimulationRunControl mSimRunCtrl;

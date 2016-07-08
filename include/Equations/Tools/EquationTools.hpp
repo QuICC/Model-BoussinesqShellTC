@@ -38,8 +38,9 @@ namespace Tools {
     * @param rPrognosticRange    Range of prognostic equations
     * @param rDiagnosticRange    Range of diagnostic equations
     * @param rTrivialRange       Range of trivial equations
+    * @param rWrapperRange       Range of wrapper equations
     */
-   template <typename T> void sortByType(typename std::vector<T>& rEqs, std::pair<typename std::vector<T>::iterator, typename std::vector<T>::iterator>& rPrognosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rDiagnosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rTrivialRange);
+   template <typename T> void sortByType(typename std::vector<T>& rEqs, std::pair<typename std::vector<T>::iterator, typename std::vector<T>::iterator>& rPrognosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rDiagnosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rTrivialRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rWrapperRange);
 
    /**
     * @brief Identify the solver indexes and set it on the equations
@@ -64,7 +65,7 @@ namespace Tools {
 // Implementation follows
 //
 
-   template <typename T> void sortByType(typename std::vector<T>& rEqs, std::pair<typename std::vector<T>::iterator, typename std::vector<T>::iterator>& rPrognosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rDiagnosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rTrivialRange)
+   template <typename T> void sortByType(typename std::vector<T>& rEqs, std::pair<typename std::vector<T>::iterator, typename std::vector<T>::iterator>& rPrognosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rDiagnosticRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rTrivialRange, std::pair<typename std::vector<T>::iterator,typename std::vector<T>::iterator>& rWrapperRange)
    {
       // Sort equations
       std::stable_sort(rEqs.begin(), rEqs.end(), Sorters::EquationType());
@@ -93,6 +94,12 @@ namespace Tools {
       if(eqIt != rEqs.end())
       {
          rTrivialRange = std::equal_range(rEqs.begin(), rEqs.end(), *eqIt, Sorters::EquationType());
+      }
+
+      eqIt = std::find_if(rEqs.begin(), rEqs.end(), Conditions::IsWrapper());
+      if(eqIt != rEqs.end())
+      {
+         rWrapperRange = std::equal_range(rEqs.begin(), rEqs.end(), *eqIt, Sorters::EquationType());
       }
    }
 }
