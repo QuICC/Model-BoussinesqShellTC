@@ -61,7 +61,7 @@ namespace Transform {
 
    void FftwLibrary::initFft()
    {
-      #ifdef GEOMHDISCC_THREADS_OPENMP
+      #if defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
       if(FftwLibrary::sCounter == 0)
       {
          // Initialize FFTW's threads
@@ -75,7 +75,7 @@ namespace Transform {
 
       // Number of threads
       fftw_plan_with_nthreads(2);
-      #endif //GEOMHDISCC_THREADS_OPENMP
+      #endif //defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
    }
 
    void FftwLibrary::cleanupFft()
@@ -83,11 +83,11 @@ namespace Transform {
       // Check if all objects have been destroyed
       if(FftwLibrary::sCounter == 0)
       {
-         #ifdef GEOMHDISCC_THREADS_OPENMP
+         #if defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
             fftw_cleanup_threads();
          #else
             fftw_cleanup();
-         #endif //GEOMHDISCC_THREADS_OPENMP
+         #endif //defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
       }
    }
 

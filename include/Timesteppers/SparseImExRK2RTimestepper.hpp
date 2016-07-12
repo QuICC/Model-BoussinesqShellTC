@@ -212,8 +212,14 @@ namespace Timestep {
 
          /**
           * @brief Build the scheme operators
+          *
+          * @param idx  Solver index
+          * @param opA  A operator
+          * @param opB  B operator
+          * @param opC  Boundary operator
+          * @param opD  Inhomogeneous boundary operator
           */
-         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size);
+         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size);
 
          /**
           * @brief Finished timestep?
@@ -328,17 +334,17 @@ namespace Timestep {
       {
          // Update intermediate solution
          MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
-         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
+         MHDFloat bEx = -TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeAMXPBYPZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
          }
 
          // Embedded lower order scheme solution
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
-            bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
+            bEx = -TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeAMXPBYPZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
@@ -352,7 +358,7 @@ namespace Timestep {
       if(this->mStep == 0)
       {
          // Reset error
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             this->mError = 0.0;
          }
@@ -376,7 +382,7 @@ namespace Timestep {
          if(this->mRegisterId == SOLUTION_REGISTER)
          {
             // Compute error estimate using embedded scheme
-            if(TimeSchemeSelector::HAS_EMBEDDED)
+            if(TimeSchemeSelector::USE_EMBEDDED)
             {
                for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
                {
@@ -388,6 +394,9 @@ namespace Timestep {
 
                // Set explicit store register for solution
                this->mRegisterId = ERROR_REGISTER; 
+
+               // Include inhomogeneous boundary conditions
+               this->addInhomogeneous();
                
                return true;
             } else
@@ -445,6 +454,9 @@ namespace Timestep {
             // Set explicit store register for solution
             this->mRegisterId = SOLUTION_REGISTER;
 
+            // Include inhomogeneous boundary conditions
+            this->addInhomogeneous();
+
             return true;
          }
       } else
@@ -453,7 +465,7 @@ namespace Timestep {
          {
             // Build RHS for implicit term
             MHDFloat aIm = (TimeSchemeSelector::aIm(this->mStep, this->mStep-1) - TimeSchemeSelector::bIm(this->mStep-1))*this->mDt;
-            MHDFloat aEx = (TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
+            MHDFloat aEx = -(TimeSchemeSelector::aEx(this->mStep, this->mStep-1) - TimeSchemeSelector::bEx(this->mStep-1))*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeAMXPYPBZ(this->mExSolution.at(i), this->mMassMatrix.at(i), aIm, this->mImSolution.at(i), this->mIntSolution.at(i), aEx);
@@ -465,6 +477,9 @@ namespace Timestep {
 
             // Set explicit store register for solution
             this->mRegisterId = EXPLICIT_REGISTER;
+
+            // Include inhomogeneous boundary conditions
+            this->addInhomogeneous();
 
          } else if(this->mRegisterId == EXPLICIT_REGISTER)
          {
@@ -539,17 +554,17 @@ namespace Timestep {
       {
          // Update intermediate solution
          MHDFloat bIm = TimeSchemeSelector::bIm(this->mStep)*this->mDt;
-         MHDFloat bEx = TimeSchemeSelector::bEx(this->mStep)*this->mDt;
+         MHDFloat bEx = -TimeSchemeSelector::bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             internal::computeAMXPBYPMZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
          }
 
          // Embedded lower order scheme solution
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             bIm = TimeSchemeSelector::bImErr(this->mStep)*this->mDt;
-            bEx = TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
+            bEx = -TimeSchemeSelector::bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
             {
                internal::computeAMXPBYPMZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
@@ -683,7 +698,7 @@ namespace Timestep {
       {
          internal::computeSet(this->mIntSolution.at(i), this->mSolution.at(i));
 
-         if(TimeSchemeSelector::HAS_EMBEDDED)
+         if(TimeSchemeSelector::USE_EMBEDDED)
          {
             internal::computeSet(this->mErrSolution.at(i), this->mSolution.at(i));
          }
@@ -709,13 +724,13 @@ namespace Timestep {
       this->mIntSolution.push_back(TData(rows,cols));
 
       // Initialize storage for embedded scheme
-      if(TimeSchemeSelector::HAS_EMBEDDED)
+      if(TimeSchemeSelector::USE_EMBEDDED)
       {
          this->mErrSolution.push_back(TData(rows,cols));
       }
    }
 
-   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size)
+   template <typename TOperator,typename TData> void SparseImExRK2RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size)
    {
       // Update timestep
       this->mDt = dt;
@@ -731,11 +746,15 @@ namespace Timestep {
       // Set implicit matrix
       for(int i = 0; i < TimeSchemeSelector::STEPS; ++i)
       {
+         // Set LHS matrix
          this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx).resize(size, size);
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), 1.0, opB);
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), -TimeSchemeSelector::aIm(i,i)*this->mDt, opA);
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), 1.0, opC);
       }
+         
+      // Set inhomogeneous boundary values
+      this->setInhomogeneous(idx, opD);
    }
 
    namespace internal

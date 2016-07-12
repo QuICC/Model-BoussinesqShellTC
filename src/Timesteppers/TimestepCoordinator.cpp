@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMinCnst(2), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
       // Initialize timestepper
       TimeSchemeSelector::init();
@@ -70,69 +70,97 @@ namespace Timestep {
 
    void TimestepCoordinator::adaptTimestep(const MHDFloat cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
-      // Flag to update timestep
-      bool hasNewDt = false;
+      // Store old timestep
+      this->mOldDt = this->mDt;
 
       // Check if CFL allows for a larger timestep
-//      if(cfl > this->mcUpWindow*this->mDt)
-//      {
-//         // Activate matrices update
-//         hasNewDt = true;
-//
-//         // Set new timestep
-//         this->mOldDt = this->mDt;
-//         this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
-//      
-//      // Check if CFL is below minimal timestep or downard jump is large
-//      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
-//      {
-//         // Don't update matrices
-//         hasNewDt = false;
-// 
-//         // Signal simulation abort
-//         this->mOldDt = this->mDt;
-//         this->mDt = -cfl;
-//     
-//      // Check if CFL requires a lower timestep
-//      } else if(cfl < this->mDt)
-//      {
-//         // Activate matrices update
-//         hasNewDt = true;
-//
-//         // Set new timestep
-//         this->mOldDt = this->mDt;
-//         this->mDt = cfl/this->mcUpWindow;
-//
+      MHDFloat newCflDt = 0.0;
+      if(cfl > this->mcUpWindow*this->mDt)
+      {
+         if(this->mCnstSteps >= this->mcMinCnst)
+         {
+            // Set new timestep
+            newCflDt = std::min(cfl, this->mcMaxJump*this->mDt);
+         } else
+         {
+            // Reuse same timestep
+            newCflDt = this->mDt;
+         }
       
-      MHDFloat maxError = 1e-8;
+      // Check if CFL is below minimal timestep or downard jump is large
+      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
+      {
+         // Signal simulation abort
+         newCflDt = -cfl;
+     
+      // Check if CFL requires a lower timestep
+      } else if(cfl < this->mDt)
+      {
+         // Set new timestep
+         newCflDt = cfl/this->mcUpWindow;
+
+      } else
+      {
+         newCflDt = cfl;
+      }
+      
+      // Gather error across processes
+      #ifdef GEOMHDISCC_MPI
+      if(this->mError > 0.0)
+      {
+         MPI_Allreduce(MPI_IN_PLACE, &this->mError, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      }
+      #endif //GEOMHDISCC_MPI
+      
       // No error control and no CFL condition
-//      if(this->mError < 0.0)
-//      {
-//         hasNewDt = false;
-//
-//      } else if(this->mError > maxError)
-//      {
-//         hasNewDt = true;
-//         this->mOldDt = this->mDt;
-//         this->mDt *= std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
-//
-//      } else if(this->mError < maxError/1.5)
-//      {
-//         hasNewDt = true;
-//         this->mOldDt = this->mDt;
-//         this->mDt = std::min(this->mDt*std::pow(maxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
-//
-//      // No need to change timestep
-//      } else
-//      {
-//         hasNewDt = false;
-//      }
-      hasNewDt = false;
+      MHDFloat newErrorDt = 0.0;
+
+      // Use what ever condition is used by CFL
+      if(this->mError < 0)
+      {
+         newErrorDt = -1.0;
+
+      // Error is too large, reduce timestep
+      } else if(this->mError > this->mMaxError)
+      {
+         newErrorDt = this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
+
+      // Error is small, increase timestep
+      } else if(this->mError < this->mMaxError/(this->mcMaxJump*0.9) && this->mCnstSteps >= this->mcMinCnst)
+      {
+         newErrorDt = std::min(this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+
+      // Timestep should not be increased
+      } else
+      {
+         newErrorDt = this->mDt;
+      }
+
+      // CFL condition requested abort!
+      if(newCflDt < 0.0)
+      {
+         this->mDt = newCflDt;
+
+      // Get minimum between both conditions
+      } else if(newCflDt > 0.0 && newErrorDt > 0.0)
+      {
+         this->mDt = std::min(newCflDt, newErrorDt);
+
+      // Use CFL condition
+      } else if(newCflDt > 0.0)
+      {
+         this->mDt = newCflDt;
+
+      // Use error condition
+      } else if(newErrorDt > 0.0)
+      {
+         this->mDt = newErrorDt;
+      }
 
       //
       // Update the timestep matrices if necessary
       //
-      if(hasNewDt)
+      if(this->mDt != this->mOldDt && this->mDt > 0.0)
       {
          DebuggerMacro_showValue("Updating timestep and matrices with new Dt = ", 0, this->mDt);
 
@@ -159,7 +187,7 @@ namespace Timestep {
       this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps, this->mError);
       this->mspIo->write();
 
-      if(hasNewDt)
+      if(this->mDt != this->mOldDt && this->mDt > 0.0)
       {
          this->mCnstSteps = 0.0;
       }
@@ -189,11 +217,18 @@ namespace Timestep {
       this->mTime = this->mRefTime + this->stepFraction()*this->mDt;
    }
 
-   void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Set initial time
       this->mTime = time;
       this->mRefTime = this->mTime;
+
+      // Use embedded scheme to compute error
+      if(maxError > 0.0)
+      {
+         TimeSchemeSelector::useEmbedded();
+         this->mMaxError = maxError;
+      }
 
       // Set initial timestep
       this->mOldDt = dt;
@@ -239,8 +274,8 @@ namespace Timestep {
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");
 
-      // Linear solver
-      oss << "Solver: ";
+      // General linear solver
+      oss << "General solver: ";
       #if defined GEOMHDISCC_SPLINALG_MUMPS
          oss << "MUMPS";
       #elif defined GEOMHDISCC_SPLINALG_UMFPACK
@@ -250,6 +285,40 @@ namespace Timestep {
       #else
          oss << "(unknown)";
       #endif //defined GEOMHDISCC_SPLINALG_MUMPS
+
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      // Triangular linear solver
+      oss << "Triangular solver: ";
+      #if defined GEOMHDISCC_SPTRILINALG_SPARSELU
+         oss << "SparseLU";
+      #elif defined GEOMHDISCC_SPTRILINALG_MUMPS
+         oss << "MUMPS";
+      #elif defined GEOMHDISCC_SPTRILINALG_UMFPACK
+         oss << "UmfPack";
+      #else
+         oss << "(unknown)";
+      #endif //defined GEOMHDISCC_SPTRILINALG_SPARSELU
+
+      IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      // SPD linear solver
+      oss << "SPD solver: ";
+      #if defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
+         oss << "SimplicialLDLT";
+      #elif defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLLT
+         oss << "SimplicialLLT";
+      #elif defined GEOMHDISCC_SPSPDLINALG_MUMPS
+         oss << "MUMPS";
+      #elif defined GEOMHDISCC_SPSPDLINALG_UMFPACK
+         oss << "UmfPack";
+      #elif defined GEOMHDISCC_SPSPDLINALG_SPARSELU
+         oss << "SparseLU";
+      #else
+         oss << "(unknown)";
+      #endif //defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
 
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");

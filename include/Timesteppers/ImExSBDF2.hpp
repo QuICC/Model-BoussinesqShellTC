@@ -111,6 +111,11 @@ namespace Timestep {
           * @brief Initialize Butcher's tableau
           */
          static void init();
+
+         /**
+          * @brief Activate embedded scheme
+          */
+         static void useEmbedded();
          
       protected:
 

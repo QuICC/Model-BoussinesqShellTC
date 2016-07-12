@@ -16,6 +16,7 @@ set(MHDPhysicalModels
    BoussinesqRBCAnnulusVCModel.hpp
    BoussinesqRBCCylinderVCModel.hpp
    BoussinesqRRBCDuctVCModel.hpp
+   BoussinesqRRBCPlaneModel.hpp
    BoussinesqRRBCPlaneVCModel.hpp
    BoussinesqRRBCBoxVCModel.hpp
    BoussinesqRRBCAnnulusVCModel.hpp
@@ -32,6 +33,8 @@ set(MHDPhysicalModels
    BoussinesqRTCSphereStdModel.hpp
    BoussinesqDynamoSphereModel.hpp
    BoussinesqDynamoSphereStdModel.hpp
+   BoussinesqCouetteShellStdModel.hpp
+   BoussinesqDynamoCouetteShellStdModel.hpp
    )
 
 set(MHDTestModels 

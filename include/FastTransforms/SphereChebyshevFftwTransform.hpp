@@ -28,7 +28,6 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
-#include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
@@ -79,6 +78,37 @@ namespace Transform {
          enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
       };
 
+      /**
+       * @brief Simple struct holding regularity stencil IDs
+       */
+      struct Stencils
+      {
+         /**
+          * @brief Enum of regularity constraints:
+          *    - REG0:     0th order regularity (i.e. f(0) = 0)
+          *    - REG1:     1st order regularity (i.e. f(0) = f'(0) = 0)
+          *    - REG2:     2nd order regularity (i.e. f(0) = f'(0) = f''(0) = 0)
+          *    - REG3:     3rd order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = 0)
+          *    - REG4:     4th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = 0)
+          *    - REG5:     5th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG6:     6th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG7:     7th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REG8:     8th order regularity (i.e. f(0) = f'(0) = f''(0) = f'''(0) = f''''(0) = ... = 0)
+          *    - REGMAX:   Maximum imposed regularity (should not be smaller than REG3)
+          */
+         enum Id {
+            REG0 = 0,
+            REG1,
+            REG2, 
+            REG3,
+            REG4,
+            REG5,
+            REG6,
+            REG7,
+            REG8,
+            REGMAX = REG3
+         };
+      };
    };
 
    /**
@@ -98,6 +128,9 @@ namespace Transform {
 
          /// Typedef for the Integrator type
          typedef SphereChebyshevFftIds::Integrators IntegratorType;
+
+         /// Typedef for the Integrator type
+         typedef SphereChebyshevFftIds::Stencils RegularityType;
 
          /**
           * @brief Generate a physical grid
@@ -146,9 +179,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -158,9 +190,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (R2R)
@@ -170,9 +201,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -182,9 +212,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute forward FFT (R2R) provide full output without spectral truncation
@@ -194,9 +223,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -206,9 +234,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (R2R) for energy calculation on full output without spectral truncation
@@ -218,9 +245,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_energy(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_energy(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C) for energy calculation  on full output without spectral truncation
@@ -230,9 +256,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_energy(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_energy(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -292,6 +317,16 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
+          * @brief Regularity operators basis size
+          */
+         std::map<RegularityType::Id, std::pair<int, int> > mRegularitySize;
+
+         /**
+          * @brief Regularity shift due to integrators 
+          */
+         std::map<IntegratorType::Id, std::pair<int, int> > mRegularityShift;
+
+         /**
           * @brief Does projector flip parity
           */
          std::map<ProjectorType::Id, int> mProjectorFlips;
@@ -300,6 +335,21 @@ namespace Transform {
           * @brief Does integrator flip parity
           */
          std::map<IntegratorType::Id, int> mIntegratorFlips;
+
+         /**
+          * @brief Storage for the regularity constraints operator
+          */
+         std::map<RegularityType::Id, std::pair<SparseMatrix,SparseMatrix> > mRegOp;
+
+         /**
+          * @brief Storage for the sparse solver matrices for the regularity constraints
+          */
+         std::map<RegularityType::Id, std::pair<SparseMatrix,SparseMatrix> > mRegSolveOp;
+
+         /**
+          * @brief Storage for the sparse solvers for the regularity constraints
+          */
+         std::map<RegularityType::Id, std::pair<SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>,SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > > mRegSolver;
 
          /**
           * @brief Storage for the projector operators
@@ -377,14 +427,29 @@ namespace Transform {
          SparseMatrix& intgOp(const IntegratorType::Id integrator, const int parity);
 
          /**
+          * @brief Get sparse regularity operator
+          */
+         SparseMatrix& regOp(const RegularityType::Id reg, const int parity);
+
+         /**
           * @brief Get sparse solver operator
           */
          SparseMatrix& solveOp(const ProjectorType::Id projector, const int parity);
 
          /**
+          * @brief Get sparse regularity solver operator
+          */
+         SparseMatrix& regSolveOp(const RegularityType::Id reg, const int parity);
+
+         /**
           * @brief Get sparse solver
           */
          Solver::SparseSelector<SparseMatrix>::Type& solver(const ProjectorType::Id projector, const int parity);
+
+         /**
+          * @brief Get sparse regularity solver
+          */
+         Solver::SparseSelector<SparseMatrix>::Type& regSolver(const RegularityType::Id reg, const int parity);
 
          /**
           * @brief Get temporary storage for solver
@@ -397,6 +462,16 @@ namespace Transform {
          Matrix& tmpOutS(const int parity);
 
          /**
+          * brief Size of regularity basis
+          */
+         int regularitySize(const RegularityType::Id reg, const int parity) const;
+
+         /**
+          * brief Regularity shift due to integrator
+          */
+         int regularityShift(const IntegratorType::Id integrator, const int parity) const;
+
+         /**
           * brief Does operator flip parity?
           */
          int flipsParity(const ProjectorType::Id projector) const;
@@ -404,7 +479,29 @@ namespace Transform {
          /**
           * brief Does operator flip parity?
           */
-         int flipsParity(const IntegratorType::Id integrator) const;
+         int flipsParity(const IntegratorType::Id integrator) const; 
+
+         /**
+          * @brief Apply regularity filters on block of data
+          */
+         void regularizeBlock(Matrix& rData, const int start, const int cols, const int parity, const RegularityType::Id reg);
+
+         /**
+          * @brief Apply regularity filters
+          *
+          * @param rData      Spectrum to regularize
+          * @param parity     Harmonic degree parity
+          * @param regShift   Shift in regularity due to the use of an integrator
+          */
+         void regularize(Matrix& rData, const int parity, const int regShift);
+
+         /**
+          * @brief Check regularity of solution
+          *
+          * @param rData      Spectrum to check
+          * @param parity     Harmonic degree parity
+          */
+         void checkRegularity(const Matrix& data, const int rows);
    };
 
    inline const MatrixI& SphereChebyshevFftwTransform::parityBlocks(const int parity) const
@@ -463,6 +560,17 @@ namespace Transform {
       }
    }
 
+   inline SparseMatrix& SphereChebyshevFftwTransform::regOp(const RegularityType::Id reg, const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mRegOp.find(reg)->second.first;
+      } else
+      {
+         return this->mRegOp.find(reg)->second.second;
+      }
+   }
+
    inline SparseMatrix& SphereChebyshevFftwTransform::solveOp(const ProjectorType::Id projector, const int parity)
    {
       if(parity == 0)
@@ -474,6 +582,17 @@ namespace Transform {
       }
    }
 
+   inline SparseMatrix& SphereChebyshevFftwTransform::regSolveOp(const RegularityType::Id reg, const int parity)
+   {
+      if(parity == 0)
+      {
+         return this->mRegSolveOp.find(reg)->second.first;
+      } else
+      {
+         return this->mRegSolveOp.find(reg)->second.second;
+      }
+   }
+
    inline Solver::SparseSelector<SparseMatrix>::Type& SphereChebyshevFftwTransform::solver(const ProjectorType::Id projector, const int parity)
    {
       if(parity == 0)
@@ -482,6 +601,17 @@ namespace Transform {
       } else
       {
          return *this->mSolver.find(projector)->second.second;
+      }
+   }
+
+   inline Solver::SparseSelector<SparseMatrix>::Type& SphereChebyshevFftwTransform::regSolver(const RegularityType::Id reg, const int parity)
+   {
+      if(parity == 0)
+      {
+         return *this->mRegSolver.find(reg)->second.first;
+      } else
+      {
+         return *this->mRegSolver.find(reg)->second.second;
       }
    }
 
@@ -504,6 +634,32 @@ namespace Transform {
       } else
       {
          return this->mTmpOutSO;
+      }
+   }
+
+   inline int SphereChebyshevFftwTransform::regularitySize(const RegularityType::Id reg, const int parity) const
+   {
+      assert(this->mRegularitySize.count(reg) > 0);
+   
+      if(parity == 0)
+      {
+         return this->mRegularitySize.find(reg)->second.first;
+      } else
+      {
+         return this->mRegularitySize.find(reg)->second.second;
+      }
+   }
+
+   inline int SphereChebyshevFftwTransform::regularityShift(const IntegratorType::Id integrator, const int parity) const
+   {
+      assert(this->mRegularityShift.count(integrator) > 0);
+   
+      if(parity == 0)
+      {
+         return this->mRegularityShift.find(integrator)->second.first;
+      } else
+      {
+         return this->mRegularityShift.find(integrator)->second.second;
       }
    }
 

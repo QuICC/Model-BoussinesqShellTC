@@ -77,6 +77,7 @@ namespace GeoMHDiSCC {
       Array min;
       Array max;
       this->analyze(min, max);
+      int digits = 3;
 
       // Create nice looking ouput header
       IoTools::Formatter::printNewline(stream);
@@ -88,12 +89,12 @@ namespace GeoMHDiSCC {
 
       // get a nice base for info
       int base = 20;
-      oss << std::fixed << std::setprecision(1) << this->mTimes.maxCoeff();
+      oss << std::fixed << std::setprecision(digits) << this->mTimes.maxCoeff();
       base += oss.str().size() + 1;
       oss.str("");
 
       // Output initialisation time
-      oss << "Initialisation [s]: " << std::fixed << std::setprecision(1) << this->mTimes(INIT);
+      oss << "Initialisation [s]: " << std::fixed << std::setprecision(digits) << this->mTimes(INIT);
       if(max.size() != 0)
       {
          oss << " / " << max(INIT) << " / " << min(INIT);
@@ -102,7 +103,7 @@ namespace GeoMHDiSCC {
       oss.str("");
 
       // Output prerun time
-      oss << "PreRun [s]: " << std::fixed << std::setprecision(1) << this->mTimes(PRERUN);
+      oss << "PreRun [s]: " << std::fixed << std::setprecision(digits) << this->mTimes(PRERUN);
       if(max.size() != 0)
       {
          oss << " / " << max(PRERUN) << " / " << min(PRERUN);
@@ -111,7 +112,7 @@ namespace GeoMHDiSCC {
       oss.str("");
 
       // Output computation time
-      oss << "Computation [s]: " << std::fixed << std::setprecision(1) << this->mTimes(RUN);
+      oss << "Computation [s]: " << std::fixed << std::setprecision(digits) << this->mTimes(RUN);
       if(max.size() != 0)
       {
          oss << " / " << max(RUN) << " / " << min(RUN);
@@ -120,7 +121,7 @@ namespace GeoMHDiSCC {
       oss.str("");
 
       // Output postrun time
-      oss << "PostRun [s]: " << std::fixed << std::setprecision(1) << this->mTimes(POSTRUN);
+      oss << "PostRun [s]: " << std::fixed << std::setprecision(digits) << this->mTimes(POSTRUN);
       if(max.size() != 0)
       {
          oss << " / " << max(POSTRUN) << " / " << min(POSTRUN);
@@ -131,7 +132,7 @@ namespace GeoMHDiSCC {
       IoTools::Formatter::printLine(stream, '-');
 
       // Output total execution time
-      oss << "Total execution time: " << std::fixed << std::setprecision(1) << this->mTimes(TOTAL);
+      oss << "Total execution time: " << std::fixed << std::setprecision(digits) << this->mTimes(TOTAL);
       if(max.size() != 0)
       {
          oss << " / " << max(TOTAL) << " / " << min(TOTAL);

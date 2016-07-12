@@ -35,6 +35,7 @@
 #include "Generator/States/ShellExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
+#include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -71,10 +72,10 @@ namespace GeoMHDiSCC {
             case 0:
                spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
                tSH.clear(); 
-               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
                tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
                tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
@@ -86,7 +87,7 @@ namespace GeoMHDiSCC {
                break;
          }
 
-         // Add temperature initial state generator
+         // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          switch(3)
@@ -174,21 +175,34 @@ namespace GeoMHDiSCC {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
       Equations::SharedVectorFieldVisualizer spVector;
+      Equations::SharedSphericalVerticalFieldVisualizer spVertical;
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spScalar->setFields(true, true);
+      spScalar->setFields(true, false);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, true);
+      spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
+
+      // Add vertical velocity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::VECTOR);
+      spVertical->setIdentity(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITY);
+
+      // Add vertical vorticity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::CURL);
+      spVertical->setIdentity(PhysicalNames::VORTICITYZ, PhysicalNames::VELOCITY);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 

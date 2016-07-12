@@ -55,6 +55,13 @@ if(GEOMHDISCC_PROFILE)
    if(profilerTest)
       geomhdiscc_add_definition(GEOMHDISCC_PROFILER)
    endif(profilerTest)
+
+   if(GEOMHDISCC_MPI)
+      option(GEOMHDISCC_PROFILE_PERCORE "Write per core profiling data?" OFF)
+      if(GEOMHDISCC_PROFILE_PERCORE)
+         add_definitions("-DGEOMHDISCC_PROFILE_PERCORE")
+      endif(GEOMHDISCC_PROFILE_PERCORE)
+   endif(GEOMHDISCC_MPI)
 endif(GEOMHDISCC_PROFILE)
 
 ###################################################

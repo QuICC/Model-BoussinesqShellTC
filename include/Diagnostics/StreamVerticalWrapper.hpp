@@ -57,6 +57,11 @@ namespace Diagnostics {
           */
          virtual const Datatypes::PhysicalScalarType& three() const;
 
+         /**
+          * @brief Get Resolution
+          */
+         virtual const SharedResolution spRes() const;
+
       protected:
 
       private:

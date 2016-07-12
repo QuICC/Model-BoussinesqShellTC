@@ -83,7 +83,7 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
         import geomhdiscc.transform.cartesian as transf
         nD = 1
 
-        if ("pressure","") in fields:
+        if ("pressure","") in fields and ("velocity","z") in fields:
             addContinuityC1D(fields, res, eigs, eq_params)
             viewSpectra(fields, show = show, save = save, fid=fid, max_cols = max_cols)
 
@@ -92,7 +92,11 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
         nD = 1
 
     elif geometry == 'b1d':
-        import geomhdiscc.transform.sphere as transf
+        import geomhdiscc.transform.sphere_chebyshev as transf
+        nD = 1
+
+    elif geometry == 'w1d':
+        import geomhdiscc.transform.sphere_worland as transf
         nD = 1
 
     elif geometry == 'c2d':
@@ -107,12 +111,20 @@ def viewPhysical(fields, geometry, res, eigs, eq_params, show = True, save = Fal
         import geomhdiscc.transform.shell as transf
         nD = 2
 
-    elif geometry == "sphere":
-        import geomhdiscc.transform.sphere as transf
+    elif geometry == "sphere_chebyshev":
+        import geomhdiscc.transform.sphere_chebyshev as transf
+        nD = 2
+
+    elif geometry == "sphere_worland":
+        import geomhdiscc.transform.sphere_worland as transf
         nD = 2
 
     elif geometry == "annulus":
         import geomhdiscc.transform.annulus as transf
+        nD = 2
+
+    elif geometry == "cylinder_worland":
+        import geomhdiscc.transform.cylinder_worland as transf
         nD = 2
 
     elif geometry == 'c3d':
@@ -144,7 +156,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         viz_res = (res[0], a, b)
         prof_opt = ()
 
-    elif geometry == 'b1d':
+    elif geometry in ['b1d', 'w1d']:
         viz_res = (res[0],)
         prof_opt = (int(eigs[0])%2,)
 
@@ -170,7 +182,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         res_1d = (res[0], a, b)
         res_2d = (res[1]-1, int(eigs[0]))
 
-    elif geometry == 'sphere':
+    elif geometry in ['sphere_chebyshev', 'sphere_worland']:
         res_1d = (res[0],)
         res_2d = (res[1]-1, int(eigs[0]))
 
@@ -180,10 +192,14 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         res_1d = (res[0], a, b)
         res_2d = (res[-1],)
 
+    elif geometry == 'cylinder_worland':
+        res_1d = (res[0], int(eigs[0]))
+        res_2d = (res[-1],)
+
     viz_res = res_1d + res_2d
 
     for k,f in specs.items():
-        sol_slice[k] = transf.toslice(f, res_1d[0], *res_2d) 
+        sol_slice[k] = transf.toslice(f, *viz_res) 
 
     if show or save:
         # Plot physical field as solution slice
@@ -209,7 +225,10 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
             saveProfileData(prof_fast, grid_fast, fid = pfid)
 
         # Plot profile extruded along periodic direction
-        grid_per = transf.grid_fast_per(*res_1d, m = np.ceil(eigs[0]))
+        if geometry == "cylinder_worland":
+            grid_per = transf.grid_fast_per(*res_1d)
+        else:
+            grid_per = transf.grid_fast_per(*res_1d, m = np.ceil(eigs[0]))
         phi = eigs[0]*transf.eqgrid(np.ceil(eigs[0]))
         viewPeriodic(prof_fast, grid_per, phi, show = show, save = save, fid = pfid, max_cols = max_cols)
 
@@ -350,6 +369,7 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3,
             fname = fname + ".pdf"
             pl.savefig(fname, bbox_inches='tight', dpi=200)
             if show:
+                pl.axis('equal')
                 pl.show()
             pl.clf()
     if subplot:

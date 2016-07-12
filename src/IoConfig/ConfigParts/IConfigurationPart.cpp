@@ -60,6 +60,11 @@ namespace IoConfig {
       return this->mIData;
    }
 
+   std::map<std::string, int>& IConfigurationPart::rIMap()
+   {
+      return this->mIData;
+   }
+
    std::pair<std::map<std::string, int>::const_iterator,std::map<std::string, int>::const_iterator> IConfigurationPart::iRange() const
    {
       return std::make_pair(this->mIData.begin(),this->mIData.end());
@@ -82,6 +87,11 @@ namespace IoConfig {
    }
 
    const std::map<std::string, MHDFloat>& IConfigurationPart::fMap() const
+   {
+      return this->mFData;
+   }
+
+   std::map<std::string, MHDFloat>& IConfigurationPart::rFMap()
    {
       return this->mFData;
    }

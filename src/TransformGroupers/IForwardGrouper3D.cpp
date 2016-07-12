@@ -35,19 +35,19 @@ namespace Transform {
    {
    }
 
-   ArrayI IForwardGrouper3D::namePacks2D(const  std::vector<IntegratorTree>& integratorTree)
+   ArrayI IForwardGrouper3D::namePacks2D(const  std::vector<TransformTree>& integratorTree)
    {  
       // Create list of packet sizes
       std::set<int>  list;
 
       // Loop over all edges
-      std::vector<IntegratorTree>::const_iterator treeIt;
+      std::vector<TransformTree>::const_iterator treeIt;
       for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
       {
-         int counter = treeIt->nPhysEdges();
+         int counter = treeIt->nEdges(0);
          list.insert(counter);
 
-         this->mNamedPacks2D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));
+         this->mNamedPacks2D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp<FieldComponents::Physical::Id>()), counter));
       }
 
       // Initialise the number of packs
@@ -64,7 +64,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper3D::groupPacks2D(const std::vector<IntegratorTree>& integratorTree)
+   ArrayI IForwardGrouper3D::groupPacks2D(const std::vector<TransformTree>& integratorTree)
    {  
       // Initialise the number of packs
       ArrayI packs = this->namePacks2D(integratorTree);

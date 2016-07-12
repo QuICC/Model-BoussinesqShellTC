@@ -16,6 +16,7 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -111,6 +112,11 @@ namespace Timestep {
 
    void ImExSBDF2::init()
    {
+   }
+
+   void ImExSBDF2::useEmbedded()
+   {
+      throw Exception("Tried to activate inexistant embedded scheme!");
    }
 
 }

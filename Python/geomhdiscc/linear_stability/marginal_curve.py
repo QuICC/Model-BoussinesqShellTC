@@ -60,7 +60,7 @@ class MarginalCurve:
 
         return (data_k, data_Ra, data_freq)
 
-    def minimum(self, ks, Ras, xtol = 1e-4, only_int = False):
+    def minimum(self, ks, Ras, xtol = 1e-8, only_int = False):
         """Compute the critical value (minimum of curve)"""
 
         # Open file for IO and write header
@@ -301,7 +301,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -316,7 +316,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv, geometry = geometry)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -381,8 +381,10 @@ class GEVP:
         h5_file.attrs['header'] = np.string_('StateFile'.encode('ascii')) 
         if geometry == 'shell':
             h5_file.attrs['type'] = np.string_('SLFm'.encode('ascii'))
-        elif geometry == 'sphere': 
+        elif geometry == 'sphere_chebyshev': 
             h5_file.attrs['type'] = np.string_('BLFm'.encode('ascii'))
+        elif geometry == 'sphere_worland': 
+            h5_file.attrs['type'] = np.string_('WLFm'.encode('ascii'))
         h5_file.attrs['version'] = np.string_('1.0'.encode('ascii'))
 
         # Create physical group
@@ -436,8 +438,10 @@ class GEVP:
         h5_file.set_node_attr('/', 'header', 'StateFile'.encode('ascii')) 
         if geometry == 'shell':
             h5_file.set_node_attr('/', 'type', 'SLFm'.encode('ascii')) 
-        elif geometry == 'sphere': 
+        elif geometry == 'sphere_chebyshev': 
             h5_file.set_node_attr('/', 'type', 'BLFm'.encode('ascii')) 
+        elif geometry == 'sphere_worland': 
+            h5_file.set_node_attr('/', 'type', 'WLFm'.encode('ascii')) 
         h5_file.set_node_attr('/', 'version', '1.0'.encode('ascii')) 
 
         # Create physical group
@@ -547,6 +551,8 @@ class GEVP:
                         fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
                     if 'taylor' in self.eq_params:
                         fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                    if 'ekman' in self.eq_params:
+                        fid = fid + "E{:g}".format(self.eq_params['ekman'])
                     viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
             else:
                 for i in range(0, len(self.evp_vec)):
@@ -561,6 +567,17 @@ class GEVP:
                         # Save spectra to HDF5
                         if save_hdf5:
                             self.saveHdf5_tables(sol_spec, geometry, postfix = '_mode_' + str(i))
+
+                        Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[i]))
+                        fid = ""
+                        if 'prandtl' in self.eq_params:
+                            fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                        if 'taylor' in self.eq_params:
+                            fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                        if 'ekman' in self.eq_params:
+                            fid = fid + "E{:g}".format(self.eq_params['ekman'])
+                        fid += "_" + str(i)
+                        viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
 
     def apply_stencil(self, sol_vec):
         """Apply Galerkin stencil to recover physical fields"""
@@ -638,6 +655,7 @@ def compute(gevp_opts, marginal_opts):
     gevp_opts['euler'] = marginal_opts['euler']
     gevp_opts['conv_idx'] = marginal_opts['conv_idx']
     gevp_opts['spectrum_conv'] = marginal_opts['spectrum_conv']
+    gevp_opts['geometry'] = marginal_opts['geometry']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object
@@ -690,4 +708,4 @@ def compute(gevp_opts, marginal_opts):
         gevp.viewSpectra(marginal_opts['viz_mode'], plot = marginal_opts['show_spectra'], save_pdf = marginal_opts['save_spectra'])
 
     if marginal_opts['show_physical'] or marginal_opts['save_physical'] or marginal_opts['data_physical'] or marginal_opts['save_hdf5']:
-        gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'])
+        gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'], save_hdf5 = marginal_opts['save_hdf5'])

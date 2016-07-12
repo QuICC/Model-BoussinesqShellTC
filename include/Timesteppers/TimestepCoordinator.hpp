@@ -65,10 +65,11 @@ namespace Timestep {
           *
           * @param time    Initial time value
           * @param dt      Initial timestep value
+          * @param error   Max error allowed during timestep
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void init(const MHDFloat time, const MHDFloat dt, const MHDFloat mxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Tune adaptive timestepper 
@@ -148,6 +149,11 @@ namespace Timestep {
          void updateMatrices();
 
          /**
+          * @brief Minimum number of constant timestep before step size increase
+          */
+         const MHDFloat mcMinCnst;
+
+         /**
           * @brief Maximum timestep jump per step (See Soederlind)
           */
          const MHDFloat mcMaxJump;
@@ -166,6 +172,11 @@ namespace Timestep {
           * @brief Maximum timestep allowed 
           */
          const MHDFloat mcMaxDt;
+
+         /**
+          * @brief Maximum error allowed 
+          */
+         MHDFloat mMaxError;
 
          /**
           * @brief Previous timestep length
@@ -213,6 +224,7 @@ namespace Timestep {
       DecoupledZSparse  linOp;
       DecoupledZSparse  timeOp;
       DecoupledZSparse  bcOp;
+      DecoupledZSparse  inhOp;
 
       // Compute model's linear operator (without Tau lines)
       spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
@@ -220,9 +232,11 @@ namespace Timestep {
       spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
       // Compute model's tau line boundary operator
       spEq->buildModelMatrix(bcOp, ModelOperator::BOUNDARY, comp, idx, ModelOperatorBoundary::SOLVER_HAS_BC);
+      // Compute model's inhomogeneous boundary operator
+      spEq->buildModelMatrix(inhOp, ModelOperator::INHOMOGENEOUS, comp, idx, ModelOperatorBoundary::SOLVER_HAS_BC);
 
       // Let the timestepper build the right operators
-      spSolver->buildOperators(idx, linOp, timeOp, bcOp, dt, spEq->couplingInfo(comp).systemN(idx));
+      spSolver->buildOperators(idx, linOp, timeOp, bcOp, inhOp, dt, spEq->couplingInfo(comp).systemN(idx));
       
       // Solver is initialized
       spSolver->setInitialized();

@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "TransformConfigurators/TransformTreeTools.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
@@ -29,7 +30,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void RequirementTools::initVariables(std::vector<Transform::ProjectorTree>& projectorTree, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes)
+   void RequirementTools::initVariables(std::vector<Transform::TransformTree>& projectorTree, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes)
    {
       VariableRequirement varInfo;
 
@@ -57,8 +58,8 @@ namespace GeoMHDiSCC {
       // 
       // Create the required variables and corresponding transform branches
       //
-      std::vector<Transform::ProjectorBranch> tmpBranches;
-      std::map<PhysicalNames::Id, std::vector<Transform::ProjectorBranch> > branches;
+      std::vector<Transform::TransformPath> tmpBranches;
+      std::map<PhysicalNames::Id, std::vector<Transform::TransformPath> > branches;
 
       // Initialise variables
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
@@ -80,7 +81,7 @@ namespace GeoMHDiSCC {
             }
 
             // Initialise transform branch
-            branches.insert(std::make_pair(infoIt->first, std::vector<Transform::ProjectorBranch>()));
+            branches.insert(std::make_pair(infoIt->first, std::vector<Transform::TransformPath>()));
 
             // Initialise the physical values if required
             if(infoIt->second.needPhysical())
@@ -172,16 +173,16 @@ namespace GeoMHDiSCC {
       }
 
       // Create the projector tree(s)
-      Transform::ProjectorTreeTools::generateTrees(projectorTree, branches);
+      Transform::TransformTreeTools::generateTrees(projectorTree, branches, TransformDirection::BACKWARD);
    }
 
-   void RequirementTools::mapEquationVariables(std::vector<Transform::IntegratorTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear)
+   void RequirementTools::mapEquationVariables(std::vector<Transform::TransformTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear)
    {
       // Store the scalar and vector branches
-      std::vector<Transform::IntegratorBranch> scalarBranches;
-      std::vector<Transform::IntegratorBranch> vectorBranches;
+      std::vector<Transform::TransformPath> scalarBranches;
+      std::vector<Transform::TransformPath> vectorBranches;
 
-      std::map<PhysicalNames::Id, std::vector<Transform::IntegratorBranch> > branches;
+      std::map<PhysicalNames::Id, std::vector<Transform::TransformPath> > branches;
 
       // Loop over all scalar variables
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::const_iterator scalIt;
@@ -203,7 +204,7 @@ namespace GeoMHDiSCC {
                if((*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
                {
                   // Initialise transform branch
-                  branches.insert(std::make_pair(scalIt->first, std::vector<Transform::IntegratorBranch>()));
+                  branches.insert(std::make_pair(scalIt->first, std::vector<Transform::TransformPath>()));
 
                   // Create scalar forward transform
                   scalarBranches = Transform::TransformSteps::forwardScalar((*scalEqIt)->nlComponents(), forwardIsNonlinear);
@@ -262,7 +263,7 @@ namespace GeoMHDiSCC {
                if((*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear())
                {
                   // Initialise transform branch
-                  branches.insert(std::make_pair(vectIt->first, std::vector<Transform::IntegratorBranch>()));
+                  branches.insert(std::make_pair(vectIt->first, std::vector<Transform::TransformPath>()));
 
                   // Create vector forward transform
                   vectorBranches = Transform::TransformSteps::forwardVector((*vectEqIt)->nlComponents(), forwardIsNonlinear);
@@ -280,6 +281,6 @@ namespace GeoMHDiSCC {
       }
 
       // Create the integrator tree(s)
-      Transform::IntegratorTreeTools::generateTrees(integratorTree, branches);
+      Transform::TransformTreeTools::generateTrees(integratorTree, branches, TransformDirection::FORWARD);
    }
 }

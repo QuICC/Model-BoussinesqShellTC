@@ -70,6 +70,7 @@ namespace Equations {
          // ---------------------------------------------------
          ZEROCOSCOS = 90,  // Galerkin, Cosine, Cosine
          PEYRET1DA,        // Kind of a place holder for tests
+         TORPOLTFF,        // Divergence free state for Toroidal/Poloidal test in TFF scheme
          // ---------------------------------------------------
          // 2D modes
          // ---------------------------------------------------
@@ -103,6 +104,11 @@ namespace Equations {
        * @brief Compute polynomial mode
        */
       static MHDFloat poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
+       * @brief Compute Chebyshev mode
+       */
+      static MHDFloat chebyshev(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
 
       /**
        * @brief Compute galerkin polynomial mode (zero at boundary)

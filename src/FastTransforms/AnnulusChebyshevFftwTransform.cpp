@@ -262,10 +262,8 @@ namespace Transform {
       FftwLibrary::cleanupFft();
    }
 
-   void AnnulusChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void AnnulusChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -295,10 +293,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void AnnulusChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, AnnulusChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void AnnulusChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, AnnulusChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -377,10 +373,8 @@ namespace Transform {
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   void AnnulusChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void AnnulusChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -429,10 +423,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void AnnulusChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, AnnulusChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void AnnulusChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, AnnulusChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -575,10 +567,8 @@ namespace Transform {
       rPhysVal.imag() = this->mTmpOut;
    }
 
-   void AnnulusChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void AnnulusChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -604,10 +594,8 @@ namespace Transform {
       }
    }
 
-   void AnnulusChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void AnnulusChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 

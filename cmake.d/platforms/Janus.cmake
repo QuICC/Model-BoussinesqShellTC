@@ -63,6 +63,18 @@ set(GEOMHDISCC_INCLUDES_MUMPS_INTEL "/home/phma6156/share/intel/mumps_5/include"
 set(GEOMHDISCC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/mumps_5/lib" "/home/phma6156/share/intel/scalapack/lib" "/home/phma6156/share/intel/scotch_6/lib" "/home/phma6156/share/intel/parmetis_4/lib" PARENT_SCOPE)
 
 ###################################################
+#- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "MUMPS" "SparseLU" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 
@@ -104,7 +116,7 @@ set(GEOMHDISCC_CC_SERIAL_INTEL "icpc" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_MPI_INTEL "mpic++" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_ARCH_INTEL "-O2" PARENT_SCOPE)
+set(GEOMHDISCC_CC_ARCH_INTEL "-O2 -xHost" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_INC_INTEL "" PARENT_SCOPE)
 

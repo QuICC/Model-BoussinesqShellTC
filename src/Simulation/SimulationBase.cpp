@@ -32,6 +32,8 @@
 #include "Variables/RequirementTools.hpp"
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "Equations/Tools/EquationTools.hpp"
+#include "Python/PythonModelWrapper.hpp"
+#include "Python/PythonTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -50,6 +52,27 @@ namespace GeoMHDiSCC {
       try{
          // Initialise the IO system
          this->mSimIoCtrl.init();
+
+         //
+         // Extend/modify parameters with automatically computed values
+         //
+         PyObject *pValue;
+         PyObject *pTmp = PythonTools::makeDict(this->mSimIoCtrl.configPhysical());
+
+         // Call model operator Python routine
+         PyObject *pArgs = PyTuple_New(1);
+         PyTuple_SetItem(pArgs, 0, pTmp);
+         PythonModelWrapper::setMethod((char *)"automatic_parameters");
+         pValue = PythonModelWrapper::callMethod(pArgs);
+
+         // Create storage
+         PythonTools::getDict(this->mSimIoCtrl.rConfigPhysical(), pValue, true);
+         Py_DECREF(pValue);
+         Py_DECREF(pTmp);
+         Py_DECREF(pArgs);
+
+         // Cleanup Python interpreter
+         PythonModelWrapper::cleanup();
 
          // Initialise the equation parameters
          this->mspEqParams->init(this->mSimIoCtrl.configPhysical());
@@ -79,7 +102,7 @@ namespace GeoMHDiSCC {
       StageTimer stage;
 
       // Transform projector tree
-      std::vector<Transform::ProjectorTree> projectorTree;
+      std::vector<Transform::TransformTree> projectorTree;
 
       stage.start("initializing variables");
 
@@ -87,7 +110,7 @@ namespace GeoMHDiSCC {
       RequirementTools::initVariables(projectorTree, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
 
       // Transform integrator tree
-      std::vector<Transform::IntegratorTree> integratorTree;
+      std::vector<Transform::TransformTree> integratorTree;
 
       // Map variables to the equations and set nonlinear requirements
       RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables, this->mForwardIsNonlinear);
@@ -145,6 +168,8 @@ namespace GeoMHDiSCC {
       this->mExecutionTimer.stop();
       this->mExecutionTimer.update(ExecutionTimer::PRERUN);
 
+      // Synchronize computation nodes
+      FrameworkMacro::synchronize();
       StageTimer::completed("Simulation initialisation successfull");
 
       // Start timer
@@ -290,7 +315,7 @@ namespace GeoMHDiSCC {
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
    }
       
-   void SimulationBase::initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)
+   void SimulationBase::initTransformCoordinator(const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree)
    {
       // Extract the run options for the equation parameters
       std::map<NonDimensional::Id,MHDFloat> runOptions;
@@ -394,10 +419,10 @@ namespace GeoMHDiSCC {
    void SimulationBase::sortEquations()
    {
       // Sort scalar equations
-      Equations::Tools::sortByType(this->mScalarEquations, this->mScalarPrognosticRange, this->mScalarDiagnosticRange, this->mScalarTrivialRange);
+      Equations::Tools::sortByType(this->mScalarEquations, this->mScalarPrognosticRange, this->mScalarDiagnosticRange, this->mScalarTrivialRange, this->mScalarWrapperRange);
 
       // Sort vector equations
-      Equations::Tools::sortByType(this->mVectorEquations, this->mVectorPrognosticRange, this->mVectorDiagnosticRange, this->mVectorTrivialRange);
+      Equations::Tools::sortByType(this->mVectorEquations, this->mVectorPrognosticRange, this->mVectorDiagnosticRange, this->mVectorTrivialRange, this->mVectorWrapperRange);
 
       // Identifiy the solver indexes by analysing the coupling between the equations
       Equations::Tools::identifySolver(this->mScalarPrognosticRange, this->mVectorPrognosticRange);

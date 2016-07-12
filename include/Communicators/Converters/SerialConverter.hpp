@@ -62,7 +62,7 @@ namespace Parallel {
          /**
           * @brief Setup the converter
           */
-         virtual void setup(const Dimensions::Transform::Id transId);
+         virtual void setup();
 
          /**
           * @brief Get the converted data from TBwdA to TFwdB conversion
@@ -92,11 +92,6 @@ namespace Parallel {
          virtual void prepareForwardReceive();
 
          /**
-          * @brief Start communication for forward transform
-          */
-         virtual void initiateForwardCommunication();
-
-         /**
           * @brief Start persistent send for backward transform
           */
          virtual void initiateBackwardSend();
@@ -105,11 +100,6 @@ namespace Parallel {
           * @brief Post persistent receive for backward transform
           */
          virtual void prepareBackwardReceive();
-
-         /**
-          * @brief Start communication for backward transform
-          */
-         virtual void initiateBackwardCommunication();
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -154,7 +144,7 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup(const Dimensions::Transform::Id transId)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup()
    {
    }
 
@@ -170,19 +160,11 @@ namespace Parallel {
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
-   {
-   }
-
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardSend()
    {
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::prepareBackwardReceive()
-   {
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardCommunication()
    {
    }
 

@@ -85,6 +85,13 @@ namespace Equations {
       if(typeId == ShellExactStateIds::CONSTANT)
       {
          rNLComp.rData().setConstant(42);
+
+      } else if(typeId == ShellExactStateIds::NOISE)
+      {
+         // Make random contant
+         rNLComp.rData().setRandom();
+         rNLComp.rData() *= 1e-15;
+
       } else if(typeId == ShellExactStateIds::HARMONIC)
       {
          throw Exception("HARMONIC state is not implemented for vector states");
@@ -240,7 +247,7 @@ namespace Equations {
 
          MHDFloat r;
          MHDFloat theta;
-         MHDFloat scale = 0.5;
+         MHDFloat scale = 1.0/std::sqrt(2);
          nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
          for(int iR = 0; iR < nR; ++iR)
          {

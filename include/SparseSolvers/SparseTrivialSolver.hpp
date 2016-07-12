@@ -127,7 +127,7 @@ namespace Solver {
    template <typename TOperator,typename TData> void SparseTrivialSolver<TOperator,TData>::zeroSolver()
    {
       // Set solver RHS to zero
-      for(int i = 0; i < this->mSolution.size(); ++i)
+      for(unsigned int i = 0; i < this->mSolution.size(); ++i)
       {
          this->mSolution.at(i).setZero();
       }

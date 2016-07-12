@@ -81,6 +81,11 @@ namespace Timestep {
          static const bool HAS_EMBEDDED;
 
          /**
+          * @brief Use scheme's embedded lower order scheme?
+          */
+         static bool USE_EMBEDDED;
+
+         /**
           * @brief Name of the scheme
           */
          static const std::string NAME;
@@ -89,6 +94,11 @@ namespace Timestep {
           * @brief Initialize Butcher's tableau
           */
          static void init();
+
+         /**
+          * @brief Activate embedded scheme
+          */
+         static void useEmbedded();
          
       protected:
          /**

@@ -36,7 +36,7 @@ namespace Debug {
           */
          enum BreakPoint {
             // Coarse profiling points (level 0)
-            BWDTRANSFORM,
+            BWDTRANSFORM = 0,
             NONLINEAR,
             FWDTRANSFORM,
             PROGNOSTICEQUATION,
@@ -51,7 +51,8 @@ namespace Debug {
             FWD1D,
             FWD2D,
             FWDND,
-            // Detailed profiling points leve 2 (included in level 1)
+            // Detailed profiling points level 2 (included in level 1)
+            BWDDEALIAS,
             BWD1DTRA,
             BWD2DTRA,
             BWDNDTRA,
@@ -70,12 +71,25 @@ namespace Debug {
             TSTEPRHS,
             TSTEPSOLVE,
             TSTEPOUT,
+            // Detailed profiling points level 3 (included in level 2)
+            BWD1DTRAFFT,
+            BWD1DTRAR,
+            BWD1DTRAR2,
+            BWD1DTRADIFF,
+            BWD1DTRADIFF2,
+            FWD1DTRAFFT,
+            TSTEPMPI,
+            // Unspecific probes
+            PROBEA,
+            PROBEB,
+            PROBEC,
+            // Break point bounding value
+            #ifdef GEOMHDISCC_PROFILER_DETAILED
+            NBREAKPOINT
+            #else
+            NBREAKPOINT = IO + 1
+            #endif // GEOMHDISCC_PROFILER_DETAILED
          };
-
-         /**
-          * @brief Stores the maximum break point ID depending on configuration
-          */
-         static const int NBREAKPOINT;
 
          /**
           * @brief Get elapsed time for provided break point

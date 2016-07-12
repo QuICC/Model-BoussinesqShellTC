@@ -20,6 +20,7 @@
 #include <zmumps_c.h>
 
 #include "Base/MpiTypes.hpp"
+#include "Profiler/ProfilerMacro.h"
 
 namespace Eigen {
 
@@ -298,7 +299,8 @@ namespace Eigen {
 
             // increase memory relaxation
             //m_id.icntl[14-1] = 700;
-            m_id.icntl[14-1] = 70;
+            m_id.icntl[14-1] = 150;
+            //m_id.icntl[14-1] = 70;
 
             // Set drop threshold
             //m_id.cntl[1-1] = 1.0;
@@ -412,6 +414,7 @@ namespace Eigen {
             #ifdef GEOMHDISCC_MPI
             if(m_isParallel)
             {
+               DetailedProfilerMacro_start(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
                mTmp.resize(m_id.lrhs, m_id.nrhs);
                #if defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
                   MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
@@ -419,6 +422,7 @@ namespace Eigen {
                   MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
                #endif //defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
                pRhs = mTmp.data();
+               DetailedProfilerMacro_stop(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
             } else
             {
                pRhs = pData;
@@ -464,7 +468,9 @@ namespace Eigen {
             #ifdef GEOMHDISCC_MPI
             if(m_isParallel)
             {
+               DetailedProfilerMacro_start(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
                MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
+               DetailedProfilerMacro_stop(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
             }
             #endif //GEOMHDISCC_MPI
          }

@@ -59,6 +59,11 @@ namespace Equations {
       return val;
    }
 
+   MHDFloat CartesianExactStateIds::chebyshev(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x)
+   {
+      return amplitude*std::cos(mode*std::acos(x));
+   }
+
    MHDFloat CartesianExactStateIds::zero(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x)
    {
       MHDFloat val;

@@ -57,14 +57,14 @@ namespace Transform {
           *
           * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree);
+         virtual ArrayI packs1D(const std::vector<TransformTree>& projectorTree);
 
          /**
           * @brief Get the number of required packs for the second exchange
           *
           * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree);
+         virtual ArrayI packs2D(const std::vector<TransformTree>& projectorTree);
 
       protected:
          /**
@@ -114,11 +114,11 @@ namespace Transform {
       //
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
       std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
-      std::vector<Transform::ProjectorTree>::const_iterator it;
+      std::vector<Transform::TransformTree>::const_iterator it;
       for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
          // Transform scalar variable
-         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         if(it->comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR)
          {
             scalIt = scalars.find(it->name());
 
@@ -147,12 +147,9 @@ namespace Transform {
       for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
          // Transform scalar variable
-         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         if(it->comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR)
          {
             scalIt = scalars.find(it->name());
-
-            // Sychronize 
-            FrameworkMacro::synchronize();
 
             // Compute second step of transform for scalar fields
             TConfigurator::secondStep(*it, *(scalIt->second), coord);
@@ -176,7 +173,7 @@ namespace Transform {
       for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
          // Transform scalar variable
-         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         if(it->comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR)
          {
             scalIt = scalars.find(it->name());
 
@@ -210,7 +207,7 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs1D(const std::vector<ProjectorTree>& projectorTree)
+   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs1D(const std::vector<TransformTree>& projectorTree)
    {
       // Get size of grouped communication
       ArrayI packs = this->groupPacks1D(projectorTree);
@@ -221,7 +218,7 @@ namespace Transform {
       return packs;
    }
 
-   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs2D(const std::vector<ProjectorTree>& projectorTree)
+   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs2D(const std::vector<TransformTree>& projectorTree)
    {
       // Get size of grouped communication
       ArrayI packs = this->groupPacks2D(projectorTree);

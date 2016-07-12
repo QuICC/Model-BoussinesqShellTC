@@ -78,7 +78,7 @@ namespace IoVariable {
          /**
           * @brief Storage for the scalar energy
           */
-         MHDFloat mEnergy;
+         Array mEnergy;
 
          /**
           * @brief Chebyshev operator for integration

@@ -43,6 +43,7 @@ namespace Equations {
       enum Id {
          // Special states
          CONSTANT = 0,  // All constant
+         NOISE,         // Random noise
 
          HARMONIC = 10, // Generate spherical harmonic state
 

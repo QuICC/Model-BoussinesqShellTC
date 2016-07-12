@@ -1,0 +1,11 @@
+set(MHDModelSources
+   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigenSHlTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellTorPolEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactStateIds.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/SphericalVerticalFieldVisualizer.cpp
+)

@@ -49,6 +49,16 @@ namespace IoAscii {
          virtual void init();
 
          /**
+          * @brief Initialise the file in debug mode (no IO filter)
+          */
+         virtual void initDebug();
+
+         /**
+          * @brief Initialise the file without header
+          */
+         void initNoHeader();
+
+         /**
           * @brief This call does nothing in this case
           */
          virtual void write() {};
@@ -57,6 +67,11 @@ namespace IoAscii {
           * @brief Finalise the file
           */
          virtual void finalize();
+
+         /**
+          * @brief Finalise the file in debug mode (no IO filter)
+          */
+         virtual void finalizeDebug();
 
          /**
           * @brief Get direct access to file handle

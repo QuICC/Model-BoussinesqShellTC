@@ -233,6 +233,10 @@ namespace IoTools {
       } else if(id == IdToHuman::toString(ModelOperator::STENCIL))
       {
          return ModelOperator::STENCIL;
+
+      } else if(id == IdToHuman::toString(ModelOperator::INHOMOGENEOUS))
+      {
+         return ModelOperator::INHOMOGENEOUS;
       } else
       {
          throw Exception("Unknown string to ID conversion requested (ModelOperator)");

@@ -75,9 +75,19 @@ namespace IoAscii {
          void open();
 
          /**
+          * @brief Open the file in debug mode (no IO filter)
+          */
+         void openDebug();
+
+         /**
           * @brief Close the file
           */
          void close();
+
+         /**
+          * @brief Close the file in debug mode (no IO filter)
+          */
+         void closeDebug();
 
       private:
    };
