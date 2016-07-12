@@ -129,8 +129,14 @@ namespace Timestep {
 
          /**
           * @brief Build the scheme operators
+          *
+          * @param idx  Solver index
+          * @param opA  A operator
+          * @param opB  B operator
+          * @param opC  Boundary operator
+          * @param opD  Inhomogeneous boundary operator
           */
-         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size);
+         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size);
 
          /**
           * @brief Error of computation
@@ -256,6 +262,9 @@ namespace Timestep {
             internal::computeRHSMemory<TOperator,TData>(this->mStep, this->mRHSData.at(i), this->rRHSMatrix(rhsId,i), this->mSolution.at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), this->mOldRHS.at(i), tmp);
          }
       }
+
+      // Include inhomogeneous boundary conditions
+      this->addInhomogeneous();
 
       return true;
    }
@@ -440,7 +449,7 @@ namespace Timestep {
       this->mTMatrix.push_back(TOperator());
    }
 
-   template <typename TOperator,typename TData> void SparseOldImExTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size)
+   template <typename TOperator,typename TData> void SparseOldImExTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size)
    {
       // Update timestep
       this->mDt = dt;
@@ -473,6 +482,9 @@ namespace Timestep {
             Solver::internal::addOperators(this->rOldRHSMatrix(TimeSchemeSelector::rhsT(0,i), idx, j), -TimeSchemeSelector::rhsT(j+1,i)/this->mDt, opB);
          }
       }
+
+      // Set inhomogeneous boundary value
+      this->setInhomogeneous(idx, opD);
    }
 
    template <typename TOperator,typename TData> void SparseOldImExTimestepper<TOperator,TData>::initMatrices(const MHDFloat lhsId, const MHDFloat rhsId, const int n)

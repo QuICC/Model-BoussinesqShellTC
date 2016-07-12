@@ -12,4 +12,5 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/SphericalVerticalFieldVisualizer.cpp
 )

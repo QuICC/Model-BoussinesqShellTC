@@ -62,6 +62,11 @@ namespace GeoMHDiSCC {
 
    void Simulation::mainRun()
    {
+      // Reset the profiler if needed
+      ProfilerMacro_printInfo();
+      ProfilerMacro_reset();
+      ProfilerMacro_init();
+
       StageTimer::stage("Starting simulation");
 
       // Start main loop of simulation
@@ -172,7 +177,7 @@ namespace GeoMHDiSCC {
       this->mDiagnostics.synchronize();
 
       // Init timestepper using clf/100 as starting timestep
-      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
 
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();

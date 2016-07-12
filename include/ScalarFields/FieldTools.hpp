@@ -24,7 +24,9 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
+#include "Enums/Arithmetics.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -45,6 +47,16 @@ namespace Datatypes {
           * @brief Create field data information
           */
          template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> static std::vector<std::tr1::tuple<int, int , T *> >  createInfo(TField<T,DIMENSION>& rField);
+
+         /**
+          * @brief Combine two field with arithmetic operation
+          */
+         template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> static void combine(TField<T,DIMENSION>& rRhs, const TField<T,DIMENSION>& lhs, const Arithmetics::Id arithId);
+
+         /**
+          * @brief Set field to negative
+          */
+         template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> static void negative(TField<T,DIMENSION>& rRhs);
          
       protected:
 
@@ -104,6 +116,27 @@ namespace Datatypes {
       }
 
       return fieldInfo;
+   }
+
+   template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> void FieldTools::combine(TField<T,DIMENSION>& rRhs, const TField<T,DIMENSION>& lhs, const Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::ADD || arithId == Arithmetics::SUB);
+
+      if(arithId == Arithmetics::ADD)
+      {
+         rRhs.addData(lhs.data());
+      } else if(arithId == Arithmetics::SUB)
+      {
+         rRhs.subData(lhs.data());
+      } else
+      {
+         throw Exception("Unknown arithmetic operation in combine!");
+      }
+   }
+
+   template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> void FieldTools::negative(TField<T,DIMENSION>& rRhs)
+   {
+      rRhs.rData() = -rRhs.data();
    }
 
 }

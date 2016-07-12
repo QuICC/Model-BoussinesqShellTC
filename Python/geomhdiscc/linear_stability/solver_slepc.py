@@ -23,7 +23,7 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
@@ -33,6 +33,7 @@ class GEVPSolver:
         self.euler = euler
         self.conv_idx = conv_idx
         self.spectrum_conv = spectrum_conv
+        self.geometry = geometry
 
         if shift_range is None:
             #self.shift_range = (1e-2, 0.2)
@@ -50,14 +51,15 @@ class GEVPSolver:
         """Create SLEPc's eigensolver"""
 
         opts = PETSc.Options()
-        opts["mat_mumps_icntl_14"] = 80
+        opts["mat_mumps_icntl_14"] = 200
         opts["mat_mumps_icntl_29"] = 2
+        opts["mat_mumps_cntl_1"] = 0.1
 
         if self.ellipse_radius is not None:
             opts['rg_type'] = 'ellipse'
             opts['rg_ellipse_center'] = 0
             opts['rg_ellipse_radius'] = self.ellipse_radius
-            opts['rg_ellipse_vscale'] = 1e0
+            opts['rg_ellipse_vscale'] = 1.0
 
         self.E = SLEPc.EPS()
         self.E.create()
@@ -113,18 +115,27 @@ class GEVPSolver:
         data = v.getArray()
         rstart, rend = v.getOwnershipRange()
         start = 0
-        par = [1, 0, 0]
-        gal = [2, 4, 2]
-        for i, sze in enumerate(sizes[0]):
-            for j in range(0, sze):
-                if start + j >= rstart and start + j < rend:
-                    if (j//(sizes[1][0]-gal[i]))%2 == par[i]:
+        if self.geometry in ['sphere_chebyshev', 'sphere_worland', 'shell']: 
+            par = [1, 0, 0]
+            gal = [2, 4, 2]
+            for i, sze in enumerate(sizes[0]):
+                for j in range(0, sze):
+                    if start + j >= rstart and start + j < rend:
+                        if (j//(sizes[1][0]-gal[i]))%2 == par[i]:
+                            data[start+j-rstart] = ((2*np.random.ranf() - 1.0)+(2*np.random.ranf() - 1.0)*1j)*10**(-10.0*(j)/float(sze))*10**(-10*(j%sizes[1][0])/float(sizes[1][0]))
+                        else:
+                            data[start+j-rstart] = 0.0
+                    elif start + j >= rend:
+                        break
+                start = start + sze
+        else:
+            for i, sze in enumerate(sizes[0]):
+                for j in range(0, sze):
+                    if start + j >= rstart and start + j < rend:
                         data[start+j-rstart] = ((2*np.random.ranf() - 1.0)+(2*np.random.ranf() - 1.0)*1j)*10**(-10.0*(j)/float(sze))*10**(-10*(j%sizes[1][0])/float(sizes[1][0]))
-                    else:
-                        data[start+j-rstart] = 0.0
-                elif start + j >= rend:
-                    break
-            start = start + sze
+                    elif start + j >= rend:
+                        break
+                start = start + sze
         Print("    Generated spectrum")
         v.createWithArray(data)
 
@@ -164,6 +175,22 @@ class GEVPSolver:
     def eigenvalues(self, system, nev, initial_vector = None):
         """Compute eigenvalues using SLEPc"""
 
+        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland']:
+            return self.eigenvalues_spherical(system, nev, initial_vector = initial_vector)
+        else:
+            return self.eigenvalues_simple(system, nev, initial_vector = initial_vector)
+
+    def eigenpairs(self, system, nev, initial_vector = None):
+        """Compute eigenpairs using SLEPc"""
+
+        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland']:
+            return self.eigenpairs_spherical(system, nev, initial_vector = initial_vector)
+        else:
+            return self.eigenpairs_simple(system, nev, initial_vector = initial_vector)
+
+    def eigenvalues_simple(self, system, nev, initial_vector = None):
+        """Compute eigenvalues using SLEPc"""
+
         pA, pB = self.petsc_operators(*system)
 
         self.update_eps(pA, pB, nev, system[-1], initial_vector = initial_vector)
@@ -180,30 +207,38 @@ class GEVPSolver:
         else:
             return None
 
-#    def eigenpairs(self, system, nev, initial_vector = None):
-#        """Compute eigenpairs using SLEPc"""
-#
-#        pA, pB = self.petsc_operators(*system)
-#
-#        self.update_eps(pA, pB, nev, initial_vector = initial_vector)
-#
-#        self.E.solve()
-#        nconv = self.E.getConverged()
-#
-#        if nconv >= nev:
-#            # Create the results vectors
-#            vr, wr = pA.getVecs()
-#            vi, wi = pA.getVecs()
-#            eigs = np.array(np.zeros(nev), dtype=complex)
-#            vects = []
-#            for i in range(nev):
-#                eigs[i] = self.E.getEigenpair(i, vr, vi)
-#                vects.append(vr + 1j*vi)
-#
-#            return (eigs, vects)
-#        else:
-#            return (None, None)
-    def eigenpairs(self, system, nev, initial_vector = None):
+    def eigenpairs_simple(self, system, nev, initial_vector = None):
+        """Compute eigenpairs using SLEPc"""
+
+        pA, pB = self.petsc_operators(*system)
+
+        self.update_eps(pA, pB, nev, system[-1], initial_vector = initial_vector)
+
+        self.E.solve()
+        nconv = self.E.getConverged()
+
+        if nconv >= nev:
+            # Create the results vectors
+            vr, wr = pA.getVecs()
+            vi, wi = pA.getVecs()
+            eigs = np.array(np.zeros(nev), dtype=complex)
+            vects = []
+            for i in range(nev):
+                eigs[i] = self.E.getEigenpair(i, vr, vi)
+                vects.append(vr + 1j*vi)
+
+            return (eigs, vects)
+        else:
+            return (None, None)
+
+    def eigenvalues_spherical(self, system, nev, initial_vector = None):
+        """Compute eigenvalues using SLEPc"""
+        
+        pair = self.eigenpairs(system, nev, initial_vector = initial_vector)
+
+        return pair[0]
+
+    def eigenpairs_spherical(self, system, nev, initial_vector = None):
         """Compute eigenpairs using SLEPc"""
 
         pA, pB = self.petsc_operators(*system)

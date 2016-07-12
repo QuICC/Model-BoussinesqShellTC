@@ -112,13 +112,13 @@ namespace IoVariable {
       Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
+      coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
       // Compute |f|^2
       rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+      coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mEnergy = 0.0;
@@ -179,9 +179,7 @@ namespace IoVariable {
       // Abort if kinetic energy is NaN
       if(std::isnan(this->mEnergy))
       {
-         #ifdef GEOMHDISCC_MPI
-            MPI_Abort(MPI_COMM_WORLD, 99);
-         #endif //GEOMHDISCC_MPI
+         FrameworkMacro::abort(99);
 
          throw Exception("Scalar energy is NaN!");
       }

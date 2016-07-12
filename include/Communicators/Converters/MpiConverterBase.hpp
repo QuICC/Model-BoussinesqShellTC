@@ -32,6 +32,7 @@
 #include "Enums/TransformDirection.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "Communicators/Converters/IConverter.hpp"
+#include "Communicators/Converters/MpiConverterTools.hpp"
 #include "Communicators/CommunicationBuffer.hpp"
 
 namespace GeoMHDiSCC {
@@ -44,6 +45,14 @@ namespace Parallel {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class MpiConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>
    {
       public:
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            typedef SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > SharedFwdBufferType;
+            typedef SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > SharedBwdBufferType;
+         #else
+            typedef SharedPtrMacro<CommunicationBuffer<char> > SharedFwdBufferType;
+            typedef SharedPtrMacro<CommunicationBuffer<char> > SharedBwdBufferType;
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+
          /**
           * @brief Constructor
           */
@@ -60,7 +69,7 @@ namespace Parallel {
           * @brief spFwd Forward communication buffers
           * @brief spBwd Backward communication buffers
           */
-         void setBuffers(SharedCommunicationBuffer spFwd, SharedCommunicationBuffer spBwd);
+         void setBuffers(SharedFwdBufferType spFwd, SharedBwdBufferType spBwd);
 
          /**
           * @brief Get forward buffer sizes
@@ -74,75 +83,14 @@ namespace Parallel {
          
       protected:
          /**
-          * @brief Reset Receive positions
+          * @brief Reset Fwd buffer positions
           */
-         void resetRecvPositions();
+         void resetFwdPositions();
 
          /**
-          * @brief Reset Send positions
+          * @brief Reset Bwd buffer positions
           */
-         void resetSendPositions();
-
-         /**
-          * @brief Get a pointer to the receive backward requests
-          *
-          * @param size Pack size of the requested request
-          */
-         MPI_Request * pRecvBRequests(const int size);
-
-         /**
-          * @brief Get a pointer to the receive forward requests
-          *
-          * @param size Pack size of the requested request
-          */
-         MPI_Request * pRecvFRequests(const int size);
-
-         /**
-          * @brief Get a pointer to the send backward requests
-          *
-          * @param size Pack size of the requested request
-          */
-         MPI_Request * pSendBRequests(const int size);
-
-         /**
-          * @brief Get a pointer to the send forward requests
-          *
-          * @param size Pack size of the requested request
-          */
-         MPI_Request * pSendFRequests(const int size);
-
-         /**
-          * @brief Get ring recv source for id
-          *
-          * @param id   ID of the CPU
-          * @param ref  ID of the reference CPU
-          * @param size Size of the CPU group
-          */
-         int  recvSrc(const int id, const int ref, const int size) const;
-
-         /**
-          * @brief Get ring send destination for id
-          *
-          * @param id   ID of the CPU
-          * @param ref  ID of the reference CPU
-          * @param size Size of the CPU group
-          */
-         int  sendDest(const int id, const int ref, const int size) const;
-
-         /**
-          * @brief Initialise the positions
-          */
-         void initPositions();
-
-         /**
-          * @brief Setup the MPI communication requests requests
-          */
-         void setupRequests(const Dimensions::Transform::Id transId);
-
-         /**
-          * @brief Cleanup the MPI communication requests
-          */
-         void cleanupRequests();
+         void resetBwdPositions();
 
          /**
           * @brief Size of the forward packet
@@ -169,28 +117,23 @@ namespace Parallel {
          int nBCpu() const;
 
          /**
-          * @brief Get global MPI rank of CPU from forward CPU group
+          * @brief Get MPI rank of CPU from forward CPU group
           *
           * @param id CPU group id
           */
          int fCpu(const int id) const;
 
          /**
-          * @brief Get global MPI rank of CPU from backward CPU group
+          * @brief Get MPI rank of CPU from backward CPU group
           *
           * @param id CPU group id
           */
          int bCpu(const int id) const;
 
          /**
-          * @brief Sending communication status
+          * @brief Keep empty communcations?
           */
-         bool  mIsSending;
-
-         /**
-          * @brief Receiving communication status
-          */
-         bool  mIsReceiving;
+         bool mNeedEmptyComm;
 
          /**
           * @brief Communication packs counter
@@ -198,29 +141,14 @@ namespace Parallel {
          int mPacks;
 
          /**
-          * @brief Active operations are for forward direction
+          * @brief Direction of operations
           */
-         TransformDirection::Id   mActiveDirection;
+         TransformDirection::Id   mDirection;
 
          /**
-          * @brief The number of packs in the "previous/active" send operations
+          * @brief Transform ID
           */
-         int   mActiveSend;
-
-         /**
-          * @brief The number of packs in the "previous/active" receive operations
-          */
-         int   mActiveReceive;
-
-         /**
-          * @brief Storage for the receive position pointers
-          */
-         std::vector<int>  mRecvPositions;
-
-         /**
-          * @brief Storage for the send position pointers
-          */
-         std::vector<int>  mSendPositions;
+         Dimensions::Transform::Id mTraId;
 
          /**
           * @brief List of CPU ranks involved in the forward conversion
@@ -235,12 +163,12 @@ namespace Parallel {
          /**
           * @brief Forward communication
           */
-         SharedCommunicationBuffer mspFBuffers;
+         SharedFwdBufferType mspFBuffers;
 
          /**
           * @brief Backward communication buffer pointer
           */
-         SharedCommunicationBuffer mspBBuffers;
+         SharedBwdBufferType mspBBuffers;
 
          /**
           * @brief List of the forward buffer sizes
@@ -262,26 +190,34 @@ namespace Parallel {
           */
          ArrayI   mBackwardPacks;
 
+         #if defined GEOMHDISCC_MPIPACK_MANUAL
+            /**
+             * @brief Storage for the forward datatypes
+             */
+            std::vector<std::vector<typename MpiConverterTools<TFwdA::FieldDimension>::Coordinate> >  mFTypes;
+
+            /**
+             * @brief Storage for the backward datatypes
+             */
+            std::vector<std::vector<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> > mBTypes;
+
+         #else
+            /**
+             * @brief Storage for the forward datatypes
+             */
+            std::vector<MPI_Datatype>  mFTypes;
+
+            /**
+             * @brief Storage for the backward datatypes
+             */
+            std::vector<MPI_Datatype> mBTypes;
+         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+
       private:
          /**
-          * @brief Storage for the non blocking communication requests: Recv F
+          * @brief Cleanup the data types
           */
-         std::map<int, std::vector<MPI_Request> >  mRecvFRequests;
-
-         /**
-          * @brief Storage for the non blocking communication requests: Recv B
-          */
-         std::map<int, std::vector<MPI_Request> >  mRecvBRequests;
-
-         /**
-          * @brief Storage for the non blocking communication requests: Send F
-          */
-         std::map<int, std::vector<MPI_Request> >  mSendFRequests;
-
-         /**
-          * @brief Storage for the non blocking communication requests: Send B
-          */
-         std::map<int, std::vector<MPI_Request> >  mSendBRequests;
+         void cleanupTypes();
    };
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline const std::vector<int>& MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::fwdSizes() const
@@ -294,7 +230,7 @@ namespace Parallel {
       return this->mBSizes;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(SharedCommunicationBuffer spFwd, SharedCommunicationBuffer spBwd)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(typename MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::SharedFwdBufferType spFwd, typename MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::SharedBwdBufferType spBwd)
    {
       // Set the forward buffers
       this->mspFBuffers = spFwd;
@@ -332,282 +268,47 @@ namespace Parallel {
    {
       return this->mPacks*this->mBSizes.at(id);
    }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pRecvBRequests(const int size)
-   {
-      return &(this->mRecvBRequests.at(size).front());
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pRecvFRequests(const int size)
-   {
-      return &(this->mRecvFRequests.at(size).front());
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pSendBRequests(const int size)
-   {
-      return &(this->mSendBRequests.at(size).front());
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pSendFRequests(const int size)
-   {
-      return &(this->mSendFRequests.at(size).front());
-   }
       
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::MpiConverterBase()
-      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>(), mIsSending(false), mIsReceiving(false), mPacks(0), mActiveSend(0), mActiveReceive(0)
+      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>(), mNeedEmptyComm(false), mPacks(0)
    {
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::~MpiConverterBase()
    {
-      // Cleanup the requests memory
-      this->cleanupRequests();
+      // Cleanup mpi datatypes 
+      void cleanupTypes();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetFwdPositions()
    {
-      // Get maximum position size
-      int maxSize = std::max(this->nFCpu(), this->nBCpu());
-
-      // Initialise the position values
-      for(int i = 0; i < maxSize; ++i)
-      {
-         this->mRecvPositions.push_back(0);
-
-         this->mSendPositions.push_back(0);
-      }
+      this->mspFBuffers->resetPositions();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetRecvPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetBwdPositions()
    {
-      // Create position iterator
-      std::vector<int>::iterator it;
-
-      // Reset all positions to zero
-      for(it = this->mRecvPositions.begin(); it != this->mRecvPositions.end(); ++it)
-      {
-         (*it) = 0;
-      }
+      this->mspBBuffers->resetPositions();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetSendPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::cleanupTypes()
    {
-      // Create position iterator
-      std::vector<int>::iterator it;
+      #if defined GEOMHDISCC_MPIPACK_MANUAL
+         // No cleanup is required
+         
+      #else
+         // Cleanup the F Types
+         typename std::vector<MPI_Datatype>::iterator  it;
 
-      // Reset all positions to zero
-      for(it = this->mSendPositions.begin(); it != this->mSendPositions.end(); ++it)
-      {
-         (*it) = 0;
-      }
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendDest(const int id, const int ref, const int size) const
-   {
-      // Create send ring
-      return ((id + 1 + ref) % size);
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::recvSrc(const int id, const int ref, const int size) const
-   {
-      // Create recv ring
-      return ((size - 1 - id + ref) % size);
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests(const Dimensions::Transform::Id transId)
-   {
-      // Storage for global location flags
-      int dest;
-      int src;
-      int tag;
-      // Storage for CPU group location flags
-      int grpMe;
-      int grpDest;
-      int grpSrc;
-
-      // Shift tag to produce unique tag in 2D distribution
-      int tagShift = 0;
-      if(transId == Dimensions::Transform::TRA2D)
-      {
-         tagShift = 0;
-      } else if(transId == Dimensions::Transform::TRA3D)
-      {
-         tagShift = FrameworkMacro::nCpu();
-      } else
-      {
-         MPI_Abort(MPI_COMM_WORLD, 999);
-      }
-
-      // Storage for the number of packs
-      int packs;
-
-      // Initialise forward transform requests
-      for(int k = 0; k < this->mForwardPacks.size(); ++k)
-      {
-         // Get the pack size
-         packs = this->mForwardPacks(k);
-
-         // Initialise receive forward with empty requests
-         this->mRecvFRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
-         for(int id = 0; id < this->nFCpu(); ++id)
+         for(it = this->mFTypes.begin(); it != this->mFTypes.end(); ++it)
          {
-            this->mRecvFRequests.at(packs).push_back(MPI_REQUEST_NULL);
+            MPI_Type_free(&(*it));
          }
 
-         // Initialise send backward with empty requests
-         this->mSendBRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
-         for(int id = 0; id < this->nBCpu(); ++id)
+         for(it = this->mBTypes.begin(); it != this->mBTypes.end(); ++it)
          {
-            this->mSendBRequests.at(packs).push_back(MPI_REQUEST_NULL);
+            MPI_Type_free(&(*it));
          }
-
-         // Create receive forward requests
-         for(int id = 0; id < this->nFCpu(); ++id)
-         {
-            // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::id()));
-
-            // Get source index in CPU group
-            grpSrc = this->recvSrc(id, grpMe, this->nFCpu());
-
-            // Get global MPI source rank
-            src = this->fCpu(grpSrc);
-
-            // Set shifted MPI tag to make it unique
-            tag = src + tagShift;
-
-            //Safety asserts
-            assert(static_cast<size_t>(grpSrc) < this->mFSizes.size());
-            assert(static_cast<size_t>(grpSrc) < this->mRecvFRequests.at(packs).size());
-
-            // initialise the Recv request
-            MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvFRequests.at(packs).at(grpSrc)));
-         }
-
-         // Create send backward requests
-         for(int id = 0; id < this->nBCpu(); ++id)
-         {
-            // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
-
-            // Set shifted MPI tag to make it unique
-            tag = FrameworkMacro::id() + tagShift;
-
-            // Get destination index in CPU group
-            grpDest = this->sendDest(id, grpMe, this->nBCpu());
-
-            // Get global MPI destination rank
-            dest = this->bCpu(grpDest);
-
-            //Safety asserts
-            assert(static_cast<size_t>(grpDest) < this->mBSizes.size());
-            assert(static_cast<size_t>(grpDest) < this->mSendBRequests.at(packs).size());
-
-            // initialise the Send request
-            MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendBRequests.at(packs).at(grpDest)));
-         }
-      }
-
-      // Initialise backward transform requests
-      for(int k = 0; k < this->mBackwardPacks.size(); ++k)
-      {
-         // Get the pack size
-         packs = this->mBackwardPacks(k);
-
-         // Initialise receive backward with empty requests
-         this->mRecvBRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
-         for(int id = 0; id < this->nBCpu(); ++id)
-         {
-            this->mRecvBRequests.at(packs).push_back(MPI_REQUEST_NULL);
-         }
-
-         // Initialise send forward with empty requests
-         this->mSendFRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
-         for(int id = 0; id < this->nFCpu(); ++id)
-         {
-            this->mSendFRequests.at(packs).push_back(MPI_REQUEST_NULL);
-         }
-
-         // Create receive backward requests
-         for(int id = 0; id < this->nBCpu(); ++id)
-         {
-            // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
-
-            // Get source index in CPU group
-            grpSrc = this->recvSrc(id, grpMe, this->nBCpu());
-
-            // Get global MPI source rank
-            src = this->bCpu(grpSrc);
-
-            // Set shifted MPI tag to make it unique
-            tag = src + tagShift;
-
-            // initialise the Recv request
-            MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvBRequests.at(packs).at(grpSrc)));
-         }
-
-         // Create send forward requests
-         for(int id = 0; id < this->nFCpu(); ++id)
-         {
-            // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::id()));
-
-            // Set shifted MPI tag to make it unique
-            tag = FrameworkMacro::id() + tagShift;
-
-            // Get destination index in CPU group
-            grpDest = this->sendDest(id, grpMe, this->nFCpu());
-
-            // Get global MPI destination rank
-            dest = this->fCpu(grpDest);
-
-            // initialise the Send request
-            MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendFRequests.at(packs).at(grpDest)));
-         }
-      }
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::cleanupRequests()
-   {
-      // Create iterator
-      std::map<int, std::vector<MPI_Request> >::iterator it;
-
-      // Free requests from Recv B
-      for(it = this->mRecvBRequests.begin(); it != this->mRecvBRequests.end(); it++)
-      {
-         for(unsigned int i = 0; i < (*it).second.size(); ++i)
-         {
-            MPI_Request_free(&((*it).second.at(i)));
-         }
-      }
-
-      // Free requests from Recv F
-      for(it = this->mRecvFRequests.begin(); it != this->mRecvFRequests.end(); it++)
-      {
-         for(unsigned int i = 0; i < (*it).second.size(); ++i)
-         {
-            MPI_Request_free(&((*it).second.at(i)));
-         }
-      }
-
-      // Free requests from Send B
-      for(it = this->mSendBRequests.begin(); it != this->mSendBRequests.end(); it++)
-      {
-         for(unsigned int i = 0; i < (*it).second.size(); ++i)
-         {
-            MPI_Request_free(&((*it).second.at(i)));
-         }
-      }
-
-      // Free requests from Send F
-      for(it = this->mSendFRequests.begin(); it != this->mSendFRequests.end(); it++)
-      {
-         for(unsigned int i = 0; i < (*it).second.size(); ++i)
-         {
-            MPI_Request_free(&((*it).second.at(i)));
-         }
-      }
+      #endif //defined GEOMHDISCC_MPIPACK_MANUAL
    }
 
 }

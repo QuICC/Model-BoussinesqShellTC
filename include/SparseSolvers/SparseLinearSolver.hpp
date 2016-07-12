@@ -36,6 +36,10 @@ namespace Solver {
       void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
 
       void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat);
+
+      void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr);
+
+      template <typename TData, typename TCorr> void addCorrection(TData& rVal, const TCorr& corr);
    }
 
    /**
@@ -148,6 +152,26 @@ namespace Solver {
          TData& rSolution(const int idx);
 
          /**
+          * @brief Get inhomogeneous boundary condition
+          *
+          * @param idx   Index of the condition
+          */
+         const Eigen::SparseMatrix<typename TData::Scalar>& inhomogeneous(const int idx) const;
+
+         /**
+          * @brief Set inhomogeneous boundary condition
+          *
+          * @param idx  Index of the data
+          * @param opD  Inhomogeneous operator
+          */
+         void setInhomogeneous(const int idx, const DecoupledZSparse& opD);
+
+         /**
+          * @brief Add inhomogeneous boundary condition to RHS data
+          */
+         void addInhomogeneous();
+
+         /**
           * @brief Computation error
           */
          virtual MHDFloat error() const;
@@ -186,6 +210,11 @@ namespace Solver {
          std::vector<TData>  mSolution;
 
          /**
+          * @brief Storage for inhomogeneous boundary conditions
+          */
+         std::vector<Eigen::SparseMatrix<typename TData::Scalar> >  mInhomogeneous;
+
+         /**
           * @brief Create sparse solvers
           */
          std::map<MHDFloat,std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > > >  mSolver;
@@ -215,6 +244,17 @@ namespace Solver {
    template <typename TOperator,typename TData> bool SparseLinearSolver<TOperator,TData>::preSolve()
    {
       return true;
+   }
+
+   template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::addInhomogeneous()
+   {
+      for(size_t i = 0; i < this->mRHSData.size(); i++)
+      {
+         if(this->mInhomogeneous.at(i).nonZeros() > 0)
+         {
+            Solver::internal::addCorrection(this->mRHSData.at(i), this->mInhomogeneous.at(i));
+         }
+      }
    }
 
    template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::solve()
@@ -252,7 +292,7 @@ namespace Solver {
    template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::zeroSolver()
    {
       // Set solver RHS to zero
-      for(int i = 0; i < this->mRHSData.size(); ++i)
+      for(unsigned int i = 0; i < this->mRHSData.size(); ++i)
       {
          this->mRHSData.at(i).setZero();
       }
@@ -362,6 +402,10 @@ namespace Solver {
       // Add storage for solution
       this->mSolution.push_back(TData(rows,cols));
       this->mSolution.back().setZero();
+
+      // Add storage for solution
+      this->mInhomogeneous.push_back(Eigen::SparseMatrix<typename TData::Scalar>(rows,cols));
+      this->mInhomogeneous.back().setZero();
    }
 
    template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const int size)
@@ -393,6 +437,29 @@ namespace Solver {
    template <typename TOperator,typename TData> TData& SparseLinearSolver<TOperator,TData>::rSolution(const int idx)
    {
       return this->mSolution.at(idx);
+   }
+
+   template <typename TOperator,typename TData> const Eigen::SparseMatrix<typename TData::Scalar>& SparseLinearSolver<TOperator,TData>::inhomogeneous(const int idx) const
+   {
+      return this->mInhomogeneous.at(idx);
+   }
+
+   template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::setInhomogeneous(const int idx, const DecoupledZSparse& opD)
+   {
+      if(opD.real().nonZeros() > 0 || opD.imag().nonZeros() > 0)
+      {
+         DecoupledZSparse tmp = opD;
+         if(opD.real().nonZeros() == 0)
+         {
+            tmp.real().resize(this->mInhomogeneous.at(idx).rows(), this->mInhomogeneous.at(idx).cols());
+         }
+
+         if(opD.imag().nonZeros() == 0)
+         {
+            tmp.imag().resize(this->mInhomogeneous.at(idx).rows(), this->mInhomogeneous.at(idx).cols());
+         }
+         Solver::internal::addOperators(this->mInhomogeneous.at(idx), 1.0, tmp);
+      }
    }
 
    namespace internal {
@@ -428,6 +495,24 @@ namespace Solver {
          {
             mat += decMat.real().cast<MHDComplex>() + Math::cI*decMat.imag();
          }
+      }
+
+      inline void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr)
+      {
+         assert(rVal.real().rows() > 0);
+         assert(rVal.real().cols() > 0);
+         assert(rVal.imag().rows() > 0);
+         assert(rVal.imag().cols() > 0);
+         assert(rVal.real().rows() == rVal.imag().rows());
+         assert(rVal.real().cols() == rVal.imag().cols());
+
+         rVal.real() += corr.real();
+         rVal.imag() += corr.imag();
+      }
+
+      template <typename TData, typename TCorr> inline void addCorrection(TData& rVal, const TCorr& corr)
+      {
+         rVal += corr;
       }
    }
 }

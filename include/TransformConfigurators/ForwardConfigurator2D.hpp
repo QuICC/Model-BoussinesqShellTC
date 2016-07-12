@@ -23,7 +23,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
@@ -44,21 +44,21 @@ namespace Transform {
           * @param spEquation Equation providing the nonlinear computation
           * @param coord      Transform coordinator
           */
-         static void nonlinearTerm(const IntegratorTree& tree, Equations::SharedIEquation spEquation, TransformCoordinatorType& coord);
+         static void nonlinearTerm(const TransformTree& tree, Equations::SharedIEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the first dimension
           *
           * @param coord   Transform coordinator
           */
-         static void integrate1D(const IntegratorSpecEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
+         static void integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the last dimension
           *
           * @param coord   Transform coordinator
           */
-         static void integrateND(const IntegratorPhysEdge& edge, TransformCoordinatorType& coord, const bool hold);
+         static void integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
           * @brief Update variable values from dealiased data
@@ -66,7 +66,7 @@ namespace Transform {
           * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void updateEquation(const IntegratorSpecEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold);
+         template <typename TSharedEquation> static void updateEquation(const TransformTreeEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor
@@ -81,7 +81,7 @@ namespace Transform {
       private: 
    };
 
-   template <typename TSharedEquation> void ForwardConfigurator2D::updateEquation(const IntegratorSpecEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
+   template <typename TSharedEquation> void ForwardConfigurator2D::updateEquation(const TransformTreeEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
@@ -90,12 +90,12 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
-      spEquation->updateDealiasedUnknown(rInVar, edge.specId(), edge.arithId());
+      spEquation->updateDealiasedUnknown(rInVar, edge.outId<FieldComponents::Spectral::Id>(), edge.arithId());
 
       // Hold temporary storage
-      if(hold)
+      if(edge.combinedOutId() >= 0)
       {
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(rInVar);
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rInVar, edge.combinedOutId());
 
       // Free the temporary storage
       } else

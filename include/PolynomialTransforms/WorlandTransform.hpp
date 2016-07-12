@@ -1,6 +1,6 @@
 /** 
  * @file WorlandTransform.hpp
- * @brief Implementation of the Worland transform
+ * @brief Implementation of the Worland transform in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -27,7 +27,6 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
-#include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
 
@@ -36,7 +35,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief Simple struct holding details about ChebyshevFFT transform
+    * @brief Simple struct holding details about Worland transform
     */
    struct WorlandIds {
 
@@ -45,8 +44,15 @@ namespace Transform {
        */
       struct Projectors
       {
-         /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         /** Enum of projector IDs
+          *    - PROJ: projection
+          *    - DIVR: 1/r
+          *    - DIFF: D
+          *    - DIFFR: D r
+          *    - DIVRDIFFR: 1/r D r
+          *    - SLAPL: spherical laplacian: D^2 + 2/r D - l(l+1)/r^2
+          */
+         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL};
       };
 
       /**
@@ -54,14 +60,23 @@ namespace Transform {
        */
       struct Integrators
       {
-         /// Enum of integrator IDs
-         enum Id {INTG};
+         /**
+          * Enum of integrator IDs
+          *    - INTG: integration
+          *    - INTGR: integration of r
+          *    - INTGQ4: integration of QST Q component for Poloidal NL (4th order equation)
+          *    - INTGS4: integration of QST S component for Poloidal NL (4th order equation)
+          *    - INTGT: integration of QST T component for Toroidal NL (2nd order equation)
+          *    - INTGQ2: integration of QST Q component for Poloidal NL (2nd order equation)
+          *    - INTGS2: integration of QST S component for Poloidal NL (2nd order equation)
+          */
+         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
       };
 
    };
 
    /**
-    * @brief Implementation of the FFTW transform for a Chebyshev expansion
+    * @brief Implementation of the Worland transform in a sphere
     */ 
    class WorlandTransform
    {
@@ -121,10 +136,8 @@ namespace Transform {
           * @param rSpecVal   Output spectral coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         void integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute polynomial projection
@@ -132,10 +145,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param specVal    Input spectral coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector);
+         void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -148,19 +159,19 @@ namespace Transform {
 
       private:
          /**
-          * @brief Initialise the quadrature points and weights
+          * @brief Initialise the operators
           */
-         void initQuadrature();
+         void initOperators();
 
          /**
-          * @brief Initialise the projector
+          * @brief Compute integration with vector of operators
           */
-         void initProjector();
+         void setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
 
          /**
-          * @brief Initialise the derivative
+          * @brief Compute projection with vector of operators
           */
-         void initDerivative();
+         void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1]
@@ -178,83 +189,15 @@ namespace Transform {
          SharedPolySetup    mspSetup;
 
          /**
-          * @brief Projector matrix
+          * @brief Storage for the projector operators 
           */
-         std::vector<Matrix>  mProjector;
+         std::map<ProjectorType::Id,std::vector<Matrix> >  mProjOp;
 
          /**
-          * @brief Derivative matrix
+          * @brief Storage for the integrator operators 
           */
-         std::vector<Matrix>  mDerivative;
+         std::map<IntegratorType::Id,std::vector<Matrix> >  mIntgOp;
    };
-
-   template <Arithmetics::Id TOperation> void WorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, WorlandTransform::IntegratorType::Id integrator)
-   {
-      //
-      /// \mhdBug Implementation should work but is probably slow!
-      //
-      
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rSpecVal.cols() == this->mspSetup->howmany());
-
-      // Compute integration
-      int start = 0;
-      int physRows = this->mspSetup->fwdSize(); 
-      for(size_t i = 0; i < this->mProjector.size(); i++)
-      {
-         int cols = this->mspSetup->mult()(i);
-         int specRows = this->mProjector.at(i).cols();
-         rSpecVal.block(0, start, specRows, cols) = this->mProjector.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
-         start += cols;
-      }
-   }
-
-   template <Arithmetics::Id TOperation> void WorlandTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, WorlandTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // assert right sizes for input  matrix
-      assert(specVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Compute first derivative
-      if(projector == WorlandTransform::ProjectorType::DIFF)
-      {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDerivative.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDerivative.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDerivative.at(i)*specVal.block(0,start, specRows, cols);
-            start += cols;
-         }
-
-      // Compute simple projection
-      } else
-      {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mProjector.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProjector.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mProjector.at(i)*specVal.block(0,start, specRows, cols);
-            start += cols;
-         }
-      }
-   }
 
 }
 }

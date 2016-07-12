@@ -27,10 +27,25 @@ namespace Debug {
 
    void SerialProfiler::init()
    {
-      for(int i = 0; i < ProfilerBase::NBREAKPOINT; i++)
+      for(int i = 0; i < static_cast<int>(ProfilerBase::NBREAKPOINT); i++)
       {
          t_starts.insert(std::make_pair(static_cast<ProfilerBase::BreakPoint>(i), timespec()));
          t_stops.insert(std::make_pair(static_cast<ProfilerBase::BreakPoint>(i), timespec()));
+      }
+   }
+
+   void SerialProfiler::reset()
+   {
+      ProfilerBase::reset();
+
+      for(std::map<ProfilerBase::BreakPoint, timespec>::iterator it = t_starts.begin(); it != t_starts.end(); ++it)
+      {
+         it->second = timespec();
+      }
+
+      for(std::map<ProfilerBase::BreakPoint, timespec>::iterator it = t_stops.begin(); it != t_stops.end(); ++it)
+      {
+         it->second = timespec();
       }
    }
 
@@ -55,13 +70,18 @@ namespace Debug {
       return static_cast<MHDFloat>(t2.tv_sec - t1.tv_sec) + static_cast<MHDFloat>(t2.tv_nsec - t1.tv_nsec)/1.0e9;
    }
 
-   void SerialProfiler::analyze(Array& ts, Array& min, Array& max)
+   void SerialProfiler::getTimings(Array& ts)
    {
-      ts.resize(ProfilerBase::NBREAKPOINT);
+      ts.resize(static_cast<int>(ProfilerBase::NBREAKPOINT));
       for(int i = 0; i < ts.size(); ++i)
       {
          ts(i) = ProfilerBase::time(static_cast<ProfilerBase::BreakPoint>(i));
       }
+   }
+
+   void SerialProfiler::analyze(Array& ts, Array& min, Array& max)
+   {
+      SerialProfiler::getTimings(ts);
 
       min.resize(0);
       max.resize(0);

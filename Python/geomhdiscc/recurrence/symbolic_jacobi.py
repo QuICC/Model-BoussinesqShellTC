@@ -81,7 +81,10 @@ class SymbolicJacobi(base.SymbolicBase):
                     recurrence[-i] = old[i].subs(n, n-i)
 
             for i in recurrence.keys():
-                recurrence[i] = recurrence[i].simplify().factor()
+                if self.useSimplify:
+                    recurrence[i] = recurrence[i].simplify().factor()
+                else:
+                    recurrence[i] = recurrence[i].factor()
         return recurrence
 
     def spectral_increase(self, f, asrow):
@@ -116,7 +119,10 @@ class SymbolicJacobi(base.SymbolicBase):
                 recurrence[-i] = old[i].subs(n, n-i)
 
         for i in recurrence.keys():
-            recurrence[i] = recurrence[i].simplify().factor()
+            if self.useSimplify:
+                recurrence[i] = recurrence[i].simplify().factor()
+            else:
+                recurrence[i] = recurrence[i].factor()
 
         return recurrence
 
@@ -152,7 +158,10 @@ class SymbolicJacobi(base.SymbolicBase):
                 recurrence[-i] = old[i].subs(n, n-i)
 
         for i in recurrence.keys():
-            recurrence[i] = recurrence[i].simplify().factor()
+            if self.useSimplify:
+                recurrence[i] = recurrence[i].simplify().factor()
+            else:
+                recurrence[i] = recurrence[i].factor()
 
         return recurrence
 
@@ -203,5 +212,8 @@ class SymbolicJacobi(base.SymbolicBase):
                     recurrence[-i] = old[i].subs(n, n-i)
 
             for i in recurrence.keys():
-                recurrence[i] = recurrence[i].simplify().factor()
+                if self.useSimplify:
+                    recurrence[i] = recurrence[i].simplify().factor()
+                else:
+                    recurrence[i] = recurrence[i].factor()
         return recurrence

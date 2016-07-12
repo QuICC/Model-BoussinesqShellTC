@@ -75,7 +75,7 @@ namespace Parallel {
                #endif //GEOMHDISCC_MPIALGO_SINGLE1D
 
                #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
-                  // Add the single splitting algorithm for first data exchange
+                  // Add the single splitting algorithm for first data exchange for coupled dimensions
                   this->mAlgorithms.push_back(SharedSplittingAlgorithm(new Coupled2DSplitting(this->mId, this->mNCpu, dim)));
                #endif //GEOMHDISCC_MPIALGO_COUPLED2D
 
@@ -187,7 +187,7 @@ namespace Parallel {
    void LoadSplitter::describeSplitting(const SplittingDescription& descr, const bool isTest) const
    {
       // Output a short description of the selected splitting. Make it look nice ;)
-      if(this->mId == 0)
+      if(FrameworkMacro::allowsIO())
       {
          if(isTest)
          {
@@ -283,6 +283,9 @@ namespace Parallel {
 
          IoTools::Formatter::printNewline(std::cout);
       }
+
+      // Synchronize
+      FrameworkMacro::synchronize();
    }
 
    void LoadSplitter::showSplittings(const int n) const

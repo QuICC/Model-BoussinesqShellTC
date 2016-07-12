@@ -9,8 +9,11 @@ import copy
 import geomhdiscc.recurrence.symbolic_base as base
 
 class SymbolicChebyshev(base.SymbolicBase):
+    """Class to compute the symbolic recurrence relation for a Chebyshev expansion"""
 
     def spectral_monomial(self, p, f, asrow = True):
+        """Recurrence relation for the multiplication by a monomial of a Chebyshev expansion"""
+
         # Some assertion for safety
         assert (p >= 0)
 
@@ -26,9 +29,12 @@ class SymbolicChebyshev(base.SymbolicBase):
                 recurrence[i+1] = recurrence.get(i+1,0) + sympy.Rational(1,2)*prev[i]
             for i in recurrence.keys():
                 recurrence[i] = recurrence[i].simplify().factor()
+
         return recurrence
 
     def spectral_integral(self, q, f, asrow = True):
+        """Recurrence relation for the indefinite integral of a Chebyshev expansion"""
+
         # Some assertion for safety
         assert (q >= 0)
 
@@ -53,9 +59,12 @@ class SymbolicChebyshev(base.SymbolicBase):
 
             for i in recurrence.keys():
                 recurrence[i] = recurrence[i].simplify().factor()
+
         return recurrence
 
     def change_variable(self, terms, type):
+        """Compute change of variable from r = [0, 1] to x = [-1,1]"""
+
         new_terms = []
         if type == 'linear_r2x':
             a, b, x = sympy.symbols('a b x')

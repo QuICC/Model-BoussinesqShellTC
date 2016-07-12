@@ -16,6 +16,10 @@
 //
 #include "FastTransforms/ShellChebyshevFftwTransform.hpp"
 
+// Configuration includes
+//
+#include "Profiler/ProfilerMacro.h"
+
 // Project includes
 //
 #include "StaticAsserts/StaticAssert.hpp"
@@ -250,6 +254,8 @@ namespace Transform {
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR)->second, pValue);
       Py_DECREF(pValue);
+      // Rescale first row to create SPD matrix (due to c_0 in Chebyshev expansion)
+      this->mSolveOp.find(ProjectorType::DIVR)->second.row(0) *= 0.5;
 
       // Call r2 for solver
       PythonWrapper::setFunction("r2");
@@ -257,21 +263,33 @@ namespace Transform {
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR2)->second, pValue);
       Py_DECREF(pValue);
+      // Rescale first row to create SPD matrix (due to c_0 in Chebyshev expansion)
+      this->mSolveOp.find(ProjectorType::DIVR2)->second.row(0) *= 0.5;
 
-      // Call d1 for solver
+      // Call i1 for solver
+      // Change resolution
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize()+1);
+      PyTuple_SetItem(pArgs, 0, pValue);
       // ... change boundary condition to zero last modes
       pValue = PyTuple_GetItem(pArgs, 3);
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
+      PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(1));
       PythonWrapper::setFunction("i1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF)->second, pValue);
       Py_DECREF(pValue);
 
-      // Call d2 for solver
+      // Call i2 for solver
+      // Change resolution
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize()+2);
+      PyTuple_SetItem(pArgs, 0, pValue);
       // ... change boundary condition to zero last modes
       pValue = PyTuple_GetItem(pArgs, 3);
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(992));
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2));
+      PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(2));
       PythonWrapper::setFunction("i2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
@@ -282,42 +300,42 @@ namespace Transform {
       this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
       this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
 
-      // Initialize solver and factorize division by R operator
-      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIVR, pSolver));
-      this->mSolver.find(ProjectorType::DIVR)->second->compute(this->mSolveOp.find(ProjectorType::DIVR)->second);
+      // Initialize solver and factorize division by R operator (SPD)
+      SharedPtrMacro<Solver::SparseSpdSelector<SparseMatrix>::Type>  pSpdSolver(new Solver::SparseSpdSelector<SparseMatrix>::Type());
+      this->mSpdSolver.insert(std::make_pair(ProjectorType::DIVR, pSpdSolver));
+      this->mSpdSolver.find(ProjectorType::DIVR)->second->compute(this->mSolveOp.find(ProjectorType::DIVR)->second);
       // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIVR)->second->info() != Eigen::Success)
+      if(this->mSpdSolver.find(ProjectorType::DIVR)->second->info() != Eigen::Success)
       {
          throw Exception("Factorization of backward division by R failed!");
       }
 
-      // Initialize solver and factorize division by R^2 operator
-      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIVR2, pSolver));
-      this->mSolver.find(ProjectorType::DIVR2)->second->compute(this->mSolveOp.find(ProjectorType::DIVR2)->second);
+      // Initialize solver and factorize division by R^2 operator (SPD)
+      pSpdSolver = SharedPtrMacro<Solver::SparseSpdSelector<SparseMatrix>::Type>(new Solver::SparseSpdSelector<SparseMatrix>::Type());
+      this->mSpdSolver.insert(std::make_pair(ProjectorType::DIVR2, pSpdSolver));
+      this->mSpdSolver.find(ProjectorType::DIVR2)->second->compute(this->mSolveOp.find(ProjectorType::DIVR2)->second);
       // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIVR2)->second->info() != Eigen::Success)
+      if(this->mSpdSolver.find(ProjectorType::DIVR2)->second->info() != Eigen::Success)
       {
          throw Exception("Factorization of backward division by R^2 failed!");
       }
 
-      // Initialize solver and factorize division by d1 operator
-      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
-      this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
+      // Initialize solver and factorize d^1 operator (upper triangular)
+      SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseTriSelector<SparseMatrix>::Type());
+      this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
+      this->mTriSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
       // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
+      if(this->mTriSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
       {
          throw Exception("Factorization of backward 1st derivative failed!");
       }
 
-      // Initialize solver and factorize division by d2 operator
-      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
-      this->mSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      // Initialize solver and factorize D^2 operator (upper triangular)
+      pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
+      this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
+      this->mTriSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
       // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
+      if(this->mTriSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
       {
          throw Exception("Factorization of backward 2nd derivative failed!");
       }
@@ -347,10 +365,8 @@ namespace Transform {
       FftwLibrary::cleanupFft();
    }
 
-   void ShellChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ShellChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -363,7 +379,9 @@ namespace Transform {
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
       // Do transform
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRAFFT);
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRAFFT);
 
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
@@ -380,10 +398,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void ShellChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void ShellChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -402,23 +418,21 @@ namespace Transform {
       // Compute first derivative
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(1).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(2).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF2);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF2);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R
@@ -426,7 +440,11 @@ namespace Transform {
       {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         // Rescale first row for SPD solve
+         this->mTmpInS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSpdSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R^2
@@ -434,37 +452,56 @@ namespace Transform {
       {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         // Rescale first row for SPD solve
+         this->mTmpInS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR2);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSpdSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR2);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute D r projection
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFFR)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR)->second.block(1, 0, this->mTmpInS.rows()-1, this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute 1/r D r projection
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR)->second.block(1, 0, this->mTmpInS.rows()-1, this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         // Rescale first row for SPD solve
+         this->mTmpOutS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSpdSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR);
          this->mTmpIn = this->mTmpInS;
 
       // Compute radial laplacian projection
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols());
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR2)->second.bottomRows(this->mTmpInS.rows()-1)*this->mTmpOutS;
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         // Rescale first row for SPD solve
+         this->mTmpOutS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR2);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSpdSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR2);
          this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection
@@ -476,13 +513,13 @@ namespace Transform {
       }
 
       // Do transform
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAFFT);
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAFFT);
    }
 
-   void ShellChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ShellChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -499,7 +536,9 @@ namespace Transform {
       //
       this->mTmpIn = physVal.real();
 
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRAFFT);
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRAFFT);
 
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
@@ -515,7 +554,9 @@ namespace Transform {
       //
       this->mTmpIn = physVal.imag();
 
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRAFFT);
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRAFFT);
 
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
@@ -531,10 +572,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void ShellChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void ShellChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -553,22 +592,20 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize(), chebVal.cols()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF2);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF2);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R of real part
@@ -576,7 +613,11 @@ namespace Transform {
       {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         // Rescale first row for SPD solve
+         this->mTmpInS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSpdSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R^2 of real part
@@ -584,37 +625,56 @@ namespace Transform {
       {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         // Rescale first row for SPD solve
+         this->mTmpInS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR2);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSpdSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR2);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute D r projection of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFFR)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR)->second.block(1, 0, this->mTmpInS.rows()-1, this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute 1/r D r projection of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR)->second.block(1, 0, this->mTmpInS.rows()-1, this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         // Rescale first row for SPD solve
+         this->mTmpOutS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSpdSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR);
          this->mTmpIn = this->mTmpInS;
 
       // Compute radial laplacian projection of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).real();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR2)->second.bottomRows(this->mTmpInS.rows()-1)*this->mTmpOutS;
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         // Rescale first row for SPD solve
+         this->mTmpOutS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR2);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSpdSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR2);
          this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of real part
@@ -626,29 +686,29 @@ namespace Transform {
       }
 
       // Do transform of real part
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAFFT);
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAFFT);
       rPhysVal.real() = this->mTmpOut;
 
       // Compute first derivative of imaginary part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative by R of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF2);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF2);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R of imaginary part
@@ -656,7 +716,11 @@ namespace Transform {
       {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         // Rescale first row for SPD solve
+         this->mTmpInS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSpdSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R^2 of imaginary part
@@ -664,37 +728,56 @@ namespace Transform {
       {
          this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
          this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         // Rescale first row for SPD solve
+         this->mTmpInS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR2);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSpdSolver.find(projector)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR2);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute D r projection of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFFR)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR)->second.block(1, 0, this->mTmpInS.rows()-1, this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute 1/r D r projection of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR)->second.block(1, 0, this->mTmpInS.rows()-1, this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         // Rescale first row for SPD solve
+         this->mTmpOutS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSpdSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR);
          this->mTmpIn = this->mTmpInS;
 
       // Compute radial laplacian projection of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).imag();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         this->mTmpInS.topRows(this->mTmpInS.rows()-1) = this->mSolveOp.find(ProjectorType::DIVR2)->second.bottomRows(this->mTmpInS.rows()-1)*this->mTmpOutS;
+         this->mTmpInS.bottomRows(1).setZero();
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRADIFF);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRADIFF);
+         // Rescale first row for SPD solve
+         this->mTmpOutS.topRows(1) *= 0.5;
+         DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAR2);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSpdSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAR2);
          this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of imaginary part
@@ -706,14 +789,14 @@ namespace Transform {
       }
 
       // Do transform of imaginary part
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRAFFT);
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRAFFT);
       rPhysVal.imag() = this->mTmpOut;
    }
 
-   void ShellChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ShellChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -739,10 +822,8 @@ namespace Transform {
       }
    }
 
-   void ShellChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ShellChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 

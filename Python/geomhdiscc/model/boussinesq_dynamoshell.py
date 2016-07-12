@@ -23,7 +23,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
+        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "rratio", "heating"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -33,10 +33,15 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row in [("velocity","tor"), ("velocity","pol"), ("temperature","")]:
-           fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
-        else:
-           fields = [field_row]
+#        # Coupled solve for velocity field and temperature
+#        if field_row in [("velocity","tor"), ("velocity","pol"), ("temperature","")]:
+#           fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+#        # Independent solve for magnetic field
+#        else:
+#           fields = [field_row]
+
+        # Large coupled solve
+        fields = [("velocity","tor"), ("velocity","pol"), ("magnetic","tor"), ("magnetic","pol"), ("temperature","")]
 
         return fields
 
@@ -108,8 +113,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
-
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+ 
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -133,15 +139,15 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                         bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:40, 'c':{'a':a, 'b':b}}
-                    elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
+                    elif field_row == ("magnetic","tor") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
+                    elif field_row == ("magnetic","pol") and field_col == field_row:
                             bc = {0:23, 'c':{'a':a, 'b':b, 'l':float("nan")}}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                             bc = {0:20}
 
             elif bcId == 1:
@@ -221,7 +227,8 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
     
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -243,7 +250,8 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -270,13 +278,14 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
                 mat = mat + geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
@@ -297,7 +306,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = geo.i4r4coriolis(res[0], res[1], m, a, b, bc, T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
                 mat = mat + geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
@@ -318,7 +327,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("magnetic","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("magnetic","pol"):
                 mat = geo.zblk(res[0], res[1], m, bc)
@@ -337,7 +346,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("magnetic","pol"):
-                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], res[1], m, bc)
@@ -380,21 +389,22 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         m = int(eigs[0])
 
-        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i4r4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("magnetic","tor"):
-            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("magnetic","pol"):
-            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("temperature",""):
             if eq_params["heating"] == 0:
@@ -416,7 +426,10 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        mat = geo.zblk(res[0], res[1], m, bc)
+        if field_row in [("velocity","tor"), ("velocity","pol"), ("magnetic","tor"), ("magnetic","pol")] and field_row == field_col:
+            mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix = 'zero', restriction = restriction)
+        else:
+            mat = geo.zblk(res[0], res[1], m, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -427,7 +440,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
         """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
 
         Ra = eq_params['rayleigh']
-        ro = eq_params['ro']
+        ro = self.automatic_parameters(eq_params)['ro']
         rratio = eq_params['rratio']
         T = eq_params['taylor']**0.5
 

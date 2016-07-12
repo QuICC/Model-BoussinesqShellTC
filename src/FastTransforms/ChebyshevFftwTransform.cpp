@@ -149,6 +149,14 @@ namespace Transform {
       //
       // Initialise integrator operators
       //
+      // i2 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // i4 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // i2d1 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI2D1, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // i4d1 integrator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGI4D1, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       //
       // Initialise solver operators
@@ -156,6 +164,8 @@ namespace Transform {
       //---------------------------------------------------------------
       // First derivative
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // Second derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
       PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
@@ -163,58 +173,80 @@ namespace Transform {
       // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;
       pArgs = PyTuple_New(3);
-      // ... create boundray condition (last mode is zero)
+      // ... create boundray condition (none)
       pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 1, pValue);
       // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0/this->mCScale);
+      pValue = PyFloat_FromDouble(1.0);
       PyTuple_SetItem(pArgs, 2, pValue);
 
-      // ... set resoluton for solver matrices
+      // ... set resolution for solver matrices
       pValue = PyLong_FromLong(this->mspSetup->fwdSize());
       PyTuple_SetItem(pArgs, 0, pValue);
 
+      // Call i2
+      PythonWrapper::setFunction("i2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI2)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call i4
+      PythonWrapper::setFunction("i4");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI4)->second, pValue);
+      Py_DECREF(pValue);
+
+      // ... set coefficient to cscale
+      pValue = PyFloat_FromDouble(this->mCScale);
+      PyTuple_SetItem(pArgs, 2, pValue);
+
+      // Call i2d1
+      PythonWrapper::setFunction("i2d1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI2D1)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call i4d1
+      PythonWrapper::setFunction("i4d1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGI4D1)->second, pValue);
+      Py_DECREF(pValue);
+
       // Call i1 for solver
+      // Change resolution
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize()+1);
+      PyTuple_SetItem(pArgs, 0, pValue);
+      // ... set coefficient to cscale
+      pValue = PyFloat_FromDouble(1.0/this->mCScale);
+      PyTuple_SetItem(pArgs, 2, pValue);
+      // ... change boundary condition to zero last modes
+      pValue = PyTuple_GetItem(pArgs, 1);
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
+      PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(1));
       PythonWrapper::setFunction("i1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF)->second, pValue);
       Py_DECREF(pValue);
 
-      // Initialize solver storage
-      this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
-      this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
-
-      // Initialize solver and factorize division by d1 operator
-      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
-      this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
-      // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
-      {
-         throw Exception("Factorization of backward 1st derivative failed!");
-      }
-
-      //---------------------------------------------------------------
-      // Second derivative
-      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-
-      // Prepare arguments to Chebyshev matrices call
-      pArgs = PyTuple_New(3);
-      // ... create boundray condition (last mode is zero)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(992));
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0/this->mCScale);
-      PyTuple_SetItem(pArgs, 2, pValue);
-
-      // ... set resoluton for solver matrices
-      pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+      // Call i2 for solver
+      // Change resolution
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize()+2);
       PyTuple_SetItem(pArgs, 0, pValue);
-
-      // Call i1 for solver
+      // ... set coefficient to cscale
+      pValue = PyFloat_FromDouble(1.0/(this->mCScale*this->mCScale));
+      PyTuple_SetItem(pArgs, 2, pValue);
+      // ... change boundary condition to zero last modes
+      pValue = PyTuple_GetItem(pArgs, 1);
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(2));
+      PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(2));
       PythonWrapper::setFunction("i2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
@@ -225,14 +257,24 @@ namespace Transform {
       this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
       this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
 
-      // Initialize solver and factorize division by d1 operator
-      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
-      this->mSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      // Initialize solver and factorize d^1 operator (upper triangular)
+      SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>  pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
+      this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
+      this->mTriSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
       // Check for successful factorisation
-      if(this->mSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
+      if(this->mTriSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
       {
          throw Exception("Factorization of backward 1st derivative failed!");
+      }
+
+      // Initialize solver and factorize d^2 operator (upper triangular)
+      pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
+      this->mTriSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
+      this->mTriSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      // Check for successful factorisation
+      if(this->mTriSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward 2nd derivative failed!");
       }
 
       // Cleanup
@@ -260,10 +302,8 @@ namespace Transform {
       FftwLibrary::cleanupFft();
    }
 
-   void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -293,10 +333,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -315,23 +353,17 @@ namespace Transform {
       // Compute first derivative
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(1).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative
       } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
-         this->mTmpInS.topRows(2).setZero();
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection
@@ -346,10 +378,8 @@ namespace Transform {
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -372,6 +402,30 @@ namespace Transform {
       {
          rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
+
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI4D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
+
       } else
       {
          rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
@@ -388,6 +442,30 @@ namespace Transform {
       {
          rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
+
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI4D1MI2)
+      {
+         // Mean has different operator
+         if(this->mspSetup->idBlocks().size() > 0)
+         {
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+         } else
+         {
+            rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI4D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+         }
+
       } else
       {
          rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
@@ -398,10 +476,8 @@ namespace Transform {
       #endif //GEOMHDISCC_DEBUG
    }
 
-   void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
@@ -420,23 +496,17 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative of real part
       } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection of real part
@@ -454,23 +524,17 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-1) = chebVal.block(1, 0, this->mspSetup->specSize()-1, chebVal.cols()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
-
-//         // Recurrence relation
-//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
-//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative of imaginary part
       } else if(projector == ChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
-         this->mTmpInS.topRows(2).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpInS.topRows(this->mspSetup->specSize()-2) = chebVal.block(2, 0, this->mspSetup->specSize()-2, chebVal.cols()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()+2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mTriSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
       // Compute simple projection of imaginary part
@@ -486,10 +550,8 @@ namespace Transform {
       rPhysVal.imag() = this->mTmpOut;
    }
 
-   void ChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);
 
@@ -515,10 +577,8 @@ namespace Transform {
       }
    }
 
-   void ChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void ChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPONENT);
 

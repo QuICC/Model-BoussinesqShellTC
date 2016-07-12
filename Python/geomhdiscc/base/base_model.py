@@ -8,6 +8,15 @@ if verbose_write_mtx:
     import scipy.io as io
     import os
 
+    def make_single_name(fields, bcs):
+        pid = str(os.getpid())
+        return str(bcs["bcType"]) + "_" + fields[0][0] + '_' + fields[0][1] + '_' + pid
+
+    def make_double_name(field_row, field_col, bcs):
+        pid = str(os.getpid())
+        return ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + pid
+
+import scipy.sparse as spsp
 import geomhdiscc.base.utils as utils
 
 
@@ -37,7 +46,7 @@ class BaseModel:
 
         mat = utils.build_diag_matrix(fields, self.time_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_time_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_time_" + make_single_name(fields, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -48,7 +57,7 @@ class BaseModel:
 
         mat = utils.build_block_matrix(fields, self.implicit_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_linear_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_linear_" + make_single_name(fields, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname  + ".mtx", mat)
@@ -59,7 +68,18 @@ class BaseModel:
 
         mat = utils.build_block_matrix(fields, self.boundary_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_boundary_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_boundary_" + make_single_name(fields, bcs)
+            for e in eigs:
+                fname = fname + "_" + str(e)
+            io.mmwrite(fname  + ".mtx", mat)
+        return mat
+
+    def inhomogeneous(self, res, eq_params, eigs, bcs, modes, fields, restriction = None):
+        """Create the boundary operator"""
+
+        mat = utils.build_block_matrix(fields, self.inhomogeneous_block, (res,eq_params,eigs,bcs,modes), restriction = restriction)
+        if verbose_write_mtx:
+            fname = "matrix_inhomogeneous_" + make_single_name(fields, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname  + ".mtx", mat)
@@ -70,7 +90,7 @@ class BaseModel:
 
         mat = self.explicit_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_linear_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_linear_" + make_double_name(field_row, field_col, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -81,7 +101,7 @@ class BaseModel:
 
         mat = self.nonlinear_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_nonlinear_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_nonlinear_" + make_double_name(field_row, field_col, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -92,7 +112,7 @@ class BaseModel:
 
         mat = self.nextstep_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_nextstep_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_nextstep_" + make_double_name(field_row, field_col, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -139,6 +159,11 @@ class BaseModel:
         shift = 0
 
         return (blocks, invariant, shift)
+
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        return dict()
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -194,3 +219,8 @@ class BaseModel:
         """Create the galerkin stencil"""
         
         raise NotImplementedError("Stencil needs to be implemented in model!")
+
+    def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):
+        """Create matrix block for inhomogeneous boundary operator"""
+
+        return spsp.lil_matrix((1,1))

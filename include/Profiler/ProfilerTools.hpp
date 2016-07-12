@@ -30,6 +30,11 @@ namespace Debug {
    {
       public:
          /**
+          * @brief Write profiling output
+          */
+         static void writeTimings();
+         
+         /**
           * @brief Print profiling output
           */
          static void printInfo();

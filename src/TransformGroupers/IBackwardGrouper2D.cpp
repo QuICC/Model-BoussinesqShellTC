@@ -35,19 +35,19 @@ namespace Transform {
    {
    }
 
-   ArrayI IBackwardGrouper2D::namePacks1D(const std::vector<ProjectorTree>& projectorTree)
+   ArrayI IBackwardGrouper2D::namePacks1D(const std::vector<TransformTree>& projectorTree)
    {
       // Create list of packet sizes
       std::set<int>  list;
 
       // Loop over all edges
-      std::vector<ProjectorTree>::const_iterator treeIt;
+      std::vector<TransformTree>::const_iterator treeIt;
       for(treeIt = projectorTree.begin(); treeIt != projectorTree.end(); ++treeIt)
       {
-         int counter = treeIt->nSpecEdges();
+         int counter = treeIt->nEdges(0);
          list.insert(counter);
 
-         this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));
+         this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp<FieldComponents::Spectral::Id>()), counter));
       }
 
       // Initialise the number of packs
@@ -64,7 +64,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IBackwardGrouper2D::groupPacks1D(const std::vector<ProjectorTree>& projectorTree)
+   ArrayI IBackwardGrouper2D::groupPacks1D(const std::vector<TransformTree>& projectorTree)
    {
       // Initialise the number of packs
       ArrayI packs = this->namePacks1D(projectorTree);

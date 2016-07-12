@@ -70,5 +70,17 @@ namespace Diagnostics {
       #endif //GEOMHDISCC_SPATIALSCHEME_TFF
    }
 
+   const SharedResolution StreamVerticalWrapper::spRes() const
+   {
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         // Safety assert
+         assert(this->mspStream);
+
+         return this->mspStream->dom(0).spRes();
+      #else
+         throw Exception("Wrapper is not defined for this scheme");
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+   }
+
 }
 }

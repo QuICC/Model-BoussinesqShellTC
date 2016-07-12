@@ -136,7 +136,7 @@ namespace Datatypes {
       assert(! this->mspPerturbation);
 
       std::map<FieldComponents::Spectral::Id,bool> map;
-      for(int i = 0; i < comps.size(); i++)
+      for(unsigned int i = 0; i < comps.size(); i++)
       {
          map.insert(std::make_pair(comps.at(i), true));
       }

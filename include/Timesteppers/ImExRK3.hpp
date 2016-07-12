@@ -116,6 +116,11 @@ namespace Timestep {
           * @brief Initialize
           */
          static void init();
+
+         /**
+          * @brief Activate embedded scheme
+          */
+         static void useEmbedded();
          
       protected:
          /**

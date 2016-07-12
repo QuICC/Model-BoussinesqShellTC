@@ -17,9 +17,16 @@ import geomhdiscc.geometry.spherical.sphere_radius as sphere
 def x_to_phys(expr, grid):
     """Convert sympy expression to grid values"""
 
-    x = sy.Symbol('x')
-    func = sy.utilities.lambdify(x, expr)
-    return func(grid)
+    try:
+        n = len(expr.free_symbols)
+        if n == 0:
+            return expr*np.ones(grid.shape)
+        else:
+            x = sy.Symbol('x')
+            func = sy.utilities.lambdify(x, expr)
+            return func(grid)
+    except:
+        return expr*np.ones(grid.shape)
 
 def test_bc(op, parity, res_expr, sol_expr, point, grid):
     """Perform a boundary condition test"""
@@ -78,7 +85,7 @@ def test_forward(op, parity, res_expr, sol_expr, grid, q):
         print(relerr)
     print("\t\tMax forward relative error: " + str(np.max(relerr[q:])))
 
-def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid):
+def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid, fix = None):
     """Perform a tau backward operation test"""
 
     try:
@@ -89,8 +96,49 @@ def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid):
 
     x = sy.Symbol('x')
     rhs = transf.torcheb(x_to_phys(res_expr,grid), pres)
-    lhs = spsplin.spsolve(opA,opB*rhs)
+    if fix == 'DIVR':
+        if pres == 0:
+            n = rhs.shape[0]
+            rhs[0] = 0
+            for i in range(1,n):
+                rhs[0] += (-1)**(i+1)*2.0*rhs[i]
+        lhs = spsplin.spsolve(opA,opB*rhs)
+#    elif fix == 'DIVR2':
+#        err = 0.0
+#        n = lhs.shape[0]
+#        if pres == 1:
+#            for i,v in enumerate(lhs[::-1]):
+#                err += (-1)**(n-i+1)*v*2.0
+#            err -= lhs[0]
+#            #rhs[0] -= err/2.0
+#        lhs = spsplin.spsolve(opA[0],opB[0]*rhs)
+#
+#        if pres == 0:
+#            n = lhs.shape[0]
+#            for i in range(0,lhs.shape[0]):
+#                lhs[i] += (-1)**(n+i)*lhs[-1]
+#        lhs = spsplin.spsolve(opA[1],opB[1]*lhs)
+#        if (pres+1)%2 == 0:
+#            n = lhs.shape[0]
+#            err = lhs[-2]
+#            for i in range(0,lhs.shape[0]):
+#                lhs[i] += (-1)**(n+i+1)*err
+    else:
+        lhs = spsplin.spsolve(opA,opB*rhs)
+#    if fix == 'DIVR':
+#        if pres == 0:
+#            n = lhs.shape[0]
+#            for i in range(0,lhs.shape[0]):
+#                lhs[i] += (-1)**(n+i)*lhs[-1]
+#    elif fix == 'DIVR2':
+#        n = lhs.shape[0]
+#        for i in range(0,n):
+#            lhs[i] += (-1)**(i+n)*(n-i)*lhs[-1]
+    print(lhs)
+    print('-------------------------------------------------------------')
     sol = transf.torcheb(x_to_phys(sol_expr,grid), psol)
+    print(sol)
+    print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     err = np.abs(lhs - sol)
     relerr = err/(1.0 + np.abs(sol))
     if np.max(err) > 10*np.spacing(1):
@@ -201,8 +249,8 @@ def d1(nr, rg):
 def r1(nr, rg):
     """Accuracy test for r1 operator"""
 
-    print("r1:")
     x = sy.Symbol('x')
+    print("r1:")
     for i in range(0,2):
         l = np.random.randint(1, nr-1)
         l = l + (l+i)%2
@@ -216,37 +264,46 @@ def r1(nr, rg):
     for i in range(0,2):
         l = np.random.randint(1, nr-1)
         l = l + (l+i)%2
+        l = i
         print("\tTest for l = " + str(l))
-        A = sphere.r1(nr, l, sphere.radbc.no_bc()).tocsr()
+        A = sphere.r1(nr, (l+1)%2, sphere.radbc.no_bc()).tocsr()
         B = sphere.qid(nr, l, 0, sphere.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x*x**(i) for i in np.arange(l%2,2*nr-2,2)])
+        sphys = np.sum([1e6*np.random.ranf()*x**(i) for i in np.arange(2*((l+1)%2) + l%2,2*nr-2,2)])
         ssol = sy.expand(sphys/x)
-        test_backward_tau(A, B, ((l+1)%2,l%2), sphys, ssol, rg)
+        error = 1e-4 
+        sphys += error
+        test_backward_tau(A, B, (l%2,(l+1)%2), sphys, ssol, rg, fix = 'DIVR')
 
 def r2(nr, rg):
     """Accuracy test for r2 operator"""
 
-    print("r2:")
     x = sy.Symbol('x')
-    for i in range(0,2):
-        l = np.random.randint(1, nr-1)
-        l = l + (l+i)%2
-        print("\tTest for l = " + str(l))
-        A = sphere.r2(nr, l, sphere.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
-        ssol = sy.expand(x*x*sphys)
-        test_forward(A, (l%2,l%2), sphys, ssol, rg, 0)
+#    print("r2:")
+#    for i in range(0,2):
+#        l = np.random.randint(1, nr-1)
+#        l = l + (l+i)%2
+#        print("\tTest for l = " + str(l))
+#        A = sphere.r2(nr, l, sphere.radbc.no_bc())
+#        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
+#        ssol = sy.expand(x*x*sphys)
+#        test_forward(A, (l%2,l%2), sphys, ssol, rg, 0)
 
     print("solve 1/r^2:")
     for i in range(0,2):
         l = np.random.randint(1, nr-1)
         l = l + (l+i)%2
+        l = 2*((i+1)%2) + i
         print("\tTest for l = " + str(l))
-        A = sphere.r2(nr, l, sphere.radbc.no_bc()).tocsr()
+        #A = (sphere.r1(nr, (l+1)%2, sphere.radbc.no_bc()).tocsr(), sphere.r1(nr, l%2, sphere.radbc.no_bc()).tocsr())
+        #B = (sphere.qid(nr, l, 0, sphere.radbc.no_bc()),sphere.qid(nr, l, 0, sphere.radbc.no_bc()))
+        A = sphere.r2(nr, l%2, sphere.radbc.no_bc()).tocsr()
         B = sphere.qid(nr, l, 0, sphere.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x*x*x**(i) for i in np.arange(l%2,2*nr-2,2)])
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(2*((l+1)%2) + 3*(l%2),2*nr-2,2)])
+        sphys = x*(x**2 + x**4)
         ssol = sy.expand(sphys/(x*x))
-        test_backward_tau(A, B, (l%2,l%2), sphys, ssol, rg)
+        error = 0e5*((i+1)%2 + i*x)
+        sphys += error
+        test_backward_tau(A, B, (l%2,l%2), sphys, ssol, rg, fix = 'DIVR2')
 
 def i1(nr, rg):
     """Accuracy test for i1 operator"""
@@ -481,15 +538,15 @@ def qid(nr, rg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 20
+    nr = 64
     rg = transf.rgrid(nr)
 
     # run tests
-    integral(nr, rg)
+#    integral(nr, rg)
 #    zblk(nr, rg)
 #    bc(nr, rg)
 #    d1(nr, rg)
-#    r1(nr, rg)
+    r1(nr, rg)
 #    r2(nr, rg)
 #    i1(nr, rg)
 #    i2(nr, rg)

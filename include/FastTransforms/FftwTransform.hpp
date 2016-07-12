@@ -30,7 +30,6 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
 namespace GeoMHDiSCC {
@@ -48,7 +47,15 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
-         enum Id {PROJ, DIFF, DIFF2};
+         // PROJ: Projector
+         // DIFF: First derivative
+         // DIFF2: Second derivative
+         // DIFF3: Third derivative
+         // PROJMEANONLY: Only project mean component (WARNING: implementation is slow)
+         // LAPLH: Horizontal Laplacian
+         // DIFFFLAPLH: Fast derivative of horizontal Laplacian
+         // DIFFSLAPLH: Slow derivative of horizontal Laplacian
+         enum Id {PROJ, DIFF, DIFF2, DIFF3, LAPLH, DIFFFLAPLH, DIFFSLAPLH, PROJMEANONLY};
       };
 
       /**
@@ -57,7 +64,17 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG, INTGDIFF};
+         // INTG: Integrator
+         // INTGM: Integrator and zero k2 = 0, k1 != 0 modes (only complex - complex)
+         // INTGDIFF: First derivative integrator
+         // INTGDIFF2: Second derivative integrator
+         // INTGLAPLH: Horizontal laplacian
+         // INTGDIFFM: First derivative integrator and mean (k = 0 mode is not zeroed)
+         // INTGDIFFNEGM: First derivative integrator and negative mean (k = 0 mode is not zeroed)
+         // INTGINVLAPLH: Inverse horizontal laplacian
+         // INTGINVDIFFFLAPLH: Fast derivative of inverse horizontal laplacian
+         // INTGMEANONLY: Only compute the mean component (WARNING implementation is slow!)
+         enum Id {INTG, INTGDIFF, INTGDIFF2, INTGLAPLH, INTGM, INTGDIFFM, INTGDIFFNEGM, INTGINVLAPLH, INTGDIFFFINVLAPLH, INTGMEANONLY};
       };
 
    };
@@ -127,9 +144,8 @@ namespace Transform {
           * @param rFFTVal Output FFT transformed values
           * @param physVal Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (C2R)
@@ -139,9 +155,8 @@ namespace Transform {
           * @param rPhysVal Output physical values
           * @param fftVal Input FFT values
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -151,9 +166,8 @@ namespace Transform {
           * @param rFFTVal Output FFT transformed values
           * @param physVal Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -163,9 +177,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param fftVal     Input FFT values
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -216,6 +229,11 @@ namespace Transform {
           * @brief Temporary storage used in the projections (complex -> complex)
           */
          MatrixZ  mTmpZOut;
+
+         /**
+          * @brief Storage for the mean block sizes
+          */
+         std::vector<std::pair<int,int> > mMeanBlocks;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)

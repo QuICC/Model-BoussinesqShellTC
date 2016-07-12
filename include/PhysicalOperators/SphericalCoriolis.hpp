@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Physical {
 
    /**
-    * @brief Implementation of a generic scalar product
+    * @brief Implementation of the spherical coriolis term
     */
    class SphericalCoriolis
    {

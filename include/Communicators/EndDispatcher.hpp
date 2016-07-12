@@ -36,21 +36,21 @@ namespace Parallel {
          /**
           * @brief Receive forward the data
           */
-         template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> static typename TTypes<TID>::FwdType& receiveForward(TComm<DIMENSION,TTypes>& comm);
+         template <typename TData, typename TComm> static TData& receiveForward(TComm& comm);
 
          /**
           * @brief transfer forward data
           */
-         template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> static void transferForward(TComm<DIMENSION,TTypes>& comm, typename TTypes<TID>::FwdType& rData);
+         template <typename TComm, typename TData> static void transferForward(TComm& comm, TData& rData);
 
    };
 
-   template <Dimensions::Transform::Id TID> template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> typename TTypes<TID>::FwdType& EndDispatcher<true,TID>::receiveForward(TComm<DIMENSION,TTypes>& comm)
+   template <Dimensions::Transform::Id TID> template <typename TData, typename TComm> TData& EndDispatcher<true,TID>::receiveForward(TComm& comm)
    {
       return comm.template storage<TID>().recoverFwd();
    }
 
-   template <Dimensions::Transform::Id TID> template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> void EndDispatcher<true,TID>::transferForward(TComm<DIMENSION,TTypes>& comm, typename TTypes<TID>::FwdType& rData)
+   template <Dimensions::Transform::Id TID> template <typename TComm, typename TData> void EndDispatcher<true,TID>::transferForward(TComm& comm, TData& rData)
    {
    }
 
@@ -60,23 +60,23 @@ namespace Parallel {
          /**
           * @brief Receive forward the data
           */
-         template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> static typename TTypes<TID>::FwdType& receiveForward(TComm<DIMENSION,TTypes>& comm);
+         template <typename TData, typename TComm> static TData& receiveForward(TComm& comm);
 
          /**
           * @brief transfer forward data
           */
-         template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> static void transferForward(TComm<DIMENSION,TTypes>& comm, typename TTypes<TID>::FwdType& rData);
+         template <typename TComm, typename TData> static void transferForward(TComm& comm, TData& rData);
 
    };
 
-   template <Dimensions::Transform::Id TID> template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> typename TTypes<TID>::FwdType& EndDispatcher<false,TID>::receiveForward(TComm<DIMENSION,TTypes>& comm)
+   template <Dimensions::Transform::Id TID> template <typename TData, typename TComm> TData& EndDispatcher<false,TID>::receiveForward(TComm& comm)
    {
-      typename TTypes<TID>::FwdType &rData = comm.template converter<Dimensions::Transform::jump<TID,1>::id>().getFwd(comm.template storage<TID>());
+      TData &rData = comm.template converter<Dimensions::Transform::jump<TID,1>::id>().getFwd(comm.template storage<TID>());
 
       return rData;
    }
 
-   template <Dimensions::Transform::Id TID> template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> void EndDispatcher<false,TID>::transferForward(TComm<DIMENSION,TTypes>& comm, typename TTypes<TID>::FwdType& rData)
+   template <Dimensions::Transform::Id TID> template <typename TComm, typename TData> void EndDispatcher<false,TID>::transferForward(TComm& comm, TData& rData)
    {
     // Convert data
     comm.template converter<Dimensions::Transform::jump<TID,1>::id>().convertFwd(rData, comm.template storage<Dimensions::Transform::jump<TID,1>::id>());

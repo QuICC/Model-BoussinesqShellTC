@@ -57,7 +57,7 @@ namespace GeoMHDiSCC {
       }
 
       // Check for maximum simulation steps
-      if(this->mMaxSimTime < 0 && this->mSteps > std::abs(this->mMaxSimTime))
+      if(this->mMaxSimTime < 0 && this->mSteps >= std::abs(this->mMaxSimTime))
       {
          this->mStatus = RuntimeStatus::STOP;
 

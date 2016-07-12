@@ -37,7 +37,6 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"
 #include "FastTransforms/CuFftLibrary.hpp"
 
@@ -135,9 +134,8 @@ namespace Transform {
           * @param rFFTVal Output FFT transformed values
           * @param physVal Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (C2R)
@@ -147,9 +145,8 @@ namespace Transform {
           * @param rPhysVal Output physical values
           * @param fftVal Input FFT values
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -159,9 +156,8 @@ namespace Transform {
           * @param rFFTVal Output FFT transformed values
           * @param physVal Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -171,9 +167,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param fftVal     Input FFT values
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**

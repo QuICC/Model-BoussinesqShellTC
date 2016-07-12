@@ -67,7 +67,7 @@ namespace GeoMHDiSCC {
           * @param spRes   Resolution information object
           * @param projectorTree Transform projector tree
           */
-         void initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
+         void initTransforms(SharedResolution spRes, const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree);
 
          /**
           * @brief Initialise the data communicator
@@ -136,7 +136,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(SharedResolution spRes, const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree)
    {
       // initialise 2 other dimensions
       Transform2DCoordinator<T1D,T2D, TCommunicator>::initTransforms(spRes, integratorTree, projectorTree);

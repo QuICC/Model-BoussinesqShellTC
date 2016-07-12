@@ -33,7 +33,7 @@
 #include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/ParallelSelector.hpp"
-#include "TypeSelectors/TransformTreeSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
 #include "TransformGroupers/IForwardGrouperMacro.h"
 #include "TransformGroupers/IBackwardGrouperMacro.h"
 #include "LoadSplitter/LoadSplitter.hpp"
@@ -42,6 +42,7 @@
 #include "IoVariable/IVariableHdf5Reader.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "Diagnostics/DiagnosticCoordinator.hpp"
+//#include "Statistics/StatisticCoordinator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -248,6 +249,16 @@ namespace GeoMHDiSCC {
          VectorEquation_range mVectorTrivialRange;
 
          /**
+          * @brief Storage for the range of scalar wrapper equations
+          */
+         ScalarEquation_range mScalarWrapperRange;
+
+         /**
+          * @brief Storage for the range of vectort wrapper equations
+          */
+         VectorEquation_range mVectorWrapperRange;
+
+         /**
           * @brief Simulation run control
           */
          SimulationRunControl mSimRunCtrl;
@@ -308,6 +319,11 @@ namespace GeoMHDiSCC {
          Diagnostics::DiagnosticCoordinator  mDiagnostics;
 
          /**
+          * @brief Statistics coordinator
+          */
+         //Statistics::StatisticsCoordinator  mStatistics;
+
+         /**
           * @brief Flag for forward transform
           */
          bool mForwardIsNonlinear;
@@ -346,7 +362,7 @@ namespace GeoMHDiSCC {
           * @param integratorTree   Transform integrator tree
           * @param projectorTree    Transform projector tree
           */
-         void initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
+         void initTransformCoordinator(const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree);
 
          /**
           * @brief Initialise the equations (generate operators, etc)

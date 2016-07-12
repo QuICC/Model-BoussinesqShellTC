@@ -123,6 +123,11 @@ namespace IoConfig {
          SharedCIConfigurationPart spPhysical() const;
 
          /**
+          * @brief Get physical part
+          */
+         SharedIConfigurationPart rspPhysical();
+
+         /**
           * @brief Get boundary part
           */
          SharedCIConfigurationPart spBoundary() const;
@@ -228,6 +233,14 @@ namespace IoConfig {
    }
 
    template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spPhysical() const
+   {
+      // Make sure initialisation was correct
+      assert(this->mSimulation.find(SimulationBlocks::PHYSICAL) != this->mSimulation.end());
+
+      return this->mSimulation.find(SimulationBlocks::PHYSICAL)->second;
+   }
+
+   template <typename TBase> inline SharedIConfigurationPart IConfigurationFile<TBase>::rspPhysical()
    {
       // Make sure initialisation was correct
       assert(this->mSimulation.find(SimulationBlocks::PHYSICAL) != this->mSimulation.end());

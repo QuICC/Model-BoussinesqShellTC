@@ -186,20 +186,35 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WFT
 
-// Configure code to use WLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_WLF
-   // WLF includes
-   #include "SpatialSchemes/3D/WLFScheme.hpp"
+// Configure code to use WLFl scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_WLFL
+   // WLFl includes
+   #include "SpatialSchemes/3D/WLFlScheme.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Schemes {
 
-         /// Typedef for the WLF spatial scheme
-         typedef WLFScheme SpatialSelector;
+         /// Typedef for the WLFl spatial scheme
+         typedef WLFlScheme SpatialSelector;
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_WLF
+#endif //GEOMHDISCC_SPATIALSCHEME_WLFL
+
+// Configure code to use WLFm scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_WLFM
+   // WLFm includes
+   #include "SpatialSchemes/3D/WLFmScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the WLFl spatial scheme
+         typedef WLFmScheme SpatialSelector;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_WLFM
 
 // Configure code to use TT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_TT

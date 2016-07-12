@@ -23,6 +23,7 @@
 
 // Project includes
 //
+#include "Python/PythonTools.hpp"
 #include "Python/PythonModelWrapper.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
@@ -41,7 +42,7 @@ namespace GeoMHDiSCC {
 
       // Create storage
       std::vector<PhysicalNames::Id> ids;
-      PythonModelWrapper::getList(ids, pValue);
+      PythonTools::getList(ids, pValue);
 
       // Clenup Python interpreter
       PythonModelWrapper::cleanup();
@@ -60,7 +61,7 @@ namespace GeoMHDiSCC {
 
       // Create storage
       std::vector<NonDimensional::Id> ids;
-      PythonModelWrapper::getList(ids, pValue);
+      PythonTools::getList(ids, pValue);
 
       // Cleanup Python interpreter
       PythonModelWrapper::cleanup();
@@ -79,7 +80,7 @@ namespace GeoMHDiSCC {
 
       // Create storage
       std::vector<bool> box;
-      PythonModelWrapper::getList(box, pValue);
+      PythonTools::getList(box, pValue);
 
       // Cleanup Python interpreter
       PythonModelWrapper::cleanup();
