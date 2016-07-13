@@ -214,6 +214,17 @@ if(GEOMHDISCC_MULTPRECISION)
    endif(mpTest)
 endif(GEOMHDISCC_MULTPRECISION)
 
+###################################################
+#---------- TRANSFORM TREE OPTIMIZATION ----------#
+###################################################
+
+# Disable by default as it doesn't work for all cases
+option(GEOMHDISCC_OPTIMIZE_TREE "Optimize transform tree?" OFF)
+mark_as_advanced(FORCE GEOMHDISCC_OPTIMIZE_TREE)
+if(GEOMHDISCC_OPTIMIZE_TREE)
+   add_definitions("-DGEOMHDISCC_OPTIMIZE_TREE")
+endif(GEOMHDISCC_OPTIMIZE_TREE)
+
 
 ###################################################
 #------------------ EMBEDDED PYTHON --------------#
