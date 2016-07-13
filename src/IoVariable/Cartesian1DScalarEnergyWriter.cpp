@@ -43,8 +43,8 @@ namespace IoVariable {
 
    void Cartesian1DScalarEnergyWriter::init()
    {
-      // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
-      this->mVolume = 2.0;
+      // Normalize by Cartesian volume V = (2*pi*Box1D/k1D)*(2*pi*Box2D/k2D)*2 but FFT already includes 1/(2*pi)
+      this->mVolume = 2.0/(this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM2D)*this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM3D));
 
       // Initialise python wrapper
       PythonWrapper::init();

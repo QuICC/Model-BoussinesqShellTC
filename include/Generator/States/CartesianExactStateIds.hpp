@@ -71,6 +71,7 @@ namespace Equations {
          ZEROCOSCOS = 90,  // Galerkin, Cosine, Cosine
          PEYRET1DA,        // Kind of a place holder for tests
          TORPOLTFF,        // Divergence free state for Toroidal/Poloidal test in TFF scheme
+         TORPOLCNST,       // Unit field for Toroidal/Poloidal test in TFF scheme
          // ---------------------------------------------------
          // 2D modes
          // ---------------------------------------------------

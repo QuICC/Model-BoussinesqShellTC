@@ -123,6 +123,41 @@ namespace Equations {
          Array modeA = this->mModeA.find(compId)->second;
          rNLComp.rData().setConstant(modeA.prod());
 
+      // Generate constant unit field divergence free state for toroidal/poloidal decomposition test
+      } else if(typeId == CartesianExactStateIds::TORPOLCNST)
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
+         for(int iK = 0; iK < nK; ++iK)
+         {
+            for(int iJ = 0; iJ < nJ; ++iJ)
+            {
+               for(int iI = 0; iI < nI; ++iI)
+               {
+                  if(compId == FieldComponents::Physical::X || compId == FieldComponents::Physical::Y)
+                  {
+                     rNLComp.setPoint(1.0, iI, iJ, iK);
+                  }
+               }
+            }
+         }
+
       // Generate divergence free state for toroidal/poloidal decomposition test
       } else if(typeId == CartesianExactStateIds::TORPOLTFF)
       {
@@ -151,6 +186,8 @@ namespace Equations {
          int nSI = 3;
          int nSJ = 3;
          int nSK = 2;
+         MHDFloat bSI = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+         MHDFloat bSJ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D);
 
          Array aT(5); aT(0) = -3.0; aT(1) = 2.0; aT(2) = 3.0; aT(3) = -1.0; aT(4) = 5.0;
          Array mT(5); mT(0) = 2.0; mT(1) = 1.0; mT(2) = 2.0; mT(3) = 1.0; mT(4) = 3.0;
@@ -179,9 +216,11 @@ namespace Equations {
                      // Toroidal component
                      for(int sI = 0; sI < nSI; sI++)
                      {
-                        MHDFloat valI = sI*(-std::sin(sI*i_)+std::cos(sI*i_));
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
+                        MHDFloat valI = sI_*(-std::sin(sI*i_)+std::cos(sI*i_));
                         for(int sJ = 0; sJ < nSJ; sJ++)
                         {
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
                            MHDFloat valJ = (std::cos(sJ*j_)+std::sin(sJ*j_));
 
                            for(int sK = 0; sK < nSK; sK++)
@@ -194,11 +233,13 @@ namespace Equations {
                      // Poloidal component
                      for(int sI = 0; sI < nSI; sI++)
                      {
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
                         MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
 
                         for(int sJ = 0; sJ < nSJ; sJ++)
                         {
-                           MHDFloat valJ = scale*sJ*(-std::sin(sJ*j_)+std::cos(sJ*j_));
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = scale*sJ_*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
                            if(nSK > 1)
                            {
@@ -230,10 +271,12 @@ namespace Equations {
                      // Toroidal component
                      for(int sI = 0; sI < nSI; sI++)
                      {
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
                         MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
                         for(int sJ = 0; sJ < nSJ; sJ++)
                         {
-                           MHDFloat valJ = -sJ*(-std::sin(sJ*j_)+std::cos(sJ*j_));
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = -sJ_*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
                            for(int sK = 0; sK < nSK; sK++)
                            {
@@ -245,10 +288,12 @@ namespace Equations {
                      // Poloidal component
                      for(int sI = 0; sI < nSI; sI++)
                      {
-                        MHDFloat valI = sI*(-std::sin(sI*i_)+std::cos(sI*i_));
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
+                        MHDFloat valI = sI_*(-std::sin(sI*i_)+std::cos(sI*i_));
 
                         for(int sJ = 0; sJ < nSJ; sJ++)
                         {
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
                            MHDFloat valJ = scale*(std::cos(sJ*j_)+std::sin(sJ*j_));
 
                            if(nSK > 1)
@@ -281,10 +326,12 @@ namespace Equations {
                      // Poloidal component
                      for(int sI = 0; sI < nSI; sI++)
                      {
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
                         MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
                         for(int sJ = 0; sJ < nSJ; sJ++)
                         {
-                           MHDFloat valJ = (sI*sI + sJ*sJ)*(std::cos(sJ*j_)+std::sin(sJ*j_));
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = (sI_*sI_ + sJ_*sJ_)*(std::cos(sJ*j_)+std::sin(sJ*j_));
 
                            for(int sK = 0; sK < nSK; sK++)
                            {

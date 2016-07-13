@@ -43,8 +43,8 @@ namespace IoVariable {
 
    void Cartesian1DTorPolEnergyWriter::init()
    {
-      // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
-      this->mVolume = 2.0;
+      // Normalize by Cartesian volume V = (2*pi*Box1D/k1D)*(2*pi*Box2D/k2D)*2 but FFT already includes 1/(2*pi)
+      this->mVolume = 2.0/(this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM2D)*this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM3D));
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -109,17 +109,22 @@ namespace IoVariable {
       int nK = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
       for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         MHDFloat k_ = static_cast<MHDFloat>(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k));
          // Convert to double Fourier mode
          if(k_ >= nK/2 + (nK % 2))
          {
             k_ = k_ - nK;
          }
+         // Include boxscale
+         k_ *= this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM3D);
+         
 
          for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            int j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            MHDFloat factor = static_cast<MHDFloat>(k_*k_ + j_*j_);
+            MHDFloat j_ = static_cast<MHDFloat>(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k));
+            // Include boxscale
+            j_ *= this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM2D);
+            MHDFloat factor = (k_*k_ + j_*j_);
 
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0)
             {
@@ -165,17 +170,21 @@ namespace IoVariable {
       // Compute integral over Chebyshev expansion and sum Fourier coefficients
       for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         MHDFloat k_ = static_cast<MHDFloat>(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k));
          // Convert to double Fourier mode
          if(k_ >= nK/2 + (nK % 2))
          {
             k_ = k_ - nK;
          }
+         // Include boxscale
+         k_ *= this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM3D);
 
          for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            int j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            MHDFloat factor = std::pow(static_cast<MHDFloat>(k_*k_ + j_*j_),2);
+            MHDFloat j_ = static_cast<MHDFloat>(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k));
+            // Include boxscale
+            j_ *= this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM2D);
+            MHDFloat factor = std::pow((k_*k_ + j_*j_),2);
 
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0)
             {
@@ -221,17 +230,21 @@ namespace IoVariable {
       // Compute integral over Chebyshev expansion and sum Fourier coefficients
       for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         MHDFloat k_ = static_cast<MHDFloat>(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k));
          // Convert to double Fourier mode
          if(k_ >= nK/2 + (nK % 2))
          {
             k_ = k_ - nK;
          }
+         // Include boxscale
+         k_ *= this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM3D);
 
          for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            int j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            MHDFloat factor = static_cast<MHDFloat>(k_*k_ + j_*j_);
+            MHDFloat j_ = static_cast<MHDFloat>(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k));
+            // Include boxscale
+            j_ *= this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM2D);
+            MHDFloat factor = (k_*k_ + j_*j_);
 
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0)
             {
