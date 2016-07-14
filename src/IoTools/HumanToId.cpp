@@ -381,6 +381,10 @@ namespace IoTools {
       {
          return PhysicalNames::NONZONAL_KINETIC_ENERGY;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::IMPOSED_MAGNETIC))
+      {
+         return PhysicalNames::IMPOSED_MAGNETIC;
+
       } else
       {
          throw Exception("Unknown string to ID conversion requested (PhysicalNames)");

@@ -120,6 +120,9 @@ namespace GeoMHDiSCC {
       // Initialise the transform coordinator
       this->initTransformCoordinator(integratorTree, projectorTree);
 
+      // Initialize Imposed fields
+      this->initImposed();
+
       stage.start("setup equations");
 
       // Initialise the equations (generate operators, etc)
@@ -147,6 +150,47 @@ namespace GeoMHDiSCC {
       this->mSimIoCtrl.cleanup();
 
       stage.done();
+   }
+
+   void SimulationBase::initImposed()
+   {
+      StageTimer stage;
+
+      // Transform projector tree
+      std::vector<Transform::TransformTree> projectorTree;
+
+      stage.start("initializing imposed variables");
+
+      // Initialise the variables and set general variable requirements
+      RequirementTools::initImposedVariables(projectorTree, this->mImposedScalarVariables, this->mImposedVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
+
+      // Transform integrator tree
+      std::vector<Transform::TransformTree> integratorTree;
+
+      // Map variables to the equations and set nonlinear requirements
+      RequirementTools::mapImposedVariables(this->mScalarEquations, this->mVectorEquations, this->mImposedScalarVariables, this->mImposedVectorVariables);
+
+      stage.done();
+
+      // Extract the run options for the equation parameters
+      std::map<NonDimensional::Id,MHDFloat> runOptions;
+      std::vector<NonDimensional::Id>::iterator it;
+      std::vector<NonDimensional::Id>  names = this->mspEqParams->ids();
+      for(it = names.begin(); it != names.end(); ++it)
+      {
+         runOptions.insert(std::make_pair(*it, this->mspEqParams->nd(*it)));
+      }
+
+      Transform::TransformCoordinatorType imposedTransformCoordinator;
+
+      // Initialise the transform coordinator
+      Transform::TransformCoordinatorTools::init(imposedTransformCoordinator, this->mspImposedFwdGrouper, this->mspImposedBwdGrouper, integratorTree, projectorTree, this->mspRes, runOptions);
+
+      // Compute physical space values if required
+      this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables, this->mImposedVectorVariables, imposedTransformCoordinator);
+
+      this->mspImposedFwdGrouper.reset();
+      this->mspImposedBwdGrouper.reset();
    }
 
    void SimulationBase::run()
@@ -223,6 +267,18 @@ namespace GeoMHDiSCC {
       // Loop over all vector variables
       std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
       for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
+      {
+         spInitFile->addVector((*vectIt));
+      }
+
+      // Loop over all imposed scalars
+      for(scalIt = this->mImposedScalarVariables.begin(); scalIt != this->mImposedScalarVariables.end(); scalIt++)
+      {
+         spInitFile->addScalar((*scalIt));
+      }
+
+      // Loop over all imposed vector variables
+      for(vectIt = this->mImposedVectorVariables.begin(); vectIt != this->mImposedVectorVariables.end(); vectIt++)
       {
          spInitFile->addVector((*vectIt));
       }
@@ -385,6 +441,18 @@ namespace GeoMHDiSCC {
          // Loop over all vector variables
          std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
          for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
+         {
+            (*hdf5It)->addVector((*vectIt));
+         }
+
+         // Loop over all imposed scalars
+         for(scalIt = this->mImposedScalarVariables.begin(); scalIt != this->mImposedScalarVariables.end(); scalIt++)
+         {
+            (*hdf5It)->addScalar((*scalIt));
+         }
+
+         // Loop over all imposed vector variables
+         for(vectIt = this->mImposedVectorVariables.begin(); vectIt != this->mImposedVectorVariables.end(); vectIt++)
          {
             (*hdf5It)->addVector((*vectIt));
          }

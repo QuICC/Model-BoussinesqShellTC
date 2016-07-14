@@ -133,6 +133,9 @@ namespace IoTools {
          case PhysicalNames::NONZONAL_KINETIC_ENERGY:
             return "Non zonal kinetic energy";
 
+         case PhysicalNames::IMPOSED_MAGNETIC:
+            return "Imposed magnetic field";
+
          default:
             throw Exception("Unknown ID to string conversion requested (PhysicalNames)");
       }
@@ -243,6 +246,9 @@ namespace IoTools {
 
          case PhysicalNames::NONZONAL_KINETIC_ENERGY:
             return "nonzonal_kinetic_energy";
+
+         case PhysicalNames::IMPOSED_MAGNETIC:
+            return "imposed_magnetic";
 
          default:
             throw Exception("Unknown ID to tag conversion requested (PhysicalNames)");

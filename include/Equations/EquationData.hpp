@@ -156,9 +156,21 @@ namespace Equations {
          const VariableRequirement& requirements() const;
 
          /**
+          * @brief Get map of imposed field storage requirements information
+          *
+          * \mhdBug Ultimatively this should depend on component
+          */
+         const VariableRequirement& imposedRequirements() const;
+
+         /**
           * @brief Get map of field storage requirements information
           */
          const FieldRequirement& requirements(PhysicalNames::Id id) const;
+
+         /**
+          * @brief Get map of imposed field storage requirements information
+          */
+         const FieldRequirement& imposedRequirements(PhysicalNames::Id id) const;
 
          /**
           * @brief Get the equation parameters
@@ -246,6 +258,13 @@ namespace Equations {
           * \mhdBug Ultimatively this should depend on component
           */
          VariableRequirement mRequirements;
+
+         /**
+          * @brief Storage for the imposed variable requirements
+          *
+          * \mhdBug Ultimatively this should depend on component
+          */
+         VariableRequirement mImposedRequirements;
 
          /**
           * @brief Coupling information of the equation

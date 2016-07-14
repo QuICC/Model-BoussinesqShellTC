@@ -115,8 +115,8 @@ namespace GeoMHDiSCC {
          /// Non zonal kinetic energy: u \cdot u
          NONZONAL_KINETIC_ENERGY,
 
-	 /// Imposed magnetic field
-	 IMPOSED_MAGNETIC,
+	      /// Imposed magnetic field
+	      IMPOSED_MAGNETIC,
       };
    };
 
