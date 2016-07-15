@@ -44,9 +44,9 @@ namespace GeoMHDiSCC {
    void BoussinesqDynamoCouetteShellStdModel::addEquations(SharedSimulation spSim)
    {
       // Add Navier-Stokes equation for kinematic dynamo
-      spSim->addVectorEquation<Equations::BoussinesqCouetteShellMomentum>();
+      //spSim->addVectorEquation<Equations::BoussinesqCouetteShellMomentum>();
       // Add Navier-Stokes equation for fully nonlinear dynamo
-      //spSim->addVectorEquation<Equations::BoussinesqDynamoCouetteShellMomentum>();
+      spSim->addVectorEquation<Equations::BoussinesqDynamoCouetteShellMomentum>();
 
       // Add induction equation
       spSim->addVectorEquation<Equations::BoussinesqDynamoCouetteShellInduction>();
