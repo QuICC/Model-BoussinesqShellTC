@@ -26,6 +26,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DTorPolEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DNusseltDZWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -54,7 +55,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBCPlaneModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -69,7 +70,7 @@ namespace GeoMHDiSCC {
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
          spScalar->setStateType(Equations::CartesianExactStateIds::POLYSINSIN);
-         spScalar->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+         spScalar->setModeOptions(1e0, 10.0, 1e0, 10.0, 1e0, 10.0);
 
       // Generate random spectrum
       } else
@@ -81,13 +82,13 @@ namespace GeoMHDiSCC {
          // Add scalar random initial state generator 
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
-         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-6, 1e-6, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-6, 1e-6, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spScalar->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -144,6 +145,11 @@ namespace GeoMHDiSCC {
       IoVariable::SharedCartesian1DTorPolEnergyWriter spKinetic(new IoVariable::Cartesian1DTorPolEnergyWriter("kinetic", SchemeType::type()));
       spKinetic->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spKinetic);
+
+      // Create nusselt number writer
+      IoVariable::SharedCartesian1DNusseltDZWriter spNusselt(new IoVariable::Cartesian1DNusseltDZWriter(SchemeType::type()));
+      spNusselt->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spNusselt);
    }
 
    void BoussinesqRRBCPlaneModel::addHdf5OutputFiles(SharedSimulation spSim)
@@ -158,6 +164,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+
       spSim->addHdf5OutputFile(spState);
    }
 

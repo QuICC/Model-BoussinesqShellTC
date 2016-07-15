@@ -36,6 +36,16 @@ namespace Equations {
       return this->mND.at(name);
    }
 
+   const std::map<NonDimensional::Id,MHDFloat>& EquationParameters::map() const
+   {
+      return this->mND;
+   }
+
+   std::map<NonDimensional::Id,MHDFloat>& EquationParameters::rMap()
+   {
+      return this->mND;
+   }
+
    std::vector<NonDimensional::Id> EquationParameters::ids() const
    {
       // Storage for the IDs

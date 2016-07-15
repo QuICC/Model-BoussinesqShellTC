@@ -74,6 +74,7 @@ namespace Transform {
       gxlTree.write();
       gxlTree.finalize();
 
+      #if defined GEOMHDISCC_OPTIMIZE_TREE
       //
       // Third stage: Combine arithmetic operations into single tree branch
       //
@@ -87,6 +88,7 @@ namespace Transform {
       gxlOpti.graphTransformTree(rTrees, dir);
       gxlOpti.write();
       gxlOpti.finalize();
+      #endif //defined GEOMHDISCC_OPTIMIZE_TREE
    }
 
    void TransformTreeTools::growTree(std::map<PhysicalNames::Id, std::vector<TransformPath> >::const_iterator nameIt, std::set<int>::const_iterator compIt, const int dim, std::vector<int>& path, TransformTreeEdge &rPrev)

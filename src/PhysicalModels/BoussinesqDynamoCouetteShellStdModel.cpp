@@ -124,7 +124,7 @@ namespace GeoMHDiSCC {
                break;
          }
 
-         // Add velocity initial state generator
+         // Add magnetic field initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::MAGNETIC);
          switch(4)
@@ -186,6 +186,68 @@ namespace GeoMHDiSCC {
                break;
          }
 
+         // Add imposed magnetic field initial state generator
+         spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
+         spVector->setIdentity(PhysicalNames::IMPOSED_MAGNETIC);
+         switch(3)
+         {
+            case 0:
+               spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
+               break;
+
+            case 1:
+               spVector->setStateType(Equations::ShellExactStateIds::POLOIDAL);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
+               break;
+
+            case 2:
+               spVector->setStateType(Equations::ShellExactStateIds::TORPOL);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
+               break;
+
+            case 3:
+               spVector->setStateType(Equations::ShellExactStateIds::IMPMAGMATSUI);
+               break;
+
+            case 4:
+               spVector->setStateType(Equations::ShellExactStateIds::NOISE);
+               break;
+         }
+
       // Generate random spectrum
       } else
       {
@@ -203,12 +265,19 @@ namespace GeoMHDiSCC {
          spVector->setIdentity(PhysicalNames::MAGNETIC);
          spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
          spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+
+         // Add vector random initial state generator 
+         spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
+         spVector->setIdentity(PhysicalNames::IMPOSED_MAGNETIC);
+         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
       }
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::MAGNETIC);
+      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -238,12 +307,18 @@ namespace GeoMHDiSCC {
       spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::MAGNETIC);
 
+      // Add imposed magnetic field visualization
+      spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+      spVector->setFields(true, false, false);
+      spVector->setIdentity(PhysicalNames::IMPOSED_MAGNETIC);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::VORTICITYZ);
       spOut->expect(PhysicalNames::MAGNETIC);
+      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -255,6 +330,7 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::VELOCITY);
       spIn->expect(PhysicalNames::MAGNETIC);
+      spIn->expect(PhysicalNames::IMPOSED_MAGNETIC);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -285,6 +361,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+      spState->expect(PhysicalNames::IMPOSED_MAGNETIC);
       spSim->addHdf5OutputFile(spState);
    }
 
@@ -302,6 +379,7 @@ namespace GeoMHDiSCC {
       {
          spInit->expect(*it);
       }
+      spInit->expect(PhysicalNames::IMPOSED_MAGNETIC);
 
       // Set simulation state
       spSim->setInitialState(spInit);

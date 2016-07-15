@@ -134,6 +134,24 @@ namespace GeoMHDiSCC {
       return pDict;
    }
 
+   PyObject* PythonTools::makeDict(const std::map<std::string, MHDFloat>& map)
+   {
+      PyObject *pDict, *pKey, *pValue;
+
+      pDict = PyDict_New();
+      std::map<std::string,MHDFloat>::const_iterator mapIt;
+      for(mapIt = map.begin(); mapIt != map.end(); ++mapIt)
+      {
+         pKey = PyUnicode_FromString(mapIt->first.c_str());
+         pValue = PyFloat_FromDouble(mapIt->second);
+         PyDict_SetItem(pDict, pKey, pValue);
+         Py_DECREF(pValue);
+         Py_DECREF(pKey);
+      }
+
+      return pDict;
+   }
+
    void PythonTools::getList(std::vector<bool> &rList, PyObject *pList)
    {
       PyObject *pValue;
@@ -206,7 +224,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonTools::getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict)
+   void PythonTools::getDict(std::map<NonDimensional::Id,MHDFloat> &rMap, PyObject *pDict, const bool replace)
    {
       PyObject *pValue, *pKey, *pList, *pTmp;
 
@@ -222,12 +240,47 @@ namespace GeoMHDiSCC {
          NonDimensional::Id nd = IoTools::HumanToId::toNd(std::string(PyBytes_AsString(pTmp)));
          Py_DECREF(pTmp);
 
-         if(rMap.count(nd) > 0)
+         if(replace && rMap.count(nd) > 0)
+         {
+            rMap.find(nd)->second = PyFloat_AsDouble(pValue);
+
+         } else if(rMap.count(nd) > 0)
          {
             throw Exception("Map key already existed!");
+         } else
+         {
+            rMap.insert(std::make_pair(nd,PyFloat_AsDouble(pValue)));
          }
+      }
+   }
 
-         rMap.insert(std::make_pair(nd,PyFloat_AsDouble(pValue)));
+   void PythonTools::getDict(std::map<std::string,MHDFloat> &rMap, PyObject *pDict, const bool replace)
+   {
+      PyObject *pValue, *pKey, *pList, *pTmp;
+
+      pList = PyDict_Keys(pDict);
+
+      long int len = PyList_Size(pList);
+      for(int i = 0; i < len; ++i)
+      {
+         pKey = PyList_GetItem(pList, i);
+         pValue = PyDict_GetItem(pDict, pKey);
+
+         pTmp = PyUnicode_AsASCIIString(pKey);
+         std::string str = std::string(PyBytes_AsString(pTmp));
+         Py_DECREF(pTmp);
+
+         if(replace && rMap.count(str) > 0)
+         {
+            rMap.find(str)->second = PyFloat_AsDouble(pValue);
+
+         } else if(rMap.count(str) > 0)
+         {
+            throw Exception("Map key already existed!");
+         } else
+         {
+            rMap.insert(std::make_pair(str,PyFloat_AsDouble(pValue)));
+         }
       }
    }
 

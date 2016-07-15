@@ -71,7 +71,15 @@ namespace Schemes {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
+      // Check for mean
+      MatrixI idBlocks;
+      if(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0 && spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0) == 0)
+      {
+         idBlocks.resize(1,1);
+         idBlocks(0,0) = 0;
+      }
+
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, idBlocks, specSize, Transform::FftSetup::COMPONENT));
    }
 
    Transform::SharedFftSetup TFFScheme::spSetup2D(SharedResolution spRes) const

@@ -332,6 +332,30 @@ namespace Transform {
          rFFTVal.topRows(posN) = factor.asDiagonal()*rFFTVal.topRows(posN);
          rFFTVal.bottomRows(negN) = rfactor.asDiagonal()*rFFTVal.bottomRows(negN);
 
+      // Compute horizontal laplacian integration
+      } else if(integrator == FftwTransform::IntegratorType::INTGLAPLH)
+      {
+         // Get k1^2 factors
+         Array factor = (this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = (this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+
+         int start = 0;
+         int negRow = rFFTVal.rows() - negN;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            MHDFloat k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale();
+            k2 *= k2;
+
+            // Split positive and negative frequencies to compute rescaling
+            Array factor2 = -this->mspSetup->scale()*(k2 + factor.array());
+            rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
+            factor2 = -this->mspSetup->scale()*(k2 + rfactor.array());
+            rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*rFFTVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
+         }
+
       // Compute first derivative integration and mean (k1 = k2 = 0 mode is not zeroed)
       } else if(integrator == FftwTransform::IntegratorType::INTGDIFFM)
       {
@@ -381,7 +405,7 @@ namespace Transform {
          }
 
       // Compute inverse horizontal gradient integration
-      } else if(integrator == FftwTransform::IntegratorType::INTGDIFFINVLAPLH)
+      } else if(integrator == FftwTransform::IntegratorType::INTGDIFFFINVLAPLH)
       {
          // Get k1 factors
          ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
@@ -410,7 +434,6 @@ namespace Transform {
 
             // Increment block counter
             start += this->mspSetup->idBlocks()(i,1);
-
          }
 
       // Compute inverse horizontal laplacian integration
@@ -440,7 +463,6 @@ namespace Transform {
 
             // Increment block counter
             start += this->mspSetup->idBlocks()(i,1);
-
          }
 
       // Compute integration and zero k2 = 0, k1 != 0
@@ -465,7 +487,8 @@ namespace Transform {
          {
             if(this->mspSetup->idBlocks()(i,0) == 0)
             {
-               rFFTVal.block(0, start, rows, this->mspSetup->idBlocks()(i,1)) *= this->mspSetup->scale();
+               rFFTVal.block(0, start, 1, this->mspSetup->idBlocks()(i,1)) *= this->mspSetup->scale();
+               rFFTVal.block(1, start, rows-1, this->mspSetup->idBlocks()(i,1)).setZero();
             } else
             {
                rFFTVal.block(0, start, rows, this->mspSetup->idBlocks()(i,1)).setZero();
@@ -548,6 +571,81 @@ namespace Transform {
          for(std::vector<std::pair<int,int> >::const_iterator it = this->mMeanBlocks.begin(); it != this->mMeanBlocks.end(); ++it)
          {
             this->mTmpZIn.block(0, it->first, 1, it->second) = fftVal.block(0, it->first, 1, it->second);
+         }
+
+      // Compute horizontal Laplacian
+      } else if(projector == FftwTransform::ProjectorType::LAPLH)
+      {
+         // Get k1^2 factors
+         Array factor = (this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = (this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+
+         int start = 0;
+         int negRow = fftVal.rows() - negN;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            MHDFloat k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale();
+            k2 *= k2;
+
+            // Split positive and negative frequencies to compute rescaling
+            Array factor2 = -(k2 + factor.array());
+            this->mTmpZIn.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*fftVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
+            factor2 = -(k2 + rfactor.array());
+            this->mTmpZIn.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*fftVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
+         }
+
+      // Compute fast derivative of horizontal Laplacian
+      } else if(projector == FftwTransform::ProjectorType::DIFFFLAPLH)
+      {
+         // Get k1 factors
+         ArrayZ factor1 = (this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1));
+         ArrayZ rfactor1 = (this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN)));
+
+         // Get k1^3 factors
+         ArrayZ factor3 = (this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1)).array().pow(3);
+         ArrayZ rfactor3 = (this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(3);
+
+         int start = 0;
+         int negRow = fftVal.rows() - negN;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            MHDFloat k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale();
+            k2 *= k2;
+
+            ArrayZ factor2 = (-k2*factor1.array() + factor3.array());
+            // Split positive and negative frequencies to compute rescaling
+            this->mTmpZIn.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*fftVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
+            factor2 = (-k2*rfactor1.array() + rfactor3.array());
+            this->mTmpZIn.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*fftVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
+         }
+
+      // Compute slow derivative of horizontal Laplacian
+      } else if(projector == FftwTransform::ProjectorType::DIFFSLAPLH)
+      {
+         // Get k1^2 factors
+         Array factor = (this->mspSetup->boxScale()*Array::LinSpaced(posN, 0, posN-1)).array().pow(2);
+         Array rfactor = (this->mspSetup->boxScale()*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN))).array().pow(2);
+
+         int start = 0;
+         int negRow = fftVal.rows() - negN;
+         for(int i = 0; i < this->mspSetup->idBlocks().rows(); ++i)
+         {
+            MHDComplex k2 = this->mspSetup->idBlocks()(i,0)*this->mspSetup->boxScale()*Math::cI;
+
+            // Split positive and negative frequencies to compute rescaling
+            ArrayZ factor2 = k2*(k2*k2 - factor.cast<MHDComplex>().array());
+            this->mTmpZIn.block(0, start, posN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*fftVal.block(0, start, posN, this->mspSetup->idBlocks()(i,1));
+            factor2 = k2*(k2*k2 - rfactor.cast<MHDComplex>().array());
+            this->mTmpZIn.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1)) = factor2.asDiagonal()*fftVal.block(negRow, start, negN, this->mspSetup->idBlocks()(i,1));
+
+            // Increment block counter
+            start += this->mspSetup->idBlocks()(i,1);
          }
 
       // Compute simple projection

@@ -155,11 +155,11 @@ def tau_diff(nx, pos, bc):
     it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
-    c = next(it)
+    c = next(it)*tau_c()
     ns = np.arange(0,nx)
     if pos >= 0:
         cond.append(c*ns**2)
-        c = next(it)
+        c = next(it)*tau_c()
 
     if pos <= 0:
         cond.append(c*ns**2*alt_ones(nx, 0))
@@ -177,11 +177,11 @@ def tau_diff2(nx, pos, bc):
     it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
-    c = next(it)
+    c = next(it)*tau_c()
     ns = np.arange(0,nx)
     if pos >= 0:
         cond.append((c/3.0)*(ns**4 - ns**2))
-        c = next(it)
+        c = next(it)*tau_c()
 
     if pos <= 0:
         cond.append((c/3.0)*(ns**4 - ns**2)*alt_ones(nx, 1))

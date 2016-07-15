@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    Cartesian1DScalarEnergyWriter::Cartesian1DScalarEnergyWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-1.0)
+      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
    {
    }
 
@@ -43,8 +43,8 @@ namespace IoVariable {
 
    void Cartesian1DScalarEnergyWriter::init()
    {
-      // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
-      this->mVolume = 2.0;
+      // Normalize by Cartesian volume V = (2*pi*Box1D/k1D)*(2*pi*Box2D/k2D)*2 but FFT already includes 1/(2*pi)
+      this->mVolume = 2.0/(this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM2D)*this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM3D));
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -80,7 +80,7 @@ namespace IoVariable {
       assert(std::distance(sRange.first, sRange.second) == 1);
 
       // Initialize the energy
-      this->mEnergy = 0.0;
+      this->mEnergy.setConstant(0.0);
 
       // Dealias variable data
       coord.communicator().dealiasSpectral(sRange.first->second->rDom(0).rTotal());
@@ -109,14 +109,16 @@ namespace IoVariable {
             // Include ignored complex conjugate
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
             {
-               this->mEnergy += (this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+               // Energy in mean
+               this->mEnergy(0) += (this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+
             } else if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) <= this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
             {
-               this->mEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+               this->mEnergy(1) += 2.0*(this->mIntgOp*rInVar.slice(k).col(0).real())(0);
             }
             start = 1;
          }
-         this->mEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
+         this->mEnergy(1) += 2.0*(this->mIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
       }
 
       // Free BWD storage
@@ -126,7 +128,7 @@ namespace IoVariable {
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
 
       // Normalize by the Cartesian volume
-      this->mEnergy /= this->mVolume;
+      this->mEnergy.array() /= this->mVolume;
    }
 
    void Cartesian1DScalarEnergyWriter::write()
@@ -136,20 +138,20 @@ namespace IoVariable {
 
       // Get the "global" Kinetic energy from MPI code
       #ifdef GEOMHDISCC_MPI
-         MPI_Allreduce(MPI_IN_PLACE, &this->mEnergy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, this->mEnergy.data(), this->mEnergy.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       #endif //GEOMHDISCC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mEnergy << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mEnergy.sum() << "\t" << this->mEnergy(0) << "\t" << this->mEnergy(1) << std::endl;
       }
 
       // Close file
       this->postWrite();
 
       // Abort if kinetic energy is NaN
-      if(std::isnan(this->mEnergy))
+      if(std::isnan(this->mEnergy.sum()))
       {
          FrameworkMacro::abort(99);
 
