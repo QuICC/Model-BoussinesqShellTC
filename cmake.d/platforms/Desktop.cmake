@@ -91,11 +91,11 @@ set(GEOMHDISCC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_INC_GCC "-I/usr/include/hdf5/serial" PARENT_SCOPE)
+set(GEOMHDISCC_CC_INC_GCC "" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_INC_MPI_GCC ${GEOMHDISCC_CC_INC_GCC} PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_LIB_GCC "-L/usr/lib/x86_64-linux-gnu/hdf5/serial/" PARENT_SCOPE)
+set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
@@ -105,12 +105,12 @@ set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
 set(GEOMHDISCC_PYTHONS "python27" PARENT_SCOPE)
 
-set(GEOMHDISCC_LIBRARIES_PYTHON27 "/usr/lib/x86_64-linux-gnu/libpython2.7.so" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_LIBRARIES "/usr/lib/x86_64-linux-gnu/hdf5/serial/" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES "/usr/include/hdf5/serial" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES "" PARENT_SCOPE)
