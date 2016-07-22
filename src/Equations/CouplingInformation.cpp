@@ -129,7 +129,7 @@ namespace Equations {
 
       // Extract the position of the equation field
       FieldId_iterator pos = std::find(this->mImplicitFields.begin(), this->mImplicitFields.end(), std::make_pair(fieldId, compId));
-      assert((this->equationType() == TRIVIAL && pos == this->mImplicitFields.end()) || pos != this->mImplicitFields.end());
+      assert((this->equationType() == TRIVIAL && pos == this->mImplicitFields.end()) || (this->equationType() == WRAPPER && pos == this->mImplicitFields.end()) || pos != this->mImplicitFields.end());
 
       // Set initial field index
       this->mFieldIndex = pos - this->mImplicitFields.begin();
