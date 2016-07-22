@@ -293,7 +293,10 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2(res[0], bc)
+            if kx == 0 and ky == 0:
+                mat = geo.zblk(res[0], bc)
+            else:
+                mat = geo.i2(res[0], bc)
 
         elif field_row == ("mean_temperature","") and field_col == ("temperature",""):
             if kx == 0 and ky == 0:
