@@ -16,6 +16,7 @@ set(MHDPhysicalModels
    BoussinesqRBCCylinderVCModel.hpp
    BoussinesqRRBCDuctVCModel.hpp
    BoussinesqRRBCPlaneModel.hpp
+   BoussinesqRRBCPlaneMeanModel.hpp
    BoussinesqRRBCPlaneVCModel.hpp
    BoussinesqRRBCBoxVCModel.hpp
    BoussinesqRRBCAnnulusVCModel.hpp

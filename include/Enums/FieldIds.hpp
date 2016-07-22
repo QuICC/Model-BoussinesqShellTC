@@ -53,8 +53,12 @@ namespace GeoMHDiSCC {
          FBZ,
          /// Magnetic field
          MAGNETIC,
-         /// Mean temperature field
-         MEANTEMPERATURE,
+         /// X Magnetic field
+         MAGNETICX,
+         /// Y Magnetic field
+         MAGNETICY,
+         /// Z Magnetic field
+         MAGNETICZ,
          /// Pressure field
          PRESSURE,
          /// Temperature field
@@ -101,6 +105,37 @@ namespace GeoMHDiSCC {
          /// Non orthogonal vertical vorticity field in tilted box
          TILTED_NO_VORTICITYZ,
 
+         /// Fluctuating temperature field
+         FLUCT_TEMPERATURE,
+         /// Fluctuating X magnetic field
+         FLUCT_MAGNETIC,
+         /// Fluctuating X magnetic field
+         FLUCT_MAGNETICX,
+         /// Fluctuating Y magnetic field
+         FLUCT_MAGNETICY,
+         /// Fluctuating Z magnetic field
+         FLUCT_MAGNETICZ,
+         /// Fluctuating X velocity field
+         FLUCT_VELOCITY,
+         /// Fluctuating X velocity field
+         FLUCT_VELOCITYX,
+         /// Fluctuating Y velocity field
+         FLUCT_VELOCITYY,
+         /// Fluctuating Z velocity field
+         FLUCT_VELOCITYZ,
+
+         /// Mean temperature field
+         MEAN_TEMPERATURE,
+         /// Mean X magnetic field
+         MEAN_MAGNETIC,
+         /// Mean X magnetic field
+         MEAN_MAGNETICX,
+         /// Mean Y magnetic field
+         MEAN_MAGNETICY,
+         /// Mean Z magnetic field
+         MEAN_MAGNETICZ,
+         /// Mean X velocity field
+         MEAN_VELOCITY,
          /// Mean X velocity field
          MEAN_VELOCITYX,
          /// Mean Y velocity field

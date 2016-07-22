@@ -1,0 +1,19 @@
+set(MHDModelSources
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRBCPlaneMeanTransport.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRBCPlaneMomentum.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRBCPlaneMeanHeat.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactStateIds.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactVectorState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldTrivialVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DScalarEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DTorPolEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DNusseltDZWriter.cpp
+)

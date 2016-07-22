@@ -33,6 +33,12 @@ namespace Equations {
    class RandomScalarState: public IScalarEquation
    {
       public:
+         enum SpecialId {
+            ONLYMEAN, ///< Only mean
+            NOMEAN, ///< No mean 
+            NOTHING, ///< Nothing special
+         };
+
          /**
           * @brief Simple constructor
           *
@@ -63,12 +69,12 @@ namespace Equations {
          /**
           * @brief Set spectrum variables
           */
-         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D);
+         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const SpecialId id = NOTHING);
 
          /**
           * @brief Set spectrum variables
           */
-         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D);
+         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D, const SpecialId id = NOTHING);
 
       protected:
          /**
@@ -121,6 +127,11 @@ namespace Equations {
           * @brief Starting seed used for random generator
           */
          int mStartSeed;
+
+         /**
+          * @brief ID flag for special setup
+          */
+         SpecialId mSpecial;
    };
 
    /// Typedef for a shared RandomScalarState

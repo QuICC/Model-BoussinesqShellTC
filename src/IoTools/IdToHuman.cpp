@@ -49,9 +49,6 @@ namespace IoTools {
          case PhysicalNames::MAGNETIC:
             return "Magnetic";
 
-         case PhysicalNames::MEANTEMPERATURE:
-            return "Mean temperature";
-
          case PhysicalNames::PRESSURE:
             return "Pressure";
 
@@ -115,6 +112,51 @@ namespace IoTools {
          case PhysicalNames::TILTED_VELOCITYZ:
             return "Tilted vertical velocityZ";
 
+         case PhysicalNames::FLUCT_TEMPERATURE:
+            return "Fluctuating temperature";
+
+         case PhysicalNames::FLUCT_MAGNETIC:
+            return "Fluctuating magnetic";
+
+         case PhysicalNames::FLUCT_MAGNETICX:
+            return "Fluctuating magneticX";
+
+         case PhysicalNames::FLUCT_MAGNETICY:
+            return "Fluctuating magneticY";
+
+         case PhysicalNames::FLUCT_MAGNETICZ:
+            return "Fluctuating magneticZ";
+
+         case PhysicalNames::FLUCT_VELOCITY:
+            return "Fluctuating velocity";
+
+         case PhysicalNames::FLUCT_VELOCITYX:
+            return "Fluctuating velocityX";
+
+         case PhysicalNames::FLUCT_VELOCITYY:
+            return "Fluctuating velocityY";
+
+         case PhysicalNames::FLUCT_VELOCITYZ:
+            return "Fluctuating velocityZ";
+
+         case PhysicalNames::MEAN_TEMPERATURE:
+            return "Mean temperature";
+
+         case PhysicalNames::MEAN_MAGNETIC:
+            return "Mean magnetic";
+
+         case PhysicalNames::MEAN_MAGNETICX:
+            return "Mean magneticX";
+
+         case PhysicalNames::MEAN_MAGNETICY:
+            return "Mean magneticY";
+
+         case PhysicalNames::MEAN_MAGNETICZ:
+            return "Mean magneticZ";
+
+         case PhysicalNames::MEAN_VELOCITY:
+            return "Mean velocity";
+
          case PhysicalNames::MEAN_VELOCITYX:
             return "Mean velocityX";
 
@@ -162,9 +204,6 @@ namespace IoTools {
 
          case PhysicalNames::MAGNETIC:
             return "magnetic";
-
-         case PhysicalNames::MEANTEMPERATURE:
-            return "meantemperature";
 
          case PhysicalNames::PRESSURE:
             return "pressure";
@@ -228,6 +267,51 @@ namespace IoTools {
 
          case PhysicalNames::TILTED_VELOCITYZ:
             return "tilted_velocityz";
+
+         case PhysicalNames::FLUCT_TEMPERATURE:
+            return "fluct_temperature";
+
+         case PhysicalNames::FLUCT_MAGNETIC:
+            return "fluct_magnetic";
+
+         case PhysicalNames::FLUCT_MAGNETICX:
+            return "fluct_magneticx";
+
+         case PhysicalNames::FLUCT_MAGNETICY:
+            return "fluct_magneticy";
+
+         case PhysicalNames::FLUCT_MAGNETICZ:
+            return "fluct_magneticz";
+
+         case PhysicalNames::FLUCT_VELOCITY:
+            return "fluct_velocity";
+
+         case PhysicalNames::FLUCT_VELOCITYX:
+            return "fluct_velocityx";
+
+         case PhysicalNames::FLUCT_VELOCITYY:
+            return "fluct_velocityy";
+
+         case PhysicalNames::FLUCT_VELOCITYZ:
+            return "fluct_velocityz";
+
+         case PhysicalNames::MEAN_TEMPERATURE:
+            return "mean_temperature";
+
+         case PhysicalNames::MEAN_MAGNETIC:
+            return "mean_magnetic";
+
+         case PhysicalNames::MEAN_MAGNETICX:
+            return "mean_magneticx";
+
+         case PhysicalNames::MEAN_MAGNETICY:
+            return "mean_magneticy";
+
+         case PhysicalNames::MEAN_MAGNETICZ:
+            return "mean_magneticz";
+
+         case PhysicalNames::MEAN_VELOCITY:
+            return "mean_velocity";
 
          case PhysicalNames::MEAN_VELOCITYX:
             return "mean_velocityx";
