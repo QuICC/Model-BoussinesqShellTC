@@ -36,7 +36,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocity", "temperature", "meantemperature"]
+        return ["velocity", "temperature", "mean_temperature"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -69,7 +69,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         elif timing == self.EXPLICIT_NONLINEAR:
             if field_row in [("temperature","")]:
                 fields = [field_row]
-            elif field_row in [("meantemperature","")]:
+            elif field_row in [("mean_temperature","")]:
                 fields = [("temperature","")]
             else:
                 fields = []
@@ -85,7 +85,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row in [("velocity","tor"), ("temperature",""), ("meantemperature","")]:
+            if field_row in [("velocity","tor"), ("temperature",""), ("mean_temperature","")]:
                 shift_z = 2
             elif field_row in [("velocity","pol")]:
                 shift_z = 4
@@ -155,7 +155,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                             bc = {0:40}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("meantemperature","") and field_col == field_row:
+                    elif field_row == ("mean_temperature","") and field_col == field_row:
                         bc = {0:20}
 
             # Stress-free / Fixed flux
@@ -215,7 +215,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                         bc['rt'] = 2
                     else:
                         bc['rt'] = 4
-                elif field_row in [("temperature",""),("meantemperature","")]:
+                elif field_row in [("temperature",""),("mean_temperature","")]:
                     bc['rt'] = 2
 
         # Stencil:
@@ -230,7 +230,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                             bc = {0:-20}
                         else:
                             bc = {0:-40}
-                    elif field_col in [("temperature",""),("meantemperature","")]:
+                    elif field_col in [("temperature",""),("mean_temperature","")]:
                         bc = {0:-20}
 
                 elif bcId == 1:
@@ -244,7 +244,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                             bc = {0:-21}
                         else:
                             bc = {0:-41}
-                    elif field_col in [("temperature",""),("meantemperature","")]:
+                    elif field_col in [("temperature",""),("mean_temperature","")]:
                         bc = {0:-21}
 
         # Field values to RHS:
@@ -258,7 +258,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                         bc['rt'] = 2
                     else:
                         bc['rt'] = 4
-                elif field_row in [("temperature",""),("meantemperature","")]:
+                elif field_row in [("temperature",""),("mean_temperature","")]:
                     bc['rt'] = 2
 
         return bc
@@ -295,7 +295,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2(res[0], bc)
 
-        elif field_row == ("meantemperature","") and ("meantemperature",""):
+        elif field_row == ("mean_temperature","") and field_col == ("temperature",""):
             if kx == 0 and ky == 0:
                 mat = geo.i2(res[0], bc)
             else:
@@ -354,7 +354,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
     
         # Mean temperature
-        elif field_row == ("meantemperature",""):
+        elif field_row == ("mean_temperature",""):
             if field_col == ("velocity","tor"):
                 mat = geo.zblk(res[0], bc)
 
@@ -364,7 +364,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("meantemperature",""):
+            elif field_col == ("mean_temperature",""):
                 if kx == 0 and ky == 0:
                     mat = geo.i2d2(res[0], bc, 1.0/Pr, cscale = zscale)
                 else:
@@ -464,146 +464,6 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         mat = geo.zblk(res[0], bc)
-        if mat is None:
-            raise RuntimeError("Equations are not setup properly!")
-
-        return mat
-
-class BoussinesqRRBCPlaneVisu(base_model.BaseModel):
-    """Class to setup the visualization options for TFF scheme """
-
-    def periodicity(self):
-        """Get the domain periodicity"""
-
-        return [False, True, True]
-
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh", "ekman", "scale1d"]
-
-    def automatic_parameters(self, eq_params):
-        """Extend parameters with automatically computable values"""
-
-        # Rescale Z direction with ekman number
-        d = {"scale1d":eq_params["scale1d"]*eq_params["ekman"]**(1./3.)}
-
-        return d
-
-    def config_fields(self):
-        """Get the list of fields that need a configuration entry"""
-
-        return ["velocity", "temperature"]
-
-    def implicit_fields(self, field_row):
-        """Get the list of coupled fields in solve"""
-
-        fields =  []
-
-        return fields
-
-    def explicit_fields(self, timing, field_row):
-        """Get the list of fields with explicit dependence"""
-
-        # Explicit linear terms
-        if timing == self.EXPLICIT_LINEAR:
-            if field_row in [("meantemperature", ""),("fluctuating_temperature", "")]:
-                fields = [("temperature","")]
-            else:
-                fields = []
-
-        # Explicit nonlinear terms
-        elif timing == self.EXPLICIT_NONLINEAR:
-            fields = []
-
-        # Explicit update terms for next step
-        elif timing == self.EXPLICIT_NEXTSTEP:
-            fields = []
-
-        return fields
-
-    def block_size(self, res, field_row):
-        """Create block size information"""
-
-        tau_n = res[0]
-        if self.use_galerkin:
-            if field_row in [("velocity","tor"), ("temperature","")]:
-                shift_z = 2
-            elif field_row in [("velocity","pol")]:
-                shift_z = 4
-            else:
-                shift_z = 0
-
-            gal_n = (res[0] - shift_z)
-
-        else:
-            gal_n = tau_n
-            shift_z = 0
-
-        block_info = (tau_n, gal_n, (shift_z,0,0), 1)
-        return block_info
-
-    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return geo.stencil(res[0], bc, make_square)
-
-    def equation_info(self, res, field_row):
-        """Provide description of the system of equation"""
-
-        # Matrix operator is complex except for vorticity and mean temperature
-        is_complex = True
-
-        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.MODE
-
-        return self.compile_equation_info(res, field_row, is_complex, index_mode)
-
-    def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
-        """Convert simulation input boundary conditions to ID"""
-
-        # Solver: no tau boundary conditions
-        if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
-            bc = no_bc()
-
-        # Solver: tau and Galerkin
-        elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
-            raise RuntimeError("Equations are not setup properly!")
-
-        # Stencil:
-        elif bcs["bcType"] == self.STENCIL:
-            raise RuntimeError("Equations are not setup properly!")
-
-        # Field values to RHS:
-        elif bcs["bcType"] == self.FIELD_TO_RHS:
-            bc = no_bc()
-            if self.use_galerkin:
-                raise RuntimeError("Equations are not setup properly!")
-
-        return bc
-
-    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
-        """Create matrix block for explicit linear term"""
-
-        kx = eigs[0]
-        ky = eigs[1]
-
-        mat = None
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        # Mean temperature
-        if field_row == ("meantemperature","") and field_col == ("temperature",""):
-            if kx == 0 and ky == 0:
-                mat = geo.qid(res[0], 0, bc)
-            else:
-                mat = geo.zblk(res[0], bc)
-        elif field_row == ("fluctuating_temperature","") and field_col == ("temperature",""):
-            if kx == 0 and ky == 0:
-                mat = geo.zblk(res[0], bc)
-            else:
-                mat = geo.qid(res[0], 0, bc)
-
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
