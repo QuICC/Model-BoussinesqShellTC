@@ -1,28 +1,25 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating Rayleigh-Benard convection in a cylinder model with Worland expansion (Toroidal/Poloidal formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq inertial waves in a cylinder model with Worland expansion (Toroidal/Poloidal formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rrbccylinder as mod
+import geomhdiscc.model.boussinesq_iwcylinder as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
-model = mod.BoussinesqRRBCCylinder()
+model = mod.BoussinesqIWCylinder()
 model.linearize = True
 model.use_galerkin = False
 
 # Set boundary conditions
-bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
-bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+bc_vel = 0 # 0: NS/NS
 
 # Create parameters
 m = 3
 res = [64, 0, 32]
-Omega = 0
-Pr = 6.7
+Ta = (1e-3)**(-2)
 Gamma = 1.0
-Ra = 1
-eq_params = {'taylor':(2.0*Omega)**2, 'prandtl':Pr, 'rayleigh':Ra, 'gamma':Gamma}
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
+eq_params = {'taylor':Ta, 'gamma':Gamma, 'rayleigh':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel}
 
 # Wave number function from single "index" (k perpendicular)
 def wave(m):
@@ -37,7 +34,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-12
 marginal_options['geometry'] = 'cylinder_worland'
-#marginal_options['ellipse_radius'] = 1e3
+marginal_options['ellipse_radius'] = 1e3
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True

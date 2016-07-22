@@ -114,7 +114,7 @@ def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
             for mbc, mc, mkron in mixed_iterator(mix):
                 bcMat = spsp.lil_matrix((nz,nz))
                 bcMat = c1dbc.constrain(bcMat, mix, pad_zeros = pad, location = location)
-                bc_mat += utils.restricted_kron_2d(bcMat, brid(nr,m,sr,dr,bc['r'], location = location)*mkron(nr+s, {0:0, 'rt':s, 'cr':s}), restriction = restriction)
+                bc_mat += utils.restricted_kron_2d(bcMat, brid(nr,m,sr,dr,bc['r'], location = location)*mkron(nr+s, m, {0:0, 'rt':s, 'cr':s}), restriction = restriction)
 
     return bc_mat
 
