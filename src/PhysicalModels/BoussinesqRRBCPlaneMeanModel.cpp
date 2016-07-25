@@ -161,9 +161,9 @@ namespace GeoMHDiSCC {
       spSim->addAsciiOutputFile(spTemp);
 
       // Create temperature energy writer
-      IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("mean_temperature", SchemeType::type()));
-      spTemp->expect(PhysicalNames::MEAN_TEMPERATURE);
-      spSim->addAsciiOutputFile(spTemp);
+      IoVariable::SharedCartesian1DScalarEnergyWriter spMeanTemp(new IoVariable::Cartesian1DScalarEnergyWriter("mean_temperature", SchemeType::type()));
+      spMeanTemp->expect(PhysicalNames::MEAN_TEMPERATURE);
+      spSim->addAsciiOutputFile(spMeanTemp);
 
       // Create kinetic energy writer
       IoVariable::SharedCartesian1DTorPolEnergyWriter spKinetic(new IoVariable::Cartesian1DTorPolEnergyWriter("kinetic", SchemeType::type()));
