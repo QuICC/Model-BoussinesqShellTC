@@ -4,7 +4,7 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVelocityZ.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen2DTools.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DNusseltXWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp

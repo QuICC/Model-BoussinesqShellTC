@@ -20,7 +20,6 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -125,17 +124,17 @@ namespace Equations {
 
    void  IScalarEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const
    {
-      this->dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->unknown().dom(0).spRes(), this->couplingInfo(FieldComponents::Spectral::SCALAR).eigenTools().getEigs(this->spRes(), matIdx));
    }
 
    void IScalarEquation::setGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
    {
-      this->dispatchGalerkinStencil(comp, mat, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchGalerkinStencil(comp, mat, matIdx, this->unknown().dom(0).spRes(), this->couplingInfo(FieldComponents::Spectral::SCALAR).eigenTools().getEigs(this->spRes(), matIdx));
    }
 
    void IScalarEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const ModelOperator::Id opId, const SpectralFieldId fieldId, const int matIdx) const
    {
-      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->unknown().dom(0).spRes(), this->couplingInfo(FieldComponents::Spectral::SCALAR).eigenTools().getEigs(this->spRes(), matIdx));
    }
 
    void IScalarEquation::setNLComponents()

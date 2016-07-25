@@ -70,6 +70,12 @@ namespace IoTools {
          case PhysicalNames::VELOCITYZ:
             return "VelocityZ";
 
+         case PhysicalNames::ZONAL_VELOCITY:
+            return "Zonal velocity";
+
+         case PhysicalNames::NONZONAL_VELOCITY:
+            return "Non zonal velocity";
+
          case PhysicalNames::VORTICITY:
             return "Vorticity";
 
@@ -225,6 +231,12 @@ namespace IoTools {
 
          case PhysicalNames::VELOCITYZ:
             return "velocityz";
+
+         case PhysicalNames::ZONAL_VELOCITY:
+            return "zonal_velocity";
+
+         case PhysicalNames::NONZONAL_VELOCITY:
+            return "nonzonal_velocity";
 
          case PhysicalNames::VORTICITY:
             return "vorticity";

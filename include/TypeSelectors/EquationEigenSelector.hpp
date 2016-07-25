@@ -18,159 +18,16 @@
 
 // Project includes
 //
+#include "Equations/CouplingInformation.hpp"
+#include "Equations/Tools/IEigenTools.hpp"
 
-// Configure code to use TTT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TTT
-   
-   #include "Equations/Tools/EquationNoEigenTools.hpp"
+namespace GeoMHDiSCC {
 
-   namespace GeoMHDiSCC {
+namespace Equations {
 
-      namespace Equations {
+   SharedIEigenTools eigenSelector(const CouplingInformation::IndexType indexType);
 
-         namespace EigenSelector = NoEigen;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_TTT
-
-// Configure code to use TFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFT
-   
-   #include "Equations/Tools/EquationEigen1DTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = Eigen1D;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_TFT
-
-// Configure code to use TFF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFF
-
-   #include "Equations/Tools/EquationEigen2DTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = Eigen2D;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_TFF
-
-// Configure code to use FFF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_FFF
-
-   #include "Equations/Tools/EquationEigen3DTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = Eigen3D;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_FFF
-
-// Configure code to use CFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_CFT
-
-   #include "Equations/Tools/EquationEigen1DTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = Eigen1D;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_CFT
-
-// Configure code to use AFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_AFT
-
-   #include "Equations/Tools/EquationEigen1DTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = Eigen1D;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_AFT
-
-// Configure code to use BLFl, SLFl, WLFl schemes
-#if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
-
-   #include "Equations/Tools/EquationEigenSHlTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = EigenSHl;
-      }
-   }
-#endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
-
-// Configure code to use BLFm, SLFm, WLFm schemes
-#if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
-
-   #include "Equations/Tools/EquationEigenSHmTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = EigenSHm;
-      }
-   }
-#endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
-
-// Configure code to use WFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_WFT
-
-   #include "Equations/Tools/EquationEigen1DTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = Eigen1D;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_WFT
-
-// Configure code to use TT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TT
-   
-   #include "Equations/Tools/EquationNoEigenTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = NoEigen;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_TT
-
-// Configure code to use TF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TF
-   
-   #include "Equations/Tools/EquationEigen1DTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = Eigen1D;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_TF
+}
+}
 
 #endif // EQUATIONEIGENSELECTOR_HPP

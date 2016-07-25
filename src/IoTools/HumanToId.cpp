@@ -297,6 +297,14 @@ namespace IoTools {
       {
          return PhysicalNames::VELOCITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::ZONAL_VELOCITY))
+      {
+         return PhysicalNames::ZONAL_VELOCITY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::NONZONAL_VELOCITY))
+      {
+         return PhysicalNames::NONZONAL_VELOCITY;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
       {
          return PhysicalNames::VORTICITY;

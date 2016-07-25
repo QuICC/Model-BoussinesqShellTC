@@ -23,6 +23,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/ModelOperator.hpp"
+#include "Equations/Tools/IEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -115,6 +116,11 @@ namespace Equations {
           * @brief Get index type
           */
          IndexType indexType() const;
+
+         /**
+          * @brief Get eigen tools
+          */
+         const IEigenTools& eigenTools() const;
 
          /**
           * @brief Number of blocks in row of the system
@@ -335,6 +341,11 @@ namespace Equations {
           * @brief Storage for the field start index
           */
          int mFieldStart;
+
+         /**
+          * @brief Shared IEigenTools
+          */
+         SharedIEigenTools mspEigenTools;
 
          /**
           * @brief Storage for the Tau block sizes

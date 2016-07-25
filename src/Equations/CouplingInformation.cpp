@@ -23,6 +23,7 @@
 
 // Project includes
 //
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -70,6 +71,11 @@ namespace Equations {
    CouplingInformation::IndexType CouplingInformation::indexType() const
    {
       return this->mIndexType;
+   }
+
+   const IEigenTools& CouplingInformation::eigenTools() const
+   {
+      return *(this->mspEigenTools);
    }
 
    int CouplingInformation::nBlocks() const
@@ -206,6 +212,8 @@ namespace Equations {
    void CouplingInformation::setIndexType(const CouplingInformation::IndexType id)
    {
       this->mIndexType = id;
+
+      this->mspEigenTools = eigenSelector(this->mIndexType);
    }
 
    CouplingInformation::FieldId_range CouplingInformation::implicitRange() const

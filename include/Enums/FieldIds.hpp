@@ -73,6 +73,10 @@ namespace GeoMHDiSCC {
          VELOCITYY,
          /// Z velocity field
          VELOCITYZ,
+         /// Zonal velocity field (m = 0)
+         ZONAL_VELOCITY, 
+         /// Non-zonal velocity field (m != 0)
+         NONZONAL_VELOCITY, 
          /// Vorticity field
          VORTICITY,
          /// X vorticity field

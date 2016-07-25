@@ -30,6 +30,7 @@
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
@@ -135,12 +136,23 @@ namespace GeoMHDiSCC {
    {
       // Shared pointer to basic field visualizer
       Equations::SharedVectorFieldVisualizer spVector;
+      Equations::SharedVectorFieldTrivialVisualizer spVTrivial;
       Equations::SharedSphericalVerticalFieldVisualizer spVertical;
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
       spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
+
+      // Add zonal velocity field visualization
+      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
+      spVTrivial->setFields(true, false, false);
+      spVTrivial->setIdentity(PhysicalNames::ZONAL_VELOCITY);
+
+      // Add nonzonal velocity field visualization
+      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
+      spVTrivial->setFields(true, false, false);
+      spVTrivial->setIdentity(PhysicalNames::NONZONAL_VELOCITY);
 
       // Add vertical velocity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
@@ -155,6 +167,8 @@ namespace GeoMHDiSCC {
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::ZONAL_VELOCITY);
+      spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);

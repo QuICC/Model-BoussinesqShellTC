@@ -22,7 +22,6 @@
 #include "Python/PythonTools.hpp"
 #include "Python/PythonModelWrapper.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 #include "IoTools/IdToHuman.hpp"
 
 namespace GeoMHDiSCC {
@@ -345,24 +344,16 @@ namespace Equations {
       infoIt.first->second.setNonlinear(hasNL, hasNL && hasQI);
 
       // Set field coupling information
-      if(static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SLOWEST_SINGLE_RHS || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SLOWEST_MULTI_RHS || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::MODE || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SINGLE)
-      {
-         int nMat = EigenSelector::fieldCouplingNMat(spRes);
-         ArrayI tauNs(nMat);
-         ArrayI galerkinNs(nMat);
-         ArrayI rhsCols(nMat);
-         ArrayI systemNs(nMat);
-         EigenSelector::interpretTauN(tauNs, tauSize, spRes);
-         EigenSelector::interpretGalerkinN(galerkinNs, galerkinSize, spRes);
-         EigenSelector::interpretRhsN(rhsCols, rhsSize, spRes);
-         EigenSelector::interpretSystemN(systemNs, systemSize, spRes);
-         infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs); 
-
-      // Unknown field coupling has be requested
-      } else
-      {
-         throw Exception("Unknown field coupling type has been requested!");
-      }
+      int nMat = infoIt.first->second.eigenTools().nMat(spRes);
+      ArrayI tauNs(nMat);
+      ArrayI galerkinNs(nMat);
+      ArrayI rhsCols(nMat);
+      ArrayI systemNs(nMat);
+      infoIt.first->second.eigenTools().setTauN(tauNs, tauSize, spRes);
+      infoIt.first->second.eigenTools().setGalerkinN(galerkinNs, galerkinSize, spRes);
+      infoIt.first->second.eigenTools().setRhsN(rhsCols, rhsSize, spRes);
+      infoIt.first->second.eigenTools().setSystemN(systemNs, systemSize, spRes);
+      infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs); 
 
       // Sort implicit fields
       infoIt.first->second.sortImplicitFields(eqId.first, eqId.second);
