@@ -112,7 +112,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         """Provide description of the system of equation"""
 
         # Matrix operator is complex except for vorticity and mean temperature
-        is_complex = True
+        is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.MODE
