@@ -197,7 +197,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                         if eigs[0] == 0 and eigs[1] == 0:
                             bc = {0:21}
                         else:
-                            bc = {0:41, 'use_parity':False}
+                            bc = {0:40, 'use_parity':False}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
                         if eigs[0] == 0 and eigs[1] == 0:
                             bc = {0:0}
