@@ -193,14 +193,14 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                         if eigs[0] == 0 and eigs[1] == 0:
                             bc = {0:21}
                         else:
-                            bc = {0:40, 'use_parity':False}
+                            bc = {0:40, 'use_parity':True}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
                         if eigs[0] == 0 and eigs[1] == 0:
                             bc = {0:0}
                         else:
                             E = eq_params['ekman']
                             c = E**(1./6.)/2**(1./2.)
-                            bc = {0:20, 'c':[c, -c], 'use_parity':False}
+                            bc = {0:20, 'c':[c, -c], 'use_parity':True}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
