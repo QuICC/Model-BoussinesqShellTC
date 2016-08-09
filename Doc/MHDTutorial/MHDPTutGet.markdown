@@ -40,7 +40,7 @@ Other useful stuff
 
    1. Create new branch:
 
-      #$>git push origin origin:refs/head/new_branch_name
+      #$>git push origin origin:refs/heads/new_branch_name
 
    2. Make sure everything is up-to-date:
 
