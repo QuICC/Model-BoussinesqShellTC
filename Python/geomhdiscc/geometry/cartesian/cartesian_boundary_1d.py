@@ -283,18 +283,12 @@ def tau_value_diff2(nx, pos, bc):
     """Create tau lines for a zero boundary value and a zero 2nd derivative """
 
     cond = []
-    if pos > 0:
+    if pos >= 0:
         cond.append(tau_value(nx,1,bc)[0])
         cond.append(tau_diff2(nx,1,bc)[0])
 
-    if pos < 0:
+    if pos <= 0:
         cond.append(tau_value(nx,-1,bc)[0])
-        cond.append(tau_diff2(nx,-1,bc)[0])
-
-    if pos == 0:
-        cond.append(tau_value(nx,1,bc)[0])
-        cond.append(tau_value(nx,-1,bc)[0])
-        cond.append(tau_diff2(nx,1,bc)[0])
         cond.append(tau_diff2(nx,-1,bc)[0])
 
     if bc.get('use_parity', True) and pos == 0:

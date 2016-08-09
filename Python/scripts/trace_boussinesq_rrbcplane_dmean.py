@@ -3,7 +3,7 @@
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_rrbcplane as mod
+import geomhdiscc.model.boussinesq_rrbcplane_dmean as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -13,7 +13,7 @@ model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 res = [512, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':8.686001195839, 'ekman':1e-7, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':8.06, 'ekman':1e-7, 'scale1d':2.0}
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v

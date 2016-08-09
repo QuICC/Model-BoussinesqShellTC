@@ -62,7 +62,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGTransport::setRequirements()
    {
-      // Set temperatur as equation unknown
+      // Set temperature as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
 
       // Set solver timing
