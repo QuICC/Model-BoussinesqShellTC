@@ -64,12 +64,9 @@ namespace GeoMHDiSCC {
          {
             int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             // Skew calculation
-            this->mSkew(k_) = (this->rInVar.phys().slice(k) - mAvg(k_)).array().pow(3).sum();
+            this->mSkew(k_) = (this->rInVar.phys().slice(k) - mAvg(k_)).array().pow(3).sum()/(this->mRMS(k_)).pow(3);
          }
 
-
-         // Normalize by the Cartesian volume
-         this->mSkew /= (this->mRMS).pow(3);
       }
 
       void Cartesian1DScalarSkewWriter::postcompute(Transform::TransformCoordinatorType& coord)
