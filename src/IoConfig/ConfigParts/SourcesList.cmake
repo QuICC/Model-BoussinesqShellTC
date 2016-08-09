@@ -5,6 +5,7 @@ set(MHDSources
    ParallelPart.cpp
    PhysicalPart.cpp
    RunPart.cpp
+   StatisticsPart.cpp
    TimesteppingPart.cpp
    TruncationPart.cpp
 )

@@ -32,6 +32,7 @@
 #include "IoConfig/ConfigParts/TimesteppingPart.hpp"
 #include "IoConfig/ConfigParts/RunPart.hpp"
 #include "IoConfig/ConfigParts/IoPart.hpp"
+#include "IoConfig/ConfigParts/StatisticsPart.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -45,7 +46,7 @@ namespace IoConfig {
       /**
        * @name Enum for framework configuration block
        */
-      enum Id {TRUNCATION, PARALLEL, TIMESTEPPING, RUN, IO};
+      enum Id {TRUNCATION, PARALLEL, TIMESTEPPING, RUN, IO, STATISTICS};
    };
 
    /**
@@ -303,13 +304,17 @@ namespace IoConfig {
       spPart = SharedParallelPart(new ParallelPart());
       this->mFramework.insert(std::make_pair(FrameworkBlocks::PARALLEL, spPart));
       
-      // Add parallel part
+      // Add timestepping part
       spPart = SharedTimesteppingPart(new TimesteppingPart());
       this->mFramework.insert(std::make_pair(FrameworkBlocks::TIMESTEPPING, spPart));
       
-      // Add parallel part
+      // Add run part
       spPart = SharedRunPart(new RunPart());
       this->mFramework.insert(std::make_pair(FrameworkBlocks::RUN, spPart));
+      
+      // Add statistics part
+      spPart = SharedStatisticsPart(new StatisticsPart());
+      this->mFramework.insert(std::make_pair(FrameworkBlocks::STATISTICS, spPart));
       
       // Add IO part
       spPart = SharedIoPart(new IoPart());
