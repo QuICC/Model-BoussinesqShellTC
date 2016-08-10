@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -31,7 +31,7 @@ namespace IoStats {
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic) horizontal average calculation for a scalar field
     */
-   class Cartesian1DScalarAvgWriter: public IoVariable::IVariableAsciiEWriter
+   class Cartesian1DScalarAvgWriter: public IStatisticsAsciiEWriter
    {
       public:
          /**
@@ -52,24 +52,30 @@ namespace IoStats {
           */
          virtual void init();
 
-         void precompute(Transform::TransformCoordinatorType& coord);
          /**
-          * @brief Compute energy for scalar field
+          * @brief Pre computation stage for average of scalar field
+          */
+         void preCompute(Transform::TransformCoordinatorType& coord);
+
+         /**
+          * @brief Compute average of scalar field
           */
          void compute(Transform::TransformCoordinatorType& coord);
 
-         void postcompute(Transform::TransformCoordinatorType& coord);
+         /**
+          * @brief Post computation stage for average of scalar field
+          */
+         void postCompute(Transform::TransformCoordinatorType& coord);
          
          /**
           * @brief Write State to file
           */
-         virtual void prewrite();
          virtual void write();
 
          /**
           * To shrare RMS with other stats
           */
-         const Array & RMS() const;
+         const Array& average() const;
 
          /**
           * @brief Requires heavy calculation?

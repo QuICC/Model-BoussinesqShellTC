@@ -78,8 +78,26 @@ namespace GeoMHDiSCC {
          // Compute explicit linear terms
          this->explicitEquations();
 
+         if(this->mTimestepCoordinator.finishedStep())
+         {
+            // Update pre calculations required for statistcs output
+            if(this->mSimIoCtrl.isStatsUpdateTime())
+            {
+               SimulationIoTools::updateStatsPre(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+            }
+         }
+
          // Compute the nonlinear terms
          this->computeNonlinear();
+
+         if(this->mTimestepCoordinator.finishedStep())
+         {
+            // Update calculations required for statistcs output
+            if(this->mSimIoCtrl.isStatsUpdateTime())
+            {
+               SimulationIoTools::updateStats(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+            }
+         }
 
          // Timestep the equations
          this->solveEquations();
@@ -198,6 +216,17 @@ namespace GeoMHDiSCC {
       this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       stage.done();
+      stage.start("write initial statistics files");
+
+      // Update calculation required for statistics output
+      SimulationIoTools::updateStatsPre(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+      SimulationIoTools::updateStats(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+      SimulationIoTools::updateStatsPost(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+
+      // Write initial statistics output
+      this->mSimIoCtrl.writeStats(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
+
+      stage.done();
    }
 
    void Simulation::explicitEquations()
@@ -285,6 +314,12 @@ namespace GeoMHDiSCC {
             SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
          }
 
+         // Update calculations required for statistcs output
+         if(this->mSimIoCtrl.isStatsUpdateTime())
+         {
+            SimulationIoTools::updateStatsPost(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+         }
+
          // Write initial ASCII and HDF5 output files if applicable
          this->mSimIoCtrl.writeFiles(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
       }
@@ -333,10 +368,21 @@ namespace GeoMHDiSCC {
       // Write final state file
       this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
-      // Synchronise all nodes of simulation
-      FrameworkMacro::synchronize();
+      stage.done();
+      stage.start("write final statistics files");
+
+      // Update calculation required for statistics output
+      SimulationIoTools::updateStatsPre(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+      SimulationIoTools::updateStats(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+      SimulationIoTools::updateStatsPost(this->mSimIoCtrl.beginStats(), this->mSimIoCtrl.endStats(), this->mTransformCoordinator);
+
+      // Write final statistics output
+      this->mSimIoCtrl.writeStats(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       stage.done();
+
+      // Synchronise all nodes of simulation
+      FrameworkMacro::synchronize();
    }
 
 }

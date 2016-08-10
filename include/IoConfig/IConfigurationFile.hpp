@@ -114,9 +114,14 @@ namespace IoConfig {
          SharedCIConfigurationPart spRun() const;
 
          /**
-          * @brief Get run part
+          * @brief Get IO part
           */
          SharedCIConfigurationPart spIo() const;
+
+         /**
+          * @brief Get statistics part
+          */
+         SharedCIConfigurationPart spStats() const;
 
          /**
           * @brief Get physical part
@@ -231,6 +236,14 @@ namespace IoConfig {
       assert(this->mFramework.find(FrameworkBlocks::IO) != this->mFramework.end());
 
       return this->mFramework.find(FrameworkBlocks::IO)->second;
+   }
+
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spStats() const
+   {
+      // Make sure initialisation was correct
+      assert(this->mFramework.find(FrameworkBlocks::STATISTICS) != this->mFramework.end());
+
+      return this->mFramework.find(FrameworkBlocks::STATISTICS)->second;
    }
 
    template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spPhysical() const

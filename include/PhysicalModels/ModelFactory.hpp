@@ -101,6 +101,9 @@ namespace GeoMHDiSCC {
       // Add HDF5 output files
       TModel::addHdf5OutputFiles(spSim);
 
+      // Add statistics output files
+      TModel::addStatsOutputFiles(spSim);
+
       // Set the boundary conditions
       SharedSimulationBoundary spBcs = spSim->createBoundary<TModel>();
 

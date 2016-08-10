@@ -18,6 +18,7 @@
 #include "IoAscii/StdOutPipe.hpp"
 #include "IoVariable/IVariableAsciiEWriter.hpp"
 #include "IoVariable/IVariableHdf5NWriter.hpp"
+#include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 
 namespace GeoMHDiSCC {
@@ -33,6 +34,9 @@ namespace GeoMHDiSCC {
 
          /// Typedef for an iterator over all the HDF5 writers
          typedef std::vector<IoVariable::SharedIVariableHdf5NWriter>::iterator hdf5_iterator;
+
+         /// Typedef for an iterator over all the ASCII writers
+         typedef std::vector<IoStats::SharedIStatisticsAsciiEWriter>::iterator stats_iterator;
 
          /**
           * @brief Constructor
@@ -87,6 +91,13 @@ namespace GeoMHDiSCC {
           * @param spOutFile Shared HDF5 writer
           */
          void addHdf5OutputFile(IoVariable::SharedIVariableHdf5NWriter  spOutFile);
+
+         /**
+          * @brief Add an statistics output file
+          *
+          * @param spOutFile Shared statistics writer
+          */
+         void addStatsOutputFile(IoStats::SharedIStatisticsAsciiEWriter spOutFile);
 
          /**
           * @brief Get the dimension read from the configuration file
@@ -149,6 +160,16 @@ namespace GeoMHDiSCC {
          hdf5_iterator endHdf5();
 
          /**
+          * @brief Get begin iterator to statistics files
+          */
+         stats_iterator beginStats();
+
+         /**
+          * @brief Get end iterator to statistics files
+          */
+         stats_iterator endStats();
+
+         /**
           * @brief Is is time to write ASCII file?
           */
          bool isAsciiTime() const;
@@ -157,6 +178,16 @@ namespace GeoMHDiSCC {
           * @brief Is is time to write HDF5 file?
           */
          bool isHdf5Time() const;
+
+         /**
+          * @brief Is is time to write statistics file?
+          */
+         bool isStatsTime() const;
+
+         /**
+          * @brief Is is time to update statistics calculations?
+          */
+         bool isStatsUpdateTime() const;
 
          /**
           * @brief Update IO status
@@ -186,6 +217,14 @@ namespace GeoMHDiSCC {
           * @param time    Current simulation timestep
           */
          void writeHdf5(const MHDFloat time, const MHDFloat timestep);
+
+         /**
+          * @brief Write statistics data
+          *
+          * @param time    Current simulation time
+          * @param time    Current simulation timestep
+          */
+         void writeStats(const MHDFloat time, const MHDFloat timestep);
          
       protected:
 
@@ -199,6 +238,11 @@ namespace GeoMHDiSCC {
           * @brief Vector of HDF5 output files
           */
          std::vector<IoVariable::SharedIVariableHdf5NWriter> mHdf5Writers;
+
+         /**
+          * @brief Vector of statistics output files
+          */
+         std::vector<IoStats::SharedIStatisticsAsciiEWriter> mStatsWriters;
 
          /**
           * @brief Handle to StdMessage buffer
@@ -224,6 +268,16 @@ namespace GeoMHDiSCC {
           * @brief HDF5 output rate
           */
          int mHdf5Rate;
+
+         /**
+          * @brief Statistics output rate
+          */
+         int mStatsRate;
+
+         /**
+          * @brief Statistics time average rate
+          */
+         int mStatsAvgRate;
 
          /**
           * @brief Initialise the configuration file

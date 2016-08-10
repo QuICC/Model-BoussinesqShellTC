@@ -32,6 +32,7 @@
 #include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
+#include "IoStats/Cartesian1DScalarAvgWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -218,6 +219,14 @@ namespace GeoMHDiSCC {
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
 
       spSim->addHdf5OutputFile(spState);
+   }
+
+   void BoussinesqFPlane3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+      // Create RMS temperature writer
+      IoStats::SharedCartesian1DScalarAvgWriter spAvg(new IoStats::Cartesian1DScalarAvgWriter("temperature", SchemeType::type()));
+      spAvg->expect(PhysicalNames::TEMPERATURE);
+      spSim->addStatsOutputFile(spAvg);
    }
 
    void BoussinesqFPlane3DQGModel::setInitialState(SharedSimulation spSim)
