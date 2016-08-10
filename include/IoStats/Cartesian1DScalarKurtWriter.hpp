@@ -84,8 +84,8 @@ namespace IoVariable {
          /**
           * @brief Storage for the scalar energy
           */
-         Array mAvg = Avg;
-         Array mRMS = RMS;
+         SharedCartesian1DScalarAvgWriter mAvg;
+         SharedCartesian1DScalarAvgWriter mRMS;
          Array mKurt;
    };
 

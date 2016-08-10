@@ -104,7 +104,7 @@ namespace GeoMHDiSCC {
          this->mRMS /= this->mArea;
 
          //take sqroot
-         this->mRMS = (this->mRMS).pow(0.5);
+         this->mRMS = (this->mRMS).sqrt();
       }
 
       void Cartesian1DScalarRMSWriter::postcompute(Transform::TransformCoordinatorType& coord)
