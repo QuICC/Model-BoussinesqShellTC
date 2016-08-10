@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -31,7 +31,7 @@ namespace IoStats {
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic) skew calculation for a scalar field
     */
-   class Cartesian1DScalarSkewWriter: public IoVariable::IVariableAsciiEWriter
+   class Cartesian1DScalarSkewWriter: public IoVariable::IStatisticsAsciiEWriter
    {
       public:
          /**
@@ -40,7 +40,7 @@ namespace IoStats {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         Cartesian1DScalarSkewWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const SharedCartesian1DScalarSkewWriter& RMS, const std::string& type);
+         Cartesian1DScalarSkewWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const SharedCartesian1DScalarRMSWriter& RMS, const std::string& type);
 
          /**
           * @brief Destructor
@@ -52,25 +52,20 @@ namespace IoStats {
           */
          virtual void init();
 
-         void precompute(Transform::TransformCoordinatorType& coord);
          /**
-          * @brief Compute energy for scalar field
+          * @brief Compute skew for scalar field
           */
          void compute(Transform::TransformCoordinatorType& coord);
 
-         void compute(Transform::TransformCoordinatorType& coord);
-         void postcompute(Transform::TransformCoordinatorType& coord);
+         /**
+          * @brief Post Compute skew for scalar field
+          */
+         void postCompute(Transform::TransformCoordinatorType& coord);
          
          /**
           * @brief Write State to file
           */
-         virtual void prewrite();
          virtual void write();
-
-         /**
-          * To shrare RMS with other stats
-          */
-         const Array & RMS() const;
 
          /**
           * @brief Requires heavy calculation?
@@ -84,8 +79,8 @@ namespace IoStats {
          /**
           * @brief Storage for the scalar energy
           */
-         Array mAvg = Avg;
-         Array mRMS = RMS;
+          SharedCartesian1DScalarAvgWriter mAvg;
+          SharedCartesian1DScalarRMSWriter mRMS;
          Array mSkew;
    };
 

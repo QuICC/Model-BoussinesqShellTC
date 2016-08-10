@@ -24,7 +24,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "ScalarFields/FieldTools.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoStats/SkewTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -32,8 +32,8 @@ namespace GeoMHDiSCC {
 
    namespace IoStats {
 
-      Cartesian1DScalarSkewWriter::Cartesian1DScalarSkewWriter(const std::string& prefix, const std::string& type)
-         : IoVariable::IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
+      Cartesian1DScalarSkewWriter::Cartesian1DScalarSkewWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const SharedCartesian1DScalarRMSWriter& RMS, const std::string& type)
+         : IStatisticsAsciiEWriter(prefix + SkewTags::BASENAME, SkewTags::EXTENSION, prefix + SkewTags::HEADER, type, SkewTags::VERSION, Dimensions::Space::SPECTRAL), mArea(-1), mAvg(Avg), mRMS(RMS), mSkew(-Array::Ones(2))
       {
       }
 
@@ -43,14 +43,15 @@ namespace GeoMHDiSCC {
 
       void Cartesian1DScalarSkewWriter::init()
       {
-         
-         IoVariable::IVariableAsciiEWriter::init();
+
+         IStatisticsAsciiEWriter::init();
+
+         if(FrameworkMacro::allowsIO())
+         {
+            this->mFile << "# " << std::setprecision(14) << this->mMesh.at(0).transpose() <<std::endl;
+         }
       }
 
-      void Cartesian1DScalarSkewWriter::precompute(Transform::TransformCoordinatorType& coord)
-      {
-         // nothing here
-      }
 
       void Cartesian1DScalarSkewWriter::compute(Transform::TransformCoordinatorType& coord)
       {
@@ -64,7 +65,7 @@ namespace GeoMHDiSCC {
          {
             int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             // Skew calculation
-            this->mSkew(k_) = (this->rInVar.phys().slice(k) - mAvg(k_)).array().pow(3).sum()/(this->mRMS(k_)).pow(3);
+            this->mSkew(k_) = (this->rInVar.phys().slice(k) - mAvg->average()(k_)).array().pow(3).sum()/(this->mRMS->RMS()(k_)).pow(3);
          }
 
       }
@@ -78,15 +79,6 @@ namespace GeoMHDiSCC {
 #endif //GEOMHDISCC_MPI
       }
 
-      void Cartesian1DScalarSkewWriter::prewrite()
-      {
-         IoVariable::IVariableAsciiEWriter::prewrite();
-
-         if(FrameworkMacro::allowsIO())
-         {
-            this->mFile << std::setprecision(14) << this->mZ.transpose() << std::endl;
-         }
-      }
 
       void Cartesian1DScalarSkewWriter::write()
       {

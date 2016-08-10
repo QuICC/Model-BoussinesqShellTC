@@ -24,7 +24,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "ScalarFields/FieldTools.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoStats/KurtTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -32,8 +32,8 @@ namespace GeoMHDiSCC {
 
    namespace IoStats {
 
-      Cartesian1DScalarKurtWriter::Cartesian1DScalarKurtWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const SharedCartesian1DScalarAvgWriter& RMS, const std::string& type)
-         : IoVariable::IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2), mAvg(Avg), mRMS(RMS))
+      Cartesian1DScalarKurtWriter::Cartesian1DScalarKurtWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const SharedCartesian1DScalarRMSWriter& RMS, const std::string& type)
+         : IStatisticsAsciiEWriter(prefix + KurtTags::BASENAME, KurtTags::EXTENSION, prefix + KurtTags::HEADER, type, KurtTags::VERSION, Dimensions::Space::SPECTRAL), mKurt(-Array::Ones(2), mAvg(Avg), mRMS(RMS))
       {
       }
 
@@ -43,15 +43,13 @@ namespace GeoMHDiSCC {
 
       void Cartesian1DScalarKurtWriter::init()
       {
+         IStatisticsAsciiEWriter::init();
 
-         // Here is where we get the mean from the 0th mode of the variable in spectral space 
+         if(FrameworkMacro::allowsIO())
+         {
+            this->mFile << "# " << std::setprecision(14) << this->mMesh.at(0).transpose() <<std::endl;
+         }
 
-         int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
-
-         // Normalize by Cartesian Area A = Nx*Ny (need to worry about 2 pi in fft?)
-         this->mArea = cols*cols;
-
-         IoVariable::IVariableAsciiEWriter::init();
       }
 
 
@@ -67,30 +65,19 @@ namespace GeoMHDiSCC {
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
-               // Mean
-               this->mKurt(k_) = (this->rInVar.phys().slice(k) - this->mAvg->average()(k_).array().pow(4).sum()/(this->mRMS->RMS()(k_)).pow(4);
+            // Mean
+            this->mKurt(k_) = (this->rInVar.phys().slice(k) - this->mAvg->average()(k_)).array().pow(4).sum()/(this->mRMS->RMS()(k_)).pow(4);
          }
-
 
       }
 
-      void Cartesian1DScalarKurtWriter::postcompute(Transform::TransformCoordinatorType& coord)
+      void Cartesian1DScalarKurtWriter::postCompute(Transform::TransformCoordinatorType& coord)
       {
          // MPI gathering
 
 #ifdef GEOMHDISCC_MPI
          MPI_Allreduce(MPI_IN_PLACE, this->mKurt.data(), this->mKurt.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif //GEOMHDISCC_MPI
-      }
-
-      void Cartesian1DScalarKurtWriter::prewrite()
-      {
-         IoVariable::IVariableAsciiEWriter::prewrite();
-
-         if(FrameworkMacro::allowsIO())
-         {
-            this->mFile << std::setprecision(14) << this->mZ.transpose() << std::endl;
-         }
       }
 
       void Cartesian1DScalarKurtWriter::write()

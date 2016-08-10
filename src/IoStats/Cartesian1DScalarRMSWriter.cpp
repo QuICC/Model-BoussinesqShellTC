@@ -24,7 +24,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "ScalarFields/FieldTools.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoStats/RmsTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -32,8 +32,8 @@ namespace GeoMHDiSCC {
 
    namespace IoStats {
 
-      Cartesian1DScalarRMSWriter::Cartesian1DScalarRMSWriter(const std::string& prefix, const std::string& type)
-         : IoVariable::IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
+      Cartesian1DScalarRMSWriter::Cartesian1DScalarRMSWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const std::string& type)
+         : IStatisticsAsciiEWriter(prefix + RmsTags::BASENAME, RmsTags::EXTENSION, prefix + RmsTags::HEADER, type, RmsTags::VERSION, Dimensions::Space::SPECTRAL), mArea(-1), mAvg(Avg),mRMS(-Array::Ones(2))
       {
       }
 
@@ -44,6 +44,12 @@ namespace GeoMHDiSCC {
       void Cartesian1DScalarRMSWriter::init()
       {
 
+         IStatisticsAsciiEWriter::init();
+
+         if(FrameworkMacro::allowsIO())
+         {
+            this->mFile << "# " << std::setprecision(14) << this->mMesh.at(0).transpose() <<std::endl;
+         }
          // Here is where we get the mean from the 0th mode of the variable in spectral space 
 
          int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -51,34 +57,12 @@ namespace GeoMHDiSCC {
          // Normalize by Cartesian Area A = Nx*Ny (need to worry about 2 pi in fft?)
          this->mArea = cols*cols;
 
-         IoVariable::IVariableAsciiEWriter::init();
       }
-
-      void Cartesian1DScalarRMSWriter::precompute(Transform::TransformCoordinatorType& coord)
+      
+      //RMS() function returns the array of RMS(Z) values when called by the Kurt and Skew functions
+      const Array& Cartesian1DScalarRMSWriter::RMS() const
       {
-         /*         //compute the mean here
-                    this->mAvg.setConstant(0.0);
-         // Dealias variable data
-         coord.communicator().dealiasSpectral(sRange.first->second->rDom(0).rTotal());
-
-         // Recover dealiased BWD data
-         Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-         // Get FWD storage
-         Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
-
-         // Compute projection transform for first dimension 
-         coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
-
-         // set mAvg to be the 0th mode of the field
-         this->mAvg = rOutVar.slice(0).col(0).real();
-
-         // Free BWD storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
-
-         // Free FWD storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
-         */
+         return this->mRMS;
       }
 
       void Cartesian1DScalarRMSWriter::compute(Transform::TransformCoordinatorType& coord)
@@ -96,7 +80,7 @@ namespace GeoMHDiSCC {
          {
             int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             // Mean
-            this->mRMS(k_) = (this->rInVar.phys().slice(k) - mAvg(k_)).array().pow(2).sum();
+            this->mRMS(k_) = (this->rInVar.phys().slice(k) - mAvg->average()(k_)).array().pow(2).sum();
          }
 
 
@@ -107,7 +91,7 @@ namespace GeoMHDiSCC {
          this->mRMS = (this->mRMS).sqrt();
       }
 
-      void Cartesian1DScalarRMSWriter::postcompute(Transform::TransformCoordinatorType& coord)
+      void Cartesian1DScalarRMSWriter::postCompute(Transform::TransformCoordinatorType& coord)
       {
          // MPI gathering
 
@@ -116,15 +100,6 @@ namespace GeoMHDiSCC {
 #endif //GEOMHDISCC_MPI
       }
 
-      void Cartesian1DScalarRMSWriter::prewrite()
-      {
-         IoVariable::IVariableAsciiEWriter::prewrite();
-
-         if(FrameworkMacro::allowsIO())
-         {
-            this->mFile << std::setprecision(14) << this->mZ.transpose() << std::endl;
-         }
-      }
 
       void Cartesian1DScalarRMSWriter::write()
       {

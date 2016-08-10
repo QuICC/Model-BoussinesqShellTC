@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -31,7 +31,7 @@ namespace IoStats {
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic) skew calculation for a scalar field
     */
-   class Cartesian1DScalarKurtWriter: public IoVariable::IVariableAsciiEWriter
+   class Cartesian1DScalarKurtWriter: public IoVariable::IStatisticsAsciiEWriter
    {
       public:
          /**
@@ -52,25 +52,20 @@ namespace IoStats {
           */
          virtual void init();
 
-         void precompute(Transform::TransformCoordinatorType& coord);
          /**
-          * @brief Compute energy for scalar field
+          * @brief Compute kurtosis for scalar field
           */
          void compute(Transform::TransformCoordinatorType& coord);
 
-         void compute(Transform::TransformCoordinatorType& coord);
-         void postcompute(Transform::TransformCoordinatorType& coord);
+         /**
+          * @brief Post Compute for kurtosis of scalar field
+          */
+         void postCompute(Transform::TransformCoordinatorType& coord);
          
          /**
           * @brief Write State to file
           */
-         virtual void prewrite();
          virtual void write();
-
-         /**
-          * To shrare RMS with other stats
-          */
-         const Array & RMS() const;
 
          /**
           * @brief Requires heavy calculation?
@@ -85,7 +80,7 @@ namespace IoStats {
           * @brief Storage for the scalar energy
           */
          SharedCartesian1DScalarAvgWriter mAvg;
-         SharedCartesian1DScalarAvgWriter mRMS;
+         SharedCartesian1DScalarRMSWriter mRMS;
          Array mKurt;
    };
 
