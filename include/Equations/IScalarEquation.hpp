@@ -26,7 +26,6 @@
 #include "Equations/IEquation.hpp"
 #include "Base/DecoupledComplexInternal.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
@@ -336,7 +335,7 @@ namespace Equations {
 
       // Get a restricted stencil matrix
       SparseMatrix stencil(eq.couplingInfo(compId).galerkinN(matIdx),eq.couplingInfo(compId).galerkinN(matIdx));
-      eq.dispatchGalerkinStencil(compId, stencil, matIdx, eq.unknown().dom(0).spRes(), EigenSelector::getEigs(eq, matIdx), true);
+      eq.dispatchGalerkinStencil(compId, stencil, matIdx, eq.unknown().dom(0).spRes(), eq.couplingInfo(compId).eigenTools().getEigs(eq.spRes(), matIdx), true);
       stencil.makeCompressed();
 
       // Create solver and factorize stencil

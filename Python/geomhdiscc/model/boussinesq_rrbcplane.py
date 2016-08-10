@@ -12,7 +12,7 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
-class BoussinesqRRBCPlane(base_model.BaseModel):
+class BoussinesqRRBCPlaneConfig:
     """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
 
     def periodicity(self):
@@ -37,6 +37,27 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]
+
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        # Get boundary condition
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        return geo.stencil(res[0], bc, make_square)
+
+    def equation_info(self, res, field_row):
+        """Provide description of the system of equation"""
+
+        # Matrix operator is complex except for vorticity and mean temperature
+        is_complex = False
+
+        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
+        index_mode = self.MODE
+
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
+
+class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
+    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -95,24 +116,6 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         block_info = (tau_n, gal_n, (shift_z,0,0), 1)
         return block_info
-
-    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return geo.stencil(res[0], bc, make_square)
-
-    def equation_info(self, res, field_row):
-        """Provide description of the system of equation"""
-
-        # Matrix operator is complex except for vorticity and mean temperature
-        is_complex = True
-
-        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.MODE
-
-        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -183,21 +186,21 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
                         if eigs[0] == 0 and eigs[1] == 0:
-                            bc = {0:20}
+                            bc = {0:21}
                         else:
                             bc = {0:21}
                     elif field_row == ("velocity","pol") and field_col == field_row:
                         if eigs[0] == 0 and eigs[1] == 0:
-                            bc = {0:20}
+                            bc = {0:21}
                         else:
-                            bc = {0:41, 'use_parity':False}
+                            bc = {0:41, 'use_parity':True}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
                         if eigs[0] == 0 and eigs[1] == 0:
                             bc = {0:0}
                         else:
                             E = eq_params['ekman']
                             c = E**(1./6.)/2**(1./2.)
-                            bc = {0:20, 'c':[c, -c], 'use_parity':False}
+                            bc = {0:20, 'c':[c, -c], 'use_parity':True}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -431,6 +434,105 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         mat = geo.zblk(res[0], bc)
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+class BoussinesqRRBCPlaneVisu(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
+    """Class to setup the visualization options for TFF scheme """
+
+    def implicit_fields(self, field_row):
+        """Get the list of coupled fields in solve"""
+
+        fields =  []
+
+        return fields
+
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
+
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            if field_row in [("mean_temperature", ""),("fluct_temperature", "")]:
+                fields = [("temperature","")]
+            else:
+                fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
+            fields = []
+
+        return fields
+
+    def block_size(self, res, field_row):
+        """Create block size information"""
+
+        tau_n = res[0]
+        if self.use_galerkin:
+            if field_row in [("velocity","tor"), ("temperature","")]:
+                shift_z = 2
+            elif field_row in [("velocity","pol")]:
+                shift_z = 4
+            else:
+                shift_z = 0
+
+            gal_n = (res[0] - shift_z)
+
+        else:
+            gal_n = tau_n
+            shift_z = 0
+
+        block_info = (tau_n, gal_n, (shift_z,0,0), 1)
+        return block_info
+
+    def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
+        """Convert simulation input boundary conditions to ID"""
+
+        # Solver: no tau boundary conditions
+        if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
+            bc = no_bc()
+
+        # Solver: tau and Galerkin
+        elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
+            raise RuntimeError("Equations are not setup properly!")
+
+        # Stencil:
+        elif bcs["bcType"] == self.STENCIL:
+            raise RuntimeError("Equations are not setup properly!")
+
+        # Field values to RHS:
+        elif bcs["bcType"] == self.FIELD_TO_RHS:
+            bc = no_bc()
+            if self.use_galerkin:
+                raise RuntimeError("Equations are not setup properly!")
+
+        return bc
+
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit linear term"""
+
+        kx = eigs[0]
+        ky = eigs[1]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        # Mean temperature
+        if field_row == ("mean_temperature","") and field_col == ("temperature",""):
+            if kx == 0 and ky == 0:
+                mat = geo.qid(res[0], 0, bc)
+            else:
+                mat = geo.zblk(res[0], bc)
+        elif field_row == ("fluct_temperature","") and field_col == ("temperature",""):
+            if kx == 0 and ky == 0:
+                mat = geo.zblk(res[0], bc)
+            else:
+                mat = geo.qid(res[0], 0, bc)
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 

@@ -2,7 +2,7 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRBCCylinderVCTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRBCCylinderVCMomentum.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRBCCylinderVCContinuity.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen1DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactStateIds.cpp

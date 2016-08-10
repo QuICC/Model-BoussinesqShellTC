@@ -22,14 +22,13 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    RandomScalarState::RandomScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mMin(-10), mMax(10), mRatio1D(1e3), mRatio2D(1e3), mRatio3D(1e3), mStartSeed(1)
+      : IScalarEquation(spEqParams), mMin(-10), mMax(10), mRatio1D(1e3), mRatio2D(1e3), mRatio3D(1e3), mStartSeed(1), mSpecial(NOTHING)
    {
       timespec t;
       clock_gettime(CLOCK_REALTIME, &t);
@@ -51,7 +50,7 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D)
+   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const SpecialId id)
    {
       if(max <= min || ratio1D < 1 || ratio2D < 1)
       {
@@ -65,9 +64,11 @@ namespace Equations {
       // Set spectrum ratios
       this->mRatio1D = ratio1D;
       this->mRatio2D = ratio2D;
+
+      this->mSpecial = id;
    }
 
-   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D)
+   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D, const SpecialId id)
    {
       if(max <= min || ratio1D < 1 || ratio2D < 1 || ratio3D < 1)
       {
@@ -82,6 +83,8 @@ namespace Equations {
       this->mRatio1D = ratio1D;
       this->mRatio2D = ratio2D;
       this->mRatio3D = ratio3D;
+
+      this->mSpecial = id;
    }
 
    void RandomScalarState::setCoupling()
@@ -110,6 +113,13 @@ namespace Equations {
          int z2D = 4;
          int z3D = 4;
          #if defined GEOMHDISCC_SPATIALSCHEME_TFF
+         if(this->mSpecial == ONLYMEAN && !(j_ == 0 && k_ == 0))
+         {
+            return Datatypes::SpectralScalarType::PointType(0);
+         } else if(this->mSpecial == NOMEAN && j_ == 0 && k_ == 0)
+         {
+            return Datatypes::SpectralScalarType::PointType(0);
+         }
          z2D = 2;
          if(k_ >= n2D/2)
          {

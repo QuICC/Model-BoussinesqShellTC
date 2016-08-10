@@ -19,6 +19,7 @@ def x_to_phys(expr, grid):
 
     x = sy.Symbol('x')
     func = sy.utilities.lambdify(x, expr)
+    print(expr)
     return func(grid)
 
 def test_forward(op, m, res_expr, sol_expr, grid, q):
@@ -29,6 +30,9 @@ def test_forward(op, m, res_expr, sol_expr, grid, q):
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
     sol = transf.torspec(t, m, op.shape[0])
+    #print(rhs.T)
+    #print("=================================================================")
+    #print(sol.T)
     err = np.abs(rhs[0:-(1+q)] - sol[q:-1])
     relerr = err/(1.0 + np.abs(sol[q:-1]))
     if np.max(err[q:]) > 10*np.spacing(1):
@@ -81,7 +85,7 @@ def i2(nr, rg):
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i2(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,1,2)])
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,2*nr,2)])
         ssol = 4**2*sy.integrate(sy.integrate(sphys*x,x)*x,x)*x**m
         sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 1)
@@ -98,8 +102,9 @@ def i2laplh(nr, rg):
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i2laplh(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,2*nr,2)])
-        ssol = 4**2*sy.integrate(sy.integrate(sphys*x,x)*x,x)*x**m
+        sphys = np.sum([np.random.ranf()*x**(j) for j in np.arange(0,2*nr,2)])
+        stmp = sy.expand(sy.diff(sphys*x**m,x,x) + sy.diff(sphys*x**m,x)/x - m**2*sphys*x**m/x**2)*x**(-m)
+        ssol = 4**2*sy.integrate(sy.integrate(stmp*x,x)*x,x)*x**m
         sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 1)
 
@@ -151,24 +156,27 @@ def i4laplh(nr, rg):
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i4laplh(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)])
-        ssol = sy.expand(sphys*x**4)
-        ssol = sy.integrate(ssol,x,x,x,x)
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,2*nr,2)])
+        stmp = sy.expand(sy.diff(sphys*x**m,x,x) + sy.diff(sphys*x**m,x)/x - m**2*sphys*x**m/x**2)*x**(-m)
+        ssol = 4**4*sy.integrate(sy.integrate(sy.integrate(sy.integrate(stmp*x,x)*x,x)*x)*x)*x**m
+        sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 2)
 
 def i4lapl2h(nr, rg):
     """Accuracy test for i4lapl2h operator"""
 
-    print("i4x4lapl:")
+    print("i4lapl2h:")
     x = sy.Symbol('x')
     for i in range(0,2):
         m = np.random.randint(1, nr-1)
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i4lapl2h(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x) + x**3*sy.diff(sphys,x) - m**2*x**2*sphys)
-        ssol = sy.integrate(ssol,x,x,x,x)
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,2*nr,2)])
+        stmp = sy.expand(sy.diff(sphys*x**m,x,x) + sy.diff(sphys*x**m,x)/x - m**2*sphys*x**m/x**2)
+        stmp = sy.expand(sy.diff(stmp,x,x) + sy.diff(stmp,x)/x - m**2*stmp/x**2)*x**(-m)
+        ssol = 4**4*sy.integrate(sy.integrate(sy.integrate(sy.integrate(stmp*x,x)*x,x)*x)*x)*x**m
+        sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 2)
 
 def i6(nr, rg):
@@ -182,7 +190,7 @@ def i6(nr, rg):
         print("\tTest for m = " + str(m))
         A = geo.i6(nr, m, geo.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,2*nr,2)])
-        ssol = 4**6*sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(sphys*x,x)*x,x)*x)*x)*x)*x)*x**m
+        ssol = 4**6*sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(sphys*x,x)*x,x)*x,x)*x,x)*x,x)*x,x)*x**m
         sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 3)
 
@@ -196,9 +204,10 @@ def i6laplh(nr, rg):
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i6laplh(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 2*x**3*sy.diff(sphys,x,x,x) - (1+2*m**2)*x**2*sy.diff(sphys,x,x) + (1+2*m**2)*x*sy.diff(sphys,x) + (m**2 - 4)*m**2*sphys)
-        ssol = sy.integrate(ssol,x,x,x,x)
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,2*nr,2)])
+        stmp = sy.expand(sy.diff(sphys*x**m,x,x) + sy.diff(sphys*x**m,x)/x - m**2*sphys*x**m/x**2)*x**(-m)
+        ssol = 4**6*sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(stmp*x,x)*x,x)*x,x)*x,x)*x,x)*x,x)*x**m
+        sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 3)
 
 def i6lapl2h(nr, rg):
@@ -211,9 +220,11 @@ def i6lapl2h(nr, rg):
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i6lapl2h(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 2*x**3*sy.diff(sphys,x,x,x) - (1+2*m**2)*x**2*sy.diff(sphys,x,x) + (1+2*m**2)*x*sy.diff(sphys,x) + (m**2 - 4)*m**2*sphys)
-        ssol = sy.integrate(ssol,x,x,x,x)
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,2*nr,2)])
+        stmp = sy.expand(sy.diff(sphys*x**m,x,x) + sy.diff(sphys*x**m,x)/x - m**2*sphys*x**m/x**2)
+        stmp = sy.expand(sy.diff(stmp,x,x) + sy.diff(stmp,x)/x - m**2*stmp/x**2)*x**(-m)
+        ssol = 4**6*sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(stmp*x,x)*x,x)*x,x)*x,x)*x,x)*x,x)*x**m
+        sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 3)
 
 def i6lapl3h(nr, rg):
@@ -226,9 +237,12 @@ def i6lapl3h(nr, rg):
         m = m + (m+i)%2
         print("\tTest for m = " + str(m))
         A = geo.i6lapl3h(nr, m, geo.radbc.no_bc())
-        sphys = np.sum([np.random.ranf()*x**(i+m) for i in np.arange(0,2*nr,2)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 2*x**3*sy.diff(sphys,x,x,x) - (1+2*m**2)*x**2*sy.diff(sphys,x,x) + (1+2*m**2)*x*sy.diff(sphys,x) + (m**2 - 4)*m**2*sphys)
-        ssol = sy.integrate(ssol,x,x,x,x)
+        sphys = np.sum([x**i for i in np.arange(0,2*nr,2)])
+        stmp = sy.expand(sy.simplify(sy.diff(sphys*x**m,x,x) + sy.diff(sphys*x**m,x)/x - m**2*sphys*x**m/x**2))
+        stmp = sy.expand(sy.simplify(sy.diff(stmp,x,x) + sy.diff(stmp,x)/x - m**2*stmp/x**2))
+        stmp = sy.expand(sy.simplify(sy.diff(stmp,x,x) + sy.diff(stmp,x)/x - m**2*stmp/x**2))*x**(-m)
+        ssol = 4**6*sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(sy.integrate(stmp*x,x)*x,x)*x,x)*x,x)*x,x)*x,x)*x**m
+        sphys = x**m*sphys
         test_forward(A, m, sphys, ssol, rg, 3)
 
 def test_worland(nr, m):
@@ -286,7 +300,7 @@ def test_fft(n, m):
 
 if __name__ == "__main__":
     # Set test parameters
-    n = 32
+    n = 16
     nr = int(np.ceil(3.0*n/2.0 + 3.0*n/4.0 + 1))
     print("Grid: " + str((n, nr)))
     rg = wb.worland_grid(nr)
@@ -296,11 +310,11 @@ if __name__ == "__main__":
 #    test_fft(nr, 32)
 #    zblk(nr, rg)
 #    i2(n, rg)
-    i2laplh(nr, rg)
+#    i2laplh(nr, rg)
 #    i4(n, rg)
 #    i4laplh(nr, rg)
 #    i4lapl2h(nr, rg)
 #    i6(nr, rg)
 #    i6laplh(nr, rg)
 #    i6lapl2h(nr, rg)
-#    i6lapl3h(nr, rg)
+    i6lapl3h(nr, rg)

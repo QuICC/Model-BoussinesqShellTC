@@ -13,13 +13,13 @@ model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 res = [512, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':8.686001195839, 'ekman':1e-10, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':8.686001195839, 'ekman':1e-7, 'scale1d':2.0}
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':2, 'temperature':0}
 phi = 0
-kp = 1.28
+kp = 1.25
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
 def generic_wave(kp, phi):

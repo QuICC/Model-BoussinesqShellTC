@@ -22,7 +22,6 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "PhysicalOperators/StreamAdvection.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -63,7 +62,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGTransport::setRequirements()
    {
-      // Set temperatur as equation unknown
+      // Set temperature as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
 
       // Set solver timing

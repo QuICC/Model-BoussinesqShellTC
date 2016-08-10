@@ -23,6 +23,7 @@
 
 // Project includes
 //
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -70,6 +71,11 @@ namespace Equations {
    CouplingInformation::IndexType CouplingInformation::indexType() const
    {
       return this->mIndexType;
+   }
+
+   const IEigenTools& CouplingInformation::eigenTools() const
+   {
+      return *(this->mspEigenTools);
    }
 
    int CouplingInformation::nBlocks() const
@@ -129,7 +135,7 @@ namespace Equations {
 
       // Extract the position of the equation field
       FieldId_iterator pos = std::find(this->mImplicitFields.begin(), this->mImplicitFields.end(), std::make_pair(fieldId, compId));
-      assert((this->equationType() == TRIVIAL && pos == this->mImplicitFields.end()) || pos != this->mImplicitFields.end());
+      assert((this->equationType() == TRIVIAL && pos == this->mImplicitFields.end()) || (this->equationType() == WRAPPER && pos == this->mImplicitFields.end()) || pos != this->mImplicitFields.end());
 
       // Set initial field index
       this->mFieldIndex = pos - this->mImplicitFields.begin();
@@ -206,6 +212,8 @@ namespace Equations {
    void CouplingInformation::setIndexType(const CouplingInformation::IndexType id)
    {
       this->mIndexType = id;
+
+      this->mspEigenTools = eigenSelector(this->mIndexType);
    }
 
    CouplingInformation::FieldId_range CouplingInformation::implicitRange() const

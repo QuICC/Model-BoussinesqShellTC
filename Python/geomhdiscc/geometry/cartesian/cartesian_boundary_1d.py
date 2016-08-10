@@ -247,6 +247,10 @@ def tau_value_diff(nx, pos, bc):
         cond[2] = (tv - cond[2])/2.0
         cond[3] = (td - cond[3])/2.0
 
+    if pos == 0:
+        order = [0, 2, 1, 3]
+        cond = [cond[i] for i in order]
+
     return np.array(cond)
 
 def tau_diff_diff2(nx, pos, bc):
@@ -269,24 +273,22 @@ def tau_diff_diff2(nx, pos, bc):
         cond[2] = (tv - cond[2])/2.0
         cond[3] = (td - cond[3])/2.0
 
+    if pos == 0:
+        order = [0, 2, 1, 3]
+        cond = [cond[i] for i in order]
+
     return np.array(cond)
 
 def tau_value_diff2(nx, pos, bc):
     """Create tau lines for a zero boundary value and a zero 2nd derivative """
 
     cond = []
-    if pos > 0:
+    if pos >= 0:
         cond.append(tau_value(nx,1,bc)[0])
         cond.append(tau_diff2(nx,1,bc)[0])
 
-    if pos < 0:
+    if pos <= 0:
         cond.append(tau_value(nx,-1,bc)[0])
-        cond.append(tau_diff2(nx,-1,bc)[0])
-
-    if pos == 0:
-        cond.append(tau_value(nx,1,bc)[0])
-        cond.append(tau_value(nx,-1,bc)[0])
-        cond.append(tau_diff2(nx,1,bc)[0])
         cond.append(tau_diff2(nx,-1,bc)[0])
 
     if bc.get('use_parity', True) and pos == 0:
@@ -296,6 +298,10 @@ def tau_value_diff2(nx, pos, bc):
         cond[1] = (cond[1] + cond[3])/2.0
         cond[2] = (tv - cond[2])/2.0
         cond[3] = (td - cond[3])/2.0
+
+    if pos == 0:
+        order = [0, 2, 1, 3]
+        cond = [cond[i] for i in order]
 
     return np.array(cond)
 

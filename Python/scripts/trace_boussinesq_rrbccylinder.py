@@ -16,7 +16,7 @@ bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 3
-res = [64, 0, 64]
+res = [64, 0, 32]
 Omega = 0
 Pr = 6.7
 Gamma = 1.0

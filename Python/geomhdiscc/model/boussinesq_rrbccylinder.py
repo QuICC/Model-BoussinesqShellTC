@@ -35,7 +35,6 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         """Get the list of fields needed for linear stability calculations"""
 
         fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
-        fields =  [("velocity","tor")]
 
         return fields
 
