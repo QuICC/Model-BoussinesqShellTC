@@ -223,10 +223,15 @@ namespace GeoMHDiSCC {
 
    void BoussinesqFPlane3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
    {
-      // Create RMS temperature writer
+      // Create Avg temperature writer
       IoStats::SharedCartesian1DScalarAvgWriter spAvg(new IoStats::Cartesian1DScalarAvgWriter("temperature", SchemeType::type()));
       spAvg->expect(PhysicalNames::TEMPERATURE);
       spSim->addStatsOutputFile(spAvg);
+
+      // Create RMS temperature writer
+      IoStats::SharedCartesian1DScalarRMSWriter spRMS(new IoStats::Cartesian1DScalarRMSWriter("temperature", spAvg,  SchemeType::type()));
+      spRMS->expect(PhysicalNames::TEMPERATURE);
+      spSim->addStatsOutputFile(spRMS);
    }
 
    void BoussinesqFPlane3DQGModel::setInitialState(SharedSimulation spSim)
