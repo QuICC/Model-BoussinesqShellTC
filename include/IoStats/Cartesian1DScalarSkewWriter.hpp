@@ -26,12 +26,12 @@
 
 namespace GeoMHDiSCC {
 
-namespace IoVariable {
+namespace IoStats {
 
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic) skew calculation for a scalar field
     */
-   class Cartesian1DScalarSkewWriter: public IVariableAsciiEWriter
+   class Cartesian1DScalarSkewWriter: public IoVariable::IVariableAsciiEWriter
    {
       public:
          /**

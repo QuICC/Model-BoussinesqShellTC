@@ -42,6 +42,7 @@ set(MHDAllSrcDirs
    IoHdf5
    IoTools
    IoVariable
+   IoStats
    IoXml
    LoadSplitter
    PhysicalModels

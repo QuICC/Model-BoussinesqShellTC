@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
    namespace IoStats {
 
       Cartesian1DScalarSkewWriter::Cartesian1DScalarSkewWriter(const std::string& prefix, const std::string& type)
-         : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
+         : IoVariable::IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
       {
       }
 
@@ -44,7 +44,7 @@ namespace GeoMHDiSCC {
       void Cartesian1DScalarSkewWriter::init()
       {
          
-         IVariableAsciiEWriter::init();
+         IoVariable::IVariableAsciiEWriter::init();
       }
 
       void Cartesian1DScalarSkewWriter::precompute(Transform::TransformCoordinatorType& coord)
@@ -80,7 +80,7 @@ namespace GeoMHDiSCC {
 
       void Cartesian1DScalarSkewWriter::prewrite()
       {
-         IVariableAsciiEWriter::prewrite();
+         IoVariable::IVariableAsciiEWriter::prewrite();
 
          if(FrameworkMacro::allowsIO())
          {

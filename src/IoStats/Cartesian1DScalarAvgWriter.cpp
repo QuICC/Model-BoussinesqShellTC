@@ -24,7 +24,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "ScalarFields/FieldTools.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoStats/AvgTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
    namespace IoStats {
 
       Cartesian1DScalarAvgWriter::Cartesian1DScalarAvgWriter(const std::string& prefix, const std::string& type)
-         : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
+         : IStatisticsAsciiEWriter(prefix + AvgTags::BASENAME, AvgTags::EXTENSION, prefix + AvgTags::HEADER, type, AvgTags::VERSION, Dimensions::Space::SPECTRAL), mArea(-1), mAvg(-Array::Ones(2))
       {
       }
 
@@ -43,35 +43,49 @@ namespace GeoMHDiSCC {
 
       void Cartesian1DScalarAvgWriter::init()
       {
+         IStatisticsAsciiEWriter::init();
 
-         IVariableAsciiEWriter::init();
+         if(FrameworkMacro::allowsIO())
+         {
+            this->mFile << "# " << std::setprecision(14) <<  this->mMesh.at(0).transpose() << std::endl;
+         }
       }
 
-      void Cartesian1DScalarAvgWriter::precompute(Transform::TransformCoordinatorType& coord)
+      void Cartesian1DScalarAvgWriter::preCompute(Transform::TransformCoordinatorType& coord)
       {
-         //compute the mean here
-         this->mAvg.setConstant(0.0);
          // Dealias variable data
-         coord.communicator().dealiasSpectral(sRange.first->second->rDom(0).rTotal());
+         scalar_iterator_range sRange = this->scalarRange();
 
-         // Recover dealiased BWD data
-         Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0 && this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0) == 0)
+         {
+            coord.communicator().dealiasSpectral(sRange.first->second->rDom(0).rTotal());
 
-         // Get FWD storage
-         Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+            // Recover dealiased BWD data
+            Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
-         // Compute projection transform for first dimension 
-         coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
+            // Get FWD storage
+            Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
-         // set mAvg to be the 0th mode of the field
-         this->mAvg = rOutVar.slice(0).col(0).real();
+            // Compute projection transform for first dimension 
+            coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
-         // Free BWD storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
+            // set mAvg to be the 0th mode of the field
+            this->mAvg = rOutVar.slice(0).col(0).real();
 
-         // Free FWD storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
+            // Free BWD storage
+            coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
 
+            // Free FWD storage
+            coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
+         } else
+         {
+            this->mAvg = Array::Zero(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>());
+         }
+      }
+
+      const Array& Cartesian1DScalarAvgWriter::average() const
+      {
+         return this->mAvg;
       }
 
       void Cartesian1DScalarAvgWriter::compute(Transform::TransformCoordinatorType& coord)
@@ -79,30 +93,19 @@ namespace GeoMHDiSCC {
          // nothing here for this one
       }
 
-      void Cartesian1DScalarAvgWriter::postcompute(Transform::TransformCoordinatorType& coord)
+      void Cartesian1DScalarAvgWriter::postCompute(Transform::TransformCoordinatorType& coord)
       {
          // MPI gathering
 
-#ifdef GEOMHDISCC_MPI
-         MPI_Allreduce(MPI_IN_PLACE, this->mAvg.data(), this->mAvg.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-#endif //GEOMHDISCC_MPI
-      }
-
-      void Cartesian1DScalarAvgWriter::prewrite()
-      {
-         IVariableAsciiEWriter::prewrite();
-
-         if(FrameworkMacro::allowsIO())
-         {
-            this->mFile << std::setprecision(14) << this->mZ.transpose() << std::endl;
-         }
+         #ifdef GEOMHDISCC_MPI
+            MPI_Allreduce(MPI_IN_PLACE, this->mAvg.data(), this->mAvg.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif //GEOMHDISCC_MPI
       }
 
       void Cartesian1DScalarAvgWriter::write()
       {
          // Create file
          this->preWrite();
-
 
          // Check if the workflow allows IO to be performed
          if(FrameworkMacro::allowsIO())
