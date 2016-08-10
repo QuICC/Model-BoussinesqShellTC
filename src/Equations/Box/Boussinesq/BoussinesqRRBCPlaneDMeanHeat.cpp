@@ -40,7 +40,21 @@ namespace Equations {
 
    void BoussinesqRRBCPlaneDMeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true);
+   }
+
+   void BoussinesqRRBCPlaneDMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
+      // Get paramters
+      MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
+
+      ///
+      /// Computation of the mean temperature feedback
+      ///
+      rNLComp.setData((Pr*this->vector(PhysicalNames::VELOCITY).dom(0).phys().comp(FieldComponents::Physical::Z).data().array()*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqRRBCPlaneDMeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -72,6 +86,12 @@ namespace Equations {
 
       // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::DZ_MEANTEMPERATURE, FieldRequirement(true, true, false, false));
+
+      // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, false));
+
+      // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, false, true, false));
    }
 
 }

@@ -427,7 +427,7 @@ namespace GeoMHDiSCC {
       }
 
       // Create the projector tree(s)
-      Transform::TransformTreeTools::generateTrees(projectorTree, branches, TransformDirection::BACKWARD);
+      Transform::TransformTreeTools::generateTrees(projectorTree, branches, TransformDirection::BACKWARD, "imposed");
    }
 
    void RequirementTools::mapImposedVariables(std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars)

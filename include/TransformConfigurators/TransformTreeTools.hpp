@@ -11,6 +11,7 @@
 //
 #include <vector>
 #include <map>
+#include <string>
 
 // External includes
 //
@@ -38,7 +39,7 @@ namespace Transform {
           * @param branches   Input transfrom paths
           * @param dir        Direction of transform (only needed for graph output)
           */
-         static void generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches, const TransformDirection::Id dir);
+         static void generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches, const TransformDirection::Id dir, const std::string& prepend = "");
          
       protected:
 
