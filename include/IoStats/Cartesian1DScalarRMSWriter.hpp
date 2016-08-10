@@ -26,12 +26,12 @@
 
 namespace GeoMHDiSCC {
 
-namespace IoVariable {
+namespace IoStats {
 
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic) energy calculation for a scalar field
     */
-   class Cartesian1DScalarRMSWriter: public IVariableAsciiEWriter
+   class Cartesian1DScalarRMSWriter: public IoVariable::IVariableAsciiEWriter
    {
       public:
          /**

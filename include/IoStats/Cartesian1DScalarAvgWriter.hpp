@@ -26,12 +26,12 @@
 
 namespace GeoMHDiSCC {
 
-namespace IoVariable {
+namespace IoStats {
 
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic) horizontal average calculation for a scalar field
     */
-   class Cartesian1DScalarAvgWriter: public IVariableAsciiEWriter
+   class Cartesian1DScalarAvgWriter: public IoVariable::IVariableAsciiEWriter
    {
       public:
          /**

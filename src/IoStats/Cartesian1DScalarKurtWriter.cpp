@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
    namespace IoStats {
 
       Cartesian1DScalarKurtWriter::Cartesian1DScalarKurtWriter(const std::string& prefix, const std::string& type)
-         : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
+         : IoVariable::IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-Array::Ones(2))
       {
       }
 
@@ -51,7 +51,7 @@ namespace GeoMHDiSCC {
          // Normalize by Cartesian Area A = Nx*Ny (need to worry about 2 pi in fft?)
          this->mArea = cols*cols;
 
-         IVariableAsciiEWriter::init();
+         IoVariable::IVariableAsciiEWriter::init();
       }
 
       void Cartesian1DScalarKurtWriter::precompute(Transform::TransformCoordinatorType& coord)
@@ -113,7 +113,7 @@ namespace GeoMHDiSCC {
 
       void Cartesian1DScalarKurtWriter::prewrite()
       {
-         IVariableAsciiEWriter::prewrite();
+         IoVariable::IVariableAsciiEWriter::prewrite();
 
          if(FrameworkMacro::allowsIO())
          {
