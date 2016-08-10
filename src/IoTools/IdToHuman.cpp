@@ -596,6 +596,9 @@ namespace IoTools {
          case NonDimensional::ELEVATOR:
             return "elevator";
 
+         case NonDimensional::FAST_MEAN:
+            return "fast_mean";
+
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
       }

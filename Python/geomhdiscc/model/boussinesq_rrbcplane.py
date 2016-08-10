@@ -23,7 +23,7 @@ class BoussinesqRRBCPlaneConfig:
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ekman", "scale1d"]
+        return ["prandtl", "rayleigh", "ekman", "scale1d", "fast_mean"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -394,6 +394,12 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
         zscale = eq_params['scale1d']
+        E = eq_params['ekman']
+        Ro = E**(1./3.)
+        if eq_params['fast_mean'] == 1:
+            mean_dt = Ro**2
+        else:
+            mean_dt = 1.0
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -407,7 +413,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
 
         # Mean temperature
         elif field_row == ("temperature","") and kx == 0 and ky == 0:
-            mat = geo.i2(res[0], bc, 1.0)
+            mat = geo.i2(res[0], bc, mean_dt)
 
         # Toroidal velocity
         elif field_row == ("velocity","tor"):

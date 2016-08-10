@@ -124,6 +124,8 @@ namespace GeoMHDiSCC {
             // Special flags
             /// Flag to filter elevator modes
             ELEVATOR,
+            /// Flag to use fast mean equation
+            FAST_MEAN,
          };
       };
 }
