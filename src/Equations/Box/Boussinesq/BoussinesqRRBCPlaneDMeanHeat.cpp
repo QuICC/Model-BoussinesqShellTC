@@ -40,16 +40,7 @@ namespace Equations {
 
    void BoussinesqRRBCPlaneDMeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true);
-   }
-
-   void BoussinesqRRBCPlaneDMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
-   {
-      /// 
-      /// Computation of the advection:
-      ///   \f$ \left(\vec u\cdot\nabla\right)\theta\f$
-      ///
-      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->scalar(PhysicalNames::TEMPERATURE).dom(0).grad(), 1.0);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, true);
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqRRBCPlaneDMeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -77,16 +68,10 @@ namespace Equations {
       this->setName(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::AFTER);
+      this->setSolveTiming(SolveTiming::BEFORE);
 
       // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::DZ_MEANTEMPERATURE, FieldRequirement(true, true, true, false));
-
-      // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, true));
-
-      // Add X velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false));
+      this->mRequirements.addField(PhysicalNames::DZ_MEANTEMPERATURE, FieldRequirement(true, true, false, false));
    }
 
 }

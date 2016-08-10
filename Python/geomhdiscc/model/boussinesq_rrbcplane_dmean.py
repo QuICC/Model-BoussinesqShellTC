@@ -67,7 +67,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
             if field_row in [("temperature","")]:
                 fields = [field_row]
             elif field_row in [("dz_meantemperature","")]:
-                fields = [("dz_meantemperature","")]
+                fields = [("temperature","")]
             else:
                 fields = []
 
@@ -287,7 +287,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
             else:
                 mat = geo.i2(res[0], bc)
 
-        elif field_row == ("dz_meantemperature","") and field_col == field_row:
+        elif field_row == ("dz_meantemperature","") and field_col == ("temperature",""):
             if kx == 0 and ky == 0:
                 mat = (geo.qid(res[0],0, bc, Pr) - spsp.eye(res[0], 1)*geo.avg(res[0]))
             else:
