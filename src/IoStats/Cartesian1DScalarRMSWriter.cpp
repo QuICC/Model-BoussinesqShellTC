@@ -94,10 +94,10 @@ namespace GeoMHDiSCC {
 
 
          // Normalize by the Cartesian volume
-         this->mRMS /= this->mArea;
+         //this->mRMS /= this->mArea;
 
          //take sqroot
-         this->mRMS = this->mRMS.array().sqrt();
+         //this->mRMS = this->mRMS.array().sqrt();
       }
 
       void Cartesian1DScalarRMSWriter::postCompute(Transform::TransformCoordinatorType& coord)
@@ -107,6 +107,8 @@ namespace GeoMHDiSCC {
 #ifdef GEOMHDISCC_MPI
          MPI_Allreduce(MPI_IN_PLACE, this->mRMS.data(), this->mRMS.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif //GEOMHDISCC_MPI
+         this->mRMS /= this->mArea;
+         this->mRMS = this->mRMS.array().sqrt();
       }
 
 
