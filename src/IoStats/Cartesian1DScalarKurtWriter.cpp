@@ -76,7 +76,6 @@ namespace GeoMHDiSCC {
             //this->mKurt(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(3).sum()/(mRMS->RMS    ()(k_)).pow(3);
             this->mKurt(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(4).sum();
             this->mKurt(k_) = this->mKurt(k_)/this->mArea;
-            this->mKurt(k_) = this->mKurt(k_)/(mRMS->RMS()(k_)*mRMS->RMS()(k_)*mRMS->RMS()(k_)*mRMS->RMS()(k_));
 
          }
 
@@ -89,6 +88,8 @@ namespace GeoMHDiSCC {
 #ifdef GEOMHDISCC_MPI
          MPI_Allreduce(MPI_IN_PLACE, this->mKurt.data(), this->mKurt.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif //GEOMHDISCC_MPI
+
+            this->mKurt = this->mKurt.array()/(mRMS->RMS().array()*mRMS->RMS().array()*mRMS->RMS().array()*mRMS->RMS().array());
       }
 
       void Cartesian1DScalarKurtWriter::write()

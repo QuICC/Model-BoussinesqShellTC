@@ -47,7 +47,7 @@ namespace GeoMHDiSCC {
 
          if(FrameworkMacro::allowsIO())
          {
-            this->mFile << "# " << std::setprecision(14) <<  (1.0 + this->mMesh.at(0).transpose().array())/2.0 << std::endl;
+            this->mFile << "# " << std::setprecision(14) <<  (1.0 + this->mMesh.at(0).transpose().reverse().array())/2.0 << std::endl;
          }
       }
 

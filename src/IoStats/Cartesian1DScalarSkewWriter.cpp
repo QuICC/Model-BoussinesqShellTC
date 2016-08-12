@@ -74,7 +74,6 @@ namespace GeoMHDiSCC {
             //this->mSkew(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(3).sum()/(mRMS->RMS()(k_)).pow(3);
             this->mSkew(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(3).sum();
             this->mSkew(k_) = this->mSkew(k_)/this->mArea;
-            this->mSkew(k_) = this->mSkew(k_)/(mRMS->RMS()(k_)*mRMS->RMS()(k_)*mRMS->RMS()(k_));
          }
 
       }
@@ -86,6 +85,8 @@ namespace GeoMHDiSCC {
 #ifdef GEOMHDISCC_MPI
          MPI_Allreduce(MPI_IN_PLACE, this->mSkew.data(), this->mSkew.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif //GEOMHDISCC_MPI
+
+            this->mSkew = this->mSkew.array()/(mRMS->RMS().array()*mRMS->RMS().array()*mRMS->RMS().array());
       }
 
 
