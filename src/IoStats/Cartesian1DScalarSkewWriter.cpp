@@ -48,8 +48,14 @@ namespace GeoMHDiSCC {
 
          if(FrameworkMacro::allowsIO())
          {
-            this->mFile << "# " << std::setprecision(14) << this->mMesh.at(0).transpose() <<std::endl;
+            this->mFile << "# " << std::setprecision(14) << (1.0 + this->mMesh.at(0).transpose().reverse().array())/2.0 <<std::endl;
          }
+         int dimZ = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL);
+         int dimX = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::PHYSICAL);
+         int dimY = this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL);
+
+         this->mArea = dimX*dimY;
+         this->mSkew = Array::Zero(dimZ);
       }
 
 
@@ -65,12 +71,15 @@ namespace GeoMHDiSCC {
          {
             int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             // Skew calculation
-            this->mSkew(k_) = (this->rInVar.phys().slice(k) - mAvg->average()(k_)).array().pow(3).sum()/(this->mRMS->RMS()(k_)).pow(3);
+            //this->mSkew(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(3).sum()/(mRMS->RMS()(k_)).pow(3);
+            this->mSkew(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(3).sum();
+            this->mSkew(k_) = this->mSkew(k_)/this->mArea;
+            this->mSkew(k_) = this->mSkew(k_)/(mRMS->RMS()(k_)*mRMS->RMS()(k_)*mRMS->RMS()(k_));
          }
 
       }
 
-      void Cartesian1DScalarSkewWriter::postcompute(Transform::TransformCoordinatorType& coord)
+      void Cartesian1DScalarSkewWriter::postCompute(Transform::TransformCoordinatorType& coord)
       {
          // MPI gathering
 
@@ -89,7 +98,7 @@ namespace GeoMHDiSCC {
          // Check if the workflow allows IO to be performed
          if(FrameworkMacro::allowsIO())
          {
-            this->mFile << std::setprecision(14) << this->mRMS.transpose() << std::endl;
+            this->mFile << std::setprecision(14) << this->mTime << " \t" << this->mSkew.transpose() << std::endl;
          }
 
          // Close file

@@ -45,18 +45,27 @@ namespace GeoMHDiSCC {
       {
 
          IStatisticsAsciiEWriter::init();
+         //print out the z values in the file (from 1 to 0)
+         if(FrameworkMacro::allowsIO())
+         {
+            this->mFile << "# " << std::setprecision(14) << (1.0 + this->mMesh.at(0).transpose().reverse().array())/2.0 <<std::endl;
+         }
+         int dimZ = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL);
+         int dimX = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::PHYSICAL);
+         int dimY = this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL);
+         //int Zcols = this->mspRes->sim()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
+         //int Xcols = this->mspRes->sim()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
+         //int Test = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF3D>();
+
+         // Normalize by Cartesian Area A = Nx*Ny (need to worry about 2 pi in fft?)
+         this->mArea = dimX*dimY;
+         this->mRMS = Array::Zero(dimZ);
 
          if(FrameworkMacro::allowsIO())
          {
-            this->mFile << "# " << std::setprecision(14) << this->mMesh.at(0).transpose() <<std::endl;
+           // this->mFile << "Test " << std::setprecision(14) <<  Test <<std::endl;
+      //      this->mFile << "Area " << std::setprecision(14) <<  this->mArea <<std::endl;
          }
-         // Here is where we get the mean from the 0th mode of the variable in spectral space 
-
-         int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
-
-         // Normalize by Cartesian Area A = Nx*Ny (need to worry about 2 pi in fft?)
-         this->mArea = cols*cols;
-
       }
       
       //RMS() function returns the array of RMS(Z) values when called by the Kurt and Skew functions
@@ -80,7 +89,7 @@ namespace GeoMHDiSCC {
          {
             int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             // Mean
-            this->mRMS(k_) = (this->rInVar.phys().slice(k) - mAvg->average()(k_)).array().pow(2).sum();
+            this->mRMS(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(2).sum();
          }
 
 
@@ -88,7 +97,7 @@ namespace GeoMHDiSCC {
          this->mRMS /= this->mArea;
 
          //take sqroot
-         this->mRMS = (this->mRMS).sqrt();
+         this->mRMS = this->mRMS.array().sqrt();
       }
 
       void Cartesian1DScalarRMSWriter::postCompute(Transform::TransformCoordinatorType& coord)
@@ -110,7 +119,7 @@ namespace GeoMHDiSCC {
          // Check if the workflow allows IO to be performed
          if(FrameworkMacro::allowsIO())
          {
-            this->mFile << std::setprecision(14) << this->mRMS.transpose() << std::endl;
+            this->mFile << std::setprecision(14) << this->mTime << "   " << this->mRMS.transpose() << std::endl;
          }
 
          // Close file

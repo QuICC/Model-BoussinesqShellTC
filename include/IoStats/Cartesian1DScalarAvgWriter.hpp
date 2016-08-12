@@ -73,7 +73,7 @@ namespace IoStats {
          virtual void write();
 
          /**
-          * To shrare RMS with other stats
+          * To share average with other stats
           */
          const Array& average() const;
 
@@ -106,5 +106,5 @@ namespace IoStats {
 
 }
 }
-
+   
 #endif // CARTESIAN1DSCALARAVGWRITER_HPP

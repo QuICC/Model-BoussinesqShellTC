@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
    namespace IoStats {
 
       Cartesian1DScalarKurtWriter::Cartesian1DScalarKurtWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const SharedCartesian1DScalarRMSWriter& RMS, const std::string& type)
-         : IStatisticsAsciiEWriter(prefix + KurtTags::BASENAME, KurtTags::EXTENSION, prefix + KurtTags::HEADER, type, KurtTags::VERSION, Dimensions::Space::SPECTRAL), mKurt(-Array::Ones(2), mAvg(Avg), mRMS(RMS))
+         : IStatisticsAsciiEWriter(prefix + KurtTags::BASENAME, KurtTags::EXTENSION, prefix + KurtTags::HEADER, type, KurtTags::VERSION, Dimensions::Space::SPECTRAL),mArea(-1), mKurt(-Array::Ones(2)), mAvg(Avg), mRMS(RMS)
       {
       }
 
@@ -47,8 +47,14 @@ namespace GeoMHDiSCC {
 
          if(FrameworkMacro::allowsIO())
          {
-            this->mFile << "# " << std::setprecision(14) << this->mMesh.at(0).transpose() <<std::endl;
+            this->mFile << "# " << std::setprecision(14) << (1.0 + this->mMesh.at(0).transpose().reverse().array())/2.0 <<std::endl;
          }
+         int dimZ = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL);
+         int dimX = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::PHYSICAL);
+         int dimY = this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL);
+
+         this->mArea = dimX*dimY;
+         this->mKurt = Array::Zero(dimZ);
 
       }
 
@@ -66,7 +72,12 @@ namespace GeoMHDiSCC {
          {
             int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             // Mean
-            this->mKurt(k_) = (this->rInVar.phys().slice(k) - this->mAvg->average()(k_)).array().pow(4).sum()/(this->mRMS->RMS()(k_)).pow(4);
+            //this->mKurt(k_) = (this->rInVar.phys().slice(k) - this->mAvg->average()(k_)).array().pow(4).sum()/(this->mRMS->RMS()(k_)).pow(4);
+            //this->mKurt(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(3).sum()/(mRMS->RMS    ()(k_)).pow(3);
+            this->mKurt(k_) = (sRange.first->second->dom(0).phys().slice(k).array() - mAvg->average()(k_)).array().pow(4).sum();
+            this->mKurt(k_) = this->mKurt(k_)/this->mArea;
+            this->mKurt(k_) = this->mKurt(k_)/(mRMS->RMS()(k_)*mRMS->RMS()(k_)*mRMS->RMS()(k_)*mRMS->RMS()(k_));
+
          }
 
       }
@@ -89,7 +100,7 @@ namespace GeoMHDiSCC {
          // Check if the workflow allows IO to be performed
          if(FrameworkMacro::allowsIO())
          {
-            this->mFile << std::setprecision(14) << this->mKurt.transpose() << std::endl;
+            this->mFile << std::setprecision(14) << this->mTime << " \t" << this->mKurt.transpose() << std::endl;
          }
 
          // Close file

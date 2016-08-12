@@ -23,6 +23,8 @@
 #include "Resolutions/Resolution.hpp"
 #include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
+#include "IoStats/Cartesian1DScalarAvgWriter.hpp"
+#include "IoStats/Cartesian1DScalarRMSWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -31,7 +33,7 @@ namespace IoStats {
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic) skew calculation for a scalar field
     */
-   class Cartesian1DScalarSkewWriter: public IoVariable::IStatisticsAsciiEWriter
+   class Cartesian1DScalarSkewWriter: public IStatisticsAsciiEWriter
    {
       public:
          /**
@@ -76,6 +78,7 @@ namespace IoStats {
 
       private:
 
+          MHDFloat mArea;
          /**
           * @brief Storage for the scalar energy
           */

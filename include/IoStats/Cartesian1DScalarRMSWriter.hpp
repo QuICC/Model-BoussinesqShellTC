@@ -23,6 +23,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
+#include "IoStats/Cartesian1DScalarAvgWriter.hpp"
 
 namespace GeoMHDiSCC {
 
