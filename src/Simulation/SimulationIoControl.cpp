@@ -20,7 +20,7 @@
 namespace GeoMHDiSCC {
 
    SimulationIoControl::SimulationIoControl()
-      : mSteps(0), mAsciiRate(-1), mHdf5Rate(-1), mStatsRate(-1), mStatsAvgRate(-1)
+      : mSteps(0), mAsciiRate(-1), mHdf5Rate(-1), mStatsRate(-1), mStatsAvgRate(-1), mActiveStatsUpdate(false), mActiveStatsWrite(true)
    {
    }
 
@@ -67,14 +67,28 @@ namespace GeoMHDiSCC {
       return (this->mHdf5Rate > 0 && this->mSteps % this->mHdf5Rate == 0);
    }
 
+   void SimulationIoControl::activateStats()
+   {
+      bool writeTrigger = (this->mStatsRate > 0 && this->mSteps % this->mStatsRate == 0);
+      bool updateTrigger = (this->mStatsAvgRate > 0 && this->mSteps % this->mStatsAvgRate == 0);
+
+      this->mActiveStatsUpdate = (writeTrigger || updateTrigger);
+   }
+
+   void SimulationIoControl::disableStats()
+   {
+      this->mActiveStatsUpdate = false;
+   }
+
    bool SimulationIoControl::isStatsTime() const
    {
-      return (this->mStatsRate > 0 && this->mSteps % this->mStatsRate == 0);
+      bool writeTrigger = (this->mStatsRate > 0 && this->mSteps % this->mStatsRate == 0);
+      return writeTrigger;
    }
 
    bool SimulationIoControl::isStatsUpdateTime() const
    {
-      return this->isStatsTime() || (this->mStatsAvgRate > 0 && this->mSteps % this->mStatsAvgRate == 0);
+      return this->mActiveStatsUpdate;
    }
 
    void SimulationIoControl::writeFiles(const MHDFloat time, const MHDFloat timestep)
@@ -89,9 +103,13 @@ namespace GeoMHDiSCC {
          this->writeHdf5(time,timestep);
       }
 
+      // Activate stats
+      this->activateStats();
+
       if(this->isStatsTime())
       {
-         this->writeStats(time,timestep);
+         this->prepareStats(time,timestep);
+         this->mActiveStatsWrite = true;
       }
    }
 
@@ -232,14 +250,28 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void SimulationIoControl::writeStats(const MHDFloat time, const MHDFloat timestep)
+   void SimulationIoControl::prepareStats(const MHDFloat time, const MHDFloat timestep)
    {
       // Iterate over all statistics writer
       SimulationIoControl::stats_iterator it;
       for(it = this->mStatsWriters.begin(); it < this->mStatsWriters.end(); it++)
       {
          (*it)->setSimTime(time,timestep);
-         (*it)->write();
+      }
+   }
+
+   void SimulationIoControl::writeStats()
+   {
+      if(this->mActiveStatsWrite)
+      {
+         // Iterate over all statistics writer
+         SimulationIoControl::stats_iterator it;
+         for(it = this->mStatsWriters.begin(); it < this->mStatsWriters.end(); it++)
+         {
+            (*it)->write();
+         }
+
+         this->mActiveStatsWrite = false;
       }
    }
 

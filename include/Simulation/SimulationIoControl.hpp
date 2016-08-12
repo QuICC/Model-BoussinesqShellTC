@@ -180,11 +180,6 @@ namespace GeoMHDiSCC {
          bool isHdf5Time() const;
 
          /**
-          * @brief Is is time to write statistics file?
-          */
-         bool isStatsTime() const;
-
-         /**
           * @brief Is is time to update statistics calculations?
           */
          bool isStatsUpdateTime() const;
@@ -219,16 +214,36 @@ namespace GeoMHDiSCC {
          void writeHdf5(const MHDFloat time, const MHDFloat timestep);
 
          /**
-          * @brief Write statistics data
+          * @brief Prepare statistics data
           *
           * @param time    Current simulation time
           * @param time    Current simulation timestep
           */
-         void writeStats(const MHDFloat time, const MHDFloat timestep);
+         void prepareStats(const MHDFloat time, const MHDFloat timestep);
+
+         /**
+          * @brief Write statistics data
+          */
+         void writeStats();
+
+         /**
+          * @brief Active stats calculation
+          */
+         void activateStats();
          
+         /**
+          * @brief Disable stats calculation
+          */
+         void disableStats();
+
       protected:
 
       private:
+         /**
+          * @brief Is is time to write statistics file?
+          */
+         bool isStatsTime() const;
+
          /**
           * @brief Vector of ASCII output files
           */
@@ -278,6 +293,16 @@ namespace GeoMHDiSCC {
           * @brief Statistics time average rate
           */
          int mStatsAvgRate;
+
+         /**
+          * @brief Activate stats calculation
+          */
+         bool mActiveStatsUpdate;
+
+         /**
+          * @brief Activate stats writing
+          */
+         bool mActiveStatsWrite;
 
          /**
           * @brief Initialise the configuration file
