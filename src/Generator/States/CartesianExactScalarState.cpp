@@ -127,6 +127,48 @@ namespace Equations {
                }
             }
          }
+
+      } else if(this->mTypeId == CartesianExactStateIds::PLANFORMSQUARES)
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
+         MHDFloat k_;
+         MHDFloat j_;
+         MHDFloat i_;
+         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
+         for(int iK = 0; iK < nK; ++iK)
+         {
+            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
+            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
+            for(int iJ = 0; iJ < nJ; ++iJ)
+            {
+               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               for(int iI = 0; iI < nI; ++iI)
+               {
+                  i_ = gI(iI);
+
+                  MHDFloat val = (1+k_)*(1.0 + std::cos(this->mModeK(0)*j_) + std::cos(this->mModeK(1)*i_));
+
+                  rNLComp.setPoint(val, iI, iJ, iK);
+               }
+            }
+         }
       } else
       {
          #ifdef GEOMHDISCC_SPATIALDIMENSION_3D

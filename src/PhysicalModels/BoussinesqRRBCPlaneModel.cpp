@@ -56,7 +56,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBCPlaneModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -70,8 +70,8 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CartesianExactStateIds::POLYSINSIN);
-         spScalar->setModeOptions(1e0, 10.0, 1e0, 10.0, 1e0, 10.0);
+         spScalar->setStateType(Equations::CartesianExactStateIds::PLANFORMSQUARES);
+         spScalar->setModeOptions(1e0, 10.0, 1e0, 10.0);
 
       // Generate random spectrum
       } else
