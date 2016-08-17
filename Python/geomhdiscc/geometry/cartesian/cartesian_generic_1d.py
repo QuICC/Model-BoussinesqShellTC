@@ -17,7 +17,7 @@ def generic(nx, q, expr, var, bc, coeff = 1.0, ntrunc = -1):
     """Compute the spectral operator for a generic expression"""
 
     # Convert expression to function
-    func = sy.utilities.lambdify(var, expr)
+    func = sy.utilities.lambdify(var, expr, 'numpy')
 
     # Convert to physical space values
     grid = transf.grid(2*nx)
