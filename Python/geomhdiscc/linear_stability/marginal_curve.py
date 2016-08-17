@@ -27,7 +27,7 @@ class MarginalCurve:
 
         # Open file for IO and write header
         if MPI.COMM_WORLD.Get_rank() == 0:
-            self.out = open('marginal_curve.dat', 'a', 0)
+            self.out = open('marginal_curve.dat', 'a', 1)
         else:
             self.out = None
         io.write_header(self.out, gevp_opts['model'].__class__.__name__, len(gevp_opts['res']), len(gevp_opts['eigs']), gevp_opts['eq_params'])
@@ -65,7 +65,7 @@ class MarginalCurve:
 
         # Open file for IO and write header
         if MPI.COMM_WORLD.Get_rank() == 0:
-            min_out = open('marginal_minimum.dat', 'a', 0)
+            min_out = open('marginal_minimum.dat', 'a', 1)
         else:
             min_out = None
         io.write_header(min_out, self.point._gevp.model.__class__.__name__, len(self.point._gevp.res), len(self.point._gevp.eigs), self.point._gevp.eq_params)

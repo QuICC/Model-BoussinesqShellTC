@@ -42,3 +42,10 @@ def generic(nx, q, expr, var, bc, coeff = 1.0, ntrunc = -1):
     mat[0:q,:] = 0
     mat = coeff*spsp.coo_matrix(mat)
     return c1dbc.constrain(mat, bc)
+
+def mult_generic(op, nx, q, expr, var, bc, ntrunc = -1):
+    """Compute the spectral operator for a generic expression"""
+    
+    gen = generic(nx, q, expr, var, c1dbc.no_bc(), ntrunc = ntrunc)
+    mat = op*gen
+    return c1dbc.constrain(mat, bc)

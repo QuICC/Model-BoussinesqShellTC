@@ -1,19 +1,21 @@
-"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
+"""Module provides the functions to generate the compressible rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
+import sympy as sy
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cartesian.cartesian_1d as geo
+import geomhdiscc.geometry.cartesian.cartesian_generic_1d as g1d
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
-class BoussinesqRRBCPlaneConfig:
-    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
+class CompressibleRRBCPlaneConfig:
+    """Class to setup the compressible rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -23,20 +25,25 @@ class BoussinesqRRBCPlaneConfig:
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ekman", "superadiabatic", "adabatic", "polytropic", "gamma", "scale1d", "fast_mean"]
+        return ["prandtl", "rayleigh", "ekman", "density_scale", "polytropic", "gamma", "scale1d", "fast_mean"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
 
-        # Rescale Z direction with ekman number
-        d = {"scale1d":eq_params["scale1d"]*eq_params["ekman"]**(1./3.)}
+        d = dict()
+        dT = np.exp(eq_params['density_scale']/eq_params['polytropic'])-1.0
+        d['Ha'] = eq_params['gamma']/((eq_params['polytropic'] + 1.0)*(eq_params['gamma']-1.0)*dT)
+        d['Hs'] = 1.0/(dT - 1.0/d['Ha'])
+
+        ## Rescale Z direction with ekman number
+        #d['scale1d'] = eq_params["scale1d"]*eq_params["ekman"]**(1./3.)
 
         return d
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocity", "entropy", "density"]
+        return ["velocity", "entropy", "temperature"]
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
@@ -56,8 +63,8 @@ class BoussinesqRRBCPlaneConfig:
 
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
-class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
-    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
+class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
+    """Class to setup the compressible rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -95,7 +102,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("entropy",""), ("density","")]:
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature","")]:
                 shift_z = 2
             else:
                 shift_z = 0
@@ -133,10 +140,6 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
-                    elif field_col == ("entropy",""):
-                        bc = {0:-20, 'rt':0}
-                    elif field_col == ("density",""):
-                        bc = {0:-20, 'rt':0}
 
                 else:
                     if field_row == ("velocity","x") and field_col == field_row:
@@ -145,9 +148,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                         bc = {0:20}
                     elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("entropy","") and field_col == field_row:
-                        bc = {0:20}
-                    elif field_row == ("density","") and field_col == field_row:
+                    elif field_row == ("entropy","") and field_col == ("temperature",""):
                         bc = {0:20}
 
             # Stress-free / Fixed flux
@@ -159,10 +160,6 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                         bc = {0:-21, 'rt':0}
                     elif field_col == ("velocity","z"):
                         bc = {0:-20, 'rt':0}
-                    elif field_col == ("entropy",""):
-                        bc = {0:-21, 'rt':0}
-                    elif field_col == ("density",""):
-                        bc = {0:-21, 'rt':0}
 
                 else:
                     if field_row == ("velocity","x") and field_col == field_row:
@@ -171,18 +168,12 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                         bc = {0:21}
                     elif field_row == ("velocity","z") and field_col == field_row:
                         bc = {0:20}
-                    elif field_row == ("entropy","") and field_col == field_row:
-                        bc = {0:21}
-                    elif field_row == ("density","") and field_col == field_row:
-                        bc = {0:21}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z")]:
                     bc['rt'] = 2
                 elif field_row == ("entropy",""):
-                    bc['rt'] = 2
-                elif field_row == ("density",""):
                     bc['rt'] = 2
 
         # Stencil:
@@ -196,9 +187,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                         bc = {0:-20}
                     elif field_col == ("velocity","z"):
                         bc = {0:-20}
-                    elif field_col == ("entropy",""):
-                        bc = {0:-20}
-                    elif field_col == ("density",""):
+                    elif field_col == ("temperature",""):
                         bc = {0:-20}
 
                 elif bcId == 1:
@@ -208,10 +197,6 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                         bc = {0:-21}
                     elif field_col == ("velocity","z"):
                         bc = {0:-20}
-                    elif field_col == ("entropy",""):
-                        bc = {0:-21}
-                    elif field_col == ("density",""):
-                        bc = {0:-21}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -220,8 +205,6 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z")]:
                     bc['rt'] = 2
                 elif field_row == ("entropy",""):
-                    bc['rt'] = 2
-                elif field_row == ("density",""):
                     bc['rt'] = 2
 
         return bc
@@ -259,8 +242,8 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         E = eq_params['ekman']
         Ta = E**(-2)
         Ro = E**(1./3.)
-        Hs = eq_params['superadiabatic']
-        Ha = eq_params['adiabatic']
+        Hs = eq_params['Hs']
+        Ha = eq_params['Ha']
         poly = eq_params['polytropic']
         gamma = eq_params['gamma']
         zscale = eq_params['scale1d']
@@ -268,22 +251,25 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        x, Tbar, Rbar, Pbar, Sbar = self.make_bar(eq_params)
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         # X velocity
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
-                mat = geo.i2lapl(res[0], bc, sqrt(Pr/Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, np.sqrt(Pr/Ra), cscale = zscale)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*sqrt(Pr/Ra)*kx**2)
+                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*kx**2)
 
             elif field_col == ("velocity","y"):
-                mat = geo.i2(res[0], bc, sqrt(Pr*Ta/Ra))
+                op = geo.i2(res[0], no_bc(), np.sqrt(Pr*Ta/Ra))
+                mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*sqrt(Pr/Ra)*kx*ky)
+                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*kx*ky)
 
             elif field_col == ("velocity","z"):
-                mat += geo.i2d1(res[0], bc, (1./3.)*sqrt(Pr/Ra)*kx*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*kx*1j, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -300,17 +286,18 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         # Y velocity
         elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
-                mat = geo.i2(res[0], bc, -sqrt(Pr*Ta/Ra))
+                op = geo.i2(res[0], no_bc(), -np.sqrt(Pr*Ta/Ra))
+                mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*sqrt(Pr/Ra)*kx*ky)
+                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*kx*ky)
 
             elif field_col == ("velocity","y"):
-                mat = geo.i2lapl(res[0], bc, sqrt(Pr/Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, np.sqrt(Pr/Ra), cscale = zscale)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*sqrt(Pr/Ra)*ky**2)
+                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*ky**2)
 
             elif field_col == ("velocity","z"):
-                mat += geo.i2d1(res[0], bc, (1./3.)*sqrt(Pr/Ra)*ky*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*ky*1j, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -327,15 +314,15 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         # Z velocity
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
-                mat = geo.i2d1(res[0], bc, (1./3.)*sqrt(Pr/Ra)*kx*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*kx*1j, cscale = zscale)
 
             elif field_col == ("velocity","y"):
-                mat += geo.i2d1(res[0], bc, (1./3.)*sqrt(Pr/Ra)*ky*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*ky*1j, cscale = zscale)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i2lapl(res[0], bc, sqrt(Pr/Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, np.sqrt(Pr/Ra), cscale = zscale)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2d2(res[0], bc, (1./3.)*sqrt(Pr/Ra), cscale = zscale)
+                mat += geo.i2d2(res[0], bc, (1./3.)*np.sqrt(Pr/Ra), cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -347,18 +334,39 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.i2(res[0], bc, Hs)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2d1(res[0], bc, -Hs)
+                mat = geo.i2d1(res[0], bc, -Hs, cscale = zscale)
 
         # Density
         elif field_row == ("density",""):
             if field_col == ("velocity","x"):
-                mat = geo.i1(res[0], bc, -kx*1j)
+                tbc = no_bc().copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                op = geo.i1(res[0]+1, no_bc(), -kx*1j)
+                tbc = bc.copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                mat = g1d.mult_generic(op, res[0]+1, 0, Rbar, x, tbc)
 
             elif field_col == ("velocity","y"):
-                mat = geo.i1(res[0], bc, -ky*1j)
+                tbc = no_bc().copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                op = geo.i1(res[0]+1, no_bc(), -ky*1j)
+                tbc = bc.copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                mat = g1d.mult_generic(op, res[0]+1, 0, Rbar, x, tbc)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i1d1(res[0], bc, -1.0, cscale = zscale)
+                tbc = no_bc().copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                op = geo.i1d1(res[0]+1, no_bc(), -1.0, cscale = zscale)
+                tbc = bc.copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                mat = g1d.mult_generic(op, res[0]+1, 0, Rbar, x, tbc)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -381,10 +389,11 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i2(res[0], bc, -1.0)
+                op = geo.i2(res[0], no_bc(), -1.0)
+                mat = g1d.mult_generic(op, res[0], 0, Rbar*Tbar*sy.diff(2*Sbar, x), x, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2lapl(res[0], bc, 1.0/sqrt(Pr*Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, 1.0/np.sqrt(Pr*Ra), cscale = zscale)
 
             elif field_col == ("entropy",""):
                 mat = geo.zblk(res[0], bc)
@@ -407,16 +416,19 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.qid(res[0], 0, bc, -1.0)
+                op = geo.qid(res[0], 0, no_bc(), -1.0)
+                mat = g1d.mult_generic(op, res[0], 0, Pbar*Rbar, x, bc)
 
             elif field_col == ("entropy",""):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("density",""):
-                mat = geo.qid(res[0], 0, bc, -1.0)
+                op = geo.qid(res[0], 0, no_bc(), -1.0)
+                mat = g1d.mult_generic(op, res[0], 0, Pbar*Tbar, x, bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.qid(res[0], 0, bc)
+                op = geo.qid(res[0], 0, no_bc())
+                mat = g1d.mult_generic(op, res[0], 0, Rbar*Tbar, x, bc)
 
         # Entropy
         elif field_row == ("temperature",""):
@@ -433,13 +445,16 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("entropy",""):
-                mat = geo.qid(res[0], 0, bc)
+                op = geo.qid(res[0], 0, no_bc())
+                mat = g1d.mult_generic(op, res[0], 0, Pbar*Rbar, x, bc)
 
             elif field_col == ("density",""):
-                mat = geo.qid(res[0], 0, bc)
+                op = geo.qid(res[0], 0, no_bc())
+                mat = g1d.mult_generic(op, res[0], 0, Pbar, x, bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.qid(res[0], 0, bc, -1.0/gamma)
+                op = geo.qid(res[0], 0, no_bc(), -1.0/gamma)
+                mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -452,27 +467,36 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        x, Tbar, Rbar, Pbar, Sbar = self.make_bar(eq_params)
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         # X velocity
         if field_row == ("velocity","x"):
-            mat = geo.i2(res[0], bc, 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
+            mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         # Y velocity
         elif field_row == ("velocity","y"):
-            mat = geo.i2(res[0], bc, 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
+            mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         # Z velocity
         elif field_row == ("velocity","z"):
-            mat = geo.i2(res[0], bc, 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
+            mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         # Entropy
         elif field_row == ("entropy",""):
-            mat = geo.i2(res[0], bc, 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
+            mat = g1d.mult_generic(op, res[0], 0, Rbar*Tbar, x, bc)
 
         # Density
         elif field_row == ("density",""):
-            mat = geo.i2(res[0], bc, 1.0)
+            tbc = bc.copy()
+            tbc['rt'] = bc.get('rt', 0) + 1
+            tbc['cr'] = bc.get('cr', 0) + 1
+            mat = geo.i1(res[0]+1, tbc, 1.0)
 
         # Pressure
         elif field_row == ("pressure",""):
@@ -498,7 +522,29 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
 
         return mat
 
-class BoussinesqRRBCPlaneVisu(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
+    def make_bar(self, eq_params):
+        """Make background states"""
+
+        Ra = eq_params['rayleigh']
+        Pr = eq_params['prandtl']
+        E = eq_params['ekman']
+        Ta = E**(-2)
+        Ro = E**(1./3.)
+        Hs = eq_params['Hs']
+        Ha = eq_params['Ha']
+        poly = eq_params['polytropic']
+        gamma = eq_params['gamma']
+        zscale = eq_params['scale1d']
+
+        x = sy.Symbol('x')
+        Tbar = 1.0 + (Hs**(-1) + Ha**(-1))*(x+1.)/2.
+        Rbar = Tbar**poly
+        Pbar = Ha*((gamma - 1.)/gamma)*Tbar**(poly+1)
+        Sbar = sy.log(Pbar**(1./gamma)/Rbar)
+
+        return (x, Tbar, Rbar, Pbar, Sbar)
+
+class CompressibleRRBCPlaneVisu(CompressibleRRBCPlaneConfig, base_model.BaseModel):
     """Class to setup the visualization options for TFF scheme """
 
     def implicit_fields(self, field_row):
