@@ -63,7 +63,6 @@ for h in config.find('framework').find('truncation'):
         ky = float(h.text)
 
 # Extract physical information
-Ro = 1.0
 phys_params = dict()
 for h in config.find('simulation').find('physical'):
     phys_params[h.tag] = float(h.text)
@@ -87,8 +86,6 @@ for f in fields:
     if f == "mean_temperature":
         phys_data[0:nz] -= 1.0 - 0.5*(grid + 1.0)
         phys_data[0:nz] /= phys_params.get('rossby', 1.0)
-    else:
-        phys_data[0:nz] *= phys_params.get('rossby', 1.0)
     phys_data[nz:] = phys_data[1:nz-1][::-1]
     data[f] = fft.rfft(phys_data).real/phys_data.shape[0]
 
@@ -104,7 +101,7 @@ hdf5_file.set_node_attr('/', 'version', '1.0'.encode('ascii'))
 
 # Write HDF5 physical parameters
 group = hdf5_file.create_group("/","physical")
-for k,v in phys_params.iteritems():
+for k,v in phys_params.items():
     hdf5_file.create_array(group, k, v)
 
 # Write HDF5 run parameters
