@@ -48,11 +48,11 @@ config = ET.fromstring(header + '<root>'+cfg_file.read()+'</root>')
 # Extract truncation information
 for h in config.find('framework').find('truncation'):
     if h.tag == "dim1D":
-        nnz = int(h.text)
+        nnz = int(h.text)+1
     elif h.tag == "dim2D":
-        nnx = int(h.text)
+        nnx = int(h.text)+1
     elif h.tag == "dim3D":
-        nny = int(h.text)
+        nny = int(h.text)+1
     elif h.tag == "box2D":
         boxX = int(h.text)
     elif h.tag == "box3D":
@@ -87,12 +87,14 @@ for f in fields:
     if f == "mean_temperature":
         phys_data[0:nz] -= 1.0 - 0.5*(grid + 1.0)
         phys_data[0:nz] /= phys_params.get('rossby', 1.0)
+    else:
+        phys_data[0:nz] *= phys_params.get('rossby', 1.0)
     phys_data[nz:] = phys_data[1:nz-1][::-1]
     data[f] = fft.rfft(phys_data).real/phys_data.shape[0]
 
 if sim_type in ["RRBCPlane", "RRBCPlaneMean", "RRBCPlaneDMean"]:
-    data["velocity_tor"] = data["streamfunction"]
-    data["velocity_pol"] = (1.0/(kx**2 + ky**2))*data["velocityz"]
+    data["velocity_tor"] = -data["streamfunction"]
+    data["velocity_pol"] = -(1.0/kx**2)*data["velocityz"]
 
 # Write HDF5 header attributes
 hdf5_file = tables.open_file(outputfile, mode = 'w')
@@ -131,6 +133,7 @@ def writeScalar(name, mean = None):
     if mean is not None:
         tmp[0,0,0:nnz].real = data[mean][0:nnz]
     tmp[boxY,0,0:nnz].real = 0.5*data[name][0:nnz]
+    #tmp[-boxY,0,0:nnz].real = 0.5*data[name][0:nnz]
     tmp[0,boxX,0:nnz].real = 0.5*data[name][0:nnz]
     hdf5_file.create_array(group, name, tmp)
 
@@ -139,6 +142,7 @@ def writeVector(name, comp):
     for c in comp:
         tmp = np.zeros((2*nny-1,nnx,nnz), dtype=np.complex128)
         tmp[boxY,0,0:nnz].real = 0.5*data[name + '_' + c][0:nnz]
+        #tmp[-boxY,0,0:nnz].real = 0.5*data[name + '_' + c][0:nnz]
         tmp[0,boxX,0:nnz].real = 0.5*data[name + '_' + c][0:nnz]
         hdf5_file.create_array(group, name + '_' + c, tmp)
 
@@ -154,20 +158,20 @@ if sim_type == "FPlane3DQG":
 # Write HDF5 RRBCPlane fields
 if sim_type == "RRBCPlane":
     writeScalar("temperature", "mean_temperature")
-    writeVector("velocity", ["tor", "pol"])
+    writeVector("velocity", ["tor","pol"])
 
 ############################################
 # Write HDF5 RRBCPlaneMean fields
 if sim_type == "RRBCPlaneMean":
     writeScalar("temperature")
     writeScalar("meantemperature")
-    writeVector("velocity", ["tor", "pol"])
+    writeVector("velocity", ["tor","pol"])
 
 ############################################
 # Write HDF5 RRBCPlaneDMean fields
 if sim_type == "RRBCPlaneDMean":
     writeScalar("temperature")
     writeScalar("dz_meantemperature")
-    writeVector("velocity", ["tor", "pol"])
+    writeVector("velocity", ["tor","pol"])
 
 hdf5_file.close()

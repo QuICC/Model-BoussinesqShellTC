@@ -8,14 +8,14 @@ import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 # Create the model and activate linearization
 model = mod.BoussinesqRTCShell()
 model.linearize = True
-model.use_galerkin = True
+model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 Rac = None
 mc = None
 
 # SF/SF, FT/FT, internal heating
-#bc_vel = 1; bc_temp = 0; heating = 0; rratio = 0.35
+bc_vel = 1; bc_temp = 0; heating = 0; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -28,8 +28,8 @@ mc = None
 #res = [64, 64, 0]
 #Ta = 1e11; Rac = 85.363356944817; mc = 20
 #res = [64, 64, 0]
-#Ta = 1e12; Rac = 122.69214718393; mc = 30
-#res = [128, 128, 0]
+Ta = 1e12; Rac = 122.69214718393; mc = 30
+res = [128, 128, 0]
 #Ta = 1e13; Rac = 177.55422348123; mc = 44
 #res = [192, 192, 0]
 #Ta = 1e14; Rac = 258.13410447601; mc = 65
@@ -73,7 +73,7 @@ mc = None
 #res = [1024, 1024, 0]
 
 # NS/NS, FT/FT, differential heating
-bc_vel = 0; bc_temp = 0; heating = 1; rratio = 0.35
+#bc_vel = 0; bc_temp = 0; heating = 1; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -86,8 +86,8 @@ bc_vel = 0; bc_temp = 0; heating = 1; rratio = 0.35
 #res = [96, 96, 0]
 #Ta = 1e11; Rac = 84.487326687693; mc = 20
 #res = [128, 128, 0]
-Ta = 1e12; Rac = 105; mc = 25
-res = [192, 192, 0]
+#Ta = 1e12; Rac = 105; mc = 25
+#res = [192, 192, 0]
 #Ta = 1e13; Rac = 176.79656879674; mc = 44
 #res = [256, 256, 0]
 #Ta = 1e14; Rac = 257.45628575047; mc = 65
@@ -102,7 +102,7 @@ res = [192, 192, 0]
 #res = [1024, 1024, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
-ro = model.automatic_parameters({'rratio':rratio})
+ro = model.automatic_parameters({'rratio':rratio})['ro']
 if mc is None:
     m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
 else:
@@ -114,6 +114,7 @@ else:
 
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
 eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra, 'rratio':rratio, 'heating':heating}
+eq_params.update(model.automatic_parameters(eq_params))
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)
@@ -127,18 +128,19 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['evp_tol'] = 1e-16
+marginal_options['evp_tol'] = 1e-10
 marginal_options['geometry'] = 'shell'
-marginal_options['curve'] = True
+marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True
 marginal_options['plot_curve'] = True
-marginal_options['solve'] = False
+marginal_options['solve'] = True
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = False
-marginal_options['show_spectra'] = False
-marginal_options['show_physical'] = False
-marginal_options['curve_points'] = np.arange(max(1,m-5), m+6, 1)
+marginal_options['viz_mode'] = 0
+marginal_options['show_spectra'] = True
+marginal_options['show_physical'] = True
+marginal_options['curve_points'] = np.arange(max(1,m-0), m+1, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)
