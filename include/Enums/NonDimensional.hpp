@@ -126,6 +126,8 @@ namespace GeoMHDiSCC {
             ELEVATOR,
             /// Flag to use fast mean equation
             FAST_MEAN,
+            /// Flag to use rescaled equation
+            RESCALED,
          };
       };
 }

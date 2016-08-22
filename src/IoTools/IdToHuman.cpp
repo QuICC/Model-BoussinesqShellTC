@@ -599,6 +599,9 @@ namespace IoTools {
          case NonDimensional::FAST_MEAN:
             return "fast_mean";
 
+         case NonDimensional::RESCALED:
+            return "rescaled";
+
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
       }
