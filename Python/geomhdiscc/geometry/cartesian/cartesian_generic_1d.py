@@ -17,13 +17,14 @@ def generic(nx, q, expr, var, bc, coeff = 1.0, ntrunc = -1):
     """Compute the spectral operator for a generic expression"""
 
     # Convert expression to function
-    func = sy.utilities.lambdify(var, expr, 'numpy')
+    func = sy.utilities.lambdify(var, expr.simplify(), 'numpy')
 
     # Convert to physical space values
     grid = transf.grid(2*nx)
     phys = func(grid)
     spec = transf.tocheb(phys)[0:nx]
-    spec *= (np.abs(spec) > np.spacing(1))
+    spec *= (np.abs(spec)/np.max(np.abs(spec)) > np.spacing(1))
+    #spec *= (np.abs(spec) > np.spacing(1))
     spec[1:] *= 2
 
     # Truncate non constant coefficient expansion
@@ -46,6 +47,7 @@ def generic(nx, q, expr, var, bc, coeff = 1.0, ntrunc = -1):
 def mult_generic(op, nx, q, expr, var, bc, ntrunc = -1):
     """Compute the spectral operator for a generic expression"""
     
-    gen = generic(nx, q, expr, var, c1dbc.no_bc(), ntrunc = ntrunc)
-    mat = op*gen
+    gen = generic(2*nx, q, expr, var, c1dbc.no_bc(), ntrunc = nx)
+    mat = op(2*nx)*gen
+    mat = mat[0:nx,0:nx]
     return c1dbc.constrain(mat, bc)

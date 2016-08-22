@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 import numpy as np
 import sympy as sy
 import scipy.sparse as spsp
-import functools
 
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cartesian.cartesian_1d as geo
@@ -26,7 +25,7 @@ class CompressibleRRBCPlaneConfig:
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ekman", "density_scale", "polytropic", "gamma", "scale1d", "fast_mean"]
+        return ["prandtl", "rayleigh", "ekman", "density_scale", "polytropic", "gamma", "scale1d", "scaling"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -38,6 +37,13 @@ class CompressibleRRBCPlaneConfig:
 
         d['rayleigh'] = eq_params['rayleigh']/(1. + dT)**(2.0*eq_params['polytropic']-1.0)
         d['ekman'] = (eq_params['ekman']**(-2)/(1. + dT)**(2.0*eq_params['polytropic']))**(-0.5)
+
+        ## Rescale Z direction with ekman number
+        if eq_params['scaling'] == 1:
+            d['aspect_ratio'] = eq_params["ekman"]**(1./3.)
+        else:
+            d['aspect_ratio'] = 1.0
+        d['scale1d'] = eq_params["scale1d"]*d['aspect_ratio']
 
         return d
 
@@ -70,8 +76,7 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        #fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("entropy",""), ("density",""), ("temperature",""), ("pressure","")]
-        fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("pressure",""), ("density",""), ("temperature",""), ("entropy","")]
+        fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("entropy",""), ("density",""), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -242,8 +247,7 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
         Ra = eq_params['rayleigh']
         Pr = eq_params['prandtl']
         E = eq_params['ekman']
-        Ta = E**(-2)
-        Ro = E**(1./3.)
+        A = eq_params['aspect_ratio']
         Hs = eq_params['Hs']
         Ha = eq_params['Ha']
         poly = eq_params['polytropic']
@@ -260,18 +264,18 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
         # X velocity
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
-                mat = geo.i2lapl(res[0], kx, ky, bc, np.sqrt(Pr/Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, 1.0, cscale = zscale)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*kx**2)
+                mat += geo.i2(res[0], bc, -(1./3.)*kx**2)
 
             elif field_col == ("velocity","y"):
-                op = functools.partial(geo.i2, bc = no_bc(), coeff = np.sqrt(Pr*Ta/Ra))
+                op = geo.i2(res[0], no_bc(), A**2/E)
                 mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*kx*ky)
+                mat += geo.i2(res[0], bc, -(1./3.)*kx*ky)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*kx*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*1j*kx, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -283,23 +287,23 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2(res[0], bc, -Hs*1j*kx)
+                mat = geo.i2(res[0], bc, -1j*kx*Ra*Hs*A**2/Pr)
 
         # Y velocity
         elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
-                op = functools.partial(geo.i2, bc = no_bc(), coeff = -np.sqrt(Pr*Ta/Ra))
+                op = geo.i2(res[0], no_bc(), -A**2/E)
                 mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*kx*ky)
+                mat += geo.i2(res[0], bc, -(1./3.)*kx*ky)
 
             elif field_col == ("velocity","y"):
-                mat = geo.i2lapl(res[0], kx, ky, bc, np.sqrt(Pr/Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, 1.0, cscale = zscale)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2(res[0], bc, -(1./3.)*np.sqrt(Pr/Ra)*ky**2)
+                mat += geo.i2(res[0], bc, -(1./3.)*ky**2)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*ky*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*1j*ky, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -311,20 +315,20 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2(res[0], bc, -Hs*ky*1j)
+                mat = geo.i2(res[0], bc, -1j*ky*Ra*Hs*A**2/Pr)
 
         # Z velocity
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
-                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*kx*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*kx*1j, cscale = zscale)
 
             elif field_col == ("velocity","y"):
-                mat = geo.i2d1(res[0], bc, (1./3.)*np.sqrt(Pr/Ra)*ky*1j, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, (1./3.)*ky*1j, cscale = zscale)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i2lapl(res[0], kx, ky, bc, np.sqrt(Pr/Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, 1.0, cscale = zscale)
                 bc[0] = min(bc[0], 0)
-                mat += geo.i2d2(res[0], bc, (1./3.)*np.sqrt(Pr/Ra), cscale = zscale)
+                mat += geo.i2d2(res[0], bc, (1./3.), cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -333,29 +337,38 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("density",""):
-                mat = geo.i2(res[0], bc, Hs)
+                mat = geo.i2(res[0], bc, Ra*Hs*A**3/Pr)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2d1(res[0], bc, -Hs, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, -Ra*Hs*A**2/Pr, cscale = zscale)
 
         # Density
         elif field_row == ("density",""):
             if field_col == ("velocity","x"):
-                op = functools.partial(geo.i1, bc = no_bc(), coeff = -1j*kx)
+                tbc = no_bc().copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                op = geo.i1(res[0]+1, no_bc(), -1j*kx)
                 tbc = bc.copy()
                 tbc['rt'] = bc.get('rt', 0) + 1
                 tbc['cr'] = bc.get('cr', 0) + 1
                 mat = g1d.mult_generic(op, res[0]+1, 0, Rbar, x, tbc)
 
             elif field_col == ("velocity","y"):
-                op = functools.partial(geo.i1, bc = no_bc(), coeff = -1j*ky)
+                tbc = no_bc().copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                op = geo.i1(res[0]+1, no_bc(), -1j*ky)
                 tbc = bc.copy()
                 tbc['rt'] = bc.get('rt', 0) + 1
                 tbc['cr'] = bc.get('cr', 0) + 1
                 mat = g1d.mult_generic(op, res[0]+1, 0, Rbar, x, tbc)
 
             elif field_col == ("velocity","z"):
-                op = functools.partial(geo.i1d1, bc = no_bc(), coeff = -1.0, cscale = zscale)
+                tbc = no_bc().copy()
+                tbc['rt'] = bc.get('rt', 0) + 1
+                tbc['cr'] = bc.get('cr', 0) + 1
+                op = geo.i1d1(res[0]+1, no_bc(), -1.0, cscale = zscale)
                 tbc = bc.copy()
                 tbc['rt'] = bc.get('rt', 0) + 1
                 tbc['cr'] = bc.get('cr', 0) + 1
@@ -382,11 +395,11 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("velocity","z"):
-                op = functools.partial(geo.i2, bc = no_bc(), coeff = -1.0)
+                op = geo.i2(res[0], no_bc(), -1.0)
                 mat = g1d.mult_generic(op, res[0], 0, Rbar*Tbar*sy.diff(2*Sbar, x), x, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2lapl(res[0], kx, ky, bc, 1.0/np.sqrt(Pr*Ra), cscale = zscale)
+                mat = geo.i2lapl(res[0], kx, ky, bc, 1.0/Pr, cscale = zscale)
 
             elif field_col == ("entropy",""):
                 mat = geo.zblk(res[0], bc)
@@ -409,18 +422,18 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                op = functools.partial(geo.qid, q = 0, bc = no_bc(), coeff = -1.0)
+                op = geo.qid(res[0], 0, no_bc(), -1.0)
                 mat = g1d.mult_generic(op, res[0], 0, Pbar*Rbar, x, bc)
 
             elif field_col == ("entropy",""):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("density",""):
-                op = functools.partial(geo.qid, q = 0, bc = no_bc(), coeff = -1.0)
+                op = geo.qid(res[0], 0, no_bc(), -1.0)
                 mat = g1d.mult_generic(op, res[0], 0, Pbar*Tbar, x, bc)
 
             elif field_col == ("pressure",""):
-                op = functools.partial(geo.qid, q = 0, bc = no_bc())
+                op = geo.qid(res[0], 0, no_bc())
                 mat = g1d.mult_generic(op, res[0], 0, Rbar*Tbar, x, bc)
 
         # Entropy
@@ -438,15 +451,15 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.zblk(res[0], bc)
 
             elif field_col == ("entropy",""):
-                op = functools.partial(geo.qid, q = 0, bc = no_bc())
+                op = geo.qid(res[0], 0, no_bc())
                 mat = g1d.mult_generic(op, res[0], 0, Pbar*Rbar, x, bc)
 
             elif field_col == ("density",""):
-                op = functools.partial(geo.qid, q = 0, bc = no_bc())
+                op = geo.qid(res[0], 0, no_bc())
                 mat = g1d.mult_generic(op, res[0], 0, Pbar, x, bc)
 
             elif field_col == ("pressure",""):
-                op = functools.partial(geo.qid, q = 0, bc = no_bc(), coeff = -1.0/gamma)
+                op = geo.qid(res[0], 0, no_bc(), -1.0/gamma)
                 mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         if mat is None:
@@ -466,22 +479,22 @@ class CompressibleRRBCPlane(CompressibleRRBCPlaneConfig, base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         # X velocity
         if field_row == ("velocity","x"):
-            op = functools.partial(geo.i2, bc = no_bc(), coeff = 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
             mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         # Y velocity
         elif field_row == ("velocity","y"):
-            op = functools.partial(geo.i2, bc = no_bc(), coeff = 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
             mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         # Z velocity
         elif field_row == ("velocity","z"):
-            op = functools.partial(geo.i2, bc = no_bc(), coeff = 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
             mat = g1d.mult_generic(op, res[0], 0, Rbar, x, bc)
 
         # Entropy
         elif field_row == ("entropy",""):
-            op = functools.partial(geo.i2, bc = no_bc(), coeff = 1.0)
+            op = geo.i2(res[0], no_bc(), 1.0)
             mat = g1d.mult_generic(op, res[0], 0, Rbar*Tbar, x, bc)
 
         # Density

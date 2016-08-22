@@ -37,7 +37,7 @@ class GEVPSolver:
 
         if shift_range is None:
             #self.shift_range = (1e-2, 0.2)
-            self.shift_range = (-1e-1, 1e-1)
+            #self.shift_range = (-1e-1, 1e-1)
             self.shift_range = (-1e-2, 1e-2)
         else:
             self.shift_range = shift_range
