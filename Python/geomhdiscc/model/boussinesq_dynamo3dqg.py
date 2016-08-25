@@ -60,7 +60,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("bx",""), ("by","")]:
+            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("bx",""), ("by",""), ("emfx",""), ("emfy","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -238,7 +238,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
-        elif field_row == ("bx","") and field_col == field_row:
+        elif field_row == ("bx","") and field_col == field_row
             if eigs[0] == 0 and eigs[1] == 0:
                 mat = geo.i2d1(res[0], bc, tau, cscale = zscale)
             else:
@@ -361,6 +361,9 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             elif field_col == ("by",""):
                 mat = geo.zblk(res[0], bc)
 
+            elif field_col == ("emfy",""):
+                mat = geo.i2d1(res[0], bc, 1.0, cscale = zscale)
+
         elif field_row == ("by",""):
             if field_col == ("streamfunction",""):
                 mat = geo.zblk(res[0], bc)
@@ -376,6 +379,9 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
             elif field_col == ("by",""):
                 mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
+
+            elif field_col == ("emfx",""):
+                mat = geo.i2d1(res[0], bc, -1.0, cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamo3DQGBy.hpp
+ * @file BoussinesqDynamo3DQGEmfy.hpp
  * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMO3DQGBY_HPP
-#define BOUSSINESQDYNAMO3DQGBY_HPP
+#ifndef BOUSSINESQDYNAMO3DQGEMFY_HPP
+#define BOUSSINESQDYNAMO3DQGEMFY_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGBy: public IScalarEquation
+   class BoussinesqDynamo3DQGEmfy: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqDynamo3DQGBy(SharedEquationParameters spEqParams);
+         BoussinesqDynamo3DQGEmfy(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamo3DQGBy();
+         virtual ~BoussinesqDynamo3DQGEmfy();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -80,4 +80,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQDYNAMO3DQGBY_HPP
+#endif // BOUSSINESQDYNAMO3DQGEMFY_HPP

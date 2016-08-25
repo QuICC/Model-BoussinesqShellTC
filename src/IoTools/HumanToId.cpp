@@ -269,6 +269,14 @@ namespace IoTools {
       {
          return PhysicalNames::DX_MEANTEMPERATURE;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::EMFX))
+      {
+         return PhysicalNames::EMFX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::EMFY))
+      {
+         return PhysicalNames::EMFY;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::ENTROPY))
       {
          return PhysicalNames::ENTROPY;

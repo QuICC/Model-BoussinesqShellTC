@@ -49,6 +49,12 @@ namespace IoTools {
          case PhysicalNames::DX_MEANTEMPERATURE:
             return "D_x mean temperature";
 
+         case PhysicalNames::EMFX:
+            return "Emfx";
+
+         case PhysicalNames::EMFY:
+            return "Emfy";
+
          case PhysicalNames::ENTROPY:
             return "Entropy";
 
@@ -225,6 +231,12 @@ namespace IoTools {
 
          case PhysicalNames::DX_MEANTEMPERATURE:
             return "dx_meantemperature";
+
+         case PhysicalNames::EMFX:
+            return "emfx";
+
+         case PhysicalNames::EMFY:
+            return "emfy";
 
          case PhysicalNames::ENTROPY:
             return "entropy";

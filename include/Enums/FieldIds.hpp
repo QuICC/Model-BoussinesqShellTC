@@ -45,6 +45,10 @@ namespace GeoMHDiSCC {
          DZ_MEANTEMPERATURE,
          /// Entropy field
          ENTROPY,
+         /// Electromagnetic force x (in By equation)
+         EMFX,
+         /// Electromagnetic force y (in Bx equation)
+         EMFY,
          /// Fluctuating bx
          FBX,
          /// Fluctuating by
