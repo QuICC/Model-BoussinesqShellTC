@@ -23,7 +23,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "magnetic_prandtl", "rratio"]
+        return ["ekman", "rossby", "modified_elsasser", "magnetic_prandtl", "rratio"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -199,7 +199,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
         E = eq_params['ekman']
         Ro = eq_params['rossby']
         Pm = eq_params['magnetic_prandtl']
-        Rm = Pm*abs(Ro)/E
+        Rm = Pm*abs(Ro)/E # TODO: decide wether this term should not rather be Rm = Pm/E
         assert(eigs[0].is_integer())
         l = eigs[0]
 

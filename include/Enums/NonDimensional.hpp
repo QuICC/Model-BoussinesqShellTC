@@ -37,6 +37,9 @@ namespace GeoMHDiSCC {
             MAGEKMAN,
             /// Magnetic Prandtl number
             MAGPRANDTL,
+			// Nicolò Lardelli
+			/// Modified Elsasser number
+			MODELSASSER,
             /// Prandtl number
             PRANDTL,
             /// Rayleigh number

@@ -478,6 +478,10 @@ namespace IoTools {
          case NonDimensional::MAGPRANDTL:
             return "magnetic_prandtl";
 
+         // Modified by Nicolò Lardelli
+         case NonDimensional::MODELSASSER:
+	    return "modified_elsasser";
+
          case NonDimensional::PRANDTL:
             return "prandtl";
 
