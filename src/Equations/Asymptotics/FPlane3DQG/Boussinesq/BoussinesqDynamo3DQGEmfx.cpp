@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqDynamo3DQGEmfx::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
    void BoussinesqDynamo3DQGEmfx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -85,7 +85,7 @@ namespace Equations {
       this->setName(PhysicalNames::EMFX);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::PROGNOSTIC);
+      this->setSolveTiming(SolveTiming::BEFORE);
 
       // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::EMFX, FieldRequirement(true, true, true, false));

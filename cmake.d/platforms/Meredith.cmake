@@ -38,7 +38,6 @@ set(GEOMHDISCC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
 ###################################################
 
 set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
 
 ###################################################
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
@@ -51,6 +50,18 @@ set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" "amd" "cholmod" "ccolamd" "colamd" "c
 set(GEOMHDISCC_LIBDIR_UMFPACK "/usr/local/lib" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "SparseLU" "MUMPS" "UmfPack" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "MUMPS" "UmfPack" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
