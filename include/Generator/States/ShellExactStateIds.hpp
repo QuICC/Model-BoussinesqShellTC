@@ -55,6 +55,7 @@ namespace Equations {
          BENCHTEMPC1 = 50, // Initial temperature perturbation state for Christensen's benchmark C1
          BENCHVELC1,       // Initial velocity perturbation state for Christensen's benchmark C1
          BENCHMAGC1,       // Initial magnetic perturbation state for Christensen's benchmark C1
+         IMPMAGMATSUI,     // Imposed magnetic field from Matsui
       };
 
       /**

@@ -23,13 +23,16 @@
 //
 #include "Base/MpiTypes.hpp"
 #include "Exceptions/Exception.hpp"
-#if defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
-   #include "Diagnostics/StreamVerticalWrapper.hpp"
+#if defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL
+   #include "Diagnostics/CartesianTorPolWrapper.hpp"
    #include "Diagnostics/CartesianCflWrapper.hpp"
 #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
    #include "Diagnostics/SphericalTorPolWrapper.hpp"
    #include "Diagnostics/SphericalCflWrapper.hpp"
-#endif //defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
+#elif defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
+   #include "Diagnostics/StreamVerticalWrapper.hpp"
+   #include "Diagnostics/CartesianCflWrapper.hpp"
+#endif //defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL 
 
 namespace GeoMHDiSCC {
 
@@ -52,11 +55,11 @@ namespace Diagnostics {
          this->mFixedStep = std::max(this->mcMinStep, tstep(1));
          this->mFixedStep = std::min(this->mFixedStep, this->mcMaxStep);
 
-      #if defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
-      // Create a stream function and vertical velocity wrapper
-      } else if(scalars.count(PhysicalNames::STREAMFUNCTION) && scalars.count(PhysicalNames::VELOCITYZ))
+      #if defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL
+      // Create a cartesian toroidal/poloidal warpper
+      } else if(vectors.count(PhysicalNames::VELOCITY))
       {
-         SharedStreamVerticalWrapper spVelocity = SharedStreamVerticalWrapper(new StreamVerticalWrapper(scalars.find(PhysicalNames::STREAMFUNCTION)->second, scalars.find(PhysicalNames::VELOCITYZ)->second));
+         SharedCartesianTorPolWrapper spVelocity = SharedCartesianTorPolWrapper(new CartesianTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
 
          this->mspCflWrapper = SharedCartesianCflWrapper(new CartesianCflWrapper(spVelocity, mesh));
 
@@ -71,7 +74,18 @@ namespace Diagnostics {
          this->mspCflWrapper = SharedSphericalCflWrapper(new SphericalCflWrapper(spVelocity, mesh));
 
          this->mFixedStep = tstep(1);
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
+
+      #elif defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
+      // Create a stream function and vertical velocity wrapper
+      } else if(scalars.count(PhysicalNames::STREAMFUNCTION) && scalars.count(PhysicalNames::VELOCITYZ))
+      {
+         SharedStreamVerticalWrapper spVelocity = SharedStreamVerticalWrapper(new StreamVerticalWrapper(scalars.find(PhysicalNames::STREAMFUNCTION)->second, scalars.find(PhysicalNames::VELOCITYZ)->second));
+
+         this->mspCflWrapper = SharedCartesianCflWrapper(new CartesianCflWrapper(spVelocity, mesh));
+
+         this->mFixedStep = tstep(1);
+
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL 
 
       // Required wrapper is not implemented
       } else

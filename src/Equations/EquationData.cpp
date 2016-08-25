@@ -298,9 +298,19 @@ namespace Equations {
       return this->mRequirements;
    }
 
+   const VariableRequirement&  EquationData::imposedRequirements() const
+   {
+      return this->mImposedRequirements;
+   }
+
    const FieldRequirement&  EquationData::requirements(PhysicalNames::Id id) const
    {
       return this->mRequirements.field(id);
+   }
+
+   const FieldRequirement&  EquationData::imposedRequirements(PhysicalNames::Id id) const
+   {
+      return this->mImposedRequirements.field(id);
    }
 
    FieldRequirement&  EquationData::updateFieldRequirements(PhysicalNames::Id id)

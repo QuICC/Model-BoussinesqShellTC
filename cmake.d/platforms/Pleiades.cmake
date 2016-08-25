@@ -51,8 +51,8 @@ set(GEOMHDISCC_LIBDIR_MUMPS "/nobackup/mplumle1/libs/lib" "$ENV{MKLROOT}/lib/int
 #set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "mkl_scalapack_lp64" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "mpifort" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "metis" "mkl_scalapack_lp64" "mkl_intel_lp64" "mkl_core" "mkl_sequential" "mkl_blacs_sgimpt_lp64" "pthread" "m" "dl" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "$ENV{HOME}/local/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL $ENV{TACC_MKL_LIB} "$ENV{HOME}/local/lib" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "/nobackup/mplumle1/libs/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL "$ENV{MKLROOT}/lib/intel64" "/nobackup/mplumle1/libs/lib" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#

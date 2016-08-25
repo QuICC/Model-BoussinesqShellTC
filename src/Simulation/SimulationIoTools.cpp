@@ -38,4 +38,31 @@ namespace GeoMHDiSCC {
          }
       }
    }
+
+   void SimulationIoTools::updateStatsPre(SimulationIoTools::stats_iterator statsBegin,  SimulationIoTools::stats_iterator statsEnd, Transform::TransformCoordinatorType& coord)
+   {
+      stats_iterator it;
+      for(it = statsBegin; it != statsEnd; ++it)
+      {
+         (*it)->preCompute(coord);
+      }
+   }
+
+   void SimulationIoTools::updateStats(SimulationIoTools::stats_iterator statsBegin,  SimulationIoTools::stats_iterator statsEnd, Transform::TransformCoordinatorType& coord)
+   {
+      stats_iterator it;
+      for(it = statsBegin; it != statsEnd; ++it)
+      {
+         (*it)->compute(coord);
+      }
+   }
+
+   void SimulationIoTools::updateStatsPost(SimulationIoTools::stats_iterator statsBegin,  SimulationIoTools::stats_iterator statsEnd, Transform::TransformCoordinatorType& coord)
+   {
+      stats_iterator it;
+      for(it = statsBegin; it != statsEnd; ++it)
+      {
+         (*it)->postCompute(coord);
+      }
+   }
 }

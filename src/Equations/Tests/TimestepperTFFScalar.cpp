@@ -22,7 +22,6 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 

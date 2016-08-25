@@ -23,7 +23,6 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -272,6 +271,55 @@ namespace Equations {
                   amplitude = scale*5.0;
                   funcR = std::sin(Math::PI*(r - ro*rratio));
                   funcTh = std::sin(2*theta);
+               }
+
+               rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
+            }
+         }
+
+      } else if(typeId == ShellExactStateIds::IMPMAGMATSUI)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         MHDFloat ro = this->eqParams().nd(NonDimensional::RO);
+         MHDFloat rratio = this->eqParams().nd(NonDimensional::RRATIO);
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, ro, rratio);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         Array funcPh = Array::Ones(nPh);
+         MHDFloat funcR = 1.0;
+         MHDFloat funcTh = 1.0;
+         MHDFloat amplitude = 1.0;
+
+         MHDFloat r;
+         MHDFloat theta;
+         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+            for(int iTh = 0; iTh < nTh; ++iTh)
+            {
+               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
+
+               if(compId == FieldComponents::Physical::R)
+               {
+                  amplitude = 1.0;
+                  funcR = 1.0;
+                  funcTh = std::cos(theta);
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  amplitude = -1.0;
+                  funcR = 1.0;
+                  funcTh = std::sin(theta);
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  amplitude = 0.0;
+                  funcR = 0.0;
+                  funcTh = 0.0;
                }
 
                rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);

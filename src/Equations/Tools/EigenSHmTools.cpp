@@ -1,5 +1,5 @@
 /** 
- * @file EquationEigenSHmTools.cpp
+ * @file EigenSHmTools.cpp
  * @brief Source of the tools for schemes with spherical harmonic expansions with m spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -12,28 +12,41 @@
 
 // External includes
 //
-#include <Eigen/Sparse>
 
 // Class include
 //
-#include "Equations/Tools/EquationEigenSHmTools.hpp"
+#include "Equations/Tools/EigenSHmTools.hpp"
 
 // Project includes
 //
-#include "Base/MathConstants.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-namespace EigenSHm {
+   EigenSHmTools::EigenSHmTools()
+   {
+   }
 
-   int fieldCouplingNMat(const SharedResolution spRes)
+   EigenSHmTools::~EigenSHmTools()
+   {
+   }
+
+   std::vector<MHDFloat> EigenSHmTools::identifyEigs(const SharedResolution& spRes, const int matIdx) const
+   {
+      std::vector<MHDFloat> eigs;
+
+      eigs.push_back(static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)));
+
+      return eigs;
+   }
+
+   int EigenSHmTools::computeNMat(const SharedResolution& spRes) const
    {
       return spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
    }
 
-   void interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution spRes)
+   void EigenSHmTools::interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
@@ -47,7 +60,7 @@ namespace EigenSHm {
       }
    }
 
-   void interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution spRes)
+   void EigenSHmTools::interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
@@ -60,12 +73,12 @@ namespace EigenSHm {
       }
    }
 
-   void interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution spRes)
+   void EigenSHmTools::interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const
    {
       rRhsCols.setConstant(rhsSize);
    }
 
-   void interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution spRes)
+   void EigenSHmTools::interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
@@ -78,6 +91,5 @@ namespace EigenSHm {
       }
    }
 
-}
 }
 }

@@ -4,12 +4,20 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVelocityZ.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticityZ.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen2DTools.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DNusseltZWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DScalarEnergyWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/Cartesian1DStreamEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/AvgTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/RmsTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/SkewTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/KurtTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/Cartesian1DScalarAvgWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/Cartesian1DScalarRMSWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/Cartesian1DScalarSkewWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoStats/Cartesian1DScalarKurtWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactStateIds.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp

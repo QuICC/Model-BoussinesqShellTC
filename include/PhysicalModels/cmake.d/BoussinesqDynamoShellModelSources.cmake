@@ -2,7 +2,7 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqDynamoShellTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqDynamoShellMomentum.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqDynamoShellInduction.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigenSHmTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHmTools.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellScalarEnergyWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellTorPolEnergyWriter.cpp

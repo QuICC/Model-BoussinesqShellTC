@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+import itertools
 
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.worland.worland_basis as wb 
@@ -73,25 +74,27 @@ def apply_tau(mat, m, bc, pad_zeros = 0, location = 't'):
     nbc = bc[0]//10
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[0], m, bc.get('c',None))
+        cond = tau_value(mat.shape[0], m, bc)
     elif bc[0] == 11:
-        cond = tau_diff(mat.shape[0], m, bc.get('c',None))
+        cond = tau_diff(mat.shape[0], m, bc)
     elif bc[0] == 12:
-        cond = tau_rdiffdivr(mat.shape[0], m, bc.get('c',None))
+        cond = tau_rdiffdivr(mat.shape[0], m, bc)
     elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[0], m, bc.get('c',None))
+        cond = tau_diff2(mat.shape[0], m, bc)
     elif bc[0] == 15:
-        cond = tau_laplh(mat.shape[0], m, bc.get('c',None))
+        cond = tau_laplh(mat.shape[0], m, bc)
     elif bc[0] == 16:
-        cond = tau_dlaplh(mat.shape[0], m, bc.get('c',None))
+        cond = tau_dlaplh(mat.shape[0], m, bc)
     elif bc[0] == 17:
-        cond = tau_lapl2h(mat.shape[0], m, bc.get('c',None))
+        cond = tau_lapl2h(mat.shape[0], m, bc)
     elif bc[0] == 20:
-        cond = tau_value_diff(mat.shape[0], m, bc.get('c',None))
+        cond = tau_value_diff(mat.shape[0], m, bc)
     elif bc[0] == 21:
-        cond = tau_value_diff2(mat.shape[0], m, bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[0], m, bc)
     elif bc[0] == 22:
-        cond = tau_value_laplh(mat.shape[0], m, bc.get('c',None))
+        cond = tau_value_laplh(mat.shape[0], m, bc)
+    elif bc[0] == 30:
+        cond = tau_value_diff_laplh(mat.shape[0], m, bc)
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)
@@ -116,135 +119,133 @@ def apply_tau(mat, m, bc, pad_zeros = 0, location = 't'):
 
     return mat
 
-def tau_value(nr, l, coeffs = None):
+def tau_value(nr, l, bc):
     """Create the boundary value tau line(s)"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_value(nr, l))
 
     return np.array(cond)
 
-def tau_diff(nr, l, coeffs = None):
+def tau_diff(nr, l, bc):
     """Create the 1st derivative tau line(s)"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_diff(nr,l))
 
     return np.array(cond)
 
-def tau_diff2(nr, m, coeffs = None):
+def tau_diff2(nr, m, bc):
     """Create the second deriviative tau line(s)"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_diff2(nr,m))
 
     return np.array(cond)
 
-def tau_rdiffdivr(nr, m, coeffs = None):
+def tau_rdiffdivr(nr, m, bc):
     """Create the r D 1/r tau line(s)"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_rdiffdivr(nr,m))
 
     return np.array(cond)
 
-def tau_lapl2h(nr, m, coeffs = None):
+def tau_lapl2h(nr, m, bc):
     """Create the no-slip tau line(s) for toroidal component on poloidal"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_lapl2h_cyl(nr,m))
 
     return np.array(cond)
 
-def tau_value_diff(nr, m, coeffs = None):
+def tau_value_diff(nr, m, bc):
     """Create the no penetration and no-slip tau line(s)"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_value(nr,m))
+    c = next(it)
     cond.append(c*wb.worland_diff(nr,m))
 
     return np.array(cond)
 
-def tau_laplh(nr, m, coeffs = None):
+def tau_laplh(nr, m, bc):
     """Create the no-slip tau line(s) for toroidal component on toroidal"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_laplh_cyl(nr,m))
 
     return np.array(cond)
 
-def tau_dlaplh(nr, m, coeffs = None):
+def tau_dlaplh(nr, m, bc):
     """Create the no-slip tau line(s) for toroidal component on toroidal"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_dlaplh_cyl(nr,m))
 
     return np.array(cond)
 
-def tau_value_diff2(nr, m, coeffs = None):
+def tau_value_diff2(nr, m, bc):
     """Create the no penetration and no-slip tau line(s)"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_value(nr,m))
+    c = next(it)
     cond.append(c*wb.worland_diff2(nr,m))
 
     return np.array(cond)
 
-def tau_value_laplh(nr, m, coeffs = None):
+def tau_value_laplh(nr, m, bc):
     """Create the no penetration and no-slip tau line(s) for poloidal component"""
 
-    if coeffs is None:
-        c = 1.0
-    else:
-        c = coeffs
+    it = coeff_iterator(bc.get('c',None))
 
     cond = []
+    c = next(it)
     cond.append(c*wb.worland_value(nr,m))
+    c = next(it)
+    cond.append(c*wb.worland_laplh_cyl(nr,m))
+
+    return np.array(cond)
+
+def tau_value_diff_laplh(nr, m, bc):
+    """Create the no penetration and no-slip tau line(s) for poloidal component"""
+
+    it = coeff_iterator(bc.get('c',None))
+
+    cond = []
+    c = next(it)
+    cond.append(c*wb.worland_value(nr,m))
+    c = next(it)
+    cond.append(c*wb.worland_diff(nr,m))
+    c = next(it)
     cond.append(c*wb.worland_laplh_cyl(nr,m))
 
     return np.array(cond)
@@ -496,3 +497,21 @@ def stencil_value_diff2(nr, l, coeffs = None):
     diags[-1] = diags[-1][0:nr+offsets[0]]
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def coeff_iterator(coeffs):
+    """Return an iterator over the constants"""
+
+    if coeffs is None:
+        it = itertools.cycle([1.0])
+    else:
+        try:
+            if len(coeffs) > 1:
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
+
+    return it

@@ -62,7 +62,15 @@ namespace GeoMHDiSCC {
       // Initialize the python model wrapper
       PythonModelWrapper::init();
       PythonModelWrapper::import(TModel::PYMODULE);
-      PythonModelWrapper::createModel(TModel::PYCLASS);
+
+      // Try to setup specialized Visualization model
+      try{
+         PythonModelWrapper::createModel(TModel::PYCLASS + "Visu");
+      } catch(const Exception& e)
+      {
+         // Try standard model
+         PythonModelWrapper::createModel(TModel::PYCLASS);
+      }
 
       // Create list of field ID strings for boundary conditions
       std::vector<PhysicalNames::Id> fields = PhysicalModelBase::fieldIds();

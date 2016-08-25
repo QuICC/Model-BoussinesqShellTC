@@ -424,3 +424,15 @@ def i6lapl3h(nr, m, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     mat = radbc.restrict_eye(mat.shape[0], 'rt', 3)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 3)
     return radbc.constrain(mat, m, bc)
+
+def qid(nr, m, q, bc, coeff = 1.0):
+    """Create a quasi identity block of order q"""
+
+    mat = spsp.coo_matrix((nr,nr))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nr-q))
+    else:
+        mat.data = np.ones((nr-q))
+    mat.row = np.arange(q,nr)
+    mat.col = mat.row
+    return radbc.constrain(mat, m, bc)

@@ -105,6 +105,13 @@ namespace GeoMHDiSCC {
          void init(const SharedSimulationBoundary spBcs);
 
          /**
+          * @brief Initialise the imposed components of the simulation
+          *
+          * @param spBcs Boundary condition information
+          */
+         void initImposed();
+
+         /**
           * @brief Run the simulation
           */
          void run();
@@ -171,6 +178,13 @@ namespace GeoMHDiSCC {
           * @param spOutFile Shared HDF5 output file
           */
          void addHdf5OutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile);
+
+         /**
+          * @brief Add Stats output file to solver
+          *
+          * @param spOutFile Shared stats output file
+          */
+         void addStatsOutputFile(IoStats::SharedIStatisticsAsciiEWriter spOutFile);
 
       protected:
          /**
@@ -304,6 +318,16 @@ namespace GeoMHDiSCC {
          std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mVectorVariables;
 
          /**
+          * @brief Map between name and pointer for the imposed scalar variables
+          */
+         std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  mImposedScalarVariables;
+
+         /**
+          * @brief Map between name and pointer for the imposed vector variables
+          */
+         std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mImposedVectorVariables;
+
+         /**
           * @brief Storage for a shared forward transform grouper
           */
          Transform::SharedIForwardGrouper   mspFwdGrouper;
@@ -312,6 +336,16 @@ namespace GeoMHDiSCC {
           * @brief Storage for a shared backward transform grouper
           */
          Transform::SharedIBackwardGrouper   mspBwdGrouper;
+
+         /**
+          * @brief Storage for a shared forward transform grouper for imposed fields
+          */
+         Transform::SharedIForwardGrouper   mspImposedFwdGrouper;
+
+         /**
+          * @brief Storage for a shared backward transform grouper for imposed fields
+          */
+         Transform::SharedIBackwardGrouper   mspImposedBwdGrouper;
 
          /**
           * @brief Diagnostic coordinator
@@ -435,6 +469,9 @@ namespace GeoMHDiSCC {
 
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
+
+      // Initialise the transform grouper for imposed fields
+      Parallel::setGrouper(best.second, this->mspImposedFwdGrouper, this->mspImposedBwdGrouper);
 
       stage.done();
    }
