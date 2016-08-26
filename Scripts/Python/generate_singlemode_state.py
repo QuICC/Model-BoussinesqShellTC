@@ -118,22 +118,22 @@ hdf5_file.create_array(group2, "dim1D", 1)
 hdf5_file.create_array(group2, "dim2D", 1)
 hdf5_file.create_array(group2, "dim3D", 1)
 group2 = hdf5_file.create_group(group, "spectral")
-hdf5_file.create_array(group2, "dim1D", nnz)
-hdf5_file.create_array(group2, "dim2D", nnx)
-hdf5_file.create_array(group2, "dim3D", nny)
+hdf5_file.create_array(group2, "dim1D", nnz-1)
+hdf5_file.create_array(group2, "dim2D", 2*(nnx-1))
+hdf5_file.create_array(group2, "dim3D", nny-1)
 group2 = hdf5_file.create_group(group, "transform")
-hdf5_file.create_array(group2, "dim1D", 1)
-hdf5_file.create_array(group2, "dim2D", 1)
-hdf5_file.create_array(group2, "dim3D", 1)
+hdf5_file.create_array(group2, "dim1D", nnz-1)
+hdf5_file.create_array(group2, "dim2D", 2*(nnx-1))
+hdf5_file.create_array(group2, "dim3D", nny-1)
 
 def writeScalar(name, c = 1.0, mean = None, cmean = 1.0):
     group = hdf5_file.create_group("/", name)
-    tmp = np.zeros((2*nny-1,nnx,nnz), dtype=np.complex128)
+    tmp = np.zeros((2*nnx-1,nny,nnz), dtype=np.complex128)
     if mean is not None:
         tmp[0,0,0:nnz].real = cmean*data[mean][0:nnz]
-    tmp[boxY,0,0:nnz].real = c*0.5*data[name][0:nnz]
-    #tmp[-boxY,0,0:nnz].real = 0.5*data[name][0:nnz]
-    tmp[0,boxX,0:nnz].real = c*0.5*data[name][0:nnz]
+    tmp[boxX,0,0:nnz].real = c*0.5*data[name][0:nnz]
+    #tmp[-boxX,0,0:nnz].real = c*0.5*data[name][0:nnz]
+    tmp[0,boxY,0:nnz].real = c*0.5*data[name][0:nnz]
     hdf5_file.create_array(group, name, tmp)
 
 def writeVector(name, comp, coeff = None):
@@ -141,10 +141,10 @@ def writeVector(name, comp, coeff = None):
     if coeff is None:
         coeff = (1.0,)*len(comp)
     for c,b in zip(comp,coeff):
-        tmp = np.zeros((2*nny-1,nnx,nnz), dtype=np.complex128)
-        tmp[boxY,0,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
-        #tmp[-boxY,0,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
-        tmp[0,boxX,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
+        tmp = np.zeros((2*nnx-1,nny,nnz), dtype=np.complex128)
+        tmp[boxX,0,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
+        #tmp[-boxX,0,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
+        tmp[0,boxY,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
         hdf5_file.create_array(group, name + '_' + c, tmp)
 
 ############################################
