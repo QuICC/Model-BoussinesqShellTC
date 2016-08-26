@@ -73,7 +73,7 @@ namespace GeoMHDiSCC {
       while(this->mSimRunCtrl.status() == RuntimeStatus::GOON)
       {
          // Update equation time
-         this->updateEquationTime(this->mTimestepCoordinator.time());
+         this->updateEquationTime(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.finishedStep());
 
          // Compute explicit linear terms
          this->explicitEquations();
@@ -180,7 +180,7 @@ namespace GeoMHDiSCC {
       StageTimer stage;
 
       // Update equation time
-      this->updateEquationTime(this->mDiagnostics.startTime());
+      this->updateEquationTime(this->mDiagnostics.startTime(), true);
 
       // Initialise all values (solve and nonlinear computations except timestep)
       this->preSolveEquations();
@@ -324,7 +324,7 @@ namespace GeoMHDiSCC {
       ProfilerMacro_stop(ProfilerMacro::IO);
    }
 
-   void Simulation::updateEquationTime(const MHDFloat time)
+   void Simulation::updateEquationTime(const MHDFloat time, const bool finished)
    {
       // Create iterators over scalar equations
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
@@ -334,13 +334,13 @@ namespace GeoMHDiSCC {
       // Loop over all scalar equations
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
       {
-         (*scalEqIt)->setTime(time);
+         (*scalEqIt)->setTime(time, finished);
       }
 
       // Loop over all vector equations
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
       {
-         (*vectEqIt)->setTime(time);
+         (*vectEqIt)->setTime(time, finished);
       }
    }
 

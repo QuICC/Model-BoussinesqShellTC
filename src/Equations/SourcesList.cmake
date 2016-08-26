@@ -3,7 +3,9 @@ set(MHDSources
    CouplingInformation.cpp
    IEquation.cpp
    IScalarEquation.cpp
+   IScalarTimeAveragedEquation.cpp
    IVectorEquation.cpp
+   IVectorTimeAveragedEquation.cpp
    EquationData.cpp
    EquationParameters.cpp
 )

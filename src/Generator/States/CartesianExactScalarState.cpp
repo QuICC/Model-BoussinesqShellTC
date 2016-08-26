@@ -107,8 +107,8 @@ namespace Equations {
          #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
          MHDFloat k_;
-         MHDFloat j_;
-         MHDFloat i_;
+         //MHDFloat j_;
+         //MHDFloat i_;
          nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
          for(int iK = 0; iK < nK; ++iK)
          {
@@ -116,10 +116,10 @@ namespace Equations {
             nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
             for(int iJ = 0; iJ < nJ; ++iJ)
             {
-               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               //j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
                for(int iI = 0; iI < nI; ++iI)
                {
-                  i_ = gI(iI);
+                  //i_ = gI(iI);
 
                   MHDFloat val = (-1.0 + 2.0*Math::PI)*std::cos(Math::PI*k_/2.0)/(2.0*Math::PI);
 

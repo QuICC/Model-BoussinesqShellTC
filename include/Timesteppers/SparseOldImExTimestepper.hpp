@@ -386,9 +386,9 @@ namespace Timestep {
 
    template <typename TOperator,typename TData> void SparseOldImExTimestepper<TOperator,TData>::initSolutions()
    {
-      for(int k = 0; k < this->mOldSolution.size(); ++k)
+      for(size_t k = 0; k < this->mOldSolution.size(); ++k)
       {
-         for(int j = 0; j < this->mOldSolution.at(k).size(); ++j)
+         for(size_t j = 0; j < this->mOldSolution.at(k).size(); ++j)
          {
             this->mOldSolution.at(k).at(j) = this->mSolution.at(k);
          }
