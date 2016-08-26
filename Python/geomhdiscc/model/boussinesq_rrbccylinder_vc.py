@@ -7,9 +7,9 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cylindrical.cylinder as geo
+import geomhdiscc.geometry.cylindrical.cylinder_worland as geo
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.cylindrical.cylinder_boundary import no_bc
+from geomhdiscc.geometry.cylindrical.cylinder_boundary_worland import no_bc
 
 
 class BoussinesqRRBCCylinderVC(base_model.BaseModel):
@@ -416,22 +416,22 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","theta"):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","z"):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_w, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc)
+            mat = geo.i2j2(res[0], res[2], m%2, bc)
 
         elif field_row == ("pressure",""):
             mat = geo.zblk(res[0], res[2], m%2, 1, 1, bc)

@@ -87,10 +87,12 @@ for f in fields:
         phys_data[0:nz] -= 1.0 - 0.5*(grid + 1.0)
         phys_data[0:nz] /= phys_params.get('rossby', 1.0)
     phys_data[nz:] = phys_data[1:nz-1][::-1]
-    data[f] = fft.rfft(phys_data).real/phys_data.shape[0]
+    cheb = fft.rfft(phys_data).real/phys_data.shape[0]
+    data[f] = np.zeros((nnz,))
+    data[f][0:min(cheb.shape[0],nnz)] = cheb[0:min(cheb.shape[0],nnz)]
 
 if sim_type in ["RRBCPlane", "RRBCPlaneMean", "RRBCPlaneDMean"]:
-    data["velocity_tor"] = -data["streamfunction"]
+    data["velocity_tor"] = data["streamfunction"]
     data["velocity_pol"] = -(1.0/kx**2)*data["velocityz"]
 
 # Write HDF5 header attributes
@@ -124,23 +126,25 @@ hdf5_file.create_array(group2, "dim1D", 1)
 hdf5_file.create_array(group2, "dim2D", 1)
 hdf5_file.create_array(group2, "dim3D", 1)
 
-def writeScalar(name, mean = None):
+def writeScalar(name, c = 1.0, mean = None, cmean = 1.0):
     group = hdf5_file.create_group("/", name)
     tmp = np.zeros((2*nny-1,nnx,nnz), dtype=np.complex128)
     if mean is not None:
-        tmp[0,0,0:nnz].real = data[mean][0:nnz]
-    tmp[boxY,0,0:nnz].real = 0.5*data[name][0:nnz]
+        tmp[0,0,0:nnz].real = cmean*data[mean][0:nnz]
+    tmp[boxY,0,0:nnz].real = c*0.5*data[name][0:nnz]
     #tmp[-boxY,0,0:nnz].real = 0.5*data[name][0:nnz]
-    tmp[0,boxX,0:nnz].real = 0.5*data[name][0:nnz]
+    tmp[0,boxX,0:nnz].real = c*0.5*data[name][0:nnz]
     hdf5_file.create_array(group, name, tmp)
 
-def writeVector(name, comp):
+def writeVector(name, comp, coeff = None):
     group = hdf5_file.create_group("/",name)
-    for c in comp:
+    if coeff is None:
+        coeff = (1.0,)*len(comp)
+    for c,b in zip(comp,coeff):
         tmp = np.zeros((2*nny-1,nnx,nnz), dtype=np.complex128)
-        tmp[boxY,0,0:nnz].real = 0.5*data[name + '_' + c][0:nnz]
-        #tmp[-boxY,0,0:nnz].real = 0.5*data[name + '_' + c][0:nnz]
-        tmp[0,boxX,0:nnz].real = 0.5*data[name + '_' + c][0:nnz]
+        tmp[boxY,0,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
+        #tmp[-boxY,0,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
+        tmp[0,boxX,0:nnz].real = b*0.5*data[name + '_' + c][0:nnz]
         hdf5_file.create_array(group, name + '_' + c, tmp)
 
 ############################################
@@ -154,7 +158,7 @@ if sim_type == "FPlane3DQG":
 ############################################
 # Write HDF5 RRBCPlane fields
 if sim_type == "RRBCPlane":
-    writeScalar("temperature", "mean_temperature")
+    writeScalar("temperature", c = -1.0, mean = "mean_temperature")
     writeVector("velocity", ["tor","pol"])
 
 ############################################

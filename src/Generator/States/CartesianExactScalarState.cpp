@@ -148,22 +148,28 @@ namespace Equations {
             Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
          #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
-         MHDFloat k_;
-         MHDFloat j_;
-         MHDFloat i_;
+         int k_;
+         int j_;
+         int i_;
+         MHDFloat gk_;
+         MHDFloat gj_;
+         MHDFloat gi_;
          nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
          for(int iK = 0; iK < nK; ++iK)
          {
-            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
+            k_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK);
+            gk_ = gK(k_);
             nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
             for(int iJ = 0; iJ < nJ; ++iJ)
             {
-               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               j_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK);
+               gj_ = gJ(j_);
                for(int iI = 0; iI < nI; ++iI)
                {
-                  i_ = gI(iI);
+                  i_ = iI;
+                  gi_ = gI(i_);
 
-                  MHDFloat val = (1+k_)*(1.0 + std::cos(this->mModeK(0)*j_) + std::cos(this->mModeK(1)*i_));
+                  MHDFloat val = (1+gk_)*(1.0 + std::cos(this->mModeK(0)*gj_) + std::cos(this->mModeK(1)*gi_));
 
                   rNLComp.setPoint(val, iI, iJ, iK);
                }

@@ -66,7 +66,7 @@ namespace TransformSteps {
          // Integrate for standard second order equation
          if(curlFlag == 0)
          {
-            // Compute curl component and mean in Y
+            // Compute curl component and mean in X
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTGDIFFM);
             transform.back().addEdge(Integrator2DType::INTGM);
@@ -85,7 +85,7 @@ namespace TransformSteps {
          // Integrate for standard fourth order double curl equation
          if(curlcurlFlag == 0)
          {
-            // Compute curlcurl with Dz component and mean in X
+            // Compute curlcurl with Dz component and mean in Y
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTGDIFF);

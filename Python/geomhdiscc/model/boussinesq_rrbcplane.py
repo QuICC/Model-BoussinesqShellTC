@@ -23,13 +23,16 @@ class BoussinesqRRBCPlaneConfig:
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ekman", "scale1d", "fast_mean"]
+        return ["prandtl", "rayleigh", "ekman", "scale1d", "fast_mean", "rescaled"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
 
         # Rescale Z direction with ekman number
-        d = {"scale1d":eq_params["scale1d"]*eq_params["ekman"]**(1./3.)}
+        if eq_params['rescaled'] == 1:
+            d = {"scale1d":eq_params["scale1d"]*eq_params["ekman"]**(1./3.)}
+        else:
+            d = dict()
 
         return d
 
@@ -48,7 +51,7 @@ class BoussinesqRRBCPlaneConfig:
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
+        # Matrix operator are real
         is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
@@ -78,10 +81,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            if field_row == ("temperature",""):
-                fields = [("velocity","pol")]
-            else:
-                fields = []
+            fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
@@ -199,7 +199,12 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                             bc = {0:0}
                         else:
                             E = eq_params['ekman']
-                            c = E**(1./6.)/2**(1./2.)
+                            # aspect ratio A (used for rescaling)
+                            if eq_params['rescaled'] == 1:
+                                A = E**(1./3.)
+                            else:
+                                A = 1.0
+                            c = E**(1./2.)*A/2**(1./2.)
                             bc = {0:20, 'c':[c, -c], 'use_parity':True}
             
             # Set LHS galerkin restriction
@@ -267,13 +272,6 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        # Mean temperature
-        if field_row == ("temperature","") and field_col == ("velocity","pol") and kx == 0 and ky == 0:
-            mat = geo.zblk(res[0], bc)
-
-        # temperature 
-        if field_row == ("temperature","") and field_col == ("velocity","pol"):
-            mat = geo.i2(res[0], bc, -(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -299,8 +297,12 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         Ra = eq_params['rayleigh']
         Pr = eq_params['prandtl']
         E = eq_params['ekman']
-        Ro = E**(1./3.)
         zscale = eq_params['scale1d']
+        # aspect ratio A (used for rescaling)
+        if eq_params['rescaled'] == 1:
+            A = E**(1./3.)
+        else:
+            A = 1.0
 
         kx = eigs[0]
         ky = eigs[1]
@@ -313,7 +315,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2(res[0], bc, -1.0/Ro)
+                mat = geo.i2(res[0], bc, A**2/E)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -321,7 +323,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         # Mean Y velocity
         elif field_row == ("velocity","pol") and kx == 0 and ky == 0:
             if field_col == ("velocity","tor"):
-                mat = geo.i2(res[0], bc, 1.0/Ro)
+                mat = geo.i2(res[0], bc, -A**2/E)
 
             elif field_col == ("velocity","pol"):
                 mat = geo.i2d2(res[0], bc, 1.0, cscale = zscale)
@@ -348,7 +350,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 mat += geo.i2d2(res[0], bc, -(kx**2 + ky**2), cscale = zscale)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2d1(res[0], bc, -(kx**2 + ky**2)/Ro, cscale = zscale)
+                mat = geo.i2d1(res[0], bc, -(kx**2 + ky**2)*A**2/E, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
@@ -356,7 +358,7 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         # Poloidal velocity
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4d1(res[0], bc, (kx**2 + ky**2)/Ro, cscale = zscale)
+                mat = geo.i4d1(res[0], bc, (kx**2 + ky**2)*A**2/E, cscale = zscale)
 
             elif field_col == ("velocity","pol"):
                 mat = geo.i4(res[0], bc, -(kx**2 + ky**2)**3)
@@ -395,9 +397,13 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
         ky = eigs[1]
         zscale = eq_params['scale1d']
         E = eq_params['ekman']
-        Ro = E**(1./3.)
+        # aspect ratio A (used for rescaling)
+        if eq_params['rescaled'] == 1:
+            A = E**(1./3.)
+        else:
+            A = 1.0
         if eq_params['fast_mean'] == 1:
-            mean_dt = Ro**2
+            mean_dt = A**2
         else:
             mean_dt = 1.0
 

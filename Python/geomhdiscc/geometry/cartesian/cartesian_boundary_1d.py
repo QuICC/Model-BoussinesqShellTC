@@ -382,13 +382,16 @@ def stencil_value(nx, pos):
         offsets = [-1, 0]
         sgn = -pos 
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
-        return galerkin_c(n+offsets[0])*sgn
+        return galerkin_c(n+offsets[0])*c(n+offsets[0])*sgn
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -407,13 +410,16 @@ def stencil_diff(nx, pos):
         offsets = [-1, 0]
         sgn = -pos 
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
-        return sgn*(n+offsets[0])**2/n**2
+        return sgn*c(n+offsets[0])*(n+offsets[0])**2/n**2
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -424,24 +430,27 @@ def stencil_diff(nx, pos):
 def stencil_diff2(nx, pos):
     """Create stencil matrix for a zero 2nd derivative"""
 
+    def c(n):
+        return np.ones(n.shape)
+
     ns = np.arange(0,nx,1)
     if pos == 0:
         offsets = [-2, 0]
 
         # Generate subdiagonal
         def d_1(n):
-            return -(n - 3.0)*(n - 2.0)**2/(n**2*(n + 1.0))
+            return -c(n-2.0)*(n - 3.0)*(n - 2.0)**2/(n**2*(n + 1.0))
 
     else:
         offsets = [-1, 0]
 
         # Generate subdiagonal
         def d_1(n):
-            return -pos*(n - 2.0)*(n - 1.0)/(n*(n + 1.0))
+            return -c(n-1.0)*pos*(n - 2.0)*(n - 1.0)/(n*(n + 1.0))
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -457,6 +466,9 @@ def stencil_value_diff(nx, pos):
     ns = np.arange(0,nx,1)
     offsets = [-4, -2, 0]
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate 2nd subdiagonal
     def d_2(n):
         val = (n - 3.0)/(n - 1.0)
@@ -466,7 +478,7 @@ def stencil_value_diff(nx, pos):
             if j > 4:
                 break
 
-        return val
+        return c(n-4.0)*val
 
     # Generate 1st subdiagonal
     def d_1(n):
@@ -477,11 +489,11 @@ def stencil_value_diff(nx, pos):
             if j > 2:
                 break
 
-        return val
+        return c(n-2.0)*val
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return c(n)*np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -497,6 +509,9 @@ def stencil_value_diff2(nx, pos):
     ns = np.arange(0,nx,1)
     offsets = [-4, -2, 0]
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate 2nd subdiagonal
     def d_2(n):
         val_num = (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)
@@ -508,7 +523,7 @@ def stencil_value_diff2(nx, pos):
             if j > 4:
                 break
 
-        return val
+        return c(n-4.0)*val
 
     # Generate 1st subdiagonal
     def d_1(n):
@@ -521,11 +536,11 @@ def stencil_value_diff2(nx, pos):
             if j > 2:
                 break
 
-        return val
+        return c(n-2.0)*val
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return c(n)*np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)

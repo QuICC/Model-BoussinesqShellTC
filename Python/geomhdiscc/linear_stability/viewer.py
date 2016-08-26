@@ -221,7 +221,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
             pfid = pfid + "_" + fid
         viewProfile(prof_fast, grid_fast, show = show, save = save, fid = pfid, max_cols = max_cols)
 
-        if save_fast_profile:
+        if save and save_fast_profile:
             saveProfileData(prof_fast, grid_fast, fid = pfid)
 
         # Plot profile extruded along periodic direction
@@ -244,7 +244,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
             pfid = pfid + "_" + fid
         viewProfile(prof_slow, grid_slow, show = show, save = save, fid = pfid, max_cols = max_cols)
 
-        if save_slow_profile:
+        if save and save_slow_profile:
             saveProfileData(prof_slow, grid_slow, fid = pfid)
 
         # Plot profile extruded along periodic direction
@@ -363,11 +363,12 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3,
         pl.colorbar(CS, cax=cax)
         if not subplot:
             pl.tight_layout()
-            fname = "slice_" + title.replace(', ', '_')
-            if fid is not None:
-                fname = fname + "_" + fid
-            fname = fname + ".pdf"
-            pl.savefig(fname, bbox_inches='tight', dpi=200)
+            if save:
+                fname = "slice_" + title.replace(', ', '_')
+                if fid is not None:
+                    fname = fname + "_" + fid
+                fname = fname + ".pdf"
+                pl.savefig(fname, bbox_inches='tight', dpi=200)
             if show:
                 pl.axis('equal')
                 pl.show()
