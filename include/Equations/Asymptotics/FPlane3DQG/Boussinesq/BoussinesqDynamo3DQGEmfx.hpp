@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGEmfx: public IScalarEquation
+   class BoussinesqDynamo3DQGEmfx: public IScalarTimeAveragedEquation
    {
       public:
          /**
