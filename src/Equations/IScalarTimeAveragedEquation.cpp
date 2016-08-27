@@ -28,6 +28,7 @@ namespace Equations {
    IScalarTimeAveragedEquation::IScalarTimeAveragedEquation(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams), mTimeFinished(true), mTimestep(-1.0)
    {
+      EquationData::setTime(-4242.0, false);
    }
 
    IScalarTimeAveragedEquation::~IScalarTimeAveragedEquation()
@@ -36,6 +37,11 @@ namespace Equations {
 
    void IScalarTimeAveragedEquation::setTime(const MHDFloat time, const bool finished)
    {
+      if(this->time() == -4242.0)
+      {
+         this->mTimeAvg->setData(this->unknown().dom(0).perturbation().data());
+      }
+
       this->mTimeFinished = finished;
 
       if(this->mTimeFinished)
@@ -45,27 +51,38 @@ namespace Equations {
       }
    }
 
-   MHDFloat IScalarTimeAveragedEquation::updateStoredSolution(const MHDFloat oldData, const MHDFloat newData)
+   void IScalarTimeAveragedEquation::setUnknown(Datatypes::SharedScalarVariableType spUnknown)
+   {
+      IScalarEquation::setUnknown(spUnknown);
+
+      this->mTimeAvg = SharedPtrMacro<Datatypes::SpectralScalarType>(new Datatypes::SpectralScalarType(this->unknown().dom(0).perturbation()));
+   }
+
+   MHDFloat IScalarTimeAveragedEquation::updateStoredSolution(const MHDFloat newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k)
    {
       // Only update mean on full timestep
       if(this->mTimeFinished)
       {
-         return this->incrementTimeAverage(oldData, newData, this->time(), this->mTimestep);
+         MHDFloat val = incrementTimeAverage(this->mTimeAvg->point(i, j, k), newData, this->time(), this->mTimestep);
+         this->mTimeAvg->setPoint(val, i, j, k);
+         return val; 
       } else
       {
-         return oldData;
+         return noupdateTimeAverage(this->mTimeAvg->point(i,j,k), newData);
       }
    }
 
-   MHDComplex IScalarTimeAveragedEquation::updateStoredSolution(const MHDComplex oldData, const MHDComplex newData)
+   MHDComplex IScalarTimeAveragedEquation::updateStoredSolution(const MHDComplex newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k)
    {
       // Only update mean on full timestep
       if(this->mTimeFinished)
       {
-         return this->incrementTimeAverage(oldData, newData, this->time(), this->mTimestep);
+         MHDComplex val = incrementTimeAverage(this->mTimeAvg->point(i, j, k), newData, this->time(), this->mTimestep);
+         this->mTimeAvg->setPoint(val, i, j, k);
+         return val; 
       } else
       {
-         return oldData;
+         return noupdateTimeAverage(this->mTimeAvg->point(i,j,k), newData);
       }
    }
 

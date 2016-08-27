@@ -51,16 +51,25 @@ namespace Equations {
           */
          virtual void setTime(const MHDFloat time, const bool finished);
 
+         /**
+          * @brief Set the smart pointer to the unknown field
+          *
+          * This is required because the field are not initialised at creation time
+          *
+          * \param spUnknown Shared pointer to the unknown of the equation
+          */
+         void setUnknown(Datatypes::SharedVectorVariableType spUnknown);
+
       protected:
          /**
           * @brief Update the stored value with the solver solution (real data)
           */
-         virtual MHDFloat updateStoredSolution(const MHDFloat oldData, const MHDFloat newData);
+         virtual MHDFloat updateStoredSolution(const MHDFloat newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
 
          /**
           * @brief Update the stored value with the solver solution (complex data)
           */
-         virtual MHDComplex updateStoredSolution(const MHDComplex oldData, const MHDComplex newData);
+         virtual MHDComplex updateStoredSolution(const MHDComplex newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
 
       private:
          /**
@@ -72,6 +81,11 @@ namespace Equations {
           * @brief Timestep since last update
           */
          MHDFloat mTimestep;
+
+         /**
+          * @brief Time averaged field
+          */
+         SharedPtrMacro<Datatypes::VectorField<Datatypes::SpectralScalarType,FieldComponents::Spectral::Id> > mTimeAvg;
    };
 
    /// Typedef for a shared IVectorTimeAveragedEquation

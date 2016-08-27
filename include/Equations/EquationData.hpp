@@ -13,6 +13,7 @@
 
 // System includes
 //
+#include <limits>
 
 // External includes
 //
@@ -212,11 +213,6 @@ namespace Equations {
 
       protected:
          /**
-          * @brief Update time average
-          */
-         template <typename TData> TData incrementTimeAverage(const TData oldData, const TData newData, const MHDFloat time, const MHDFloat timestep) const;
-
-         /**
           * @brief Set the unknown name of equation
           */
          void setName(PhysicalNames::Id name);
@@ -369,12 +365,30 @@ namespace Equations {
    /// Typedef for a smart EquationData
    typedef SharedPtrMacro<EquationData> SharedEquationData;
 
-   template <typename TData> TData EquationData::incrementTimeAverage(const TData oldData, const TData newData, const MHDFloat time, const MHDFloat timestep) const
-   {
-         MHDFloat stepWeight = timestep/(time + timestep);
-         MHDFloat avgWeight = time/(time + timestep);
+   /**
+    * @brief Update time average
+    */
+   template <typename TData> TData incrementTimeAverage(const TData avg, const TData newData, const MHDFloat time, const MHDFloat timestep);
+   MHDFloat incrementTimeAverage(const MHDComplex avg, const MHDFloat newData, const MHDFloat time, const MHDFloat timestep);
 
-         return avgWeight*oldData + stepWeight*newData;
+   /**
+    * @brief Don't update time average
+    */
+   template <typename TData> TData noupdateTimeAverage(const TData avg, const TData newData);
+   MHDFloat noupdateTimeAverage(const MHDComplex avg, const MHDFloat newData);
+
+
+   template <typename TData> TData incrementTimeAverage(const TData avg, const TData newData, const MHDFloat time, const MHDFloat timestep)
+   {
+      MHDFloat stepWeight = timestep/(time + timestep);
+      MHDFloat avgWeight = time/(time + timestep);
+
+      return avgWeight*avg + stepWeight*newData;
+   }
+
+   template <typename TData> TData noupdateTimeAverage(const TData avg, const TData newData)
+   {
+      return avg;
    }
 }
 }

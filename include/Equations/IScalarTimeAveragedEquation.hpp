@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "TypeSelectors/ScalarSelector.hpp"
 #include "Equations/IScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
@@ -48,17 +49,26 @@ namespace Equations {
           * @brief Current simulation time update
           */
          virtual void setTime(const MHDFloat time, const bool finished);
+
+         /**
+          * @brief Set the shared pointer to the unknown field
+          *
+          * This is required because the field are not initialised at creation time
+          *
+          * \param spUnknown Shared pointer to the unknown of the equation
+          */
+         virtual void setUnknown(Datatypes::SharedScalarVariableType spUnknown);
          
       protected:
          /**
           * @brief Update the stored value with the solver solution (read data)
           */
-         virtual MHDFloat updateStoredSolution(const MHDFloat oldData, const MHDFloat newData);
+         virtual MHDFloat updateStoredSolution(const MHDFloat newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
 
          /**
           * @brief Update the stored value with the solver solution (complex data)
           */
-         virtual MHDComplex updateStoredSolution(const MHDComplex oldData, const MHDComplex newData);
+         virtual MHDComplex updateStoredSolution(const MHDComplex newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
 
       private:
          /**
@@ -74,8 +84,7 @@ namespace Equations {
          /**
           * @brief Storage of the previous values
           */
-         SharedSpectralScalarType mTimeAvg;
-
+         SharedPtrMacro<Datatypes::SpectralScalarType> mTimeAvg;
    };
 
    /// Typedef for a shared IScalarTimeAveragedEquation

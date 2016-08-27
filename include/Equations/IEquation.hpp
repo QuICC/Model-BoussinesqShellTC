@@ -155,6 +155,16 @@ namespace Equations {
           */
          void dispatchExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const ModelOperator::Id opId, const SpectralFieldId fieldId, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
 
+         /**
+          * @brief Update the stored value with the solver solution (real data)
+          */
+         virtual MHDFloat updateStoredSolution(const MHDFloat newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
+
+         /**
+          * @brief Update the stored value with the solver solution (complex data)
+          */
+         virtual MHDComplex updateStoredSolution(const MHDComplex newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
+
       private:
          /**
           * @brief Initialise the quasi-inverse spectral  matrices for given component
@@ -228,6 +238,16 @@ namespace Equations {
     */
    template <typename TData> void applyGalerkinStencil(const IEquation& eq, TData& rField, const int start, const int matIdx, const TData& rhs);
    template <> void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs);
+
+   inline MHDFloat IEquation::updateStoredSolution(const MHDFloat newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k)
+   {
+      return newData;
+   }
+
+   inline MHDComplex IEquation::updateStoredSolution(const MHDComplex newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k)
+   {
+      return newData;
+   }
 
    template <typename TData> inline void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs)
    {
