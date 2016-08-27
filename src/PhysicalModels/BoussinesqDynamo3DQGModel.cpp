@@ -38,6 +38,7 @@
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DMagneticEnergyWriter.hpp"
+#include "IoStats/Cartesian1DScalarAvgWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -53,10 +54,10 @@ namespace GeoMHDiSCC {
    {
       // Add upright streamfunction equation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGStreamfunction>();
-      
+
       // Add upright vertical velocity equation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGVelocityZ>();
-      
+
       // Add upright transport equation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGTransport>();
 
@@ -127,7 +128,7 @@ namespace GeoMHDiSCC {
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
-      // Generate random spectrum
+         // Generate random spectrum
       } else
       {
          // Shared pointer to random initial state equation
@@ -187,17 +188,17 @@ namespace GeoMHDiSCC {
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
-      
+
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
-      
+
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
-      
+
       // Add background temperature profile visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
@@ -269,13 +270,23 @@ namespace GeoMHDiSCC {
       spMag->expect(PhysicalNames::BX);
       spMag->expect(PhysicalNames::BY);
       spSim->addAsciiOutputFile(spMag);
-     
-     // Create temperature energy writer
-   //   IoVariable::SharedCartesian1DScalarEnergyWriter spMag(new IoVariable::Cartesian1DScalarEnergyWriter("magX", SchemeType::type()));
-   //   spMag->expect(PhysicalNames::BX);
-   //   spSim->addAsciiOutputFile(spMag);
+
+      // Create temperature energy writer
+      //   IoVariable::SharedCartesian1DScalarEnergyWriter spMag(new IoVariable::Cartesian1DScalarEnergyWriter("magX", SchemeType::type()));
+      //   spMag->expect(PhysicalNames::BX);
+      //   spSim->addAsciiOutputFile(spMag);
 
    }
+
+   void BoussinesqDynamo3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+      // Create Avg temperature writer
+      IoStats::SharedCartesian1DScalarAvgWriter spAvg(new IoStats::Cartesian1DScalarAvgWriter("temperature",SchemeType::type()));
+      spAvg->expect(PhysicalNames::TEMPERATURE);
+      spSim->addStatsOutputFile(spAvg);
+
+   }
+
 
    void BoussinesqDynamo3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
    {

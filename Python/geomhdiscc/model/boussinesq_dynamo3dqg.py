@@ -226,7 +226,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
-        elif field_row == ("emfx","") and field_col == field_row
+        elif field_row == ("emfx","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
                 mat = geo.qid(res[0], 0, bc)
             else:

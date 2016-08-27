@@ -27,14 +27,14 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGEmfx::BoussinesqDynamo3DQGBx(SharedEquationParameters spEqParams)
+   BoussinesqDynamo3DQGEmfx::BoussinesqDynamo3DQGEmfx(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGEmfx::~BoussinesqDynamo3DQGBx()
+   BoussinesqDynamo3DQGEmfx::~BoussinesqDynamo3DQGEmfx()
    {
    }
 
