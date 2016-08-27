@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IScalarTimeAveragedEquation.hpp"
 
 namespace GeoMHDiSCC {
 
