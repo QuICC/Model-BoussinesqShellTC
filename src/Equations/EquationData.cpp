@@ -341,7 +341,7 @@ namespace Equations {
       return this->mTime;
    }
 
-   void  EquationData::setTime(const MHDFloat time)
+   void  EquationData::setTime(const MHDFloat time, const bool finished)
    {
       this->mTime = time;
    }
