@@ -40,8 +40,8 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""),("by",""),("emfx",""), ("emfy","")]:
-            fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by",""),("emfx",""), ("emfy","")]
+        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""),("by","")]:
+            fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by","")]
 
         else:
             fields = [field_row]
@@ -53,11 +53,13 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            fields = []
-#            if field_row in [("fbx",""), ("fby",""), ("fbz","")]:
-#                fields = [field_row]
-#            else:
-#                fields = []
+        #fields = []
+            if field_row in [("bx","")]: 
+                fields = [("emfy","")]
+            elif field_row in [("by","")]: 
+                fields = [("emfx","")]
+            else:
+                fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
@@ -152,7 +154,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                     if bcs["bcType"] == self.SOLVER_HAS_BC:
                         if field_row == ("temperature","") and field_col == field_row:
                             bc = {0:20}
-            
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityz","") or field_row == ("streamfunction",""):
@@ -165,17 +167,17 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             if self.use_galerkin:
                 if field_col == ("temperature",""):
                     bc = {0:-20, 'rt':0}
-                elif field_col == ("velocityz",""):
-                    bc = {0:-20, 'rt':0}
-        
+            elif field_col == ("velocityz",""):
+                bc = {0:-20, 'rt':0}
+
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
-                if field_row == ("velocityz",""):
-                    bc['rt'] = 2
-                elif field_row == ("temperature",""):
-                    bc['rt'] = 2
+                   if field_row == ("velocityz",""):
+                       bc['rt'] = 2
+                   elif field_row == ("temperature",""):
+                       bc['rt'] = 2
 
         else:
             bc = no_bc()
@@ -185,11 +187,17 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit linear term"""
 
-        kx = eigs[0]
-        ky = eigs[1]
+        tau = eq_params['tau']
+        zscale = eq_params['scale1d']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+
+        if field_row == ("bx","") and field_col == ("emfy",""):
+            mat = geo.i2d1(res[0], bc, 1.0*tau, cscale = zscale)
+
+        elif field_row == ("by","") and field_col == ("emfx",""):
+            mat = geo.i2d1(res[0], bc, -1.0*tau, cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -222,7 +230,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         elif field_row == ("dz_meantemperature","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
-                mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+                mat = (spsp.eye(res[0]) - spsp.eye(res[0], 1)*geo.avg(res[0]))
             else:
                 mat = geo.zblk(res[0], bc)
 
@@ -367,9 +375,6 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             elif field_col == ("by",""):
                 mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("emfy",""):
-                mat = geo.i2d1(res[0], bc, 1.0*tau, cscale = zscale)
-
         elif field_row == ("by",""):
             if field_col == ("streamfunction",""):
                 mat = geo.zblk(res[0], bc)
@@ -386,8 +391,6 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             elif field_col == ("by",""):
                 mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
 
-            elif field_col == ("emfx",""):
-                mat = geo.i2d1(res[0], bc, -1.0*tau, cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

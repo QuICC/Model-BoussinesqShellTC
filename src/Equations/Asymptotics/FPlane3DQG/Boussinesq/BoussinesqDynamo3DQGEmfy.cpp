@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    BoussinesqDynamo3DQGEmfy::BoussinesqDynamo3DQGEmfy(SharedEquationParameters spEqParams)
-      : IScalarTimeAveragedEquation(spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
