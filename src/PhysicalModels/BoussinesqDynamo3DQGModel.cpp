@@ -128,6 +128,18 @@ namespace GeoMHDiSCC {
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
+         // Add BY initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::EMFY);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(0, 0.0, 0, 0.0, 0, 0.0);
+         
+         // Add BY initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::EMFX);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(0, 0.0, 0, 0.0, 0, 0.0);
+
          // Generate random spectrum
       } else
       {
@@ -166,6 +178,16 @@ namespace GeoMHDiSCC {
          spRand->setIdentity(PhysicalNames::BY);
          spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
 
+         // Add BY initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::EMFY);
+         spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4);
+
+         // Add BY initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::EMFX);
+         spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4);
+
       }
 
       // Add output file
@@ -176,6 +198,8 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spOut->expect(PhysicalNames::BX);
       spOut->expect(PhysicalNames::BY);
+      spOut->expect(PhysicalNames::EMFX);
+      spOut->expect(PhysicalNames::EMFY);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -318,7 +342,7 @@ namespace GeoMHDiSCC {
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spState->expect(PhysicalNames::VORTICITYZ);
-      spState->expect(PhysicalNames::EMFY);
+     // spState->expect(PhysicalNames::EMFY);
 
       spSim->addHdf5OutputFile(spState);
    }

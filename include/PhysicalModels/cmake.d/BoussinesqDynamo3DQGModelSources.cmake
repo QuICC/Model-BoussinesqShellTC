@@ -3,6 +3,8 @@ set(MHDModelSources
 	${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbx.cpp
 	${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfby.cpp
 	${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbz.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBy.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBx.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfx.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfy.cpp
 	${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGStreamfunction.cpp
