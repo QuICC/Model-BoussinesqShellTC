@@ -380,8 +380,8 @@ namespace Equations {
 
    template <typename TData> TData incrementTimeAverage(const TData avg, const TData newData, const MHDFloat time, const MHDFloat timestep)
    {
-      MHDFloat stepWeight = timestep/(time + timestep);
-      MHDFloat avgWeight = time/(time + timestep);
+      MHDFloat stepWeight = timestep/time;
+      MHDFloat avgWeight = (time-timestep)/time;
 
       return avgWeight*avg + stepWeight*newData;
    }

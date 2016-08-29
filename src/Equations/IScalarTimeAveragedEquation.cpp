@@ -20,13 +20,12 @@
 // Project includes
 //
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    IScalarTimeAveragedEquation::IScalarTimeAveragedEquation(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTimeFinished(true), mTimestep(-1.0)
+      : IScalarEquation(spEqParams), mTimeFinished(false), mTimestep(-1.0)
    {
       EquationData::setTime(-4242.0, false);
    }
@@ -40,6 +39,7 @@ namespace Equations {
       if(this->time() == -4242.0)
       {
          this->mTimeAvg->setData(this->unknown().dom(0).perturbation().data());
+         EquationData::setTime(time, finished);
       }
 
       this->mTimeFinished = finished;

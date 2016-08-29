@@ -180,7 +180,7 @@ namespace GeoMHDiSCC {
       StageTimer stage;
 
       // Update equation time
-      this->updateEquationTime(this->mDiagnostics.startTime(), true);
+      this->updateEquationTime(this->mDiagnostics.startTime(), false);
 
       // Initialise all values (solve and nonlinear computations except timestep)
       this->preSolveEquations();
