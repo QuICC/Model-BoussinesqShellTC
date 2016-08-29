@@ -214,6 +214,16 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::BY);
 
+      // Add background temperature profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::VORTICITYZ);
+
+      // Add background temperature profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::EMFY);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
@@ -222,6 +232,8 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spOut->expect(PhysicalNames::BX);
       spOut->expect(PhysicalNames::BY);
+      spOut->expect(PhysicalNames::VORTICITYZ);
+      spOut->expect(PhysicalNames::EMFY);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -237,6 +249,8 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spIn->expect(PhysicalNames::BX);
       spIn->expect(PhysicalNames::BY);
+      spIn->expect(PhysicalNames::VORTICITYZ);
+      spIn->expect(PhysicalNames::EMFY);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -304,6 +318,7 @@ namespace GeoMHDiSCC {
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spState->expect(PhysicalNames::VORTICITYZ);
+      spState->expect(PhysicalNames::EMFY);
 
       spSim->addHdf5OutputFile(spState);
    }

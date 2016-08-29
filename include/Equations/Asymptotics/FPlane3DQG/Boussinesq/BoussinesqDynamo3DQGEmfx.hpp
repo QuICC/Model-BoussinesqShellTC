@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IScalarTimeAveragedEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGEmfx: public IScalarEquation
+   class BoussinesqDynamo3DQGEmfx: public IScalarTimeAveragedEquation
    {
       public:
          /**
