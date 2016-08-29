@@ -31,6 +31,8 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGMeanHeat.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfx.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfy.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBx.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBy.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbx.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfby.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbz.hpp"
@@ -73,6 +75,12 @@ namespace GeoMHDiSCC {
 
       // Add Emfy computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGEmfy>();
+
+      // Add Emfy computation
+      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBx>();
+
+      // Add Emfy computation
+      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBy>();
 
       // Add fbx computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfbx>();
@@ -342,7 +350,8 @@ namespace GeoMHDiSCC {
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spState->expect(PhysicalNames::VORTICITYZ);
-     // spState->expect(PhysicalNames::EMFY);
+      spState->expect(PhysicalNames::EMFY);
+      spState->expect(PhysicalNames::EMFX);
 
       spSim->addHdf5OutputFile(spState);
    }

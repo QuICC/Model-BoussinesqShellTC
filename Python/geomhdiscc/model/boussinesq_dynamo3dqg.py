@@ -40,8 +40,14 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""),("by","")]:
-            fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("bx",""), ("by","")]
+        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature","")]:
+            fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
+
+        elif field_row in [("bx","")]:
+            fields =  [("bx","")]
+
+        elif field_row in [("by","")]:
+            fields =  [("by","")]
 
         else:
             fields = [field_row]
@@ -309,11 +315,6 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
 
-            elif field_col == ("bx",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("by",""):
-                mat = geo.zblk(res[0], bc)
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
@@ -327,12 +328,6 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                     mat = geo.zblk(res[0], bc)
                 else:
                     mat = geo.i1(res[0], bc, (Ra/Pr))*utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
-
-            elif field_col == ("bx",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("by",""):
-                mat = geo.zblk(res[0], bc)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
@@ -353,44 +348,13 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                 else:
                     mat = geo.sid(res[0],1, bc, -(1.0/Pr)*(kx**2 + ky**2))
 
-            elif field_col == ("bx",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("by",""):
-                mat = geo.zblk(res[0], bc)
-
         elif field_row == ("bx",""):
-            if field_col == ("streamfunction",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("velocityz",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("bx",""):
+            if field_col == ("bx",""):
                 mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
-
-            elif field_col == ("by",""):
-                mat = geo.zblk(res[0], bc)
 
         elif field_row == ("by",""):
-            if field_col == ("streamfunction",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("velocityz",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("temperature",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("bx",""):
-                mat = geo.zblk(res[0], bc)
-
-            elif field_col == ("by",""):
+            if field_col == ("by",""):
                 mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
-
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
