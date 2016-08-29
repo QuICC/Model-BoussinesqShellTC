@@ -254,6 +254,11 @@ namespace GeoMHDiSCC {
       // Add background temperature profile visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::EMFX);
+
+      // Add background temperature profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::EMFY);
 
       // Add output file
@@ -283,6 +288,7 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::BY);
       spIn->expect(PhysicalNames::VORTICITYZ);
       spIn->expect(PhysicalNames::EMFY);
+      spIn->expect(PhysicalNames::EMFX);
 
       // Set simulation state
       spVis->setInitialState(spIn);
