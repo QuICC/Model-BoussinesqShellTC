@@ -1,6 +1,6 @@
 /** 
  * @file SphereTransformSteps.cpp
- * @brief Source of the implementation of the physical <-> spectral transform steps in a spherical shell
+ * @brief Source of the implementation of the physical <-> spectral transform steps in a whole shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
