@@ -142,6 +142,36 @@ namespace Transform {
          std::map<ProjectorType::Id,std::vector<Matrix> >::iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
          projIt->second.at(iL) = op.transpose();
 
+         // 1/R Projector: 1/R P
+         Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
+         projIt = this->mProjOp.find(ProjectorType::DIVR);
+         projIt->second.at(iL) = op.transpose();
+
+         // Projector: D P
+         Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
+         projIt = this->mProjOp.find(ProjectorType::DIFF);
+         projIt->second.at(iL) = op.transpose();
+
+         // Projector: 1/R D R P
+         Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
+         projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
+         projIt->second.at(iL) = op.transpose();
+
+         // Projector: horizontal laplacian
+         Polynomial::WorlandPolynomial::claplhWnl(op, itmp, l, igrid);
+         projIt = this->mProjOp.find(ProjectorType::LAPLH);
+         projIt->second.at(iL) = op.transpose();
+
+         // Projector: 1/R horizontal laplacian
+         Polynomial::WorlandPolynomial::r_1claplhWnl(op, itmp, l, igrid);
+         projIt = this->mProjOp.find(ProjectorType::DIVRLAPLH);
+         projIt->second.at(iL) = op.transpose();
+
+         // Projector: diff horizontal laplacian
+         Polynomial::WorlandPolynomial::dclaplhWnl(op, itmp, l, igrid);
+         projIt = this->mProjOp.find(ProjectorType::DIFFLAPLH);
+         projIt->second.at(iL) = op.transpose();
+
          // Allocate memory for the weighted integrator
          this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTG)->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();

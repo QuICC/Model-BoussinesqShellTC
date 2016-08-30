@@ -139,27 +139,27 @@ namespace Transform {
          projIt->second.at(iL) = op.transpose();
 
          // 1/R Projector: 1/R P
-         Polynomial::WorlandPolynomial::r_1WnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVR);
          projIt->second.at(iL) = op.transpose();
 
          // First derivative: D
-         Polynomial::WorlandPolynomial::dWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFF);
          projIt->second.at(iL) = op.transpose();
 
          // D R
-         Polynomial::WorlandPolynomial::drWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::drWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFFR);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R D R
-         Polynomial::WorlandPolynomial::r_1drWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
          projIt->second.at(iL) = op.transpose();
 
          // Spherical laplacian: D^2 2/R D - l(l+1)/R^2
-         Polynomial::WorlandPolynomial::slaplWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::slaplWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::SLAPL);
          projIt->second.at(iL) = op.transpose();
 

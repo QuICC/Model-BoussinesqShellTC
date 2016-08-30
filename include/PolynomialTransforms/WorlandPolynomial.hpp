@@ -77,11 +77,32 @@ namespace Polynomial {
          static void r_1Wnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
 
          /**
-          * @brief Compute spherical \f$\nabla2 W_n^l (r)\f$
+          * @brief Compute spherical \f$\nabla^2 W_n^l (r)\f$
           *
           * Internal computation can be done in multiple precision
           */
          static void slaplWnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
+
+         /**
+          * @brief Compute cylindrical horizontal \f$\nabla_h^2 W_n^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void claplhWnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
+
+         /**
+          * @brief Compute cylindrical horizontal \f$\frac{1}{r}\nabla_h^2 W_n^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void r_1claplhWnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
+
+         /**
+          * @brief Compute cylindrical horizontal \f$\frac{d}{dr}\nabla_h^2 W_n^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dclaplhWnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
 
          /**
           * @brief Compute \f$W_0^l (r)\f$

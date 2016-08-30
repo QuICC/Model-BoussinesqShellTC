@@ -49,7 +49,7 @@ namespace Polynomial {
 
       if (gN != igrid.size())
       {
-         throw Exception("Operator matrix does not mach grid size");
+         throw Exception("Operator matrix does not match grid size");
       }
 
       internal::MHDFloat a = WorlandPolynomial::alpha(l);
@@ -168,10 +168,10 @@ namespace Polynomial {
 
             // Compute DP_1
             WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-            idpnab.col(0) *= MHD_MP(4.0);
+            idpnab.col(0) *= MHD_MP(2.0);
 
             // Compute e P + 4r^2 DP
-            idiff.col(1) = ipnab.col(1) + idpnab.col(0);
+            idiff.col(1) = ipnab.col(1) + (dl + MHD_MP(1.0))*idpnab.col(0);
          }
 
          if(nPoly > 2)
@@ -184,11 +184,13 @@ namespace Polynomial {
             JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
             // Compute e P + 2(x+1) DP
-            idiff.col(2) = ipnab.col(1) + idpnab.col(1);
+            idiff.col(2) = ipnab.col(1) + (dl + MHD_MP(2.0))*idpnab.col(1);
          }
 
          for(int i = 3; i < nPoly; ++i)
          {
+            internal::MHDFloat di = internal::MHDFloat(i);
+
             // Increment P_n
             JacobiPolynomial::Pnab(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
             ipnab.col(0).swap(ipnab.col(1));
@@ -198,7 +200,7 @@ namespace Polynomial {
             idpnab.col(0).swap(idpnab.col(1));
 
             // Compute e P + 2(x+1) DP
-            idiff.col(i) = ipnab.col(1) + idpnab.col(1);
+            idiff.col(i) = ipnab.col(1) + (dl + di)*idpnab.col(1);
          }
 
          diff = Precision::cast(idiff);
@@ -224,6 +226,7 @@ namespace Polynomial {
       internal::MHDFloat b = WorlandPolynomial::beta(l);
       internal::MHDFloat a1 = WorlandPolynomial::alpha(l) + MHD_MP(1.0);
       internal::MHDFloat b1 = WorlandPolynomial::beta(l) + MHD_MP(1.0);
+      internal::MHDFloat dl = internal::MHDFloat(l);
       internal::MHDFloat dl1 = internal::MHDFloat(l+1);
 
       // Make X grid in [-1, 1]
@@ -251,10 +254,10 @@ namespace Polynomial {
 
          // Compute DP_1
          WorlandPolynomial::W0l(idpnab.col(0), l+2, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(4.0);
+         idpnab.col(0) *= MHD_MP(2.0);
 
          // Compute e P + 4r^2 DP
-         idiff.col(1) = ipnab.col(1) + idpnab.col(0);
+         idiff.col(1) = ipnab.col(1) + (dl + MHD_MP(1.0))*idpnab.col(0);
       }
 
       if(nPoly > 2)
@@ -267,11 +270,12 @@ namespace Polynomial {
          JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute e P + 2(x+1) DP
-         idiff.col(2) = ipnab.col(1) + idpnab.col(1);
+         idiff.col(2) = ipnab.col(1) + (dl +  + MHD_MP(2.0))*idpnab.col(1);
       }
 
       for(int i = 3; i < nPoly; ++i)
       {
+         internal::MHDFloat di = internal::MHDFloat(i);
          // Increment P_n
          JacobiPolynomial::Pnab(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
          ipnab.col(0).swap(ipnab.col(1));
@@ -281,7 +285,7 @@ namespace Polynomial {
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute e P + 2(x+1) DP
-         idiff.col(i) = ipnab.col(1) + idpnab.col(1);
+         idiff.col(i) = ipnab.col(1) + (dl + di)*idpnab.col(1);
       }
 
       diff = Precision::cast(idiff);
@@ -311,6 +315,7 @@ namespace Polynomial {
       internal::MHDFloat b = WorlandPolynomial::beta(l);
       internal::MHDFloat a1 = WorlandPolynomial::alpha(l) + MHD_MP(1.0);
       internal::MHDFloat b1 = WorlandPolynomial::beta(l) + MHD_MP(1.0);
+      internal::MHDFloat dl = internal::MHDFloat(l);
       internal::MHDFloat dl1 = internal::MHDFloat(l+1);
 
       // Make X grid in [-1, 1]
@@ -338,10 +343,10 @@ namespace Polynomial {
 
          // Compute DP_1
          WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(4.0);
+         idpnab.col(0) *= MHD_MP(2.0);
 
          // Compute e P + 4r^2 DP
-         idiff.col(1) = ipnab.col(1) + idpnab.col(0);
+         idiff.col(1) = ipnab.col(1) + (dl + MHD_MP(1.0))*idpnab.col(0);
       }
 
       if(nPoly > 2)
@@ -354,11 +359,13 @@ namespace Polynomial {
          JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute e P + 2(x+1) DP
-         idiff.col(2) = ipnab.col(1) + idpnab.col(1);
+         idiff.col(2) = ipnab.col(1) + (dl + MHD_MP(2.0))*idpnab.col(1);
       }
 
       for(int i = 3; i < nPoly; ++i)
       {
+         internal::MHDFloat di = internal::MHDFloat(i);
+
          // Increment P_n
          JacobiPolynomial::Pnab(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
          ipnab.col(0).swap(ipnab.col(1));
@@ -368,7 +375,7 @@ namespace Polynomial {
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute e P + 2(x+1) DP
-         idiff.col(i) = ipnab.col(1) + idpnab.col(1);
+         idiff.col(i) = ipnab.col(1) + (dl + di)*idpnab.col(1);
       }
 
       diff = Precision::cast(idiff);
@@ -415,10 +422,10 @@ namespace Polynomial {
       {
          // Compute DP_1
          WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(4.0)*(MHD_MP(2.0)*dl + MHD_MP(3.0)); 
+         idpnab.col(0) *= MHD_MP(2.0)*(MHD_MP(2.0)*dl + MHD_MP(3.0)); 
 
          // Compute spherical laplacian P_1
-         idiff.col(1) = idpnab.col(0);
+         idiff.col(1) = (dl + MHD_MP(1.0))*idpnab.col(0);
       }
 
       if(nPoly > 2)
@@ -428,10 +435,10 @@ namespace Polynomial {
 
          // Compute D2P_2
          WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
-         id2pnab.col(0) *= MHD_MP(16.0); 
+         id2pnab.col(0) *= MHD_MP(4.0); 
 
          // Compute e P + 2(x+1) DP
-         idiff.col(2) = id2pnab.col(0) + idpnab.col(1);
+         idiff.col(2) = (dl + MHD_MP(2.0))*((dl + MHD_MP(3.0))*id2pnab.col(0) + idpnab.col(1));
       }
 
       if(nPoly > 3)
@@ -444,11 +451,13 @@ namespace Polynomial {
          JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
 
          // Compute e P + 2(x+1) DP
-         idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
+         idiff.col(3) = (dl + MHD_MP(3.0))*((dl + MHD_MP(4.0))*id2pnab.col(1) + idpnab.col(1));
       }
 
       for(int i = 4; i < nPoly; ++i)
       {
+         internal::MHDFloat di = internal::MHDFloat(i);
+
          // Increment DP_n
          JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
@@ -458,7 +467,311 @@ namespace Polynomial {
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute e P + 2(x+1) DP
-         idiff.col(i) = id2pnab.col(1) + idpnab.col(1);
+         idiff.col(i) = (dl + di)*((dl + di + MHD_MP(1.0))*id2pnab.col(1) + idpnab.col(1));
+      }
+
+      diff = Precision::cast(idiff);
+   }
+
+   void WorlandPolynomial::claplhWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   {
+      int gN = diff.rows();
+      int nPoly = diff.cols();
+
+      if(l < 0)
+      {
+         throw Exception("Tried to compute Worland cylindrical laplacian with l < 0");
+      }
+
+      if (nPoly < 1)
+      {
+         throw Exception("Operator matrix should have at least 1 column");
+      }
+
+      if (gN != igrid.size())
+      {
+         throw Exception("Operator matrix does not mach grid size");
+      }
+
+      internal::MHDFloat a1 = WorlandPolynomial::alpha(l) + MHD_MP(1.0);
+      internal::MHDFloat b1 = WorlandPolynomial::beta(l) + MHD_MP(1.0);
+      internal::MHDFloat a2 = WorlandPolynomial::alpha(l) + MHD_MP(2.0);
+      internal::MHDFloat b2 = WorlandPolynomial::beta(l) + MHD_MP(2.0);
+      internal::MHDFloat dl = internal::MHDFloat(l);
+
+      // Make X grid in [-1, 1]
+      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+
+      // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
+      internal::Matrix idpnab(gN,2);
+      internal::Matrix id2pnab(gN,2);
+      idiff.resize(gN, nPoly);
+
+      // Compute cylindrical laplacian P_0
+      idiff.col(0).setZero();
+
+      if(nPoly > 1)
+      {
+         // Compute DP_1
+         WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
+         idpnab.col(0) *= MHD_MP(4.0)*(dl + MHD_MP(1.0)); 
+
+         // Compute cylindrical laplacian P_1
+         idiff.col(1) = (dl + MHD_MP(1.0))*idpnab.col(0);
+      }
+
+      if(nPoly > 2)
+      {
+         // Increment DP_2
+         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+
+         // Compute D2P_2
+         WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
+         id2pnab.col(0) *= MHD_MP(4.0); 
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(2) = (dl + MHD_MP(2.0))*((dl + MHD_MP(3.0))*id2pnab.col(0) + idpnab.col(1));
+      }
+
+      if(nPoly > 3)
+      {
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Compute D2P_2
+         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(3) = (dl + MHD_MP(3.0))*((dl + MHD_MP(4.0))*id2pnab.col(1) + idpnab.col(1));
+      }
+
+      for(int i = 4; i < nPoly; ++i)
+      {
+         internal::MHDFloat di = internal::MHDFloat(i);
+
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Increment D2P_n
+         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         id2pnab.col(0).swap(id2pnab.col(1));
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(i) = (dl + di)*((dl + di + MHD_MP(1.0))*id2pnab.col(1) + idpnab.col(1));
+      }
+
+      diff = Precision::cast(idiff);
+   }
+
+   void WorlandPolynomial::r_1claplhWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   {
+      int gN = diff.rows();
+      int nPoly = diff.cols();
+
+      if(l < 0)
+      {
+         throw Exception("Tried to compute Worland cylindrical laplacian with l < 0");
+      }
+
+      if (nPoly < 1)
+      {
+         throw Exception("Operator matrix should have at least 1 column");
+      }
+
+      if (gN != igrid.size())
+      {
+         throw Exception("Operator matrix does not mach grid size");
+      }
+
+      internal::MHDFloat a1 = WorlandPolynomial::alpha(l) + MHD_MP(1.0);
+      internal::MHDFloat b1 = WorlandPolynomial::beta(l) + MHD_MP(1.0);
+      internal::MHDFloat a2 = WorlandPolynomial::alpha(l) + MHD_MP(2.0);
+      internal::MHDFloat b2 = WorlandPolynomial::beta(l) + MHD_MP(2.0);
+      internal::MHDFloat dl = internal::MHDFloat(l);
+
+      // Make X grid in [-1, 1]
+      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+
+      // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
+      internal::Matrix idpnab(gN,2);
+      internal::Matrix id2pnab(gN,2);
+      idiff.resize(gN, nPoly);
+
+      // Compute cylindrical laplacian P_0
+      idiff.col(0).setZero();
+
+      if(nPoly > 1)
+      {
+         // Compute DP_1
+         WorlandPolynomial::W0l(idpnab.col(0), l-1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
+         idpnab.col(0) *= MHD_MP(4.0)*(dl + MHD_MP(1.0)); 
+
+         // Compute cylindrical laplacian P_1
+         idiff.col(1) = (dl + MHD_MP(1.0))*idpnab.col(0);
+      }
+
+      if(nPoly > 2)
+      {
+         // Increment DP_2
+         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+
+         // Compute D2P_2
+         WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
+         id2pnab.col(0) *= MHD_MP(4.0); 
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(2) = (dl + MHD_MP(2.0))*((dl + MHD_MP(3.0))*id2pnab.col(0) + idpnab.col(1));
+      }
+
+      if(nPoly > 3)
+      {
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Compute D2P_2
+         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(3) = (dl + MHD_MP(3.0))*((dl + MHD_MP(4.0))*id2pnab.col(1) + idpnab.col(1));
+      }
+
+      for(int i = 4; i < nPoly; ++i)
+      {
+         internal::MHDFloat di = internal::MHDFloat(i);
+
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Increment D2P_n
+         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         id2pnab.col(0).swap(id2pnab.col(1));
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(i) = (dl + di)*((dl + di + MHD_MP(1.0))*id2pnab.col(1) + idpnab.col(1));
+      }
+
+      diff = Precision::cast(idiff);
+   }
+
+   void WorlandPolynomial::dclaplhWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   {
+      int gN = diff.rows();
+      int nPoly = diff.cols();
+
+      if(l < 0)
+      {
+         throw Exception("Tried to compute Worland cylindrical laplacian with l < 0");
+      }
+
+      if (nPoly < 1)
+      {
+         throw Exception("Operator matrix should have at least 1 column");
+      }
+
+      if (gN != igrid.size())
+      {
+         throw Exception("Operator matrix does not mach grid size");
+      }
+
+      internal::MHDFloat a1 = WorlandPolynomial::alpha(l) + MHD_MP(1.0);
+      internal::MHDFloat b1 = WorlandPolynomial::beta(l) + MHD_MP(1.0);
+      internal::MHDFloat a2 = WorlandPolynomial::alpha(l) + MHD_MP(2.0);
+      internal::MHDFloat b2 = WorlandPolynomial::beta(l) + MHD_MP(2.0);
+      internal::MHDFloat a3 = WorlandPolynomial::alpha(l) + MHD_MP(3.0);
+      internal::MHDFloat b3 = WorlandPolynomial::beta(l) + MHD_MP(3.0);
+      internal::MHDFloat dl = internal::MHDFloat(l);
+
+      // Make X grid in [-1, 1]
+      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+
+      // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
+      internal::Matrix idpnab(gN,2);
+      internal::Matrix id2pnab(gN,2);
+      internal::Matrix id3pnab(gN,2);
+      idiff.resize(gN, nPoly);
+
+      // Compute cylindrical laplacian P_0
+      idiff.col(0).setZero();
+
+      if(nPoly > 1)
+      {
+         // Compute DP_1
+         WorlandPolynomial::W0l(idpnab.col(0), l-1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
+         idpnab.col(0) *= MHD_MP(4.0)*(dl + MHD_MP(1.0))*dl; 
+
+         // Compute cylindrical laplacian P_1
+         idiff.col(1) = (dl + MHD_MP(1.0))*idpnab.col(0);
+      }
+
+      if(nPoly > 2)
+      {
+         // Increment DP_2
+         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+
+         // Compute D2P_2
+         WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
+         id2pnab.col(0) *= MHD_MP(4.0)*(MHD_MP(4.0) + MHD_MP(3.0)*dl); 
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(2) = (dl + MHD_MP(2.0))*((dl + MHD_MP(3.0))*id2pnab.col(0) + idpnab.col(1));
+      }
+
+      if(nPoly > 3)
+      {
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Compute D2P_2
+         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+
+         // Compute D3P_0
+         WorlandPolynomial::W0l(id3pnab.col(0), l+3, a3, b3, igrid, &WorlandPolynomial::unitWD2P0ab);
+         id3pnab.col(0) *= MHD_MP(8.0); 
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(3) = (dl + MHD_MP(3.0))*((dl + MHD_MP(4.0))*((dl + MHD_MP(5.0))*id3pnab.col(0) + id2pnab.col(1)) + idpnab.col(1));
+      }
+
+      if(nPoly > 4)
+      {
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), 3, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Compute D2P_2
+         JacobiPolynomial::Pnab(id2pnab.col(0), 2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         id2pnab.col(0).swap(id2pnab.col(1));
+
+         // Compute D3P_1
+         JacobiPolynomial::P1ab(id3pnab.col(1), a3, b3, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(4) = (dl + MHD_MP(4.0))*((dl + MHD_MP(5.0))*((dl + MHD_MP(6.0))*id3pnab.col(1) + id2pnab.col(1)) + idpnab.col(1));
+      }
+
+      for(int i = 5; i < nPoly; ++i)
+      {
+         internal::MHDFloat di = internal::MHDFloat(i);
+
+         // Increment DP_n
+         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Increment D2P_n
+         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         id2pnab.col(0).swap(id2pnab.col(1));
+
+         // Increment D3P_n
+         JacobiPolynomial::Pnab(id3pnab.col(0), i-3, a3, b3, id3pnab.col(1), id3pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         id3pnab.col(0).swap(id3pnab.col(1));
+
+         // Compute e P + 2(x+1) DP
+         idiff.col(i) = (dl + di)*((dl + di + MHD_MP(1.0))*((dl + di + MHD_MP(2.0))*id3pnab.col(1) + id2pnab.col(1)) + idpnab.col(1));
       }
 
       diff = Precision::cast(idiff);
