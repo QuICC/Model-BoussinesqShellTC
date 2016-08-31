@@ -271,6 +271,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::BY);
       spOut->expect(PhysicalNames::VORTICITYZ);
       spOut->expect(PhysicalNames::EMFY);
+      spOut->expect(PhysicalNames::EMFX);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -356,8 +357,8 @@ namespace GeoMHDiSCC {
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spState->expect(PhysicalNames::VORTICITYZ);
-      spState->expect(PhysicalNames::EMFY);
-      spState->expect(PhysicalNames::EMFX);
+      //spState->expect(PhysicalNames::EMFY);
+      //spState->expect(PhysicalNames::EMFX);
 
       spSim->addHdf5OutputFile(spState);
    }
@@ -376,6 +377,9 @@ namespace GeoMHDiSCC {
       {
          spInit->expect(*it);
       }
+
+      spInit->expect(PhysicalNames::EMFY);
+      spInit->expect(PhysicalNames::EMFX);
 
       // Set simulation state
       spSim->setInitialState(spInit);
