@@ -266,6 +266,41 @@ namespace Polynomial {
       return cs;
    }
 
+   //
+   // Natural third derivative normalizer
+   //
+   internal::Array JacobiPolynomial::naturalD3Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   {
+      internal::Array cs(4);
+
+      cs(0) = -((dn + alpha + beta - MHD_MP(1.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/((dn + alpha + beta - MHD_MP(4.0))*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
+      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(dn + alpha + beta - MHD_MP(3.0));
+      
+      return cs;
+   }
+
+   internal::Array JacobiPolynomial::naturalD3P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   {
+      internal::Array cs(3);
+
+      cs(0) = (MHD_MP(2.0) + alpha + beta);
+      cs(1) = (alpha - beta);
+      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta - MHD_MP(1.0)));
+
+      return cs;
+   }
+
+   internal::Array JacobiPolynomial::naturalD3P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   {
+      internal::Array cs(1);
+
+      cs(0) = MHD_MP(0.125)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD_MP(2.0)));
+
+      return cs;
+   }
+
    JacobiPolynomial::JacobiPolynomial()
    {
    }

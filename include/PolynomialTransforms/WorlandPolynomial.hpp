@@ -156,6 +156,21 @@ namespace Polynomial {
           */
          static internal::Array unitWD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
+         /**
+          * @brief Third derivative normalizer for unit Worland normalization
+          */
+         static internal::Array unitWD3Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Third derivative n=0 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWD3P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Third derivative n=1 normalizer for unit Worland normalization
+          */
+         static internal::Array unitWD3P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
       private:
          /**
           * @brief Get alpha parameter of Jacobi polynomial
