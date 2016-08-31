@@ -102,7 +102,7 @@ namespace Polynomial {
          static internal::Array naturalDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
          /**
-          * @brief First derivative n=1 normalizer for natural normalization
+          * @brief First derivative n=0 normalizer for natural normalization
           */
          static internal::Array naturalDP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
