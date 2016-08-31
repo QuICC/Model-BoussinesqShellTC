@@ -175,6 +175,21 @@ namespace Transform {
          // Allocate memory for the weighted integrator
          this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTG)->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+
+         this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+
+         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+
+         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+
+         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+
+         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL) = (this->mProjOp.find(ProjectorType::LAPLH)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
       }
    }
 

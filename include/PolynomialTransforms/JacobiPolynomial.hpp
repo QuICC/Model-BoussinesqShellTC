@@ -126,6 +126,21 @@ namespace Polynomial {
           */
          static internal::Array naturalD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
+         /**
+          * @brief Third derivative normalizer for natural normalization
+          */
+         static internal::Array naturalD3Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Third derivative n=0 normalizer for natural normalization
+          */
+         static internal::Array naturalD3P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
+         /**
+          * @brief Third derivative n=1 normalizer for natural normalization
+          */
+         static internal::Array naturalD3P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+
       private:
          /**
           * @brief Constructor

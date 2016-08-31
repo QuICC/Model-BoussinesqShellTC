@@ -464,7 +464,7 @@ namespace Polynomial {
       diff = Precision::cast(idiff);
    }
 
-   void WorlandPolynomial::claplWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   void WorlandPolynomial::claplhWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
    {
       int gN = diff.rows();
       int nPoly = diff.cols();
@@ -554,7 +554,7 @@ namespace Polynomial {
       diff = Precision::cast(idiff);
    }
 
-   void WorlandPolynomial::r_1claplWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   void WorlandPolynomial::r_1claplhWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
    {
       int gN = diff.rows();
       int nPoly = diff.cols();
@@ -644,7 +644,7 @@ namespace Polynomial {
       diff = Precision::cast(idiff);
    }
 
-   void WorlandPolynomial::dclaplWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   void WorlandPolynomial::dclaplhWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
    {
       int gN = diff.rows();
       int nPoly = diff.cols();
