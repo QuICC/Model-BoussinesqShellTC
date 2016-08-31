@@ -72,7 +72,7 @@ if 'ekman' in phys_params.keys():
     phys_params['rossby'] = phys_params['ekman']**(1./3.)
 
 # read data and get Chebyshev expansion
-tmp = np.genfromtxt(inputfile, skip_header = 2)
+tmp = np.genfromtxt(inputfile, skip_header = 1)
 nz  = tmp.shape[0]
 grid = np.array([np.cos(i*np.pi/(nz - 1.0)) for i in range(0,nz)])
 fields = ["mean_temperature", "dz_meantemperature", "velocityz", "streamfunction", "temperature"]
