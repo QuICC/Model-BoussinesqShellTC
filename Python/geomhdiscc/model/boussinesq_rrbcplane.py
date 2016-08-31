@@ -201,10 +201,10 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                             E = eq_params['ekman']
                             # aspect ratio A (used for rescaling)
                             if eq_params['rescaled'] == 1:
-                                A = E**(1./3.)
+                                A = E**(1./6.)
                             else:
-                                A = 1.0
-                            c = E**(1./2.)*A/2**(1./2.)
+                                A = E**(1./2.)
+                            c = A/2**(1./2.)
                             bc = {0:20, 'c':[c, -c], 'use_parity':True}
             
             # Set LHS galerkin restriction
