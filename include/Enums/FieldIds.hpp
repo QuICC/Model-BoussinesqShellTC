@@ -235,7 +235,15 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Y,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
+            /// First vector component
+            ONE = R,
+            /// Second vector component
+            TWO = THETA,
+            /// Third vector component
+            THREE = Z,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
             /// First vector component
             ONE = R,
             /// Second vector component
@@ -344,7 +352,15 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Y,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
+               /// First vector component
+               ONE = TOR,
+               /// Second vector component
+               TWO = POL,
+               /// Third vector component
+               THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
                /// First vector component
                ONE = R,
                /// Second vector component

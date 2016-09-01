@@ -24,7 +24,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "gamma", "scale3d"]
+        return ["ekman", "prandtl", "rayleigh", "gamma", "scale3d"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -135,7 +135,6 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
             m = eigs[0]
             Ra = eq_params['rayleigh']
             zscale = eq_params['scale3d']
-            T = eq_params['taylor']**0.5
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -252,7 +251,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         G = eq_params['gamma']
         zscale = eq_params['scale3d']
-        T = eq_params['taylor']**0.5
+        E = eq_params['ekman']
         m = eigs[0]
 
         mat = None
@@ -266,7 +265,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                 #mat += geo.tau_mat_z(res[0], res[2], m, {0:20, 'kron_shift':0}, functools.partial(geo.rad.i2laplh), 2, 2, bc)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4laplhj2e1(res[0], res[2], m, bc, T, zscale = zscale)
+                mat = geo.i4laplhj2e1(res[0], res[2], m, bc, 1.0/E, zscale = zscale)
                 bc['r'][0] = min(0, bc['r'][0])
                 bc['z'][0] = min(0, bc['z'][0])
                 mat += geo.tau_mat_r(res[0], res[2], m, {0:11, 'pad':1, 'kron_shift':1}, functools.partial(geo.c1d.i1d1, cscale = zscale), 2, 2, bc)
@@ -276,7 +275,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i6laplhj4e1(res[0], res[2], m, bc, -T, zscale = zscale)
+                mat = geo.i6laplhj4e1(res[0], res[2], m, bc, -1.0/E, zscale = zscale)
                 bc['r'][0] = min(0, bc['r'][0])
                 bc['z'][0] = min(0, bc['z'][0])
                 mat += geo.tau_mat_r(res[0], res[2], m, {0:16, 'pad':2, 'kron_shift':2}, functools.partial(geo.c1d.i2d1, cscale = zscale), 3, 4, bc)

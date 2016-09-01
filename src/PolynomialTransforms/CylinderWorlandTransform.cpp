@@ -21,6 +21,7 @@
 #include "Base/MathConstants.hpp"
 #include "Quadratures/WorlandChebyshevRule.hpp"
 #include "PolynomialTransforms/WorlandPolynomial.hpp"
+#include "Python/PythonWrapper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -39,6 +40,8 @@ namespace Transform {
 
    CylinderWorlandTransform::CylinderWorlandTransform()
    {
+      // Initialise the Python interpreter wrapper
+      PythonWrapper::init();
    }
 
    CylinderWorlandTransform::~CylinderWorlandTransform()
@@ -80,6 +83,9 @@ namespace Transform {
 
    void CylinderWorlandTransform::initOperators()
    {
+      // Initialise python wrapper
+      PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius_worland");
+
       this->mGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
 
@@ -118,6 +124,10 @@ namespace Transform {
       this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.reserve(this->mspSetup->slow().size());
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGINVLAPLH,std::vector<Matrix>()));
       this->mIntgOp.find(IntegratorType::INTGINVLAPLH)->second.reserve(this->mspSetup->slow().size());
+
+      // Prepare arguments to Chebyshev matrices call
+      PyObject *pArgs, *pValue;
+      pArgs = PyTuple_New(4);
 
       // Loop over harmonic degrees
       Matrix op;
@@ -172,25 +182,59 @@ namespace Transform {
          projIt = this->mProjOp.find(ProjectorType::DIFFLAPLH);
          projIt->second.at(iL) = op.transpose();
 
+         // Set resolution and m
+         PyTuple_SetItem(pArgs, 0, PyLong_FromLong(this->mspSetup->fast().at(iL).size()));
+         PyTuple_SetItem(pArgs, 1, PyLong_FromLong(l));
+         // ... create boundray condition (none)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         PyTuple_SetItem(pArgs, 2, pValue);
+         // Set coefficient
+         PyTuple_SetItem(pArgs, 3, PyFloat_FromDouble(1.0));
+
+         // Call i4
+         SparseMatrix matI4(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
+         PythonWrapper::setFunction("i4");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(matI4, pValue);
+         Py_DECREF(pValue);
+
+         // Call i6
+         SparseMatrix matI6(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
+         PythonWrapper::setFunction("i6");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(matI6, pValue);
+         Py_DECREF(pValue);
+
          // Allocate memory for the weighted integrator
          this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTG)->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL) = (this->mProjOp.find(ProjectorType::LAPLH)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose();
       }
+
+      // Cleanup
+      PythonWrapper::finalize();
    }
 
    void CylinderWorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, CylinderWorlandTransform::IntegratorType::Id integrator)
@@ -203,7 +247,11 @@ namespace Transform {
       assert(rSpecVal.cols() == this->mspSetup->howmany());
 
       // Compute basic integrator
-      if(integrator == CylinderWorlandTransform::IntegratorType::INTG)
+      if(integrator == CylinderWorlandTransform::IntegratorType::INTGINVLAPLH)
+      {
+         this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(CylinderWorlandTransform::IntegratorType::INTG)->second);
+
+      } else if(this->mIntgOp.count(integrator) == 1)
       {
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
 
@@ -224,7 +272,7 @@ namespace Transform {
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
       // Compute projection
-      if(projector == CylinderWorlandTransform::ProjectorType::PROJ)
+      if(this->mProjOp.count(projector) == 1)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
