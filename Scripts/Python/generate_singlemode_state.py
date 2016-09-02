@@ -92,8 +92,8 @@ for f in fields:
     data[f][0:min(cheb.shape[0],nnz)] = cheb[0:min(cheb.shape[0],nnz)]
 
 if sim_type in ["RRBCPlane", "RRBCPlaneMean", "RRBCPlaneDMean"]:
-    data["velocity_tor"] = data["streamfunction"]
-    data["velocity_pol"] = -(1.0/kx**2)*data["velocityz"]
+    data["velocity_tor"] = -data["streamfunction"]
+    data["velocity_pol"] = (1.0/kx**2)*data["velocityz"]
 
 # Write HDF5 header attributes
 hdf5_file = tables.open_file(outputfile, mode = 'w')
@@ -158,7 +158,7 @@ if sim_type == "FPlane3DQG":
 ############################################
 # Write HDF5 RRBCPlane fields
 if sim_type == "RRBCPlane":
-    writeScalar("temperature", c = -1.0, mean = "mean_temperature")
+    writeScalar("temperature", mean = "mean_temperature")
     writeVector("velocity", ["tor","pol"])
 
 ############################################

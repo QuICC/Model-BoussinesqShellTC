@@ -492,8 +492,9 @@ def stencil(nx, bc, make_square):
 
     mat = qid(nx, 0, c1dbc.no_bc())
 
-    if not make_square:
-        bc['rt'] = 0
+    if make_square:
+        bc['rb'] = bc['rt']
+    bc['rt'] = 0
 
     return c1dbc.constrain(mat, bc)
 

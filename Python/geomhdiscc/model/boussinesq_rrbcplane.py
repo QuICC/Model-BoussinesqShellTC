@@ -43,7 +43,7 @@ class BoussinesqRRBCPlaneConfig:
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
-        
+    
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         return geo.stencil(res[0], bc, make_square)
@@ -225,28 +225,28 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("velocity","pol"):
                         if eigs[0] == 0 and eigs[1] == 0:
-                            bc = {0:-20}
+                            bc = {0:-20, 'rt':2}
                         else:
-                            bc = {0:-40}
+                            bc = {0:-40, 'rt':4}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20}
+                        bc = {0:-20, 'rt':2}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
                         if eigs[0] == 0 and eigs[1] == 0:
-                            bc = {0:-21}
+                            bc = {0:-21, 'rt':2}
                         else:
-                            bc = {0:-21}
+                            bc = {0:-21, 'rt':2}
                     elif field_col == ("velocity","pol"):
                         if eigs[0] == 0 and eigs[1] == 0:
-                            bc = {0:-21}
+                            bc = {0:-21, 'rt':2}
                         else:
-                            bc = {0:-41}
+                            bc = {0:-41, 'rt':4}
                     elif field_col == ("temperature",""):
-                        bc = {0:-21}
+                        bc = {0:-21, 'rt':2}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:

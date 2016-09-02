@@ -338,8 +338,10 @@ namespace Equations {
    template <typename TData> void solveStencilUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
    {
       // Create temporary storage for tau data
+      TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
+      Equations::copyUnknown(eq, compId, tmp, matIdx, 0, false, true);
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      Equations::copyUnknown(eq, compId, rhs, matIdx, 0, true, true);
+      Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
 
       // Get a restricted stencil matrix
       SparseMatrix stencil(eq.couplingInfo(compId).galerkinN(matIdx),eq.couplingInfo(compId).galerkinN(matIdx));
