@@ -152,7 +152,7 @@ namespace Transform {
          std::map<ProjectorType::Id,std::vector<Matrix> >::iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
          projIt->second.at(iL) = op.transpose();
 
-         // 1/R Projector: 1/R P
+         // 1/R Projector: 1/R P, set to 0 for l = 0 (always appears combined with \partial_\theta)
          Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVR);
          projIt->second.at(iL) = op.transpose();
