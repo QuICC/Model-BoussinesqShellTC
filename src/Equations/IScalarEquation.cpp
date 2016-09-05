@@ -66,7 +66,7 @@ namespace Equations {
       assert(compId == FieldComponents::Spectral::SCALAR);
 
       // Assert dealiasing has taken place!
-      assert(this->rUnknown().rDom(0).rPerturbation().data().rows() < rhs.data().rows());
+      assert(this->rUnknown().rDom(0).rPerturbation().data().rows() <= rhs.data().rows());
       assert(this->rUnknown().rDom(0).rPerturbation().data().cols() == rhs.data().cols());
 
       if(arithId == Arithmetics::SET)

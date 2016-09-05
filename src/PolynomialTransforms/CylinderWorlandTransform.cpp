@@ -148,38 +148,74 @@ namespace Transform {
          op.resize(this->mGrid.size(), this->mspSetup->fast().at(iL).size());
 
          // Projector: P
-         Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
          std::map<ProjectorType::Id,std::vector<Matrix> >::iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R Projector: 1/R P, set to 0 for l = 0 (always appears combined with \partial_\theta)
-         Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVR);
+         if(l == 0)
+         {
+            op.setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
+         }
          projIt->second.at(iL) = op.transpose();
 
          // Projector: D P
-         Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFF);
+         if(l == 0)
+         {
+            op.setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
+         }
          projIt->second.at(iL) = op.transpose();
 
          // Projector: 1/R D R P
-         Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
+         if(l == 0)
+         {
+            op.setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
+         }
          projIt->second.at(iL) = op.transpose();
 
          // Projector: horizontal laplacian
-         Polynomial::WorlandPolynomial::claplhWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::LAPLH);
+         if(l == 0)
+         {
+            op.setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::claplhWnl(op, itmp, l, igrid);
+         }
          projIt->second.at(iL) = op.transpose();
 
          // Projector: 1/R horizontal laplacian
-         Polynomial::WorlandPolynomial::r_1claplhWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVRLAPLH);
+         if(l == 0)
+         {
+            op.setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::r_1claplhWnl(op, itmp, l, igrid);
+         }
          projIt->second.at(iL) = op.transpose();
 
          // Projector: diff horizontal laplacian
-         Polynomial::WorlandPolynomial::dclaplhWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFFLAPLH);
+         if(l == 0)
+         {
+            op.setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::dclaplhWnl(op, itmp, l, igrid);
+         }
          projIt->second.at(iL) = op.transpose();
 
          // Set resolution and m
@@ -194,41 +230,55 @@ namespace Transform {
 
          // Call i4
          SparseMatrix matI4(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i4");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI4, pValue);
-         Py_DECREF(pValue);
+         if(l == 0)
+         {
+            matI4.setZero();
+         } else
+         {
+            PythonWrapper::setFunction("i4");
+            pValue = PythonWrapper::callFunction(pArgs);
+            // Fill matrix
+            PythonWrapper::fillMatrix(matI4, pValue);
+            Py_DECREF(pValue);
+         }
 
          // Call i6
          SparseMatrix matI6(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i6");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI6, pValue);
-         Py_DECREF(pValue);
+         if(l == 0)
+         {
+            matI6.setZero();
+         } else
+         {
+            PythonWrapper::setFunction("i6");
+            pValue = PythonWrapper::callFunction(pArgs);
+            // Fill matrix
+            PythonWrapper::fillMatrix(matI6, pValue);
+            Py_DECREF(pValue);
+         }
 
          // Allocate memory for the weighted integrator
          this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+
+
          this->mIntgOp.find(IntegratorType::INTG)->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL) = (this->mProjOp.find(ProjectorType::LAPLH)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose();
       }

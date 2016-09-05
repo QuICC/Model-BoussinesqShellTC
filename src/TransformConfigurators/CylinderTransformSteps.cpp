@@ -86,13 +86,13 @@ namespace TransformSteps {
          {
             // Compute curlcurl Q component
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGI4DIFF);
+            transform.back().addEdge(IntegratorNDType::INTGI4D1);
             transform.back().addEdge(Integrator2DType::INTG);
             transform.back().addEdge(Integrator1DType::INTGI6DIVRDIFFR, curlcurlId, Arithmetics::ADD);
 
             // Compute curlcurl S component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGI4DIFF);
+            transform.back().addEdge(IntegratorNDType::INTGI4D1);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
             transform.back().addEdge(Integrator1DType::INTGI6DIVR, curlcurlId, Arithmetics::ADD);
 
@@ -106,13 +106,13 @@ namespace TransformSteps {
          {
             // Compute curlcurl Q component
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGI4DIFF);
+            transform.back().addEdge(IntegratorNDType::INTGI4D1);
             transform.back().addEdge(Integrator2DType::INTG);
             transform.back().addEdge(Integrator1DType::INTGI6DIVRDIFFR, curlcurlId, Arithmetics::ADD);
 
             // Compute curlcurl S component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGI4DIFF);
+            transform.back().addEdge(IntegratorNDType::INTGI4D1);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
             transform.back().addEdge(Integrator1DType::INTGI6DIVR, curlcurlId, Arithmetics::ADD);
 
@@ -132,12 +132,12 @@ namespace TransformSteps {
          {
             // Compute Toroidal component
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGDIVR);
+            transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
             transform.back().addEdge(Integrator1DType::INTGINVLAPLH, curlId, Arithmetics::ADD);
 
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
-            transform.back().addEdge(IntegratorNDType::INTGDIVRDIFFR);
+            transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTG);
             transform.back().addEdge(Integrator1DType::INTGINVLAPLH, curlId, Arithmetics::SUB);
 

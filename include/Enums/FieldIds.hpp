@@ -328,47 +328,7 @@ namespace GeoMHDiSCC {
             NOTUSED,
 
             // Define generic enums for cartesian geometry
-            #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
-               /// First vector component
-               ONE = X,
-               /// Second vector component
-               TWO = Y,
-               /// Third vector component
-               THREE = Z,
-
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL
-               /// First vector component
-               ONE = TOR,
-               /// Second vector component
-               TWO = POL,
-               /// Third vector component
-               THREE = NOTUSED,
-
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
-               /// First vector component
-               ONE = Z,
-               /// Second vector component
-               TWO = X,
-               /// Third vector component
-               THREE = Y,
-
-            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
-               /// First vector component
-               ONE = TOR,
-               /// Second vector component
-               TWO = POL,
-               /// Third vector component
-               THREE = NOTUSED,
-
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
-               /// First vector component
-               ONE = R,
-               /// Second vector component
-               TWO = THETA,
-               /// Third vector component
-               THREE = Z,
-
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
+            #if defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
                /// First vector component
                ONE = TOR,
                /// Second vector component
@@ -383,6 +343,38 @@ namespace GeoMHDiSCC {
                TWO = S,
                /// Third vector component
                THREE = T,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
+               /// First vector component
+               ONE = X,
+               /// Second vector component
+               TWO = Y,
+               /// Third vector component
+               THREE = Z,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+               /// First vector component
+               ONE = Z,
+               /// Second vector component
+               TWO = X,
+               /// Third vector component
+               THREE = Y,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
+               /// First vector component
+               ONE = R,
+               /// Second vector component
+               TWO = THETA,
+               /// Third vector component
+               THREE = Z,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
+               /// First vector component
+               ONE = R,
+               /// Second vector component
+               TWO = THETA,
+               /// Third vector component
+               THREE = Z,
 
             #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
                /// First vector component
@@ -415,7 +407,7 @@ namespace GeoMHDiSCC {
                TWO = THETA,
                /// Third vector component
                THREE = NOTUSED,
-            #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
          };
       };
    };

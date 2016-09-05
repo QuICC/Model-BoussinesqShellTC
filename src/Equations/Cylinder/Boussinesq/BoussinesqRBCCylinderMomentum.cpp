@@ -23,6 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/VelocityAdvection.hpp"
+#include "PhysicalOperators/Cross.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -41,44 +42,41 @@ namespace Equations {
 
    void BoussinesqRBCCylinderMomentum::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::R, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, 0, true, false);
 
-      this->defineCoupling(FieldComponents::Spectral::THETA, CouplingInformation::PROGNOSTIC, 0, true, false);
-
-      this->defineCoupling(FieldComponents::Spectral::Z, CouplingInformation::PROGNOSTIC, 0, true, false);
+      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
    void BoussinesqRBCCylinderMomentum::setNLComponents()
    {
-      this->addNLComponent(FieldComponents::Spectral::R, 0);
+      this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
-      this->addNLComponent(FieldComponents::Spectral::THETA, 0);
-
-      this->addNLComponent(FieldComponents::Spectral::Z, 0);
+      this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqRBCCylinderMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRBCCylinderMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       // Get Prandtl number
       MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
 
-      /// 
-      /// Computation of the advection:
-      ///   \f$ \left(\vec u\cdot\nabla\right)u_x\f$
       ///
-      FieldComponents::Spectral::Id specId = FieldComponents::Spectral::NOTUSED;
-      if(id == FieldComponents::Physical::R)
+      /// Compute \f$\left(\nabla\wedge\vec u\right)\wedge\vec u\f$
+      ///
+      switch(compId)
       {
-         specId = FieldComponents::Spectral::R;
-      } else if(id == FieldComponents::Physical::THETA)
-      {
-         specId = FieldComponents::Spectral::THETA;
-      } else if(id == FieldComponents::Physical::Z)
-      {
-         specId = FieldComponents::Spectral::Z;
+         case(FieldComponents::Physical::R):
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0/Pr);
+            break;
+         case(FieldComponents::Physical::THETA):
+            Physical::Cross<FieldComponents::Physical::Z,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0/Pr);
+            break;
+         case(FieldComponents::Physical::Z):
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0/Pr);
+            break;
+         default:
+            assert(false);
+            break;
       }
-
-      Physical::VelocityAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys(), this->unknown().dom(0).grad(specId), 1.0/Pr);
    }
 
    void BoussinesqRBCCylinderMomentum::setRequirements()

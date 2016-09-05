@@ -24,6 +24,9 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/3D/WFTScheme.hpp"
 
+// THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
+// GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
+
 namespace GeoMHDiSCC {
 
    /**
