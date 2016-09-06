@@ -18,6 +18,9 @@
 //
 #include "Exceptions/Exception.hpp"
 
+//#define GEOMHDISCC_WORLAND_NORM_UNITY
+#define GEOMHDISCC_WORLAND_NORM_NATURAL
+
 namespace GeoMHDiSCC {
 
 namespace Polynomial {
@@ -56,19 +59,19 @@ namespace Polynomial {
       internal::MHDFloat b = WorlandPolynomial::beta(l);
 
       ipoly.resize(gN, nPoly);
-      WorlandPolynomial::W0l(ipoly.col(0), l, a, b, igrid, &WorlandPolynomial::unitWP0ab);
+      WorlandPolynomial::W0l(ipoly.col(0), l, a, b, igrid, WorlandPolynomial::normWP0ab());
 
       // Make X grid in [-1, 1]
       internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
 
       if(nPoly > 1)
       {
-         ThreeTermRecurrence::P1(ipoly.col(1), a, b, ipoly.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipoly.col(1), a, b, ipoly.col(0), ixgrid, WorlandPolynomial::normWP1ab());
       }
 
       for(int i = 2; i < nPoly; ++i)
       {
-         ThreeTermRecurrence::Pn(ipoly.col(i), i, a, b, ipoly.col(i-1), ipoly.col(i-2), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipoly.col(i), i, a, b, ipoly.col(i-1), ipoly.col(i-2), ixgrid, WorlandPolynomial::normWPnab());
       }
 
       poly = Precision::cast(ipoly);
@@ -100,18 +103,18 @@ namespace Polynomial {
 
       if(nPoly > 1)
       {
-         WorlandPolynomial::W0l(idiff.col(1), 1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
+         WorlandPolynomial::W0l(idiff.col(1), 1, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
          idiff.col(1) *= MHD_MP(4.0);
       }
 
       if(nPoly > 2)
       {
-         ThreeTermRecurrence::P1(idiff.col(2), a1, b1, idiff.col(1), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idiff.col(2), a1, b1, idiff.col(1), ixgrid, WorlandPolynomial::normWDP1ab());
       }
 
       for(int i = 3; i < nPoly; ++i)
       {
-         ThreeTermRecurrence::Pn(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), ixgrid, WorlandPolynomial::normWDPnab());
       }
 
       diff = Precision::cast(idiff);
@@ -152,7 +155,7 @@ namespace Polynomial {
          idiff.resize(gN, nPoly);
 
          // Compute P_0
-         WorlandPolynomial::W0l(ipnab.col(0), l-1, a, b, igrid, &WorlandPolynomial::unitWP0ab);
+         WorlandPolynomial::W0l(ipnab.col(0), l-1, a, b, igrid, WorlandPolynomial::normWP0ab());
          ipnab.col(0) *= dl;
 
          // Compute DP_0
@@ -164,11 +167,10 @@ namespace Polynomial {
          if(nPoly > 1)
          {
             // Compute P_0
-            ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+            ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, WorlandPolynomial::normWP1ab());
 
             // Compute DP_1
-            WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-            idpnab.col(0) *= MHD_MP(4.0);
+            WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
 
             // Compute e P + 4r^2 DP
             idiff.col(1) = ipnab.col(1) + idpnab.col(0);
@@ -177,11 +179,11 @@ namespace Polynomial {
          if(nPoly > 2)
          {
             // Increment P_n
-            ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+            ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
             ipnab.col(0).swap(ipnab.col(1));
 
             // Compute DP_2
-            ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+            ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
 
             // Compute e P + 2(x+1) DP
             idiff.col(2) = ipnab.col(1) + idpnab.col(1);
@@ -190,11 +192,11 @@ namespace Polynomial {
          for(int i = 3; i < nPoly; ++i)
          {
             // Increment P_n
-            ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+            ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
             ipnab.col(0).swap(ipnab.col(1));
 
             // Increment DP_n
-            ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+            ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
             idpnab.col(0).swap(idpnab.col(1));
 
             // Compute e P + 2(x+1) DP
@@ -235,7 +237,7 @@ namespace Polynomial {
       idiff.resize(gN, nPoly);
 
       // Compute P_0
-      WorlandPolynomial::W0l(ipnab.col(0), l, a, b, igrid, &WorlandPolynomial::unitWP0ab);
+      WorlandPolynomial::W0l(ipnab.col(0), l, a, b, igrid, WorlandPolynomial::normWP0ab());
       ipnab.col(0) *= dl1;
 
       // Compute DP_0
@@ -247,11 +249,10 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute P_0
-         ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, WorlandPolynomial::normWP1ab());
 
          // Compute DP_1
-         WorlandPolynomial::W0l(idpnab.col(0), l+2, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(4.0);
+         WorlandPolynomial::W0l(idpnab.col(0), l+2, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
 
          // Compute e P + 4r^2 DP
          idiff.col(1) = ipnab.col(1) + idpnab.col(0);
@@ -260,11 +261,11 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment P_n
-         ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
          ipnab.col(0).swap(ipnab.col(1));
 
          // Compute DP_2
-         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = ipnab.col(1) + idpnab.col(1);
@@ -273,11 +274,11 @@ namespace Polynomial {
       for(int i = 3; i < nPoly; ++i)
       {
          // Increment P_n
-         ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
          ipnab.col(0).swap(ipnab.col(1));
 
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -322,7 +323,7 @@ namespace Polynomial {
       idiff.resize(gN, nPoly);
 
       // Compute P_0
-      WorlandPolynomial::W0l(ipnab.col(0), l-1, a, b, igrid, &WorlandPolynomial::unitWP0ab);
+      WorlandPolynomial::W0l(ipnab.col(0), l-1, a, b, igrid, WorlandPolynomial::normWP0ab());
       ipnab.col(0) *= dl1;
 
       // Compute DP_0
@@ -334,11 +335,10 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute P_0
-         ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, WorlandPolynomial::normWP1ab());
 
          // Compute DP_1
-         WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(4.0);
+         WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
 
          // Compute e P + 4r^2 DP
          idiff.col(1) = ipnab.col(1) + idpnab.col(0);
@@ -347,11 +347,11 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment P_n
-         ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
          ipnab.col(0).swap(ipnab.col(1));
 
          // Compute DP_2
-         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = ipnab.col(1) + idpnab.col(1);
@@ -360,11 +360,11 @@ namespace Polynomial {
       for(int i = 3; i < nPoly; ++i)
       {
          // Increment P_n
-         ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
          ipnab.col(0).swap(ipnab.col(1));
 
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -414,8 +414,8 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute DP_1
-         WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(4.0)*(MHD_MP(2.0)*dl + MHD_MP(3.0)); 
+         WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
+         idpnab.col(0) *= (MHD_MP(2.0)*dl + MHD_MP(3.0)); 
 
          // Compute spherical laplacian P_1
          idiff.col(1) = idpnab.col(0);
@@ -424,11 +424,10 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
 
          // Compute D2P_2
-         WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
-         id2pnab.col(0) *= MHD_MP(16.0); 
+         WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, WorlandPolynomial::normWD2P0ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = id2pnab.col(0) + idpnab.col(1);
@@ -437,11 +436,11 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2P1ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
@@ -450,11 +449,11 @@ namespace Polynomial {
       for(int i = 4; i < nPoly; ++i)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2Pnab());
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -504,8 +503,8 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute DP_1
-         WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(8.0)*(dl + MHD_MP(1.0)); 
+         WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
+         idpnab.col(0) *= MHD_MP(2.0)*(dl + MHD_MP(1.0)); 
 
          // Compute spherical laplacian P_1
          idiff.col(1) = idpnab.col(0);
@@ -514,11 +513,10 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
 
          // Compute D2P_2
-         WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
-         id2pnab.col(0) *= MHD_MP(16.0); 
+         WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, WorlandPolynomial::normWD2P0ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = id2pnab.col(0) + idpnab.col(1);
@@ -527,11 +525,11 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2P1ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
@@ -540,11 +538,11 @@ namespace Polynomial {
       for(int i = 4; i < nPoly; ++i)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2Pnab());
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -594,8 +592,8 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute DP_1
-         WorlandPolynomial::W0l(idpnab.col(0), l-1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(8.0)*(dl + MHD_MP(1.0)); 
+         WorlandPolynomial::W0l(idpnab.col(0), l-1, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
+         idpnab.col(0) *= MHD_MP(2.0)*(dl + MHD_MP(1.0)); 
 
          // Compute spherical laplacian P_1
          idiff.col(1) = idpnab.col(0);
@@ -604,11 +602,10 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
 
          // Compute D2P_2
-         WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
-         id2pnab.col(0) *= MHD_MP(16.0); 
+         WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, WorlandPolynomial::normWD2P0ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = id2pnab.col(0) + idpnab.col(1);
@@ -617,11 +614,11 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2P1ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
@@ -630,11 +627,11 @@ namespace Polynomial {
       for(int i = 4; i < nPoly; ++i)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2Pnab());
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -687,8 +684,8 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute DP_1
-         WorlandPolynomial::W0l(idpnab.col(0), l-1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
-         idpnab.col(0) *= MHD_MP(8.0)*dl*(dl + MHD_MP(1.0)); 
+         WorlandPolynomial::W0l(idpnab.col(0), l-1, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
+         idpnab.col(0) *= MHD_MP(2.0)*dl*(dl + MHD_MP(1.0)); 
 
          // Compute spherical laplacian P_1
          idiff.col(1) = idpnab.col(0);
@@ -697,11 +694,11 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
 
          // Compute D2P_2
-         WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
-         id2pnab.col(0) *= MHD_MP(16.0)*(MHD_MP(3.0)*dl + MHD_MP(4.0)); 
+         WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, WorlandPolynomial::normWD2P0ab());
+         id2pnab.col(0) *= (MHD_MP(3.0)*dl + MHD_MP(4.0)); 
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = id2pnab.col(0) + idpnab.col(1);
@@ -710,15 +707,14 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2P1ab());
 
          // Compute D3P_2
-         WorlandPolynomial::W0l(id3pnab.col(0), l+3, a3, b3, igrid, &WorlandPolynomial::unitWD3P0ab);
-         id2pnab.col(0) *= MHD_MP(64.0); 
+         WorlandPolynomial::W0l(id3pnab.col(0), l+3, a3, b3, igrid, WorlandPolynomial::normWD3P0ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(3) = id2pnab.col(0) + id2pnab.col(1) + idpnab.col(1);
@@ -727,15 +723,15 @@ namespace Polynomial {
       if(nPoly > 4)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), 3, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 3, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         ThreeTermRecurrence::Pn(id2pnab.col(0), 2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), 2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2Pnab());
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute D3P_2
-         ThreeTermRecurrence::P1(id3pnab.col(1), a3, b3, id3pnab.col(0), ixgrid, &WorlandPolynomial::unitWD3P1ab);
+         ThreeTermRecurrence::P1(id3pnab.col(1), a3, b3, id3pnab.col(0), ixgrid, WorlandPolynomial::normWD3P1ab());
 
          // Compute e P + 2(x+1) DP
          idiff.col(4) = id3pnab.col(1) + id2pnab.col(1) + idpnab.col(1);
@@ -744,15 +740,15 @@ namespace Polynomial {
       for(int i = 5; i < nPoly; ++i)
       {
          // Increment DP_n
-         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2Pnab());
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Increment D3P_n
-         ThreeTermRecurrence::Pn(id3pnab.col(0), i-3, a3, b3, id3pnab.col(1), id3pnab.col(0), ixgrid, &WorlandPolynomial::unitWD3Pnab);
+         ThreeTermRecurrence::Pn(id3pnab.col(0), i-3, a3, b3, id3pnab.col(1), id3pnab.col(0), ixgrid, WorlandPolynomial::normWD3Pnab());
          id3pnab.col(0).swap(id3pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -783,19 +779,19 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      WorlandPolynomial::W0l(ipoly.col(0), l-1, WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), igrid, &WorlandPolynomial::unitWP0ab);
+      WorlandPolynomial::W0l(ipoly.col(0), l-1, WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), igrid, WorlandPolynomial::normWP0ab());
 
       // Make X grid in [-1, 1]
       internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
 
       if(nPoly > 1)
       {
-         ThreeTermRecurrence::P1(ipoly.col(1), WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipoly.col(1), WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(0), ixgrid, WorlandPolynomial::normWP1ab());
       }
 
       for(int i = 2; i < nPoly; ++i)
       {
-         ThreeTermRecurrence::Pn(ipoly.col(i), i, WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(i-1), ipoly.col(i-2), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipoly.col(i), i, WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(i-1), ipoly.col(i-2), ixgrid, WorlandPolynomial::normWPnab());
       }
 
       poly = Precision::cast(ipoly);
@@ -814,6 +810,117 @@ namespace Polynomial {
       }
 
       iw0l.array() *= cs(0);
+   }
+
+   //
+   // General polynomial normalizer
+   //
+   ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWPnab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWPnab;
+      #else 
+         return &WorlandPolynomial::naturalWPnab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWP1ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWP1ab;
+      #else 
+         return &WorlandPolynomial::naturalWP1ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWP0ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWP0ab;
+      #else 
+         return &WorlandPolynomial::naturalWP0ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWDPnab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWDPnab;
+      #else 
+         return &WorlandPolynomial::naturalWDPnab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWDP1ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWDP1ab;
+      #else 
+         return &WorlandPolynomial::naturalWDP1ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWDP0ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWDP0ab;
+      #else 
+         return &WorlandPolynomial::naturalWDP0ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWD2Pnab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWD2Pnab;
+      #else 
+         return &WorlandPolynomial::naturalWD2Pnab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD2P1ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWD2P1ab;
+      #else 
+         return &WorlandPolynomial::naturalWD2P1ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD2P0ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWD2P0ab;
+      #else 
+         return &WorlandPolynomial::naturalWD2P0ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWD3Pnab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWD3Pnab;
+      #else 
+         return &WorlandPolynomial::naturalWD3Pnab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD3P1ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWD3P1ab;
+      #else 
+         return &WorlandPolynomial::naturalWD3P1ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+   }
+
+   ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD3P0ab()
+   {
+      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+         return &WorlandPolynomial::unitWD3P0ab;
+      #else 
+         return &WorlandPolynomial::naturalWD3P0ab;
+      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
    }
 
    //
@@ -1012,6 +1119,170 @@ namespace Polynomial {
       cs(0) = MHD_MP(0.125)*precision::exp(precisiontr1::lgamma(a + b + MHD_MP(1.0)) - precisiontr1::lgamma(a + b - MHD_MP(2.0)));
 
       cs(0) *= precision::sqrt(a + b + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b - MHD_MP(2.0)) + precisiontr1::lgamma(MHD_MP(4.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   //
+   // Natural polynomial normalizer
+   //
+   internal::Array WorlandPolynomial::naturalWPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(4);
+
+      cs(0) = -((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n*(n + a + b));
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0);
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(3);
+
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
+      cs(2) = MHD_MP(0.5);
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(1);
+
+      cs(0) = MHD_MP(1.0);
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   //
+   // Natural first derivative normalizer
+   //
+   internal::Array WorlandPolynomial::naturalWDPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(4);
+
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(1.0));
+
+      assert(!std::isnan(cs.sum()));
+      
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWDP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(3);
+
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b));
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWDP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(1);
+
+      cs(0) = MHD_MP(2.0)*(a + b);
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   //
+   // Natural second derivative normalizer
+   //
+   internal::Array WorlandPolynomial::naturalWD2Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(4);
+
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(2.0));
+
+      assert(!std::isnan(cs.sum()));
+      
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(3);
+
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(1.0)));
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(1);
+
+      cs(0) = MHD_MP(4.0)*(a + b)*(a + b - MHD_MP(1.0));
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   //
+   // Natural third derivative normalizer
+   //
+   internal::Array WorlandPolynomial::naturalWD3Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(4);
+
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(4.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(3.0));
+
+      assert(!std::isnan(cs.sum()));
+      
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(3);
+
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(2.0)));
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   internal::Array WorlandPolynomial::naturalWD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(1);
+
+      cs(0) = MHD_MP(8.0)*(a + b)*(a + b - MHD_MP(1.0))*(a + b - MHD_MP(2.0));
 
       assert(!std::isnan(cs.sum()));
 

@@ -38,16 +38,16 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      ThreeTermRecurrence::P0(ipoly.col(0), alpha, beta, igrid, &JacobiPolynomial::naturalP0ab);
+      ThreeTermRecurrence::P0(ipoly.col(0), alpha, beta, igrid, JacobiPolynomial::normP0ab());
 
       if(nPoly > 1)
       {
-         ThreeTermRecurrence::P1(ipoly.col(1), alpha, beta, ipoly.col(0), igrid, &JacobiPolynomial::naturalP1ab);
+         ThreeTermRecurrence::P1(ipoly.col(1), alpha, beta, ipoly.col(0), igrid, JacobiPolynomial::normP1ab());
       }
 
       for(int i = 2; i < nPoly; ++i)
       {
-         ThreeTermRecurrence::Pn(ipoly.col(i), i, alpha, beta, ipoly.col(i-1), ipoly.col(i-2), igrid, &JacobiPolynomial::naturalPnab);
+         ThreeTermRecurrence::Pn(ipoly.col(i), i, alpha, beta, ipoly.col(i-1), ipoly.col(i-2), igrid, JacobiPolynomial::normPnab());
       }
 
       poly = Precision::cast(ipoly);
@@ -76,17 +76,17 @@ namespace Polynomial {
 
       if(nPoly > 1)
       {
-         ThreeTermRecurrence::P0(idiff.col(1), a1, b1, igrid, &JacobiPolynomial::naturalDP0ab);
+         ThreeTermRecurrence::P0(idiff.col(1), a1, b1, igrid, JacobiPolynomial::normDP0ab());
       }
 
       if(nPoly > 2)
       {
-         ThreeTermRecurrence::P1(idiff.col(2), a1, b1, idiff.col(1), igrid, &JacobiPolynomial::naturalDP1ab);
+         ThreeTermRecurrence::P1(idiff.col(2), a1, b1, idiff.col(1), igrid, JacobiPolynomial::normDP1ab());
       }
 
       for(int i = 3; i < nPoly; ++i)
       {
-         ThreeTermRecurrence::Pn(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), igrid, &JacobiPolynomial::naturalDPnab);
+         ThreeTermRecurrence::Pn(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), igrid, JacobiPolynomial::normDPnab());
       }
 
       diff = Precision::cast(idiff);
@@ -120,17 +120,17 @@ namespace Polynomial {
 
       if(nPoly > 2)
       {
-         ThreeTermRecurrence::P0(idiff.col(2), a2, b2, igrid, &JacobiPolynomial::naturalD2P0ab);
+         ThreeTermRecurrence::P0(idiff.col(2), a2, b2, igrid, JacobiPolynomial::normD2P0ab());
       }
 
       if(nPoly > 3)
       {
-         ThreeTermRecurrence::P1(idiff.col(3), a2, b2, idiff.col(2), igrid, &JacobiPolynomial::naturalD2P1ab);
+         ThreeTermRecurrence::P1(idiff.col(3), a2, b2, idiff.col(2), igrid, JacobiPolynomial::normD2P1ab());
       }
 
       for(int i = 4; i < nPoly; ++i)
       {
-         ThreeTermRecurrence::Pn(idiff.col(i), i-2, a2, b2, idiff.col(i-1), idiff.col(i-2), igrid, &JacobiPolynomial::naturalD2Pnab);
+         ThreeTermRecurrence::Pn(idiff.col(i), i-2, a2, b2, idiff.col(i-1), idiff.col(i-2), igrid, JacobiPolynomial::normD2Pnab());
       }
 
       diff = Precision::cast(idiff);
@@ -169,20 +169,83 @@ namespace Polynomial {
 
       if(nPoly > 3)
       {
-         ThreeTermRecurrence::P0(idiff.col(3), a3, b3, igrid, &JacobiPolynomial::naturalD3P0ab);
+         ThreeTermRecurrence::P0(idiff.col(3), a3, b3, igrid, JacobiPolynomial::normD3P0ab());
       }
 
       if(nPoly > 4)
       {
-         ThreeTermRecurrence::P1(idiff.col(4), a3, b3, idiff.col(2), igrid, &JacobiPolynomial::naturalD3P1ab);
+         ThreeTermRecurrence::P1(idiff.col(4), a3, b3, idiff.col(3), igrid, JacobiPolynomial::normD3P1ab());
       }
 
       for(int i = 5; i < nPoly; ++i)
       {
-         ThreeTermRecurrence::Pn(idiff.col(i), i-3, a3, b3, idiff.col(i-1), idiff.col(i-2), igrid, &JacobiPolynomial::naturalD3Pnab);
+         ThreeTermRecurrence::Pn(idiff.col(i), i-3, a3, b3, idiff.col(i-1), idiff.col(i-2), igrid, JacobiPolynomial::normD3Pnab());
       }
 
       diff = Precision::cast(idiff);
+   }
+
+   //
+   // General polynomial normalizer
+   //
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normPnab()
+   {
+      return &JacobiPolynomial::naturalPnab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normP1ab()
+   {
+      return &JacobiPolynomial::naturalP1ab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normP0ab()
+   {
+      return &JacobiPolynomial::naturalP0ab;
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normDPnab()
+   {
+      return &JacobiPolynomial::naturalDPnab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normDP1ab()
+   {
+      return &JacobiPolynomial::naturalDP1ab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normDP0ab()
+   {
+      return &JacobiPolynomial::naturalDP0ab;
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normD2Pnab()
+   {
+      return &JacobiPolynomial::naturalD2Pnab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD2P1ab()
+   {
+      return &JacobiPolynomial::naturalD2P1ab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD2P0ab()
+   {
+      return &JacobiPolynomial::naturalD2P0ab;
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normD3Pnab()
+   {
+      return &JacobiPolynomial::naturalD3Pnab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD3P1ab()
+   {
+      return &JacobiPolynomial::naturalD3P1ab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD3P0ab()
+   {
+      return &JacobiPolynomial::naturalD3P0ab;
    }
 
    //
@@ -249,7 +312,7 @@ namespace Polynomial {
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
-      cs(2) = (a + b + MHD_MP(1.0))/(a + b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b));
 
       assert(!std::isnan(cs.sum()));
 
@@ -290,7 +353,7 @@ namespace Polynomial {
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
-      cs(2) = (a + b + MHD_MP(1.0))/(a + b - MHD_MP(1.0));
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(1.0)));
 
       assert(!std::isnan(cs.sum()));
 
@@ -331,7 +394,7 @@ namespace Polynomial {
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
-      cs(2) = (a + b + MHD_MP(1.0))/(a + b - MHD_MP(2.0));
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(2.0)));
 
       assert(!std::isnan(cs.sum()));
 

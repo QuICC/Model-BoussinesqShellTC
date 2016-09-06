@@ -111,6 +111,19 @@ namespace Polynomial {
           */
          static void dWn0(Matrix& diff, internal::Matrix& idiff, const internal::Array& igrid);
 
+         static ThreeTermRecurrence::NormalizerNAB normWPnab();
+         static ThreeTermRecurrence::NormalizerAB normWP1ab();
+         static ThreeTermRecurrence::NormalizerAB normWP0ab();
+         static ThreeTermRecurrence::NormalizerNAB normWDPnab();
+         static ThreeTermRecurrence::NormalizerAB normWDP1ab();
+         static ThreeTermRecurrence::NormalizerAB normWDP0ab();
+         static ThreeTermRecurrence::NormalizerNAB normWD2Pnab();
+         static ThreeTermRecurrence::NormalizerAB normWD2P1ab();
+         static ThreeTermRecurrence::NormalizerAB normWD2P0ab();
+         static ThreeTermRecurrence::NormalizerNAB normWD3Pnab();
+         static ThreeTermRecurrence::NormalizerAB normWD3P1ab();
+         static ThreeTermRecurrence::NormalizerAB normWD3P0ab();
+
          /**
           * @brief Polynomial normalizer for unit Worland normalization
           */
@@ -170,6 +183,67 @@ namespace Polynomial {
           * @brief Third derivative n=1 normalizer for unit Worland normalization
           */
          static internal::Array unitWD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Polynomial normalizer for natural normalization
+          */
+         static internal::Array naturalWPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Polynomial n=0 normalizer for natural normalization
+          */
+         static internal::Array naturalWP0ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Polynomial n=1 normalizer for natural normalization
+          */
+         static internal::Array naturalWP1ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief First derivative normalizer for natural normalization
+          */
+         static internal::Array naturalWDPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief First derivative n=0 normalizer for natural normalization
+          */
+         static internal::Array naturalWDP0ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief First derivative n=1 normalizer for natural normalization
+          */
+         static internal::Array naturalWDP1ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Second derivative normalizer for natural normalization
+          */
+         static internal::Array naturalWD2Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Second derivative n=0 normalizer for natural normalization
+          */
+         static internal::Array naturalWD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Second derivative n=1 normalizer for natural normalization
+          */
+         static internal::Array naturalWD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Third derivative normalizer for natural normalization
+          */
+         static internal::Array naturalWD3Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Third derivative n=0 normalizer for natural normalization
+          */
+         static internal::Array naturalWD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
+         /**
+          * @brief Third derivative n=1 normalizer for natural normalization
+          */
+         static internal::Array naturalWD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b);
+
 
       private:
          /**

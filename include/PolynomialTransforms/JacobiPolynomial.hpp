@@ -61,6 +61,18 @@ namespace Polynomial {
           * Internal computation can be done in multiple precision
           */
          static void d3Pnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid);
+         static ThreeTermRecurrence::NormalizerNAB normPnab();
+         static ThreeTermRecurrence::NormalizerAB normP1ab();
+         static ThreeTermRecurrence::NormalizerAB normP0ab();
+         static ThreeTermRecurrence::NormalizerNAB normDPnab();
+         static ThreeTermRecurrence::NormalizerAB normDP1ab();
+         static ThreeTermRecurrence::NormalizerAB normDP0ab();
+         static ThreeTermRecurrence::NormalizerNAB normD2Pnab();
+         static ThreeTermRecurrence::NormalizerAB normD2P1ab();
+         static ThreeTermRecurrence::NormalizerAB normD2P0ab();
+         static ThreeTermRecurrence::NormalizerNAB normD3Pnab();
+         static ThreeTermRecurrence::NormalizerAB normD3P1ab();
+         static ThreeTermRecurrence::NormalizerAB normD3P0ab();
 
          /**
           * @brief Polynomial normalizer for natural normalization
