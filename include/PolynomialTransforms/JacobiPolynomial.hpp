@@ -56,64 +56,71 @@ namespace Polynomial {
          static void d2Pnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid);
 
          /**
+          * @brief Compute \f$\frac{d^3}{dx^3}P_n^{(\alpha,\beta)} (x)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void d3Pnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid);
+
+         /**
           * @brief Polynomial normalizer for natural normalization
           */
-         static internal::Array naturalPnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Polynomial n=0 normalizer for natural normalization
           */
-         static internal::Array naturalP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalP0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Polynomial n=1 normalizer for natural normalization
           */
-         static internal::Array naturalP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalP1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief First derivative normalizer for natural normalization
           */
-         static internal::Array naturalDPnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalDPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief First derivative n=0 normalizer for natural normalization
           */
-         static internal::Array naturalDP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalDP0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief First derivative n=1 normalizer for natural normalization
           */
-         static internal::Array naturalDP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalDP1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Second derivative normalizer for natural normalization
           */
-         static internal::Array naturalD2Pnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD2Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Second derivative n=0 normalizer for natural normalization
           */
-         static internal::Array naturalD2P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Second derivative n=1 normalizer for natural normalization
           */
-         static internal::Array naturalD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Third derivative normalizer for natural normalization
           */
-         static internal::Array naturalD3Pnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD3Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Third derivative n=0 normalizer for natural normalization
           */
-         static internal::Array naturalD3P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Third derivative n=1 normalizer for natural normalization
           */
-         static internal::Array naturalD3P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
       private:
          /**

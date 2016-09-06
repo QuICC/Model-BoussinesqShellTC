@@ -820,43 +820,50 @@ namespace Polynomial {
    // Unit Worland polynomial normalizers
    //
 
-   internal::Array WorlandPolynomial::unitWPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(4);
 
-      cs(0) = -((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta));
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(0) = -((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n*(n + a + b));
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0);
 
-      if(dn == MHD_MP(2.0))
+      if(n == MHD_MP(2.0))
       {
-         cs(0) *= precision::sqrt((2.0*dn+alpha+beta+MHD_MP(1.0)))*precision::sqrt(((dn + alpha + beta)*dn*(dn - MHD_MP(1.0)))/((dn + alpha)*(dn + beta)*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
+         cs(0) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0)))*precision::sqrt(((n + a + b)*n*(n - MHD_MP(1.0)))/((n + a)*(n + b)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))));
       } else
       {
-         cs(0) *= precision::sqrt((2.0*dn+alpha+beta+MHD_MP(1.0))/(2.0*dn+alpha+beta-MHD_MP(3.0)))*precision::sqrt(((dn + alpha + beta)*dn*(dn + alpha + beta - MHD_MP(1.0))*(dn - MHD_MP(1.0)))/((dn + alpha)*(dn + beta)*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
+         cs(0) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0))/(2.0*n+a+b-MHD_MP(3.0)))*precision::sqrt(((n + a + b)*n*(n + a + b - MHD_MP(1.0))*(n - MHD_MP(1.0)))/((n + a)*(n + b)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))));
       }
-      cs(1) *= precision::sqrt((2.0*dn+alpha+beta+MHD_MP(1.0))/(2.0*dn+alpha+beta-MHD_MP(1.0)))*precision::sqrt(((dn + alpha + beta)*dn)/((dn + alpha)*(dn + beta)));
-      cs(2) *= precision::sqrt((2.0*dn+alpha+beta+MHD_MP(1.0))/(2.0*dn+alpha+beta-MHD_MP(1.0)))*precision::sqrt(((dn + alpha + beta)*dn)/((dn + alpha)*(dn + beta)));
+      cs(1) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0))/(2.0*n+a+b-MHD_MP(1.0)))*precision::sqrt(((n + a + b)*n)/((n + a)*(n + b)));
+      cs(2) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0))/(2.0*n+a+b-MHD_MP(1.0)))*precision::sqrt(((n + a + b)*n)/((n + a)*(n + b)));
+
+      assert(!std::isnan(cs.sum()));
+
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta);
-      cs(1) = (alpha - beta);
-      cs(2) = precision::sqrt((alpha + beta + MHD_MP(3.0))/(MHD_MP(4.0)*(alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))));
+      cs(0) = (MHD_MP(2.0) + a + b);
+      cs(1) = (a - b);
+      cs(2) = precision::sqrt((a + b + MHD_MP(3.0))/(MHD_MP(4.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(1);
 
-      cs(0) = precision::sqrt(MHD_MP(2.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta + MHD_MP(2.0)) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
+      cs(0) = precision::sqrt(MHD_MP(2.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b + MHD_MP(2.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
@@ -864,43 +871,49 @@ namespace Polynomial {
    //
    // Unit Worland first derivative normalizers
    //
-   internal::Array WorlandPolynomial::unitWDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWDPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(4);
 
-      cs(0) = -((alpha + beta + dn - MHD_MP(1.0))/(alpha + beta + dn - MHD_MP(2.0)))*((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0)/(alpha + beta + dn - MHD_MP(1.0));
+      cs(0) = -((a + b + n - MHD_MP(1.0))/(a + b + n - MHD_MP(2.0)))*((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(a + b + n - MHD_MP(1.0));
 
-      cs(0) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(3.0)))*precision::sqrt(dn*(dn + alpha + beta - MHD_MP(2.0))/((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
-      cs(1) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
-      cs(2) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
-      cs(3) *= precision::sqrt((dn + MHD_MP(1.0))*(dn + alpha + beta - MHD_MP(1.0))/((dn + alpha)*(dn + beta)));
+      cs(0) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(3.0)))*precision::sqrt(n*(n + a + b - MHD_MP(2.0))/((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))));
+      cs(1) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(1.0)));
+      cs(2) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(1.0)));
+      cs(3) *= precision::sqrt((n + MHD_MP(1.0))*(n + a + b - MHD_MP(1.0))/((n + a)*(n + b)));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWDP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWDP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta)/MHD_MP(2.0);
-      cs(1) = (alpha - beta)/MHD_MP(2.0);
-      cs(2) = (alpha + beta + MHD_MP(1.0))/(alpha + beta);
+      cs(0) = (MHD_MP(2.0) + a + b)/MHD_MP(2.0);
+      cs(1) = (a - b)/MHD_MP(2.0);
+      cs(2) = (a + b + MHD_MP(1.0))/(a + b);
 
-      cs(2) *= precision::sqrt((alpha + beta + MHD_MP(3.0))/(alpha + beta + MHD_MP(1.0)))*precision::sqrt(MHD_MP(2.0)*(alpha+beta)/((alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))));
+      cs(2) *= precision::sqrt((a + b + MHD_MP(3.0))/(a + b + MHD_MP(1.0)))*precision::sqrt(MHD_MP(2.0)*(a+b)/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWDP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWDP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(0.5)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta));
+      cs(0) = MHD_MP(0.5)*precision::exp(precisiontr1::lgamma(a + b + MHD_MP(1.0)) - precisiontr1::lgamma(a + b));
 
-      cs(0) *= precision::sqrt(alpha + beta + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
+      cs(0) *= precision::sqrt(a + b + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
@@ -908,42 +921,49 @@ namespace Polynomial {
    //
    // Unit Worland second derivative normalizers
    //
-   internal::Array WorlandPolynomial::unitWD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWD2Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(4);
 
-      cs(0) = -((dn + alpha + beta - MHD_MP(1.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/((dn + alpha + beta - MHD_MP(3.0))*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0)/(dn + alpha + beta - MHD_MP(2.0));
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/((n + a + b - MHD_MP(3.0))*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(2.0));
 
-      cs(0) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))*(dn + alpha + beta - MHD_MP(3.0))*(dn + MHD_MP(1.0))/((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(3.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
-      cs(1) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
-      cs(2) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
-      cs(3) *= precision::sqrt((dn + alpha + beta - MHD_MP(2.0))*(dn + MHD_MP(2.0))/((dn + alpha)*(dn + beta)));
+      cs(0) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))*(n + a + b - MHD_MP(3.0))*(n + MHD_MP(1.0))/((MHD_MP(2.0)*n + a + b - MHD_MP(3.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))));
+      cs(1) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(1.0)));
+      cs(2) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(1.0)));
+      cs(3) *= precision::sqrt((n + a + b - MHD_MP(2.0))*(n + MHD_MP(2.0))/((n + a)*(n + b)));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta);
-      cs(1) = (alpha - beta);
-      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta - MHD_MP(1.0)));
+      cs(0) = (MHD_MP(2.0) + a + b);
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(1.0)));
 
-      cs(2) *= precision::sqrt((alpha + beta + MHD_MP(3.0))*(alpha + beta - MHD_MP(1.0))*(MHD_MP(3.0))/((alpha + beta + MHD_MP(1.0))*(alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))));
+      cs(2) *= precision::sqrt((a + b + MHD_MP(3.0))*(a + b - MHD_MP(1.0))*(MHD_MP(3.0))/((a + b + MHD_MP(1.0))*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
+
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWD2P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(0.25)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD_MP(1.0)));
+      cs(0) = MHD_MP(0.25)*precision::exp(precisiontr1::lgamma(a + b + MHD_MP(1.0)) - precisiontr1::lgamma(a + b - MHD_MP(1.0)));
 
-      cs(0) *= precision::sqrt(alpha + beta + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta - MHD_MP(1.0)) + precisiontr1::lgamma(MHD_MP(3.0)) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
+      cs(0) *= precision::sqrt(a + b + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b - MHD_MP(1.0)) + precisiontr1::lgamma(MHD_MP(3.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
@@ -951,42 +971,49 @@ namespace Polynomial {
    //
    // Unit Worland third derivative normalizers
    //
-   internal::Array WorlandPolynomial::unitWD3Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWD3Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(4);
 
-      cs(0) = -((dn + alpha + beta - MHD_MP(1.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/((dn + alpha + beta - MHD_MP(4.0))*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0)/(dn + alpha + beta - MHD_MP(3.0));
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/((n + a + b - MHD_MP(4.0))*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(3.0));
 
-      cs(0) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))*(dn + alpha + beta - MHD_MP(3.0))*(dn + MHD_MP(1.0))/((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(3.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
-      cs(1) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
-      cs(2) *= precision::sqrt((MHD_MP(2.0)*dn + alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0)));
-      cs(3) *= precision::sqrt((dn + alpha + beta - MHD_MP(2.0))*(dn + MHD_MP(2.0))/((dn + alpha)*(dn + beta)));
+      cs(0) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))*(n + a + b - MHD_MP(3.0))*(n + MHD_MP(1.0))/((MHD_MP(2.0)*n + a + b - MHD_MP(3.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))));
+      cs(1) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(1.0)));
+      cs(2) *= precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(1.0)));
+      cs(3) *= precision::sqrt((n + a + b - MHD_MP(2.0))*(n + MHD_MP(2.0))/((n + a)*(n + b)));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWD3P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta);
-      cs(1) = (alpha - beta);
-      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta - MHD_MP(2.0)));
+      cs(0) = (MHD_MP(2.0) + a + b);
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(2.0)));
 
-      cs(2) *= precision::sqrt((alpha + beta + MHD_MP(3.0))*(alpha + beta - MHD_MP(2.0))*(MHD_MP(4.0))/((alpha + beta + MHD_MP(1.0))*(alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))));
+      cs(2) *= precision::sqrt((a + b + MHD_MP(3.0))*(a + b - MHD_MP(2.0))*(MHD_MP(4.0))/((a + b + MHD_MP(1.0))*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
+
       return cs;
    }
 
-   internal::Array WorlandPolynomial::unitWD3P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array WorlandPolynomial::unitWD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(0.125)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD_MP(2.0)));
+      cs(0) = MHD_MP(0.125)*precision::exp(precisiontr1::lgamma(a + b + MHD_MP(1.0)) - precisiontr1::lgamma(a + b - MHD_MP(2.0)));
 
-      cs(0) *= precision::sqrt(alpha + beta + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta - MHD_MP(2.0)) + precisiontr1::lgamma(MHD_MP(4.0)) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
+      cs(0) *= precision::sqrt(a + b + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b - MHD_MP(2.0)) + precisiontr1::lgamma(MHD_MP(4.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }

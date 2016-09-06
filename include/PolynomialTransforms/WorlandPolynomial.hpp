@@ -42,6 +42,13 @@ namespace Polynomial {
          static void Wnl(Matrix& poly, internal::Matrix& ipoly, const int l, const internal::Array& igrid);
 
          /**
+          * @brief Compute \f$\frac{W_n^l (r)}{r}\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void r_1Wnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
+
+         /**
           * @brief Compute \f$\frac{d}{dr} W_n^l (r)\f$
           *
           * Internal computation can be done in multiple precision
@@ -61,20 +68,6 @@ namespace Polynomial {
           * Internal computation can be done in multiple precision
           */
          static void r_1drWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid);
-
-         /**
-          * @brief Compute \f$\frac{d}{dr} W_n^0 (r)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void dWn0(Matrix& diff, internal::Matrix& idiff, const internal::Array& igrid);
-
-         /**
-          * @brief Compute \f$\frac{W_n^l (r)}{r}\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void r_1Wnl(Matrix& poly, internal::Matrix& iwnl, const int l, const internal::Array& igrid);
 
          /**
           * @brief Compute spherical \f$\nabla^2 W_n^l (r)\f$
@@ -112,64 +105,71 @@ namespace Polynomial {
          static void W0l(Eigen::Ref<internal::Matrix> iw0ab, const int l, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, ThreeTermRecurrence::NormalizerAB norm);
 
          /**
+          * @brief Compute \f$\frac{d}{dr} W_n^0 (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dWn0(Matrix& diff, internal::Matrix& idiff, const internal::Array& igrid);
+
+         /**
           * @brief Polynomial normalizer for unit Worland normalization
           */
-         static internal::Array unitWPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWPnab(const internal::MHDFloat dn, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Polynomial n=0 normalizer for unit Worland normalization
           */
-         static internal::Array unitWP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWP0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Polynomial n=1 normalizer for unit Worland normalization
           */
-         static internal::Array unitWP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWP1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief First derivative normalizer for unit Worland normalization
           */
-         static internal::Array unitWDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWDPnab(const internal::MHDFloat dn, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief First derivative n=0 normalizer for unit Worland normalization
           */
-         static internal::Array unitWDP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWDP0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief First derivative n=1 normalizer for unit Worland normalization
           */
-         static internal::Array unitWDP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWDP1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Second derivative normalizer for unit Worland normalization
           */
-         static internal::Array unitWD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Second derivative n=0 normalizer for unit Worland normalization
           */
-         static internal::Array unitWD2P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Second derivative n=1 normalizer for unit Worland normalization
           */
-         static internal::Array unitWD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Third derivative normalizer for unit Worland normalization
           */
-         static internal::Array unitWD3Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWD3Pnab(const internal::MHDFloat dn, const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Third derivative n=0 normalizer for unit Worland normalization
           */
-         static internal::Array unitWD3P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
          /**
           * @brief Third derivative n=1 normalizer for unit Worland normalization
           */
-         static internal::Array unitWD3P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array unitWD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b);
 
       private:
          /**
