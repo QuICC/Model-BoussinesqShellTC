@@ -63,12 +63,12 @@ namespace Polynomial {
 
       if(nPoly > 1)
       {
-         JacobiPolynomial::P1ab(ipoly.col(1), a, b, ipoly.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipoly.col(1), a, b, ipoly.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
       }
 
       for(int i = 2; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(ipoly.col(i), i, a, b, ipoly.col(i-1), ipoly.col(i-2), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipoly.col(i), i, a, b, ipoly.col(i-1), ipoly.col(i-2), ixgrid, &WorlandPolynomial::unitWPnab);
       }
 
       poly = Precision::cast(ipoly);
@@ -106,12 +106,12 @@ namespace Polynomial {
 
       if(nPoly > 2)
       {
-         JacobiPolynomial::P1ab(idiff.col(2), a1, b1, idiff.col(1), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idiff.col(2), a1, b1, idiff.col(1), ixgrid, &WorlandPolynomial::unitWDP1ab);
       }
 
       for(int i = 3; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), ixgrid, &WorlandPolynomial::unitWDPnab);
       }
 
       diff = Precision::cast(idiff);
@@ -164,7 +164,7 @@ namespace Polynomial {
          if(nPoly > 1)
          {
             // Compute P_0
-            JacobiPolynomial::P1ab(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+            ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
 
             // Compute DP_1
             WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
@@ -177,11 +177,11 @@ namespace Polynomial {
          if(nPoly > 2)
          {
             // Increment P_n
-            JacobiPolynomial::Pnab(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+            ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
             ipnab.col(0).swap(ipnab.col(1));
 
             // Compute DP_2
-            JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+            ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
             // Compute e P + 2(x+1) DP
             idiff.col(2) = ipnab.col(1) + idpnab.col(1);
@@ -190,11 +190,11 @@ namespace Polynomial {
          for(int i = 3; i < nPoly; ++i)
          {
             // Increment P_n
-            JacobiPolynomial::Pnab(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+            ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
             ipnab.col(0).swap(ipnab.col(1));
 
             // Increment DP_n
-            JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+            ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
             idpnab.col(0).swap(idpnab.col(1));
 
             // Compute e P + 2(x+1) DP
@@ -247,7 +247,7 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute P_0
-         JacobiPolynomial::P1ab(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
 
          // Compute DP_1
          WorlandPolynomial::W0l(idpnab.col(0), l+2, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
@@ -260,11 +260,11 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment P_n
-         JacobiPolynomial::Pnab(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
          ipnab.col(0).swap(ipnab.col(1));
 
          // Compute DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = ipnab.col(1) + idpnab.col(1);
@@ -273,11 +273,11 @@ namespace Polynomial {
       for(int i = 3; i < nPoly; ++i)
       {
          // Increment P_n
-         JacobiPolynomial::Pnab(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
          ipnab.col(0).swap(ipnab.col(1));
 
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -334,7 +334,7 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          // Compute P_0
-         JacobiPolynomial::P1ab(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
 
          // Compute DP_1
          WorlandPolynomial::W0l(idpnab.col(0), l+1, a1, b1, igrid, &WorlandPolynomial::unitWDP0ab);
@@ -347,11 +347,11 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment P_n
-         JacobiPolynomial::Pnab(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
          ipnab.col(0).swap(ipnab.col(1));
 
          // Compute DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute e P + 2(x+1) DP
          idiff.col(2) = ipnab.col(1) + idpnab.col(1);
@@ -360,11 +360,11 @@ namespace Polynomial {
       for(int i = 3; i < nPoly; ++i)
       {
          // Increment P_n
-         JacobiPolynomial::Pnab(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, &WorlandPolynomial::unitWPnab);
          ipnab.col(0).swap(ipnab.col(1));
 
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -424,7 +424,7 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute D2P_2
          WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
@@ -437,11 +437,11 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
 
          // Compute e P + 2(x+1) DP
          idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
@@ -450,11 +450,11 @@ namespace Polynomial {
       for(int i = 4; i < nPoly; ++i)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -514,7 +514,7 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute D2P_2
          WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
@@ -527,11 +527,11 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
 
          // Compute e P + 2(x+1) DP
          idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
@@ -540,11 +540,11 @@ namespace Polynomial {
       for(int i = 4; i < nPoly; ++i)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -604,7 +604,7 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute D2P_2
          WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
@@ -617,11 +617,11 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
 
          // Compute e P + 2(x+1) DP
          idiff.col(3) = id2pnab.col(1) + idpnab.col(1);
@@ -630,11 +630,11 @@ namespace Polynomial {
       for(int i = 4; i < nPoly; ++i)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -697,7 +697,7 @@ namespace Polynomial {
       if(nPoly > 2)
       {
          // Increment DP_2
-         JacobiPolynomial::P1ab(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDP1ab);
 
          // Compute D2P_2
          WorlandPolynomial::W0l(id2pnab.col(0), l+1, a2, b2, igrid, &WorlandPolynomial::unitWD2P0ab);
@@ -710,11 +710,11 @@ namespace Polynomial {
       if(nPoly > 3)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         JacobiPolynomial::P1ab(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2P1ab);
 
          // Compute D3P_2
          WorlandPolynomial::W0l(id3pnab.col(0), l+3, a3, b3, igrid, &WorlandPolynomial::unitWD3P0ab);
@@ -727,15 +727,15 @@ namespace Polynomial {
       if(nPoly > 4)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), 3, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), 3, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Compute D2P_2
-         JacobiPolynomial::Pnab(id2pnab.col(0), 2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), 2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Compute D3P_2
-         JacobiPolynomial::P1ab(id3pnab.col(1), a3, b3, id3pnab.col(0), ixgrid, &WorlandPolynomial::unitWD3P1ab);
+         ThreeTermRecurrence::P1(id3pnab.col(1), a3, b3, id3pnab.col(0), ixgrid, &WorlandPolynomial::unitWD3P1ab);
 
          // Compute e P + 2(x+1) DP
          idiff.col(4) = id3pnab.col(1) + id2pnab.col(1) + idpnab.col(1);
@@ -744,15 +744,15 @@ namespace Polynomial {
       for(int i = 5; i < nPoly; ++i)
       {
          // Increment DP_n
-         JacobiPolynomial::Pnab(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, &WorlandPolynomial::unitWDPnab);
          idpnab.col(0).swap(idpnab.col(1));
 
          // Increment D2P_n
-         JacobiPolynomial::Pnab(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, &WorlandPolynomial::unitWD2Pnab);
          id2pnab.col(0).swap(id2pnab.col(1));
 
          // Increment D3P_n
-         JacobiPolynomial::Pnab(id3pnab.col(0), i-3, a3, b3, id3pnab.col(1), id3pnab.col(0), ixgrid, &WorlandPolynomial::unitWD3Pnab);
+         ThreeTermRecurrence::Pn(id3pnab.col(0), i-3, a3, b3, id3pnab.col(1), id3pnab.col(0), ixgrid, &WorlandPolynomial::unitWD3Pnab);
          id3pnab.col(0).swap(id3pnab.col(1));
 
          // Compute e P + 2(x+1) DP
@@ -790,18 +790,18 @@ namespace Polynomial {
 
       if(nPoly > 1)
       {
-         JacobiPolynomial::P1ab(ipoly.col(1), WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
+         ThreeTermRecurrence::P1(ipoly.col(1), WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(0), ixgrid, &WorlandPolynomial::unitWP1ab);
       }
 
       for(int i = 2; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(ipoly.col(i), i, WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(i-1), ipoly.col(i-2), ixgrid, &WorlandPolynomial::unitWPnab);
+         ThreeTermRecurrence::Pn(ipoly.col(i), i, WorlandPolynomial::alpha(l), WorlandPolynomial::beta(l), ipoly.col(i-1), ipoly.col(i-2), ixgrid, &WorlandPolynomial::unitWPnab);
       }
 
       poly = Precision::cast(ipoly);
    }
 
-   void WorlandPolynomial::W0l(Eigen::Ref<internal::Matrix> iw0l, const int l, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, JacobiPolynomial::NormalizerAB norm)
+   void WorlandPolynomial::W0l(Eigen::Ref<internal::Matrix> iw0l, const int l, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, ThreeTermRecurrence::NormalizerAB norm)
    {
       internal::Array cs = norm(alpha, beta);
 
@@ -829,9 +829,9 @@ namespace Polynomial {
       cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0);
 
-      if(alpha + beta == -MHD_MP(1.0) && dn == MHD_MP(2.0))
+      if(dn == MHD_MP(2.0))
       {
-         cs(0) *= precision::sqrt((2.0*dn+alpha+beta+MHD_MP(1.0)))*precision::sqrt(dn*(dn - MHD_MP(1.0))/((dn + alpha)*(dn + beta)*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
+         cs(0) *= precision::sqrt((2.0*dn+alpha+beta+MHD_MP(1.0)))*precision::sqrt(((dn + alpha + beta)*dn*(dn - MHD_MP(1.0)))/((dn + alpha)*(dn + beta)*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
       } else
       {
          cs(0) *= precision::sqrt((2.0*dn+alpha+beta+MHD_MP(1.0))/(2.0*dn+alpha+beta-MHD_MP(3.0)))*precision::sqrt(((dn + alpha + beta)*dn*(dn + alpha + beta - MHD_MP(1.0))*(dn - MHD_MP(1.0)))/((dn + alpha)*(dn + beta)*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))));
@@ -847,13 +847,7 @@ namespace Polynomial {
 
       cs(0) = (MHD_MP(2.0) + alpha + beta);
       cs(1) = (alpha - beta);
-      if(alpha + beta == -MHD_MP(1.0))
-      {
-         cs(2) = precision::sqrt(MHD_MP(2.0)/(MHD_MP(4.0)*(alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))));
-      } else
-      {
-         cs(2) = precision::sqrt((alpha + beta + MHD_MP(3.0))*(alpha + beta + MHD_MP(1.0))/(MHD_MP(4.0)*(alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))*(alpha + beta + MHD_MP(1.0))));
-      }
+      cs(2) = precision::sqrt((alpha + beta + MHD_MP(3.0))/(MHD_MP(4.0)*(alpha + MHD_MP(1.0))*(beta + MHD_MP(1.0))));
 
       return cs;
    }
@@ -862,13 +856,7 @@ namespace Polynomial {
    {
       internal::Array cs(1);
 
-      if(alpha + beta == -MHD_MP(1.0))
-      {
-         cs(0) = precision::exp(MHD_MP(0.5)*(-precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
-      } else
-      {
-         cs(0) = precision::sqrt(alpha + beta + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
-      }
+      cs(0) = precision::sqrt(MHD_MP(2.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(alpha + beta + MHD_MP(2.0)) - precisiontr1::lgamma(alpha + MHD_MP(1.0)) - precisiontr1::lgamma(beta + MHD_MP(1.0))));
 
       return cs;
    }

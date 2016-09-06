@@ -10,6 +10,7 @@ endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL" OR GEOMHDISCC_SPATIALSCHEME STREQ
 
 if(GEOMHDISCC_SPATIALSCHEME STREQUAL "WLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "WLFM")
    list(APPEND MHDSources 
+      ThreeTermRecurrence.cpp
       JacobiPolynomial.cpp
       WorlandPolynomial.cpp
       SphereWorlandTransform.cpp
@@ -18,6 +19,7 @@ endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "WLFL" OR GEOMHDISCC_SPATIALSCHEME STREQ
 
 if(GEOMHDISCC_SPATIALSCHEME STREQUAL "WFT" )
    list(APPEND MHDSources 
+      ThreeTermRecurrence.cpp
       JacobiPolynomial.cpp
       WorlandPolynomial.cpp
       CylinderWorlandTransform.cpp

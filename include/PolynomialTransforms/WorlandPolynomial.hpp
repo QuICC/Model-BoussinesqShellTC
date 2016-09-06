@@ -22,7 +22,7 @@
 // Project includes
 //
 #include "Base/Precision.hpp"
-#include "PolynomialTransforms/JacobiPolynomial.hpp"
+#include "PolynomialTransforms/ThreeTermRecurrence.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -109,7 +109,7 @@ namespace Polynomial {
           *
           * Internal computation can be done in multiple precision
           */
-         static void W0l(Eigen::Ref<internal::Matrix> iw0ab, const int l, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, JacobiPolynomial::NormalizerAB norm);
+         static void W0l(Eigen::Ref<internal::Matrix> iw0ab, const int l, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, ThreeTermRecurrence::NormalizerAB norm);
 
          /**
           * @brief Polynomial normalizer for unit Worland normalization

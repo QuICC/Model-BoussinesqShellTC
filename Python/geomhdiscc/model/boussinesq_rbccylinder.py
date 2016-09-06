@@ -212,17 +212,13 @@ class BoussinesqRBCCylinder(base_model.BaseModel):
 
         m = eigs[0]
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
-
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
             mat = geo.i4j2(res[0], res[2], m, bc)
-            mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
         elif field_row == ("velocity","pol") and field_col == field_row:
             mat = geo.i6j4(res[0], res[2], m, bc)
-            mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2(res[0], res[2], m, bc)

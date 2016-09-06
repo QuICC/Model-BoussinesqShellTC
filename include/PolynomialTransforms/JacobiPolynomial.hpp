@@ -15,7 +15,6 @@
 
 // System includes
 //
-#include <tr1/functional>
 
 // External includes
 //
@@ -23,6 +22,7 @@
 // Project includes
 //
 #include "Base/Precision.hpp"
+#include "PolynomialTransforms/ThreeTermRecurrence.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,11 +34,6 @@ namespace Polynomial {
    class JacobiPolynomial
    {
       public:
-         /// Typedef for the function signature of an n independent normalizer 
-         typedef std::tr1::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerAB;
-         /// Typedef for the function signature of an n dependent normalizer 
-         typedef std::tr1::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat, const internal::MHDFloat)> NormalizerNAB;
-
          /**
           * @brief Compute \f$P_n^{(\alpha,\beta)} (x)\f$
           *
@@ -61,30 +56,9 @@ namespace Polynomial {
          static void d2Pnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid);
 
          /**
-          * @brief Compute \f$P_n^{(\alpha,\beta)} (x)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void Pnab(Eigen::Ref<internal::Matrix> iplm, const int n, const internal::MHDFloat alpha, const internal::MHDFloat beta, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid, NormalizerNAB norm);
-
-         /**
-          * @brief Compute \f$P_0^{(\alpha,\beta)} (x)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void P0ab(Eigen::Ref<internal::Matrix> ip0ab, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, NormalizerAB norm);
-
-         /**
-          * @brief Compute \f$P_1^{(\alpha,\beta)} (x)\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         static void P1ab(Eigen::Ref<internal::Matrix> ip1ab, const internal::MHDFloat alpha, const internal::MHDFloat beta, const Eigen::Ref<const internal::Matrix>& ip0ab, const internal::Array& igrid, NormalizerAB norm);
-
-         /**
           * @brief Polynomial normalizer for natural normalization
           */
-         static internal::Array naturalPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalPnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
          /**
           * @brief Polynomial n=0 normalizer for natural normalization
@@ -99,7 +73,7 @@ namespace Polynomial {
          /**
           * @brief First derivative normalizer for natural normalization
           */
-         static internal::Array naturalDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalDPnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
          /**
           * @brief First derivative n=0 normalizer for natural normalization
@@ -114,7 +88,7 @@ namespace Polynomial {
          /**
           * @brief Second derivative normalizer for natural normalization
           */
-         static internal::Array naturalD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD2Pnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
          /**
           * @brief Second derivative n=0 normalizer for natural normalization
@@ -129,7 +103,7 @@ namespace Polynomial {
          /**
           * @brief Third derivative normalizer for natural normalization
           */
-         static internal::Array naturalD3Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         static internal::Array naturalD3Pnab(const internal::MHDFloat n, const internal::MHDFloat alpha, const internal::MHDFloat beta);
 
          /**
           * @brief Third derivative n=0 normalizer for natural normalization
