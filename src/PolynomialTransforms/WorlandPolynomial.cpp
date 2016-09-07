@@ -18,8 +18,8 @@
 //
 #include "Exceptions/Exception.hpp"
 
-//#define GEOMHDISCC_WORLAND_NORM_UNITY
-#define GEOMHDISCC_WORLAND_NORM_NATURAL
+#define GEOMHDISCC_WORLAND_NORM_UNITY
+//#define GEOMHDISCC_WORLAND_NORM_NATURAL
 
 namespace GeoMHDiSCC {
 
@@ -931,20 +931,14 @@ namespace Polynomial {
    {
       internal::Array cs(4);
 
-      cs(0) = -((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n*(n + a + b));
-      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0);
-
-      if(n == MHD_MP(2.0))
+      cs(0) = -(MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))*precision::sqrt((n - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))/(n + a + b));
+      if (n > MHD_MP(2.0))
       {
-         cs(0) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0)))*precision::sqrt(((n + a + b)*n*(n - MHD_MP(1.0)))/((n + a)*(n + b)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))));
-      } else
-      {
-         cs(0) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0))/(2.0*n+a+b-MHD_MP(3.0)))*precision::sqrt(((n + a + b)*n*(n + a + b - MHD_MP(1.0))*(n - MHD_MP(1.0)))/((n + a)*(n + b)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))));
+         cs(0) *= precision::sqrt((n + a + b - MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(3.0)));
       }
-      cs(1) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0))/(2.0*n+a+b-MHD_MP(1.0)))*precision::sqrt(((n + a + b)*n)/((n + a)*(n + b)));
-      cs(2) *= precision::sqrt((2.0*n+a+b+MHD_MP(1.0))/(2.0*n+a+b-MHD_MP(1.0)))*precision::sqrt(((n + a + b)*n)/((n + a)*(n + b)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b)/MHD_MP(2.0))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b));
+      cs(2) = (a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b));
+      cs(3) = precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(n*(n + a)*(n + b)));
 
       assert(!std::isnan(cs.sum()));
 
@@ -955,7 +949,7 @@ namespace Polynomial {
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + a + b);
+      cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
       cs(2) = precision::sqrt((a + b + MHD_MP(3.0))/(MHD_MP(4.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
 
@@ -1001,11 +995,10 @@ namespace Polynomial {
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + a + b)/MHD_MP(2.0);
-      cs(1) = (a - b)/MHD_MP(2.0);
-      cs(2) = (a + b + MHD_MP(1.0))/(a + b);
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
 
-      cs(2) *= precision::sqrt((a + b + MHD_MP(3.0))/(a + b + MHD_MP(1.0)))*precision::sqrt(MHD_MP(2.0)*(a+b)/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
+      cs(2) = precision::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/(MHD_MP(2.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b)));
 
       assert(!std::isnan(cs.sum()));
 
@@ -1016,9 +1009,7 @@ namespace Polynomial {
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(0.5)*precision::exp(precisiontr1::lgamma(a + b + MHD_MP(1.0)) - precisiontr1::lgamma(a + b));
-
-      cs(0) *= precision::sqrt(a + b + MHD_MP(1.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
+      cs(0) = MHD_MP(2.0)*precision::sqrt(MHD_MP(2.0)*(a+b))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b + MHD_MP(2.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
 
       assert(!std::isnan(cs.sum()));
 
