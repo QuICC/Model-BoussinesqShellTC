@@ -139,7 +139,7 @@ namespace Equations {
                      MHDFloat valR = 0.0;
                      MHDFloat valT = 0.0;
                      MHDFloat valZ = 0.0;
-                     for(int jM = 0; jM <= modeK(1);  ++jM)
+                     for(int jM = 1; jM <= modeK(1);  ++jM)
                      {
                         valR = 0.0;
                         for(int jR = 0; jR <= modeK(0); jR++)

@@ -304,7 +304,7 @@ namespace TransformSteps {
          transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
          transform.back().addEdge(Projector1DType::DIFF);
          transform.back().addEdge(Projector2DType::PROJ);
-         transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::Z, Arithmetics::ADD);
+         transform.back().addEdge(ProjectorNDType::DIFF, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
