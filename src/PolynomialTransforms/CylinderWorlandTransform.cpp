@@ -125,6 +125,12 @@ namespace Transform {
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGINVLAPLH,std::vector<Matrix>()));
       this->mIntgOp.find(IntegratorType::INTGINVLAPLH)->second.reserve(this->mspSetup->slow().size());
 
+      // Reserve storage for the solver operators 
+      this->mSolveOp.insert(std::make_pair(ProjectorType::INVLAPLH,std::vector<SparseMatrix>()));
+      this->mSolveOp.find(ProjectorType::INVLAPLH)->second.reserve(this->mspSetup->slow().size());
+      this->mTriSolver.insert(std::make_pair(ProjectorType::INVLAPLH,std::vector<SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> >()));
+      this->mTriSolver.find(ProjectorType::INVLAPLH)->second.reserve(this->mspSetup->slow().size());
+
       // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;
       pArgs = PyTuple_New(4);
@@ -274,13 +280,42 @@ namespace Transform {
          this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose() = matI6*this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose() = matI6*this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose();
 
          this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL) = (this->mProjOp.find(ProjectorType::LAPLH)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose();
+         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose() = matI6*this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose();
+
+//         // Call i2laplh for solver
+//         // Set resolution and m
+//         PyTuple_SetItem(pArgs, 0, PyLong_FromLong(this->mspSetup->fast().at(iL).size()+1));
+//         PyTuple_SetItem(pArgs, 1, PyLong_FromLong(l));
+//         // ... create boundray condition (none)
+//         pValue = PyDict_New();
+//         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+//         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
+//         PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(1));
+//         PyTuple_SetItem(pArgs, 2, pValue);
+//         // Set coefficient
+//         PyTuple_SetItem(pArgs, 3, PyFloat_FromDouble(1.0));
+//         PythonWrapper::setFunction("i2laplh");
+//         pValue = PythonWrapper::callFunction(pArgs);
+//         // Fill matrix
+//         this->mSolveOp.find(ProjectorType::INVLAPLH)->second.push_back(SparseMatrix(this->mspSetup->fast().at(iL).size(), this->mspSetup->fast().at(iL).size()));
+//         PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::INVLAPLH)->second.at(iL), pValue);
+//         Py_DECREF(pValue);
+//
+//         // Initialize solver and factorize i2laph operator (upper triangular)
+//         SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
+//         this->mTriSolver.find(ProjectorType::INVLAPLH)->second.push_back(pSolver);
+//         this->mTriSolver.find(ProjectorType::INVLAPLH)->second.at(iL)->compute(this->mSolveOp.find(ProjectorType::INVLAPLH)->second.at(iL));
+//         // Check for successful factorisation
+//         if(this->mTriSolver.find(ProjectorType::INVLAPLH)->second.at(iL)->info() != Eigen::Success)
+//         {
+//            throw Exception("Factorization of inverse laplacian failed!");
+//         }
       }
 
       // Cleanup

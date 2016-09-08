@@ -122,24 +122,25 @@ namespace Equations {
                      MHDFloat valR = 0.0;
                      MHDFloat valT = 0.0;
                      MHDFloat valZ = 0.0;
-                     for(int jM = 0; jM <= this->mModeK(1);  ++jM)
-                     {
-                        valR = 0.0;
-                        for(int jR = 0; jR <= this->mModeK(0); jR++)
-                        {
-                           valR += std::pow(r_, 2*jR);
-                        }
-                        valR *= std::pow(r_, jM);
-
-                        valT = CylinderExactStateIds::cos(1.0,jM,t_) + CylinderExactStateIds::sin(1.0,jM,t_);
-
-                        valZ = 0.0;
-                        for(int jZ = 0; jZ <= this->mModeK(2); jZ++)
-                        {
-                           valZ += CylinderExactStateIds::chebyshev(1.0, jZ, z_);
-                        }
-                        val += valR*valT*valZ;
-                     }
+//                     for(int jM = 0; jM <= this->mModeK(1);  ++jM)
+//                     {
+//                        valR = 0.0;
+//                        for(int jR = 0; jR <= this->mModeK(0); jR++)
+//                        {
+//                           valR += std::pow(r_, 2*jR);
+//                        }
+//                        valR *= std::pow(r_, jM);
+//
+//                        valT = CylinderExactStateIds::cos(1.0,jM,t_) + CylinderExactStateIds::sin(1.0,jM,t_);
+//
+//                        valZ = 0.0;
+//                        for(int jZ = 0; jZ <= this->mModeK(2); jZ++)
+//                        {
+//                           valZ += CylinderExactStateIds::chebyshev(1.0, jZ, z_);
+//                        }
+//                        val += valR*valT*valZ;
+//                     }
+                     val = (std::pow(r_, 5))*(CylinderExactStateIds::cos(1.0,5,t_))*(CylinderExactStateIds::chebyshev(1.0,2,z_));
 
                      rNLComp.setPoint(val, iZ, iT, iR);
 

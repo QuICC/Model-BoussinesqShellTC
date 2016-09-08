@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBCCylinderModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCylinderExactScalarState spScalar;

@@ -29,6 +29,8 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
+#include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -53,7 +55,7 @@ namespace Transform {
           *    - DIVRLAPLH: 1/r horizontal cylindrical laplacian: D^2 + 1/r D - m^2/r^2
           *    - DIFFLAPLH: radial derivative of horizontal cylindrical laplacian: D(D^2 + 1/r D - m^2/r^2)
           */
-         enum Id {PROJ, DIVR, DIFF, DIVRDIFFR, LAPLH, DIVRLAPLH, DIFFLAPLH};
+         enum Id {PROJ, DIVR, DIFF, DIVRDIFFR, LAPLH, DIVRLAPLH, DIFFLAPLH, INVLAPLH};
       };
 
       /**
@@ -192,6 +194,16 @@ namespace Transform {
           * @brief Storage for the integrator operators 
           */
          std::map<IntegratorType::Id,std::vector<Matrix> >  mIntgOp;
+
+         /**
+          * @brief Storage for the sparse solver matrices
+          */
+         std::map<ProjectorType::Id, std::vector<SparseMatrix> > mSolveOp;
+
+         /**
+          * @brief Storage for the sparse triangular solvers
+          */
+         std::map<ProjectorType::Id, std::vector<SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> > > mTriSolver;
    };
 
 }
