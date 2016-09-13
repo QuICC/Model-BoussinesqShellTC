@@ -8,14 +8,19 @@ import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 # Create the model and activate linearization
 model = mod.BoussinesqRTCShell()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
 Rac = None
 mc = None
 
+# SF/SF, FT/FT, differential heating, small gap
+bc_vel = 1; bc_temp = 0; heating = 1; rratio = 0.99
+res = [64, 92, 0]
+Ta = 1e12; Rac = 7.4758215298779; mc = 245
+
 # SF/SF, FT/FT, internal heating
-bc_vel = 1; bc_temp = 0; heating = 0; rratio = 0.35
+#bc_vel = 1; bc_temp = 0; heating = 0; rratio = 0.35
 #Ta = 1e6
 #res = [32, 32, 0]
 #Ta = 1e7
@@ -28,8 +33,8 @@ bc_vel = 1; bc_temp = 0; heating = 0; rratio = 0.35
 #res = [64, 64, 0]
 #Ta = 1e11; Rac = 85.363356944817; mc = 20
 #res = [64, 64, 0]
-Ta = 1e12; Rac = 122.69214718393; mc = 30
-res = [128, 128, 0]
+#Ta = 1e12; Rac = 122.69214718393; mc = 30
+#res = [128, 128, 0]
 #Ta = 1e13; Rac = 177.55422348123; mc = 44
 #res = [192, 192, 0]
 #Ta = 1e14; Rac = 258.13410447601; mc = 65
@@ -140,7 +145,9 @@ marginal_options['plot_point'] = False
 marginal_options['viz_mode'] = 0
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(1,m-0), m+1, 1)
+marginal_options['impose_symmetry'] = False
+marginal_options['use_spherical_evp'] = False
+marginal_options['curve_points'] = np.arange(max(1,m-3), m+3, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

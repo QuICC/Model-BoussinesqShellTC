@@ -168,7 +168,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid = transf.grid_1d(*viz_res)
         viewProfile(sol_profile, grid, show = show, save = save, fid = fid, max_cols = max_cols)
 
-def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = True, save_slow_profile = True, fid = None, max_cols = 3, slice_ratio = 4):
+def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = True, save_slow_profile = True, fid = None, max_cols = 3, slice_ratio = 2):
     """View 2D physical data"""
 
     sol_slice = dict()
@@ -213,6 +213,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         # Plot physical field on profile along fast direction
         grid_fast = transf.grid_fast(*res_1d)
         prof_fast = dict()
+        print("slice_ratio: " + str(slice_ratio))
         for k,f in sol_slice.items():
             prof_fast[k] = f[np.floor(f.shape[0]/slice_ratio),:]
 
@@ -271,6 +272,7 @@ def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         # Plot physical field as slow slice
         slice_res = res_1d + res_2d
         grid = transf.grid_2d(*slice_res)
+        print("slice_ratio: " + str(slice_ratio))
         for k,f in sol_volume.items():
             sol_slice[k] = f[:,:,np.floor(f.shape[2]/slice_ratio)].T
         sfid = "slow"
@@ -323,6 +325,7 @@ def viewProfile(fields, grid, fid = None, show = True, save = False, max_cols = 
         pl.subplot(rows,cols,i+1)
         pl.plot(grid, df[1].real, 'b-')
         pl.plot(grid, df[1].imag, 'r-')
+        pl.plot(grid, np.abs(df[1]), 'g-')
         title = df[0][0]
         if df[0][1] != "":
             title = title + ', ' + df[0][1]
