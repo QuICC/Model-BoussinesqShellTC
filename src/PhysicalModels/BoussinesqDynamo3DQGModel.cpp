@@ -31,6 +31,7 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGMeanHeat.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfx.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfy.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGPressure.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBx.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBy.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbx.hpp"
@@ -81,6 +82,9 @@ namespace GeoMHDiSCC {
 
       // Add Emfy computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBy>();
+
+      // Add mean Emfy (called Pressure) computation
+      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGPressure>();
 
       // Add fbx computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfbx>();
@@ -189,12 +193,17 @@ namespace GeoMHDiSCC {
          // Add BY initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::EMFY);
-         spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4, Equations::RandomScalarState::ONLYMEAN);
 
          // Add BY initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::EMFX);
-         spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4,Equations::RandomScalarState::ONLYMEAN);
+
+         // Add BY initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::PRESSURE);
+         spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4,Equations::RandomScalarState::ONLYMEAN);
 
       }
 
@@ -208,6 +217,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::BY);
       spOut->expect(PhysicalNames::EMFX);
       spOut->expect(PhysicalNames::EMFY);
+      spOut->expect(PhysicalNames::PRESSURE);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -261,6 +271,11 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::EMFY);
 
+      // Add background temperature profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::PRESSURE);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
@@ -270,6 +285,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::BX);
       spOut->expect(PhysicalNames::BY);
       spOut->expect(PhysicalNames::VORTICITYZ);
+      spOut->expect(PhysicalNames::PRESSURE);
       spOut->expect(PhysicalNames::EMFY);
       spOut->expect(PhysicalNames::EMFX);
       spVis->addHdf5OutputFile(spOut);
@@ -289,6 +305,7 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::BY);
       spIn->expect(PhysicalNames::VORTICITYZ);
       spIn->expect(PhysicalNames::EMFY);
+      spIn->expect(PhysicalNames::PRESSURE);
       spIn->expect(PhysicalNames::EMFX);
 
       // Set simulation state
@@ -357,8 +374,9 @@ namespace GeoMHDiSCC {
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spState->expect(PhysicalNames::VORTICITYZ);
-      //spState->expect(PhysicalNames::EMFY);
-      //spState->expect(PhysicalNames::EMFX);
+      spState->expect(PhysicalNames::EMFY);
+      spState->expect(PhysicalNames::EMFX);
+      spState->expect(PhysicalNames::PRESSURE);
 
       spSim->addHdf5OutputFile(spState);
    }
@@ -380,6 +398,7 @@ namespace GeoMHDiSCC {
 
       spInit->expect(PhysicalNames::EMFY);
       spInit->expect(PhysicalNames::EMFX);
+      spInit->expect(PhysicalNames::PRESSURE);
 
       // Set simulation state
       spSim->setInitialState(spInit);
