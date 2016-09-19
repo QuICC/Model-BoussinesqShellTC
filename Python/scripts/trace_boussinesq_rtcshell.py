@@ -145,6 +145,7 @@ marginal_options['plot_point'] = False
 marginal_options['viz_mode'] = 0
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
+marginal_options['save_physical'] = True
 marginal_options['impose_symmetry'] = False
 marginal_options['use_spherical_evp'] = False
 marginal_options['curve_points'] = np.arange(max(1,m-3), m+3, 1)

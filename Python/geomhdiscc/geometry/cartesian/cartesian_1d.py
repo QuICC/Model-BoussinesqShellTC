@@ -85,6 +85,12 @@ def i2d2(nx, bc, coeff = 1.0, cscale = 1.0):
 
     return qid(nx,2, bc, coeff*cscale**2)
 
+def i2d4(nx, bc, coeff = 1.0, cscale = 1.0):
+    """Create a quasi identity block of order 2"""
+
+    mat = i2d2(nx, c1dbc.no_bc(), cscale = cscale)*d2(nx, c1dbc.no_bc(), cscale = cscale)
+    return c1dbc.constrain(mat, bc)
+
 def i1(nx, bc, coeff = 1.0):
     """Create operator for 1st integral in x of T_n(x)"""
 

@@ -168,7 +168,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid = transf.grid_1d(*viz_res)
         viewProfile(sol_profile, grid, show = show, save = save, fid = fid, max_cols = max_cols)
 
-def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = True, save_slow_profile = True, fid = None, max_cols = 3, slice_ratio = 2):
+def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, save = False, save_fast_profile = True, save_slow_profile = True, fid = None, max_cols = 3, slice_ratio = 2, save_slice = True):
     """View 2D physical data"""
 
     sol_slice = dict()
@@ -207,7 +207,10 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         sfid = "solution"
         if fid is not None:
             sfid = sfid + "_" + fid
-        viewSlice(sol_slice, grid, show = show, save = save, fid = sfid, max_cols = max_cols)
+        viewSlice(sol_slice, grid, show = show, save = False, fid = sfid, max_cols = max_cols)
+
+        if save and save_slice:
+            saveSliceData(sol_slice, grid, fid = sfid)
 
     if show or save:
         # Plot physical field on profile along fast direction
@@ -314,6 +317,23 @@ def saveProfileData(fields, grid, fid = None):
         if k[1] != "":
             fname = fname + "_" + k[1]
         np.savetxt(fname + ".dat", np.array([grid, f.real, f.imag]).transpose())
+
+def saveSliceData(fields, grid, fid = None):
+    """Save profile data to ASCII file"""
+
+    fbase = "slice"
+    if fid is not None:
+        fbase = fbase + "_" + fid
+
+    for k,df in enumerate(fields.items()):
+        fname = fbase + "_" + df[0][0]
+        if df[0][1] != "":
+            fname = fname + "_" + df[0][1]
+        np.savetxt(fname + "_grid0.dat", grid[0])
+        np.savetxt(fname + "_grid1.dat", grid[1])
+        np.savetxt(fname + "_field.dat", df[1].real)
+        np.savetxt(fname + "_re.dat", df[1].real)
+        np.savetxt(fname + "_im.dat", df[1].imag)
 
 def viewProfile(fields, grid, fid = None, show = True, save = False, max_cols = 3):
     """View a profile"""

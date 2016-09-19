@@ -30,6 +30,16 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         return ["velocity", "magnetic", "temperature"]
 
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        # Unit gap width
+        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
+        # Unit radius
+        #d = {"ro":1.0}
+
+        return d
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
