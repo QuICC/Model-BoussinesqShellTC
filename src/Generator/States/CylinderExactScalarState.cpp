@@ -100,28 +100,54 @@ namespace Equations {
                {
                   z_ = gZ(iZ);
 
-                  MHDFloat valZ = 0.0;
-                  MHDFloat valT = 0.0;
-                  MHDFloat valR = 0.0;
-
                   if(this->mTypeId == CylinderExactStateIds::POLYCOSPOLY)
                   {
-                     valR = CylinderExactStateIds::poly(this->mModeA(0),this->mModeK(0),r_);
-                     valT = CylinderExactStateIds::cos(this->mModeA(1),this->mModeK(1),t_);
-                     valZ = CylinderExactStateIds::poly(this->mModeA(2),this->mModeK(2),z_);
+                     MHDFloat valR = CylinderExactStateIds::poly(this->mModeA(0),this->mModeK(0),r_);
+                     MHDFloat valT = CylinderExactStateIds::cos(this->mModeA(1),this->mModeK(1),t_);
+                     MHDFloat valZ = CylinderExactStateIds::poly(this->mModeA(2),this->mModeK(2),z_);
+
+                     rNLComp.setPoint(valR*valT*valZ, iZ, iT, iR);
 
                   } else if(this->mTypeId == CylinderExactStateIds::POLYSINPOLY)
                   {
-                     valR = CylinderExactStateIds::poly(this->mModeA(0),this->mModeK(0),r_);
-                     valT = CylinderExactStateIds::sin(this->mModeA(1),this->mModeK(1),t_);
-                     valZ = CylinderExactStateIds::poly(this->mModeA(2),this->mModeK(2),z_);
+                     MHDFloat valR = CylinderExactStateIds::poly(this->mModeA(0),this->mModeK(0),r_);
+                     MHDFloat valT = CylinderExactStateIds::sin(this->mModeA(1),this->mModeK(1),t_);
+                     MHDFloat valZ = CylinderExactStateIds::poly(this->mModeA(2),this->mModeK(2),z_);
+
+                     rNLComp.setPoint(valR*valT*valZ, iZ, iT, iR);
+
+                  } else if(this->mTypeId == CylinderExactStateIds::TESTUNITSPECTRUM)
+                  {
+                     MHDFloat val = 0.0;
+                     MHDFloat valR = 0.0;
+                     MHDFloat valT = 0.0;
+                     MHDFloat valZ = 0.0;
+//                     for(int jM = 0; jM <= this->mModeK(1);  ++jM)
+//                     {
+//                        valR = 0.0;
+//                        for(int jR = 0; jR <= this->mModeK(0); jR++)
+//                        {
+//                           valR += std::pow(r_, 2*jR);
+//                        }
+//                        valR *= std::pow(r_, jM);
+//
+//                        valT = CylinderExactStateIds::cos(1.0,jM,t_) + CylinderExactStateIds::sin(1.0,jM,t_);
+//
+//                        valZ = 0.0;
+//                        for(int jZ = 0; jZ <= this->mModeK(2); jZ++)
+//                        {
+//                           valZ += CylinderExactStateIds::chebyshev(1.0, jZ, z_);
+//                        }
+//                        val += valR*valT*valZ;
+//                     }
+                     val = (std::pow(r_, 5))*(CylinderExactStateIds::cos(1.0,5,t_))*(CylinderExactStateIds::chebyshev(1.0,2,z_));
+
+                     rNLComp.setPoint(val, iZ, iT, iR);
 
                   } else
                   {
                      throw Exception("Unknown exact state");
                   }
-
-                  rNLComp.setPoint(valR*valT*valZ, iZ, iT, iR);
                }
             }
          }

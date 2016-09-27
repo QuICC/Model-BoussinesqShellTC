@@ -64,10 +64,8 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("temperature","")]:
+            if field_row in [("temperature",""),("dz_meantemperature","")]:
                 fields = [field_row]
-            elif field_row in [("dz_meantemperature","")]:
-                fields = [("temperature","")]
             else:
                 fields = []
 
@@ -277,7 +275,6 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         kx = eigs[0]
         ky = eigs[1]
-        Pr = eq_params['prandtl']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -287,9 +284,9 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
             else:
                 mat = geo.i2(res[0], bc)
 
-        elif field_row == ("dz_meantemperature","") and field_col == ("temperature",""):
+        elif field_row == ("dz_meantemperature","") and field_col == field_row:
             if kx == 0 and ky == 0:
-                mat = (geo.qid(res[0],0, bc, Pr) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+                mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
             else:
                 mat = geo.zblk(res[0], bc)
 

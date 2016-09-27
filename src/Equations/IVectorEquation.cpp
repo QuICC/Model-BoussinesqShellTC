@@ -73,7 +73,7 @@ namespace Equations {
    void IVectorEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId, Arithmetics::Id arithId)
    {
       // Assert dealiasing has taken place!
-      assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows() < rhs.data().rows());
+      assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows() <= rhs.data().rows());
       assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().cols() == rhs.data().cols());
 
       if(arithId == Arithmetics::SET)

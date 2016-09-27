@@ -27,7 +27,7 @@ class MarginalCurve:
 
         # Open file for IO and write header
         if MPI.COMM_WORLD.Get_rank() == 0:
-            self.out = open('marginal_curve.dat', 'a', 0)
+            self.out = open('marginal_curve.dat', 'a', 1)
         else:
             self.out = None
         io.write_header(self.out, gevp_opts['model'].__class__.__name__, len(gevp_opts['res']), len(gevp_opts['eigs']), gevp_opts['eq_params'])
@@ -65,7 +65,7 @@ class MarginalCurve:
 
         # Open file for IO and write header
         if MPI.COMM_WORLD.Get_rank() == 0:
-            min_out = open('marginal_minimum.dat', 'a', 0)
+            min_out = open('marginal_minimum.dat', 'a', 1)
         else:
             min_out = None
         io.write_header(min_out, self.point._gevp.model.__class__.__name__, len(self.point._gevp.res), len(self.point._gevp.eigs), self.point._gevp.eq_params)
@@ -301,7 +301,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None, impose_symmetry = False, use_spherical_evp = False):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -316,7 +316,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv, geometry = geometry)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv, geometry = geometry, impose_symmetry = impose_symmetry, use_spherical_evp = use_spherical_evp)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -619,6 +619,9 @@ def default_options():
     opts['solve'] = False           # Solve fixed point
     opts['solve_nev'] = 1           # Solve fixed point
 
+    opts['impose_symmetry'] = False # Solve fixed point
+    opts['use_spherical_evp'] = False # Solve fixed point
+
     opts['plot_spy'] = False        # Plot matrix spy
     opts['plot_point'] = False      # Plot solution for marginal curve point
     opts['plot_curve'] = False      # Plot marginal curve 
@@ -656,6 +659,8 @@ def compute(gevp_opts, marginal_opts):
     gevp_opts['conv_idx'] = marginal_opts['conv_idx']
     gevp_opts['spectrum_conv'] = marginal_opts['spectrum_conv']
     gevp_opts['geometry'] = marginal_opts['geometry']
+    gevp_opts['impose_symmetry'] = marginal_opts['impose_symmetry']
+    gevp_opts['use_spherical_evp'] = marginal_opts['use_spherical_evp']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object

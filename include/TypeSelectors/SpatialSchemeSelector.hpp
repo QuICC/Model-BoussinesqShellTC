@@ -235,7 +235,7 @@
 // Configure code to use TF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_TF
    
-   // TFT includes
+   // TF includes
    #include "SpatialSchemes/2D/TFScheme.hpp"
 
    namespace GeoMHDiSCC {

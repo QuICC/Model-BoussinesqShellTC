@@ -45,6 +45,7 @@ namespace Equations {
          CONSTANT = 0,  // All constant
          POLYCOSPOLY = 10, // Polynomial, Cosine, Polynomial
          POLYSINPOLY,      // Polynomial, Sine, Polynomial
+         TESTUNITSPECTRUM, // Exact solution with unit spectrum to test implementation
       };
 
       /**
@@ -61,6 +62,11 @@ namespace Equations {
        * @brief Compute polynomial mode
        */
       static MHDFloat poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
+       * @brief Compute Chebyshev mode
+       */
+      static MHDFloat chebyshev(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
    };
 
 }

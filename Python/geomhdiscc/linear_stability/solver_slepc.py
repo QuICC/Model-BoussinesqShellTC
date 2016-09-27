@@ -23,7 +23,7 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None, impose_symmetry = False, use_spherical_evp = False):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
@@ -34,11 +34,13 @@ class GEVPSolver:
         self.conv_idx = conv_idx
         self.spectrum_conv = spectrum_conv
         self.geometry = geometry
+        self.impose_symmetry = impose_symmetry
+        self.use_spherical_evp = use_spherical_evp
 
         if shift_range is None:
             #self.shift_range = (1e-2, 0.2)
-            self.shift_range = (-1e-1, 1e-1)
-            #self.shift_range = (-1e-2, 1e-2)
+            #self.shift_range = (-1e-1, 1e-1)
+            self.shift_range = (-1e-2, 1e-2)
         else:
             self.shift_range = shift_range
 
@@ -115,7 +117,7 @@ class GEVPSolver:
         data = v.getArray()
         rstart, rend = v.getOwnershipRange()
         start = 0
-        if self.geometry in ['sphere_chebyshev', 'sphere_worland', 'shell']: 
+        if self.geometry in ['sphere_chebyshev', 'sphere_worland', 'shell'] and self.impose_symmetry: 
             par = [1, 0, 0]
             gal = [2, 4, 2]
             for i, sze in enumerate(sizes[0]):
@@ -175,7 +177,7 @@ class GEVPSolver:
     def eigenvalues(self, system, nev, initial_vector = None):
         """Compute eigenvalues using SLEPc"""
 
-        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland']:
+        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland'] and self.use_spherical_evp:
             return self.eigenvalues_spherical(system, nev, initial_vector = initial_vector)
         else:
             return self.eigenvalues_simple(system, nev, initial_vector = initial_vector)
@@ -183,7 +185,7 @@ class GEVPSolver:
     def eigenpairs(self, system, nev, initial_vector = None):
         """Compute eigenpairs using SLEPc"""
 
-        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland']:
+        if self.geometry in ['shell', 'sphere_chebyshev', 'sphere_worland'] and self.use_spherical_evp:
             return self.eigenpairs_spherical(system, nev, initial_vector = initial_vector)
         else:
             return self.eigenpairs_simple(system, nev, initial_vector = initial_vector)

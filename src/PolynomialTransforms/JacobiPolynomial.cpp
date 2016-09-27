@@ -38,16 +38,16 @@ namespace Polynomial {
       }
 
       ipoly.resize(gN, nPoly);
-      JacobiPolynomial::P0ab(ipoly.col(0), alpha, beta, igrid, &JacobiPolynomial::naturalP0ab);
+      ThreeTermRecurrence::P0(ipoly.col(0), alpha, beta, igrid, JacobiPolynomial::normP0ab());
 
       if(nPoly > 1)
       {
-         JacobiPolynomial::P1ab(ipoly.col(1), alpha, beta, ipoly.col(0), igrid, &JacobiPolynomial::naturalP1ab);
+         ThreeTermRecurrence::P1(ipoly.col(1), alpha, beta, ipoly.col(0), igrid, JacobiPolynomial::normP1ab());
       }
 
       for(int i = 2; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(ipoly.col(i), i, alpha, beta, ipoly.col(i-1), ipoly.col(i-2), igrid, &JacobiPolynomial::naturalPnab);
+         ThreeTermRecurrence::Pn(ipoly.col(i), i, alpha, beta, ipoly.col(i-1), ipoly.col(i-2), igrid, JacobiPolynomial::normPnab());
       }
 
       poly = Precision::cast(ipoly);
@@ -76,17 +76,17 @@ namespace Polynomial {
 
       if(nPoly > 1)
       {
-         JacobiPolynomial::P0ab(idiff.col(1), a1, b1, igrid, &JacobiPolynomial::naturalDP0ab);
+         ThreeTermRecurrence::P0(idiff.col(1), a1, b1, igrid, JacobiPolynomial::normDP0ab());
       }
 
       if(nPoly > 2)
       {
-         JacobiPolynomial::P1ab(idiff.col(2), a1, b1, idiff.col(1), igrid, &JacobiPolynomial::naturalDP1ab);
+         ThreeTermRecurrence::P1(idiff.col(2), a1, b1, idiff.col(1), igrid, JacobiPolynomial::normDP1ab());
       }
 
       for(int i = 3; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), igrid, &JacobiPolynomial::naturalDPnab);
+         ThreeTermRecurrence::Pn(idiff.col(i), i-1, a1, b1, idiff.col(i-1), idiff.col(i-2), igrid, JacobiPolynomial::normDPnab());
       }
 
       diff = Precision::cast(idiff);
@@ -120,78 +120,171 @@ namespace Polynomial {
 
       if(nPoly > 2)
       {
-         JacobiPolynomial::P0ab(idiff.col(2), a2, b2, igrid, &JacobiPolynomial::naturalD2P0ab);
+         ThreeTermRecurrence::P0(idiff.col(2), a2, b2, igrid, JacobiPolynomial::normD2P0ab());
       }
 
       if(nPoly > 3)
       {
-         JacobiPolynomial::P1ab(idiff.col(3), a2, b2, idiff.col(2), igrid, &JacobiPolynomial::naturalD2P1ab);
+         ThreeTermRecurrence::P1(idiff.col(3), a2, b2, idiff.col(2), igrid, JacobiPolynomial::normD2P1ab());
       }
 
       for(int i = 4; i < nPoly; ++i)
       {
-         JacobiPolynomial::Pnab(idiff.col(i), i-2, a2, b2, idiff.col(i-1), idiff.col(i-2), igrid, &JacobiPolynomial::naturalD2Pnab);
+         ThreeTermRecurrence::Pn(idiff.col(i), i-2, a2, b2, idiff.col(i-1), idiff.col(i-2), igrid, JacobiPolynomial::normD2Pnab());
       }
 
       diff = Precision::cast(idiff);
    }
 
-   void JacobiPolynomial::Pnab(Eigen::Ref<internal::Matrix> ipnab, const int n, const internal::MHDFloat alpha, const internal::MHDFloat beta, const Eigen::Ref<const internal::Matrix>& ipn_1ab, const Eigen::Ref<const internal::Matrix>& ipn_2ab, const internal::Array& igrid, NormalizerNAB norm)
+   void JacobiPolynomial::d3Pnab(Matrix& diff, internal::Matrix& idiff, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid)
    {
-      internal::MHDFloat dn = internal::MHDFloat(n);
-      internal::Array cs = norm(dn, alpha, beta);
+      int gN = diff.rows();
+      int nPoly = diff.cols();
 
-      ipnab.array() = cs(0)*ipn_2ab.array();
-      ipnab.array() += (cs(1)*igrid.array() + cs(2))*ipn_1ab.array();
-      ipnab.array() *= cs(3);
+      if (alpha < -1 || beta < -1)
+      {
+         throw Exception("Tried to compute Jacobi polynomial P_n^{(alpha,beta)} with alpha < -1 or beta < -1");
+      }
+
+      if (nPoly < 1)
+      {
+         throw Exception("Operator matrix should have at least 1 column");
+      }
+
+      internal::MHDFloat a3 = alpha + MHD_MP(3.0);
+      internal::MHDFloat b3 = beta + MHD_MP(3.0);
+
+      idiff.resize(gN, nPoly);
+      idiff.col(0).setZero();
+
+      if(nPoly > 1)
+      {
+         idiff.col(1).setZero();
+      }
+
+      if(nPoly > 2)
+      {
+         idiff.col(2).setZero();
+      }
+
+      if(nPoly > 3)
+      {
+         ThreeTermRecurrence::P0(idiff.col(3), a3, b3, igrid, JacobiPolynomial::normD3P0ab());
+      }
+
+      if(nPoly > 4)
+      {
+         ThreeTermRecurrence::P1(idiff.col(4), a3, b3, idiff.col(3), igrid, JacobiPolynomial::normD3P1ab());
+      }
+
+      for(int i = 5; i < nPoly; ++i)
+      {
+         ThreeTermRecurrence::Pn(idiff.col(i), i-3, a3, b3, idiff.col(i-1), idiff.col(i-2), igrid, JacobiPolynomial::normD3Pnab());
+      }
+
+      diff = Precision::cast(idiff);
    }
 
-   void JacobiPolynomial::P1ab(Eigen::Ref<internal::Matrix> ip1ab, const internal::MHDFloat alpha, const internal::MHDFloat beta, const Eigen::Ref<const internal::Matrix>& ip0ab, const internal::Array& igrid, NormalizerAB norm)
+   //
+   // General polynomial normalizer
+   //
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normPnab()
    {
-      internal::Array cs = norm(alpha, beta);
-
-      ip1ab.array() = (cs(0)*igrid.array() + cs(1))*ip0ab.array();
-      ip1ab.array() *= cs(2);
+      return &JacobiPolynomial::naturalPnab;
    }
 
-   void JacobiPolynomial::P0ab(Eigen::Ref<internal::Matrix> ip0ab, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, NormalizerAB norm)
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normP1ab()
    {
-      internal::Array cs = norm(alpha, beta);
+      return &JacobiPolynomial::naturalP1ab;
+   }
 
-      ip0ab.setConstant(cs(0));
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normP0ab()
+   {
+      return &JacobiPolynomial::naturalP0ab;
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normDPnab()
+   {
+      return &JacobiPolynomial::naturalDPnab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normDP1ab()
+   {
+      return &JacobiPolynomial::naturalDP1ab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normDP0ab()
+   {
+      return &JacobiPolynomial::naturalDP0ab;
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normD2Pnab()
+   {
+      return &JacobiPolynomial::naturalD2Pnab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD2P1ab()
+   {
+      return &JacobiPolynomial::naturalD2P1ab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD2P0ab()
+   {
+      return &JacobiPolynomial::naturalD2P0ab;
+   }
+
+   ThreeTermRecurrence::NormalizerNAB  JacobiPolynomial::normD3Pnab()
+   {
+      return &JacobiPolynomial::naturalD3Pnab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD3P1ab()
+   {
+      return &JacobiPolynomial::naturalD3P1ab;
+   }
+
+   ThreeTermRecurrence::NormalizerAB  JacobiPolynomial::normD3P0ab()
+   {
+      return &JacobiPolynomial::naturalD3P0ab;
    }
 
    //
    // Natural polynomial normalizer
    //
-   internal::Array JacobiPolynomial::naturalPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(4);
 
-      cs(0) = -((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta));
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(dn + alpha + beta)*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
+      cs(0) = -((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n*(n + a + b));
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0);
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array JacobiPolynomial::naturalP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta);
-      cs(1) = (alpha - beta);
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
       cs(2) = MHD_MP(0.5);
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array JacobiPolynomial::naturalP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(1);
 
       cs(0) = MHD_MP(1.0);
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
@@ -199,34 +292,40 @@ namespace Polynomial {
    //
    // Natural first derivative normalizer
    //
-   internal::Array JacobiPolynomial::naturalDPnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalDPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(4);
 
-      cs(0) = -((alpha + beta + dn - MHD_MP(1.0))/(alpha + beta + dn - MHD_MP(2.0)))*((dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0)/(alpha + beta + dn - MHD_MP(1.0));
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(1.0));
+
+      assert(!std::isnan(cs.sum()));
       
       return cs;
    }
 
-   internal::Array JacobiPolynomial::naturalDP1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalDP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta);
-      cs(1) = (alpha - beta);
-      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta));
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array JacobiPolynomial::naturalDP0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalDP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(0.5)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta));
+      cs(0) = MHD_MP(0.5)*(a + b);
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
@@ -234,34 +333,81 @@ namespace Polynomial {
    //
    // Natural second derivative normalizer
    //
-   internal::Array JacobiPolynomial::naturalD2Pnab(const internal::MHDFloat dn, const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalD2Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(4);
 
-      cs(0) = -((dn + alpha + beta - MHD_MP(1.0))*(dn + alpha - MHD_MP(1.0))*(dn + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/((dn + alpha + beta - MHD_MP(3.0))*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(1) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(MHD_MP(2.0)*dn + alpha + beta))/(MHD_MP(2.0)*dn);
-      cs(2) = ((MHD_MP(2.0)*dn + alpha + beta - MHD_MP(1.0))*(alpha*alpha - beta*beta))/(MHD_MP(2.0)*dn*(MHD_MP(2.0)*dn + alpha + beta - MHD_MP(2.0)));
-      cs(3) = MHD_MP(1.0)/(dn + alpha + beta - MHD_MP(2.0));
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(2.0));
+
+      assert(!std::isnan(cs.sum()));
       
       return cs;
    }
 
-   internal::Array JacobiPolynomial::naturalD2P1ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(3);
 
-      cs(0) = (MHD_MP(2.0) + alpha + beta);
-      cs(1) = (alpha - beta);
-      cs(2) = (alpha + beta + MHD_MP(1.0))/(MHD_MP(2.0)*(alpha + beta - MHD_MP(1.0)));
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(1.0)));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array JacobiPolynomial::naturalD2P0ab(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   internal::Array JacobiPolynomial::naturalD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
    {
       internal::Array cs(1);
 
-      cs(0) = MHD_MP(0.25)*precision::exp(precisiontr1::lgamma(alpha + beta + MHD_MP(1.0)) - precisiontr1::lgamma(alpha + beta - MHD_MP(1.0)));
+      cs(0) = MHD_MP(0.25)*(a + b)*(a + b - MHD_MP(1.0));
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   //
+   // Natural third derivative normalizer
+   //
+   internal::Array JacobiPolynomial::naturalD3Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(4);
+
+      cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(4.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
+      cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
+      cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(3.0));
+
+      assert(!std::isnan(cs.sum()));
+      
+      return cs;
+   }
+
+   internal::Array JacobiPolynomial::naturalD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(3);
+
+      cs(0) = (a + b + MHD_MP(2.0));
+      cs(1) = (a - b);
+      cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(2.0)));
+
+      assert(!std::isnan(cs.sum()));
+
+      return cs;
+   }
+
+   internal::Array JacobiPolynomial::naturalD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   {
+      internal::Array cs(1);
+
+      cs(0) = MHD_MP(0.125)*(a + b)*(a + b - MHD_MP(1.0))*(a + b - MHD_MP(2.0));
+
+      assert(!std::isnan(cs.sum()));
 
       return cs;
    }

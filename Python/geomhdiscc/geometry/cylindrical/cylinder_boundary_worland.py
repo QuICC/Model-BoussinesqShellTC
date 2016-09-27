@@ -63,10 +63,9 @@ def bzid(n, q, d, bc, location = 't'):
 
     return c1dbc.constrain(mat,tbc)
 
-def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
-    """Contrain the matrix with the Tau boundary condition"""
+def convert_priority(priority, qr, qz):
+    """Convert priority flag into shifts"""
 
-    priority = bc.get('priority', 'r')
     sr = 0
     dr = 0
     sz = 0
@@ -86,6 +85,13 @@ def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
         dz = -qz
     else:
         raise RuntimeError("Unknown boundary condition priority!")
+
+    return (sr, dr, sz, dz)
+
+def constrain(mat, nr, nz, m, qr, qz, bc, location = 't', restriction = None):
+    """Contrain the matrix with the Tau boundary condition"""
+
+    sr, dr, sz, dz = convert_priority(bc.get('priority', 'r'), qr, qz)
 
     bc_mat = mat
     if bc['r'][0] > 0 or bc['r'].get('mixed',None) is not None:

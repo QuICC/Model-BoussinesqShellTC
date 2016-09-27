@@ -217,7 +217,7 @@ class BaseModel:
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
-        
+
         raise NotImplementedError("Stencil needs to be implemented in model!")
 
     def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):

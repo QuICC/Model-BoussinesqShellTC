@@ -53,12 +53,12 @@ namespace Diagnostics {
             {
                this->mMeshSpacings.back()(j) = std::min(std::abs(mesh.at(i)(j) - mesh.at(i)(j-1)), std::abs(mesh.at(i)(j) - mesh.at(i)(j+1)));
 
-               // Get left endpoint grid spacing
+            // Get left endpoint grid spacing
             } else if(j > 0)
             {
                this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j-1));
 
-               // Get right endpoint grid spacing
+            // Get right endpoint grid spacing
             } else
             {
                this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j+1));
@@ -82,11 +82,41 @@ namespace Diagnostics {
    MHDFloat CartesianCflWrapper::cfl() const
    {
       // Compute most stringent CFL condition
-      MHDFloat cfl = this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/this->mspVelocity->one().data().array().abs().maxCoeff();
+      MHDFloat cfl = 1.0;
 
-      cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/this->mspVelocity->two().data().array().abs().maxCoeff());
+      int nK = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
 
-      cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/this->mspVelocity->three().data().array().abs().maxCoeff());
+      // CFL from first component
+      for(int k = 0; k < nK; ++k)
+      {
+         int k_ = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
+         cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(0)(k_)/this->mspVelocity->one().slice(k).array().abs().maxCoeff());
+      }
+
+      // CFL from second component
+      for(int k = 0; k < nK; ++k)
+      {
+         int nJ = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(k);
+         for(int j = 0; j < nJ; ++j)
+         {
+            int j_ = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(j,k);
+            cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(1)(j_)/this->mspVelocity->two().profile(j,k).array().abs().maxCoeff());
+         }
+      }
+
+      // CFL from second component
+      for(int k = 0; k < nK; ++k)
+      {
+         int nJ = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(k);
+         for(int j = 0; j < nJ; ++j)
+         {
+            int nI = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>(k);
+            for(int i = 0; i < nI; ++i)
+            {
+               cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(2)(i)/std::abs(this->mspVelocity->three().point(i,j,k)));
+            }
+         }
+      }
 
       return cfl;
    }

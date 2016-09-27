@@ -8,9 +8,9 @@ import numpy as np
 import scipy.special as sp
 import geomhdiscc.geometry.worland.worland_basis as wb
 
-min_r_points = 50
+min_r_points = 150
 min_th_points = 200
-min_z_points = 50
+min_z_points = 150
 
 def nrgrid(nr):
     return max(min_r_points, nr)

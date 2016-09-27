@@ -32,14 +32,18 @@ def worland_poly(n, l, nr):
 
     return rg**l*special.eval_jacobi(n, -0.5, l - 0.5, 2.0*rg**2 - 1.0)*norm
 
-def worland_norm_row(n , l, k):
+def worland_norm_row(n, l, k):
     """Normalization factor for matrix row"""
-    
-    norm = np.log(2.0*n + l + 2.0*k) - np.log(2.0*n + l)
-    norm += special.gammaln(n + 0.5) - special.gammaln(n + 0.5 + k)
-    norm += special.gammaln(n + l + 0.5) - special.gammaln(n + l + 0.5 + k)
-    norm += special.gammaln(n + l + k) - special.gammaln(n + l)
-    norm += special.gammaln(n + 1.0 + k) - special.gammaln(n + 1.0)
+   
+    norm = -np.log(2.0*n + l) + special.gammaln(n + 0.5) + special.gammaln(n + l + 0.5) - special.gammaln(n + l) - special.gammaln(n + 1.0)
+
+    # Special case for projection on m = 0
+    if n[0] + k == 0:
+        s = 1
+    else:
+        s = 0
+
+    norm[s:] += np.log(2.0*n[s:] + l + 2.0*k) - special.gammaln(n[s:] + 0.5 + k) - special.gammaln(n[s:] + l + 0.5 + k) + special.gammaln(n[s:] + l + k) + special.gammaln(n[s:] + 1.0 + k)
 
     return np.sqrt(np.exp(norm))
 

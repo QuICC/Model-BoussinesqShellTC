@@ -12,6 +12,27 @@ n = sympy.Symbol('n')
 
 symbolic = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = m - sympy.Rational(1,2))
 
+def chooseParameters(alpha, beta):
+    """Choose the Jacobi polynomial to use"""
+
+    global symbolic
+    symbolic = mod.SymbolicJacobi(a = alpha, b = beta)
+
+def useLegendreJacobi():
+    """Setup Legendre type Jacobi polynomial"""
+
+    chooseParameters(0, m)
+
+def useChebyshevZeroJacobi():
+    """Setup Legendre type Jacobi polynomial"""
+
+    chooseParameters(-sympy.Rational(1,2), -sympy.Rational(1,2))
+
+def useChebyshevJacobi():
+    """Setup Chebyshev type Jacobi polynomial"""
+
+    chooseParameters(-sympy.Rational(1,2), m - sympy.Rational(1,2))
+
 def x1():
     """Cylinder x operator"""
 

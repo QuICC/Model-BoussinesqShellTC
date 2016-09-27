@@ -1,5 +1,5 @@
 /** 
- * @file WorlandTransform.cpp
+ * @file SphereWorlandTransform.cpp
  * @brief Source of the implementation of the Worland transform in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PolynomialTransforms/WorlandTransform.hpp"
+#include "PolynomialTransforms/SphereWorlandTransform.hpp"
 
 // Project includes
 //
@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   Array WorlandTransform::generateGrid(const int size)
+   Array SphereWorlandTransform::generateGrid(const int size)
    {
       // Initialise grid storage
       Array grid(size);
@@ -36,15 +36,15 @@ namespace Transform {
       return grid;
    }
 
-   WorlandTransform::WorlandTransform()
+   SphereWorlandTransform::SphereWorlandTransform()
    {
    }
 
-   WorlandTransform::~WorlandTransform()
+   SphereWorlandTransform::~SphereWorlandTransform()
    {
    }
 
-   void WorlandTransform::init(WorlandTransform::SharedSetupType spSetup)
+   void SphereWorlandTransform::init(SphereWorlandTransform::SharedSetupType spSetup)
    {
       // Store the shared pointer to setup object
       this->mspSetup = spSetup;
@@ -53,31 +53,31 @@ namespace Transform {
       this->initOperators();
    }
 
-   void WorlandTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
+   void SphereWorlandTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
       //
       // No possible options
       //
    }
 
-   void WorlandTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
+   void SphereWorlandTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
       //
       // No possible options
       //
    }
 
-   const Array& WorlandTransform::meshGrid() const
+   const Array& SphereWorlandTransform::meshGrid() const
    {
       if(this->mGrid.size() == 0 || this->mWeights.size() == 0)
       {
-         throw Exception("WorlandTransform has not been initialised!");
+         throw Exception("SphereWorlandTransform has not been initialised!");
       }
 
       return this->mGrid;
    }
 
-   void WorlandTransform::initOperators()
+   void SphereWorlandTransform::initOperators()
    {
       this->mGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
@@ -139,27 +139,27 @@ namespace Transform {
          projIt->second.at(iL) = op.transpose();
 
          // 1/R Projector: 1/R P
-         Polynomial::WorlandPolynomial::r_1WnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVR);
          projIt->second.at(iL) = op.transpose();
 
          // First derivative: D
-         Polynomial::WorlandPolynomial::dWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFF);
          projIt->second.at(iL) = op.transpose();
 
          // D R
-         Polynomial::WorlandPolynomial::drWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::drWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFFR);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R D R
-         Polynomial::WorlandPolynomial::r_1drWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
          projIt->second.at(iL) = op.transpose();
 
          // Spherical laplacian: D^2 2/R D - l(l+1)/R^2
-         Polynomial::WorlandPolynomial::slaplWnlA(op, itmp, l, igrid);
+         Polynomial::WorlandPolynomial::slaplWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::SLAPL);
          projIt->second.at(iL) = op.transpose();
 
@@ -169,7 +169,7 @@ namespace Transform {
       }
    }
 
-   void WorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, WorlandTransform::IntegratorType::Id integrator)
+   void SphereWorlandTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, SphereWorlandTransform::IntegratorType::Id integrator)
    {
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
@@ -179,11 +179,11 @@ namespace Transform {
       assert(rSpecVal.cols() == this->mspSetup->howmany());
 
       // Compute first derivative integration
-      if(integrator == AssociatedLegendreTransform::IntegratorType::INTGR)
+      if(integrator == SphereWorlandTransform::IntegratorType::INTGR)
       {
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
 
-      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTG)
+      } else if(integrator == SphereWorlandTransform::IntegratorType::INTG)
       {
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
 
@@ -194,7 +194,7 @@ namespace Transform {
 
    }
 
-   void WorlandTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, WorlandTransform::ProjectorType::Id projector)
+   void SphereWorlandTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, SphereWorlandTransform::ProjectorType::Id projector)
    {
       // assert right sizes for input  matrix
       assert(specVal.cols() == this->mspSetup->howmany());
@@ -204,32 +204,32 @@ namespace Transform {
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
       // Compute D
-      if(projector == AssociatedLegendreTransform::ProjectorType::DIFF)
+      if(projector == SphereWorlandTransform::ProjectorType::DIFF)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       // Compute 1/R
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVR)
+      } else if(projector == SphereWorlandTransform::ProjectorType::DIVR)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       // Compute D R
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIFFR)
+      } else if(projector == SphereWorlandTransform::ProjectorType::DIFFR)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       // Compute 1/R D R
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVRDIFFR)
+      } else if(projector == SphereWorlandTransform::ProjectorType::DIVRDIFFR)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       // Compute D^2 + 2/R - l(l+1)/R2
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::SLAPL)
+      } else if(projector == SphereWorlandTransform::ProjectorType::SLAPL)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       // Compute simple projection
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJ)
+      } else if(projector == SphereWorlandTransform::ProjectorType::PROJ)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
@@ -239,7 +239,7 @@ namespace Transform {
       }
    }
 
-   void WorlandTransform::setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
+   void SphereWorlandTransform::setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
    {
       // Compute integration
       int start = 0;
@@ -253,7 +253,7 @@ namespace Transform {
       }
    }
 
-   void WorlandTransform::setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops)
+   void SphereWorlandTransform::setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops)
    {
       int start = 0;
       int physRows = this->mspSetup->fwdSize(); 
@@ -267,7 +267,7 @@ namespace Transform {
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   MHDFloat WorlandTransform::requiredStorage() const
+   MHDFloat SphereWorlandTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 

@@ -15,7 +15,7 @@ bc_vel = 0 # 0: NS/NS
 
 # Create parameters
 m = 3
-res = [64, 0, 32]
+res = [64, 0, 64]
 Ta = (1e-3)**(-2)
 Gamma = 1.0
 eq_params = {'taylor':Ta, 'gamma':Gamma, 'rayleigh':0}
@@ -35,6 +35,7 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-12
 marginal_options['geometry'] = 'cylinder_worland'
 marginal_options['ellipse_radius'] = 1e3
+marginal_options['target'] = -104
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True

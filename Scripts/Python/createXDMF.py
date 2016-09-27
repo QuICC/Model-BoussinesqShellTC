@@ -145,9 +145,9 @@ def main(argv):
 
             print(xdmfVxVyVzGrid.format(nFast = nFast, nMid = nMid, nSlow = nSlow, fid = fId, basename = basename, gFast = gFast, gMid = gMid, gSlow = gSlow, rFast = xdmfRevGrid.format(nD = nFast) if rFast else '', rFastEnd = xdmfRevGridEnd if rFast else '', rMid = xdmfRevGrid.format(nD = nMid) if rMid else '', rMidEnd = xdmfRevGridEnd if rMid else '', rSlow = xdmfRevGrid.format(nD = nSlow) if rSlow else '', rSlowEnd = xdmfRevGridEnd if rSlow else ''), file=out_file)
 
-        elif scheme in [b'CFT', b'AFT', b'BLFl', b'BLFm', b'SLFm', b'SLFl']:
+        elif scheme in [b'CFT', b'WFT', b'AFT', b'BLFl', b'BLFm', b'SLFm', b'SLFl']:
             if fId == sId:
-                if scheme in [b'CFT']:
+                if scheme in [b'CFT',b'WFT']:
                     gridfunc = cylinderXYZ
                     gridfname = 'cylinder'
                 elif scheme in [b'AFT']:
@@ -240,10 +240,10 @@ def boxXYZ(pFast, pMid, pSlow):
     return np.array([pFast, pMid*np.ones(pFast.shape), pSlow*np.ones(pFast.shape)])
 
 def cylinderXYZ(pz, pth, pr):
-    return np.array([pz, pr*np.cos(pth)*np.ones(pz.shape), pr*np.sin(pth)*np.ones(pz.shape)])
+    return np.array([pz, pr*np.cos(pth)*np.ones(pz.shape), pr*np.sin(pth)*np.ones(pz.shape)]).T
 
 def annulusXYZ(pz, pth, pr):
-    return np.array([pz, pr*np.cos(pth)*np.ones(pz.shape), pr*np.sin(pth)*np.ones(pz.shape)])
+    return np.array([pz, pr*np.cos(pth)*np.ones(pz.shape), pr*np.sin(pth)*np.ones(pz.shape)]).T
 
 def sphereXYZ(pph, pth, pr):
     return np.array([pr*cos(pth)*np.ones(pph.shape), pr*np.sin(pth)*np.cos(pph), pr*np.sin(pth)*np.sin(pph)]).T
