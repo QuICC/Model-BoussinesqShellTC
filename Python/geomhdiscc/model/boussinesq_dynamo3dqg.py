@@ -69,7 +69,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz",""), ("emfx",""), ("emfy",""),("pressure","")]:
+            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz",""), ("emfx",""), ("emfy",""), ("pressure","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -257,6 +257,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                 mat = geo.qid(res[0], 0, bc)
             else:
                 mat = geo.zblk(res[0], bc)
+
 
         elif field_row == ("fbx","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:

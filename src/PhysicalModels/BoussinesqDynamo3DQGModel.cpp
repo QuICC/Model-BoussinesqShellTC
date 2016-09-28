@@ -28,10 +28,10 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVelocityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGTransport.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVorticityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGPressure.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGMeanHeat.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfx.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfy.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGPressure.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBx.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBy.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbx.hpp"
@@ -83,9 +83,6 @@ namespace GeoMHDiSCC {
       // Add Emfy computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBy>();
 
-      // Add mean Emfy (called Pressure) computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGPressure>();
-
       // Add fbx computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfbx>();
 
@@ -94,6 +91,9 @@ namespace GeoMHDiSCC {
 
       // Add fbz heat computation
       spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfbz>();
+
+      // Add fbz heat computation
+      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGPressure>();
    }
 
    void BoussinesqDynamo3DQGModel::addStates(SharedStateGenerator spGen)
@@ -205,6 +205,7 @@ namespace GeoMHDiSCC {
          spRand->setIdentity(PhysicalNames::PRESSURE);
          spRand->setSpectrum(-1e-6, 1e-6, 1e4, 1e4, 1e4,Equations::RandomScalarState::ONLYMEAN);
 
+
       }
 
       // Add output file
@@ -276,6 +277,7 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::PRESSURE);
 
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
@@ -285,9 +287,9 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::BX);
       spOut->expect(PhysicalNames::BY);
       spOut->expect(PhysicalNames::VORTICITYZ);
-      spOut->expect(PhysicalNames::PRESSURE);
       spOut->expect(PhysicalNames::EMFY);
       spOut->expect(PhysicalNames::EMFX);
+      spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -305,8 +307,8 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::BY);
       spIn->expect(PhysicalNames::VORTICITYZ);
       spIn->expect(PhysicalNames::EMFY);
-      spIn->expect(PhysicalNames::PRESSURE);
       spIn->expect(PhysicalNames::EMFX);
+      spIn->expect(PhysicalNames::PRESSURE);
 
       // Set simulation state
       spVis->setInitialState(spIn);
