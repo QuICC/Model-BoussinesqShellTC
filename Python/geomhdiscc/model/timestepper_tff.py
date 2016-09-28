@@ -141,7 +141,7 @@ class TimestepperTFF(base_model.BaseModel):
         elif bcs["bcType"] == self.STENCIL:
             if self.use_galerkin:
                 if field_col == ("temperature",""):
-                    bc = {0:-20, 'rt':0}
+                    bc = {0:-20, 'rt':2}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:

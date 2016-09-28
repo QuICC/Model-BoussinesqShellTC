@@ -529,3 +529,10 @@ def surfaceFlux(nx, cscale = 1.0):
     mat = 2.0*cscale*mat
 
     return mat.tocoo()
+
+def tau_mat(nx, tau, pad, bc, coeff = 1.0):
+    """Create a quasi identity block of order q"""
+
+    mat = spsp.coo_matrix((nx,nx))
+    mat = c1dbc.constrain(mat, tau, pad_zeros = pad)
+    return c1dbc.constrain(mat, bc)

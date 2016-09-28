@@ -340,6 +340,12 @@ namespace Equations {
       eq.dispatchGalerkinStencil(compId, stencil, matIdx, eq.unknown().dom(0).spRes(), eq.couplingInfo(compId).eigenTools().getEigs(eq.spRes(), matIdx), true);
       stencil.makeCompressed();
 
+      // Check that square stencil was generated (Python setup is wrong if matrix is not square)
+      if(stencil.rows() != stencil.cols())
+      {
+      	throw Exception("Stencil setup is wrong and did not produce a square matrix");
+      }
+
       // Create solver and factorize stencil
       Solver::SparseSelector<SparseMatrix>::Type solver;
       solver.compute(stencil);
