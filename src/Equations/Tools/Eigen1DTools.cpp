@@ -47,24 +47,24 @@ namespace Equations {
       return spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATND>();
    }
 
-   void Eigen1DTools::interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const
+   void Eigen1DTools::interpretTauN(ArrayI& rTauNs, const SharedResolution& spRes) const
    {
-      rTauNs.setConstant(tauSize);
+      // Python setup is sufficient
    }
 
-   void Eigen1DTools::interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const
+   void Eigen1DTools::interpretGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const
    {
-      rGalerkinNs.setConstant(galerkinSize);
+      // Python setup is sufficient
    }
 
-   void Eigen1DTools::interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const
+   void Eigen1DTools::interpretRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const
    {
-      rRhsCols.setConstant(rhsSize);
+      // Python setup is sufficient
    }
 
-   void Eigen1DTools::interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const
+   void Eigen1DTools::interpretSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const
    {
-      rSystemNs.setConstant(systemSize);
+      // Python setup is sufficient
    }
 }
 }

@@ -7,29 +7,45 @@ import numpy as np
 
 abbr = {'prandtl':'Pr', 'rayleigh':'Ra', 'taylor':'Ta'}
 
-def viewOperators(A, B = None, show = True, save = False):
+def viewOperators(A, B = None, C = None, show = True, save = False):
     """Spy and/or write the operators to MatrixMarket file"""
 
     if save:
         import scipy.io as sciio
         sciio.mmwrite("matrix_A.mtx", A)
         sciio.mmwrite("matrix_B.mtx", B)
+        sciio.mmwrite("matrix_C.mtx", C)
 
     # Spy the A (and B) operators
     if show:
         import matplotlib.pylab as pl
 
         if B is not None:
-            pl.subplot(1,2,1)
+            if C is not None:
+                pl.subplot(1,3,1)
+            else:
+                pl.subplot(1,2,1)
         pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
+        pl.xlabel('A')
         pl.tick_params(axis='x', labelsize=30)
         pl.tick_params(axis='y', labelsize=30)
 
         if B is not None:
-            pl.subplot(1,2,2)
+            if C is not None:
+                pl.subplot(1,3,2)
+            else:
+                pl.subplot(1,2,2)
             pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
             pl.tick_params(axis='x', labelsize=30)
             pl.tick_params(axis='y', labelsize=30)
+            pl.xlabel('B')
+
+        if C is not None:
+            pl.subplot(1,3,3)
+            pl.spy(C, markersize=5, marker = '.', markeredgecolor = 'b')
+            pl.tick_params(axis='x', labelsize=30)
+            pl.tick_params(axis='y', labelsize=30)
+            pl.xlabel('C')
 
         pl.show()
         pl.clf()

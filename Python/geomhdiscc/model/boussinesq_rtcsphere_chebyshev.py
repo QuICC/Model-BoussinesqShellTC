@@ -67,7 +67,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -99,7 +99,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         return geo.stencil(res[0], res[1], m, bc, make_square)
 
-    def stability_sizes(self, res, eigs):
+    def stability_sizes(self, res, eigs, bcs):
         """Get the block sizes in the stability calculation matrix"""
 
         assert(eigs[0].is_integer())
@@ -109,7 +109,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         # Block sizes
         blocks = []
         for f in self.stability_fields():
-            blocks.append(self.block_size(res, f)[1]*(res[1]-m))
+            blocks.append(self.block_size(res, eigs, bcs, f)[1]*(res[1]-m))
 
         # Invariant size (local dimension in spectral space, no restriction)
         invariant = (res[0],)*len(self.stability_fields())

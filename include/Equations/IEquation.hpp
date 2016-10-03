@@ -66,7 +66,7 @@ namespace Equations {
          /**
           * @brief Initialise the equation
           */
-         virtual void init();
+         virtual void init(const SharedSimulationBoundary spBcIds);
 
          /**
           * @brief Generic model operator dispatcher to python scripts
@@ -101,10 +101,8 @@ namespace Equations {
 
          /**
           * @brief Initialise the spectral equation matrices
-          *
-          * @param spBcIds   List of boundary condition IDs
           */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
+         virtual void initSpectralMatrices() = 0;
 
          /**
           * @brief Implementation of the galerkin stencil dispatch to python scripts

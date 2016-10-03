@@ -49,28 +49,27 @@ namespace Equations {
       return spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
    }
 
-   void EigenSHlTools::interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const
+   void EigenSHlTools::interpretTauN(ArrayI& rTauNs, const SharedResolution& spRes) const
    {
-      rTauNs.setConstant(tauSize);
+      // Python setup is sufficient
    }
 
-   void EigenSHlTools::interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const
+   void EigenSHlTools::interpretGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const
    {
-      rGalerkinNs.setConstant(galerkinSize);
+      // Python setup is sufficient
    }
 
-   void EigenSHlTools::interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const
+   void EigenSHlTools::interpretRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const
    {
-      rRhsCols.setConstant(rhsSize);
       for(int l = 0; l < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); l++)
       {
          rRhsCols(l) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(l);
       }
    }
 
-   void EigenSHlTools::interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const
+   void EigenSHlTools::interpretSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const
    {
-      rSystemNs.setConstant(systemSize);
+      // Python setup is sufficient
    }
 
 }
