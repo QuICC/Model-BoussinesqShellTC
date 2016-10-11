@@ -58,22 +58,22 @@ namespace Equations {
          /**
           * @brief Set Tau resolution
           */
-         void setTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const;
+         void setTauN(ArrayI& rTauNs, const SharedResolution& spRes) const;
 
          /**
           * @brief Set Galerkin resolution provided by python code
           */
-         void setGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const;
+         void setGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const;
 
          /**
           * @brief Set number of RHS provided by python code
           */
-         void setRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const;
+         void setRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const;
 
          /**
           * @brief Set system size provided by python code
           */
-         void setSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const;
+         void setSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const;
 
       private:
          /**
@@ -91,22 +91,22 @@ namespace Equations {
          /**
           * @brief Interpret Tau resolution provided by python code
           */
-         virtual void interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const = 0;
+         virtual void interpretTauN(ArrayI& rTauNs, const SharedResolution& spRes) const = 0;
 
          /**
           * @brief Interpret Galerkin resolution provided by python code
           */
-         virtual void interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const = 0;
+         virtual void interpretGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const = 0;
 
          /**
           * @brief Interpret number of RHS provided by python code
           */
-         virtual void interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const = 0;
+         virtual void interpretRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const = 0;
 
          /**
           * @brief Interpret system size provided by python code
           */
-         virtual void interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const = 0;
+         virtual void interpretSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const = 0;
    };
 
    /// Typedef for a shared IEigenTools

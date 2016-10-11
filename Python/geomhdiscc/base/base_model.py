@@ -130,27 +130,35 @@ class BaseModel:
         # Additional explicit update for next step linear fields
         next_fields = self.explicit_fields(self.EXPLICIT_NEXTSTEP, field_row)
 
+        return (is_complex, im_fields, lin_fields, nl_fields, next_fields, index_mode)
+
+    def operator_info(self, res, eigs, bcs, field_row):
+        """Combine block sizes into global operator info"""
+
+        # Implicit field coupling
+        im_fields = self.implicit_fields(field_row)
+
         # Compute block info
-        block_info = self.block_size(res, field_row)
+        info = self.block_size(res, eigs, bcs, field_row)
 
         # Compute system size
         sys_n = 0
         for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
+            sys_n += self.block_size(res, eigs, bcs, f)[1]
         
         if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
+            sys_n = info[1]
+        info = info + (sys_n,)
 
-        return (is_complex, im_fields, lin_fields, nl_fields, next_fields, index_mode, block_info)
+        return info
 
-    def stability_sizes(self, res, eigs):
+    def stability_sizes(self, res, eigs, bcs):
         """Get the block sizes in the stability calculation matrix"""
 
         # Block sizes
         blocks = []
         for f in self.stability_fields():
-            blocks.append(self.block_size(res, f)[1])
+            blocks.append(self.block_size(res, eigs, bcs, f)[1])
 
         # Invariant size (local dimension in spectral space, no restriction)
         invariant = (res[0],)*len(self.stability_fields())
@@ -170,10 +178,10 @@ class BaseModel:
 
         raise NotImplementedError("Model cannot be used for linear stability calculations!")
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
-        raise NotImplementedError("Model cannot be used for linear stability calculations!")
+        raise NotImplementedError("Operator block sizes have not been defined!")
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""

@@ -111,7 +111,7 @@ namespace Equations {
           *
           * @param spBcIds   List of boundary condition IDs
           */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
+         virtual void initSpectralMatrices();
 
          /**
           * @brief Generic model operator dispatcher to python scripts
@@ -369,8 +369,8 @@ namespace Equations {
       int zeroCol = 0;
       if(useShift)
       {
-         zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-         zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+         zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+         zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
       }
 
       // matIdx is the index of the slowest varying direction with single RHS
@@ -631,8 +631,8 @@ namespace Equations {
          {
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
 
             //Safety assertion
             assert(start >= 0);
@@ -681,8 +681,8 @@ namespace Equations {
          {
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
 
             //Safety assertion
             assert(start >= 0);
@@ -706,7 +706,7 @@ namespace Equations {
             // Get mode indexes
             ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
 
             // Copy data
             int k = start;
@@ -724,9 +724,9 @@ namespace Equations {
          {
             assert(matIdx == 0);
 
-            //int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            //int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-            //int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+            //int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            //int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            //int zeroBlock = eq.couplingInfo(compId).galerkinShift(matIdx,2);
 
             //Safety assertion
             assert(start >= 0);
@@ -777,8 +777,8 @@ namespace Equations {
          #else
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
 
             // Copy data
             int k = start;
@@ -799,8 +799,8 @@ namespace Equations {
       {
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
          int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+         int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
 
          //Safety assertion
          assert(start >= 0);
@@ -823,7 +823,7 @@ namespace Equations {
          // Get mode indexes
          ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
-         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
 
          // Copy data
          int k = start;

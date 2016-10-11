@@ -12,12 +12,13 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [64, 0, 0]
+res = [512, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.69672, 'ekman':1e-7, 'scale1d':2.0, 'fast_mean':0, 'rescaled':1}
+eq_params = {'prandtl':1, 'rayleigh':20, 'ekman':1e-8, 'scale1d':2.0, 'fast_mean':0, 'rescaled':1}
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':1, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':2, 'temperature':0}
 phi = 0
 kp = 1.30476
 kpm = 0.02
@@ -49,17 +50,18 @@ marginal_options['evp_tol'] = 1e-12
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 6
+marginal_options['solve_nev'] = 3
 marginal_options['point_k'] = kp
 marginal_options['plot_curve'] = False
 marginal_options['plot_point'] = False
-marginal_options['plot_spy'] = False
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['save_spectra'] = False
 marginal_options['show_physical'] = True
 marginal_options['save_physical'] = False
 marginal_options['save_pdf'] = False
-marginal_options['viz_mode'] = -1
+marginal_options['write_mtx'] = True
+marginal_options['viz_mode'] = 0
 marginal_options['curve_points'] = np.arange(max(0, kp-kpm), kp+kpp, dkp)
 
 # Compute 

@@ -331,6 +331,8 @@ def stencil(nx, bc):
         mat = stencil_value(nx, 0)
     elif bc[0] == -21:
         mat = stencil_diff(nx, 0)
+    elif bc[0] == -23:
+        mat = stencil_diff2(nx, 0)
     elif bc[0] == -40:
         mat = stencil_value_diff(nx, 0)
     elif bc[0] == -41:

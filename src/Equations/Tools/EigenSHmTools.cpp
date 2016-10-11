@@ -46,47 +46,47 @@ namespace Equations {
       return spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
    }
 
-   void EigenSHmTools::interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const
+   void EigenSHmTools::interpretTauN(ArrayI& rTauNs, const SharedResolution& spRes) const
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
          #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
-            rTauNs(m) = tauSize*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
+            rTauNs(m) = rTauNs(m)*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
-            rTauNs(m) = tauSize*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
+            rTauNs(m) = rTauNs(m)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
          #endif //GEOMHDISCC_MPISPSOLVE
 
       }
    }
 
-   void EigenSHmTools::interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const
+   void EigenSHmTools::interpretGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
          #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
-            rGalerkinNs(m) = galerkinSize*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
+            rGalerkinNs(m) = rGalerkinNs(m)*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
-            rGalerkinNs(m) = galerkinSize*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
+            rGalerkinNs(m) = rGalerkinNs(m)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
          #endif //GEOMHDISCC_MPISPSOLVE
       }
    }
 
-   void EigenSHmTools::interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const
+   void EigenSHmTools::interpretRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const
    {
-      rRhsCols.setConstant(rhsSize);
+      // Python setup is sufficient
    }
 
-   void EigenSHmTools::interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const
+   void EigenSHmTools::interpretSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
          #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
-            rSystemNs(m) = systemSize*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
+            rSystemNs(m) = rSystemNs(m)*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
-            rSystemNs(m) = systemSize*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
+            rSystemNs(m) = rSystemNs(m)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
          #endif //GEOMHDISCC_MPISPSOLVE
       }
    }

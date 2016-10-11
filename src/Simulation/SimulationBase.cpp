@@ -113,7 +113,7 @@ namespace GeoMHDiSCC {
       std::vector<Transform::TransformTree> integratorTree;
 
       // Map variables to the equations and set nonlinear requirements
-      RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables, this->mForwardIsNonlinear);
+      RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables, this->mForwardIsNonlinear, spBcs);
 
       stage.done();
 
@@ -126,7 +126,7 @@ namespace GeoMHDiSCC {
       stage.start("setup equations");
 
       // Initialise the equations (generate operators, etc)
-      this->setupEquations(spBcs);
+      this->setupEquations();
 
       // Sort the equations by type: time/solver/trivial
       this->sortEquations();
@@ -386,7 +386,7 @@ namespace GeoMHDiSCC {
       Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, integratorTree, projectorTree, this->mspRes, runOptions);
    }
 
-   void SimulationBase::setupEquations(const SharedSimulationBoundary spBcs)
+   void SimulationBase::setupEquations()
    {
       // Create iterators over scalar equations
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
@@ -396,13 +396,13 @@ namespace GeoMHDiSCC {
       // Loop over all scalar equations
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
       {
-         (*scalEqIt)->initSpectralMatrices(spBcs);
+         (*scalEqIt)->initSpectralMatrices();
       }
 
       // Loop over all vector equations
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
       {
-         (*vectEqIt)->initSpectralMatrices(spBcs);
+         (*vectEqIt)->initSpectralMatrices();
       }
    }
 
