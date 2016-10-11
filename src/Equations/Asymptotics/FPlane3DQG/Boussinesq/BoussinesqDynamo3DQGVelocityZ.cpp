@@ -55,8 +55,7 @@ namespace Equations {
       ///
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
       
-//      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()).matrix())   
-      ;
+//      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()).matrix());
    }
 
    void BoussinesqDynamo3DQGVelocityZ::setRequirements()

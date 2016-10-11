@@ -60,24 +60,6 @@ namespace Equations {
 
    }
 
-   Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGEmfx::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
-   {
-      // Assert on scalar component is used
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iY) == 0)
-      {
-         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iZ,iY) == 0)
-         {
-            if(iX == 0)
-            {
-               return Datatypes::SpectralScalarType::PointType(-1.0);
-            }
-         }
-      } 
-
-      return Datatypes::SpectralScalarType::PointType(0.0);
-   }
 
    void BoussinesqDynamo3DQGEmfx::setRequirements()
    {
