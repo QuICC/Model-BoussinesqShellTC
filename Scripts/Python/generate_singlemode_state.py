@@ -5,7 +5,6 @@ from __future__ import print_function
 import sys, getopt
 import numpy as np
 import numpy.fft as fft
-import matplotlib.pylab as pl
 import tables
 import xml.etree.ElementTree as ET
 
@@ -13,8 +12,9 @@ argv = sys.argv[1:]
 inputfile = ''
 outputfile = ''
 sim_type = None
+viz_fields = False
 try:
-    opts, args = getopt.getopt(argv,"hi:o:t:")
+    opts, args = getopt.getopt(argv,"hi:o:t:v")
 except getopt.GetoptError:
     print('generate_singlemode_state.py -i <inputfile> -o <outputfile> -t <simulation type>')
     sys.exit(2)
@@ -28,6 +28,8 @@ for opt, arg in opts:
         outputfile = arg
     elif opt in ("-t"):
         sim_type = arg
+    elif opt in ("-v"):
+        viz_fields = True
 
 if sim_type not in ["FPlane3DQG", "RRBCPlane", "RRBCPlaneMean", "RRBCPlaneDMean"]:
     print("Unknown simulation type")
@@ -90,6 +92,15 @@ for f in fields:
     cheb = fft.rfft(phys_data).real/phys_data.shape[0]
     data[f] = np.zeros((nnz,))
     data[f][0:min(cheb.shape[0],nnz)] = cheb[0:min(cheb.shape[0],nnz)]
+    if viz_fields:
+        import matplotlib.pylab as pl
+        pl.subplot(121)
+        pl.plot(grid, phys_data[0:nz])
+        pl.title(f)
+        pl.subplot(122)
+        pl.semilogy(np.abs(data[f][0:min(cheb.shape[0],nnz)]))
+        pl.title(f)
+        pl.show()
 
 if sim_type in ["RRBCPlane", "RRBCPlaneMean", "RRBCPlaneDMean"]:
     data["velocity_tor"] = -data["streamfunction"]
