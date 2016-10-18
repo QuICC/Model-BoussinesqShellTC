@@ -87,6 +87,7 @@ for f in fields:
     phys_data[0:nz] = data[f][0:nz][::-1]
     if f == "mean_temperature":
         phys_data[0:nz] -= 1.0 - 0.5*(grid + 1.0)
+    if f == "mean_temperature" and sim_type in ["RRBCPlane", "RRBCPlaneMean", "RRBCPlaneDMean"]:
         phys_data[0:nz] /= phys_params.get('rossby', 1.0)
     phys_data[nz:] = phys_data[1:nz-1][::-1]
     cheb = fft.rfft(phys_data).real/phys_data.shape[0]
@@ -137,6 +138,12 @@ hdf5_file.create_array(group2, "dim1D", nnz-1)
 hdf5_file.create_array(group2, "dim2D", 2*(nnx-1))
 hdf5_file.create_array(group2, "dim3D", nny-1)
 
+def writeMean(name, c = 1.0):
+    group = hdf5_file.create_group("/", name)
+    tmp = np.zeros((2*nnx-1,nny,nnz), dtype=np.complex128)
+    tmp[0,0,0:nnz].real = cmean*data[mean][0:nnz]
+    hdf5_file.create_array(group, name, tmp)
+
 def writeScalar(name, c = 1.0, mean = None, cmean = 1.0):
     group = hdf5_file.create_group("/", name)
     tmp = np.zeros((2*nnx-1,nny,nnz), dtype=np.complex128)
@@ -163,7 +170,7 @@ def writeVector(name, comp, coeff = None):
 if sim_type == "FPlane3DQG":
     writeScalar("temperature")
     writeScalar("streamfunction")
-    writeScalar("dz_meantemperature")
+    writeMean("dz_meantemperature")
     writeScalar("velocityz")
 
 ############################################
@@ -176,14 +183,14 @@ if sim_type == "RRBCPlane":
 # Write HDF5 RRBCPlaneMean fields
 if sim_type == "RRBCPlaneMean":
     writeScalar("temperature")
-    writeScalar("meantemperature")
+    writeMean("meantemperature")
     writeVector("velocity", ["tor","pol"])
 
 ############################################
 # Write HDF5 RRBCPlaneDMean fields
 if sim_type == "RRBCPlaneDMean":
     writeScalar("temperature")
-    writeScalar("dz_meantemperature")
+    writeMean("dz_meantemperature")
     writeVector("velocity", ["tor","pol"])
 
 hdf5_file.close()
