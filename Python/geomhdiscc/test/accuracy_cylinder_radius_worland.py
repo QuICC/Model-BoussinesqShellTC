@@ -297,16 +297,61 @@ def test_fft(n, m):
     # Print error for FFT transform loop
     print(np.max(np.abs(s.T-fs.T)))
 
+def test_endpoints(n, m):
+    """Test endpoint values"""
+
+    t = []
+    t.append(wb.worland_value(n, m))
+    t.append(wb.worland_diff(n, m))
+    t.append(wb.worland_diff2(n, m))
+    t.append(wb.worland_diff3(n, m))
+    t.append(wb.worland_diff4(n, m))
+    t.append(wb.worland_rdiffdivr(n, m))
+    t.append(wb.worland_divrdiffr(n, m))
+    t.append(wb.worland_laplh_cyl(n, m))
+    t.append(wb.worland_dlaplh_cyl(n, m))
+    t.append(wb.worland_lapl2h_cyl(n, m))
+    t = np.array(t).T
+    np.savetxt("cylinder_worland_endpoints_l"+str(m)+".dat", t)
+    print("Endpoint values:")
+    print("Value, Diff, Diff2, Diff3, Diff4, rdiffdivr, divrdiff, laplh, dlaplh, lapl2h")
+    print(t)
+
+def test_stencils(n, m):
+    """Test endpoint values"""
+
+    print("Stencil errors: m = " + str(m))
+    print("\t Value:")
+    err = geo.radbc.stencil_value(n,m).T*wb.worland_value(n, m)
+    print(np.max(np.abs(err)))
+    print("\t Diff:")
+    val = geo.radbc.stencil_diff(n,m).T*wb.worland_diff(n, m)
+    print(np.max(np.abs(err)))
+    print("\t Value + Diff:")
+    t = np.array([wb.worland_value(n, m), wb.worland_diff(n, m)])
+    err = geo.radbc.stencil_value_diff(n,m).T*t.T
+    print(np.max(np.abs(err),0))
+    # print("\t Value + Diff2:")
+    #t = np.array([wb.worland_value(n, m), wb.worland_diff2(n, m)])
+    #err = geo.radbc.stencil_value_diff2(n,m).T*t.T
+    #print(np.max(np.abs(err),0))
+    print("\t Value + Laplh:")
+    t = np.array([wb.worland_value(n, m), wb.worland_laplh_cyl(n, m)])
+    err = geo.radbc.stencil_value_laplh(n,m).T*t.T
+    print(np.max(np.abs(err),0))
 
 if __name__ == "__main__":
     # Set test parameters
-    n = 16
+    n = 6
     nr = int(np.ceil(3.0*n/2.0 + 3.0*n/4.0 + 1))
     print("Grid: " + str((n, nr)))
     rg = wb.worland_grid(nr)
 
     # run tests
 #    test_worland(nr, 110)
+    for i in range(0,4):
+        test_endpoints(n, i)
+    test_stencils(n, 0)
 #    test_fft(nr, 32)
 #    zblk(nr, rg)
 #    i2(n, rg)
@@ -317,4 +362,4 @@ if __name__ == "__main__":
 #    i6(nr, rg)
 #    i6laplh(nr, rg)
 #    i6lapl2h(nr, rg)
-    i6lapl3h(nr, rg)
+#    i6lapl3h(nr, rg)

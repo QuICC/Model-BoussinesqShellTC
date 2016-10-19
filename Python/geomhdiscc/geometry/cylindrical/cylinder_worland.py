@@ -194,7 +194,7 @@ def qid(nr, nz, m, qr, qz, bc, coeff = 1.0, restriction = None):
 
 def stencil(nr, nz, m, bc, make_square, restriction = None):
     """Create a galerkin stencil matrix"""
-    
+        
     bcr, bcz = convert_bc(bc)
     mat_r = rad.stencil(nr, m, bcr, make_square)
     mat_z = c1d.stencil(nz, bcz, make_square)
@@ -212,7 +212,7 @@ def tau_mat_r(nr, nz, m, tau, kron_op, qr, qz, bc, location = 't', restriction =
     s = tau.get('kron_shift',0)
     matR = spsp.lil_matrix((nr,nr))
     matR = rad.radbc.constrain(matR, m, tau, pad_zeros = pad, location = location)
-    matZ = cylbc.bzid(nz,sz,dz, c1d.c1dbc.no_bc(), location = location)*kron_op(nz+s, {0:0, 'rt':s, 'cr':s})
+    matZ = cylbc.bzid(nz,sz,dz, c1d.c1dbc.no_bc(), location = location)*kron_op(nz+s, bc = {0:0, 'rt':s, 'cr':s})
 
     matR = rad.radbc.constrain(matR, m, bcr, location = location)
     matZ = c1d.c1dbc.constrain(matZ, bcz, location = location)

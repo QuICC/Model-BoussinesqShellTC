@@ -141,7 +141,7 @@ hdf5_file.create_array(group2, "dim3D", nny-1)
 def writeMean(name, c = 1.0):
     group = hdf5_file.create_group("/", name)
     tmp = np.zeros((2*nnx-1,nny,nnz), dtype=np.complex128)
-    tmp[0,0,0:nnz].real = c*data[mean][0:nnz]
+    tmp[0,0,0:nnz].real = c*data[name][0:nnz]
     hdf5_file.create_array(group, name, tmp)
 
 def writeScalar(name, c = 1.0, mean = None, cmean = 1.0):

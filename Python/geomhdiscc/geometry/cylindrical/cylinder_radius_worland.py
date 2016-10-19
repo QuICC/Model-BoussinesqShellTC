@@ -32,7 +32,10 @@ def i2(nr, m, bc, coeff = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return wb.worland_norm_row(n,m,-2)*4.0*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
+        if m == 0:
+            return wb.worland_norm_row(n,0,-2)/((2.0*n - 3.0)*(2.0*n - 1.0))
+        else:
+            return wb.worland_norm_row(n,m,-2)*4.0*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
 
     # Generate 1st subdiagonal
     def d_1(n):
@@ -92,7 +95,10 @@ def i4(nr, m, bc, coeff = 1.0):
 
     # Generate 4th subdiagonal
     def d_4(n):
-        return wb.worland_norm_row(n, m, -4)*16.0*(m + n - 4.0)*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 8.0)*(m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
+        if m == 0:
+            return wb.worland_norm_row(n, 0, -4)/((2.0*n - 7.0)*(2.0*n - 5.0)*(2.0*n - 3.0)*(2.0*n - 1.0))
+        else:
+            return wb.worland_norm_row(n, m, -4)*16.0*(m + n - 4.0)*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 8.0)*(m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
 
     # Generate 3rd subdiagonal
     def d_3(n):
@@ -218,7 +224,10 @@ def i6(nr, m, bc, coeff = 1.0):
 
     # Generate 6th subdiagonal
     def d_6(n):
-        return wb.worland_norm_row(n, m, -6)*64.0*(m + n - 6.0)*(m + n - 5.0)*(m + n - 4.0)*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 12.0)*(m + 2.0*n - 11.0)*(m + 2.0*n - 10.0)*(m + 2.0*n - 9.0)*(m + 2.0*n - 8.0)*(m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
+        if m == 0:
+            return wb.worland_norm_row(n, 0, -6)/((2.0*n - 11.0)*(2.0*n - 9.0)*(2.0*n - 7.0)*(2.0*n - 5.0)*(2.0*n - 3.0)*(2.0*n - 1.0))
+        else:
+            return wb.worland_norm_row(n, m, -6)*64.0*(m + n - 6.0)*(m + n - 5.0)*(m + n - 4.0)*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 12.0)*(m + 2.0*n - 11.0)*(m + 2.0*n - 10.0)*(m + 2.0*n - 9.0)*(m + 2.0*n - 8.0)*(m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
 
     # Generate 5th subdiagonal
     def d_5(n):
@@ -442,7 +451,8 @@ def stencil(nr, m, bc, make_square):
 
     mat = qid(nr, m, 0, radbc.no_bc())
 
-    if not make_square:
-        bc['rt'] = 0
+    if make_square:
+        bc['rb'] = bc['rt']
+    bc['rt'] = 0
 
     return radbc.constrain(mat, m, bc)

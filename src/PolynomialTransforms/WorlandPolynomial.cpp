@@ -21,6 +21,7 @@
 #define GEOMHDISCC_WORLAND_NORM_UNITY
 //#define GEOMHDISCC_WORLAND_NORM_NATURAL
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Polynomial {
@@ -295,7 +296,8 @@ namespace Polynomial {
 
       if(l < 1)
       {
-         throw Exception("Tried to compute Worland polynomial 1/r d/dr r W_n^l with l < 1");
+         std::cerr << "Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
+         //throw Exception("Tried to compute Worland polynomial 1/r d/dr r W_n^l with l < 1");
       }
 
       if (nPoly < 1)
@@ -765,7 +767,8 @@ namespace Polynomial {
 
       if (l < 1)
       {
-         throw Exception("Tried to compute Worland polynomial W_n^l/r with l < 1");
+         std::cerr << "Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
+         //throw Exception("Tried to compute Worland polynomial W_n^l/r with l < 1");
       }
 
       if (nPoly < 1)

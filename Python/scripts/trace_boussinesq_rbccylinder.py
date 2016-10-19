@@ -16,11 +16,8 @@ bc_temp = 1 # 0: FT/FT, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 4
-res = [24, 0, 24]
-Pr = 1.0
-Gamma = 3.0
-Ra = 1.5e3
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':Gamma, 'scale3d':2.0}
+res = [12, 0, 12]
+eq_params = {'prandtl':1, 'rayleigh':1.5e3, 'gamma':3.0, 'scale3d':2.0}
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v
@@ -40,21 +37,22 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-12
 marginal_options['geometry'] = 'cylinder_worland'
 marginal_options['ellipse_radius'] = 3e2
-marginal_options['curve'] = True
+marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True
 marginal_options['plot_curve'] = False
-marginal_options['solve'] = False
+marginal_options['solve'] = True
 marginal_options['solve_nev'] = 3
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = False
 marginal_options['plot_spy'] = False
-marginal_options['write_mtx'] = True
-marginal_options['show_spectra'] = True
 marginal_options['viz_mode'] = 1
-marginal_options['show_physical'] = True
-marginal_options['save_pdf'] = False
+marginal_options['show_spectra'] = True
+marginal_options['save_spectra'] = False
+marginal_options['show_physical'] = False
 marginal_options['save_physical'] = False
+marginal_options['save_pdf'] = False
+marginal_options['write_mtx'] = True
 marginal_options['curve_points'] = np.arange(max(0, m-2), m+2, 1)
 
 # Compute 

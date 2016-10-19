@@ -101,7 +101,7 @@ namespace TransformSteps {
             transform.back().addEdge(Integrator2DType::INTG);
             transform.back().addEdge(Integrator1DType::INTGI6LAPLH, curlcurlId, Arithmetics::SUB);
 
-         // Integrate for double curle equation, second order (typically induction equation)
+         // Integrate for double curl equation, second order (typically induction equation)
          } else if(curlcurlFlag == 1)
          {
             // Compute curlcurl Q component

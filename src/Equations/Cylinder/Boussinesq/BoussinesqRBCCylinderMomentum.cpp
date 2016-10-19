@@ -87,8 +87,8 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
-      // Add X velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, true));
+      // Add X velocity to requirements: is scalar?, need spectral?, need physical?, need diff?, need curl?
+      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
    }
 
 }

@@ -23,6 +23,7 @@
 #include "PolynomialTransforms/WorlandPolynomial.hpp"
 #include "Python/PythonWrapper.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -270,52 +271,55 @@ namespace Transform {
          this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
 
+         // Integrator: INTG
+         std::map<IntegratorType::Id,std::vector<Matrix> >::iterator intgIt = this->mIntgOp.find(IntegratorType::INTG);
+         intgIt->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTG)->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         // Integrator I4DIVR
+         intgIt =  this->mIntgOp.find(IntegratorType::INTGI4DIVR);
+         // Integrator onto W_n^{l-1} basis
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+         intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+         // Compute 1/r on W_n^{l-1}, integrator onto W_n^{l-1} and apply quasi-inverse
+         Polynomial::WorlandPolynomial::r_1Wnl(op, ipoly, std::abs(l-1), igrid);
+         // Integrator onto W_n^{l-1} and apply quasi-inverse
+         intgIt->second.at(iL) = (matI4*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI4DIVR)->second.at(iL).transpose();
+         // Integrator I4DIVRDIFFR
+         intgIt =  this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR);
+         // Integrator onto W_n^{l-1} basis
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+         intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+         // Compute 1/r d r on W_n^{l-1}, integrator onto W_n^{l-1} and apply quasi-inverse
+         Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+         // Integrator onto W_n^{l-1} and apply quasi-inverse
+         intgIt->second.at(iL) = (matI4*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose() = matI4*this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR)->second.at(iL).transpose();
+         // Integrator I6DIVR
+         intgIt =  this->mIntgOp.find(IntegratorType::INTGI6DIVR);
+         // Integrator onto W_n^{l-1} basis
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+         intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+         // Compute 1/r on W_n^{l-1}, integrator onto W_n^{l-1} and apply quasi-inverse
+         Polynomial::WorlandPolynomial::r_1Wnl(op, ipoly, std::abs(l-1), igrid);
+         // Integrator onto W_n^{l-1} and apply quasi-inverse
+         intgIt->second.at(iL) = (matI6*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose() = matI6*this->mIntgOp.find(IntegratorType::INTGI6DIVR)->second.at(iL).transpose();
+         // Integrator I6DIVRDIFFR
+         intgIt =  this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR);
+         // Integrator onto W_n^{l-1} basis
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+         intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+         // Compute 1/r d r on W_n^{l-1}, integrator onto W_n^{l-1} and apply quasi-inverse
+         Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+         // Integrator onto W_n^{l-1} and apply quasi-inverse
+         intgIt->second.at(iL) = (matI6*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL) = (this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose() = matI6*this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR)->second.at(iL).transpose();
+         // Integrator I6LAPLH
+         intgIt =  this->mIntgOp.find(IntegratorType::INTGI6LAPLH);
+         // Integrator onto W_n^{l-1} and apply quasi-inverse
+         intgIt->second.at(iL) = (matI6*this->mProjOp.find(ProjectorType::LAPLH)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
 
-         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL) = (this->mProjOp.find(ProjectorType::LAPLH)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
-         this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose() = matI6*this->mIntgOp.find(IntegratorType::INTGI6LAPLH)->second.at(iL).transpose();
-
-//         // Call i2laplh for solver
-//         // Set resolution and m
-//         PyTuple_SetItem(pArgs, 0, PyLong_FromLong(this->mspSetup->fast().at(iL).size()+1));
-//         PyTuple_SetItem(pArgs, 1, PyLong_FromLong(l));
-//         // ... create boundray condition (none)
-//         pValue = PyDict_New();
-//         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-//         PyDict_SetItem(pValue, PyUnicode_FromString("rt"), PyLong_FromLong(1));
-//         PyDict_SetItem(pValue, PyUnicode_FromString("cr"), PyLong_FromLong(1));
-//         PyTuple_SetItem(pArgs, 2, pValue);
-//         // Set coefficient
-//         PyTuple_SetItem(pArgs, 3, PyFloat_FromDouble(1.0));
-//         PythonWrapper::setFunction("i2laplh");
-//         pValue = PythonWrapper::callFunction(pArgs);
-//         // Fill matrix
-//         this->mSolveOp.find(ProjectorType::INVLAPLH)->second.push_back(SparseMatrix(this->mspSetup->fast().at(iL).size(), this->mspSetup->fast().at(iL).size()));
-//         PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::INVLAPLH)->second.at(iL), pValue);
-//         Py_DECREF(pValue);
-//
-//         // Initialize solver and factorize i2laph operator (upper triangular)
-//         SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> pSolver = SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type>(new Solver::SparseTriSelector<SparseMatrix>::Type());
-//         this->mTriSolver.find(ProjectorType::INVLAPLH)->second.push_back(pSolver);
-//         this->mTriSolver.find(ProjectorType::INVLAPLH)->second.at(iL)->compute(this->mSolveOp.find(ProjectorType::INVLAPLH)->second.at(iL));
-//         // Check for successful factorisation
-//         if(this->mTriSolver.find(ProjectorType::INVLAPLH)->second.at(iL)->info() != Eigen::Success)
-//         {
-//            throw Exception("Factorization of inverse laplacian failed!");
-//         }
       }
 
       // Cleanup
