@@ -2,13 +2,13 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rrbccylinder as mod
+import geomhdiscc.model.boussinesq_rrbccylinder_split as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRRBCCylinder()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set boundary conditions
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
@@ -16,12 +16,12 @@ bc_temp = 1 # 0: FT/FT, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 7
-res = [48, 0, 128]
-eq_params = {'ekman':1e-4, 'prandtl':1, 'rayleigh':1e1, 'gamma':1.0, 'scale3d':2.0}
+res = [128, 0, 256]
+eq_params = {'ekman':1e-5, 'prandtl':1, 'rayleigh':1e3, 'gamma':1.0, 'scale3d':2.0}
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp, 'psi1':bc_vel, 'phi1':bc_vel, 'phi2':bc_vel}
 
 # Wave number function from single "index" (k perpendicular)
 def wave(m):
@@ -37,6 +37,7 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-12
 marginal_options['geometry'] = 'cylinder_worland'
 marginal_options['ellipse_radius'] = 3e3
+#marginal_options['target'] = 1
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['minimum_int'] = True

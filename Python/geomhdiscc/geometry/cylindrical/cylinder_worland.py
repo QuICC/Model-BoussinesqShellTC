@@ -68,6 +68,13 @@ def i2laplhj2(nr, nz, m, bc, coeff = 1.0, restriction = None):
     mat = coeff*utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i2laplh(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 1, 2, bc, restriction = restriction)
 
+def i2j2e1(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i2 in R kronecker with i2 in Z of the laplacian"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i2d1(nz, bcz, cscale = zscale), rad.i2(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 1, 2, bc, restriction = restriction)
+
 def i2j2lapl(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     """Create a i2 in R kronecker with i2 in Z of the laplacian"""
 
