@@ -62,7 +62,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("temperature",""),("velocity","tor"),("velocity","pol")]:
+            if field_row in [("velocity","tor"),("velocity","pol"),("temperature","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -150,9 +150,9 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'r':{0:11}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:22}, 'z':{0:40}, 'priority':'z'}
+                        bc = {'r':{0:22}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
 
@@ -314,48 +314,64 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        bc['priority'] = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)['priority']
         if field_row == ("velocity","tor"):                                    
+            if bc['priority'] == 'r':
+                kr = 2
+                kz = 0
+            elif bc['priority'] == 'z':
+                kr = 0
+                kz = 2
             mat = geo.zblk(res[0], res[2], m, 2, 2, bc, restriction = restriction) 
-            bc['priority'] = 'z'
+
             if field_col == ("velocity","tor"):
                 bc['r'][0] = min(0, bc['r'][0])
+                needZ = (bc['z'][0] >= 0 and bc['z'][0] < 20)
                 bc['z'][0] = min(0, bc['z'][0])
                 if m == 0:
                     mat += geo.tau_mat_r(res[0], res[2], m, {0:10, 'pad':1, 'kron_shift':0}, functools.partial(geo.c1d.qid, q = 0), 2, 2, bc)
                 else:
-                    mat += geo.tau_mat_r(res[0], res[2], m, {0:16, 'pad':1, 'kron_shift':0}, functools.partial(geo.c1d.i2d1, cscale = zscale), 2, 2, bc)
-                #mat += geo.tau_mat_z(res[0], res[2], m, {0:20, 'kron_shift':0}, functools.partial(geo.rad.i2laplh), 2, 2, bc)
+                    mat += geo.tau_mat_r(res[0], res[2], m, {0:16, 'pad':1, 'kron_shift':kr}, functools.partial(geo.c1d.i2d1, cscale = zscale), 2, 2, bc)
+                if needZ:
+                    mat += geo.tau_mat_z(res[0], res[2], m, {0:20, 'kron_shift':kz}, functools.partial(geo.rad.i4laplh), 2, 2, bc)
 
             elif field_col == ("velocity","pol"):
                 bc['r'][0] = min(0, bc['r'][0])
                 bc['z'][0] = min(0, bc['z'][0])
                 if m != 0:
-                    mat += geo.tau_mat_r(res[0], res[2], m, {0:17, 'c':-1j*m, 'pad':1, 'kron_shift':0}, functools.partial(geo.c1d.i2), 2, 2, bc)
-                    mat += geo.tau_mat_r(res[0], res[2], m, {0:15, 'c':-1j*m, 'pad':1, 'kron_shift':0}, functools.partial(geo.c1d.i2d2, cscale = zscale), 2, 2, bc)
+                    mat += geo.tau_mat_r(res[0], res[2], m, {0:17, 'c':-1j*m, 'pad':1, 'kron_shift':kr}, functools.partial(geo.c1d.i2), 2, 2, bc)
+                    mat += geo.tau_mat_r(res[0], res[2], m, {0:15, 'c':-1j*m, 'pad':1, 'kron_shift':kr}, functools.partial(geo.c1d.i2d2, cscale = zscale), 2, 2, bc)
 
             elif field_col == ("temperature",""):
                 bc['r'][0] = min(0, bc['r'][0])
                 bc['z'][0] = min(0, bc['z'][0])
                 if m != 0:
-                    mat += geo.tau_mat_r(res[0], res[2], m, {0:10, 'c':1j*m*Ra, 'pad':1, 'kron_shift':0}, functools.partial(geo.c1d.i2), 2, 2, bc)
+                    mat += geo.tau_mat_r(res[0], res[2], m, {0:10, 'c':1j*m*Ra, 'pad':1, 'kron_shift':kr}, functools.partial(geo.c1d.i2), 2, 2, bc)
 
         elif field_row == ("velocity","pol"):
+            if bc['priority'] == 'r':
+                kr = 4
+                kz = 0
+            elif bc['priority'] == 'z':
+                kr = 0
+                kz = 3
             mat = geo.zblk(res[0], res[2], m, 3, 4, bc, restriction = restriction) 
-            bc['priority'] = 'z'
             if field_col == ("velocity","tor"):
                 bc['r'][0] = min(0, bc['r'][0])
                 bc['z'][0] = min(0, bc['z'][0])
                 if m != 0:
-                    mat += geo.tau_mat_r(res[0], res[2], m, {0:10, 'c':1j*m, 'pad':2, 'kron_shift':0}, functools.partial(geo.c1d.i4), 3, 4, bc)
+                    mat += geo.tau_mat_r(res[0], res[2], m, {0:10, 'c':1j*m, 'pad':2, 'kron_shift':kr}, functools.partial(geo.c1d.i4), 3, 4, bc)
 
             elif field_col == ("velocity","pol"):
                 bc['r'][0] = min(0, bc['r'][0])
+                needZ = (bc['z'][0] >= 0 and bc['z'][0] < 40)
                 bc['z'][0] = min(0, bc['z'][0])
                 if m == 0:
                     mat += geo.tau_mat_r(res[0], res[2], m, {0:11, 'pad':2, 'kron_shift':0}, functools.partial(geo.c1d.qid, q = 0), 3, 4, bc)
                 else:
-                    mat += geo.tau_mat_r(res[0], res[2], m, {0:11, 'pad':2, 'kron_shift':0}, functools.partial(geo.c1d.i4d1, cscale = zscale), 3, 4, bc)
-                #mat += geo.tau_mat_z(res[0], res[2], m, {0:40, 'kron_shift':0}, functools.partial(geo.rad.i2laplh), 3, 4, bc)
+                    mat += geo.tau_mat_r(res[0], res[2], m, {0:11, 'pad':2, 'kron_shift':kr}, functools.partial(geo.c1d.i4d1, cscale = zscale), 3, 4, bc)
+                if needZ:
+                    mat += geo.tau_mat_z(res[0], res[2], m, {0:40, 'kron_shift':kz}, functools.partial(geo.rad.i6laplh), 3, 4, bc)
 
         elif field_row == ("temperature",""):                                    
             mat = geo.zblk(res[0], res[2], m, 1, 2, bc, restriction = restriction) 
