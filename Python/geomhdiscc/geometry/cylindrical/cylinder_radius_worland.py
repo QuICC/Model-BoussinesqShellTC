@@ -434,6 +434,28 @@ def i6lapl3h(nr, m, bc, coeff = 1.0):
     mat = radbc.restrict_eye(mat.shape[0], 'rt', 3)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 3)
     return radbc.constrain(mat, m, bc)
 
+def divr(nr, m, bc, coeff = 1.0):
+    """Create operator for 1/r r^m P_n^{-1/2,m-3/2}(2r^2-1)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-1,1)
+    nzrow = -1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return wb.worland_norm_row_l_1(n,m,-1)*n/(2.0*n + m - 2.0)
+
+    # Generate diagonal
+    def d0(n):
+        return wb.worland_norm_row_l_1(n,m,0)*(2.0*n + 2.0*m - 1.0)/(2.0*(2.0*n + m))
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    #mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
+    return radbc.constrain(mat, m, bc)
+
 def qid(nr, m, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
 

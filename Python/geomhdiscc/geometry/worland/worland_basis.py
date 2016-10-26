@@ -57,6 +57,30 @@ def worland_norm_row(n, l, k):
 
     return np.sqrt(np.exp(norm))
 
+def worland_norm_row_l_1(n, l, k):
+    """Normalization factor for matrix row from W_n^l to Wn^{l-1}"""
+  
+    if l - 1 == 0:
+        norm = -np.log(4.0) + 2.0*special.gammaln(n + 0.5) - 2.0*special.gammaln(n + 1.0)
+        if n[0] == 0:
+            norm[0] = (np.log(np.pi) - np.log(2.0))
+    elif l == 0:
+        norm = -np.log(2.0*(2.0*n + l + 1.0)) + special.gammaln(n + 0.5) + special.gammaln(n + l + 1.5) - special.gammaln(n + l + 1.0) - special.gammaln(n + 1.0)
+    else:
+        norm = -np.log(2.0*(2.0*n + l - 1.0)) + special.gammaln(n + 0.5) + special.gammaln(n + l - 0.5) - special.gammaln(n + l - 1.0) - special.gammaln(n + 1.0)
+
+    # Special case for projection on l = 0
+    if l == 0:
+        if n[0] + k == 0:
+            norm[0] += np.log(2.0) - np.log(np.pi)
+            norm[1:] += np.log(4.0) - 2.0*special.gammaln(n[1:] + 0.5 + k) + 2.0*special.gammaln(n[1:] + 1.0 + k)
+        else:
+            norm += np.log(4.0) - 2.0*special.gammaln(n + 0.5 + k) + 2.0*special.gammaln(n + 1.0 + k)
+    else:
+        norm += np.log(2.0*(2.0*n + l + 2.0*k)) - special.gammaln(n + 0.5 + k) - special.gammaln(n + l + 0.5 + k) + special.gammaln(n + l + k) + special.gammaln(n + 1.0 + k)
+
+    return np.sqrt(np.exp(norm))
+
 def worland_normalize(val, l):
     """Normalize array of values"""
 
