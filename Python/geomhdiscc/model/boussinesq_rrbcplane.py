@@ -435,8 +435,8 @@ class BoussinesqRRBCPlane(BoussinesqRRBCPlaneConfig, base_model.BaseModel):
             A = E**(1./3.)
         else:
             A = 1.0
-        if eq_params['fast_mean'] == 1:
-            mean_dt = A**2
+        if eq_params['fast_mean'] > 0:
+            mean_dt = eq_params['fast_mean']*(A**2)
         else:
             mean_dt = 1.0
 
