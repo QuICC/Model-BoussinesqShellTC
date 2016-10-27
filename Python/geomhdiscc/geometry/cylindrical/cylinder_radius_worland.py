@@ -437,7 +437,7 @@ def i6lapl3h(nr, m, bc, coeff = 1.0):
 def divr(nr, m, bc, coeff = 1.0):
     """Create operator for 1/r r^m P_n^{-1/2,m-3/2}(2r^2-1)."""
 
-    ns = np.arange(0, nr)
+    ns = np.arange(0, nr+1)
     offsets = np.arange(-1,1)
     nzrow = -1
 
@@ -453,7 +453,7 @@ def divr(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
-    #mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
     return radbc.constrain(mat, m, bc)
 
 def qid(nr, m, q, bc, coeff = 1.0):
