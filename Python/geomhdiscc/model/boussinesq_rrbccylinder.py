@@ -150,9 +150,11 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:11}, 'z':{0:0}, 'priority':'r'}
+                        #bc = {'r':{0:11}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:22}, 'z':{0:0}, 'priority':'r'}
+                        #bc = {'r':{0:22}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'r':{0:22}, 'z':{0:40}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
 
@@ -219,10 +221,16 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2(res[0], res[2], m, bc)
+
         elif field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.zblk(res[0], res[2],m,2,2, bc)
+            #mat = geo.i4j2(res[0], res[2], m, bc)
+            #mat = geo.qid(res[0], res[2], m, 0, 0, bc)
+            mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
+
         elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.zblk(res[0], res[2],m,3,4, bc)
+            #mat = geo.i6j4(res[0], res[2], m, bc)
+            #mat = geo.qid(res[0], res[2], m, 0, 0, bc)
+            mat = geo.zblk(res[0], res[2], m, 3, 4, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -367,7 +375,7 @@ class BoussinesqRRBCCylinder(base_model.BaseModel):
                 needZ = (bc['z'][0] >= 0 and bc['z'][0] < 40)
                 bc['z'][0] = min(0, bc['z'][0])
                 if m == 0:
-                    mat += geo.tau_mat_r(res[0], res[2], m, {0:11, 'pad':2, 'kron_shift':0}, functools.partial(geo.c1d.qid, q = 0), 3, 4, bc)
+                    mat += geo.tau_mat_r(res[0], res[2], m, {0:11, 'pad':2, 'kron_shift':kr}, functools.partial(geo.c1d.i4d1, cscale = zscale), 3, 4, bc)
                 else:
                     mat += geo.tau_mat_r(res[0], res[2], m, {0:11, 'pad':2, 'kron_shift':kr}, functools.partial(geo.c1d.i4d1, cscale = zscale), 3, 4, bc)
                 if needZ:

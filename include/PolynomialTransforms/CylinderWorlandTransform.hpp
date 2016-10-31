@@ -48,14 +48,14 @@ namespace Transform {
       {
          /** Enum of projector IDs
           *    - PROJ: projection
-          *    - DIVR: 1/r
+          *    - DIVRM0: 1/r, 0 for m = 0
           *    - DIFF: D
           *    - DIVRDIFFR: 1/r D r
           *    - LAPLH: horizontal cylindrical laplacian: D^2 + 1/r D - m^2/r^2
-          *    - DIVRLAPLH: 1/r horizontal cylindrical laplacian: D^2 + 1/r D - m^2/r^2
+          *    - DIVRLAPLHM0: 1/r horizontal cylindrical laplacian: D^2 + 1/r D - m^2/r^2, 0 for m = 0
           *    - DIFFLAPLH: radial derivative of horizontal cylindrical laplacian: D(D^2 + 1/r D - m^2/r^2)
           */
-         enum Id {PROJ, DIVR, DIFF, DIVRDIFFR, LAPLH, DIVRLAPLH, DIFFLAPLH, INVLAPLH};
+         enum Id {PROJ, DIVRM0, DIFF, DIVRDIFFR, LAPLH, DIVRLAPLHM0, DIFFLAPLH, INVLAPLH};
       };
 
       /**
@@ -66,8 +66,11 @@ namespace Transform {
          /**
           * Enum of integrator IDs
           *    - INTG: integration
+          *    - INTGI4DIVRM0: integration, zero for m = 0
+          *    - INTGI4DIVRDIFFR: integration
+          *    - INTGI6DIVR: integration, 0 for m = 0
           */
-         enum Id {INTG, INTGI4DIVR, INTGI4DIVRDIFFR, INTGI6DIVR, INTGI6DIVRDIFFR, INTGI6LAPLH, INTGINVLAPLH};
+         enum Id {INTG, INTGI4DIVRM0, INTGI4DIVRDIFFR, INTGI6DIVRM0, INTGI6DIVRDIFFR, INTGI6LAPLH, INTGINVLAPLH};
       };
 
    };

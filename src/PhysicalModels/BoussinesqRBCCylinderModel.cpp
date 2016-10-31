@@ -32,6 +32,7 @@
 #include "Generator/States/CylinderExactScalarState.hpp"
 #include "Generator/States/CylinderExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/ScalarFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
@@ -53,7 +54,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCCylinderModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedCylinderExactScalarState spScalar;
@@ -105,12 +106,23 @@ namespace GeoMHDiSCC {
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
+      Equations::SharedScalarFieldTrivialVisualizer spSTrivial;
       Equations::SharedVectorFieldVisualizer spVector;
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spScalar->setFields(true, false);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+
+      // Add mean temperature field visualization
+      spSTrivial = spVis->addScalarEquation<Equations::ScalarFieldTrivialVisualizer>();
+      spSTrivial->setFields(true, false);
+      spSTrivial->setIdentity(PhysicalNames::MEAN_TEMPERATURE);
+
+      // Add fluctuating temperature field visualization
+      spSTrivial = spVis->addScalarEquation<Equations::ScalarFieldTrivialVisualizer>();
+      spSTrivial->setFields(true, false);
+      spSTrivial->setIdentity(PhysicalNames::FLUCT_TEMPERATURE);
 
       // Add velocity fields visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
@@ -120,6 +132,8 @@ namespace GeoMHDiSCC {
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::MEAN_TEMPERATURE);
+      spOut->expect(PhysicalNames::FLUCT_TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
       spVis->addHdf5OutputFile(spOut);
    }

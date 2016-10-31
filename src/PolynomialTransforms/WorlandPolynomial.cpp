@@ -296,7 +296,7 @@ namespace Polynomial {
 
       if(l < 1)
       {
-         std::cerr << "Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
+         std::cerr << "r_1drWnl: Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
          //throw Exception("Tried to compute Worland polynomial 1/r d/dr r W_n^l with l < 1");
       }
 
@@ -767,7 +767,7 @@ namespace Polynomial {
 
       if (l < 1)
       {
-         std::cerr << "Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
+         std::cerr << "r_1Wnl: Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
          //throw Exception("Tried to compute Worland polynomial W_n^l/r with l < 1");
       }
 
