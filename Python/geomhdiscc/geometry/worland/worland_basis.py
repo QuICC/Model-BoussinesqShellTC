@@ -87,6 +87,21 @@ def worland_normalize(val, l):
     for i in range(0, val.shape[0]):
          val[i] *= worland_norm(i, l)
 
+def worland_origin(nr, l, k = 0, normalize = True):
+    """Compute the value at origin for Worland polynomials"""
+
+    val = np.zeros(nr)
+    val[0] = 1.0
+    if nr > 0:
+        for i in range(1,nr):
+            val[i] = (-1.0)**i*np.exp(special.gammaln(i + l + 0.5) - special.gammaln(i + 1.0) - special.gammaln(l + 0.5))
+
+    # Normalize
+    if normalize:
+        worland_normalize(val, l)
+
+    return val
+
 def worland_value(nr, l, k = 0, normalize = True):
     """Compute the endpoint value for Worland polynomials"""
 

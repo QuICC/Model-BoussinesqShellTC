@@ -26,6 +26,8 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "IoVariable/CylinderScalarEnergyWriter.hpp"
+#include "IoVariable/CylinderTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/CylinderExactStateIds.hpp"
@@ -34,6 +36,7 @@
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/ScalarFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -54,7 +57,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCCylinderModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCylinderExactScalarState spScalar;
@@ -86,13 +89,13 @@ namespace GeoMHDiSCC {
          // Add scalar random initial state generator 
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
-         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-10, 1e-10, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-10, 1e-10, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spScalar->setSpectrum(-1e-10, 1e-10, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -108,6 +111,7 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldVisualizer spScalar;
       Equations::SharedScalarFieldTrivialVisualizer spSTrivial;
       Equations::SharedVectorFieldVisualizer spVector;
+      Equations::SharedVectorFieldTrivialVisualizer spVTrivial;
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
@@ -126,8 +130,13 @@ namespace GeoMHDiSCC {
 
       // Add velocity fields visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, false);
+      spVector->setFields(true, false, true);
       spVector->setIdentity(PhysicalNames::VELOCITY);
+
+      // Add velocity fields visualization
+      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
+      spVTrivial->setFields(true, false, true);
+      spVTrivial->setIdentity(PhysicalNames::MAGNETIC);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -135,6 +144,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::MEAN_TEMPERATURE);
       spOut->expect(PhysicalNames::FLUCT_TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::MAGNETIC);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -153,11 +163,15 @@ namespace GeoMHDiSCC {
 
    void BoussinesqRBCCylinderModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-      // Create maximal continuity writer
-///      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-///      spState->expect(PhysicalNames::VELOCITY);
-///
-///      spSim->addAsciiOutputFile(spState);
+      // Create temperature energy writer
+      IoVariable::SharedCylinderScalarEnergyWriter spScalar(new IoVariable::CylinderScalarEnergyWriter("temperature", SchemeType::type()));
+      spScalar->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spScalar);
+
+      // Create kinetic energy writer
+      IoVariable::SharedCylinderTorPolEnergyWriter spVector(new IoVariable::CylinderTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector);
    }
 
    void BoussinesqRBCCylinderModel::addHdf5OutputFiles(SharedSimulation spSim)

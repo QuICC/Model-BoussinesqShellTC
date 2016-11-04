@@ -312,7 +312,7 @@ namespace Schemes {
       //
 
       // Get dealiased Worland size
-      int nR = Transform::PolynomialTools::dealias(this->mI+1);
+      int nR = Transform::PolynomialTools::dealias(this->mI+this->mJ/2+2);
 
       // Get mixed dealiased FFT size
       int nTh = Transform::Fft::ToolsSelector::dealiasMixedFft(this->mJ+1);

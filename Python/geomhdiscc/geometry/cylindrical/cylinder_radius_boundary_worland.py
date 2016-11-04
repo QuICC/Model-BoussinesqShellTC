@@ -87,6 +87,8 @@ def apply_tau(mat, m, bc, pad_zeros = 0, location = 't'):
         cond = tau_dlaplh(mat.shape[0], m, bc)
     elif bc[0] == 17:
         cond = tau_lapl2h(mat.shape[0], m, bc)
+    elif bc[0] == 18:
+        cond = tau_origin(mat.shape[0], m, bc)
     elif bc[0] == 20:
         cond = tau_value_diff(mat.shape[0], m, bc)
     elif bc[0] == 21:
@@ -127,6 +129,17 @@ def tau_value(nr, l, bc):
     cond = []
     c = next(it)
     cond.append(c*wb.worland_value(nr, l))
+
+    return np.array(cond)
+
+def tau_origin(nr, l, bc):
+    """Create the value at origin tau line(s)"""
+
+    it = coeff_iterator(bc.get('c',None))
+
+    cond = []
+    c = next(it)
+    cond.append(c*wb.worland_origin(nr, l))
 
     return np.array(cond)
 

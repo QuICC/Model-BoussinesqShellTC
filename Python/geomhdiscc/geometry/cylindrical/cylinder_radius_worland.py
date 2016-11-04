@@ -139,6 +139,48 @@ def i4(nr, m, bc, coeff = 1.0):
     mat = radbc.restrict_eye(mat.shape[0], 'rt', 2)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 2)
     return radbc.constrain(mat, m, bc)
 
+def i4r_1d1(nr, m, bc, coeff = 1.0):
+    """Create operator for 4th integral of 1/r D of r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
+
+    ns = np.arange(0, nr+2)
+    offsets = np.arange(-3,4)
+    nzrow = 3
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return wb.worland_norm_row(n, m, -3)*32.0*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -wb.worland_norm_row(n, m, -2)*96.0*m*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2*n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return wb.worland_norm_row(n, m, -1)*24.0*(m + n - 1.0)*(4.0*m**2 - 4.0*m*n + 2.0*m - 4.0*n**2 + 4.0*n + 3.0)/((m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0))
+
+    # Generate diagonal
+    def d0(n):
+        return -wb.worland_norm_row(n, m, 0)*16.0*m*(2.0*m**2 - 12.0*m*n - 12.0*n**2 + 7.0)/((m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -wb.worland_norm_row(n, m, 1)*6.0*(2.0*n + 1.0)*(2.0*m + 2.0*n + 1.0)*(4.0*m**2 - 4.0*m*n - 2.0*m - 4.0*n**2 - 4.0*n + 3.0)/((m + n)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -wb.worland_norm_row(n, m, 2)*6.0*m*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*m + 2.0*n + 1.0)*(2.0*m + 2.0*n + 3.0)/((m + n)*(m + n + 1.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -wb.worland_norm_row(n, m, 3)*0.5*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*m + 2.0*n + 1.0)*(2.0*m + 2.0*n + 3.0)*(2.0*m + 2.0*n + 5.0)/((m + n)*(m + n + 1.0)*(m + n + 2.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0)*(m + 2.0*n + 6.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 2)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 2)
+    return radbc.constrain(mat, m, bc)
+
 def i4laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral of laplh r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
@@ -278,6 +320,64 @@ def i6(nr, m, bc, coeff = 1.0):
         return wb.worland_norm_row(n, m, 6)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*n + 9.0)*(2.0*n + 11.0)*(2.0*m + 2.0*n + 1.0)*(2.0*m + 2.0*n + 3.0)*(2.0*m + 2.0*n + 5.0)*(2.0*m + 2.0*n + 7.0)*(2.0*m + 2.0*n + 9.0)*(2.0*m + 2.0*n + 11.0)/(64.0*(m + n)*(m + n + 1.0)*(m + n + 2.0)*(m + n + 3.0)*(m + n + 4.0)*(m + n + 5.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0)*(m + 2.0*n + 6.0)*(m + 2.0*n + 7.0)*(m + 2.0*n + 8.0)*(m + 2.0*n + 9.0)*(m + 2.0*n + 10.0)*(m + 2.0*n + 11.0)*(m + 2.0*n + 12.0))
 
     ds = [d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 3)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 3)
+    return radbc.constrain(mat, m, bc)
+
+def i6r_1d1(nr, m, bc, coeff = 1.0):
+    """Create operator for 6th integral of 1/r D of r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
+
+    ns = np.arange(0, nr+3)
+    offsets = np.arange(-5,6)
+    nzrow = 5
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return wb.worland_norm_row(n, m, -5)*128.0*(m + n - 5.0)*(m + n - 4.0)*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 10.0)*(m + 2.0*n - 9.0)*(m + 2.0*n - 8.0)*(m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return -wb.worland_norm_row(n, m, -4)*640.0*m*(m + n - 4.0)*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)/((m + 2.0*n - 9.0)*(m + 2.0*n - 8.0)*(m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return wb.worland_norm_row(n, m, -3)*160.0*(m + n - 3.0)*(m + n - 2.0)*(m + n - 1.0)*(8.0*m**2 - 4.0*m*n + 6.0*m - 4.0*n**2 + 12.0*n + 7.0)/((m + 2.0*n - 8.0)*(m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -wb.worland_norm_row(n, m, -2)*640.0*m*(m + n - 2.0)*(m + n - 1.0)*(2.0*m**2 - 4.0*m*n + 4.0*m - 4.0*n**2 + 8.0*n + 9.0)/((m + 2.0*n - 7.0)*(m + 2.0*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return wb.worland_norm_row(n, m, -1)*80.0*(m + n - 1.0)*(8.0*m**4 - 48.0*m**3*n + 24.0*m**3 - 32.0*m**2*n**2 + 32.0*m**2*n + 112.0*m**2 + 32.0*m*n**3 - 48.0*m*n**2 - 56.0*m*n + 36.0*m + 16.0*n**4 - 32.0*n**3 - 56.0*n**2 + 72.0*n + 45.0)/((m + 2*n - 6.0)*(m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0))
+
+    # Generate diagonal
+    def d0(n):
+        return -wb.worland_norm_row(n, m, 0)*16.0*m*(8.0*m**4 - 160.0*m**3*n + 80.0*m**2*n**2 + 260.0*m**2 + 480.0*m*n**3 - 920.0*m*n + 240.0*n**4 - 920.0*n**2 + 407.0)/((m + 2.0*n - 5.0)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -wb.worland_norm_row(n, m, 1)*20.0*(2.0*n + 1.0)*(2.0*m + 2.0*n + 1.0)*(8.0*m**4 - 48.0*m**3*n - 24.0*m**3 - 32.0*m**2*n**2 - 32.0*m**2*n + 112.0*m**2 + 32.0*m*n**3 + 48.0*m*n**2 - 56.0*m*n - 36.0*m + 16.0*n**4 + 32.0*n**3 - 56.0*n**2 - 72.0*n + 45.0)/((m + n)*(m + 2.0*n - 4.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0)*(m + 2.0*n + 6.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -wb.worland_norm_row(n, m, 2)*40.0*m*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*m + 2.0*n + 1.0)*(2.0*m + 2.0*n + 3.0)*(2.0*m**2 - 4.0*m*n - 4.0*m - 4.0*n**2 - 8.0*n + 9.0)/((m + n)*(m + n + 1.0)*(m + 2.0*n - 3.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0)*(m + 2.0*n + 6.0)*(m + 2.0*n + 7.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -wb.worland_norm_row(n, m, 3)*2.5*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*m + 2.0*n + 1.0)*(2.0*m + 2.0*n + 3.0)*(2.0*m + 2.0*n + 5.0)*(8.0*m**2 - 4.0*m*n - 6.0*m - 4.0*n**2 - 12.0*n + 7.0)/((m + n)*(m + n + 1.0)*(m + n + 2.0)*(m + 2.0*n - 2.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0)*(m + 2.0*n + 6.0)*(m + 2.0*n + 7.0)*(m + 2.0*n + 8.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return -wb.worland_norm_row(n, m, 4)*2.5*m*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*m + 2.0*n + 1.0)*(2.0*m + 2.0*n + 3.0)*(2.0*m + 2.0*n + 5.0)*(2.0*m + 2.0*n + 7.0)/((m + n)*(m + n + 1.0)*(m + n + 2.0)*(m + n + 3.0)*(m + 2.0*n - 1.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0)*(m + 2.0*n + 6.0)*(m + 2.0*n + 7.0)*(m + 2.0*n + 8.0)*(m + 2.0*n + 9.0))
+
+    # Generate 5rd superdiagonal
+    def d5(n):
+        return -wb.worland_norm_row(n, m, 5)*0.125*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*n + 9.0)*(2.0*m + 2.0*n + 1.0)*(2.0*m + 2.0*n + 3.0)*(2.0*m + 2.0*n + 5.0)*(2.0*m + 2.0*n + 7.0)*(2.0*m + 2.0*n + 9.0)/((m + n)*(m + n + 1.0)*(m + n + 2.0)*(m + n + 3.0)*(m + n + 4.0)*(m + 2.0*n + 1.0)*(m + 2.0*n + 2.0)*(m + 2.0*n + 3.0)*(m + 2.0*n + 4.0)*(m + 2.0*n + 5.0)*(m + 2.0*n + 6.0)*(m + 2.0*n + 7.0)*(m + 2.0*n + 8.0)*(m + 2.0*n + 9.0)*(m + 2.0*n + 10.0))
+
+    ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
@@ -467,6 +567,16 @@ def qid(nr, m, q, bc, coeff = 1.0):
     mat.row = np.arange(q,nr)
     mat.col = mat.row
     return radbc.constrain(mat, m, bc)
+
+def integral(nr, m):
+    """Compute definite integral of the expansion"""
+
+    print("IMPLEMENTATION OF INTEGRAL IS WRONG!")
+    mat = spsp.lil_matrix((1,nr))
+    mat[0,::2] = [4.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nr,2)]
+    mat[0,0] = mat[0,0]/2.0
+
+    return mat.tocoo()
 
 def stencil(nr, m, bc, make_square):
     """Create a galerkin stencil matrix"""

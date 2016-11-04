@@ -121,6 +121,18 @@ def i4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i4divrdiff():
+    """Cylinder i4 ((i1r1)^4 1/r D) operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':4, 'p':0, 'd':1, 'c':4.0}]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i4laplh():
     """Cylinder i4laplh ((i1r1)^4 laplh) operator"""
 
@@ -161,6 +173,18 @@ def i6():
 
     # Setup terms in recurrence
     terms = [{'q':6, 'p':0, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i6divrdiff():
+    """Cylinder i6 ((i1r1)^6 1/r D) operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':6, 'p':0, 'd':1, 'c':4.0}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals
