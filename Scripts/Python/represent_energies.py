@@ -8,7 +8,9 @@ Created on Mon Aug 29 15:08:52 2016
 import pandas as pd
 from matplotlib import pyplot as pp
 
-if __name__="__main__":
+if __name__=="__main__":
+
+    filename = '~/Downloads/kinetic_energy.dat'
     
     table = pd.read_csv(filename,skiprows=3,header=['time', 'total' 'toroidal', 'poloida'], sep = '\t')
     table.plot(x='time',y=['total', 'toroidal','poloidal'])
