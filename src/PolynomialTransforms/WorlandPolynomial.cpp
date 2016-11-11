@@ -465,6 +465,160 @@ namespace Polynomial {
       diff = Precision::cast(idiff);
    }
 
+   void WorlandPolynomial::dr_1drWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
+   {
+      int gN = diff.rows();
+      int nPoly = diff.cols();
+
+      if(l < 1)
+      {
+         std::cerr << "dr_1drWnl: Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
+         //throw Exception("Tried to compute Worland polynomial 1/r d/dr r W_n^l with l < 1");
+      }
+
+      if (nPoly < 1)
+      {
+         throw Exception("Operator matrix should have at least 1 column");
+      }
+
+      if (gN != igrid.size())
+      {
+         throw Exception("Operator matrix does not mach grid size");
+      }
+
+      internal::MHDFloat a = WorlandPolynomial::alpha(l);
+      internal::MHDFloat b = WorlandPolynomial::beta(l);
+      internal::MHDFloat a1 = WorlandPolynomial::alpha(l) + MHD_MP(1.0);
+      internal::MHDFloat b1 = WorlandPolynomial::beta(l) + MHD_MP(1.0);
+      internal::MHDFloat a2 = WorlandPolynomial::alpha(l) + MHD_MP(2.0);
+      internal::MHDFloat b2 = WorlandPolynomial::beta(l) + MHD_MP(2.0);
+      internal::MHDFloat dl = internal::MHDFloat(l);
+
+      // Make X grid in [-1, 1]
+      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+
+      // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
+      internal::Matrix ipnab(gN,2);
+      internal::Matrix idpnab(gN,2);
+      internal::Matrix id2pnab(gN,2);
+      idiff.resize(gN, nPoly);
+
+      // Compute P_0
+      WorlandPolynomial::W0l(ipnab.col(0), l-2, a, b, igrid, WorlandPolynomial::normWP0ab());
+      ipnab.col(0) *= (dl - MHD_MP(1.0))*(dl + MHD_MP(1.0)); 
+
+      // Compute l P
+      if(l == 1)
+      {
+         idiff.col(0).setZero();
+      } else
+      {
+         idiff.col(0) = ipnab.col(0);
+      }
+
+      if(nPoly > 1)
+      {
+         // Compute P_0
+         if(l != 1)
+         {
+            ThreeTermRecurrence::P1(ipnab.col(1), a, b, ipnab.col(0), ixgrid, WorlandPolynomial::normWP1ab());
+         }
+
+         // Compute DP_1
+         WorlandPolynomial::W0l(idpnab.col(0), l, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
+         idpnab.col(0) *= MHD_MP(2.0)*(dl + MHD_MP(1.0)); 
+
+         // Compute e P + 4r^2 DP
+         if(l == 1)
+         {
+            idiff.col(1) = idpnab.col(0);
+         } else
+         {
+            idiff.col(1) = ipnab.col(1) + idpnab.col(0);
+         }
+      }
+
+      if(nPoly > 2)
+      {
+         if(l != 1)
+         {
+            // Increment P_n
+            ThreeTermRecurrence::Pn(ipnab.col(0), 2, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
+            ipnab.col(0).swap(ipnab.col(1));
+         }
+
+         // Compute DP_1
+         ThreeTermRecurrence::P1(idpnab.col(1), a1, b1, idpnab.col(0), ixgrid, WorlandPolynomial::normWDP1ab());
+
+         // Compute D2P_0
+         WorlandPolynomial::W0l(id2pnab.col(0), l+2, a2, b2, igrid, WorlandPolynomial::normWD2P0ab());
+
+         // Compute e P + 2(x+1) DP
+         if(l == 1)
+         {
+            idiff.col(2) = idpnab.col(1) + id2pnab.col(0);
+         } else
+         {
+            idiff.col(2) = ipnab.col(1) + idpnab.col(1) + id2pnab.col(0);
+         }
+      }
+
+      if(nPoly > 3)
+      {
+         if(l != 1)
+         {
+            // Increment P_3
+            ThreeTermRecurrence::Pn(ipnab.col(0), 3, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
+            ipnab.col(0).swap(ipnab.col(1));
+         }
+
+         // Compute DP_2
+         ThreeTermRecurrence::Pn(idpnab.col(0), 2, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Compute D2P_1
+         ThreeTermRecurrence::P1(id2pnab.col(1), a2, b2, id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2P1ab());
+
+         // Compute e P + 2(x+1) DP
+         if(l == 1)
+         { 
+            idiff.col(3) = idpnab.col(1) + id2pnab.col(1);
+         } else
+         {
+            idiff.col(3) = ipnab.col(1) + idpnab.col(1) + id2pnab.col(1);
+         }
+      }
+
+      for(int i = 4; i < nPoly; ++i)
+      {
+         if(l != 1)
+         {
+            // Increment P_n
+            ThreeTermRecurrence::Pn(ipnab.col(0), i, a, b, ipnab.col(1), ipnab.col(0), ixgrid, WorlandPolynomial::normWPnab());
+            ipnab.col(0).swap(ipnab.col(1));
+         }
+
+         // Increment DP_n
+         ThreeTermRecurrence::Pn(idpnab.col(0), i-1, a1, b1, idpnab.col(1), idpnab.col(0), ixgrid, WorlandPolynomial::normWDPnab());
+         idpnab.col(0).swap(idpnab.col(1));
+
+         // Increment D2P_n
+         ThreeTermRecurrence::Pn(id2pnab.col(0), i-2, a2, b2, id2pnab.col(1), id2pnab.col(0), ixgrid, WorlandPolynomial::normWD2Pnab());
+         id2pnab.col(0).swap(id2pnab.col(1));
+
+         // Compute e P + 2(x+1) DP
+         if(l == 1)
+         {
+            idiff.col(i) = idpnab.col(1) + id2pnab.col(1);
+         } else
+         {
+            idiff.col(i) = ipnab.col(1) + idpnab.col(1) + id2pnab.col(1);
+         }
+      }
+
+      diff = Precision::cast(idiff);
+   }
+
    void WorlandPolynomial::claplhWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
    {
       int gN = diff.rows();
