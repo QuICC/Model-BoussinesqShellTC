@@ -18,7 +18,7 @@ def no_bc():
 
 def constrain(mat, m, bc, pad_zeros = 0, location = 't'):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
-
+    
     if bc[0] > 0:
         bc_mat = apply_tau(mat, m, bc, pad_zeros = pad_zeros, location = location)
     elif bc[0] < 0:
@@ -352,7 +352,7 @@ def stencil_value(nr, m, coeffs = None):
 
 def stencil_diff(nr, m, coeffs = None):
     """Create stencil matrix for a zero 1st derivative"""
-
+    
     assert(coeffs is None)
 
     ns = np.arange(0,nr)

@@ -60,6 +60,76 @@ def i2(nr, m, bc, coeff = 1.0):
     mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
     return radbc.constrain(mat, m, bc)
 
+def i2r_1dr(nr, m, bc, coeff = 1.0):
+    """Create operator for 2nd integral of 1/r D r r P_n^{-1/2,1/2}(2r^2-1) projected onto P_n^{-1/2,-1/2}(2r^2-1)."""
+    if m != 0:
+        raise RuntimeError("Operator only exists for m = 0!")
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+1)
+    offsets = np.arange(-2,2)
+    nzrow = 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return wb.worland_norm_row(n,m,-2)*4.0*(n - 1.0)/((2.0*n - 3.0)*(2.0*n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return wb.worland_norm_row(n,m,-1)*2.0/(2*n - 1.0)
+
+    # Generate diagonal
+    def d0(n):
+        return -wb.worland_norm_row(n,m,0)*1.0/n
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -wb.worland_norm_row(n,m,1)*(2.0*n + 1.0)/(2.0*n*(n + 1.0))
+
+    ds = [d_2, d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
+    return radbc.constrain(mat, m+1, bc)
+
+def i2dr(nr, m, bc, coeff = 1.0):
+    """Create operator for 2nd integral of D P_n^{-1/2,-1/2}(2r^2-1) projected onto r P_n^{-1/2,1/2}(2r^2-1)."""
+    if m != 1:
+        raise RuntimeError("Operator only exists for m = 1!")
+
+    # Copy BC dict as we modify it!
+    bc = dict(bc)
+
+    ns = np.arange(0, nr+1)
+    offsets = np.arange(-1,3)
+    nzrow = 1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return wb.worland_norm_row(n,m,-1)*2.0/(2.0*n - 1.0)
+
+    # Generate diagonal
+    def d0(n):
+        return wb.worland_norm_row(n,m,0)*1.0/(n + 1.0)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -wb.worland_norm_row(n,m,1)*(2.0*n + 1.0)/(2.0*n*(n + 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -wb.worland_norm_row(n,m,2)*(2.0*n + 1.0)*(2.0*n + 3.0)/(4.0*(n + 1.0)**2*(n + 2.0))
+
+    ds = [d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
+    return radbc.constrain(mat, m-1, bc)
+
 def i2laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 2nd integral of laplh r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
@@ -138,6 +208,54 @@ def i4(nr, m, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     mat = radbc.restrict_eye(mat.shape[0], 'rt', 2)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 2)
     return radbc.constrain(mat, m, bc)
+
+def i4dr(nr, m, bc, coeff = 1.0):
+    """Create operator for 4th integral of D P_n^{-1/2,-1/2}(2r^2-1) projected onto r P_n^{-1/2,1/2}(2r^2-1)."""
+    if m != 1:
+        raise RuntimeError("Operator only exists for m = 1!")
+
+    ns = np.arange(0, nr+2)
+    offsets = np.arange(-3,5)
+    nzrow = 3
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return wb.worland_norm_row(n, m, -3)*2.0/((2.0*n - 5.0)*(2.0*n - 3.0)*(2.0*n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return wb.worland_norm_row(n, m, -2)*1.0/((n + 1.0)*(2.0*n - 3.0)*(2.0*n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -wb.worland_norm_row(n, m, -1)*3.0/(2.0*(n - 2.0)*(n + 1.0)*(2.0*n - 1.0))
+
+    # Generate diagonal
+    def d0(n):
+        return -wb.worland_norm_row(n, m, 0)*3.0/(4.0*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return wb.worland_norm_row(n, m, 1)*3.0*(2.0*n + 1.0)/(8.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return wb.worland_norm_row(n, m, 2)*3.0*(2.0*n + 1.0)*(2.0*n + 3.0)/(16.0*n*(n + 1.0)**2*(n + 2.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -wb.worland_norm_row(n, m, 3)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)/(32.0*n*(n + 1.0)**2*(n + 2.0)**2*(n + 3.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return -wb.worland_norm_row(n, m, 4)*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)/(64.0*(n + 1.0)**2*(n + 2.0)**2*(n + 3.0)**2*(n + 4.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3, d4]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 2)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 2)
+    return radbc.constrain(mat, m-1, bc)
 
 def i4r_1d1(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral of 1/r D of r^m P_n^{-1/2,m-1/2}(2r^2-1)."""

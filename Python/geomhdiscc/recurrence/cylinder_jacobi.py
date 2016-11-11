@@ -249,3 +249,81 @@ def i6lapl3h():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
+
+def i1dr():
+    """Cylinder 1st integral operator of radial derivative (projects accross beta)"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':0, 'd':0, 'c':1}]
+    n = sympy.Symbol('n')
+    r = symbolic.build_recurrence(terms, {0:sympy.Rational(2,1), 1:(2*n+1)/(n+1)})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2dr():
+    """Cylinder 2nd integral operator of radial derivative (projects accross beta)"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':0, 'd':0, 'c':1}]
+    n = sympy.Symbol('n')
+    r = symbolic.build_recurrence(terms, {0:sympy.Rational(2,1), -1:(2*n-1)/n})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i4dr():
+    """Cylinder 4th integral operator of radial derivative (projects accross beta)"""
+
+    # Setup terms in recurrence
+    terms = [{'q':3, 'p':0, 'd':0, 'c':1}]
+    n = sympy.Symbol('n')
+    r = symbolic.build_recurrence(terms, {0:sympy.Rational(2,1), -1:(2*n-1)/n})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i6dr():
+    """Cylinder 6th integral operator of radial derivative (projects accross beta)"""
+
+    # Setup terms in recurrence
+    terms = [{'q':5, 'p':0, 'd':0, 'c':1}]
+    n = sympy.Symbol('n')
+    r = symbolic.build_recurrence(terms, {0:sympy.Rational(2,1), -1:(2*n-1)/n})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i1r_1dr():
+    """Cylinder 1st integral operator of 1/r D r (projects accross beta)"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':0, 'd':0, 'c':1}]
+    n = sympy.Symbol('n')
+    r = symbolic.build_recurrence(terms, {0:sympy.Rational(2,1), -1:4*n/(2*n-1)})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2r_1dr():
+    """Cylinder 1st integral operator of 1/r D r (projects accross beta)"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':0, 'd':0, 'c':1}]
+    n = sympy.Symbol('n')
+    r = symbolic.build_recurrence(terms, {0:sympy.Rational(2,1), 1:4*(n+1)/(2*n+1)})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")

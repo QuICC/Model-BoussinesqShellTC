@@ -37,7 +37,10 @@ def worland_poly(n, l, nr):
 
 def worland_norm_row(n, l, k):
     """Normalization factor for matrix row"""
-  
+
+    if n[0] + k < 0:
+        raise RuntimeError("Requested row normalization is inconsistent")
+
     if l == 0:
         norm = -np.log(4.0) + 2.0*special.gammaln(n + 0.5) - 2.0*special.gammaln(n + 1.0)
         if n[0] == 0:
@@ -59,6 +62,9 @@ def worland_norm_row(n, l, k):
 
 def worland_norm_row_l_1(n, l, k):
     """Normalization factor for matrix row from W_n^l to Wn^{l-1}"""
+
+    if n[0] + k < 0:
+        raise RuntimeError("Requested row normalization is inconsistent")
   
     if l - 1 == 0:
         norm = -np.log(4.0) + 2.0*special.gammaln(n + 0.5) - 2.0*special.gammaln(n + 1.0)
