@@ -62,7 +62,7 @@ class BoussinesqRRBCCylinderConfig:
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
 
-class BoussinesqRRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
+class BoussinesqRRBCCylinder(BoussinesqRRBCCylinderConfig, base_model.BaseModel):
     """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a cylinder (Toroidal/Poloidal formulation)"""
 
     def stability_fields(self):
@@ -130,13 +130,14 @@ class BoussinesqRRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
+        m = eigs[0]
+
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
-            m = eigs[0]
             Ra = eq_params['rayleigh']
             zscale = eq_params['scale3d']
 
@@ -445,7 +446,7 @@ class BoussinesqRRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
         return mat
 
 
-class BoussinesqRBCCylinderVisu(BoussinesqRBCCylinderConfig, base_model.BaseModel):
+class BoussinesqRRBCCylinderVisu(BoussinesqRRBCCylinderConfig, base_model.BaseModel):
     """Class to setup the Boussinesq Rayleigh-Benard convection in a cylinder (Toroidal/Poloidal formulation)"""
 
     def implicit_fields(self, field_row):

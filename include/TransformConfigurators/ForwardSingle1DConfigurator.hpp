@@ -132,10 +132,10 @@ namespace Transform {
    template <typename TSharedEquation> void ForwardSingle1DConfigurator::firstStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the transforms
-      TransformTreeEdge::EdgeType_citerator itSpec;
+      TransformTreeEdge::EdgeType_citerator it3D;
 
       // Ranges for the vector of edges for the transforms
-      TransformTreeEdge::EdgeType_crange rangePhys = tree.root().edgeRange();
+      TransformTreeEdge::EdgeType_crange range3D = tree.root().edgeRange();
 
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);
@@ -145,18 +145,18 @@ namespace Transform {
 
       #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
-         IntegratorPartEdge_iterator it2D;
+         TransformTreeEdge::EdgeType_citerator it2D;
 
          // Ranges for the vector of edges for the second transforms
-         IntegratorPartEdge_range range2D;
+         TransformTreeEdge::EdgeType_crange range2D;
 
          // Loop over first transform
-         for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
+         for(it3D = range3D.first; it3D != range3D.second; ++it3D)
          {
             // Compute third transform
-            ForwardConfigurator3D::integrateND(*itPhys, coord);
+            ForwardConfigurator3D::integrateND(*it3D, coord);
 
-            range2D = itPhys->edgeRange();
+            range2D = it3D->edgeRange();
             for(it2D = range2D.first; it2D != range2D.second; ++it2D)
             {
                // Compute second transform
@@ -165,10 +165,10 @@ namespace Transform {
          }
       #else
          // Loop over first transform
-         for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
+         for(it3D = range3D.first; it3D != range3D.second; ++it3D)
          {
             // Compute third transform
-            ForwardConfigurator2D::integrateND(*itPhys, coord);
+            ForwardConfigurator2D::integrateND(*it3D, coord);
          }
       #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
@@ -184,11 +184,11 @@ namespace Transform {
    template <typename TSharedEquation> void ForwardSingle1DConfigurator::lastStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the transforms
-      TransformTreeEdge::EdgeType_citerator itSpec;
+      TransformTreeEdge::EdgeType_citerator it1D;
       TransformTreeEdge::EdgeType_citerator itPhys;
 
       // Ranges for the vector of edges for the transforms
-      TransformTreeEdge::EdgeType_crange rangeSpec;
+      TransformTreeEdge::EdgeType_crange range1D;
       TransformTreeEdge::EdgeType_crange rangePhys = tree.root().edgeRange();
 
       // Start profiler
@@ -196,10 +196,10 @@ namespace Transform {
 
       #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
-         IntegratorPartEdge_iterator it2D;
+         TransformTreeEdge::EdgeType_citerator it2D;
 
          // Ranges for the vector of edges for the second transforms
-         IntegratorPartEdge_range range2D;
+         TransformTreeEdge::EdgeType_crange range2D;
 
          // Loop over first transform
          for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
@@ -207,14 +207,14 @@ namespace Transform {
             range2D = itPhys->edgeRange();
             for(it2D = range2D.first; it2D != range2D.second; ++it2D)
             {
-               rangeSpec = it2D->edgeRange();
-               for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
+               range1D = it2D->edgeRange();
+               for(it1D = range1D.first; it1D != range1D.second; ++it1D)
                {
                   // Compute third transform
-                  ForwardConfigurator3D::integrate1D(*itSpec, coord);
+                  ForwardConfigurator3D::integrate1D(*it1D, coord);
 
                   // Update equation
-                  ForwardConfigurator3D::updateEquation(*itSpec, spEquation, coord);
+                  ForwardConfigurator3D::updateEquation(*it1D, spEquation, coord);
                }
             }
          }
@@ -222,14 +222,14 @@ namespace Transform {
          // Loop over first transform
          for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
          {
-            rangeSpec = itPhys->edgeRange();
-            for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
+            range1D = itPhys->edgeRange();
+            for(it1D = range1D.first; it1D != range1D.second; ++it1D)
             {
                // Compute third transform
-               ForwardConfigurator2D::integrate1D(*itSpec, coord, recoverSpec);
+               ForwardConfigurator2D::integrate1D(*it1D, coord, recover1D);
 
                // Update equation
-               ForwardConfigurator2D::updateEquation(*itSpec, spEquation, coord);
+               ForwardConfigurator2D::updateEquation(*it1D, spEquation, coord);
             }
          }
       #endif //GEOMHDISCC_SPATIALDIMENSION_3D

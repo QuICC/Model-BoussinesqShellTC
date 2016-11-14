@@ -130,13 +130,13 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
+        m = eigs[0]
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
-            m = eigs[0]
             Ra = eq_params['rayleigh']
             zscale = eq_params['scale3d']
 
@@ -245,14 +245,18 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
         elif field_row == ("velocity","tor") and field_col == field_row:
             if m == 0:
                 mat = geo.qid(res[0], res[2], 1, 1, 2, bc, -1.0, restriction = restriction)
+                #mat = geo.zblk(res[0], res[2], 1, 1, 2, bc, restriction = restriction)
             else:
                 mat = geo.qid(res[0], res[2], m, 2, 2, bc, -1.0, restriction = restriction)
+                #mat = geo.zblk(res[0], res[2], m, 2, 2, bc, restriction = restriction)
 
         elif field_row == ("velocity","pol") and field_col == field_row:
             if m == 0:
                 mat = geo.qid(res[0], res[2], 1, 2, 4, bc, restriction = restriction)
+                #mat = geo.zblk(res[0], res[2], 1, 2, 4, bc, restriction = restriction)
             else:
                 mat = geo.qid(res[0], res[2], m, 3, 4, bc, restriction = restriction)
+                #mat = geo.zblk(res[0], res[2], m, 3, 4, bc, restriction = restriction)
 
 
         if mat is None:
@@ -542,13 +546,13 @@ class BoussinesqRBCCylinderVisu(BoussinesqRBCCylinderConfig, base_model.BaseMode
             if m == 0:
                 mat = geo.qid(res[0], res[2], m, 0, 0, bc)
             else:
-                mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
 
         elif field_row == ("fluct_temperature","") and field_col == ("temperature",""):
             if m == 0:
-                mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], m, 0, 0, bc)
             else:
-                mat = geo.qid(res[0], res[2], m, 0, 0, bc)
+                mat = geo.qid(res[0], res[2], m, 1, 2, bc)
 
         elif field_row == ("magnetic","tor") and field_col == ("velocity","tor"):
             if m == 0:
@@ -560,7 +564,7 @@ class BoussinesqRBCCylinderVisu(BoussinesqRBCCylinderConfig, base_model.BaseMode
             if m == 0:
                 mat = geo.qid(res[0], res[2], m, 0, 0, bc)
             else:
-                mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], m, 3, 4, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -19,7 +19,7 @@ m = 0
 res = [16, 0, 16]
 eq_params = {'prandtl':1, 'rayleigh':2.66491e3, 'gamma':1.0, 'scale3d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':1193, 'gamma':1.0, 'scale3d':2.0}
-eq_params = {'prandtl':1, 'rayleigh':2000, 'gamma':++G++, 'scale3d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':2000, 'gamma':1.0, 'scale3d':2.0}
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v

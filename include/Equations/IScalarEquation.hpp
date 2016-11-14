@@ -333,7 +333,11 @@ namespace Equations {
       TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
       Equations::copyUnknown(eq, compId, tmp, matIdx, 0, false, true);
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
+      #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
+      #else 
+         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
       // Get a restricted stencil matrix
       SparseMatrix stencil(eq.couplingInfo(compId).galerkinN(matIdx),eq.couplingInfo(compId).galerkinN(matIdx));
@@ -371,7 +375,11 @@ namespace Equations {
       if(useShift)
       {
          zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-         zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+         #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+            zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+         #else
+            zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+         #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
       }
 
       // matIdx is the index of the slowest varying direction with a single RHS
@@ -640,7 +648,11 @@ namespace Equations {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+            #else
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
             //Safety assertion
             assert(start >= 0);
@@ -690,7 +702,11 @@ namespace Equations {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+            #else
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
             //Safety assertion
             assert(start >= 0);
@@ -787,7 +803,11 @@ namespace Equations {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+            #else
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
             // Set data to zero
             int k = start;
@@ -810,7 +830,11 @@ namespace Equations {
          int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
          int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-         int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+         #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+         #else
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+         #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
          //Safety assertion
          assert(start >= 0);

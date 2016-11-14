@@ -8,16 +8,17 @@ import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 # Create the model and activate linearization
 model = mod.BoussinesqRRBCCylinder()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set boundary conditions
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 1 # 0: FT/FT, 2: FF/FT, 3: FT/FF
 
 # Create parameters
-m = 0
-res = [12, 0, 12]
-eq_params = {'ekman':1e-4, 'prandtl':1, 'rayleigh':1.5e2, 'gamma':1.0, 'scale3d':2.0}
+m = 1
+res = [256, 0, 256]
+eq_params = {'ekman':1e-4, 'prandtl':1, 'rayleigh':1539716.5974917, 'gamma':1.0, 'scale3d':2.0} # m = 0
+eq_params = {'ekman':1e-6, 'prandtl':1, 'rayleigh':1.0e4, 'gamma':1.0, 'scale3d':2.0} # m = 1
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v
@@ -46,14 +47,14 @@ marginal_options['solve_nev'] = 3
 marginal_options['point_k'] = m
 marginal_options['plot_point'] = False
 marginal_options['plot_spy'] = True
-marginal_options['viz_mode'] = 0
+marginal_options['viz_mode'] = -1
 marginal_options['show_spectra'] = True
 marginal_options['save_spectra'] = False
 marginal_options['show_physical'] = True
 marginal_options['save_physical'] = False
-marginal_options['write_mtx'] = False
+marginal_options['write_mtx'] = True
 marginal_options['save_pdf'] = False
-marginal_options['curve_points'] = np.arange(max(0, m-2), m+12, 1)
+marginal_options['curve_points'] = np.arange(m, m+1, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

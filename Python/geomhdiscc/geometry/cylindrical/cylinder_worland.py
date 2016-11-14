@@ -132,6 +132,13 @@ def i4j4(nr, nz, m, bc, coeff = 1.0, restriction = None):
     mat = coeff*utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i4(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
 
+def i4j4e1(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i4 in R kronecker with i4e1 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i4d1(nz, bcz, cscale = zscale), rad.i4(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
+
 def i4drj4(nr, nz, m, bc, coeff = 1.0, restriction = None):
     """Create a i4dr in R kronecker with i4 in Z"""
 

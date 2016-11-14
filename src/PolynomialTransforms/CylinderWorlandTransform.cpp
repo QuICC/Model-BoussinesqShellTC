@@ -210,11 +210,11 @@ namespace Transform {
          projIt = this->mProjOp.find(ProjectorType::LAPLH_DIVRDIFFR);
          if(l == 0)
          {
-            Polynomial::WorlandPolynomial::claplhWnl(op, itmp, 1, igrid);
+            Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, 1, igrid);
             projIt->second.at(iL) = op.transpose();
          } else
          {
-            Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
+            Polynomial::WorlandPolynomial::claplhWnl(op, itmp, l, igrid);
             projIt->second.at(iL) = op.transpose();
          }
 
