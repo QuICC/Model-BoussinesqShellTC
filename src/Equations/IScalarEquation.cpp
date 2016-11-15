@@ -89,11 +89,8 @@ namespace Equations {
       }
    }
 
-   void IScalarEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   void IScalarEquation::initSpectralMatrices()
    {
-      // Store the boundary condition list
-      this->mspBcIds = spBcIds;
-
       // Make sure it is safe to do nothing
       bool needInit = this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse();
 
@@ -113,7 +110,7 @@ namespace Equations {
       // Initialise spectral matrices
       if(needInit)
       {
-         this->initSpectralMatricesComponent(spBcIds, FieldComponents::Spectral::SCALAR);
+         this->initSpectralMatricesComponent(this->mspBcIds, FieldComponents::Spectral::SCALAR);
       }
    }
 

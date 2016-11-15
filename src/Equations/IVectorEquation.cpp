@@ -95,11 +95,8 @@ namespace Equations {
       }
    }
 
-   void IVectorEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   void IVectorEquation::initSpectralMatrices()
    {
-      // Store the boundary condition list
-      this->mspBcIds = spBcIds;
-
       IVectorEquation::SpectralComponent_range range = this->spectralRange();
 
       for(SpectralComponent_iterator it = range.first; it != range.second; ++it)
@@ -123,7 +120,7 @@ namespace Equations {
          // Initialise spectral matrices
          if(needInit)
          {
-            this->initSpectralMatricesComponent(spBcIds, *it);
+            this->initSpectralMatricesComponent(this->mspBcIds, *it);
          }
       }
    }

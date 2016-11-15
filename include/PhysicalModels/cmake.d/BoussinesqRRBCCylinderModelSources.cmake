@@ -8,5 +8,6 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldTrivialVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
 )

@@ -62,7 +62,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         # Tau matrix dimension

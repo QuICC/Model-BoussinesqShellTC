@@ -327,11 +327,12 @@ class GEVP:
 
         self.eq_params['rayleigh'] = Ra
 
-        opA = functools.partial(self.model.implicit_linear, self.res, self.eq_params, self.eigs, self.bcs, self.fields)
+        opA = functools.partial(self.model.implicit_linear, self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
         opB = functools.partial(self.model.time, self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
-        sizes = self.model.stability_sizes(self.res, self.eigs)
+        opC = functools.partial(self.model.boundary, self.res, self.eq_params, self.eigs, self.bcs, self.fields)
+        sizes = self.model.stability_sizes(self.res, self.eigs, self.bcs)
 
-        return (opA, opB, sizes)
+        return (opA, opB, opC, sizes)
    
     def setEigs(self, k):
        """Set the wave number"""
@@ -363,12 +364,13 @@ class GEVP:
 
         # Create operators
         if spy or write_mtx:
-            opA, opB, sizes = self.setupProblem(Ra)
+            opA, opB, opC, sizes = self.setupProblem(Ra)
             restrict = self.solver.restrict_operators(sizes)
             A = opA(restriction = restrict)
             B = opB(restriction = restrict)
+            C = opC(restriction = restrict)
 
-            viewer.viewOperators(A, B, show = spy, save = write_mtx)
+            viewer.viewOperators(A, B, C, show = spy, save = write_mtx)
 
     def saveHdf5_h5py(self, spectra, geometry, postfix = ''):
         """Save spectra to HDF5 file"""
@@ -506,7 +508,7 @@ class GEVP:
                 stop = 0
                 sol_spec = dict()
                 for i,f in enumerate(self.fields):
-                    stop = stop + self.model.stability_sizes(self.res, self.eigs)[0][i]
+                    stop = stop + self.model.stability_sizes(self.res, self.eigs, self.bcs)[0][i]
                     sol_spec[f] = full_vec[start:stop]
                     start = stop
                 

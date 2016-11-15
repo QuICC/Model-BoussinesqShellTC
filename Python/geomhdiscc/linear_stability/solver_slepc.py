@@ -345,7 +345,7 @@ class GEVPSolver:
 
         return restrict
 
-    def petsc_operators(self, opA, opB, sizes):
+    def petsc_operators(self, opA, opB, opC, sizes):
         """Convert SciPy operators to PETSc operators"""
 
         # Build operator restriction
@@ -353,7 +353,7 @@ class GEVPSolver:
         restrict = None
 
         # Setup A matrix
-        A = opA(restriction = restrict).transpose().tocsr()
+        A = (opA(restriction = restrict) + opC(restriction = restrict)).transpose().tocsr()
         pA = PETSc.Mat().create()
         pA.setSizes(A.shape)
         pA.setUp()

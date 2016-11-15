@@ -92,7 +92,7 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -303,7 +303,7 @@ class BoussinesqCouetteShellStdVisu(BoussinesqCouetteShellStdConfig, base_model.
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]

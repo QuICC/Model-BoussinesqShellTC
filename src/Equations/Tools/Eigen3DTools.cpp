@@ -54,24 +54,24 @@ namespace Equations {
       return nMat;
    }
 
-   void Eigen3DTools::interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const
+   void Eigen3DTools::interpretTauN(ArrayI& rTauNs, const SharedResolution& spRes) const
    {
-      rTauNs.setConstant(tauSize);
+      // Python setup is sufficient
    }
 
-   void Eigen3DTools::interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const
+   void Eigen3DTools::interpretGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const
    {
-      rGalerkinNs.setConstant(galerkinSize);
+      // Python setup is sufficient
    }
 
-   void Eigen3DTools::interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const
+   void Eigen3DTools::interpretRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const
    {
-      rRhsCols.setConstant(rhsSize);
+      // Python setup is sufficient
    }
 
-   void Eigen3DTools::interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const
+   void Eigen3DTools::interpretSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const
    {
-      rSystemNs.setConstant(systemSize);
+      // Python setup is sufficient
    }
 
 }

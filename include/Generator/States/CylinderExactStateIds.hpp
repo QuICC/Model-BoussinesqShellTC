@@ -45,6 +45,7 @@ namespace Equations {
          CONSTANT = 0,  // All constant
          POLYCOSPOLY = 10, // Polynomial, Cosine, Polynomial
          POLYSINPOLY,      // Polynomial, Sine, Polynomial
+         TESTTRANSFORM,    // Test case for transforms
          TESTUNITSPECTRUM, // Exact solution with unit spectrum to test implementation
       };
 

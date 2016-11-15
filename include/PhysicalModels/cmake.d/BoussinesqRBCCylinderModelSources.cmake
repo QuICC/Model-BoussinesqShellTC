@@ -2,11 +2,16 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRBCCylinderTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRBCCylinderMomentum.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/CylinderScalarEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/CylinderTorPolEnergyWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactStateIds.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldTrivialVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldTrivialVisualizer.cpp
 )

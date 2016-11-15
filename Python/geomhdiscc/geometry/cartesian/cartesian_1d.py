@@ -513,11 +513,11 @@ def avg(nx):
 
     return mat.tocoo()
 
-def integral(nr, cscale = 1.0):
+def integral(nx, cscale = 1.0):
     """Compute the definite integral of the expansion"""
 
-    mat = spsp.lil_matrix((1,nr))
-    mat[0,::2] = [4.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nr,2)]
+    mat = spsp.lil_matrix((1,nx))
+    mat[0,::2] = [4.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nx,2)]
     mat[0,0] = mat[0,0]/2.0
 
     return mat.tocoo()
@@ -529,3 +529,10 @@ def surfaceFlux(nx, cscale = 1.0):
     mat = 2.0*cscale*mat
 
     return mat.tocoo()
+
+def tau_mat(nx, tau, pad, bc, coeff = 1.0):
+    """Create a quasi identity block of order q"""
+
+    mat = spsp.coo_matrix((nx,nx))
+    mat = c1dbc.constrain(mat, tau, pad_zeros = pad)
+    return c1dbc.constrain(mat, bc)

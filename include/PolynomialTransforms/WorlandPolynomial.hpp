@@ -70,6 +70,13 @@ namespace Polynomial {
          static void r_1drWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid);
 
          /**
+          * @brief Compute \f$\frac{d}{dr}\frac{1}{r}\frac{d}{dr} r W_n^l (r)\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dr_1drWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid);
+
+         /**
           * @brief Compute spherical \f$\nabla^2 W_n^l (r)\f$
           *
           * Internal computation can be done in multiple precision

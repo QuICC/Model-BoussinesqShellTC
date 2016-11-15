@@ -61,7 +61,7 @@ namespace Datatypes  {
       void addMatrixProduct(DecoupledZMatrix& rField, const int start, const SparseMatrixZ& mat, const Eigen::Ref<const MatrixZ>& rhs);
 
       //
-      // Top block operations
+      // 1D Top block operations
       //
 
       void setTopBlock(MatrixZ& rField, const int start, const int rows, const MatrixZ& rhs);
@@ -69,6 +69,16 @@ namespace Datatypes  {
       void setTopBlock(Matrix& rField, const int start, const int rows, const Matrix& rhs);
 
       void setTopBlock(DecoupledZMatrix& rField, const int start, const int rows, const DecoupledZMatrix& rhs);
+
+      //
+      // 2D Top block operations
+      //
+
+      void setTopBlock(MatrixZ& rField, const int start, const int rows, const int fastSize, const int fastShift, const MatrixZ& rhs);
+
+      void setTopBlock(Matrix& rField, const int start, const int rows, const int fastSize, const int fastShift, const Matrix& rhs);
+
+      void setTopBlock(DecoupledZMatrix& rField, const int start, const int rows, const int fastSize, const int fastShift, const DecoupledZMatrix& rhs);
 
       /*
        * Inline definitions below
@@ -216,6 +226,49 @@ namespace Datatypes  {
          int cols = rField.real().cols();
          rField.real().block(start, 0, rows, cols) = rhs.real().topRows(rows);
          rField.imag().block(start, 0, rows, cols) = rhs.imag().topRows(rows);
+      }
+
+      inline void setTopBlock(Matrix& rField, const int start, const int rows, const int fastSize, const int fastShift, const Matrix& rhs)
+      {
+         int cols = rField.cols();
+         int galBlock = fastSize - fastShift;
+         int nJ = rows/galBlock;
+         assert(rows - nJ*galBlock == 0);
+         assert(rhs.rows() >= nJ*fastSize);
+         for(int j = 0; j < nJ; j++)
+         {
+            rField.block(j*galBlock + start, 0, galBlock, cols) = rhs.block(j*fastSize, 0, galBlock, cols);
+         }
+      }
+
+      inline void setTopBlock(MatrixZ& rField, const int start, const int rows, const int fastSize, const int fastShift, const MatrixZ& rhs)
+      {
+         int cols = rField.cols();
+         int galBlock = fastSize - fastShift;
+         int nJ = rows/galBlock;
+         assert(rows - nJ*galBlock == 0);
+         assert(rhs.rows() >= nJ*fastSize);
+         for(int j = 0; j < nJ; j++)
+         {
+            rField.block(j*galBlock + start, 0, galBlock, cols) = rhs.block(j*fastSize, 0, galBlock, cols);
+         }
+      }
+
+      inline void setTopBlock(DecoupledZMatrix& rField, const int start, const int rows, const int fastSize, const int fastShift, const DecoupledZMatrix& rhs)
+      {
+         assert(rField.real().rows() == rField.imag().rows());
+         assert(rField.real().cols() == rField.imag().cols());
+
+         int cols = rField.real().cols();
+         int galBlock = fastSize - fastShift;
+         int nJ = rows/galBlock;
+         assert(rows - nJ*galBlock == 0);
+         assert(rhs.real().rows() >= nJ*fastSize);
+         for(int j = 0; j < nJ; j++)
+         {
+            rField.real().block(j*galBlock + start, 0, galBlock, cols) = rhs.real().block(j*fastSize, 0, galBlock, cols);
+            rField.imag().block(j*galBlock + start, 0, galBlock, cols) = rhs.imag().block(j*fastSize, 0, galBlock, cols);
+         }
       }
    }
 }

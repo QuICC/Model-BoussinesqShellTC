@@ -58,22 +58,22 @@ namespace Equations {
          /**
           * @brief Interpret Tau resolution provided by python code
           */
-         virtual void interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const;
+         virtual void interpretTauN(ArrayI& rTauNs, const SharedResolution& spRes) const;
 
          /**
           * @brief Interpret Galerkin resolution provided by python code
           */
-         virtual void interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const;
+         virtual void interpretGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const;
 
          /**
           * @brief Interpret number of RHS provided by python code
           */
-         virtual void interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const;
+         virtual void interpretRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const;
 
          /**
           * @brief Interpret system size provided by python code
           */
-         virtual void interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const;
+         virtual void interpretSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const;
    };
 
    /// Typedef for a shared EigenSHlmTools

@@ -37,8 +37,11 @@ namespace Equations {
    {
    }
 
-   void IEquation::init()
+   void IEquation::init(const SharedSimulationBoundary spBcIds)
    {
+      // Store the boundary condition list
+      this->mspBcIds = spBcIds;
+
       // Set the coupling
       this->setCoupling();
 
@@ -250,25 +253,8 @@ namespace Equations {
       pTmp = PyTuple_GetItem(pValue, 5);
       int indexMode = PyLong_AsLong(pTmp);
 
-      // Get block information
-      pArgs = PyTuple_GetItem(pValue, 6);
-      pTmp = PyTuple_GetItem(pArgs, 0);
-      int tauSize = PyLong_AsLong(pTmp);
-      pTmp = PyTuple_GetItem(pArgs, 1);
-      int galerkinSize = PyLong_AsLong(pTmp);
-      pTmp = PyTuple_GetItem(pArgs, 2);
-      ArrayI galerkinShifts(3);
-      galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 0));
-      galerkinShifts(1) = PyLong_AsLong(PyTuple_GetItem(pTmp, 1));
-      galerkinShifts(2) = PyLong_AsLong(PyTuple_GetItem(pTmp, 2));
-      pTmp = PyTuple_GetItem(pArgs, 3);
-      int rhsSize = PyLong_AsLong(pTmp);
-      pTmp = PyTuple_GetItem(pArgs, 4);
-      int systemSize = PyLong_AsLong(pTmp);
-      Py_DECREF(pValue);
-
       // Finalise Python interpreter
-      PythonModelWrapper::cleanup();
+      Py_DECREF(pValue);
 
       // Initialise coupling information
       std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
@@ -343,20 +329,78 @@ namespace Equations {
       // Set nonlinear flags: has nonlinear term? has quasi-inverse?
       infoIt.first->second.setNonlinear(hasNL, hasNL && hasQI);
 
-      // Set field coupling information
-      int nMat = infoIt.first->second.eigenTools().nMat(spRes);
-      ArrayI tauNs(nMat);
-      ArrayI galerkinNs(nMat);
-      ArrayI rhsCols(nMat);
-      ArrayI systemNs(nMat);
-      infoIt.first->second.eigenTools().setTauN(tauNs, tauSize, spRes);
-      infoIt.first->second.eigenTools().setGalerkinN(galerkinNs, galerkinSize, spRes);
-      infoIt.first->second.eigenTools().setRhsN(rhsCols, rhsSize, spRes);
-      infoIt.first->second.eigenTools().setSystemN(systemNs, systemSize, spRes);
-      infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs); 
-
       // Sort implicit fields
       infoIt.first->second.sortImplicitFields(eqId.first, eqId.second);
+
+      // Get number of matrices
+      int nMat = infoIt.first->second.eigenTools().nMat(spRes);
+
+      // Prepare Python call
+      pArgs = PyTuple_New(4);
+
+      // Get resolution
+      pValue = PythonTools::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      PyTuple_SetItem(pArgs, 0, pValue);
+
+      // Get boundary conditions
+      std::map<std::string,int> bcMap = this->bcIds().getTagMap();
+      pValue = PythonTools::makeDict(bcMap);
+      PyTuple_SetItem(pArgs, 2, pValue);
+
+      // Get field
+      pTmp = PyTuple_New(2);
+      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(this->name()).c_str());
+      PyTuple_SetItem(pTmp, 0, pValue);
+      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(compId).c_str());
+      PyTuple_SetItem(pTmp, 1, pValue);
+      PyTuple_SetItem(pArgs, 3, pTmp);
+
+      // Call model operator Python routine
+      PythonModelWrapper::setMethod((char *)"operator_info");
+
+      // Set field coupling information
+      ArrayI tauNs(nMat);
+      ArrayI galerkinNs(nMat);
+      MatrixI galerkinShifts(nMat, 3);
+      ArrayI rhsCols(nMat);
+      ArrayI systemNs(nMat);
+
+      // Loop overall matrices/eigs
+      for(int matIdx = 0; matIdx < nMat; ++matIdx)
+      {
+         // Get the eigen direction values
+         pValue = PythonTools::makeTuple(infoIt.first->second.eigenTools().getEigs(spRes, matIdx));
+         PyTuple_SetItem(pArgs, 1, pValue);
+
+         pValue = PythonModelWrapper::callMethod(pArgs);
+
+         // Get block information
+         pTmp = PyTuple_GetItem(pValue, 0);
+         tauNs(matIdx) = PyLong_AsLong(pTmp);
+         pTmp = PyTuple_GetItem(pValue, 1);
+         galerkinNs(matIdx) = PyLong_AsLong(pTmp);
+         pTmp = PyTuple_GetItem(pValue, 2);
+         ArrayI shifts(3);
+         galerkinShifts(matIdx,0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 0));
+         galerkinShifts(matIdx,1) = PyLong_AsLong(PyTuple_GetItem(pTmp, 1));
+         galerkinShifts(matIdx,2) = PyLong_AsLong(PyTuple_GetItem(pTmp, 2));
+         pTmp = PyTuple_GetItem(pValue, 3);
+         rhsCols(matIdx) = PyLong_AsLong(pTmp);
+         pTmp = PyTuple_GetItem(pValue, 4);
+         systemNs(matIdx) = PyLong_AsLong(pTmp);
+
+         Py_DECREF(pValue);
+      }
+      Py_DECREF(pArgs);
+
+      infoIt.first->second.eigenTools().setTauN(tauNs, spRes);
+      infoIt.first->second.eigenTools().setGalerkinN(galerkinNs, spRes);
+      infoIt.first->second.eigenTools().setRhsN(rhsCols, spRes);
+      infoIt.first->second.eigenTools().setSystemN(systemNs, spRes);
+      infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs); 
+
+      // Finalise Python interpreter
+      PythonModelWrapper::cleanup();
    }
 
    PyObject*  IEquation::dispatchBaseArguments(const int tupleSize, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const

@@ -115,9 +115,6 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
-#error "The SINGLE1D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE1D
 #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
 #error "The SINGLE2D parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_SINGLE2D

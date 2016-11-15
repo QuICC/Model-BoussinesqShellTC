@@ -98,9 +98,9 @@ namespace Equations {
       return this->mGalerkinNs(idx);
    }
 
-   int CouplingInformation::galerkinShift(const int dim) const
+   int CouplingInformation::galerkinShift(const int idx, const int dim) const
    {
-      return this->mGalerkinShifts(dim);
+      return this->mGalerkinShifts(idx, dim);
    }
 
    int CouplingInformation::systemN(const int idx) const
@@ -187,7 +187,7 @@ namespace Equations {
       this->mHasSource = hasSource;
    }
 
-   void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs)
+   void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const MatrixI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs)
    {
       this->mNSystems = nSystems;
 
