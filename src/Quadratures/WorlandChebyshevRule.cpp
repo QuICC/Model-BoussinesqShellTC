@@ -46,7 +46,7 @@ namespace GeoMHDiSCC {
          igrid(k_) = precision::sqrt((igrid(k_) + MHD_MP(1.0))/MHD_MP(2.0));
       }
 
-      iweights.setConstant(Precision::PI/(MHD_MP(2.0)*MHD_MP(size)));
+      iweights.setConstant(Precision::PI/(MHD_MP(2.0)*internal::MHDFloat(size)));
 
       // Copy internal precision values into input arrays
       grid = Precision::cast(igrid);

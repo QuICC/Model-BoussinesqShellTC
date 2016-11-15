@@ -189,12 +189,11 @@ namespace Transform {
          if(l == 0)
          {
             Polynomial::WorlandPolynomial::Wnl(op, itmp, 1, igrid);
-            projIt->second.at(iL) = op.transpose();
          } else
          {
             Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
-            projIt->second.at(iL) = op.transpose();
          }
+         projIt->second.at(iL) = op.transpose();
 
          // Projector: 1/R D R P
          projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
@@ -211,12 +210,11 @@ namespace Transform {
          if(l == 0)
          {
             Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, 1, igrid);
-            projIt->second.at(iL) = op.transpose();
          } else
          {
             Polynomial::WorlandPolynomial::claplhWnl(op, itmp, l, igrid);
-            projIt->second.at(iL) = op.transpose();
          }
+         projIt->second.at(iL) = op.transpose();
 
          // Projector: 1/R horizontal laplacian, set to 0 for m = 0 (always appears combined with \partial_\theta)
          projIt = this->mProjOp.find(ProjectorType::DIVRLAPLHM0);
@@ -239,12 +237,11 @@ namespace Transform {
          if(l == 0)
          {
             Polynomial::WorlandPolynomial::dr_1drWnl(op, itmp, 1, igrid);
-            projIt->second.at(iL) = op.transpose();
          } else
          {
             Polynomial::WorlandPolynomial::dclaplhWnl(op, itmp, l, igrid);
-            projIt->second.at(iL) = op.transpose();
          }
+         projIt->second.at(iL) = op.transpose();
 
          // Set resolution and m
          PyTuple_SetItem(pArgs, 0, PyLong_FromLong(this->mspSetup->fast().at(iL).size()));

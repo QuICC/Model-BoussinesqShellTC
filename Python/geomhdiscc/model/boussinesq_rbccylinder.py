@@ -245,7 +245,6 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
         elif field_row == ("velocity","tor") and field_col == field_row:
             if m == 0:
                 mat = geo.qid(res[0], res[2], 1, 1, 2, bc, -1.0, restriction = restriction)
-                #mat = geo.zblk(res[0], res[2], 1, 1, 2, bc, restriction = restriction)
             else:
                 mat = geo.qid(res[0], res[2], m, 2, 2, bc, -1.0, restriction = restriction)
                 #mat = geo.zblk(res[0], res[2], m, 2, 2, bc, restriction = restriction)
@@ -253,7 +252,6 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
         elif field_row == ("velocity","pol") and field_col == field_row:
             if m == 0:
                 mat = geo.qid(res[0], res[2], 1, 2, 4, bc, restriction = restriction)
-                #mat = geo.zblk(res[0], res[2], 1, 2, 4, bc, restriction = restriction)
             else:
                 mat = geo.qid(res[0], res[2], m, 3, 4, bc, restriction = restriction)
                 #mat = geo.zblk(res[0], res[2], m, 3, 4, bc, restriction = restriction)
