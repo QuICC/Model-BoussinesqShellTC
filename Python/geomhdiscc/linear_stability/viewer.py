@@ -361,7 +361,7 @@ def viewProfile(fields, grid, fid = None, show = True, save = False, max_cols = 
         pl.subplot(rows,cols,i+1)
         pl.plot(grid, df[1].real, 'b-')
         pl.plot(grid, df[1].imag, 'r-')
-        pl.plot(grid, np.abs(df[1]), 'g-')
+        pl.plot(grid, np.abs(df[1]), 'g:')
         title = df[0][0]
         if df[0][1] != "":
             title = title + ', ' + df[0][1]

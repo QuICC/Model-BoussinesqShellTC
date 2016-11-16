@@ -50,14 +50,14 @@ namespace GeoMHDiSCC {
       // Add transport equation
       spSim->addScalarEquation<Equations::BoussinesqRBCCylinderTransport>();
       
-      // Add Navier-Stokes equation (X,Y,Z components)
+      // Add Navier-Stokes equation
       spSim->addVectorEquation<Equations::BoussinesqRBCCylinderMomentum>();
    }
 
    void BoussinesqRBCCylinderModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedCylinderExactScalarState spScalar;
@@ -66,18 +66,13 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CylinderExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::R, Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::R, 1.0e0, 1.0, 1.0e0, 0.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::THETA, Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::THETA, 1.0e0, 0.0, 1.0e0, 1.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 0.0, 1.0e0, 0.0, 1.0e0, 1.0);
+         spVector->setSpectralType(FieldComponents::Spectral::TOR, Equations::CylinderExactStateIds::SPEC_UNIT);
+         spVector->setSpectralType(FieldComponents::Spectral::POL, Equations::CylinderExactStateIds::SPEC_UNIT);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spScalar->setModeOptions(1e0, 2.0, 1e0, 2.0, 1e0, 1.0);
+         spScalar->setSpectralType(Equations::CylinderExactStateIds::SPEC_UNIT);
 
       // Generate random spectrum
       } else

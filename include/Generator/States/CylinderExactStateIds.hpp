@@ -41,12 +41,12 @@ namespace Equations {
        * @brief Enums for the avaialable exact states
        */
       enum Id {
+         NOTUSED = -1,  // Initialisation state (do NOT use)
          // Special states
          CONSTANT = 0,  // All constant
          POLYCOSPOLY = 10, // Polynomial, Cosine, Polynomial
          POLYSINPOLY,      // Polynomial, Sine, Polynomial
-         TESTTRANSFORM,    // Test case for transforms
-         TESTUNITSPECTRUM, // Exact solution with unit spectrum to test implementation
+         SPEC_UNIT, // Spectral space solution: unit spectrum of max 5 modes
       };
 
       /**
