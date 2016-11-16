@@ -84,7 +84,10 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            fields = []
+            if field_row in [("velocity","pol")]:
+                fields = [("temperature","")]
+            else:
+                fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
@@ -232,6 +235,28 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
 
         return bc
 
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create the explicit nonlinear operator"""
+
+        Ra = eq_params['rayleigh']
+        G = eq_params['gamma']
+        zscale = eq_params['scale3d']
+        m = eigs[0]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","pol") and field_col == ("temperature",""):
+            if m == 0:
+                mat = geo.i4drj4(res[0], res[2], 1, bc, Ra*G**3, restriction = restriction)
+            else:
+                mat = geo.i6laplhj4(res[0], res[2], m, bc, Ra*G**3, restriction = restriction)
+
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 
@@ -306,10 +331,16 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
                     mat = geo.i6j4lapl2laplh(res[0], res[2], m, bc, zscale = zscale, restriction = restriction)
 
             elif field_col == ("temperature",""):
-                if m == 0:
-                    mat = geo.i4drj4(res[0], res[2], 1, bc, -Ra*G**3, restriction = restriction)
+                if self.linearize:
+                    if m == 0:
+                        mat = geo.i4drj4(res[0], res[2], 1, bc, -Ra*G**3, restriction = restriction)
+                    else:
+                        mat = geo.i6laplhj4(res[0], res[2], m, bc, -Ra*G**3, restriction = restriction)
                 else:
-                    mat = geo.i6laplhj4(res[0], res[2], m, bc, -Ra*G**3, restriction = restriction)
+                    if m == 0:
+                        mat = geo.zblk(res[0], res[2], 1, 2, 4, bc, restriction = restriction)
+                    else:
+                        mat = geo.zblk(res[0], res[2], m, 3, 4, bc, restriction = restriction)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
