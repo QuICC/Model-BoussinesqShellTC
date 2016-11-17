@@ -44,28 +44,22 @@ set(GEOMHDISCC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
 
 set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 
+
 ###################################################
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "MUMPS" "Pardiso" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
-#set(GEOMHDISCC_LIBRARIES_SPARSELU "/usr/local/lib/libmetis.a" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "parmetis" "ptesmumps" "ptscotch" "ptscotcherr" "ptscotchparmetis" "ptscotcherrexit" "scotch" "scotcherr" "scotcherrexit" "pord" "scalapack" "metis" "atllapack" "f77blas" "mpi" "gfortran" "mpi_mpifh" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_MUMPS "/usr/local/share/petsc-3.6.3_complex/arch-linux2-c-opt/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_MUMPS "/usr/local/share/petsc-3.6.3_complex/arch-linux2-c-opt/lib" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_PARDISO "pardiso412-GNU450-X86-64" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_PARDISO "/usr/local/share/Pardiso/lib" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SparseLU" "MUMPS" "UmfPack" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "MUMPS" "UmfPack" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "metis" "openblas" "goto2" "mpi" "gfortran" "mpi_mpifh" "cmumps" "smumps" "pord" "scalapack" "parmetis" PARENT_SCOPE)
+#set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "parmetis" "ptesmumps" "ptscotch" "ptscotcherr" "ptscotchparmetis" "ptscotcherrexit" "scotch" "scotcherr" "scotcherrexit" "pord" "scalapack" "metis" "atllapack" "f77blas" "mpi" "gfortran" "mpi_mpifh" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_MUMPS "/cluster/apps/mumps/5.0.1/x86_64/gcc_4.8.2/openmpi_1.6.5/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_MUMPS "/cluster/apps/mumps/5.0.1/x86_64/gcc_4.8.2/openmpi_1.6.5/lib" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
@@ -84,7 +78,7 @@ set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
 #-------------- MPI IMPLEMENTATION ---------------#
 ###################################################
 
-set(GEOMHDISCC_MPIIMPLS "MVAPICH" "OpenMPI" PARENT_SCOPE)
+set(GEOMHDISCC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#
@@ -101,7 +95,7 @@ set(GEOMHDISCC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
+set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2 -fpermissive" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_OPENMP_GCC "-fopenmp" PARENT_SCOPE)
 
