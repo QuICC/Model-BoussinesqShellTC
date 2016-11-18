@@ -23,7 +23,7 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["eady", "prandtl", "rayleigh", "mean_flow", "scale1d"]
+        return ["eady", "prandtl", "rayleigh", "ekman", "gamma", "scale1d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -129,23 +129,12 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
                         bc = {0:-20, 'rt':0}
 
                 else:
-                    if bcs["bcType"] == self.SOLVER_HAS_BC:
-                        if field_row == ("velocityz","") and field_col == field_row:
-                            bc = {0:11}
-                        elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                            bc = {0:10}
-                    else:
-                        bc = no_bc()
-
-            elif bcId == 1:
-                if self.use_galerkin:
-                    if field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':0}
-
-                else:
-                    if bcs["bcType"] == self.SOLVER_HAS_BC:
-                        if field_row == ("temperature","") and field_col == field_row:
-                            bc = {0:20}
+                    if field_row == ("velocityz","") and field_col == field_row:
+                        bc = {0:11}
+                    elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
+                        bc = {0:10}
+                    elif field_row == ("temperature","") and field_col == field_row:
+                        bc = {0:20}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -186,10 +175,7 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
-            if bcs["temperature"] == 1 and not self.use_galerkin:
-                mat = geo.sid(res[0], 2, bc)
-            else:
-                mat = geo.sid(res[0], 0, bc)
+            mat = geo.i2(res[0], bc)
 
         elif field_row == ("streamfunction","") and field_col == field_row:
             mat = geo.i1(res[0], bc)
@@ -230,8 +216,9 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        E = eq_params['ekman']
         Ea = eq_params['eady']
-        U = eq_params['mean_flow']
+        G = eq_params['gamma']
         zscale = eq_params['scale1d']
         kx = eigs[0]
         ky = eigs[1]
@@ -242,7 +229,7 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
             if field_col == ("streamfunction",""):
                 mat = geo.i1(res[0], bc, (kx**2 + ky**2)**2)
                 bc[0] = min(bc[0],0)
-                mat += geo.i1z1(res[0], bc, U*1j*kx*(kx**2 + ky**2), cscale = zscale)
+                mat += geo.i1z1(res[0], bc, 1j*kx*(kx**2 + ky**2)*G, cscale = zscale)
 
             elif field_col == ("velocityz",""):
                 mat = geo.i1d1(res[0], bc, 1.0, cscale = zscale)
@@ -257,41 +244,29 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
                 bc[0] = min(bc[0],0)
-                mat += geo.i1z1(res[0], bc, -U*1j*kx, cscale = zscale)
+                mat += geo.i1z1(res[0], bc, -1j*kx*G, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 if kx == 0 and ky == 0:
                     mat = geo.zblk(res[0], bc)
                 else:
-                    mat = geo.i1(res[0], bc, Ra/Pr)*utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
+                    mat = geo.i1(res[0], bc, Ra/Pr)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
-                mat = geo.zblk(res[0], bc)
-                bc[0] = min(bc[0],0)
-                if bcs["temperature"] == 1 and not self.use_galerkin:
-                    mat += geo.z1(res[0], bc, U*1j*kx, cscale = zscale, zr = 2, location = 'b')
-                else:
-                    mat += geo.z1(res[0], bc, U*1j*kx, cscale = zscale)
+                mat = geo.i2z1(res[0], bc, 1j*kx*G, cscale = zscale)
 
             elif field_col == ("velocityz",""):
                 if self.linearize:
-                    if bcs["temperature"] == 1 and not self.use_galerkin:
-                        mat = geo.sid(res[0],2, bc, -Ea)
-                    else:
-                        mat = geo.sid(res[0],0, bc, -Ea)
+                    mat = geo.i2(res[0], bc, -Ea)
                 else:
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                if bcs["temperature"] == 1 and not self.use_galerkin:
-                    mat = geo.sid(res[0],2, bc, -(1.0/Pr)*(kx**2 + ky**2))
-                    bc[0] = min(bc[0],0)
-                    mat += geo.z1(res[0], bc, -U*1j*kx, cscale = zscale, zr = 2, location = 'b')
-                else:
-                    mat = geo.sid(res[0],0, bc, -(1.0/Pr)*(kx**2 + ky**2))
-                    bc[0] = min(bc[0],0)
-                    mat += geo.z1(res[0], bc, -U*1j*kx, cscale = zscale)
+                mat = geo.i2(res[0], bc, -(1.0/Pr)*(kx**2 + ky**2))
+                bc[0] = min(bc[0],0)
+                mat += geo.i2d2(res[0], bc, E**(2./3.)/Pr, cscale = zscale) 
+                mat += geo.i2z1(res[0], bc, -1j*kx*G, cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -313,10 +288,7 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
             mat = geo.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
-            if bcs["temperature"] == 1 and not self.use_galerkin:
-                mat = geo.sid(res[0],2, bc)
-            else:
-                mat = geo.sid(res[0],0, bc)
+            mat = geo.i2(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -328,13 +300,7 @@ class BoussinesqFPlaneNHBGE(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("temperature",""):
-            if bcs["temperature"] == 1 and not self.use_galerkin:
-                mat = geo.zblk(res[0], bc, location='b')
-            else:
-                mat = geo.zblk(res[0], bc)
-        else:
-            mat = geo.zblk(res[0], bc)
+        mat = geo.zblk(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

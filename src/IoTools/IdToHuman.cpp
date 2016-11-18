@@ -469,6 +469,9 @@ namespace IoTools {
       {
          //
          // Nondimensional numbers
+         case NonDimensional::EADY:
+            return "eady";
+
          case NonDimensional::EKMAN:
             return "ekman";
 

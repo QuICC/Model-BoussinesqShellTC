@@ -12,8 +12,9 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [64, 0, 0]
-eq_params = {'eady':1, 'prandtl':1.0, 'rayleigh':8.69, 'mean_flow':0, 'scale1d':2.0}
+res = [128, 0, 0]
+#eq_params = {'eady':-1, 'prandtl':1.0, 'rayleigh':8.69, 'ekman':1e-9, 'mean_flow':0, 'scale1d':2.0} # No mean flow, unstable
+eq_params = {'eady':1, 'prandtl':1.0, 'rayleigh':13.53, 'ekman':1e-9, 'gamma':1, 'scale1d':2.0} # Mean flow, stable
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 phi = 0
 kp = 1.304807403014
@@ -33,7 +34,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['curve'] = False
+marginal_options['curve'] = True
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
 marginal_options['point_k'] = kp
@@ -43,7 +44,7 @@ marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
 marginal_options['write_mtx'] = True
-marginal_options['curve_points'] = np.arange(kp-0.05, kp+.05, 0.01)
+marginal_options['curve_points'] = np.arange(kp-0.05, kp+0.05, 0.01)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

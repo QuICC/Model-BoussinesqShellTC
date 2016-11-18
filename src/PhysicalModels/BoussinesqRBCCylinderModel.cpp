@@ -37,6 +37,7 @@
 #include "Generator/Visualizers/ScalarFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
+#include "Generator/Visualizers/NonlinearVectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -107,6 +108,7 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldTrivialVisualizer spSTrivial;
       Equations::SharedVectorFieldVisualizer spVector;
       Equations::SharedVectorFieldTrivialVisualizer spVTrivial;
+      Equations::SharedNonlinearVectorFieldVisualizer spVNL;
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
@@ -133,13 +135,19 @@ namespace GeoMHDiSCC {
       spVTrivial->setFields(true, false, true);
       spVTrivial->setIdentity(PhysicalNames::MAGNETIC);
 
+      // Add velocity fields visualization
+      spVNL = spVis->addVectorEquation<Equations::NonlinearVectorFieldVisualizer>();
+      spVNL->setNonlinearType(Equations::NonlinearVisualizerIds::CYLINDER_TORPOL_ADVECTION);
+      spVNL->setIdentity(PhysicalNames::PRESSURE);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::MEAN_TEMPERATURE);
       spOut->expect(PhysicalNames::FLUCT_TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
-      spOut->expect(PhysicalNames::MAGNETIC);
+//      spOut->expect(PhysicalNames::MAGNETIC);
+      spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
 

@@ -33,7 +33,11 @@ namespace IoTools {
       //
       // Nondimensional numbers
       // 
-      if(id == IdToHuman::toTag(NonDimensional::EKMAN))
+      if(id == IdToHuman::toTag(NonDimensional::EADY))
+      {
+         return NonDimensional::EADY;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::EKMAN))
       {
          return NonDimensional::EKMAN;
 

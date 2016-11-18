@@ -31,8 +31,10 @@ namespace GeoMHDiSCC {
          enum Id {
             //
             // Nondimensional numbers
+            /// Eady number
+            EADY = 0,
             /// Ekman number
-            EKMAN = 0,
+            EKMAN,
             /// Magnetic Ekman number
             MAGEKMAN,
             /// Magnetic Prandtl number

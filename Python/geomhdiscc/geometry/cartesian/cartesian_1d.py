@@ -205,6 +205,49 @@ def i2(nx, bc, coeff = 1.0):
     mat = spsp.diags(diags, offsets, format='coo')
     return c1dbc.constrain(mat, bc)
 
+def i2z1(nx, bc, coeff = 1.0, cscale = 2.0):
+    """Create operator for 2nd integral in x of z of T_n(x)"""
+    
+    ns = np.arange(0, nx, 1)
+    offsets = np.arange(-3,4,1)
+    nzrow = 1
+
+    cnst = coeff/cscale
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return coeff/(8.0*n*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return coeff/(4.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -coeff/(8.0*n*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -coeff/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -coeff/(8.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return coeff/(4.0*n*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return coeff/(8.0*n*(n + 1.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = spsp.diags(diags, offsets, format='coo')
+    return c1dbc.constrain(mat, bc)
+
 def i2x1(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 2nd integral in x of x T_n(x)"""
     
