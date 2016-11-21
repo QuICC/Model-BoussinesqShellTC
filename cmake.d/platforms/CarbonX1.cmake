@@ -43,8 +43,9 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "MUMPS" "SuperLU" "UmfPack" "SparseLU" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
@@ -67,12 +68,13 @@ set(GEOMHDISCC_SPTRILINALGS "SparseLU" "SuperLU" "UmfPack" PARENT_SCOPE)
 
 set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
-
+set(GEOMHDISCC_LIBDIR_HDF5 "/usr/lib/x86_64-linux-gnu/hdf5/mpich" "/usr/lib/x86_64-linux-gnu/hdf5/serial" "/usr/lib/x86_64-linux-gnu/hdf5/openmpi" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES "/usr/include/hdf5/openmpi/" PARENT_SCOPE)
 ###################################################
 #-------------- MPI IMPLEMENTATION ---------------#
 ###################################################
 
-set(GEOMHDISCC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
+set(GEOMHDISCC_MPIIMPLS "OpenMPI" "MPICH"  PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#
@@ -91,11 +93,11 @@ set(GEOMHDISCC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_INC_GCC "-I/usr/include/hdf5/serial" PARENT_SCOPE)
+set(GEOMHDISCC_CC_INC_GCC "" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_INC_MPI_GCC ${GEOMHDISCC_CC_INC_GCC} PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_LIB_GCC "-L/usr/lib/x86_64-linux-gnu/hdf5/serial/" PARENT_SCOPE)
+set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
@@ -116,5 +118,5 @@ set(GEOMHDISCC_INCLUDES_PYTHON35 "/usr/include/python3.5m" PARENT_SCOPE)
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_LIBRARIES "/usr/lib/x86_64-linux-gnu/hdf5/serial/" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES "/usr/include/hdf5/serial" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES "/usr/include/hdf5/openmpi/" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)
