@@ -49,7 +49,7 @@ namespace GeoMHDiSCC {
    void BoussinesqCouetteShellStdModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedShellExactVectorState spVector;
