@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbccylinder as mod
+import geomhdiscc.model.boussinesq_rbccylinder_v2 as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -16,7 +16,7 @@ bc_temp = 1 # 0: FT/FT, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 2
-res = [32, 0, 32]
+res = [48, 0, 48]
 eq_params = {'prandtl':1, 'rayleigh':2.66491e3, 'gamma':1.0, 'scale3d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':1193, 'gamma':1.0, 'scale3d':2.0}
 eq_params = {'prandtl':1, 'rayleigh':2000, 'gamma':1.0, 'scale3d':2.0}
@@ -54,7 +54,7 @@ marginal_options['show_spectra'] = True
 marginal_options['save_spectra'] = False
 marginal_options['show_physical'] = True
 marginal_options['save_physical'] = False
-marginal_options['write_mtx'] = False
+marginal_options['write_mtx'] = True
 marginal_options['save_pdf'] = False
 marginal_options['curve_points'] = np.arange(m, m+1, 1)
 
