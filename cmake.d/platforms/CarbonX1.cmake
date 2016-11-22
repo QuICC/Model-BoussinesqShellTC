@@ -119,4 +119,4 @@ set(GEOMHDISCC_INCLUDES_PYTHON35 "/usr/include/python3.5m" PARENT_SCOPE)
 ###################################################
 
 set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES "/usr/include/hdf5/openmpi/" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES "/usr/include/hdf5/serial" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)

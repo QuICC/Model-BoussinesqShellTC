@@ -61,22 +61,24 @@ namespace Equations {
 
    void BoussinesqDynamoCouetteShellInduction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
+	  // Import the Rossby number for scaling the induction term
+	   MHDFloat Ro = std::abs(this->eqParams().nd(NonDimensional::ROSSBY));
       ///
       /// Compute \f$\vec u\wedge\vec B + B0\right)\f$
       ///
       switch(compId)
       {
          case(FieldComponents::Physical::R):
-            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::IMPOSED_MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), Ro);
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::IMPOSED_MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), Ro);
             break;
          case(FieldComponents::Physical::THETA):
-            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::IMPOSED_MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
+            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), Ro);
+            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::IMPOSED_MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), Ro);
             break;
          case(FieldComponents::Physical::PHI):
-            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::IMPOSED_MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), Ro);
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::IMPOSED_MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), Ro);
             break;
          default:
             assert(false);

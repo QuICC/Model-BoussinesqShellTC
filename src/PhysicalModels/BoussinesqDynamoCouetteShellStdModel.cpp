@@ -277,7 +277,7 @@ namespace GeoMHDiSCC {
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::MAGNETIC);
-      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC);
+      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC); // TODO: NL/ is it necessary to dump the vertical field?
       spGen->addHdf5OutputFile(spOut);
    }
 
