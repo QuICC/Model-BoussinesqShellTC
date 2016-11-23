@@ -262,7 +262,7 @@ def tau_mat_z(nr, nz, m, tau, kron_op, qr, qz, bc, location = 't', restriction =
 
     pad = tau.get('pad',0)
     s = tau.get('kron_shift',0)
-    matR = cylbc.brid(nr,m,sr,dr,rad.radbc.no_bc(), location = location)*kron_op(nr+s, m, {0:0, 'rt':s, 'cr':s})
+    matR = cylbc.brid(nr,m,sr,dr,rad.radbc.no_bc(), location = location)*kron_op(nr+s, m, bc = {0:0, 'rt':s, 'cr':s})
     matZ = spsp.lil_matrix((nz,nz))
     matZ = c1d.c1dbc.constrain(matZ, tau, pad_zeros = pad, location = location)
 

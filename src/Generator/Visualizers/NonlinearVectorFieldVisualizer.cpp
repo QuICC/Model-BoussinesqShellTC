@@ -46,7 +46,7 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void NonlinearVectorFieldVisualizer::setNonlinearType(const NonlinearScalarVisualizerIds::Id type)
+   void NonlinearVectorFieldVisualizer::setNonlinearType(const NonlinearVectorVisualizerIds::Id type)
    {
       this->mNonlinearType = type;
    }

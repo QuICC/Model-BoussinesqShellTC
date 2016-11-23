@@ -137,7 +137,7 @@ namespace GeoMHDiSCC {
 
       // Add velocity fields visualization
       spVNL = spVis->addVectorEquation<Equations::NonlinearVectorFieldVisualizer>();
-      spVNL->setNonlinearType(Equations::NonlinearVisualizerIds::CYLINDER_TORPOL_ADVECTION);
+      spVNL->setNonlinearType(Equations::NonlinearVectorVisualizerIds::CYLINDER_TORPOL_ADVECTION);
       spVNL->setIdentity(PhysicalNames::PRESSURE);
 
       // Add output file
