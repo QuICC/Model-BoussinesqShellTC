@@ -15,11 +15,11 @@ bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 1 # 0: FT/FT, 2: FF/FT, 3: FT/FF
 
 # Create parameters
-m = 2
+m = 0
 res = [14, 0, 14]
 eq_params = {'prandtl':1, 'rayleigh':2.66491e3, 'gamma':1.0, 'scale3d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':1193, 'gamma':1.0, 'scale3d':2.0}
-eq_params = {'prandtl':1, 'rayleigh':2000, 'gamma':1.0, 'scale3d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':3000, 'gamma':1.0, 'scale3d':2.0}
 auto_params = model.automatic_parameters(eq_params)
 for k,v in auto_params.items():
     eq_params[k] = v

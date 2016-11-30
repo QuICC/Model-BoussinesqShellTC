@@ -58,7 +58,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCCylinderModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCylinderExactScalarState spScalar;
@@ -136,9 +136,9 @@ namespace GeoMHDiSCC {
       spVTrivial->setIdentity(PhysicalNames::MAGNETIC);
 
       // Add velocity fields visualization
-      spVNL = spVis->addVectorEquation<Equations::NonlinearVectorFieldVisualizer>();
-      spVNL->setNonlinearType(Equations::NonlinearVectorVisualizerIds::CYLINDER_TORPOL_ADVECTION);
-      spVNL->setIdentity(PhysicalNames::PRESSURE);
+      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
+      spVTrivial->setFields(true, false, true);
+      spVTrivial->setIdentity(PhysicalNames::PRESSURE);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -146,7 +146,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::MEAN_TEMPERATURE);
       spOut->expect(PhysicalNames::FLUCT_TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
-//      spOut->expect(PhysicalNames::MAGNETIC);
+      spOut->expect(PhysicalNames::MAGNETIC);
       spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
