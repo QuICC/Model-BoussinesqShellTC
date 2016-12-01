@@ -199,7 +199,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
         E = eq_params['ekman']
         #Ro = eq_params['rossby']
         Pm = eq_params['magnetic_prandtl']
-        #Rm = Pm*abs(Ro)/E # TODO: decide wether this term should not rather be Rm = Pm/E
+        #Rm = Pm*abs(Ro)/E # TODO: decide wether this term should not rather be Rm = E/Pm
         Em = E/Pm
         assert(eigs[0].is_integer())
         l = eigs[0]
