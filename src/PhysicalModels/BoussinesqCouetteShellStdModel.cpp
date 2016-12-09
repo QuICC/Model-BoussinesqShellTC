@@ -26,6 +26,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
+#include "IoVariable/ShellTorPolTracerWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
@@ -190,6 +191,11 @@ namespace GeoMHDiSCC {
    {
       // Create kinetic energy writer
       IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector);
+
+      // Create probe field writer
+      IoVariable::ShellTorPolTracerWriter spVector(new  IoVariable::ShellTorPolTracerWriter("velocity_r", SchemeType::type()));
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
    }

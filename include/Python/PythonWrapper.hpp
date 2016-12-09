@@ -91,6 +91,17 @@ namespace GeoMHDiSCC {
           * @brief Fill sparse matrix with data from Python call
           */
          static void fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat);
+
+         /*
+          * @brief Fill a full matrix (Eigen::MatrixXd) with data from PyObject
+          */
+         static void getMatrix(Matrix& rMatrix, PyObject* pMat);
+
+         /*
+          * @brief Fill a vector (Eigen::VectorXd) with data from PyObject
+          */
+         static void getVector(Array& rArray, PyObject* pVec);
+
   
          /**
           * @brief Cleanup wrapper without finalize

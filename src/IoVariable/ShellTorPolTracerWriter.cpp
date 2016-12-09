@@ -33,8 +33,8 @@ namespace IoVariable{
 	/*
 	 * @brief Constructor
 	 */
-	ShellTorPolTracerWriter::ShellTorPolTracerWriter(const std::string& prefix, const std::string& type)
-		:IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix+EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL),mTorTracer(),mPolTracer()
+	ShellTorPolTracerWriter::ShellTorPolTracerWriter(const std::string& prefix, const std::string& type, const Matrix& Points)
+		:IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix+EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorTracer(Points.rows()), mPolTracer(Points.rows()), mPoints(Points)
 	{
 
 	}
@@ -60,6 +60,7 @@ namespace IoVariable{
 		PythonWrapper::init();
 		PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
 		PythonWrapper::import("geomhdiscc.projection.shell");
+		PythonWrapper::import("geomhdiscc.projection.spherical");
 
 		// prepare arguments for the linear_2x call
 		PyObject *pArgs, * pValue, *pTmp;
@@ -81,15 +82,19 @@ namespace IoVariable{
 		PyTuple_SetItem(pArgs,0,PyLong_FromLong(cols));
 
 		// TODO: decide how the argument r positions is passed
-		PyTuple_SetItem(pArgs,3,PyList_FromList(xRadial));
+		Array xRadial = mPoints.col(0);
+		int m = xRadial.rows();
+		int dims[1];
+		dims[0]=m;
+		pTmp = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,xRadial.data());
+		PyTuple_SetItem(pArgs,3,pTmp);
 
 		// function call proj_radial
 		PythonWrapper::setFunction("proj_radial");
 		pValue = PythonWrapper::callFunction(pArgs);
 
 		// Fill matrix and cleanup
-		// TODO: find out how to call len(x)
-		m = len(xRadial)
+
 		mProjMat = Matrix(m,cols);
 		PythonWrapper::fillMatrix(mProjMat, pValue);
 
@@ -97,7 +102,59 @@ namespace IoVariable{
 		PythonWrapper::setFunction("proj_dradial_dr");
 		pValue = PythonWrapper::callFunction(pArgs);
 		mProjDrMat = Matrix(m,cols);
-		PythonWrapper::fillMatrix(mProjDrMat,pValue);
+		PythonWrapper::getMatrix(mProjDrMat,pValue);
+
+		// create PyObjects for the 2 vectors theta and phi
+		PyObject *vPhi, *vTheta;
+		vTheta = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,mPoints.col(1).data());
+		vPhi = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,mPoints.col(2).data());
+
+		// create 2 instances for the execution of eimp and lplm
+		PythonWrapper PyWrapL();
+		PythonWrapper PyWrapM();
+		PyWrapL.import("geomhdiscc.projection.spherical");
+		PyWrapM.import("geomhdiscc.projection.spherical");
+		PyWrapL.setFunction("lplm");
+		PyWrapM.setFunction("eipm");
+
+
+		// precompute the Spherical harmonic part of the projector
+		#ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
+			// k  is the index to the degree m
+			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+
+			for(int j=0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j){
+				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+				// prepare the call of lplm
+				pArgs = PyTuple_New(3)
+				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+				PyTuple_SetItem(pArgs,2,vTheta);
+
+				// set the function to lplm
+				pValue = PyWrapL.callFunction(pArgs);
+
+				// retrieve the result
+				Array lplm;
+				PythonWrapper::getVector(lplm,pValue);
+
+				// prepare the call of eimp
+				PyTuple_SetItem(pArgs,2, vPhi);
+
+				// set the function to eimp
+				pValue = PPyWrapM.callFunction(pArgs);
+
+				// retrieve the result
+				Array eimp;
+				PythonWrapper::getVector(eimp,pValue);
+			}
+		}
+		#endif // GEOMHDISCC_SPATIALSCHEME_SLFM
+		#ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+
+		#endif
 
 
 

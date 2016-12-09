@@ -96,6 +96,15 @@ namespace IoVariable{
 		/*
 		 * @brief
 		 */
+		std::vector<std::vector<Array>> Mparts;
+
+		/*
+		 *
+		 */
+
+		/*
+		 * @brief
+		 */
 		Matrix mProjMat;
 
 		/*
