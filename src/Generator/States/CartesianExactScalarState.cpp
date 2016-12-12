@@ -22,7 +22,6 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -51,6 +50,17 @@ namespace Equations {
       this->mTypeId = id;
    }
 
+   void CartesianExactScalarState::setModeOptions(const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2)
+   {
+      this->mModeA.resize(2);
+      this->mModeA(0) = a1;
+      this->mModeA(1) = a2;
+
+      this->mModeK.resize(2);
+      this->mModeK(0) = k1;
+      this->mModeK(1) = k2;
+   }
+
    void CartesianExactScalarState::setModeOptions(const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2, const MHDFloat a3, const MHDFloat k3)
    {
       this->mModeA(0) = a1;
@@ -74,182 +84,149 @@ namespace Equations {
 
       if(this->mTypeId == CartesianExactStateIds::CONSTANT)
       {
-         rNLComp.rData().setConstant(this->mModeA(0)*this->mModeA(1)*this->mModeA(2));
-      } else
-      {
-         int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
-         int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+         rNLComp.rData().setConstant(this->mModeA.prod());
 
-         Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
-         Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
-         Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+      } else if(this->mTypeId == CartesianExactStateIds::PEYRET1DA)
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
          MHDFloat k_;
          MHDFloat j_;
          MHDFloat i_;
-         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
          for(int iK = 0; iK < nK; ++iK)
          {
-            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iK));
-            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iK);
+            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
+            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
             for(int iJ = 0; iJ < nJ; ++iJ)
             {
-               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
                for(int iI = 0; iI < nI; ++iI)
                {
                   i_ = gI(iI);
 
-                  MHDFloat valJ = 0.0;
-                  MHDFloat valI = 0.0;
-                  MHDFloat valK = 0.0;
+                  MHDFloat val = (-1.0 + 2.0*Math::PI)*std::cos(Math::PI*k_/2.0)/(2.0*Math::PI);
 
-                  // Generate solutions for TTT geometries
-                  if(static_cast<int>(this->mTypeId) > 9 && static_cast<int>(this->mTypeId) < 20)
+                  rNLComp.setPoint(val, iI, iJ, iK);
+               }
+            }
+         }
+
+      } else if(this->mTypeId == CartesianExactStateIds::PLANFORMSQUARES)
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
+         int k_;
+         int j_;
+         int i_;
+         MHDFloat gk_;
+         MHDFloat gj_;
+         MHDFloat gi_;
+         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
+         for(int iK = 0; iK < nK; ++iK)
+         {
+            k_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK);
+            gk_ = gK(k_);
+            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
+            for(int iJ = 0; iJ < nJ; ++iJ)
+            {
+               j_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK);
+               gj_ = gJ(j_);
+               for(int iI = 0; iI < nI; ++iI)
+               {
+                  i_ = iI;
+                  gi_ = gI(i_);
+
+                  MHDFloat val = (1+gk_)*(1.0 + std::cos(this->mModeK(0)*gj_) + std::cos(this->mModeK(1)*gi_));
+
+                  rNLComp.setPoint(val, iI, iJ, iK);
+               }
+            }
+         }
+      } else
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
+         MHDFloat k_;
+         MHDFloat j_;
+         MHDFloat i_;
+         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
+         for(int iK = 0; iK < nK; ++iK)
+         {
+            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
+            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
+            for(int iJ = 0; iJ < nJ; ++iJ)
+            {
+               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               for(int iI = 0; iI < nI; ++iI)
+               {
+                  i_ = gI(iI);
+
+                  MHDFloat val = 0.0;
+                  if(static_cast<int>(this->mTypeId) < 100)
                   {
-                     if(this->mTypeId == CartesianExactStateIds::CartesianExactStateIds::POLYPOLYPOLY)
-                     {
-                        valK = CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::poly(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::poly(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
-                     }
-
-                     // Generate solutions for TFT geometries
-                  } else if(static_cast<int>(this->mTypeId) > 19 && static_cast<int>(this->mTypeId) < 30)
+                     Array grid(3);
+                     grid(0) = k_;
+                     grid(1) = j_;
+                     grid(2) = i_;
+                     val = CartesianExactStateIds::exact3D(this->mTypeId, this->mModeA, this->mModeK, grid);
+                  } else if(static_cast<int>(this->mTypeId) >= 100)
                   {
-                     if(this->mTypeId == CartesianExactStateIds::POLYCOSPOLY)
-                     {
-                        valK = CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::poly(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::POLYSINPOLY)
-                     {
-                        valK = CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::poly(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
-                     }
-
-                     // Generate solutions for TFF geometries
-                  } else if(static_cast<int>(this->mTypeId) > 29 && static_cast<int>(this->mTypeId) < 50)
-                  {
-                     if(this->mTypeId == CartesianExactStateIds::POLYCOSCOS)
-                     {
-                        valK = CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::POLYSINSIN)
-                     {
-                        valK = CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::POLYSINCOS)
-                     {
-                        valK = CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::POLYCOSSIN)
-                     {
-                        valK = CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
-                     }
-
-                     // Generate solutions for FFF geometries
-                  } else if(static_cast<int>(this->mTypeId) > 39 && static_cast<int>(this->mTypeId) < 50)
-                  {
-                     if(this->mTypeId == CartesianExactStateIds::COSCOSCOS)
-                     {
-                        valK = CartesianExactStateIds::cos(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::SINSINSIN)
-                     {
-                        valK = CartesianExactStateIds::sin(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::COSSINCOS)
-                     {
-                        valK = CartesianExactStateIds::cos(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::SINCOSSIN)
-                     {
-                        valK = CartesianExactStateIds::sin(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::SINSINCOS)
-                     {
-                        valK = CartesianExactStateIds::sin(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::COSCOSSIN)
-                     {
-                        valK = CartesianExactStateIds::cos(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::SINCOSCOS)
-                     {
-                        valK = CartesianExactStateIds::sin(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else if(this->mTypeId == CartesianExactStateIds::COSSINSIN)
-                     {
-                        valK = CartesianExactStateIds::cos(this->mModeA(0),this->mModeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                        valI = CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
-                     }
-
-                  } else if(this->mTypeId == CartesianExactStateIds::SPECIAL1)
-                  {
-                     valK = 3.31 + CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                     valJ = 2.71 + CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_) + CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                     valI = -1.3 + CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_) + CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                  } else if(this->mTypeId == CartesianExactStateIds::SPECIAL2)
-                  {
-                     valK = 3.31 + CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                     valJ = 2.71 + CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_) - CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                     valI = -1.3 + CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_) - CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                  } else if(this->mTypeId == CartesianExactStateIds::SPECIAL3)
-                  {
-                     valK = 3.31 + CartesianExactStateIds::poly(this->mModeA(0),this->mModeK(0),k_);
-                     valJ = 2.71 + CartesianExactStateIds::cos(this->mModeA(1),this->mModeK(1),j_) + CartesianExactStateIds::sin(this->mModeA(1),this->mModeK(1),j_);
-                     valI = -1.3 + CartesianExactStateIds::cos(this->mModeA(2),this->mModeK(2),i_) + CartesianExactStateIds::sin(this->mModeA(2),this->mModeK(2),i_);
-
-                  } else
-                  {
-                     throw Exception("Unknown exact state");
+                     Array grid(2);
+                     grid(0) = j_;
+                     grid(1) = i_;
+                     val = CartesianExactStateIds::exact2D(this->mTypeId, this->mModeA, this->mModeK, grid);
                   }
 
-                  rNLComp.setPoint(valK*valJ*valI, iI, iJ, iK);
+                  rNLComp.setPoint(val, iI, iJ, iK);
                }
             }
          }
@@ -269,7 +246,7 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
-      // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?, need curl?, need diff2?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, false));
    }
 

@@ -86,6 +86,11 @@ namespace Datatypes {
           */
          void initPhysicalCurl(const std::map<FieldComponents::Physical::Id,bool>& comps);
 
+         /**
+          * @brief Initialise the physical 2nd order gradient values storage
+          */
+         void initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps);
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
@@ -173,6 +178,15 @@ namespace Datatypes {
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
          this->mDomains.at(i).initPhysicalCurl(comps);
+      }
+   }
+
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps)
+   {
+      // Loop over all domains
+      for(size_t i = 0; i < this->mDomains.size(); i++)
+      {
+         this->mDomains.at(i).initPhysicalGradient2(id, comps);
       }
    }
 

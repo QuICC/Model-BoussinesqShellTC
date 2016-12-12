@@ -8,6 +8,15 @@ if verbose_write_mtx:
     import scipy.io as io
     import os
 
+    def make_single_name(fields, bcs):
+        pid = str(os.getpid())
+        return str(bcs["bcType"]) + "_" + fields[0][0] + '_' + fields[0][1] + '_' + pid
+
+    def make_double_name(field_row, field_col, bcs):
+        pid = str(os.getpid())
+        return ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + pid
+
+import scipy.sparse as spsp
 import geomhdiscc.base.utils as utils
 
 
@@ -37,7 +46,7 @@ class BaseModel:
 
         mat = utils.build_diag_matrix(fields, self.time_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_time_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_time_" + make_single_name(fields, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -48,7 +57,29 @@ class BaseModel:
 
         mat = utils.build_block_matrix(fields, self.implicit_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_linear_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_linear_" + make_single_name(fields, bcs)
+            for e in eigs:
+                fname = fname + "_" + str(e)
+            io.mmwrite(fname  + ".mtx", mat)
+        return mat
+
+    def boundary(self, res, eq_params, eigs, bcs, fields, restriction = None):
+        """Create the boundary operator"""
+
+        mat = utils.build_block_matrix(fields, self.boundary_block, (res,eq_params,eigs,bcs), restriction = restriction)
+        if verbose_write_mtx:
+            fname = "matrix_boundary_" + make_single_name(fields, bcs)
+            for e in eigs:
+                fname = fname + "_" + str(e)
+            io.mmwrite(fname  + ".mtx", mat)
+        return mat
+
+    def inhomogeneous(self, res, eq_params, eigs, bcs, modes, fields, restriction = None):
+        """Create the boundary operator"""
+
+        mat = utils.build_block_matrix(fields, self.inhomogeneous_block, (res,eq_params,eigs,bcs,modes), restriction = restriction)
+        if verbose_write_mtx:
+            fname = "matrix_inhomogeneous_" + make_single_name(fields, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname  + ".mtx", mat)
@@ -59,7 +90,7 @@ class BaseModel:
 
         mat = self.explicit_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_linear_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_linear_" + make_double_name(field_row, field_col, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -70,7 +101,7 @@ class BaseModel:
 
         mat = self.nonlinear_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_nonlinear_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_nonlinear_" + make_double_name(field_row, field_col, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -81,7 +112,7 @@ class BaseModel:
 
         mat = self.nextstep_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_nextstep_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_nextstep_" + make_double_name(field_row, field_col, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -99,27 +130,35 @@ class BaseModel:
         # Additional explicit update for next step linear fields
         next_fields = self.explicit_fields(self.EXPLICIT_NEXTSTEP, field_row)
 
+        return (is_complex, im_fields, lin_fields, nl_fields, next_fields, index_mode)
+
+    def operator_info(self, res, eigs, bcs, field_row):
+        """Combine block sizes into global operator info"""
+
+        # Implicit field coupling
+        im_fields = self.implicit_fields(field_row)
+
         # Compute block info
-        block_info = self.block_size(res, field_row)
+        info = self.block_size(res, eigs, bcs, field_row)
 
         # Compute system size
         sys_n = 0
         for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
+            sys_n += self.block_size(res, eigs, bcs, f)[1]
         
         if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
+            sys_n = info[1]
+        info = info + (sys_n,)
 
-        return (is_complex, im_fields, lin_fields, nl_fields, next_fields, index_mode, block_info)
+        return info
 
-    def stability_sizes(self, res, eigs):
+    def stability_sizes(self, res, eigs, bcs):
         """Get the block sizes in the stability calculation matrix"""
 
         # Block sizes
         blocks = []
         for f in self.stability_fields():
-            blocks.append(self.block_size(res, f)[1])
+            blocks.append(self.block_size(res, eigs, bcs, f)[1])
 
         # Invariant size (local dimension in spectral space, no restriction)
         invariant = (res[0],)*len(self.stability_fields())
@@ -129,15 +168,20 @@ class BaseModel:
 
         return (blocks, invariant, shift)
 
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        return dict()
+
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
         raise NotImplementedError("Model cannot be used for linear stability calculations!")
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
-        raise NotImplementedError("Model cannot be used for linear stability calculations!")
+        raise NotImplementedError("Operator block sizes have not been defined!")
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -151,6 +195,11 @@ class BaseModel:
 
     def explicit_fields(self, timing, field_row):
         """Get the list of fields with explicit dependence"""
+
+        raise NotImplementedError("Model should implement this method!")
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for boundary operator"""
 
         raise NotImplementedError("Model should implement this method!")
 
@@ -176,5 +225,10 @@ class BaseModel:
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
-        
+
         raise NotImplementedError("Stencil needs to be implemented in model!")
+
+    def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):
+        """Create matrix block for inhomogeneous boundary operator"""
+
+        return spsp.lil_matrix((1,1))

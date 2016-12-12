@@ -46,16 +46,24 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 ###################################################
 
 set(GEOMHDISCC_SPLINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
-
 set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" "m" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" "lapack" "blas" "gfortran" PARENT_SCOPE)
-
 set(GEOMHDISCC_INCLUDES_UMFPACK_CLANG "/soft/libraries/petsc/3.5.2.1/xl-opt/include/" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK_CLANG "/soft/libraries/alcf/current/gcc/LAPACK/lib" "/soft/libraries/alcf/current/gcc/BLAS/lib" "/soft/libraries/petsc/3.5.2.1/xl-opt/lib/" PARENT_SCOPE)
-
 set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "metis" "scalapack" "lapack" "blas" "xlf90" "xlopt" "xl" "xlfmath" "xlsmp" "gfortran" "m" PARENT_SCOPE)
-
 set(GEOMHDISCC_INCLUDES_MUMPS_CLANG "/soft/libraries/petsc/3.5.2.1/xl-opt/include/" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_MUMPS_CLANG "/soft/compilers/bgclang/xlsmp-nonconflicting/ibmcmp-feb2015" "/soft/compilers/ibmcmp-feb2015/xlf/bg/14.1/bglib64" "/soft/libraries/alcf/current/gcc/LAPACK/lib" "/soft/libraries/alcf/current/gcc/BLAS/lib" "/soft/libraries/alcf/current/gcc/SCALAPACK/lib" "/soft/libraries/petsc/3.5.2.1/xl-opt/lib/" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#

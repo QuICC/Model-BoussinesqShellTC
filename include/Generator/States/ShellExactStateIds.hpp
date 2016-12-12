@@ -43,6 +43,7 @@ namespace Equations {
       enum Id {
          // Special states
          CONSTANT = 0,  // All constant
+         NOISE,         // Random noise
 
          HARMONIC = 10, // Generate spherical harmonic state
 
@@ -54,6 +55,7 @@ namespace Equations {
          BENCHTEMPC1 = 50, // Initial temperature perturbation state for Christensen's benchmark C1
          BENCHVELC1,       // Initial velocity perturbation state for Christensen's benchmark C1
          BENCHMAGC1,       // Initial magnetic perturbation state for Christensen's benchmark C1
+         IMPMAGMATSUI,     // Imposed magnetic field from Matsui
       };
 
       /**

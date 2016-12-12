@@ -66,7 +66,7 @@ namespace Equations {
          /**
           * @brief Initialise the equation
           */
-         virtual void init();
+         virtual void init(const SharedSimulationBoundary spBcIds);
 
          /**
           * @brief Generic model operator dispatcher to python scripts
@@ -101,10 +101,8 @@ namespace Equations {
 
          /**
           * @brief Initialise the spectral equation matrices
-          *
-          * @param spBcIds   List of boundary condition IDs
           */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
+         virtual void initSpectralMatrices() = 0;
 
          /**
           * @brief Implementation of the galerkin stencil dispatch to python scripts
@@ -332,15 +330,15 @@ namespace Equations {
             int l;
             int j_;
             int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-            #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+            #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
                int corrDim = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
             for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
             {
                j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
-               #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+               #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
                   j_ -= corrDim;
-               #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+               #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
                for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
                {
                   // Compute correct position
@@ -391,17 +389,27 @@ namespace Equations {
          /// \mhdBug very bad and slow implementation!
          Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->cols());
          int l = 0;
+         int k_;
+         int j_;
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+         #else
+            int dimK = 1;
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
          {
+            k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
             for(int j = 0; j < explicitField.slice(k).cols(); j++)
             {
+               j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                for(int i = 0; i < explicitField.slice(k).rows(); i++)
                {
+                  // Compute correct position
+                  l = k_ + j_ + i;
+
                   // Copy slice into flat array
                   tmp(l) = explicitField.point(i,j,k);
-
-                  // increase storage counter
-                  l++;
                }
             }
          }

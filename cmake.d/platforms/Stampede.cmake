@@ -46,11 +46,8 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 ###################################################
 
 set(GEOMHDISCC_SPLINALGS "MUMPS" "SparseLU" "UmfPack" PARENT_SCOPE)
-#set(GEOMHDISCC_INCLUDES_MUMPS $ENV{TACC_MUMPS_INC} PARENT_SCOPE)
-#set(GEOMHDISCC_INCLUDES_MUMPS $ENV{TACC_MUMPS_INC} PARENT_SCOPE)
-#set(GEOMHDISCC_LIBDIR_MUMPS $ENV{TACC_MUMPS_LIB} $ENV{TACC_MKL_LIB} PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_MUMPS "/work/00434/eijkhout/petsc/petsc-3.5.4/sandybridge/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_MUMPS "/work/00434/eijkhout/petsc/petsc-3.5.4/sandybridge/lib" $ENV{TACC_MKL_LIB} PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_MUMPS "$ENV{PETSC_DIR}$ENV{PETSC_ARCH}/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_MUMPS "$ENV{PETSC_DIR}$ENV{PETSC_ARCH}/lib" $ENV{TACC_MKL_LIB} PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "scalapack" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "mpifort" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 #set(GEOMHDISCC_LIBRARIES_SUPERLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "superlu_4.3" PARENT_SCOPE)
@@ -58,6 +55,18 @@ set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "$ENV{HOME}/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL $ENV{TACC_MKL_LIB} "$ENV{HOME}/local/lib" PARENT_SCOPE)
 #set(GEOMHDISCC_INCLUDES_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/SRC" PARENT_SCOPE)
 #set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "MUMPS" "SparseLU" "UmfPack" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "MUMPS" "UmfPack" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
@@ -89,7 +98,7 @@ set(GEOMHDISCC_CC_SERIAL_INTEL "icpc" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_MPI_INTEL "mpicxx" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_ARCH_INTEL "-xhost -O2" PARENT_SCOPE)
+set(GEOMHDISCC_CC_ARCH_INTEL "-xHost -O2" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_INC_INTEL "" PARENT_SCOPE)
 

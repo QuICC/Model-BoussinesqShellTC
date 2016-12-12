@@ -29,7 +29,6 @@
 #include "Base/Typedefs.hpp"
 #include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
-#include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
@@ -148,9 +147,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -160,9 +158,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (R2R)
@@ -172,9 +169,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -184,9 +180,8 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute forward FFT (R2R) provide full output without spectral truncation
@@ -196,9 +191,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -208,9 +202,8 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          * @param arithId    Arithmetic operation to perform
           */
-         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -263,9 +256,14 @@ namespace Transform {
          std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
 
          /**
-          * @brief Storage for the sparse solvers
+          * @brief Storage for the sparse triangular solvers
           */
-         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> > mTriSolver;
+
+         /**
+          * @brief Storage for the sparse SPD solvers
+          */
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSpdSelector<SparseMatrix>::Type> > mSpdSolver;
 
          /**
           * @brief Storage for the backward operators input data
@@ -286,21 +284,6 @@ namespace Transform {
           * @brief Initialise the spectral operators
           */
          void initOperators();
-
-         /**
-          * @brief Compute derivative by recurrence relation
-          */
-         template <typename TDerived> void recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
-
-         /**
-          * @brief Compute division by R by recurrence relation
-          */
-         template <typename TDerived> void recurrenceDivR(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
-
-         /**
-          * @brief Compute division by R^2 by recurrence relation
-          */
-         template <typename TDerived> void recurrenceDivR2(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
 
          /**
           * @brief Cleanup memory used by FFTW on destruction
@@ -327,71 +310,6 @@ namespace Transform {
           */
          MHDFloat mCnstB;
    };
-
-   template <typename TDerived> void ShellChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
-   {
-      int i = chebVal.rows()-1;
-      MHDFloat scale = 1.0/this->mCnstA;
-
-      // Set T_N to zero
-      rDealiased.row(i).setConstant(0.0);
-      --i;
-
-      // Compute T_N-1
-      rDealiased.row(i) = scale*static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
-      --i;
-
-      // Compute remaining modes
-      for(; i >= 0; --i)
-      {
-         rDealiased.row(i) = rDealiased.row(i+2) + scale*static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
-      }
-   }
-
-   template <typename TDerived> void ShellChebyshevFftwTransform::recurrenceDivR(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
-   {
-      int i = chebVal.rows()-1;
-      MHDFloat scaleA = 2.0/this->mCnstA;
-      MHDFloat scaleB = 2.0*this->mCnstB/this->mCnstA;
-
-      // Set T_N to zero
-      rDealiased.row(i).setConstant(0.0);
-      --i;
-
-      // Compute T_N-1
-      rDealiased.row(i) = scaleA*chebVal.row(i+1);
-      --i;
-
-      // Compute remaining modes
-      for(; i >= 0; --i)
-      {
-         rDealiased.row(i) = scaleA*chebVal.row(i+1) - scaleB*rDealiased.row(i+1) - rDealiased.row(i+2);
-      }
-   }
-
-   template <typename TDerived> void ShellChebyshevFftwTransform::recurrenceDivR2(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
-   {
-      int i = chebVal.rows()-1;
-      MHDFloat scaleA = 4.0/std::pow(this->mCnstA,2);
-      MHDFloat scaleB = 4.0*this->mCnstB/this->mCnstA;
-      MHDFloat scaleC = 2.0*(std::pow(this->mCnstA,2) + 2.0*std::pow(this->mCnstB,2))/std::pow(this->mCnstA,2);
-
-      // Set T_N and T_N-1 to zero
-      rDealiased.row(i).setConstant(0.0);
-      --i;
-      rDealiased.row(i).setConstant(0.0);
-      --i;
-
-      // Compute T_N-2
-      rDealiased.row(i) = scaleA*chebVal.row(i+2);
-      --i;
-
-      // Compute remaining modes
-      for(; i >= 0; --i)
-      {
-         rDealiased.row(i) = scaleA*chebVal.row(i+2) - scaleB*rDealiased.row(i+1) - scaleC*rDealiased.row(i+2) - scaleB*rDealiased.row(i+3) - scaleB*rDealiased.row(i+4);
-      }
-   }
 
 }
 }

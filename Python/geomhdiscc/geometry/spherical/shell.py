@@ -46,9 +46,39 @@ def fix_l_zero(nr, m, mat, bc, fix):
     elif fix == 'zero':
         return rad.zblk(nr, bc)
     elif fix == 'set':
-        return rad.qid(nr, 0, bc)
+        if bc[0] < 0:
+            nn = nr - bc['rt']
+        else:
+            nn = nr
+        return rad.qid(nn, 0, {0:0})
     else:
         raise RuntimeError("Unkown l=0 fix!")
+
+def make_sh_zero(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Generic function to create a coupled spherical harmonics operator"""
+
+    bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
+
+    base_mat = rad.zblk(nr, rad.radbc.no_bc())
+    if restriction is None or m in restriction:
+        bcr = sphbc.ldependent_bc(bcr, m)
+        mat = coeff*shc(m)*rad.radbc.constrain(base_mat,bcr)
+        mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    else:
+        mat = rad.zblk(nr, bcr)
+    blocks = [mat]
+
+    for l in range(m+1, maxnl):
+        if restriction is None or l in restriction:
+            bcr = sphbc.ldependent_bc(bcr, l)
+            mat = coeff*shc(l)*rad.radbc.constrain(base_mat,bcr)
+        else:
+            mat = rad.zblk(nr, bcr)
+        blocks.append(mat)
+    mat = spsp.block_diag(blocks, format = 'coo')
+
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
 def make_sh_operator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Generic function to create a coupled spherical harmonics operator"""
@@ -145,14 +175,10 @@ def make_sh_qoperator(opl, opr, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coe
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
-def zblk(nr, maxnl, m, bc):
+def zblk(nr, maxnl, m, bc, l_zero_fix = False, restriction = None):
     """Create a block of zeros"""
 
-    bcr = convert_bc(bc)
-
-    nl = maxnl - m
-    mat = spsp.kron(rad.zblk(nl,rad.radbc.no_bc()),rad.zblk(nr,bcr), format = 'coo')
-    return sphbc.constrain(mat, nr, maxnl, m, bc)
+    return make_sh_zero(nr, maxnl, m, bc, 0.0, with_sh_coeff = None, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def i2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2 radial operator kronecker with an identity"""

@@ -20,9 +20,9 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/ForwardConfigurator.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
+#include "TransformConfigurators/ForwardConfigurator3D.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -31,7 +31,7 @@ namespace Transform {
    /**
     * @brief This class defines the forward transform single second exchange splitting operations
     */
-   class ForwardSingle2DConfigurator: public ForwardConfigurator
+   class ForwardSingle2DConfigurator: public ForwardConfigurator3D
    {
       public:
          /**
@@ -45,7 +45,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void firstStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Second step in transform
@@ -53,7 +53,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void secondStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Last step in transform
@@ -61,7 +61,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void lastStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief First exchange communication setup
@@ -129,48 +129,47 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   template <typename TSharedEquation> void ForwardSingle2DConfigurator::firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSingle2DConfigurator::firstStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      TransformTreeEdge::EdgeType_citerator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      TransformTreeEdge::EdgeType_crange range3D = tree.root().edgeRange();
 
       // Compute the nonlinear interaction
-      ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);
+      ForwardConfigurator3D::nonlinearTerm(tree, spEquation, coord);
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Loop over first transform
-      int hold3D = std::distance(range3D.first, range3D.second) - 1;
-      for(it3D = range3D.first; it3D != range3D.second; ++it3D, --hold3D)
+      for(it3D = range3D.first; it3D != range3D.second; ++it3D)
       {
          // Compute third transform
-         ForwardConfigurator::integrate3D(*it3D, coord, hold3D);
+         ForwardConfigurator3D::integrateND(*it3D, coord);
       }
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   template <typename TSharedEquation> void ForwardSingle2DConfigurator::secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSingle2DConfigurator::secondStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
    
-   template <typename TSharedEquation> void ForwardSingle2DConfigurator::lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSingle2DConfigurator::lastStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // Iterators for the three transforms
-      IntegratorTree::Integrator1DEdge_iterator it1D;
-      IntegratorTree::Integrator2DEdge_iterator it2D;
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      TransformTreeEdge::EdgeType_citerator it1D;
+      TransformTreeEdge::EdgeType_citerator it2D;
+      TransformTreeEdge::EdgeType_citerator it3D;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator1DEdge_range range1D;
-      IntegratorTree::Integrator2DEdge_range range2D;
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      TransformTreeEdge::EdgeType_crange range1D;
+      TransformTreeEdge::EdgeType_crange range2D;
+      TransformTreeEdge::EdgeType_crange range3D = tree.root().edgeRange();
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -179,23 +178,19 @@ namespace Transform {
       for(it3D = range3D.first; it3D != range3D.second; ++it3D)
       {
          range2D = it3D->edgeRange();
-         int recover2D = 0;
-         int hold2D = std::distance(range2D.first, range2D.second) - 1;
-         for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+         for(it2D = range2D.first; it2D != range2D.second; ++it2D)
          {
             // Compute second transform
-            ForwardConfigurator::integrate2D(*it2D, coord, recover2D, hold2D);
+            ForwardConfigurator3D::integrate2D(*it2D, coord);
 
             range1D = it2D->edgeRange();
-            int recover1D = 0;
-            int hold1D = std::distance(range1D.first, range1D.second) - 1;
-            for(it1D = range1D.first; it1D != range1D.second; ++it1D, ++recover1D, --hold1D)
+            for(it1D = range1D.first; it1D != range1D.second; ++it1D)
             {
                // Compute third transform
-               ForwardConfigurator::integrate1D(*it1D, coord, recover1D, hold1D);
+               ForwardConfigurator3D::integrate1D(*it1D, coord);
 
                // Update equation
-               ForwardConfigurator::updateEquation(*it1D, spEquation, coord, hold1D);
+               ForwardConfigurator3D::updateEquation(*it1D, spEquation, coord);
             }
          }
       }

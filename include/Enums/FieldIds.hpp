@@ -33,6 +33,10 @@ namespace GeoMHDiSCC {
       enum Id {
          /// Codensity field
          CODENSITY = 0,
+         /// large scale x B field 
+         BX,
+         /// large scale y B field 
+         BY,
          /// Density field
          DENSITY,
          /// X derivative of mean temperature field
@@ -41,10 +45,20 @@ namespace GeoMHDiSCC {
          DZ_MEANTEMPERATURE,
          /// Entropy field
          ENTROPY,
+         /// Fluctuating bx
+         FBX,
+         /// Fluctuating by
+         FBY,
+         /// Fluctuating bz
+         FBZ,
          /// Magnetic field
          MAGNETIC,
-         /// Mean temperature field
-         MEANTEMPERATURE,
+         /// X Magnetic field
+         MAGNETICX,
+         /// Y Magnetic field
+         MAGNETICY,
+         /// Z Magnetic field
+         MAGNETICZ,
          /// Pressure field
          PRESSURE,
          /// Temperature field
@@ -59,8 +73,16 @@ namespace GeoMHDiSCC {
          VELOCITYY,
          /// Z velocity field
          VELOCITYZ,
+         /// Zonal velocity field (m = 0)
+         ZONAL_VELOCITY, 
+         /// Non-zonal velocity field (m != 0)
+         NONZONAL_VELOCITY, 
          /// Vorticity field
          VORTICITY,
+         /// X vorticity field
+         VORTICITYX,
+         /// Y vorticity field
+         VORTICITYY,
          /// Axial vorticity field
          VORTICITYZ,
 
@@ -87,6 +109,37 @@ namespace GeoMHDiSCC {
          /// Non orthogonal vertical vorticity field in tilted box
          TILTED_NO_VORTICITYZ,
 
+         /// Fluctuating temperature field
+         FLUCT_TEMPERATURE,
+         /// Fluctuating X magnetic field
+         FLUCT_MAGNETIC,
+         /// Fluctuating X magnetic field
+         FLUCT_MAGNETICX,
+         /// Fluctuating Y magnetic field
+         FLUCT_MAGNETICY,
+         /// Fluctuating Z magnetic field
+         FLUCT_MAGNETICZ,
+         /// Fluctuating X velocity field
+         FLUCT_VELOCITY,
+         /// Fluctuating X velocity field
+         FLUCT_VELOCITYX,
+         /// Fluctuating Y velocity field
+         FLUCT_VELOCITYY,
+         /// Fluctuating Z velocity field
+         FLUCT_VELOCITYZ,
+
+         /// Mean temperature field
+         MEAN_TEMPERATURE,
+         /// Mean X magnetic field
+         MEAN_MAGNETIC,
+         /// Mean X magnetic field
+         MEAN_MAGNETICX,
+         /// Mean Y magnetic field
+         MEAN_MAGNETICY,
+         /// Mean Z magnetic field
+         MEAN_MAGNETICZ,
+         /// Mean X velocity field
+         MEAN_VELOCITY,
          /// Mean X velocity field
          MEAN_VELOCITYX,
          /// Mean Y velocity field
@@ -100,6 +153,9 @@ namespace GeoMHDiSCC {
          ZONAL_KINETIC_ENERGY,
          /// Non zonal kinetic energy: u \cdot u
          NONZONAL_KINETIC_ENERGY,
+
+	      /// Imposed magnetic field
+	      IMPOSED_MAGNETIC,
       };
    };
 
@@ -120,6 +176,8 @@ namespace GeoMHDiSCC {
          GRADIENT,
          /// Curl field
          CURL,
+         /// 2nd order gradient field
+         GRADIENT2,
          /// divergence field
          DIVERGENCE,
       };
@@ -177,7 +235,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Y,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
             /// First vector component
             ONE = R,
             /// Second vector component
@@ -185,13 +243,45 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLF
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
+            /// First vector component
+            ONE = R,
+            /// Second vector component
+            TWO = THETA,
+            /// Third vector component
+            THREE = Z,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
             /// First vector component
             ONE = R,
             /// Second vector component
             TWO = THETA,
             /// Third vector component
             THREE = PHI,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+            /// First vector component
+            ONE = X,
+            /// Second vector component
+            TWO = Z,
+            /// Third vector component
+            THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TF
+            /// First vector component
+            ONE = Z,
+            /// Second vector component
+            TWO = X,
+            /// Third vector component
+            THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CF || defined GEOMHDISCC_SPATIALSCHEME_AF
+            /// First vector component
+            ONE = R,
+            /// Second vector component
+            TWO = THETA,
+            /// Third vector component
+            THREE = NOTUSED,
 
             #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
          };
@@ -238,7 +328,23 @@ namespace GeoMHDiSCC {
             NOTUSED,
 
             // Define generic enums for cartesian geometry
-            #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
+            #if defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+               /// First vector component
+               ONE = TOR,
+               /// Second vector component
+               TWO = POL,
+               /// Third vector component
+               THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_SLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_WLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_WLFM_QST
+               /// First vector component
+               ONE = Q,
+               /// Second vector component
+               TWO = S,
+               /// Third vector component
+               THREE = T,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
                /// First vector component
                ONE = X,
                /// Second vector component
@@ -254,7 +360,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Y,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
                /// First vector component
                ONE = R,
                /// Second vector component
@@ -262,23 +368,15 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
                /// First vector component
-               ONE = TOR,
+               ONE = R,
                /// Second vector component
-               TWO = POL,
+               TWO = THETA,
                /// Third vector component
-               THREE = NOTUSED,
+               THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_SLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_WLF_QST
-               /// First vector component
-               ONE = Q,
-               /// Second vector component
-               TWO = S,
-               /// Third vector component
-               THREE = T,
-
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLF
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
                /// First vector component
                ONE = R,
                /// Second vector component
@@ -286,7 +384,30 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = PHI,
 
-            #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+               /// First vector component
+               ONE = X,
+               /// Second vector component
+               TWO = Z,
+               /// Third vector component
+               THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TF
+               /// First vector component
+               ONE = Z,
+               /// Second vector component
+               TWO = X,
+               /// Third vector component
+               THREE = NOTUSED,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF 
+               /// First vector component
+               ONE = R,
+               /// Second vector component
+               TWO = THETA,
+               /// Third vector component
+               THREE = NOTUSED,
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
          };
       };
    };

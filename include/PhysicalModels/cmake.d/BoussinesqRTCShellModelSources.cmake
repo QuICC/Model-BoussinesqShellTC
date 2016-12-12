@@ -1,7 +1,7 @@
 set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigenSHmTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHmTools.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellScalarEnergyWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellTorPolEnergyWriter.cpp
@@ -12,4 +12,5 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/SphericalVerticalFieldVisualizer.cpp
 )

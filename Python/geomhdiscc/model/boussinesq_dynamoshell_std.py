@@ -23,7 +23,17 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
+        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "rratio", "heating"]
+
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        # Unit gap width
+        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
+        # Unit radius
+        #d = {"ro":1.0}
+
+        return d
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -65,7 +75,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -86,6 +96,22 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        # Get boundary condition
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        mat = geo.stencil(res[0], bc, make_square)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
@@ -103,7 +129,8 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -117,15 +144,15 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-40, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("magnetic","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("magnetic","pol"):
                         bc = {0:-23, 'rt':0, 'c':{'a':a, 'b':b, 'l':l}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
@@ -171,15 +198,15 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-40, 'rt':4, 'c':{'a':a, 'b':b}}
                     elif field_col == ("magnetic","tor"):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("magnetic","pol"):
                         bc = {0:-23, 'rt':2, 'c':{'a':a, 'b':b, 'l':l}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
@@ -215,7 +242,8 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -236,7 +264,8 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -260,7 +289,8 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         Pm = eq_params['magnetic_prandtl']
         Pr = eq_params['prandtl']
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -293,7 +323,8 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -320,11 +351,23 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         return mat
 
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def nondimensional_factors(self, eq_params):
         """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
 
         Ra = eq_params['rayleigh']
-        ro = eq_params['ro']
+        ro = self.automatic_parameters(eq_params)['ro']
         rratio = eq_params['rratio']
         T = eq_params['taylor']**0.5
 

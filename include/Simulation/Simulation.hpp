@@ -98,6 +98,11 @@ namespace GeoMHDiSCC {
          void writeOutput();
 
          /**
+          * @brief Update the time stored in each equation
+          */
+         void updateEquationTime(const MHDFloat time);
+
+         /**
           * @brief Timestep coordinator
           */
          Timestep::TimestepCoordinator mTimestepCoordinator;

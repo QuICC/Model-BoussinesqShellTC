@@ -43,6 +43,9 @@ namespace Equations {
       enum Id {
          // Special states
          CONSTANT = 0,  // All constant
+         // ---------------------------------------------------
+         // 3D modes
+         // ---------------------------------------------------
          // TTT states
          POLYPOLYPOLY = 10,  // Polynomial, Polynomial, Polynomial
          // TFT states
@@ -62,10 +65,31 @@ namespace Equations {
          SINCOSCOS,        // Sine, Cosine, Cosine
          COSSINCOS,        // Cosine, Sine, Cosine
          SINCOSSIN,        // Sine, Cosine, Sine
-         // Special
-         SPECIAL1 = 1000,  // Kind of a place holder for tests
-         SPECIAL2,         // Kind of a place holder for tests
-         SPECIAL3,         // Kind of a place holder for tests
+         // ---------------------------------------------------
+         // Special 3D states (benchmarks, etc)
+         // ---------------------------------------------------
+         ZEROCOSCOS = 90,  // Galerkin, Cosine, Cosine
+         PEYRET1DA,        // Kind of a place holder for tests
+         TORPOLTFF,        // Divergence free state for Toroidal/Poloidal test in TFF scheme
+         TORPOLCNST,       // Unit field for Toroidal/Poloidal test in TFF scheme
+         PLANFORMSQUARES,  // Planform squares
+         // ---------------------------------------------------
+         // 2D modes
+         // ---------------------------------------------------
+         // TT states
+         POLYPOLY = 110,  // Polynomial, Polynomial
+         // TF states
+         POLYCOS = 120, // Polynomial, Cosine
+         POLYSIN,       // Polynomial, Sine
+         // FF states
+         COSCOS = 130,  // Cosine, Cosine
+         SINSIN,        // Sine, Sine
+         COSSIN,        // Cosine, Sine
+         SINCOS,        // Sine, Cosine
+         // ---------------------------------------------------
+         // Special 2D states (benchmarks, etc)
+         // ---------------------------------------------------
+         ZEROCOS = 190,  // Kind of a place holder for tests
       };
 
       /**
@@ -82,6 +106,26 @@ namespace Equations {
        * @brief Compute polynomial mode
        */
       static MHDFloat poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
+       * @brief Compute Chebyshev mode
+       */
+      static MHDFloat chebyshev(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
+       * @brief Compute galerkin polynomial mode (zero at boundary)
+       */
+      static MHDFloat zero(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
+       * @brief Compute 2D mode
+       */
+      static MHDFloat exact2D(const Id id, const Array& amplitude, const Array& mode, const Array& x);
+
+      /**
+       * @brief Compute 3D mode
+       */
+      static MHDFloat exact3D(const Id id, const Array& amplitude, const Array& mode, const Array& x);
    };
 
 }

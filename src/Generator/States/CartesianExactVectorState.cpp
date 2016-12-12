@@ -22,8 +22,8 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -46,9 +46,39 @@ namespace Equations {
       this->setRequirements();
    }
 
+   void CartesianExactVectorState::setStateType(const CartesianExactStateIds::Id id)
+   {
+      if(FieldComponents::Physical::ONE != FieldComponents::Physical::NOTUSED)
+      {
+         this->mTypeId.insert(std::make_pair(FieldComponents::Physical::ONE, id));
+      }
+
+      if(FieldComponents::Physical::TWO != FieldComponents::Physical::NOTUSED)
+      {
+         this->mTypeId.insert(std::make_pair(FieldComponents::Physical::TWO, id));
+      }
+
+      if(FieldComponents::Physical::THREE != FieldComponents::Physical::NOTUSED)
+      {
+         this->mTypeId.insert(std::make_pair(FieldComponents::Physical::THREE, id));
+      }
+   }
+
    void CartesianExactVectorState::setStateType(const FieldComponents::Physical::Id compId, const CartesianExactStateIds::Id id)
    {
       this->mTypeId.insert(std::make_pair(compId, id));
+   }
+
+   void CartesianExactVectorState::setModeOptions(const FieldComponents::Physical::Id compId, const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2)
+   {
+      Array tmp(2);
+      tmp(0) = a1;
+      tmp(1) = a2;
+      this->mModeA.insert(std::make_pair(compId, tmp));
+
+      tmp(0) = k1;
+      tmp(1) = k2;
+      this->mModeK.insert(std::make_pair(compId, tmp));
    }
 
    void CartesianExactVectorState::setModeOptions(const FieldComponents::Physical::Id compId, const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2, const MHDFloat a3, const MHDFloat k3)
@@ -86,187 +116,289 @@ namespace Equations {
    void CartesianExactVectorState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       CartesianExactStateIds::Id typeId = this->mTypeId.find(compId)->second;
-      Array modeA = this->mModeA.find(compId)->second;
-      Array modeK = this->mModeK.find(compId)->second;
 
       if(typeId == CartesianExactStateIds::CONSTANT)
       {
-         rNLComp.rData().setConstant(modeA(0)*modeA(1)*modeA(2));
-      } else
-      {
-         int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
-         int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+         Array modeA = this->mModeA.find(compId)->second;
+         rNLComp.rData().setConstant(modeA.prod());
 
-         Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
-         Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
-         Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+      // Generate constant unit field divergence free state for toroidal/poloidal decomposition test
+      } else if(typeId == CartesianExactStateIds::TORPOLCNST)
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
+         for(int iK = 0; iK < nK; ++iK)
+         {
+            for(int iJ = 0; iJ < nJ; ++iJ)
+            {
+               for(int iI = 0; iI < nI; ++iI)
+               {
+                  if(compId == FieldComponents::Physical::X || compId == FieldComponents::Physical::Y)
+                  {
+                     rNLComp.setPoint(1.0, iI, iJ, iK);
+                  }
+               }
+            }
+         }
+
+      // Generate divergence free state for toroidal/poloidal decomposition test
+      } else if(typeId == CartesianExactStateIds::TORPOLTFF)
+      {
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
          MHDFloat k_;
          MHDFloat j_;
          MHDFloat i_;
-         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+
+         int nSI = 3;
+         int nSJ = 3;
+         int nSK = 2;
+         MHDFloat bSI = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+         MHDFloat bSJ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D);
+
+         Array aT(5); aT(0) = -3.0; aT(1) = 2.0; aT(2) = 3.0; aT(3) = -1.0; aT(4) = 5.0;
+         Array mT(5); mT(0) = 2.0; mT(1) = 1.0; mT(2) = 2.0; mT(3) = 1.0; mT(4) = 3.0;
+         Array aP(5); aP(0) = 6.0; aP(1) = -7.0; aP(2) = 5.0; aP(3) = 2.0; aP(4) = 5.0;
+         Array mP(5); mP(0) = -5.0; mP(1) = 4.0; mP(2) = 3.0; mP(3) = -3.0; mP(4) = 1.0;
+
+         // Chebyshev rescaling
+         MHDFloat scale = this->eqParams().nd(NonDimensional::SCALE1D);
+
+         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
          for(int iK = 0; iK < nK; ++iK)
          {
-            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iK));
-            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iK);
+            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
+            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
             for(int iJ = 0; iJ < nJ; ++iJ)
             {
-               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
                for(int iI = 0; iI < nI; ++iI)
                {
                   i_ = gI(iI);
 
-                  MHDFloat valJ = 0.0;
-                  MHDFloat valI = 0.0;
-                  MHDFloat valK = 0.0;
+                  MHDFloat val = 0.0;
 
-                  // Generate solutions for TTT geometries
-                  if(static_cast<int>(typeId) > 9 && static_cast<int>(typeId) < 20)
+                  if(compId == FieldComponents::Physical::X)
                   {
-                     if(typeId == CartesianExactStateIds::POLYPOLYPOLY)
+                     // Toroidal component
+                     for(int sI = 0; sI < nSI; sI++)
                      {
-                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::poly(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::poly(modeA(2),modeK(2),i_);
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
+                        MHDFloat valI = sI_*(-std::sin(sI*i_)+std::cos(sI*i_));
+                        for(int sJ = 0; sJ < nSJ; sJ++)
+                        {
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = (std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
+                           for(int sK = 0; sK < nSK; sK++)
+                           {
+                              val += CartesianExactStateIds::chebyshev(aT(sK),sK,k_)*valI*valJ;
+                           }
+                        }
                      }
 
-                     // Generate solutions for TFT geometries
-                  } else if(static_cast<int>(typeId) > 19 && static_cast<int>(typeId) < 30)
-                  {
-                     if(typeId == CartesianExactStateIds::POLYCOSPOLY)
+                     // Poloidal component
+                     for(int sI = 0; sI < nSI; sI++)
                      {
-                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::poly(modeA(2),modeK(2),i_);
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
+                        MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
 
-                     } else if(typeId == CartesianExactStateIds::POLYSINPOLY)
-                     {
-                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::poly(modeA(2),modeK(2),i_);
+                        for(int sJ = 0; sJ < nSJ; sJ++)
+                        {
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = scale*sJ_*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
+                           if(nSK > 1)
+                           {
+                              val += (aP(1))*valI*valJ;
+                              if(nSK > 2)
+                              {
+                                 val += (4.0*aP(2)*k_)*valI*valJ;
+                                 if(nSK > 3)
+                                 {
+                                    val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
+                                    if(nSK > 4)
+                                    {
+                                       val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                                    }
+                                 }
+                              }
+                           }
+                        }
                      }
 
-                     // Generate solutions for TFF geometries
-                  } else if(static_cast<int>(typeId) > 29 && static_cast<int>(typeId) < 50)
-                  {
-                     if(typeId == CartesianExactStateIds::POLYCOSCOS)
+                     // X mean component
+                     for(int sK = 0; sK < nSK; sK++)
                      {
-                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::POLYSINSIN)
-                     {
-                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::POLYSINCOS)
-                     {
-                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::POLYCOSSIN)
-                     {
-                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
-
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
+                        val += CartesianExactStateIds::chebyshev(mT(sK),sK,k_);
                      }
 
-                     // Generate solutions for FFF geometries
-                  } else if(static_cast<int>(typeId) > 39 && static_cast<int>(typeId) < 50)
+                  } else if(compId == FieldComponents::Physical::Y)
                   {
-                     if(typeId == CartesianExactStateIds::COSCOSCOS)
+                     // Toroidal component
+                     for(int sI = 0; sI < nSI; sI++)
                      {
-                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
+                        MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
+                        for(int sJ = 0; sJ < nSJ; sJ++)
+                        {
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = -sJ_*(-std::sin(sJ*j_)+std::cos(sJ*j_));
 
-                     } else if(typeId == CartesianExactStateIds::SINSINSIN)
-                     {
-                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::COSSINCOS)
-                     {
-                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::SINCOSSIN)
-                     {
-                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::SINSINCOS)
-                     {
-                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::COSCOSSIN)
-                     {
-                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::SINCOSCOS)
-                     {
-                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
-
-                     } else if(typeId == CartesianExactStateIds::COSSINSIN)
-                     {
-                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
-                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
-
-                     } else
-                     {
-                        throw Exception("Unknown exact state");
+                           for(int sK = 0; sK < nSK; sK++)
+                           {
+                              val += CartesianExactStateIds::chebyshev(aT(sK),sK,k_)*valI*valJ;
+                           }
+                        }
                      }
 
-                  } else if(typeId == CartesianExactStateIds::SPECIAL1)
-                  {
-                     valK = 3.31 + CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                     valJ = 2.71 + CartesianExactStateIds::cos(modeA(1),modeK(1),j_) + CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                     valI = -1.3 + CartesianExactStateIds::cos(modeA(2),modeK(2),i_) + CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
+                     // Poloidal component
+                     for(int sI = 0; sI < nSI; sI++)
+                     {
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
+                        MHDFloat valI = sI_*(-std::sin(sI*i_)+std::cos(sI*i_));
 
-                  } else if(typeId == CartesianExactStateIds::SPECIAL2)
-                  {
-                     valK = 3.31 + CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                     valJ = 2.71 + CartesianExactStateIds::cos(modeA(1),modeK(1),j_) - CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                     valI = -1.3 + CartesianExactStateIds::cos(modeA(2),modeK(2),i_) - CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
+                        for(int sJ = 0; sJ < nSJ; sJ++)
+                        {
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = scale*(std::cos(sJ*j_)+std::sin(sJ*j_));
 
-                  } else if(typeId == CartesianExactStateIds::SPECIAL3)
-                  {
-                     valK = 3.31 + CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
-                     valJ = 2.71 + CartesianExactStateIds::cos(modeA(1),modeK(1),j_) + CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
-                     valI = -1.3 + CartesianExactStateIds::cos(modeA(2),modeK(2),i_) + CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
+                           if(nSK > 1)
+                           {
+                              val += (aP(1))*valI*valJ;
+                              if(nSK > 2)
+                              {
+                                 val += (4.0*aP(2)*k_)*valI*valJ;
+                                 if(nSK > 3)
+                                 {
+                                    val += aP(3)*(-3.0 + 12.0*k_*k_)*valI*valJ;
+                                    if(nSK > 4)
+                                    {
+                                       val += aP(4)*(-16.0*k_ + 32.0*k_*k_*k_)*valI*valJ;
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
 
-                  } else
+                     // Y mean component
+                     for(int sK = 0; sK < nSK; sK++)
+                     {
+                        val += CartesianExactStateIds::chebyshev(mP(sK),sK,k_);
+                     }
+
+                  } else if(compId == FieldComponents::Physical::Z)
                   {
-                     throw Exception("Unknown exact state");
+                     // Poloidal component
+                     for(int sI = 0; sI < nSI; sI++)
+                     {
+                        MHDFloat sI_ = static_cast<MHDFloat>(sI*bSI);
+                        MHDFloat valI = (std::cos(sI*i_)+std::sin(sI*i_));
+                        for(int sJ = 0; sJ < nSJ; sJ++)
+                        {
+                           MHDFloat sJ_ = static_cast<MHDFloat>(sJ*bSJ);
+                           MHDFloat valJ = (sI_*sI_ + sJ_*sJ_)*(std::cos(sJ*j_)+std::sin(sJ*j_));
+
+                           for(int sK = 0; sK < nSK; sK++)
+                           {
+                              val += CartesianExactStateIds::chebyshev(aP(sK),sK,k_)*valI*valJ;
+                           }
+                        }
+                     }
                   }
 
-                  rNLComp.setPoint(valK*valJ*valI, iI, iJ, iK);
+                  rNLComp.setPoint(val, iI, iJ, iK);
+               }
+            }
+         }
+
+      } else
+      {
+         Array modeA = this->mModeA.find(compId)->second;
+         Array modeK = this->mModeK.find(compId)->second;
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+            Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nI);
+         #else
+            int nK = 1;
+            int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+            int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+
+            Array gK = -42*Array::Ones(1);
+            Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
+            Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+
+         MHDFloat k_;
+         MHDFloat j_;
+         MHDFloat i_;
+         nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
+         for(int iK = 0; iK < nK; ++iK)
+         {
+            k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT3D>(iK));
+            nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT2D>(iK);
+            for(int iJ = 0; iJ < nJ; ++iJ)
+            {
+               j_ = gJ(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRAND)->idx<Dimensions::Data::DAT2D>(iJ, iK));
+               for(int iI = 0; iI < nI; ++iI)
+               {
+                  i_ = gI(iI);
+
+                  MHDFloat val = 0.0;
+                  if(static_cast<int>(typeId) < 100)
+                  {
+                     Array grid(3);
+                     grid(0) = k_;
+                     grid(1) = j_;
+                     grid(2) = i_;
+                     val = CartesianExactStateIds::exact3D(typeId, modeA, modeK, grid);
+                  } else if(static_cast<int>(typeId) >= 100)
+                  {
+                     Array grid(2);
+                     grid(0) = j_;
+                     grid(1) = i_;
+                     val = CartesianExactStateIds::exact2D(typeId, modeA, modeK, grid);
+                  }
+
+                  rNLComp.setPoint(val, iI, iJ, iK);
                }
             }
          }

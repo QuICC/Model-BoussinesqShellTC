@@ -86,24 +86,14 @@ namespace IoVariable {
          MHDFloat mPolEnergy;
 
          /**
-          * @brief Chebyshev operator to integrate in radius for even basis
+          * @brief Chebyshev operator to integrate in radius for energy (even)
           */
-         SparseMatrix mIntgOpEven;
+         SparseMatrix mIntgOp;
 
          /**
-          * @brief Chebyshev operator to integrate in radius for odd basis
+          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for energy (even)
           */
-         SparseMatrix mIntgOpOdd;
-
-         /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for even basis
-          */
-         SparseMatrix mSphIntgOpEven;
-
-         /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for odd basis
-          */
-         SparseMatrix mSphIntgOpOdd;
+         SparseMatrix mSphIntgOp;
    };
 
    inline bool SphereTorPolEnergyWriter::isHeavy() const

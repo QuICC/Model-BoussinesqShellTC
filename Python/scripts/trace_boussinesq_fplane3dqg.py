@@ -12,12 +12,13 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [32, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':8.6957, 'scale1d':2.0}
 res = [64, 0, 0]
-eq_params = {'prandtl':7, 'rayleigh':8.6957, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':8.6957, 'scale1d':2.0}
+#res = [64, 0, 0]
+#eq_params = {'prandtl':7, 'rayleigh':8.6957, 'scale1d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 phi = 0
+kp = 1.304807403014
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
 def generic_wave(kp, phi):
@@ -34,12 +35,17 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
+marginal_options['curve'] = False
+marginal_options['minimum'] = True
 marginal_options['solve'] = True
+marginal_options['target'] = 0.2
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
+marginal_options['plot_spy'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(0, kp-5), kp, kp+6)
+marginal_options['write_mtx'] = True
+marginal_options['curve_points'] = np.arange(kp-0.05, kp+0.05, 0.01)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

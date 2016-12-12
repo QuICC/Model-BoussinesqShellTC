@@ -25,7 +25,7 @@ def eqgrid(m):
 def zgrid(nz):
     """Create the z Chebyshev grid"""
 
-    gN = max(min_r_points, nz)
+    gN = max(min_z_points, nz)
 
     return np.cos(np.pi*(np.arange(0,gN)+0.5)/gN)
 

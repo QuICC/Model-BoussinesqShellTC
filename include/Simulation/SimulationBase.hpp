@@ -30,18 +30,19 @@
 #include "SparseSolvers/SparseTrivialCoordinator.hpp"
 #include "SparseSolvers/SparseLinearCoordinator.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/ParallelSelector.hpp"
-#include "TransformGroupers/IForwardGrouper.hpp"
-#include "TransformGroupers/IBackwardGrouper.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
+#include "TransformGroupers/IForwardGrouperMacro.h"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 #include "LoadSplitter/LoadSplitter.hpp"
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
 #include "IoConfig/ConfigParts/BoundaryPart.hpp"
 #include "IoVariable/IVariableHdf5Reader.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "Diagnostics/DiagnosticCoordinator.hpp"
+//#include "Statistics/StatisticCoordinator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -102,6 +103,13 @@ namespace GeoMHDiSCC {
           * @param spBcs Boundary condition information
           */
          void init(const SharedSimulationBoundary spBcs);
+
+         /**
+          * @brief Initialise the imposed components of the simulation
+          *
+          * @param spBcs Boundary condition information
+          */
+         void initImposed();
 
          /**
           * @brief Run the simulation
@@ -248,6 +256,16 @@ namespace GeoMHDiSCC {
          VectorEquation_range mVectorTrivialRange;
 
          /**
+          * @brief Storage for the range of scalar wrapper equations
+          */
+         ScalarEquation_range mScalarWrapperRange;
+
+         /**
+          * @brief Storage for the range of vectort wrapper equations
+          */
+         VectorEquation_range mVectorWrapperRange;
+
+         /**
           * @brief Simulation run control
           */
          SimulationRunControl mSimRunCtrl;
@@ -293,6 +311,16 @@ namespace GeoMHDiSCC {
          std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mVectorVariables;
 
          /**
+          * @brief Map between name and pointer for the imposed scalar variables
+          */
+         std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  mImposedScalarVariables;
+
+         /**
+          * @brief Map between name and pointer for the imposed vector variables
+          */
+         std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mImposedVectorVariables;
+
+         /**
           * @brief Storage for a shared forward transform grouper
           */
          Transform::SharedIForwardGrouper   mspFwdGrouper;
@@ -303,9 +331,24 @@ namespace GeoMHDiSCC {
          Transform::SharedIBackwardGrouper   mspBwdGrouper;
 
          /**
+          * @brief Storage for a shared forward transform grouper for imposed fields
+          */
+         Transform::SharedIForwardGrouper   mspImposedFwdGrouper;
+
+         /**
+          * @brief Storage for a shared backward transform grouper for imposed fields
+          */
+         Transform::SharedIBackwardGrouper   mspImposedBwdGrouper;
+
+         /**
           * @brief Diagnostic coordinator
           */
          Diagnostics::DiagnosticCoordinator  mDiagnostics;
+
+         /**
+          * @brief Statistics coordinator
+          */
+         //Statistics::StatisticsCoordinator  mStatistics;
 
          /**
           * @brief Flag for forward transform
@@ -346,14 +389,12 @@ namespace GeoMHDiSCC {
           * @param integratorTree   Transform integrator tree
           * @param projectorTree    Transform projector tree
           */
-         void initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
+         void initTransformCoordinator(const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree);
 
          /**
           * @brief Initialise the equations (generate operators, etc)
-          *
-          * @param spBcs Boundary condition information
           */
-         void setupEquations(const SharedSimulationBoundary spBcs);
+         void setupEquations();
 
          /**
           * @brief Sort equations and store information for timestep/solver/nothing ranges
@@ -419,6 +460,9 @@ namespace GeoMHDiSCC {
 
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
+
+      // Initialise the transform grouper for imposed fields
+      Parallel::setGrouper(best.second, this->mspImposedFwdGrouper, this->mspImposedBwdGrouper);
 
       stage.done();
    }

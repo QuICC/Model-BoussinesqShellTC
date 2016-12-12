@@ -34,9 +34,14 @@ namespace Schemes {
    {
       public:
          /**
-          * @brief Build map of indexes for a regular spatial schemes
+          * @brief Build map of even and odd harmonics for L ordering
           */
-         static void splitParity(SharedResolution spRes, const Dimensions::Transform::Id traId, ArrayI& howmany, MatrixI& evenBlocks, MatrixI& oddBlocks);
+         static void splitParityL(SharedResolution spRes, const Dimensions::Transform::Id traId, ArrayI& howmany, MatrixI& evenBlocks, MatrixI& oddBlocks);
+
+         /**
+          * @brief Build map of even and odd harmonics for M ordering
+          */
+         static void splitParityM(SharedResolution spRes, const Dimensions::Transform::Id traId, ArrayI& howmany, MatrixI& evenBlocks, MatrixI& oddBlocks);
 
    };
 }

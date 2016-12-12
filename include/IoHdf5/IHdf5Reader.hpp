@@ -167,11 +167,21 @@ namespace IoHdf5 {
 
    template <typename T> void IHdf5Reader::readScalar(hid_t loc, const std::string dsname, T& val) const
    {
-      // Open dataset
+      // Open dataset and get type
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
+      hid_t type = H5Dget_type(dataset);
 
-      // Read dataset with right data type
-      H5Dread(dataset, Hdf5Types::type<T>(), H5S_ALL, H5S_ALL, H5P_DEFAULT, &val);
+      if(Hdf5Types::isSupported<T>(type))
+      {
+         // Read dataset with right data type
+         H5Dread(dataset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, &val);
+      } else
+      {
+         throw Exception("Unsupported datatype used to store data");
+      }
+
+      // Close datatype
+      H5Tclose(type);
 
       // Close dataset
       H5Dclose(dataset);
@@ -179,45 +189,53 @@ namespace IoHdf5 {
 
    template <typename T> void IHdf5Reader::readArray(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, 1>& arr) const
    {
-      // Set data type correctly
-      hid_t type = Hdf5Types::type<T>();
-
-      // Open dataset in file
+      // Open dataset in file and get datatype
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
+      hid_t type = H5Dget_type(dataset);
 
-      // Get file dataspace
-      hid_t filespace = H5Dget_space(dataset);
-
-      // Get rank of data set
-      int rank = H5Sget_simple_extent_ndims(filespace);
-
-      // Rank should be one
-      if(rank != 1)
+      if(Hdf5Types::isSupported<T>(type))
       {
-         throw Exception("Rank of HDF5 dataset is not 1!");
+         // Get file dataspace
+         hid_t filespace = H5Dget_space(dataset);
+
+         // Get rank of data set
+         int rank = H5Sget_simple_extent_ndims(filespace);
+
+         // Rank should be one
+         if(rank != 1)
+         {
+            throw Exception("Rank of HDF5 dataset is not 1!");
+         }
+
+         // Read dimensions
+         hsize_t dim;
+         H5Sget_simple_extent_dims(filespace, &dim, NULL);
+
+         // Supplied array should have right size (don't want to resize it)
+         if(arr.size() != dim)
+         {
+            throw Exception("Provided storage for HDF5 data has wrong size!");
+         }
+
+         // memory dataspace 
+         hid_t memspace = H5Screate_simple(1, &dim, NULL);
+
+         // Read data from file
+         H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, arr.data());
+
+         // Close memspace
+         H5Sclose(memspace);
+
+         // Close filespace
+         H5Sclose(filespace);
+
+      } else
+      {
+         throw Exception("Unsupported datatype used to store data");
       }
 
-      // Read dimensions
-      hsize_t dim;
-      H5Sget_simple_extent_dims(filespace, &dim, NULL);
-
-      // Supplied array should have right size (don't want to resize it)
-      if(arr.size() != dim)
-      {
-         throw Exception("Provided storage for HDF5 data has wrong size!");
-      }
-
-      // memory dataspace 
-      hid_t memspace = H5Screate_simple(1, &dim, NULL);
-
-      // Read data from file
-      H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, arr.data());
-      
-      // Close memspace
-      H5Sclose(memspace);
-
-      // Close filespace
-      H5Sclose(filespace);
+      // Close datatype
+      H5Tclose(type);
 
       // Close Dataset
       H5Dclose(dataset);
@@ -225,45 +243,53 @@ namespace IoHdf5 {
 
    template <typename T> void IHdf5Reader::readMatrix(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat) const
    {
-      // Set data type correctly
-      hid_t type = Hdf5Types::type<T>();
-
       // Open dataset in file
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
+      hid_t type = H5Dget_type(dataset);
 
-      // Get file dataspace
-      hid_t filespace = H5Dget_space(dataset);
-
-      // Get rank of data set
-      int rank = H5Sget_simple_extent_ndims(filespace);
-
-      // Rank should be one
-      if(rank != 2)
+      if(Hdf5Types::isSupported<T>(type))
       {
-         throw Exception("Rank of HDF5 dataset is not 2!");
+         // Get file dataspace
+         hid_t filespace = H5Dget_space(dataset);
+
+         // Get rank of data set
+         int rank = H5Sget_simple_extent_ndims(filespace);
+
+         // Rank should be one
+         if(rank != 2)
+         {
+            throw Exception("Rank of HDF5 dataset is not 2!");
+         }
+
+         // Read dimensions
+         hsize_t dims[2];
+         H5Sget_simple_extent_dims(filespace, dims, NULL);
+
+         // Supplied array should have right size (don't want to resize it)
+         if(mat.cols() != dims[0] && mat.rows() != dims[1])
+         {
+            throw Exception("Provided storage for HDF5 data has wrong size!");
+         }
+
+         // memory dataspace 
+         hid_t memspace = H5Screate_simple(2, dims, NULL);
+
+         // Read data from file
+         H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, mat.data());
+
+         // Close memspace
+         H5Sclose(memspace);
+
+         // Close filespace
+         H5Sclose(filespace);
+
+      } else
+      {
+         throw Exception("Unsupported datatype used to store data");
       }
 
-      // Read dimensions
-      hsize_t dims[2];
-      H5Sget_simple_extent_dims(filespace, dims, NULL);
-
-      // Supplied array should have right size (don't want to resize it)
-      if(mat.cols() != dims[0] && mat.rows() != dims[1])
-      {
-         throw Exception("Provided storage for HDF5 data has wrong size!");
-      }
-
-      // memory dataspace 
-      hid_t memspace = H5Screate_simple(2, dims, NULL);
-
-      // Read data from file
-      H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, mat.data());
-      
-      // Close memspace
-      H5Sclose(memspace);
-
-      // Close filespace
-      H5Sclose(filespace);
+      // Close datatype
+      H5Tclose(type);
 
       // Close Dataset
       H5Dclose(dataset);
@@ -271,245 +297,273 @@ namespace IoHdf5 {
 
    template <typename T> void IHdf5Reader::readRegularField(hid_t loc, const std::string dsname, std::vector<std::tr1::tuple<int, int, T *> >& storage)
    {
-      // Set data type correctly
-      hid_t  type = Hdf5Types::type<T>();
-
       // Open dataset in file
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
 
-      // Get file dataspace
-      hid_t  filespace = H5Dget_space(dataset);
-
-      // Get dimensionality of data set
-      int nDims = H5Sget_simple_extent_ndims(filespace);
-
-      // Read file dimensions
-      hsize_t fDims[nDims];
-      H5Sget_simple_extent_dims(filespace, fDims, NULL);
-
-      // memory dataspace 
-      hid_t  memspace;
-
-      // Create offset storage
-      hsize_t pOffset[nDims];
-      // Fix offset for the fastest dimension (always full on each CPU)
-      pOffset[nDims-1] = 0;
-
-      // Compute size of the dataspace
-      hsize_t dims[nDims];
-      // Always read one block of the slowest dimension
-      dims[0] = 1;
-      // Fastest read dimension is minimum between file and memory sizes
-      dims[nDims-1] = this->mBlock;
-
-      // Compute size of the memory dataspace
-      hsize_t iDims[2];
-
-      // Storage for the memory offsets
-      hsize_t memOffset[2];
-      memOffset[0] = 0;
-      memOffset[1] = 0;
-
-      // Create dataset PList
-      hid_t dsPList = this->datasetPList();
-
-      //
-      // First do the collective reads
-      //
-      for(int i = 0; i < this->mCollIoRead; ++i)
+      if(dataset < 0)
       {
-         // Get storage index
-         int sidx = this->mFileOffsets.at(i).at(2);
-
-         // Set full memory space
-         iDims[0] = std::tr1::get<1>(storage.at(sidx));
-         iDims[1] = std::tr1::get<0>(storage.at(sidx));
-         memspace = H5Screate_simple(2, iDims, NULL);
-
-         // Select memory hyperslabs (i.e. minimum between file and memory spaces)
-         // Check that at least one index is stored in file
-         if(this->mFileOffsets.at(i).size() > 0)
-         {
-            iDims[0] = std::min(std::tr1::get<1>(storage.at(sidx)), std::max(0,static_cast<int>(fDims[nDims-2]-this->mFileOffsets.at(i).at(1))));
-         } else
-         {
-            iDims[0] = 0;
-         }
-         iDims[1] = this->mBlock;
-         H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
-
-         // Set offsets
-         for(int j = 0; j < nDims -1; j++)
-         {
-            pOffset[j] = this->mFileOffsets.at(i).at(j);
-         }
-
-         // Select corresponding hyperslab
-         dims[nDims-2] = iDims[0];
-         H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffset, NULL, dims, NULL);
-
-         // Read file hyperslab into memory hyperslab
-         H5Dread(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(sidx)));
-
-         // Reset hyperslab to whole dataset
-         H5Sselect_all(filespace);
-
-         // Close memory space
-         H5Sclose(memspace);
+         throw Exception("Tried to open inexistant HDF5 dataset");
       }
 
-      //
-      // Then do the independent reads
-      //
-      for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
+      hid_t type = H5Dget_type(dataset);
+
+      if(Hdf5Types::isSupported<T>(type))
       {
-         // Get storage index
-         int sidx = this->mFileOffsets.at(i).at(2);
+         // Get file dataspace
+         hid_t  filespace = H5Dget_space(dataset);
 
-         // Set full memory space
-         iDims[0] = std::tr1::get<1>(storage.at(sidx));
-         iDims[1] = std::tr1::get<0>(storage.at(sidx));
-         memspace = H5Screate_simple(2, iDims, NULL);
+         // Get dimensionality of data set
+         int nDims = H5Sget_simple_extent_ndims(filespace);
 
-         // Select memory hyperslabs
-         iDims[0] = std::min(std::tr1::get<1>(storage.at(sidx)), static_cast<int>(fDims[nDims-2]));
-         iDims[1] = this->mBlock;
-         H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
+         // Read file dimensions
+         hsize_t fDims[nDims];
+         H5Sget_simple_extent_dims(filespace, fDims, NULL);
 
-         // Set offsets
-         for(int j = 0; j < nDims -1; j++)
+         // memory dataspace 
+         hid_t  memspace;
+
+         // Create offset storage
+         hsize_t pOffset[nDims];
+         // Fix offset for the fastest dimension (always full on each CPU)
+         pOffset[nDims-1] = 0;
+
+         // Compute size of the dataspace
+         hsize_t dims[nDims];
+         // Always read one block of the slowest dimension
+         dims[0] = 1;
+         // Fastest read dimension is minimum between file and memory sizes
+         dims[nDims-1] = this->mBlock;
+
+         // Compute size of the memory dataspace
+         hsize_t iDims[2];
+
+         // Storage for the memory offsets
+         hsize_t memOffset[2];
+         memOffset[0] = 0;
+         memOffset[1] = 0;
+
+         // Create dataset PList
+         hid_t dsPList = this->datasetPList();
+
+         //
+         // First do the collective reads
+         //
+         for(int i = 0; i < this->mCollIoRead; ++i)
          {
-            pOffset[j] = this->mFileOffsets.at(i).at(j);
+            // Get storage index
+            int sidx = this->mFileOffsets.at(i).at(2);
+
+            // Set full memory space
+            iDims[0] = std::tr1::get<1>(storage.at(sidx));
+            iDims[1] = std::tr1::get<0>(storage.at(sidx));
+            memspace = H5Screate_simple(2, iDims, NULL);
+
+            // Select memory hyperslabs (i.e. minimum between file and memory spaces)
+            // Check that at least one index is stored in file
+            if(this->mFileOffsets.at(i).size() > 0)
+            {
+               iDims[0] = std::min(std::tr1::get<1>(storage.at(sidx)), std::max(0,static_cast<int>(fDims[nDims-2]-this->mFileOffsets.at(i).at(1))));
+            } else
+            {
+               iDims[0] = 0;
+            }
+            iDims[1] = this->mBlock;
+            H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
+
+            // Set offsets
+            for(int j = 0; j < nDims -1; j++)
+            {
+               pOffset[j] = this->mFileOffsets.at(i).at(j);
+            }
+
+            // Select corresponding hyperslab
+            dims[nDims-2] = iDims[0];
+            H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffset, NULL, dims, NULL);
+
+            // Read file hyperslab into memory hyperslab
+            H5Dread(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(sidx)));
+
+            // Reset hyperslab to whole dataset
+            H5Sselect_all(filespace);
+
+            // Close memory space
+            H5Sclose(memspace);
          }
 
-         // Select corresponding hyperslab
-         dims[nDims-2] = std::min(std::tr1::get<1>(storage.at(sidx)), static_cast<int>(fDims[nDims-2]));
-         H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffset, NULL, dims, NULL);
+         //
+         // Then do the independent reads
+         //
+         for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
+         {
+            // Get storage index
+            int sidx = this->mFileOffsets.at(i).at(2);
 
-         // Read file hyperslab into memory hyperslab and update offset
-         H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, std::tr1::get<2>(storage.at(sidx)));
+            // Set full memory space
+            iDims[0] = std::tr1::get<1>(storage.at(sidx));
+            iDims[1] = std::tr1::get<0>(storage.at(sidx));
+            memspace = H5Screate_simple(2, iDims, NULL);
 
-         // Reset hyperslab to whole dataset
-         H5Sselect_all(filespace);
+            // Select memory hyperslabs
+            iDims[0] = std::min(std::tr1::get<1>(storage.at(sidx)), static_cast<int>(fDims[nDims-2]));
+            iDims[1] = this->mBlock;
+            H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
 
-         // Close memory space
-         H5Sclose(memspace);
+            // Set offsets
+            for(int j = 0; j < nDims -1; j++)
+            {
+               pOffset[j] = this->mFileOffsets.at(i).at(j);
+            }
 
+            // Select corresponding hyperslab
+            dims[nDims-2] = std::min(std::tr1::get<1>(storage.at(sidx)), static_cast<int>(fDims[nDims-2]));
+            H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffset, NULL, dims, NULL);
+
+            // Read file hyperslab into memory hyperslab and update offset
+            H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, std::tr1::get<2>(storage.at(sidx)));
+
+            // Reset hyperslab to whole dataset
+            H5Sselect_all(filespace);
+
+            // Close memory space
+            H5Sclose(memspace);
+
+         }
+
+         // Close file dataspace
+         H5Sclose(filespace);
+
+         this->freePList(dsPList);
+
+      } else
+      {
+         throw Exception("Unsupported datatype used to store data");
       }
 
-      // Close file dataspace
-      H5Sclose(filespace);
+      // Close datatype
+      H5Tclose(type);
 
       // Close Dataset
       H5Dclose(dataset);
-
-      this->freePList(dsPList);
    }
 
    template <typename T> void IHdf5Reader::readIrregularField(hid_t loc, const std::string dsname, std::vector<std::tr1::tuple<int, int, T *> >& storage)
    {
-      // Set data type correctly
-      hid_t  type = Hdf5Types::type<T>();
-
       // Open dataset in file
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
 
-      // Get file dataspace
-      hid_t  filespace = H5Dget_space(dataset);
-
-      // memory dataspace 
-      hid_t  memspace;
-
-      // Storage for the memory offsets
-      hsize_t memOffset[2];
-      memOffset[0] = 0;
-      memOffset[1] = 0;
-
-      // Create offset storage
-      hsize_t pOffset[2];
-      pOffset[1] = 0;
-
-      // Compute size of the memory dataspace
-      hsize_t iDims[2];
-
-      // Create dataset PList
-      hid_t dsPList = this->datasetPList();
-
-      //
-      // First do the collective reads
-      //
-      for(int i = 0; i < this->mCollIoRead; ++i)
+      if(dataset < 0)
       {
-         // Set full memory space
-         iDims[0] = std::tr1::get<1>(storage.at(i));
-         iDims[1] = std::tr1::get<0>(storage.at(i));
-         memspace = H5Screate_simple(2, iDims, NULL);
-
-         // Set size of read block (file resolution and memory resolution might be different)
-         iDims[0] = this->mFileOffsets.at(i).size();
-         iDims[1] = this->mBlock;
-         // Select memory hyperslabs
-         H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
-
-         // Create non regular hyperslab selection in file
-         H5Sselect_none(filespace);
-         iDims[0] = 1;
-         for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
-         {
-            pOffset[0] = this->mFileOffsets.at(i).at(j);
-            H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
-         }
-
-         // Read file hyperslab into memory hyperslab and update offset
-         H5Dread(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(i)));
-
-         // Reset hyperslab to whole dataset
-         H5Sselect_all(filespace);
-
-         // Close memory space
-         H5Sclose(memspace);
+         throw Exception("Tried to open inexistant HDF5 dataset");
       }
 
-      //
-      // Then do the independent reads
-      //
-      for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
+      hid_t type = H5Dget_type(dataset);
+
+      if(Hdf5Types::isSupported<T>(type))
       {
-         // Set full memory space
-         iDims[0] = std::tr1::get<1>(storage.at(i));
-         iDims[1] = std::tr1::get<0>(storage.at(i));
-         memspace = H5Screate_simple(2, iDims, NULL);
+         // Get file dataspace
+         hid_t  filespace = H5Dget_space(dataset);
 
-         // Select memory hyperslabs
-         iDims[1] = this->mBlock;
-         H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
+         // memory dataspace 
+         hid_t  memspace;
 
-         // Create non regular hyperslab selection in file
-         H5Sselect_none(filespace);
-         iDims[0] = 1;
-         for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
+         // Storage for the memory offsets
+         hsize_t memOffset[2];
+         memOffset[0] = 0;
+         memOffset[1] = 0;
+
+         // Create offset storage
+         hsize_t pOffset[2];
+         pOffset[1] = 0;
+
+         // Compute size of the memory dataspace
+         hsize_t iDims[2];
+
+         // Create dataset PList
+         hid_t dsPList = this->datasetPList();
+
+         //
+         // First do the collective reads
+         //
+         for(int i = 0; i < this->mCollIoRead; ++i)
          {
-            pOffset[0] = this->mFileOffsets.at(i).at(j);
-            H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
+            // Set full memory space
+            iDims[0] = std::tr1::get<1>(storage.at(i));
+            iDims[1] = std::tr1::get<0>(storage.at(i));
+            memspace = H5Screate_simple(2, iDims, NULL);
+
+            // Set size of read block (file resolution and memory resolution might be different)
+            iDims[0] = this->mFileOffsets.at(i).size();
+            iDims[1] = this->mBlock;
+            // Select memory hyperslabs
+            H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
+
+            // Create non regular hyperslab selection in file
+            H5Sselect_none(filespace);
+            iDims[0] = 1;
+            for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
+            {
+               pOffset[0] = this->mFileOffsets.at(i).at(j);
+               H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
+            }
+
+            // Read file hyperslab into memory hyperslab and update offset
+            H5Dread(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(i)));
+
+            // Reset hyperslab to whole dataset
+            H5Sselect_all(filespace);
+
+            // Close memory space
+            H5Sclose(memspace);
          }
 
-         // Read file hyperslab into memory hyperslab and update offset
-         H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, std::tr1::get<2>(storage.at(i)));
+         //
+         // Then do the independent reads
+         //
+         for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
+         {
+            // Set full memory space
+            iDims[0] = std::tr1::get<1>(storage.at(i));
+            iDims[1] = std::tr1::get<0>(storage.at(i));
+            memspace = H5Screate_simple(2, iDims, NULL);
 
-         // Reset hyperslab to whole dataset
-         H5Sselect_all(filespace);
+            // Select memory hyperslabs
+            iDims[1] = this->mBlock;
+            H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
 
-         // Close memory space
-         H5Sclose(memspace);
+            // Create non regular hyperslab selection in file
+            H5Sselect_none(filespace);
+            iDims[0] = 1;
+            for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
+            {
+               pOffset[0] = this->mFileOffsets.at(i).at(j);
+               H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
+            }
+
+            // Read file hyperslab into memory hyperslab and update offset
+            H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, std::tr1::get<2>(storage.at(i)));
+
+            // Reset hyperslab to whole dataset
+            H5Sselect_all(filespace);
+
+            // Close memory space
+            H5Sclose(memspace);
+         }
+
+         // Close file dataspace
+         H5Sclose(filespace);
+
+         this->freePList(dsPList);
+
+      } else
+      {
+         throw Exception("Unsupported datatype used to store data");
       }
 
-      // Close file dataspace
-      H5Sclose(filespace);
+      // Close datatype
+      H5Tclose(type);
 
       // Close Dataset
       H5Dclose(dataset);
-
-      this->freePList(dsPList);
    }
 
    /// Typedef for a shared pointer of a IHdf5Reader

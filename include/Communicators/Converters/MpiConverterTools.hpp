@@ -50,9 +50,35 @@ namespace Parallel {
          /// Typedef for a three indexes specifing a point
          typedef std::tr1::tuple<int,int,int>   Coordinate;
 
+         /**
+          * @brief Build local cpu map of forward data
+          */
          static void buildLocalFwdMap(std::map<Coordinate,Coordinate>& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim);
 
+         /**
+          * @brief Build local cpu map of backward data
+          */
          template <typename TIdx> static void buildLocalBwdMap(std::map<Coordinate,Coordinate>& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, SharedPtrMacro<TIdx> spIdxConv);
+
+         /**
+          * @brief Build a forward MPI Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         static void buildFwdCpuMap(std::map<Coordinate,Coordinate>& sharedMap, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
+
+         /**
+          * @brief Build a backward MPI Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         static void buildBwdCpuMap(std::map<Coordinate,Coordinate>& sharedMap, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
 
          /**
           * @brief Build a forward MPI Datatype
@@ -75,6 +101,26 @@ namespace Parallel {
          template <typename TData> static MPI_Datatype buildBwdDatatype(const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
 
          /**
+          * @brief Build manual packing description for forward Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         template <typename TData> static void buildFwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
+
+         /**
+          * @brief Build manual packing description for backward Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         template <typename TData> static void buildBwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
+
+         /**
           * @brief Extract shared indexes
           *
           * @param sharedMap     Storage for the shared index map
@@ -91,6 +137,24 @@ namespace Parallel {
           * @param type       MPI datatype storage
           */
          template <typename TData> static MPI_Datatype buildType(typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const std::map<Coordinate,Coordinate>& sharedMap);
+
+         /**
+          * @brief Pack data into buffer
+          *
+          * @param data       The concerned data
+          * @param sharedMap  Shared index map
+          * @param type       MPI datatype storage
+          */
+         template <typename TData> static void pack(TData* rBuffer, int &position, const typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const std::vector<Coordinate> &coords);
+
+         /**
+          * @brief Unpack data from buffer
+          *
+          * @param data       The concerned data
+          * @param sharedMap  Shared index map
+          * @param type       MPI datatype storage
+          */
+         template <typename TData> static void unpack(typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &rData, const std::vector<Coordinate> &coords, const TData* buffer, int &position);
          
       protected:
 
@@ -107,14 +171,47 @@ namespace Parallel {
 
    };
 
+   template <typename TData> void MpiConverterTools<Dimensions::THREED>::pack(TData* rBuffer, int &position, const typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const std::vector<MpiConverterTools<Dimensions::THREED>::Coordinate> &coords)
+   {
+      // Create map iterator
+      std::vector<Coordinate>::const_iterator it;
+
+      // Create MPI displacement list
+      for(it = coords.begin(); it != coords.end(); ++it)
+      {
+         *(rBuffer+position) = data.point(std::tr1::get<0>(*it), std::tr1::get<1>(*it), std::tr1::get<2>(*it));
+
+         // Increment datatype size
+         position++;
+      }
+   }
+
+   template <typename TData> void MpiConverterTools<Dimensions::THREED>::unpack(typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &rData, const std::vector<MpiConverterTools<Dimensions::THREED>::Coordinate> &coords, const TData* buffer, int &position)
+   {
+      // Create map iterator
+      std::vector<Coordinate>::const_iterator it;
+
+      // Create MPI displacement list
+      for(it = coords.begin(); it != coords.end(); ++it)
+      {
+         rData.rPoint(std::tr1::get<0>(*it), std::tr1::get<1>(*it), std::tr1::get<2>(*it)) = *(buffer + position);
+
+         // Increment datatype size
+         position++;
+      }
+   }
+
    template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildType(typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const std::map<MpiConverterTools<Dimensions::THREED>::Coordinate,MpiConverterTools<Dimensions::THREED>::Coordinate>& sharedMap)
    {
+      // MPI error code
+      int ierr;
+
       // Get the number of elements
       int nElements = sharedMap.size();
 
       // Prepare data required for MPI datatype
-      MPI_Aint    displ[nElements];
-      int         blocks[nElements];
+      MPI_Aint *displ = new MPI_Aint[nElements];
+      int      *blocks = new int[nElements];
 
       // Prepare data required for MPI datatype
       MPI_Aint    base;
@@ -144,10 +241,16 @@ namespace Parallel {
 
       // Create MPI datatype
       MPI_Datatype   type;
-      MPI_Type_create_hindexed(nElements, blocks, displ, MpiTypes::type<TData>(), &type);
+      ierr = MPI_Type_create_hindexed(nElements, blocks, displ, MpiTypes::type<TData>(), &type);
+      FrameworkMacro::check(ierr, 971);
 
       // Commit MPI datatype
-      MPI_Type_commit(&type);
+      ierr = MPI_Type_commit(&type);
+      FrameworkMacro::check(ierr, 972);
+
+      // Free allocated memory
+      delete[] displ;
+      delete[] blocks;
 
       return type;
    }
@@ -249,96 +352,36 @@ namespace Parallel {
       }
    }
 
+   template <typename TData> void MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
+   {
+      std::map<Coordinate,Coordinate>  sharedMap;
+      MpiConverterTools<Dimensions::THREED>::buildFwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+
+      coords.clear();
+      coords.reserve(sharedMap.size());
+      for(std::map<Coordinate,Coordinate>::const_iterator it = sharedMap.begin(); it != sharedMap.end(); ++it)
+      {
+         coords.push_back(it->second);
+      }
+   }
+
+   template <typename TData> void MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
+   {
+      std::map<Coordinate,Coordinate>  sharedMap;
+      MpiConverterTools<Dimensions::THREED>::buildBwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+
+      coords.clear();
+      coords.reserve(sharedMap.size());
+      for(std::map<Coordinate,Coordinate>::const_iterator it = sharedMap.begin(); it != sharedMap.end(); ++it)
+      {
+         coords.push_back(it->second);
+      }
+   }
 
    template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
    {
-      // List of remote keys
-      std::set<Coordinate>  remoteKeys;
-
-      // Storage for the simulation wide indexes
-      int i_, j_, k_;
-
-      // Storage for the generated key
-      Coordinate key;
-
-      //
-      // Create the list of remote indexes in next transform
-      //
-
-      // Remote is also local CPU
-      MatrixI  matRemote;
-      if(cpuId == FrameworkMacro::transformId(fwdDim))
-      {
-         // Loop over slow data dimension
-         for(int k=0; k < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            // Extract "physical" index of slow data dimension
-            k_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT3D>(k);
-
-            // Loop over middle data dimension
-            for(int j=0; j < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(k); ++j)
-            {
-               // Extract "physical" index of middle data dimension
-               j_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j,k);
-
-               // Loop over backward data dimension
-               for(int i=0; i < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(k); ++i)
-               {
-                  // Extract "physical" index of backward data dimension
-                  i_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
-
-                  // Create key as (2D, 3D, 1D) indexes (i.e. data gets transposed during communication)
-                  key = spRes->counter()->makeKey(Dimensions::jump(fwdDim,1), i_, j_, k_);
-
-                  // Add key to remote set
-                  remoteKeys.insert(key);
-               }
-            }
-         }
-
-         // Convert remote keys to matrix to send througg MPI
-         matRemote.resize(3, remoteKeys.size());
-         int i = 0; 
-         for(std::set<Coordinate>::iterator it = remoteKeys.begin(); it != remoteKeys.end(); ++it)
-         {
-            matRemote(0,i) = std::tr1::get<0>(*it);
-            matRemote(1,i) = std::tr1::get<1>(*it);
-            matRemote(2,i) = std::tr1::get<2>(*it);
-            i++;
-         }
-   
-         // Broadcast size
-         i = remoteKeys.size();
-         MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
-
-         // Broadcast data
-         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-
-      // Remote CPU needs to generate list 
-      } else
-      {
-         // Get size
-         int nCoords;
-         MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
-
-         // Get remote keys as matrix
-         matRemote.resize(3, nCoords);
-         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-
-         // Convert matrix to remoteKeys set
-         for(int i = 0; i < nCoords; i++)
-         {
-            key = std::tr1::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
-            remoteKeys.insert(key);
-         }
-      }
-
-      // Synchronize
-      FrameworkMacro::syncTransform(fwdDim);
-
-      // Extract map of shared indexes (stored as keys)
       std::map<Coordinate,Coordinate>  sharedMap;
-      MpiConverterTools<Dimensions::THREED>::extractShared(sharedMap, localIdxMap, remoteKeys);
+      MpiConverterTools<Dimensions::THREED>::buildFwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
 
       // Create the datatype
       MPI_Datatype type = MpiConverterTools<Dimensions::THREED>::buildType(data, sharedMap);
@@ -348,93 +391,8 @@ namespace Parallel {
 
    template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
    {
-      // List of remote keys
-      std::set<Coordinate>  remoteKeys;
-      
-      // Storage for the simulation wide indexes
-      int i_, j_, k_;
-
-      // Storage for the generated key
-      Coordinate key;
-
-      //
-      // Create the list of remote indexes
-      //
-
-      // Remote is also local CPU
-      MatrixI  matRemote;
-      if(cpuId == FrameworkMacro::transformId(fwdDim))
-      {
-         // Loop over slow data dimension
-         for(int k=0; k < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            // Extract "physical" index of slow data dimension
-            k_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DAT3D>(k);
-
-            // Loop over middle data dimension
-            for(int j=0; j < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(k); ++j)
-            {
-               // Extract "physical" index of middle data dimension
-               j_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j,k);
-
-               // Loop over forward data dimension
-               for(int i=0; i < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(k); ++i)
-               {
-                  // Extract "physical" index of forward data dimension
-                  i_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,k);
-
-                  // Create key as (1D, 2D, 3D)
-                  key = spRes->counter()->makeKey(fwdDim, i_, j_, k_);
-
-                  // Add key to remote set
-                  remoteKeys.insert(key);
-               }
-            }
-         }
-
-         // Convert remote keys to matrix to send through MPI
-         matRemote.resize(3, remoteKeys.size());
-         int i = 0; 
-         for(std::set<Coordinate>::iterator it = remoteKeys.begin(); it != remoteKeys.end(); ++it)
-         {
-            matRemote(0,i) = std::tr1::get<0>(*it);
-            matRemote(1,i) = std::tr1::get<1>(*it);
-            matRemote(2,i) = std::tr1::get<2>(*it);
-            i++;
-         }
-
-         // Broadcast size
-         i = remoteKeys.size();
-         MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
-
-         // Broadcast data
-         MPI_Bcast(matRemote.data(), matRemote.rows()*matRemote.cols(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-
-      // Remote CPU needs to generate list 
-      } else
-      {
-         // Get size
-         int nCoords;
-         MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
-
-         // Get remot ekeys as matrix
-         matRemote.resize(3, nCoords);
-         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
-
-         // Convert matrix to remoteKeys set
-         for(int i = 0; i < nCoords; i++)
-         {
-            key = std::tr1::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
-            remoteKeys.insert(key);
-         }
-      }
-
-      // Synchronize
-      FrameworkMacro::syncTransform(fwdDim);
-
-      // Extract map of shared indexes (stored as keys)
       std::map<Coordinate,Coordinate>  sharedMap;
-      MpiConverterTools<Dimensions::THREED>::extractShared(sharedMap, localIdxMap, remoteKeys);
+      MpiConverterTools<Dimensions::THREED>::buildBwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
 
       // Create the datatype
       MPI_Datatype type = MpiConverterTools<Dimensions::THREED>::buildType(data, sharedMap);
@@ -452,6 +410,36 @@ namespace Parallel {
          typedef std::pair<int,int>   Coordinate;
 
          /**
+          * @brief Build local cpu map of forward data
+          */
+         static void buildLocalFwdMap(std::map<Coordinate,Coordinate>& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim);
+
+         /**
+          * @brief Build local cpu map of backward data
+          */
+         template <typename TIdx> static void buildLocalBwdMap(std::map<Coordinate,Coordinate>& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, SharedPtrMacro<TIdx> spIdxConv);
+
+         /**
+          * @brief Build a forward MPI Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         static void buildFwdCpuMap(std::map<Coordinate,Coordinate>& sharedMap, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
+
+         /**
+          * @brief Build a backward MPI Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         static void buildBwdCpuMap(std::map<Coordinate,Coordinate>& sharedMap, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
+
+         /**
           * @brief Build a forward MPI Datatype
           *
           * @param spRes   Shared Resolution
@@ -460,7 +448,7 @@ namespace Parallel {
           * @param type    Created MPI data type
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId);
+         template <typename TData> static MPI_Datatype buildFwdDatatype(const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId);
 
          /**
           * @brief Build a backward MPI Datatype
@@ -471,7 +459,27 @@ namespace Parallel {
           * @param type    Created MPI data type
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId);
+         template <typename TData> static MPI_Datatype buildBwdDatatype(const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId);
+
+         /**
+          * @brief Build manual packing description for forward Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         template <typename TData> static void buildFwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId);
+
+         /**
+          * @brief Build manual packing description for backward Datatype
+          *
+          * @param spRes   Shared Resolution
+          * @param fwdDim  Dimension index for forward transform
+          * @param data    Input data
+          * @param cpuId   ID of the CPU
+          */
+         template <typename TData> static void buildBwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId);
 
          /**
           * @brief Extract shared indexes
@@ -490,6 +498,24 @@ namespace Parallel {
           * @param type       MPI datatype storage
           */
          template <typename TData> static MPI_Datatype buildType(typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const std::map<Coordinate,Coordinate>& sharedMap);
+
+         /**
+          * @brief Pack data into buffer
+          *
+          * @param data       The concerned data
+          * @param sharedMap  Shared index map
+          * @param type       MPI datatype storage
+          */
+         template <typename TData> static void pack(TData* rBuffer, int &position, const typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const std::vector<Coordinate> &coords);
+
+         /**
+          * @brief Unpack data from buffer
+          *
+          * @param data       The concerned data
+          * @param sharedMap  Shared index map
+          * @param type       MPI datatype storage
+          */
+         template <typename TData> static void unpack(typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &rData, const std::vector<Coordinate> &coords, const TData* buffer, int &position);
          
       protected:
 
@@ -506,14 +532,47 @@ namespace Parallel {
 
    };
 
+   template <typename TData> void MpiConverterTools<Dimensions::TWOD>::pack(TData* rBuffer, int &position, const typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const std::vector<MpiConverterTools<Dimensions::TWOD>::Coordinate> &coords)
+   {
+      // Create map iterator
+      std::vector<Coordinate>::const_iterator it;
+
+      // Create MPI displacement list
+      for(it = coords.begin(); it != coords.end(); ++it)
+      {
+         *(rBuffer+position) = data.point(it->first, it->second);
+
+         // Increment datatype size
+         position++;
+      }
+   }
+
+   template <typename TData> void MpiConverterTools<Dimensions::TWOD>::unpack(typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &rData, const std::vector<MpiConverterTools<Dimensions::TWOD>::Coordinate> &coords, const TData* buffer, int &position)
+   {
+      // Create map iterator
+      std::vector<Coordinate>::const_iterator it;
+
+      // Create MPI displacement list
+      for(it = coords.begin(); it != coords.end(); ++it)
+      {
+         rData.rPoint(it->first, it->second) = *(buffer + position);
+
+         // Increment datatype size
+         position++;
+      }
+   }
+
    template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::TWOD>::buildType(typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const std::map<MpiConverterTools<Dimensions::TWOD>::Coordinate,MpiConverterTools<Dimensions::TWOD>::Coordinate>& sharedMap)
    {
+      // MPI error code
+      int ierr;
+
       // Get the number of elements
       int nElements = sharedMap.size();
 
       // Prepare data required for MPI datatype
-      MPI_Aint    displ[nElements];
-      int         blocks[nElements];
+      MPI_Aint *displ = new MPI_Aint[nElements];
+      int      *blocks = new int[nElements];
 
       // Prepare data required for MPI datatype
       MPI_Aint    base;
@@ -543,20 +602,65 @@ namespace Parallel {
 
       // Create MPI datatype
       MPI_Datatype  type;
-      MPI_Type_create_hindexed(nElements, blocks, displ, MpiTypes::type<TData>(), &type);
+      ierr = MPI_Type_create_hindexed(nElements, blocks, displ, MpiTypes::type<TData>(), &type);
+      FrameworkMacro::check(ierr, 971);
 
       // Commit MPI datatype
-      MPI_Type_commit(&type);
+      ierr = MPI_Type_commit(&type);
+      FrameworkMacro::check(ierr, 972);
+
+      // Free allocated memory
+      delete[] displ;
+      delete[] blocks;
 
       return type;
    }
 
-   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::TWOD>::buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId)
+   inline void MpiConverterTools<Dimensions::TWOD>::buildLocalFwdMap(std::map<Coordinate,Coordinate>&  rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim)
    {
-      // Create  map of the local indexes to unique keys
-      std::map<Coordinate,Coordinate>  localIdxMap;
-      // List of remote keys
-      std::set<Coordinate>  remoteKeys;
+      // Make sure key map is empty
+      rLocalIdxMap.clear();
+
+      // Storage for the generated key
+      Coordinate key;
+      // Storage for the coordinate indexes
+      Coordinate coord;
+      
+      // Storage for the simulation wide indexes
+      int i_, j_;
+
+      //
+      // Create the list of local indexes
+      //
+
+      // Loop over middle data dimension
+      for(int j = 0; j < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(); ++j)
+      {
+         // Extract "physical" index of middle data dimension
+         j_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j);
+
+         // Loop over forward data dimension
+         for(int i = 0; i < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(); ++i)
+         {
+            // Extract "physical" index of forward data dimension
+            i_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i);
+
+            // Combine array indexes into coordinate tuple
+            coord = std::make_pair(i, j);
+
+            // Create key as (1D, 2D)
+            key = spRes->counter()->makeKey(fwdDim, i_, j_);
+
+            // add key->coordinate to map
+            rLocalIdxMap.insert(std::pair<Coordinate,Coordinate>(key, coord));
+         }
+      }
+   }
+
+   template <typename TIdx> void MpiConverterTools<Dimensions::TWOD>::buildLocalBwdMap(std::map<Coordinate,Coordinate>& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, SharedPtrMacro<TIdx> spIdxConv)
+   {
+      // Make sure key map is empty
+      rLocalIdxMap.clear();
 
       // Storage for the index
       Coordinate coord;
@@ -571,56 +675,60 @@ namespace Parallel {
       // Create the list of local indexes
       //
 
-      // Loop over slow data dimension
-      for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(); ++j)
+      // Loop over middle data dimension
+      for(int j = 0; j < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(); ++j)
       {
-         // Extract "physical" index of slow data dimension
-         j_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j);
-
-         // Loop over forward data dimension
-         for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(j); ++i)
-         {
-            // Extract "physical" index of forward data dimension
-            i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,j);
-
-            // Combine array indexes into coordinate
-            coord = std::make_pair(i, j);
-
-            // Create key as (1D, 2D)
-            key = std::make_pair(i_, j_);
-
-            // add key->coordinate to map
-            localIdxMap.insert(std::pair<Coordinate,Coordinate>(key, coord));
-         }
-      }
-
-      //
-      // Create the list of remote indexes
-      //
-
-      // Loop over slow data dimension
-      for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(); ++j)
-      {
-         // Extract "physical" index of slow data dimension
-         j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j);
+         // Extract "physical" index of middle data dimension
+         j_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j);
 
          // Loop over backward data dimension
-         for(int i=0; i < spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(j); ++i)
+         for(int i = 0; i < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(); ++i)
          {
             // Extract "physical" index of backward data dimension
-            i_ = spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,j);
+            i_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i);
 
-            // Create key as (2D, 1D)
-            key = std::make_pair(j_, i_);
+            // Combine array indexes into coordinate tuple
+            coord = std::make_pair(i, j);
 
-            // Add key to remote set
-            remoteKeys.insert(key);
+            // Create key as (2D, 3D, 1D)
+            key = spRes->counter()->makeKey(Dimensions::jump(fwdDim,1), i_, j_);
+
+            // add key->coordinate to map
+            rLocalIdxMap.insert(std::pair<Coordinate,Coordinate>(key, coord));
          }
       }
+   }
 
-      // Extract map of shared indexes (stored as keys)
+   template <typename TData> void MpiConverterTools<Dimensions::TWOD>::buildFwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId)
+   {
       std::map<Coordinate,Coordinate>  sharedMap;
-      MpiConverterTools<Dimensions::TWOD>::extractShared(sharedMap, localIdxMap, remoteKeys);
+      MpiConverterTools<Dimensions::TWOD>::buildFwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+
+      coords.clear();
+      coords.reserve(sharedMap.size());
+      for(std::map<Coordinate,Coordinate>::const_iterator it = sharedMap.begin(); it != sharedMap.end(); ++it)
+      {
+         coords.push_back(it->second);
+      }
+   }
+
+   template <typename TData> void MpiConverterTools<Dimensions::TWOD>::buildBwdDatatype(std::vector<Coordinate>& coords, const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId)
+   {
+      std::map<Coordinate,Coordinate>  sharedMap;
+      MpiConverterTools<Dimensions::TWOD>::buildBwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+
+      coords.clear();
+      coords.reserve(sharedMap.size());
+      for(std::map<Coordinate,Coordinate>::const_iterator it = sharedMap.begin(); it != sharedMap.end(); ++it)
+      {
+         coords.push_back(it->second);
+      }
+   }
+
+   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::TWOD>::buildFwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId)
+   {
+      std::map<Coordinate,Coordinate>  sharedMap;
+      MpiConverterTools<Dimensions::TWOD>::buildFwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
 
       // Create the datatype
       MPI_Datatype type = MpiConverterTools<Dimensions::TWOD>::buildType(data, sharedMap);
@@ -628,80 +736,13 @@ namespace Parallel {
       return type;
    }
 
-   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::TWOD>::buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId)
+   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::TWOD>::buildBwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::TWOD> &data, const int cpuId)
    {
-      // Create  map of the local indexes to unique keys
-      std::map<Coordinate,Coordinate>  localIdxMap;
-
-      // List of remote keys
-      std::set<Coordinate>  remoteKeys;
-
-      // Storage for the index
-      Coordinate coord;
-      
-      // Storage for the simulation wide indexes
-      int i_, j_;
-
-      // Storage for the generated key
-      Coordinate key;
-
-      //
-      // Create the list of local indexes
-      //
-
-      // Loop over slow data dimension
-      for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(); ++j)
-      {
-         // Extract "physical" index of slow data dimension
-         j_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j);
-
-         // Loop over backward data dimension
-         for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(j); ++i)
-         {
-            // Extract "physical" index of backward data dimension
-            i_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,j);
-
-            // Combine array indexes into coordinate pair
-            coord = std::make_pair(i, j);
-
-            // Create key as (2D, 1D)
-            key = std::make_pair(j_, i_);
-
-            // add key->coordinate to map
-            localIdxMap.insert(std::pair<Coordinate,Coordinate>(key, coord));
-         }
-      }
-
-      //
-      // Create the list of remote indexes
-      //
-
-      // Loop over slow data dimension
-      for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(); ++j)
-      {
-         // Extract "physical" index of slow data dimension
-         j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j);
-
-         // Loop ver forward data dimension
-         for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(j); ++i)
-         {
-            // Extract "physical" index of forward data dimension
-            i_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,j);
-
-            // Create key as (1D, 2D)
-            key = std::make_pair(i_, j_);
-
-            // Add key to remote set
-            remoteKeys.insert(key);
-         }
-      }
-
-      // Extract map of shared indexes (stored as keys)
       std::map<Coordinate,Coordinate>  sharedMap;
-      MpiConverterTools<Dimensions::TWOD>::extractShared(sharedMap, localIdxMap, remoteKeys);
+      MpiConverterTools<Dimensions::TWOD>::buildBwdCpuMap(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
 
       // Create the datatype
-      MPI_Datatype type = MpiConverterTools<Dimensions::TWOD>::buildType(data, sharedMap, type);
+      MPI_Datatype type = MpiConverterTools<Dimensions::TWOD>::buildType(data, sharedMap);
 
       return type;
    }
@@ -776,8 +817,8 @@ namespace Parallel {
       int nElements = sharedMap.size();
 
       // Prepare data required for MPI datatype
-      MPI_Aint    displ[nElements];
-      int         blocks[nElements];
+      MPI_Aint *displ = new MPI_Aint[nElements];
+      int      *blocks = new int[nElements];
 
       // Prepare data required for MPI datatype
       MPI_Aint    base;
@@ -811,6 +852,10 @@ namespace Parallel {
 
       // Commit MPI datatype
       MPI_Type_commit(&type);
+
+      // Free allocated memory
+      delete[] displ;
+      delete[] blocks;
 
       return type;
    }

@@ -10,18 +10,16 @@ import itertools
 import geomhdiscc.base.utils as utils
 
 
-use_parity_bc = True
-
 def no_bc():
     """Get a no boundary condition flag"""
 
     return {0:0}
 
-def constrain(mat, bc, location = 't'):
+def constrain(mat, bc, pad_zeros = 0, location = 't'):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
 
     if bc[0] > 0:
-        bc_mat = apply_tau(mat, bc, location = location)
+        bc_mat = apply_tau(mat, bc, pad_zeros = pad_zeros, location = location)
     elif bc[0] < 0:
         bc_mat = apply_galerkin(mat, bc)
     else:
@@ -69,35 +67,39 @@ def constrain(mat, bc, location = 't'):
 
     return bc_mat
 
-def apply_tau(mat, bc, location = 't'):
+def apply_tau(mat, bc, pad_zeros = 0, location = 't'):
     """Add Tau lines to the matrix"""
     
     nbc = bc[0]//10
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 1, bc)
     elif bc[0] == 11:
-        cond = tau_value(mat.shape[1], -1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], -1, bc)
     elif bc[0] == 12:
-        cond = tau_diff(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 1, bc)
     elif bc[0] == 13:
-        cond = tau_diff(mat.shape[1], -1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], -1, bc)
     elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], 1, bc)
     elif bc[0] == 15:
-        cond = tau_diff2(mat.shape[1], -1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], -1, bc)
     elif bc[0] == 16:
-        cond = tau_integral(mat.shape[1], 1, bc.get('c',None))
+        cond = tau_integral(mat.shape[1], 1, bc)
     elif bc[0] == 20:
-        cond = tau_value(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 0, bc)
     elif bc[0] == 21:
-        cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 0, bc)
     elif bc[0] == 22:
-        cond = tau_valuediff(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_valuediff(mat.shape[1], 0, bc)
+    elif bc[0] == 23:
+        cond = tau_diff2(mat.shape[1], 0, bc)
     elif bc[0] == 40:
-        cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_value_diff(mat.shape[1], 0, bc)
     elif bc[0] == 41:
-        cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[1], 0, bc)
+    elif bc[0] == 42:
+        cond = tau_diff_diff2(mat.shape[1], 0, bc)
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)
@@ -111,6 +113,10 @@ def apply_tau(mat, bc, location = 't'):
         s = mat.shape[0]-nbc
 
     conc = np.concatenate
+    if pad_zeros > 0:
+        cond = conc((np.zeros((pad_zeros,cond.shape[1])),cond))
+    elif pad_zeros < 0:
+        cond = conc((cond, np.zeros((pad_zeros,cond.shape[1]))))
     for i,c in enumerate(cond):
         mat.data = conc((mat.data, c))
         mat.row = conc((mat.row, [s+i]*mat.shape[1]))
@@ -118,10 +124,10 @@ def apply_tau(mat, bc, location = 't'):
 
     return mat
 
-def tau_value(nx, pos, coeffs = None):
+def tau_value(nx, pos, bc):
     """Create the tau line(s) for a zero boundary value"""
     
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
     c = next(it)
@@ -136,61 +142,61 @@ def tau_value(nx, pos, coeffs = None):
         cond.append(cnst*alt_ones(nx, 1))
         cond[-1][0] /= tau_c()
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
         cond[0] = (cond[0] + cond[1])/2.0
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
-def tau_diff(nx, pos, coeffs = None):
+def tau_diff(nx, pos, bc):
     """Create the tau line(s) for a zero 1st derivative"""
 
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
-    c = next(it)
+    c = next(it)*tau_c()
     ns = np.arange(0,nx)
     if pos >= 0:
         cond.append(c*ns**2)
-        c = next(it)
+        c = next(it)*tau_c()
 
     if pos <= 0:
         cond.append(c*ns**2*alt_ones(nx, 0))
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
         cond[0] = (cond[0] + cond[1])/2.0
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
-def tau_diff2(nx, pos, coeffs = None):
+def tau_diff2(nx, pos, bc):
     """Create the tau line(s) for a zero 2nd derivative"""
 
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
-    c = next(it)
+    c = next(it)*tau_c()
     ns = np.arange(0,nx)
     if pos >= 0:
         cond.append((c/3.0)*(ns**4 - ns**2))
-        c = next(it)
+        c = next(it)*tau_c()
 
     if pos <= 0:
         cond.append((c/3.0)*(ns**4 - ns**2)*alt_ones(nx, 1))
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
         cond[0] = (cond[0] + cond[1])/2.0
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
 
-def tau_integral(nx, pos, coeffs = None):
+def tau_integral(nx, pos, bc):
     """Create the boundary integral tau line(s)"""
 
-    it = coeff_iterator(coeffs, pos)
+    it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
     c = next(it)
@@ -210,30 +216,30 @@ def tau_integral(nx, pos, coeffs = None):
 
     return np.array(cond)
 
-def tau_valuediff(nx, pos, coeffs = None):
+def tau_valuediff(nx, pos, bc):
     """Create the tau lines for a zero boundary value at top and a zero 1st derivative at bottom"""
 
     assert(pos == 0)
 
     cond = []
-    cond.append(tau_value(nx,1,coeffs)[0])
-    cond.append(tau_diff(nx,-1,coeffs)[0])
+    cond.append(tau_value(nx,1,bc)[0])
+    cond.append(tau_diff(nx,-1,bc)[0])
 
     return np.array(cond)
 
-def tau_value_diff(nx, pos, coeffs = None):
+def tau_value_diff(nx, pos, bc):
     """Create the tau lines for a zero boundary value and a zero 1st derivative"""
 
     cond = []
     if pos >= 0:
-        cond.append(tau_value(nx,1,coeffs)[0])
-        cond.append(tau_diff(nx,1,coeffs)[0])
+        cond.append(tau_value(nx,1,bc)[0])
+        cond.append(tau_diff(nx,1,bc)[0])
 
     if pos <= 0:
-        cond.append(tau_value(nx,-1,coeffs)[0])
-        cond.append(tau_diff(nx,-1,coeffs)[0])
+        cond.append(tau_value(nx,-1,bc)[0])
+        cond.append(tau_diff(nx,-1,bc)[0])
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         tv = cond[0].copy()
         td = cond[1].copy()
         cond[0] = (cond[0] + cond[2])/2.0
@@ -241,27 +247,61 @@ def tau_value_diff(nx, pos, coeffs = None):
         cond[2] = (tv - cond[2])/2.0
         cond[3] = (td - cond[3])/2.0
 
+    if pos == 0:
+        order = [0, 2, 1, 3]
+        cond = [cond[i] for i in order]
+
     return np.array(cond)
 
-def tau_value_diff2(nx, pos, coeffs = None):
+def tau_diff_diff2(nx, pos, bc):
+    """Create tau lines for a zero 1st derivative and a zero 2nd derivative """
+
+    cond = []
+    if pos >= 0:
+        cond.append(tau_diff(nx,1,bc)[0])
+        cond.append(tau_diff2(nx,1,bc)[0])
+
+    if pos <= 0:
+        cond.append(tau_diff(nx,-1,bc)[0])
+        cond.append(tau_diff2(nx,-1,bc)[0])
+
+    if bc.get('use_parity', True) and pos == 0:
+        tv = cond[0].copy()
+        td = cond[1].copy()
+        cond[0] = (cond[0] + cond[2])/2.0
+        cond[1] = (cond[1] + cond[3])/2.0
+        cond[2] = (tv - cond[2])/2.0
+        cond[3] = (td - cond[3])/2.0
+
+    if pos == 0:
+        order = [0, 2, 1, 3]
+        cond = [cond[i] for i in order]
+
+    return np.array(cond)
+
+def tau_value_diff2(nx, pos, bc):
     """Create tau lines for a zero boundary value and a zero 2nd derivative """
 
     cond = []
     if pos >= 0:
-        cond.append(tau_value(nx,1,coeffs)[0])
-        cond.append(tau_diff2(nx,1,coeffs)[0])
+        cond.append(tau_value(nx,1,bc)[0])
+        cond.append(tau_diff2(nx,1,bc)[0])
 
     if pos <= 0:
-        cond.append(tau_value(nx,-1,coeffs)[0])
-        cond.append(tau_diff2(nx,-1,coeffs)[0])
+        cond.append(tau_value(nx,-1,bc)[0])
+        cond.append(tau_diff2(nx,-1,bc)[0])
 
-    if use_parity_bc and pos == 0:
+    if bc.get('use_parity', True) and pos == 0:
         tv = cond[0].copy()
         td = cond[1].copy()
         cond[0] = (cond[0] + cond[2])/2.0
         cond[1] = (cond[1] + cond[3])/2.0
         cond[2] = (tv - cond[2])/2.0
         cond[3] = (td - cond[3])/2.0
+
+    if pos == 0:
+        order = [0, 2, 1, 3]
+        cond = [cond[i] for i in order]
 
     return np.array(cond)
 
@@ -291,6 +331,8 @@ def stencil(nx, bc):
         mat = stencil_value(nx, 0)
     elif bc[0] == -21:
         mat = stencil_diff(nx, 0)
+    elif bc[0] == -23:
+        mat = stencil_diff2(nx, 0)
     elif bc[0] == -40:
         mat = stencil_value_diff(nx, 0)
     elif bc[0] == -41:
@@ -342,13 +384,16 @@ def stencil_value(nx, pos):
         offsets = [-1, 0]
         sgn = -pos 
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
-        return galerkin_c(n+offsets[0])*sgn
+        return galerkin_c(n+offsets[0])*c(n+offsets[0])*sgn
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -367,13 +412,16 @@ def stencil_diff(nx, pos):
         offsets = [-1, 0]
         sgn = -pos 
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
-        return sgn*(n+offsets[0])**2/n**2
+        return sgn*c(n+offsets[0])*(n+offsets[0])**2/n**2
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -384,24 +432,27 @@ def stencil_diff(nx, pos):
 def stencil_diff2(nx, pos):
     """Create stencil matrix for a zero 2nd derivative"""
 
+    def c(n):
+        return np.ones(n.shape)
+
     ns = np.arange(0,nx,1)
     if pos == 0:
         offsets = [-2, 0]
 
         # Generate subdiagonal
         def d_1(n):
-            return -(n - 3.0)*(n - 2.0)**2/(n**2*(n + 1.0))
+            return -c(n-2.0)*(n - 3.0)*(n - 2.0)**2/(n**2*(n + 1.0))
 
     else:
         offsets = [-1, 0]
 
         # Generate subdiagonal
         def d_1(n):
-            return -pos*(n - 2.0)*(n - 1.0)/(n*(n + 1.0))
+            return -c(n-1.0)*pos*(n - 2.0)*(n - 1.0)/(n*(n + 1.0))
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -412,32 +463,39 @@ def stencil_diff2(nx, pos):
 def stencil_value_diff(nx, pos):
     """Create stencil matrix for a zero boundary value and a zero 1st derivative"""
 
+    assert(pos == 0)
+
     ns = np.arange(0,nx,1)
-    if pos == 0:
-        offsets = [-4, -2, 0]
+    offsets = [-4, -2, 0]
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (n - 3.0)/(n - 1.0)
+    def c(n):
+        return np.ones(n.shape)
 
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -2.0*n/(n + 1.0)
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        val = (n - 3.0)/(n - 1.0)
+        for i,j in enumerate(n):
+            if j == 4:
+                val[i] = 1.0/6.0 
+            if j > 4:
+                break
 
-    else:
-        offsets = [-2, -1, 0]
+        return c(n-4.0)*val
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (2.0*n - 3.0)/(2.0*n - 1.0)
+    # Generate 1st subdiagonal
+    def d_1(n):
+        val = -2.0*n/(n + 1.0)
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = -2.0/3.0
+            if j > 2:
+                break
 
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -pos*4.0*n/(2.0*n + 1.0)
+        return c(n-2.0)*val
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return c(n)*np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -448,32 +506,43 @@ def stencil_value_diff(nx, pos):
 def stencil_value_diff2(nx, pos):
     """Create stencil matrix for a zero boundary value and a zero 2nd derivative"""
 
+    assert(pos == 0)
+
     ns = np.arange(0,nx,1)
-    if pos == 0:
-        offsets = [-4, -2, 0]
+    offsets = [-4, -2, 0]
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)/((n - 1.0)*(2*n**2 - 4.0*n + 3.0))
+    def c(n):
+        return np.ones(n.shape)
 
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -2.0*n*(2.0*n**2 + 7.0)/((n + 1.0)*(2.0*n**2 + 4.0*n + 3.0))
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        val_num = (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)
+        val_den = (n - 1.0)*(2.0*n**2 - 4.0*n + 3.0)
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 4:
+                val[i] = 1.0/38.0
+            if j > 4:
+                break
 
-    else:
-        offsets = [-2, -1, 0]
+        return c(n-4.0)*val
 
-        # Generate 2nd subdiagonal
-        def d_2(n):
-            return (n - 3.0)*(2.0*n - 3.0)/(n*(2.0*n - 1.0))
+    # Generate 1st subdiagonal
+    def d_1(n):
+        val_num = -2.0*n*(2.0*n**2 + 7.0)
+        val_den = (n + 1.0)*(2.0*n**2 + 4.0*n + 3.0)
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 2:
+                val[i] = -10.0/19.0
+            if j > 2:
+                break
 
-        # Generate 1st subdiagonal
-        def d_1(n):
-            return -pos*2.0*(2*.0*n**2 + 1.0)/((n + 1.0)*(2.0*n + 1.0))
+        return c(n-2.0)*val
 
     # Generate diagonal
     def d0(n):
-        return 1.0
+        return c(n)*np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)

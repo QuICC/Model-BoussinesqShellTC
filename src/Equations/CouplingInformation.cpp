@@ -23,6 +23,7 @@
 
 // Project includes
 //
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -72,6 +73,11 @@ namespace Equations {
       return this->mIndexType;
    }
 
+   const IEigenTools& CouplingInformation::eigenTools() const
+   {
+      return *(this->mspEigenTools);
+   }
+
    int CouplingInformation::nBlocks() const
    {
       return this->mImplicitFields.size();
@@ -92,9 +98,9 @@ namespace Equations {
       return this->mGalerkinNs(idx);
    }
 
-   int CouplingInformation::galerkinShift(const int dim) const
+   int CouplingInformation::galerkinShift(const int idx, const int dim) const
    {
-      return this->mGalerkinShifts(dim);
+      return this->mGalerkinShifts(idx, dim);
    }
 
    int CouplingInformation::systemN(const int idx) const
@@ -129,7 +135,7 @@ namespace Equations {
 
       // Extract the position of the equation field
       FieldId_iterator pos = std::find(this->mImplicitFields.begin(), this->mImplicitFields.end(), std::make_pair(fieldId, compId));
-      assert((this->equationType() == TRIVIAL && pos == this->mImplicitFields.end()) || pos != this->mImplicitFields.end());
+      assert((this->equationType() == TRIVIAL && pos == this->mImplicitFields.end()) || (this->equationType() == WRAPPER && pos == this->mImplicitFields.end()) || pos != this->mImplicitFields.end());
 
       // Set initial field index
       this->mFieldIndex = pos - this->mImplicitFields.begin();
@@ -181,7 +187,7 @@ namespace Equations {
       this->mHasSource = hasSource;
    }
 
-   void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs)
+   void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const MatrixI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs)
    {
       this->mNSystems = nSystems;
 
@@ -206,6 +212,8 @@ namespace Equations {
    void CouplingInformation::setIndexType(const CouplingInformation::IndexType id)
    {
       this->mIndexType = id;
+
+      this->mspEigenTools = eigenSelector(this->mIndexType);
    }
 
    CouplingInformation::FieldId_range CouplingInformation::implicitRange() const

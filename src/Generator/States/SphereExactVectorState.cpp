@@ -23,7 +23,6 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -217,7 +216,7 @@ namespace Equations {
 
       } else if(typeId == SphereExactStateIds::BENCHVELC1)
       {
-         rNLComp.rData().setConstant(1e-12);
+         rNLComp.rData().setConstant(1e-16);
 
       } else if(typeId == SphereExactStateIds::BENCHVELC2)
       {
@@ -395,7 +394,7 @@ namespace Equations {
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = r*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= std::sqrt(3.0/Math::PI)*std::sin(theta);
          rField = Array::Ones(phi.size());
       }
@@ -413,13 +412,13 @@ namespace Equations {
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = r*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= std::sqrt(3.0/(2.0*Math::PI));
          rField = phi.array().cos() + phi.array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = r*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= std::sqrt(3.0/(2.0*Math::PI))*std::cos(theta);
          rField = phi.array().cos() - phi.array().sin();
       }
@@ -442,7 +441,7 @@ namespace Equations {
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = std::pow(r,2)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= 3.0*std::sqrt(5.0/Math::PI)*std::cos(theta)*std::sin(theta);
          rField = Array::Ones(phi.size());
       }
@@ -460,13 +459,13 @@ namespace Equations {
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = std::pow(r,2)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta);
          rField = phi.array().cos() + phi.array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = std::pow(r,2)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(2.0*theta);
          rField = phi.array().cos() - phi.array().sin();
       }
@@ -484,13 +483,13 @@ namespace Equations {
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = std::pow(r,2)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::sin(theta);
          rField = (2.0*phi).array().cos() + (2.0*phi).array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = std::pow(r,2)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta)*std::sin(theta);
          rField = (2.0*phi).array().cos() - (2.0*phi).array().sin();
       }
@@ -508,13 +507,13 @@ namespace Equations {
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = std::pow(r,5)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= -(3.0/2.0)*std::sqrt(385.0/(2.0*Math::PI))*std::cos(theta)*std::pow(std::sin(theta),3);
          rField = (4.0*phi).array().cos() + (4.0*phi).array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor = std::pow(r,5)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= -(3.0/16.0)*std::sqrt(385.0/(2.0*Math::PI))*(3.0 + 5.0*std::cos(2.0*theta))*std::pow(std::sin(theta),3);
          rField = (4.0*phi).array().cos() - (4.0*phi).array().sin();
       }
@@ -549,14 +548,14 @@ namespace Equations {
       MHDFloat factor = 1.0;
       if(compId == FieldComponents::Physical::R)
       {
-         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor = (std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= 2.0*std::sqrt(3.0/Math::PI)*std::cos(theta);
          rField = Array::Ones(phi.size());
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
-         factor *= -std::sqrt(3.0/Math::PI)*std::sin(theta);
+         factor = (5.0*std::pow(r,8) + 4.0*std::pow(r,6) + 3.0*std::pow(r,4) + 2.0*std::pow(r,2) + 1.0);
+         factor *= -2.0*std::sqrt(3.0/Math::PI)*std::sin(theta);
          rField = Array::Ones(phi.size());
 
       } else if(compId == FieldComponents::Physical::PHI)
@@ -573,20 +572,20 @@ namespace Equations {
       MHDFloat factor = 1.0;
       if(compId == FieldComponents::Physical::R)
       {
-         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor = (std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= -std::sqrt(6.0/Math::PI)*std::sin(theta);
          rField = phi.array().cos() - phi.array().sin();
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
-         factor *= -std::sqrt(3.0/(2.0*Math::PI))*std::cos(theta);
+         factor = (5.0*std::pow(r,8) + 4.0*std::pow(r,6) + 3.0*std::pow(r,4) + 2.0*std::pow(r,2) + 1.0);
+         factor *= -std::sqrt(6.0/Math::PI)*std::cos(theta);
          rField = phi.array().cos() +-phi.array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
-         factor *= std::sqrt(3.0/(2.0*Math::PI));
+         factor = (5.0*std::pow(r,8) + 4.0*std::pow(r,6) + 3.0*std::pow(r,4) + 2.0*std::pow(r,2) + 1.0);
+         factor *= std::sqrt(6.0/Math::PI);
          rField = phi.array().cos() + phi.array().sin();
       }
       rField *= factor;
@@ -598,13 +597,13 @@ namespace Equations {
       MHDFloat factor = 1.0;
       if(compId == FieldComponents::Physical::R)
       {
-         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor = r*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= (3.0/2.0)*std::sqrt(5.0/Math::PI)*(1.0 + 3.0*std::cos(2.0*theta));
          rField = Array::Ones(phi.size());
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor = r*(11.0*std::pow(r,8) + 9.0*std::pow(r,6) + 7.0*std::pow(r,4) + 5.0*std::pow(r,2) + 3.0);
          factor *= -3.0*std::sqrt(5.0/Math::PI)*std::cos(theta)*std::sin(theta);
          rField = Array::Ones(phi.size());
 
@@ -622,19 +621,19 @@ namespace Equations {
       MHDFloat factor = 1.0;
       if(compId == FieldComponents::Physical::R)
       {
-         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor = r*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= -3.0*std::sqrt(30.0/Math::PI)*std::cos(theta)*std::sin(theta);
          rField = phi.array().cos() - phi.array().sin();
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor = r*(11.0*std::pow(r,8) + 9.0*std::pow(r,6) + 7.0*std::pow(r,4) + 5.0*std::pow(r,2) + 3.0);
          factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::cos(2.0*theta);
          rField = phi.array().cos() - phi.array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor = r*(11.0*std::pow(r,8) + 9.0*std::pow(r,6) + 7.0*std::pow(r,4) + 5.0*std::pow(r,2) + 3.0);
          factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta);
          rField = phi.array().cos() + phi.array().sin();
       }
@@ -647,19 +646,19 @@ namespace Equations {
       MHDFloat factor = 1.0;
       if(compId == FieldComponents::Physical::R)
       {
-         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor = r*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= 3.0*std::sqrt(15.0/(2.0*Math::PI))*std::pow(std::sin(theta),2);
          rField = (2.0*phi).array().cos() - (2.0*phi).array().sin();
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor = r*(11.0*std::pow(r,8) + 9.0*std::pow(r,6) + 7.0*std::pow(r,4) + 5.0*std::pow(r,2) + 3.0);
          factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta)*std::sin(theta);
          rField = (2.0*phi).array().cos() - (2.0*phi).array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor = r*(11.0*std::pow(r,8) + 9.0*std::pow(r,6) + 7.0*std::pow(r,4) + 5.0*std::pow(r,2) + 3.0);
          factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::sin(theta);
          rField = (2.0*phi).array().cos() + (2.0*phi).array().sin();
       }
@@ -672,19 +671,19 @@ namespace Equations {
       MHDFloat factor = 1.0;
       if(compId == FieldComponents::Physical::R)
       {
-         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor = std::pow(r,3)*(std::pow(r,8) + std::pow(r,6) + std::pow(r,4) + std::pow(r,2) + 1.0);
          factor *= -15.0*std::sqrt(35.0/Math::PI)*std::cos(theta)*std::pow(std::sin(theta),3);
          rField = (3.0*phi).array().cos() - (3.0*phi).array().sin();
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor = std::pow(r,3)*(13.0*std::pow(r,8) + 11.0*std::pow(r,6) + 9.0*std::pow(r,4) + 7.0*std::pow(r,2) + 5.0);
          factor *= -(3.0/4.0)*std::sqrt(35.0/Math::PI)*(1.0 + 2.0*std::cos(2.0*theta))*std::pow(std::sin(theta),2);
          rField = (3.0*phi).array().cos() - (3.0*phi).array().sin();
 
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor = std::pow(r,3)*(13.0*std::pow(r,8) + 11.0*std::pow(r,6) + 9.0*std::pow(r,4) + 7.0*std::pow(r,2) + 5.0);
          factor *= (9.0/4.0)*std::sqrt(35.0/Math::PI)*std::cos(theta)*std::pow(std::sin(theta),2);
          rField = (3.0*phi).array().cos() + (3.0*phi).array().sin();
       }

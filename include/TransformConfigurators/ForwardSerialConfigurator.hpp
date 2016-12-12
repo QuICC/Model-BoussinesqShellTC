@@ -18,9 +18,9 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/ForwardConfigurator.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
+#include "TransformConfigurators/ForwardConfiguratorMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -43,7 +43,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void firstStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Second step in transform
@@ -51,7 +51,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void secondStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Last step in transform
@@ -59,7 +59,7 @@ namespace Transform {
           * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         template <typename TSharedEquation> static void lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void lastStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief First exchange communication setup
@@ -112,17 +112,15 @@ namespace Transform {
    {
    }
 
-   template <typename TSharedEquation> void ForwardSerialConfigurator::firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSerialConfigurator::firstStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
-      // Iterators for the three transforms
-      IntegratorTree::Integrator1DEdge_iterator it1D;
-      IntegratorTree::Integrator2DEdge_iterator it2D;
-      IntegratorTree::Integrator3DEdge_iterator it3D;
+      // Iterators for the transforms
+      TransformTreeEdge::EdgeType_citerator itSpec;
+      TransformTreeEdge::EdgeType_citerator itPhys;
 
       // Ranges for the vector of edges for the three transforms
-      IntegratorTree::Integrator1DEdge_range range1D;
-      IntegratorTree::Integrator2DEdge_range range2D;
-      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+      TransformTreeEdge::EdgeType_crange rangeSpec;
+      TransformTreeEdge::EdgeType_crange rangePhys = tree.root().edgeRange();
 
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);
@@ -130,45 +128,65 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      // Loop over first transform
-      int hold3D = std::distance(range3D.first, range3D.second) - 1;
-      for(it3D = range3D.first; it3D != range3D.second; ++it3D, --hold3D)
-      {
-         // Compute third transform
-         ForwardConfigurator::integrate3D(*it3D, coord, hold3D);
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         // Iterators for the second transforms
+         TransformTreeEdge::EdgeType_citerator it2D;
 
-         range2D = it3D->edgeRange();
-         int recover2D = 0;
-         int hold2D = std::distance(range2D.first, range2D.second) - 1;
-         for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+         // Ranges for the vector of edges for the second transforms
+         TransformTreeEdge::EdgeType_crange range2D;
+
+         // Loop over first transform
+         for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
          {
-            // Compute second transform
-            ForwardConfigurator::integrate2D(*it2D, coord, recover2D, hold2D);
+            // Compute third transform
+            ForwardConfigurator3D::integrateND(*itPhys, coord);
 
-            range1D = it2D->edgeRange();
-            int recover1D = 0;
-            int hold1D = std::distance(range1D.first, range1D.second) - 1;
-            for(it1D = range1D.first; it1D != range1D.second; ++it1D, ++recover1D, --hold1D)
+            range2D = itPhys->edgeRange();
+            for(it2D = range2D.first; it2D != range2D.second; ++it2D)
             {
-               // Compute third transform
-               ForwardConfigurator::integrate1D(*it1D, coord, recover1D, hold1D);
+               // Compute second transform
+               ForwardConfigurator3D::integrate2D(*it2D, coord);
 
-               // Update equation
-               ForwardConfigurator::updateEquation(*it1D, spEquation, coord, hold1D);
+               rangeSpec = it2D->edgeRange();
+               for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
+               {
+                  // Compute third transform
+                  ForwardConfigurator3D::integrate1D(*itSpec, coord);
+
+                  // Update equation
+                  ForwardConfigurator3D::updateEquation(*itSpec, spEquation, coord);
+               }
             }
          }
-      }
+      #else
+         // Loop over physical transform
+         for(itPhys = rangePhys.first; itPhys != rangePhys.second; ++itPhys)
+         {
+            // Compute physical transform
+            ForwardConfigurator2D::integrateND(*itPhys, coord);
+
+            rangeSpec = itPhys->edgeRange();
+            for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
+            {
+               // Compute third transform
+               ForwardConfigurator2D::integrate1D(*itSpec, coord);
+
+               // Update equation
+               ForwardConfigurator2D::updateEquation(*itSpec, spEquation, coord);
+            }
+         }
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   template <typename TSharedEquation> void ForwardSerialConfigurator::secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSerialConfigurator::secondStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
    
-   template <typename TSharedEquation> void ForwardSerialConfigurator::lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardSerialConfigurator::lastStep(const TransformTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }

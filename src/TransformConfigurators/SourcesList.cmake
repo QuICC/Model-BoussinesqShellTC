@@ -1,17 +1,23 @@
 set(MHDSources
-   BackwardConfigurator.cpp
-   ForwardConfigurator.cpp
-   ProjectorBranch.cpp
-   ProjectorTree.cpp
-   ProjectorTreeTools.cpp
-   IntegratorBranch.cpp
-   IntegratorTree.cpp
-   IntegratorTreeTools.cpp
+   BackwardConfigurator2D.cpp
+   ForwardConfigurator2D.cpp
+   TransformTreeEdge.cpp
+   TransformTree.cpp
+   TransformTreeTools.cpp
+   TransformPathEdge.cpp
+   TransformPath.cpp
 )
+
+if(GEOMHDISCC_SPATIALDIMENSION STREQUAL "3D")
+   list(APPEND MHDSources
+      BackwardConfigurator3D.cpp
+      ForwardConfigurator3D.cpp
+      )
+endif(GEOMHDISCC_SPATIALDIMENSION STREQUAL "3D")
 
 if(GEOMHDISCC_SPATIALSCHEME STREQUAL "TTT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFF" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "FFF")
    list(APPEND MHDSources
-      CartesianTransformSteps.cpp
+      Cartesian3DTransformSteps.cpp
       )
 elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
    list(APPEND MHDSources
@@ -25,8 +31,18 @@ elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL" OR GEOMHDISCC_SPATIALSCHEME STRE
    list(APPEND MHDSources
       ShellTransformSteps.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFM" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "WFL")
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFM" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "WLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "WLFM")
    list(APPEND MHDSources
       SphereTransformSteps.cpp
+      )
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "AF")
+   list(APPEND MHDSources
+      )
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "CF")
+   list(APPEND MHDSources
+      )
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TF" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TT")
+   list(APPEND MHDSources
+      Cartesian2DTransformSteps.cpp
       )
 endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TTT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFF" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "FFF")

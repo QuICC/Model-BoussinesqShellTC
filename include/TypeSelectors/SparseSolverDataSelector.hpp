@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
    namespace Solver {
 
       // Configure code to use TTT scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_TTT
+      #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TT
          template <template <class,class> class TSolver> class SparseSolverDataSelector
          {
             public:

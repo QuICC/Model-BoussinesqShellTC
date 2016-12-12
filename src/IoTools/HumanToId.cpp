@@ -33,7 +33,11 @@ namespace IoTools {
       //
       // Nondimensional numbers
       // 
-      if(id == IdToHuman::toTag(NonDimensional::EKMAN))
+      if(id == IdToHuman::toTag(NonDimensional::EADY))
+      {
+         return NonDimensional::EADY;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::EKMAN))
       {
          return NonDimensional::EKMAN;
 
@@ -192,6 +196,20 @@ namespace IoTools {
       {
          return NonDimensional::OMEGA;
 
+      //
+      // Special flags
+      } else if(id == IdToHuman::toTag(NonDimensional::ELEVATOR))
+      {
+         return NonDimensional::ELEVATOR;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::FAST_MEAN))
+      {
+         return NonDimensional::FAST_MEAN;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::RESCALED))
+      {
+         return NonDimensional::RESCALED;
+
       } else
       {
          throw Exception("Unknown string to ID conversion requested (Nondimensional)");
@@ -208,6 +226,10 @@ namespace IoTools {
       {
          return ModelOperator::IMPLICIT_LINEAR;
 
+      } else if(id == IdToHuman::toString(ModelOperator::BOUNDARY))
+      {
+         return ModelOperator::BOUNDARY;
+
       } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR))
       {
          return ModelOperator::EXPLICIT_LINEAR;
@@ -223,6 +245,10 @@ namespace IoTools {
       } else if(id == IdToHuman::toString(ModelOperator::STENCIL))
       {
          return ModelOperator::STENCIL;
+
+      } else if(id == IdToHuman::toString(ModelOperator::INHOMOGENEOUS))
+      {
+         return ModelOperator::INHOMOGENEOUS;
       } else
       {
          throw Exception("Unknown string to ID conversion requested (ModelOperator)");
@@ -255,10 +281,6 @@ namespace IoTools {
       {
          return PhysicalNames::MAGNETIC;
 
-      } else if(id == IdToHuman::toTag(PhysicalNames::MEANTEMPERATURE))
-      {
-         return PhysicalNames::MEANTEMPERATURE;
-
       } else if(id == IdToHuman::toTag(PhysicalNames::PRESSURE))
       {
          return PhysicalNames::PRESSURE;
@@ -287,9 +309,25 @@ namespace IoTools {
       {
          return PhysicalNames::VELOCITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::ZONAL_VELOCITY))
+      {
+         return PhysicalNames::ZONAL_VELOCITY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::NONZONAL_VELOCITY))
+      {
+         return PhysicalNames::NONZONAL_VELOCITY;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
       {
          return PhysicalNames::VORTICITY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYX))
+      {
+         return PhysicalNames::VORTICITYX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYY))
+      {
+         return PhysicalNames::VORTICITYY;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYZ))
       {
@@ -335,6 +373,66 @@ namespace IoTools {
       {
          return PhysicalNames::TILTED_NO_VORTICITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_TEMPERATURE))
+      {
+         return PhysicalNames::FLUCT_TEMPERATURE;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_MAGNETIC))
+      {
+         return PhysicalNames::FLUCT_MAGNETIC;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_MAGNETICX))
+      {
+         return PhysicalNames::FLUCT_MAGNETICX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_MAGNETICY))
+      {
+         return PhysicalNames::FLUCT_MAGNETICY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_MAGNETICZ))
+      {
+         return PhysicalNames::FLUCT_MAGNETICZ;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_VELOCITY))
+      {
+         return PhysicalNames::FLUCT_VELOCITY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_VELOCITYX))
+      {
+         return PhysicalNames::FLUCT_VELOCITYX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_VELOCITYY))
+      {
+         return PhysicalNames::FLUCT_VELOCITYY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FLUCT_VELOCITYZ))
+      {
+         return PhysicalNames::FLUCT_VELOCITYZ;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_TEMPERATURE))
+      {
+         return PhysicalNames::MEAN_TEMPERATURE;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_MAGNETIC))
+      {
+         return PhysicalNames::MEAN_MAGNETIC;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_MAGNETICX))
+      {
+         return PhysicalNames::MEAN_MAGNETICX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_MAGNETICY))
+      {
+         return PhysicalNames::MEAN_MAGNETICY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_MAGNETICZ))
+      {
+         return PhysicalNames::MEAN_MAGNETICZ;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_VELOCITY))
+      {
+         return PhysicalNames::MEAN_VELOCITY;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_VELOCITYX))
       {
          return PhysicalNames::MEAN_VELOCITYX;
@@ -358,6 +456,10 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(PhysicalNames::NONZONAL_KINETIC_ENERGY))
       {
          return PhysicalNames::NONZONAL_KINETIC_ENERGY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::IMPOSED_MAGNETIC))
+      {
+         return PhysicalNames::IMPOSED_MAGNETIC;
 
       } else
       {

@@ -2,8 +2,8 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
-#import geomhdiscc.model.boussinesq_rbcduct_vc as mod
+#import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
+import geomhdiscc.model.boussinesq_rbcduct_vc2 as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -14,14 +14,15 @@ model.use_galerkin = False
 # Set resolution, parameters, boundary conditions
 #res = [8, 0, 8]
 #res = [6, 0, 6]
-res = [12, 0, 12]
+#res = [12, 0, 12]
 #res = [16, 0, 16]
 #res = [24, 0, 24]
 #res = [32, 0, 32]
 #res = [36, 0, 36]
 #res = [48, 0, 48]
 #res = [64, 0, 64]
-#res = [128, 0, 128]
+res = [128, 0, 128]
+#res = [256, 0, 256]
 
 # SF/SF, FF/FT, k = 0
 #bc_vel = 2
@@ -53,11 +54,13 @@ bc_vel = 2
 bc_temp = 1
 heating = 0
 #k = np.pi
-k = 0
-Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
-#k = (np.sqrt(7.0)/2.0)*np.pi
-#Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
+#Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0/2.0
+#Pr = 7; Ra = 116.83858990055; A3d = 1.0/4.0
+#Pr = 7; Ra = 800; A3d = 1.0
+#Pr = 7; Ra = 116.83858990055; A3d = 4.0
+k = (np.sqrt(7.0)/2.0)*np.pi
 #k = 0
+Pr = 7; Ra = 36*np.pi**4; A1d = 1.0/2.0; A3d = 1.0
 #Pr = 1; Ra = 500*np.pi**4; A1d = 2.0; A3d = 1.0
 #k = 0
 #Pr = 7; Ra = 8*np.pi**4; A1d = 1.0/8.0; A3d = 1.0
@@ -82,6 +85,7 @@ Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 #bc_temp = 1
 #heating = 0
 #k = 5.35
+#k = 3.0
 # SF/SF, FF/FT, Aspect ratio 1:1
 #Pr = 1; Ra = 1992.541617; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
 #Pr = 1; Ra = 2938.551173; A1d = 1.0; A3d = 1.0 # m = 1, n = 1, aspect ration 1:1
@@ -98,7 +102,7 @@ Pr = 1; Ra = 108*np.pi**4; A1d = 1.0; A3d = 1.0
 #Pr = 1; Ra = 1500.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 #Pr = 1; Ra = 2000.0; A1d = 1.0/3.0; A3d = 1.0 # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0*A3d, 'scale3d':2.0*A3d} #
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'heating':heating, 'scale1d':2.0, 'scale3d':2.0*A3d} #
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -121,7 +125,7 @@ marginal_options['point'] = False
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
-marginal_options['solve_nev'] = 10
+marginal_options['solve_nev'] = 5
 marginal_options['point_k'] = k
 marginal_options['plot_point'] = True
 marginal_options['plot_curve'] = False
@@ -129,8 +133,8 @@ marginal_options['plot_spy'] = True
 marginal_options['write_mtx'] = True
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['viz_mode'] = 4
-marginal_options['curve_points'] = np.arange(max(1, k-2), k+3, 0.1)
+marginal_options['viz_mode'] = 2
+marginal_options['curve_points'] = np.arange(max(1, k-2), k+2, 0.2)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

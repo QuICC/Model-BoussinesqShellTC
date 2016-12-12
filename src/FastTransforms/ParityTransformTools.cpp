@@ -23,7 +23,7 @@ namespace Transform {
 
    void ParityTransformTools::extractParityModes(Matrix& rSelected, const Matrix& data, const MatrixI& info, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
       assert(rSelected.cols() >= info.col(1).sum());
 
       int k = 0;
@@ -38,7 +38,7 @@ namespace Transform {
 
    void ParityTransformTools::setParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
       assert(selected.cols() >= info.col(1).sum());
 
       int k = 0;
@@ -53,7 +53,7 @@ namespace Transform {
 
    void ParityTransformTools::addParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
       assert(selected.cols() >= info.col(1).sum());
 
       int k = 0;
@@ -68,7 +68,7 @@ namespace Transform {
 
    void ParityTransformTools::scaleParityModes(Matrix& rData, const MatrixI& info, const MHDFloat scale, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
 
       for(int i = 0; i < info.rows(); ++i)
       {
@@ -80,7 +80,7 @@ namespace Transform {
 
    void ParityTransformTools::extractParityModes(Matrix& rSelected, const MatrixZ& data, const bool isReal, const MatrixI& info, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
       assert(rSelected.cols() >= info.col(1).sum());
 
       int k = 0;
@@ -107,7 +107,7 @@ namespace Transform {
 
    void ParityTransformTools::setParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
       assert(selected.cols() >= info.col(1).sum());
 
       int k = 0;
@@ -134,7 +134,7 @@ namespace Transform {
 
    void ParityTransformTools::addParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
       assert(selected.cols() >= info.col(1).sum());
 
       int k = 0;
@@ -161,7 +161,7 @@ namespace Transform {
 
    void ParityTransformTools::scaleParityModes(MatrixZ& rData, const bool isReal, const MatrixI& info, const MHDFloat scale, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
 
       if(isReal)
       {
@@ -184,7 +184,7 @@ namespace Transform {
 
    void ParityTransformTools::applyOperator(Matrix& rData, const SparseMatrix& op, const MatrixI& info, const MHDFloat scale, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
 
       int dataRows = rData.rows(); 
       for(int i = 0; i < info.rows(); ++i)
@@ -197,7 +197,7 @@ namespace Transform {
 
    void ParityTransformTools::applyOperator(MatrixZ& rData, const bool isReal, const SparseMatrix& op, const MatrixI& info, const MHDFloat scale, const int rows)
    {
-      assert(info.cols() == 2);
+      assert(info.cols() > 1);
 
       int dataRows = rData.rows(); 
       if(isReal)

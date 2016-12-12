@@ -58,11 +58,6 @@ namespace Solver {
          virtual ~SparseCoordinatorBase();
 
          /**
-          * @brief Finished computation of solver step?
-          */
-         bool finishedStep() const;
-
-         /**
           * @brief Initialise solver coordinator
           *
           * @param scalEq  Shared scalar equations
@@ -77,6 +72,8 @@ namespace Solver {
           * @param vectEq Vector equations
           */
          void getExplicitInput(const ModelOperator::Id opId, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const typename SparseCoordinatorBase<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorBase<TSolver>::VectorVariable_map& vectVar);
+
+         bool finishedStep() const;
          
       protected:
          /**
@@ -114,25 +111,20 @@ namespace Solver {
          void transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
-          * @brief Update the step, counting from 0 to Nstep - 1
+          * @brief Flag to signal end of computation
           */
-         void updateStep();
+         bool mFinished;
 
          /**
-          * @brief Number of solver substeps
+          * @brief Computation error
           */
-         int   mNStep;
-
-         /**
-          * @brief Current solver step
-          */
-         int   mStep;
+         MHDFloat mError;
 
       private:
    };
 
    template <template <class,class> class TSolver> SparseCoordinatorBase<TSolver>::SparseCoordinatorBase()
-      : SparseCoordinatorData<TSolver>(), mNStep(1), mStep(0)
+      : SparseCoordinatorData<TSolver>(), mFinished(false), mError(-1.0)
    {
    }
 
@@ -142,15 +134,7 @@ namespace Solver {
 
    template <template <class,class> class TSolver> bool SparseCoordinatorBase<TSolver>::finishedStep() const
    {
-      return (this->mStep == 0);
-   }
-
-   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::updateStep()
-   {
-      if(this->solveTime() == SolveTiming::PROGNOSTIC || this->solveTime() == SolveTiming::AFTER)
-      {
-         this->mStep = (this->mStep + 1) % this->mNStep;
-      }
+      return this->mFinished;
    }
 
    template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::createSolver(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)

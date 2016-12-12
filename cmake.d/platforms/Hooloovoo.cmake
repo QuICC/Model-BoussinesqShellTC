@@ -43,7 +43,7 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "Mumps" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "MUMPS" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
@@ -51,6 +51,18 @@ set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "SuperLU" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
+
+###################################################
+#- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
+###################################################
+
+set(GEOMHDISCC_SPTRILINALGS "SparseLU" "SuperLU" "UmfPack" "MUMPS" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
@@ -90,19 +102,17 @@ set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
-set(GEOMHDISCC_PYTHONS "python33" PARENT_SCOPE)
-
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_PYTHONS "python27" "python33" PARENT_SCOPE)
+set(GEOMHDISCC_PYTHONS "python27" "python34" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
-set(GEOMHDISCC_LIBRARIES_PYTHON33 "/usr/lib64/libpython3.3.so" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON33 "/usr/include/python3.3" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4.so" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON34 "/usr/include/python3.4" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#

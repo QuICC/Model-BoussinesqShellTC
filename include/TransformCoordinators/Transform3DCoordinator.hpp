@@ -67,7 +67,7 @@ namespace GeoMHDiSCC {
           * @param spRes   Resolution information object
           * @param projectorTree Transform projector tree
           */
-         void initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
+         void initTransforms(SharedResolution spRes, const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree);
 
          /**
           * @brief Initialise the data communicator
@@ -87,9 +87,14 @@ namespace GeoMHDiSCC {
          void setOptions(const std::map<NonDimensional::Id, MHDFloat>& options);
 
          /**
-          * @brief Get the transform for the first dimension
+          * @brief Get the transform for the third dimension
           */
          T3D&   transform3D();
+
+         /**
+          * @brief Get the transform for the last dimension
+          */
+         T3D&   transformND();
 
          /**
           * @brief Get grid array(s) of the mesh
@@ -117,6 +122,11 @@ namespace GeoMHDiSCC {
       return this->mTransform3D;
    }
 
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> inline T3D&  Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::transformND()
+   {
+      return this->mTransform3D;
+   }
+
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::Transform3DCoordinator()
       : Transform2DCoordinator<T1D,T2D, TCommunicator>()
    {
@@ -126,7 +136,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(SharedResolution spRes, const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree)
    {
       // initialise 2 other dimensions
       Transform2DCoordinator<T1D,T2D, TCommunicator>::initTransforms(spRes, integratorTree, projectorTree);

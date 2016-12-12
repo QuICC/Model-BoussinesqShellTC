@@ -90,6 +90,8 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_rdiffdivr(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 23:
         cond = tau_insulating(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 24:
+        cond = tau_couette(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
@@ -219,12 +221,12 @@ def tau_rdiffdivr(nr, pos, coeffs = None):
     c = next(it) 
     ns = np.arange(0,nr)
     if pos >= 0:
-        cond.append(c*((2.0/a)*ns**2 - (1.0/(a+b))*tau_c()))
+        cond.append(c*((1.0/a)*ns**2 - (1.0/(a+b)))*tau_c())
         cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
-        cond.append(c*((2.0/a)*ns**2 + (1.0/(-a+b))*tau_c())*alt_ones(nr, 0))
+        cond.append(c*((1.0/a)*ns**2 + (1.0/(-a+b)))*tau_c()*alt_ones(nr, 0))
         cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
@@ -255,10 +257,12 @@ def tau_insulating(nr, pos, coeffs = None):
     ns = np.arange(0,nr)
     if pos >= 0:
         cond.append(c*((2.0/a)*ns**2 + ((l+1.0)/(a+b))*tau_c()))
+        cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
         cond.append(c*((2.0/a)*ns**2 + (l/(-a+b))*tau_c())*alt_ones(nr, 0))
+        cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
         t = cond[0].copy()
@@ -266,6 +270,15 @@ def tau_insulating(nr, pos, coeffs = None):
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
+
+def tau_couette(nr, pos, coeffs = None):
+    """Create the toroidal Couette boundray tau line(s)"""
+
+    assert(coeffs.get('c', None) is not None)
+    assert(coeffs.get('l', None) is not None)
+    assert(pos == 0)
+
+    return tau_value(nr, 0, None)
 
 def tau_value_diff(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
@@ -463,12 +476,13 @@ def stencil_rdiffdivr(nr, pos, coeffs = None):
     def d_2(n):
         #val_num = a**2*((n - 3.0)**2*n**2 - 2.0) - b**2*(n**2 - 3.0*n + 2.0)**2
         #val_den = -a**2*((n - 2.0)*n - 1.0)*(n**2 - 2.0) + b**2*(n - 1.0)**2*n**2
-        val_num = a**2*((n - 3.0)**2*n**2 - 2.0) - b**2*(n**2 - 3.0*n + 2.0)**2
-        val_den = -a**2*((n - 2.0)*n - 1.0)*(n**2 - 2.0) + b**2*(n - 1.0)**2*n**2
+        val_num = (n - 2.0)*(b**2*(n - 2.0)*(n - 1.0) - a**2*(n - 3.0)*n)
+        val_den = n*(a**2*(n - 2.0)*(n + 1.0) - b**2*(n - 1.0)*n)
         val = val_num/val_den
         for i,j in enumerate(n):
             if j == 2:
-                val[i] = a**2/(2.0*a**2 + 4.0*b**2)
+                #val[i] = a**2/(2.0*a**2 + 4.0*b**2)
+                val[i] = 0
             if j > 2:
                 break
 
@@ -476,12 +490,15 @@ def stencil_rdiffdivr(nr, pos, coeffs = None):
 
     # Generate 1st subdiagonal
     def d_1(n):
-        val_num = -8.0*a*b*n
-        val_den = a**2*(n**2 - 2.0)*(n*(n + 2.0) - 1.0) - b**2*n**2*(n + 1.0)**2
+        #val_num = -8.0*a*b*n
+        #val_den = a**2*(n**2 - 2.0)*(n*(n + 2.0) - 1.0) - b**2*n**2*(n + 1.0)**2
+        val_num = -4.0*a*b
+        val_den = (n + 1.0)*(a**2*(n**2 + n - 2.0) - b**2*n*(n + 1.0))
         val = val_num/val_den
         for i,j in enumerate(n):
             if j == 1:
-                val[i] = 2.0*a*b/(a**2 + 2.0*b**2)
+                #val[i] = 2.0*a*b/(a**2 + 2.0*b**2)
+                val[i] = a/(2.0*b)
             if j > 1:
                 break
 
@@ -515,20 +532,33 @@ def stencil_insulating(nr, pos, coeffs = None):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        el_num = 2.0*(b**2*(n-2.0)**2*(n - 1.0)**2 + a*b*(2.0*l + 1.0)*(2.0*n**2 - 6.0*n + 5.0) + a**2*(4.0*l*(l+1) - (n**2 - 3.0*n + 3.0)**2)) 
-        el_den = 2.0*(a**2*((2.0*l + 1.0)**2 - (n**2 + 1.0)*(n**2 - 2.0*n + 2.0)) + a*b*(2.0*l + 1.0)*(2.0*n**2 - 2.0*n + 1.0) + b**2*(n - 1.0)**2*n**2)
-        if n == 2:
-            return -(el_num - a**2*(4.0*l*(l + 1.0) - (n - 1.0)**2) - a*b*(2.0*l + 1.0)*(n - 1.0)**2)/el_den
-        else:
-            return -el_num/el_den
+        val_num = a**2*(2.0*l*(l+1.0)-2.0*(n-3.0)*n*((n-3.0)*n+5.0)-13.0)+a*b*(2.0*l+1.0)*(2.0*(n-3.0)*n+5.0)+2.0*b**2*(n**2-3.0*n+2.0)**2 
+        val_den = a**2*(2.0*l*(l+1.0)-2.0*(n-1.0)*n*((n-1.0)*n+1.0)-1.0)+a*b*(2.0*l+1.0)*(2.0*(n-1.0)*n+1.0)+2.0*b**2*(n-1.0)**2.0*n**2
+        val = -val_num/val_den
+        for i,j in enumerate(n):
+            if j == 2:
+                corr_num = a*(a*(2.0*l**2+2.0*l-1.0)+2.0*b*l+b)
+                corr_den = 2.0*(a**2*(2.0*l**2+2.0*l-13.0)+5.0*a*(2.0*b*l+b)+8.0*b**2)
+                val[i] = -corr_num/corr_den
+            if j > 2:
+                break
+
+        return val
 
     # Generate 1st subdiagonal
     def d_1(n):
-        el_den = (4.0*l**2 + 4.0*l - (n**2 + n + 1.0))*a**2 + a*b*(2.0*l + 1)*(2.0*n**2 + 2.0*n + 1.0) + b**2*n**2*(n + 1.0)**2
-        if n == 1:
-            return -a*((2.0*l + 1.0)*a - b)*(n**2 - 6.0*n + 1.0)/(2.0*el_den)
-        else:
-            return 4.0*a*((2.0*l + 1.0)*a - b)/el_den
+        val_num = 4.0*a*n*((2.0*l+1.0)*a - b)
+        val_den = a**2*(2.0*l*(l+1.0)-2.0*n*(n+1.0)*(n**2+n+1.0)-1.0)+a*b*(2.0*l+1.0)*(2.0*n*(n+1.0)+1.0)+2.0*b**2*n**2*(n+1.0)**2
+        val = val_num/val_den
+        for i,j in enumerate(n):
+            if j == 1:
+                corr_num = 2.0*a*(2.0*a*l+a-b)
+                corr_den = a**2*(2.0*l**2+2.0*l-13.0)+5.0*a*(2.0*b*l+b)+8.0*b**2
+                val[i] = corr_num/corr_den
+            if j > 1:
+                break
+
+        return val
 
     # Generate diagonal
     def d0(n):
@@ -705,4 +735,36 @@ def alt_ones(nr, parity):
         return np.cumprod(-np.ones(nr))
     else:
         return -np.cumprod(-np.ones(nr))
+
+def apply_inhomogeneous(mat, modes, bc, location = 't'):
+    """Add inhomogeneous conditions to the matrix"""
+
+    mat = mat.tolil()
+
+    if location == 't':
+        s = 0
+    elif location == 'b':
+        s = mat.shape[0]-nbc
+
+    if bc[0] == 24:
+        mat = inh_couette(mat, s, modes, bc.get('c',None))
+
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo()
+
+    return mat
+
+def inh_couette(mat, s, modes, coeffs):
+    """Set inhomogeneous constrain for toroidal Couette"""
+
+    assert(coeffs.get('c', None) is not None)
+    assert(coeffs.get('l', None) is not None)
+
+    if coeffs['l'] == 1:
+        for i, m in enumerate(modes):
+            if m == 0:
+                norm = np.sqrt(3.0/(4.0*np.pi))
+                mat[s+1,i] += coeffs['c']/norm
+
+    return mat
 

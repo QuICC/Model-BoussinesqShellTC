@@ -156,9 +156,21 @@ namespace Equations {
          const VariableRequirement& requirements() const;
 
          /**
+          * @brief Get map of imposed field storage requirements information
+          *
+          * \mhdBug Ultimatively this should depend on component
+          */
+         const VariableRequirement& imposedRequirements() const;
+
+         /**
           * @brief Get map of field storage requirements information
           */
          const FieldRequirement& requirements(PhysicalNames::Id id) const;
+
+         /**
+          * @brief Get map of imposed field storage requirements information
+          */
+         const FieldRequirement& imposedRequirements(PhysicalNames::Id id) const;
 
          /**
           * @brief Get the equation parameters
@@ -179,6 +191,16 @@ namespace Equations {
           * @brief Timing of the solver for the equation
           */
          SolveTiming::Id  solveTiming() const;
+
+         /**
+          * @brief Current simulation time to allow for timedependent implementations
+          */
+         MHDFloat  time() const;
+
+         /**
+          * @brief Set current simulation time to allow for timedependent implementations
+          */
+         void  setTime(const MHDFloat time);
 
          /**
           * @brief Get the nonlinear integration components order
@@ -238,6 +260,13 @@ namespace Equations {
          VariableRequirement mRequirements;
 
          /**
+          * @brief Storage for the imposed variable requirements
+          *
+          * \mhdBug Ultimatively this should depend on component
+          */
+         VariableRequirement mImposedRequirements;
+
+         /**
           * @brief Coupling information of the equation
           */
          std::map<FieldComponents::Spectral::Id, CouplingInformation>  mCouplingInfos;
@@ -277,6 +306,11 @@ namespace Equations {
           * @brief Storage for smart equation parameters
           */
          SharedEquationParameters   mspEqParams;
+
+         /**
+          * @brief Name ID of the unknown
+          */
+         MHDFloat mTime;
 
          /**
           * @brief Map of name and pointer for the scalar variables

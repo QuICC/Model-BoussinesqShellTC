@@ -62,11 +62,19 @@ namespace GeoMHDiSCC {
 
    void Simulation::mainRun()
    {
+      // Reset the profiler if needed
+      ProfilerMacro_printInfo();
+      ProfilerMacro_reset();
+      ProfilerMacro_init();
+
       StageTimer::stage("Starting simulation");
 
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == RuntimeStatus::GOON)
       {
+         // Update equation time
+         this->updateEquationTime(this->mTimestepCoordinator.time());
+
          // Compute explicit linear terms
          this->explicitEquations();
 
@@ -152,10 +160,15 @@ namespace GeoMHDiSCC {
    {
       StageTimer stage;
 
+      // Update equation time
+      this->updateEquationTime(this->mDiagnostics.startTime());
+
       // Initialise all values (solve and nonlinear computations except timestep)
       this->preSolveEquations();
 
       stage.start("Building timestepper");
+      // Print timestepper information
+      this->mTimestepCoordinator.printInfo(std::cout);
 
       // Update CFL condition
       this->mDiagnostics.initialCfl();
@@ -164,7 +177,7 @@ namespace GeoMHDiSCC {
       this->mDiagnostics.synchronize();
 
       // Init timestepper using clf/100 as starting timestep
-      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
 
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
@@ -276,6 +289,26 @@ namespace GeoMHDiSCC {
          this->mSimIoCtrl.writeFiles(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
       }
       ProfilerMacro_stop(ProfilerMacro::IO);
+   }
+
+   void Simulation::updateEquationTime(const MHDFloat time)
+   {
+      // Create iterators over scalar equations
+      std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
+      // Create iterators over vector equations
+      std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
+
+      // Loop over all scalar equations
+      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
+      {
+         (*scalEqIt)->setTime(time);
+      }
+
+      // Loop over all vector equations
+      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
+      {
+         (*vectEqIt)->setTime(time);
+      }
    }
 
    void Simulation::postRun()

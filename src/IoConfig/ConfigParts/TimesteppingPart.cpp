@@ -40,6 +40,7 @@ namespace IoConfig {
    {
       this->addFloatTag("time", -1.0);
       this->addFloatTag("timestep", -1.0);
+      this->addFloatTag("error", -1.0);
    }
 
    void TimesteppingPart::checkData()

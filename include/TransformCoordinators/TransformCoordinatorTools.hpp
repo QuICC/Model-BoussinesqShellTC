@@ -16,10 +16,10 @@
 
 // Project includes
 //
-#include "TypeSelectors/TransformSelector.hpp"
-#include "TransformGroupers/IForwardGrouper.hpp"
-#include "TransformGroupers/IBackwardGrouper.hpp"
-#include "TransformConfigurators/ProjectorTree.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
+#include "TransformConfigurators/TransformTree.hpp"
+#include "TransformGroupers/IForwardGrouperMacro.h"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -42,7 +42,7 @@ namespace Transform {
           * @param spRes            Shared resolution
           * @param runOptions       Available run options map
           */
-         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions);
+         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions);
          
       protected:
 

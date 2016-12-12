@@ -2,4 +2,5 @@
 set(MHDSources
    PrueferAlgorithm.cpp
    LegendreRule.cpp
+   WorlandChebyshevRule.cpp
 )

@@ -43,8 +43,8 @@ namespace Transform {
       assert(this->mFwdSize >= this->mBwdSize);
    }
 
-   FftSetup::FftSetup(const int size, const int howmany, const MatrixI& specialBlocks, const int specSize, const FftSetup::Type type)
-      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1), mBoxScale(-1), mSpecialBlocks(specialBlocks)
+   FftSetup::FftSetup(const int size, const int howmany, const MatrixI& idBlocks, const int specSize, const FftSetup::Type type)
+      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1), mBoxScale(-1), mIdBlocks(idBlocks)
    {
       this->setBackwardSize();
 
@@ -108,9 +108,9 @@ namespace Transform {
       return this->mOddBlocks;
    }
 
-   const MatrixI& FftSetup::specialBlocks() const
+   const MatrixI& FftSetup::idBlocks() const
    {
-      return this->mSpecialBlocks;
+      return this->mIdBlocks;
    }
 
    int FftSetup::padSize() const

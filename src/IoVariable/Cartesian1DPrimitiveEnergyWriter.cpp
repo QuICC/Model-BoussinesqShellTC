@@ -25,7 +25,6 @@
 #include "Enums/FieldIds.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "IoVariable/EnergyTags.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -44,8 +43,8 @@ namespace IoVariable {
 
    void Cartesian1DPrimitiveEnergyWriter::init()
    {
-      // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
-      this->mVolume = 2.0;
+      // Normalize by Cartesian volume V = (2*pi*Box1D/k1D)*(2*pi*Box2D/k2D)*2 but FFT already includes 1/(2*pi)
+      this->mVolume = 2.0/(this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM2D)*this->mspRes->sim()->boxScale(Dimensions::Simulation::SIM3D));
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -104,13 +103,13 @@ namespace IoVariable {
          Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
          // Compute projection transform for first dimension 
-         coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
+         coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
          // Compute |f|^2
          rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
          // Compute integration transform for first dimension 
-         coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+         coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
          MHDFloat *pEnergy;
          if(*cIt == FieldComponents::Spectral::X)
@@ -131,7 +130,10 @@ namespace IoVariable {
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
                // Include ignored complex conjugate
-               if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) <= this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
+               if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
+               {
+                  *pEnergy += (this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+               } else if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) <= this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
                {
                   *pEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).col(0).real())(0);
                }
@@ -183,9 +185,7 @@ namespace IoVariable {
       // Abort if kinetic energy is NaN
       if(std::isnan(this->mXEnergy) || std::isnan(this->mYEnergy) || std::isnan(this->mZEnergy))
       {
-         #ifdef GEOMHDISCC_MPI
-            MPI_Abort(MPI_COMM_WORLD, 99);
-         #endif //GEOMHDISCC_MPI
+         FrameworkMacro::abort(99);
 
          throw Exception("Kinetic energy is NaN!");
       }

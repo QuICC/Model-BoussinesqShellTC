@@ -69,7 +69,7 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -412,6 +412,6 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
         idx_v = utils.qidx(res[0], res[0])
 
         # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0]-1)
+        idx_p = utils.qidx(res[0], res[0])
 
         return (idx_u, idx_v, idx_p)

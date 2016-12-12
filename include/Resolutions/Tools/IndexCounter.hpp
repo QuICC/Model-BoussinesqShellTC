@@ -80,6 +80,11 @@ namespace GeoMHDiSCC {
           * @brief Generate index key
           */
          virtual std::tr1::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const;
+
+         /**
+          * @brief Generate index key
+          */
+         virtual std::pair<int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j) const;
          
       protected:
 

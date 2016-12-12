@@ -91,23 +91,23 @@ def r4(nr, a, b, bc, coeff = 1.0, zr = 0):
 
     # Generate 4th subdiagonal
     def d_4(n):
-        return numpy.full(n.shape, a**4/16.0)
+        return np.full(n.shape, a**4/16.0)
 
     # Generate 3rd subdiagonal
     def d_3(n):
-        return numpy.full(n.shape, a**3*b/2.0)
+        return np.full(n.shape, a**3*b/2.0)
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return numpy.full(n.shape, a**2*(a**2 + 6.0*b**2)/4.0)
+        return np.full(n.shape, a**2*(a**2 + 6.0*b**2)/4.0)
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return numpy.full(n.shape, a*b*(3.0*a**2 + 4.0*b**2)/2.0)
+        return np.full(n.shape, a*b*(3.0*a**2 + 4.0*b**2)/2.0)
 
     # Generate diagonal
     def d0(n):
-        return numpy.full(n.shape, (3.0*a**4 + 24.0*a**2*b**2 + 8.0*b**4)/8.0)
+        return np.full(n.shape, (3.0*a**4 + 24.0*a**2*b**2 + 8.0*b**4)/8.0)
 
     # Generate 1st superdiagonal
     def d1(n):
@@ -824,6 +824,39 @@ def i4r4lapl(nr, l, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
+def i4r2lapl2_l1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^2 Laplacian^2 T_n(x) for l = 1."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3)
+    nzrow = 3
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*(n - 5.0)/(4.0*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*b*(n - 2.0)/n
+
+    # Generate main diagonal
+    def d0(n):
+        return (a**2*n**2 + 3.0*a**2 + 2.0*b**2*n**2 - 2.0*b**2)/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a*b*(n + 2.0)/n
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return a**2*(n + 5.0)/(4.0*(n + 1.0))
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, bc)
+
 def i4r4lapl2(nr, l, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of r^4 Laplacian^2 T_n(x)."""
 
@@ -991,6 +1024,71 @@ def i2r2d1(nr, a, b, bc, coeff = 1.0):
         return -a**3*(n + 3.0)/(8.0*n*(n + 1.0))
 
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, bc)
+
+def i4r2(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^2 T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-6,7)
+    nzrow = 3
+
+    # Generate 6th subdiagonal
+    def d_6(n):
+        return a**6/(64.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return a**5*b/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return -a**4*(a**2*n - 5.0*a**2 - 2.0*b**2*n - 2.0*b**2)/(32.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return -3.0*a**5*b/(16.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**4*(a**2*n + 17.0*a**2 + 16.0*b**2*n + 32.0*b**2)/(64.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a**5*b*(n - 8.0)/(8.0*n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return a**4*(a**2*n**2 - 19.0*a**2 + 6.0*b**2*n**2 - 54.0*b**2)/(16.0*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a**5*b*(n + 8.0)/(8.0*n*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**4*(a**2*n - 17.0*a**2 + 16.0*b**2*n - 32.0*b**2)/(64.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -3*a**5*b/(16.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return -a**4*(a**2*n + 5.0*a**2 - 2.0*b**2*n + 2.0*b**2)/(32.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 5th superdiagonal
+    def d5(n):
+        return a**5*b/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 6th superdiagonal
+    def d6(n):
+        return a**6/(64.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
@@ -1260,4 +1358,10 @@ def avg(nr, a, b):
     mat = integral(nr,a,b)/2.0
 
     return mat
+
+def inhomogeneous_bc(nr, l, modes, bc):
+    """Create a inhomogeneous boundary operator"""
+
+    mat = spsp.lil_matrix((nr, len(modes)))
+    return radbc.apply_inhomogeneous(mat, modes, bc)
 

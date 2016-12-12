@@ -6,9 +6,12 @@
 
 // System includes
 //
+#include "Framework/FrameworkMacro.h"
 
 // External includes
 //
+#include <set>
+#include <vector>
 
 // Class include
 //
@@ -16,7 +19,7 @@
 
 // Project includes
 //
-#include "TypeSelectors/FftSelector.hpp"
+#include "Resolutions/Tools/RegularIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -25,6 +28,25 @@ namespace Schemes {
    std::string TTScheme::type()
    {
       return "TT";
+   }
+
+   void TTScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
+   {
+      TTScheme::tuneMpiResolution(descr);
+      
+      // Create spectral space sub communicators
+      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         // Initialise the ranks with local rank
+         std::set<int>  ranks;
+         for(int cpu = 0; cpu < spRes->nCpu(); ++cpu)
+         {
+            ranks.insert(cpu);
+         }
+
+         FrameworkMacro::initSubComm(FrameworkMacro::SPECTRAL, 1);
+
+         FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, 0, ranks);
+      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
    }
 
    void TTScheme::addTransformSetups(SharedResolution spRes) const
@@ -47,11 +69,7 @@ namespace Schemes {
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
-      int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
-      {
-         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-      }
+      int howmany = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>();
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::REAL));
    }
@@ -65,11 +83,7 @@ namespace Schemes {
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
-      int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>(); i++)
-      {
-         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
-      }
+      int howmany = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>();
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::REAL));
    }

@@ -41,10 +41,12 @@ namespace Equations {
        * @brief Enums for the avaialable exact states
        */
       enum Id {
+         NOTUSED = -1,  // Initialisation state (do NOT use)
          // Special states
          CONSTANT = 0,  // All constant
          POLYCOSPOLY = 10, // Polynomial, Cosine, Polynomial
          POLYSINPOLY,      // Polynomial, Sine, Polynomial
+         SPEC_UNIT, // Spectral space solution: unit spectrum of max 5 modes
       };
 
       /**
@@ -61,6 +63,11 @@ namespace Equations {
        * @brief Compute polynomial mode
        */
       static MHDFloat poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
+
+      /**
+       * @brief Compute Chebyshev mode
+       */
+      static MHDFloat chebyshev(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
    };
 
 }

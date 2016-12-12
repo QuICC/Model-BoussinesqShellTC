@@ -64,6 +64,40 @@ def coriolis_r(maxnl, m, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return mat
 
+def coriolism(maxnl, m, coeff = 1.0):
+    """Create operator for the spherical harmonic coriolis Q (l-1) term."""
+
+    ls = np.arange(m, maxnl)
+    offsets = np.array([-1])
+    nzrow = -1
+
+    # Generate 1st subdiagonal
+    def d_1(l):
+        return (l - 1.0)*(l + 1.0)*np.sqrt(((l - m)*(l + m))/((2.0*l - 1.0)*(2.0*l + 1.0)))
+
+    ds = [d_1]
+    diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return mat
+
+def coriolisp(maxnl, m, coeff = 1.0):
+    """Create operator for the spherical harmonic coriolis Q (l+1) term."""
+
+    ls = np.arange(m, maxnl)
+    offsets = np.array([1])
+    nzrow = -1
+
+    # Generate 1st superdiagonal
+    def d1(l):
+        return  -l*(l + 2.0)*np.sqrt(((l - m + 1.0)*(l + m + 1.0))/((2.0*l + 1.0)*(2.0*l + 3.0)))
+
+    ds = [d1]
+    diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return mat
+
 def qid(maxnl, m, coeff = 1.0):
     """Create a quasi identity block"""
 

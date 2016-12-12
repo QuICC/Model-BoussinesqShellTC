@@ -72,7 +72,12 @@ namespace Equations {
          /**
           * @brief Set the state type id
           */
-         void setStateType(const FieldComponents::Physical::Id compId, const CylinderExactStateIds::Id id);
+         void setPhysicalType(const FieldComponents::Physical::Id compId, const CylinderExactStateIds::Id id);
+
+         /**
+          * @brief Set the state type id
+          */
+         void setSpectralType(const FieldComponents::Spectral::Id compId, const CylinderExactStateIds::Id id);
 
          /**
           * @brief Set the options for the solution states
@@ -107,6 +112,11 @@ namespace Equations {
           * @brief Type of the state to generate
           */
          std::map<FieldComponents::Physical::Id,CylinderExactStateIds::Id> mTypeId;
+
+         /**
+          * @brief Type of the spectral state to generate
+          */
+         std::map<FieldComponents::Spectral::Id,CylinderExactStateIds::Id> mSpecTypeId;
 
          /**
           * @brief Amplitude of the state

@@ -84,12 +84,6 @@ namespace IoVariable {
           * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for even basis
           */
          SparseMatrix mSphIntgOpEven;
-
-         /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for odd basis
-          */
-         SparseMatrix mSphIntgOpOdd;
-
    };
 
    inline bool SphereScalarEnergyWriter::isHeavy() const

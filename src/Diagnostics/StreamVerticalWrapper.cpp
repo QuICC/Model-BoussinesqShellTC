@@ -36,26 +36,50 @@ namespace Diagnostics {
 
    const Datatypes::PhysicalScalarType& StreamVerticalWrapper::one() const
    {
-      // Safety assert
-      assert(this->mspStream);
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         // Safety assert
+         assert(this->mspVertical);
 
-      return this->mspStream->dom(0).grad().comp(FieldComponents::Physical::TWO);
+         return this->mspVertical->dom(0).phys();
+      #else
+         throw Exception("Wrapper is not defined for this scheme");
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
    }
 
    const Datatypes::PhysicalScalarType& StreamVerticalWrapper::two() const
    {
-      // Safety assert
-      assert(this->mspStream);
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         // Safety assert
+         assert(this->mspStream);
 
-      return this->mspStream->dom(0).grad().comp(FieldComponents::Physical::ONE);
+         return this->mspStream->dom(0).grad().comp(FieldComponents::Physical::Y);
+      #else
+         throw Exception("Wrapper is not defined for this scheme");
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
    }
 
    const Datatypes::PhysicalScalarType& StreamVerticalWrapper::three() const
    {
-      // Safety assert
-      assert(this->mspVertical);
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         // Safety assert
+         assert(this->mspStream);
 
-      return this->mspVertical->dom(0).phys();
+         return this->mspStream->dom(0).grad().comp(FieldComponents::Physical::X);
+      #else
+         throw Exception("Wrapper is not defined for this scheme");
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+   }
+
+   const SharedResolution StreamVerticalWrapper::spRes() const
+   {
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         // Safety assert
+         assert(this->mspStream);
+
+         return this->mspStream->dom(0).spRes();
+      #else
+         throw Exception("Wrapper is not defined for this scheme");
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
    }
 
 }

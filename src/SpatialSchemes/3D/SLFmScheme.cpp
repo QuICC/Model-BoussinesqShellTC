@@ -38,15 +38,11 @@ namespace Schemes {
       
       // Create spectral space sub communicators
       #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-         // Create minimial MPI communicator
-         MPI_Group world;
-         MPI_Group group;
-         MPI_Comm_group(MPI_COMM_WORLD, &world);
-         MPI_Group_incl(world, FrameworkMacro::groupCpuIds(0).size(), FrameworkMacro::groupCpuIds(0).data(), &group);
-         MPI_Comm comm;
-         MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 
-         // Initialise the ranks with local rank
+         // MPI error code
+         int ierr;
+
+         // Extract modes available on local rank
          std::vector<std::set<int> >  ranks;
          ArrayI modes(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
          std::map<int, int>  mapModes;
@@ -63,53 +59,56 @@ namespace Schemes {
             }
          }
 
-         // Loop over all cpus
-         int commId;
-         int globalCpu = FrameworkMacro::id();
-         MPI_Comm_rank(comm, &commId); 
+         // Share modes information with CPUs in first transform group
+         int traId = 0;
          ArrayI tmp;
-         for(int commCpu = 0; commCpu < FrameworkMacro::groupCpuIds(0).size(); ++commCpu)
+         for(int commCpu = 0; commCpu < FrameworkMacro::transformCpus(0).size(); ++commCpu)
          {
-            int size;
-            if(commCpu == commId)
+            ArrayI iData(2);
+            iData.setConstant(-1);
+            if(commCpu == FrameworkMacro::transformId(traId))
             {
-               // Send the size
-               size = modes.size();
-               MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
-
-               // Send global CPU rank 
-               globalCpu = FrameworkMacro::id();
-               MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
+               // Send the size and global rank
+               iData(0) = modes.size();
+               iData(1) = FrameworkMacro::id();
+               FrameworkMacro::syncTransform(traId);
+               ierr = MPI_Bcast(iData.data(), iData.size(), MPI_INT, commCpu, FrameworkMacro::transformComm(traId));
+               FrameworkMacro::check(ierr, 815);
 
                // Send modes
-               MPI_Bcast(modes.data(), modes.size(), MPI_INT, commCpu, comm);
+               FrameworkMacro::syncTransform(traId);
+               ierr = MPI_Bcast(modes.data(), modes.size(), MPI_INT, commCpu, FrameworkMacro::transformComm(traId));
+               FrameworkMacro::check(ierr, 817);
             } else
             {
-               // Get size
-               MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
-
-               // Get global CPU rank 
-               MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
+               // Get size and global rank
+               FrameworkMacro::syncTransform(traId);
+               ierr = MPI_Bcast(iData.data(), iData.size(), MPI_INT, commCpu, FrameworkMacro::transformComm(traId));
+               FrameworkMacro::check(ierr, 818);
 
                // Receive modes
-               tmp.resize(size);
-               MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, commCpu, comm);
+               tmp.resize(iData(0));
+               FrameworkMacro::syncTransform(traId);
+               ierr = MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, commCpu, FrameworkMacro::transformComm(traId));
+               FrameworkMacro::check(ierr, 820);
 
+               // Expand modes to rank map
                std::map<int,int>::iterator mapIt;
-               for(int i = 0; i < size; i++)
+               for(int i = 0; i < iData(0); i++)
                {
                   mapIt = mapModes.find(tmp(i));
                   if(mapIt != mapModes.end())
                   {
-                     ranks.at(mapIt->second).insert(globalCpu);
+                     ranks.at(mapIt->second).insert(iData(1));
                   }
                }
             }
-
-            // Synchronize
-            FrameworkMacro::synchronize();
          }
 
+         // Synchronize
+         FrameworkMacro::synchronize();
+
+         // Initialize storage for SPECTRAL sub communicators
          FrameworkMacro::initSubComm(FrameworkMacro::SPECTRAL, spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
 
          std::set<int>  subRanks;
@@ -123,7 +122,9 @@ namespace Schemes {
                if(cpu == FrameworkMacro::id())
                {
                   size = ranks.at(i).size();
-                  MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
+                  ierr = MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::check(ierr, 821);
 
                   if(size > 0)
                   {
@@ -135,18 +136,24 @@ namespace Schemes {
                         ++j;
                         subRanks.insert(*sIt);
                      }
-                     MPI_Bcast(tmp.data(), size, MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
+                     ierr = MPI_Bcast(tmp.data(), size, MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::check(ierr, 822);
                   }
                } else
                {
                   // Get size
-                  MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::synchronize();
+                  ierr = MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  FrameworkMacro::check(ierr, 823);
 
                   // Receive ranks
                   if(size > 0)
                   {
                      tmp.resize(size);
-                     MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::synchronize();
+                     ierr = MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     FrameworkMacro::check(ierr, 824);
 
                      for(int j = 0; j < size; ++j)
                      {
@@ -154,9 +161,6 @@ namespace Schemes {
                      }
                   }
                }
-
-               // Synchronize
-               FrameworkMacro::synchronize();
             }
 
             FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, i_, subRanks);
@@ -166,9 +170,9 @@ namespace Schemes {
                i_++;
             }
          }
-         
-         // Free communicator
-         MPI_Comm_free(&comm);
+
+         // Synchronize
+         FrameworkMacro::synchronize();
       #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
    }
 

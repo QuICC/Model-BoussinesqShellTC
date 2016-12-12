@@ -72,7 +72,12 @@ namespace Equations {
          /**
           * @brief Set the state type id
           */
-         void setStateType(const CylinderExactStateIds::Id id);
+         void setPhysicalType(const CylinderExactStateIds::Id id);
+
+         /**
+          * @brief Set the state type id
+          */
+         void setSpectralType(const CylinderExactStateIds::Id id);
 
          /**
           * @brief Set the options for the solution states
@@ -102,6 +107,11 @@ namespace Equations {
           * @brief Type of the state to generate
           */
          CylinderExactStateIds::Id mTypeId;
+
+         /**
+          * @brief Type of the state to generate
+          */
+         CylinderExactStateIds::Id mSpecTypeId;
 
          /**
           * @brief Amplitude of the state

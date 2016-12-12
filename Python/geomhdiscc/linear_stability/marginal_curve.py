@@ -8,11 +8,15 @@ import numpy as np
 import scipy.optimize as optimize
 import functools
 
+import h5py
+import tables
+
 import geomhdiscc.linear_stability.solver_slepc as solver_mod
 import geomhdiscc.linear_stability.viewer as viewer
 import geomhdiscc.linear_stability.io as io
 from geomhdiscc.linear_stability.solver_slepc import Print
 from mpi4py import MPI
+from petsc4py import PETSc
 
 
 class MarginalCurve:
@@ -23,7 +27,7 @@ class MarginalCurve:
 
         # Open file for IO and write header
         if MPI.COMM_WORLD.Get_rank() == 0:
-            self.out = open('marginal_curve.dat', 'a', 0)
+            self.out = open('marginal_curve.dat', 'a', 1)
         else:
             self.out = None
         io.write_header(self.out, gevp_opts['model'].__class__.__name__, len(gevp_opts['res']), len(gevp_opts['eigs']), gevp_opts['eq_params'])
@@ -56,12 +60,12 @@ class MarginalCurve:
 
         return (data_k, data_Ra, data_freq)
 
-    def minimum(self, ks, Ras, xtol = 1e-4, only_int = False):
+    def minimum(self, ks, Ras, xtol = 1e-8, only_int = False):
         """Compute the critical value (minimum of curve)"""
 
         # Open file for IO and write header
         if MPI.COMM_WORLD.Get_rank() == 0:
-            min_out = open('marginal_minimum.dat', 'a', 0)
+            min_out = open('marginal_minimum.dat', 'a', 1)
         else:
             min_out = None
         io.write_header(min_out, self.point._gevp.model.__class__.__name__, len(self.point._gevp.res), len(self.point._gevp.eigs), self.point._gevp.eq_params)
@@ -297,7 +301,7 @@ class MarginalPoint:
 class GEVP:
     """Class to represent a marginal point on a marginal curve"""
     
-    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False):
+    def __init__(self, model, res, eq_params, eigs, bcs, wave = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None, impose_symmetry = False, use_spherical_evp = False):
         """Initialize the marginal point variables"""
 
         self.model = copy.copy(model)
@@ -312,7 +316,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv, geometry = geometry, impose_symmetry = impose_symmetry, use_spherical_evp = use_spherical_evp)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -323,11 +327,12 @@ class GEVP:
 
         self.eq_params['rayleigh'] = Ra
 
-        opA = functools.partial(self.model.implicit_linear, self.res, self.eq_params, self.eigs, self.bcs, self.fields)
+        opA = functools.partial(self.model.implicit_linear, self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
         opB = functools.partial(self.model.time, self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
-        sizes = self.model.stability_sizes(self.res, self.eigs)
+        opC = functools.partial(self.model.boundary, self.res, self.eq_params, self.eigs, self.bcs, self.fields)
+        sizes = self.model.stability_sizes(self.res, self.eigs, self.bcs)
 
-        return (opA, opB, sizes)
+        return (opA, opB, opC, sizes)
    
     def setEigs(self, k):
        """Set the wave number"""
@@ -343,7 +348,7 @@ class GEVP:
             problem = self.setupProblem(Ra)
 
             if use_vector is not None and self.evp_vec is not None:
-                initial_vector = self.evp_vec[:,use_vector]
+                initial_vector = self.evp_vec[use_vector]
             else:
                 initial_vector = None
 
@@ -359,58 +364,222 @@ class GEVP:
 
         # Create operators
         if spy or write_mtx:
-            opA, opB, sizes = self.setupProblem(Ra)
+            opA, opB, opC, sizes = self.setupProblem(Ra)
             restrict = self.solver.restrict_operators(sizes)
             A = opA(restriction = restrict)
             B = opB(restriction = restrict)
+            C = opC(restriction = restrict)
 
-            viewer.viewOperators(A, B, show = spy, save = write_mtx)
+            viewer.viewOperators(A, B, C, show = spy, save = write_mtx)
+
+    def saveHdf5_h5py(self, spectra, geometry, postfix = ''):
+        """Save spectra to HDF5 file"""
+
+        h5_file = h5py.File('eigensolution' + postfix + '.hdf5', 'w')
+
+        eig = int(self.eigs[0])
+
+        # Create header
+        h5_file.attrs['header'] = np.string_('StateFile'.encode('ascii')) 
+        if geometry == 'shell':
+            h5_file.attrs['type'] = np.string_('SLFm'.encode('ascii'))
+        elif geometry == 'sphere_chebyshev': 
+            h5_file.attrs['type'] = np.string_('BLFm'.encode('ascii'))
+        elif geometry == 'sphere_worland': 
+            h5_file.attrs['type'] = np.string_('WLFm'.encode('ascii'))
+        h5_file.attrs['version'] = np.string_('1.0'.encode('ascii'))
+
+        # Create physical group
+        group = h5_file.create_group('physical')
+        for k,p in self.eq_params.items():
+            group.create_dataset(k, (), 'f8', data = p)
+        # ... add boundary conditions
+        for k,b in self.bcs.items():
+            if k != 'bcType':
+                group.create_dataset('bc_' + k, (), 'f8', data = b)
+
+        # Create run group
+        group = h5_file.create_group('run')
+        group.create_dataset('time', (), 'f8', data = -1)
+        group.create_dataset('timestep', (), 'f8', data = -1)
+
+        # Create truncation group
+        base_res = [self.res[0]-1, self.res[1]-1, eig]
+        group = h5_file.create_group('truncation')
+        for sg in ['physical', 'spectral', 'transform']:
+            subgroup = group.create_group(sg)
+            file_res = base_res
+            for i, d in enumerate(['dim1D', 'dim2D', 'dim3D']):
+                subgroup.create_dataset(d, (), 'i4', data = file_res[i])
+
+        # Compute dataset shape
+        ls = 0
+        for m in range(eig+1):
+            ls = ls + self.res[1] - m
+        data_shape = (ls, self.res[0])
+
+        # Create data groups
+        for k,f in spectra.items():
+            name = k[0]
+            group = h5_file.require_group(name)
+            if k[1] != '':
+                name = name + '_' + k[1]
+            dset = group.create_dataset(name, data_shape, f.dtype)
+            dset[-self.res[1]+eig:,:] = np.reshape(f, (self.res[1]-eig, self.res[0]), order='C') 
+
+        h5_file.close()
+
+    def saveHdf5_tables(self, spectra, geometry, postfix = ''):
+        """Save spectra to HDF5 file"""
+
+        eig = int(self.eigs[0])
+
+        h5_file = tables.open_file('eigensolution' + postfix + '.hdf5', mode = 'w')
+
+        # Create header
+        h5_file.set_node_attr('/', 'header', 'StateFile'.encode('ascii')) 
+        if geometry == 'shell':
+            h5_file.set_node_attr('/', 'type', 'SLFm'.encode('ascii')) 
+        elif geometry == 'sphere_chebyshev': 
+            h5_file.set_node_attr('/', 'type', 'BLFm'.encode('ascii')) 
+        elif geometry == 'sphere_worland': 
+            h5_file.set_node_attr('/', 'type', 'WLFm'.encode('ascii')) 
+        h5_file.set_node_attr('/', 'version', '1.0'.encode('ascii')) 
+
+        # Create physical group
+        group = h5_file.create_group('/', 'physical')
+        for k,p in self.eq_params.items():
+            h5_file.create_array(group, k, p)
+        # ... add boundary conditions
+        for k,b in self.bcs.items():
+            if k != 'bcType':
+                h5_file.create_array(group, 'bc_' + k, b)
+
+        # Create run group
+        group = h5_file.create_group('/', 'run')
+        h5_file.create_array(group, 'time', -1)
+        h5_file.create_array(group, 'timestep', -1)
+
+        # Create truncation group
+        group = h5_file.create_group('/', 'truncation')
+        for sg in ['physical', 'spectral', 'transform']:
+            subgroup = h5_file.create_group(group, sg)
+            file_res = [self.res[0]-1, self.res[1]-1, eig]
+            for i,d in enumerate(['dim1D', 'dim2D', 'dim3D']):
+                h5_file.create_array(subgroup, d, file_res[i])
+
+        # Compute dataset shape
+        ls = 0
+        for m in range(eig+1):
+            ls = ls + self.res[1] - m
+        data_shape = (ls, self.res[0])
+
+        # Create data groups
+        for g in set([k[0] for k,f in spectra.items()]):
+            group = h5_file.create_group('/', g)
+
+        # Create datasets
+        for k,f in spectra.items():
+            name = k[0]
+            if k[1] != '':
+                name = name + '_' + k[1]
+            zz = np.zeros(data_shape, dtype=f.dtype)
+            dset = h5_file.create_array(h5_file.get_node('/'+k[0]), name, zz)
+            if eig == 0:
+                f.imag = 0
+            dset[-self.res[1]+eig:,:] = np.reshape(f, (self.res[1]-eig, self.res[0]), order='C') 
+
+        h5_file.close()
 
     def viewSpectra(self, viz_mode, plot = True, save_pdf = False):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
+            # Gather full field across ranks
+            rank = MPI.COMM_WORLD.Get_rank()
+            scatter, v = PETSc.Scatter.toZero(self.evp_vec[viz_mode])
+            scatter.scatter(self.evp_vec[viz_mode], v, False, PETSc.Scatter.Mode.FORWARD)
+            full_vec = v.getArray()
 
-            # Extra different fields
-            start = 0
-            stop = 0
-            sol_spec = dict()
-            for i,f in enumerate(self.fields):
-                stop = stop + self.model.stability_sizes(self.res, self.eigs)[0][i]
-                sol_spec[f] = self.evp_vec[start:stop, viz_mode]
-                start = stop
-            
-            if plot or save_pdf:
-                Print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
+            # Output is only done on rank 0
+            if rank == 0:
+                # Extra different fields
+                start = 0
+                stop = 0
+                sol_spec = dict()
+                for i,f in enumerate(self.fields):
+                    stop = stop + self.model.stability_sizes(self.res, self.eigs, self.bcs)[0][i]
+                    sol_spec[f] = full_vec[start:stop]
+                    start = stop
+                
+                if plot or save_pdf:
+                    Print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
 
-                fid = ""
-                if 'prandtl' in self.eq_params:
-                    fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
-                if 'taylor' in self.eq_params:
-                    fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
-                viewer.viewSpectra(sol_spec, show = plot, save = save_pdf, fid = fid)
+                    fid = ""
+                    if 'prandtl' in self.eq_params:
+                        fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                    if 'taylor' in self.eq_params:
+                        fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                    viewer.viewSpectra(sol_spec, show = plot, save = save_pdf, fid = fid)
 
-            return sol_spec
+                return sol_spec
+
+            else:
+                return None
 
         else:
             return None
 
-    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = False, save_profile = True):
+    def viewPhysical(self, viz_mode, geometry, plot = True, save_pdf = False, save_profile = True, save_hdf5 = True):
         """Plot eigenvectors in physical space"""
 
         if self.evp_lmb is not None:
-            # Extra different fields
-            sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
-            if self.model.use_galerkin:
-                sol_spec = self.apply_stencil(sol_spec)
+            if viz_mode >= 0:
+                # Extra different fields
+                sol_spec = self.viewSpectra(viz_mode, plot = False, save_pdf = False)
 
-            Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
-            fid = ""
-            if 'prandtl' in self.eq_params:
-                fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
-            if 'taylor' in self.eq_params:
-                fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
-            viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
+                rank = MPI.COMM_WORLD.Get_rank()
+                if rank == 0:
+                    if self.model.use_galerkin:
+                        sol_spec = self.apply_stencil(sol_spec)
+
+                    # Save spectra to HDF5
+                    if save_hdf5:
+                        self.saveHdf5_tables(sol_spec, geometry)
+
+                    Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
+                    fid = ""
+                    if 'prandtl' in self.eq_params:
+                        fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                    if 'taylor' in self.eq_params:
+                        fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                    if 'ekman' in self.eq_params:
+                        fid = fid + "E{:g}".format(self.eq_params['ekman'])
+                    viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
+            else:
+                for i in range(0, len(self.evp_vec)):
+                    # Extra different fields
+                    sol_spec = self.viewSpectra(i, plot = False, save_pdf = False)
+
+                    rank = MPI.COMM_WORLD.Get_rank()
+                    if rank == 0:
+                        if self.model.use_galerkin:
+                            sol_spec = self.apply_stencil(sol_spec)
+
+                        # Save spectra to HDF5
+                        if save_hdf5:
+                            self.saveHdf5_tables(sol_spec, geometry, postfix = '_mode_' + str(i))
+
+                        Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[i]))
+                        fid = ""
+                        if 'prandtl' in self.eq_params:
+                            fid = fid + "Pr{:g}".format(self.eq_params['prandtl'])
+                        if 'taylor' in self.eq_params:
+                            fid = fid + "Ta{:g}".format(self.eq_params['taylor'])
+                        if 'ekman' in self.eq_params:
+                            fid = fid + "E{:g}".format(self.eq_params['ekman'])
+                        fid += "_" + str(i)
+                        viewer.viewPhysical(sol_spec, geometry, self.res, self.eigs, self.eq_params, show = plot, save = save_pdf, fid = fid)
 
     def apply_stencil(self, sol_vec):
         """Apply Galerkin stencil to recover physical fields"""
@@ -432,6 +601,10 @@ def default_options():
     opts = dict()
 
     opts['fixed_shift'] = False     # Compute random shift only once
+    opts['target'] = None           # Compute eigenvalues around target
+    opts['euler'] = None            # Compute implicit Euler steps before starting calculation
+    opts['conv_idx'] = 1            # Number of index at end of spectrum to be converged
+    opts['spectrum_conv'] = 1       # Ratio between min and max of spectrum
     opts['ellipse_radius'] = None   # Restrict eigenvalue search to be within radius
     opts['mode'] = 0                # Mode to track
     opts['root_tol'] = 1e-8         # Tolerance used in root finding algorighm
@@ -448,6 +621,9 @@ def default_options():
     opts['solve'] = False           # Solve fixed point
     opts['solve_nev'] = 1           # Solve fixed point
 
+    opts['impose_symmetry'] = False # Solve fixed point
+    opts['use_spherical_evp'] = False # Solve fixed point
+
     opts['plot_spy'] = False        # Plot matrix spy
     opts['plot_point'] = False      # Plot solution for marginal curve point
     opts['plot_curve'] = False      # Plot marginal curve 
@@ -461,6 +637,7 @@ def default_options():
     opts['save_physical'] = False   # Save physical space plots to pdf
     opts['data_spectra'] = False    # Save spectral data to file(s)
     opts['data_physical'] = False   # Save physical data to file(s)
+    opts['save_hdf5'] = False   # Save physical data to file(s)
 
     return opts
 
@@ -479,6 +656,13 @@ def compute(gevp_opts, marginal_opts):
     # Move options to GEVP
     gevp_opts['ellipse_radius'] = marginal_opts['ellipse_radius']
     gevp_opts['fixed_shift'] = marginal_opts['fixed_shift']
+    gevp_opts['target'] = marginal_opts['target']
+    gevp_opts['euler'] = marginal_opts['euler']
+    gevp_opts['conv_idx'] = marginal_opts['conv_idx']
+    gevp_opts['spectrum_conv'] = marginal_opts['spectrum_conv']
+    gevp_opts['geometry'] = marginal_opts['geometry']
+    gevp_opts['impose_symmetry'] = marginal_opts['impose_symmetry']
+    gevp_opts['use_spherical_evp'] = marginal_opts['use_spherical_evp']
 
     if marginal_opts['point'] or marginal_opts['curve']:
         # Create marginal curve object
@@ -507,7 +691,7 @@ def compute(gevp_opts, marginal_opts):
                 min_point = (kc, Rac)
             curve.view(data_k, data_Ra, data_freq, minimum = min_point, plot = marginal_opts['plot_curve'], save_pdf = marginal_opts['save_curve'])
 
-    if marginal_opts['plot_spy'] or marginal_opts['write_mtx'] or marginal_opts['solve']:
+    if marginal_opts['plot_spy'] or marginal_opts['write_mtx'] or marginal_opts['solve'] or marginal_opts['minimum']:
         if marginal_opts['plot_point']:
             Ra = Rac
             kp = kc
@@ -530,5 +714,5 @@ def compute(gevp_opts, marginal_opts):
     if marginal_opts['show_spectra'] or marginal_opts['save_spectra'] or marginal_opts['data_spectra']:
         gevp.viewSpectra(marginal_opts['viz_mode'], plot = marginal_opts['show_spectra'], save_pdf = marginal_opts['save_spectra'])
 
-    if marginal_opts['show_physical'] or marginal_opts['save_physical'] or marginal_opts['data_physical']:
-        gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'])
+    if marginal_opts['show_physical'] or marginal_opts['save_physical'] or marginal_opts['data_physical'] or marginal_opts['save_hdf5']:
+        gevp.viewPhysical(marginal_opts['viz_mode'], marginal_opts['geometry'], plot = marginal_opts['show_physical'], save_pdf = marginal_opts['save_physical'], save_hdf5 = marginal_opts['save_hdf5'])

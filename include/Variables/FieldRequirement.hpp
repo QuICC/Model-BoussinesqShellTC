@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief General constructor with default requirements
           */
-         FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl = false);
+         FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl = false, const bool needGradient2 = false);
 
          /**
           * @brief Destructor
@@ -62,6 +62,11 @@ namespace GeoMHDiSCC {
          bool needPhysicalCurl() const;
 
          /**
+          * @brief Get physical 2nd order gradient requirement
+          */
+         bool needPhysicalGradient2() const;
+
+         /**
           * @brief Get the physical field components requirements
           */
          const ArrayB& physicalComps() const;
@@ -75,6 +80,11 @@ namespace GeoMHDiSCC {
           * @brief Get the physical curl components requirements
           */
          const ArrayB& curlComps() const;
+
+         /**
+          * @brief Get the physical 2nd order gradient components requirements
+          */
+         const MatrixB& gradient2Comps(const FieldComponents::Spectral::Id id) const;
 
          /**
           * @brief Get vector of spectral field components
@@ -102,6 +112,11 @@ namespace GeoMHDiSCC {
          std::map<FieldComponents::Physical::Id,bool> mapCurlComps() const;
 
          /**
+          * @brief Get map for 2nd order gradient components to field requirements
+          */
+         std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> mapGradient2Comps(const FieldComponents::Spectral::Id id) const;
+
+         /**
           * @brief Update the physical component requirements
           */
          void updatePhysical(const ArrayB& comps);
@@ -115,6 +130,11 @@ namespace GeoMHDiSCC {
           * @brief Update the curl component requirements
           */
          void updateCurl(const ArrayB& comps);
+
+         /**
+          * @brief Update the 2nd order gradient component requirements
+          */
+         void updateGradient2(const std::map<FieldComponents::Spectral::Id,MatrixB>& comps);
 
          /**
           * @brief Merge information from other requirements
@@ -157,6 +177,11 @@ namespace GeoMHDiSCC {
          bool  mNeedCurl;
 
          /**
+          * @brief Storage for physical 2nd order gradient storage requirements
+          */
+         bool  mNeedGradient2;
+
+         /**
           * @brief List of spectral field components
           */
          std::vector<FieldComponents::Spectral::Id>  mSpectralIds;
@@ -180,6 +205,11 @@ namespace GeoMHDiSCC {
           * @brief Detailed requirements for curl field components
           */
          ArrayB mCurlComps;
+
+         /**
+          * @brief Detailed requirements for 2nd order gradient field components
+          */
+         std::map<FieldComponents::Spectral::Id,MatrixB> mGradient2Comps;
    };
 
 }

@@ -46,7 +46,7 @@ namespace Parallel {
          /**
           * @brief Set up the converter
           */
-         virtual void setup(const Dimensions::Transform::Id transId) = 0;
+         virtual void setup() = 0;
 
          /**
           * @brief Convert data from TFwdA to TBwdB
@@ -86,11 +86,6 @@ namespace Parallel {
          virtual void prepareForwardReceive() = 0;
 
          /**
-          * @brief Start communication for forward transform
-          */
-         virtual void initiateForwardCommunication() = 0;
-
-         /**
           * @brief Start persistent send for backward transform
           */
          virtual void initiateBackwardSend() = 0;
@@ -99,11 +94,6 @@ namespace Parallel {
           * @brief Post persistent receive for backward transform
           */
          virtual void prepareBackwardReceive() = 0;
-
-         /**
-          * @brief Start communication for backward transform
-          */
-         virtual void initiateBackwardCommunication() = 0;
 
          /**
           * @brief Index converter 

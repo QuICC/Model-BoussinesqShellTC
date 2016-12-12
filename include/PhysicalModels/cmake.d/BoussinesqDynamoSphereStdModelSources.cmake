@@ -2,7 +2,8 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqDynamoSphereTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqDynamoSphereMomentum.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqDynamoSphereInduction.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigenSHlTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHlTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHlmTools.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/SphereScalarEnergyWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/SphereTorPolEnergyWriter.cpp

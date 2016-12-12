@@ -50,16 +50,21 @@ namespace Equations {
           * @brief Compute the random state as a source term
           *
           * @param compId  ID of the spectral component
-          * @param iX      Index for the X direction
-          * @param iZ      Index for the Z direction
-          * @param iY      Index for the Y direction
+          * @param i      Fast direction
+          * @param j      Middle direction
+          * @param k      Slow direction
           */
-         virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const;
+         virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
          /**
           * @brief Set the unknown name and requirements
           */
          void setIdentity(const PhysicalNames::Id name);
+
+         /**
+          * @brief Set spectrum variables
+          */
+         void setSpectrum(const FieldComponents::Spectral::Id compId, const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D);
 
          /**
           * @brief Set spectrum variables

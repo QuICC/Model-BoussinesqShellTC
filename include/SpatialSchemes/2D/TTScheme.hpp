@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "TypeSelectors/FftSelector.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/2D/IRegular2DScheme.hpp"
@@ -38,6 +39,11 @@ namespace Schemes {
           * @brief Get type string for the scheme
           */
          static std::string type();
+
+         /**
+          * @brief Tune the shared resolution used by simulation
+          */
+         static void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
 
          /**
           * @brief Constructor

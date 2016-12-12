@@ -101,6 +101,42 @@ endif(mpiTest)
 
 
 ###################################################
+#--------------- MPI DATA PACKING ----------------#
+###################################################
+
+if(GEOMHDISCC_MPI)
+   set(GEOMHDISCC_MPIPACKS "MPI" "Manual")
+   if(GEOMHDISCC_MPIPACK STREQUAL "")
+      set(GEOMHDISCC_MPIPACK "MPI")
+   endif(GEOMHDISCC_MPIPACK STREQUAL "")
+   mark_as_advanced(FORCE GEOMHDISCC_MPIPACK)
+   geomhdiscc_provide_choice(GEOMHDISCC_MPIPACKS "MPI data packing" GEOMHDISCC_MPIPACK mpipackTest)
+
+   if(mpipackTest)
+      geomhdiscc_add_definition(GEOMHDISCC_MPIPACK)
+   endif(mpipackTest)
+endif(GEOMHDISCC_MPI)
+
+
+###################################################
+#--------------- MPI COMMUNICATION ---------------#
+###################################################
+
+if(GEOMHDISCC_MPI)
+   set(GEOMHDISCC_MPICOMMS "SendRecv" "AllToAll")
+   if(GEOMHDISCC_MPICOMM STREQUAL "")
+      set(GEOMHDISCC_MPICOMM "AllToAll")
+   endif(GEOMHDISCC_MPICOMM STREQUAL "")
+   mark_as_advanced(FORCE GEOMHDISCC_MPICOMM)
+   geomhdiscc_provide_choice(GEOMHDISCC_MPICOMMS "MPI communication" GEOMHDISCC_MPICOMM mpicommTest)
+
+   if(mpicommTest)
+      geomhdiscc_add_definition(GEOMHDISCC_MPICOMM)
+   endif(mpicommTest)
+endif(GEOMHDISCC_MPI)
+
+
+###################################################
 #------------- BOUNDARY CONDITIONS ---------------#
 ###################################################
 
@@ -123,9 +159,9 @@ endif(boundaryTest)
 
 #
 # Choose the type of time integration the code is using.
-# Possible options are: ImExRK3, ImExSBDF2
+# Possible options are: ImExRKCB2, ImExRKCB3a, ImExRKCB3b, ImExRKCB3c, ImExRKCB3d, ImExRKCB3e, ImExRKCB3f, ImExRKCB4, ImExRK3, ImExSBDF2
 #
-set(GEOMHDISCC_TIMESTEPPERS "ImExRK3" "ImExSBDF2")
+set(GEOMHDISCC_TIMESTEPPERS "ImExRKCB2" "ImExRKCB3a" "ImExRKCB3b" "ImExRKCB3c" "ImExRKCB3d" "ImExRKCB3e" "ImExRKCB3f" "ImExRKCB4" "ImExRK3" "ImExSBDF2")
 
 geomhdiscc_provide_choice(GEOMHDISCC_TIMESTEPPERS "Time integrator" GEOMHDISCC_TIMESTEPPER timeTest)
 

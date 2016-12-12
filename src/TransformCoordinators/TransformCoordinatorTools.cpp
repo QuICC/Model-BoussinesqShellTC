@@ -31,7 +31,7 @@ namespace Transform {
    {
    }
 
-   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions)
+   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions)
    {
       StageTimer stage;
       stage.start("initializing transforms");
@@ -74,14 +74,21 @@ namespace Transform {
       stage.done();
       stage.start("initializing converters");
 
-      // Get the buffer pack sizes
+      // Get the buffer pack sizes for first dimension
       ArrayI packs1DFwd = spFwdGrouper->packs1D(integratorTree);
-      ArrayI packs2DFwd = spFwdGrouper->packs2D(integratorTree);
       ArrayI packs1DBwd = spBwdGrouper->packs1D(projectorTree);
-      ArrayI packs2DBwd = spBwdGrouper->packs2D(projectorTree);
 
-      // Initialise the converters
-      rCoord.communicator().initConverter(spRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, spFwdGrouper->split);
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         // Get the buffer pack sizes for second dimension
+         ArrayI packs2DFwd = spFwdGrouper->packs2D(integratorTree);
+         ArrayI packs2DBwd = spBwdGrouper->packs2D(projectorTree);
+
+         // Initialise the converters
+         rCoord.communicator().initConverter(spRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, spFwdGrouper->split);
+      #else
+         // Initialise the converters
+         rCoord.communicator().initConverter(spRes, packs1DFwd, packs1DBwd, spFwdGrouper->split);
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       stage.done();
    }

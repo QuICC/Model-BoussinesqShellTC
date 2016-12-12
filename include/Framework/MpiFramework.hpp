@@ -46,9 +46,24 @@ namespace GeoMHDiSCC {
          static void synchronize();
 
          /**
+          * @brief Abort simulation
+          */
+         static void abort(const int code);
+
+         /**
+          * @brief Check error code for success
+          */
+         static void check(const int ierr, const int code);
+
+         /**
           * @brief Finalise the MPI system
           */
          static void finalize();
+
+         /**
+          * @brief Init transform MPI storage
+          */
+         static void initTransformComm(const int size);
 
          /**
           * @brief Add CPU group IDs
@@ -69,11 +84,6 @@ namespace GeoMHDiSCC {
           * @brief Get transform CPU group IDs
           */
          static const ArrayI& transformCpus(const int traId);
-
-         /**
-          * @brief Get transform MPI group
-          */
-         static MPI_Group transformGroup(const int traId);
 
          /**
           * @brief Get transform MPI comm
@@ -104,6 +114,16 @@ namespace GeoMHDiSCC {
           * @brief Set the MPI sub group and sub communicator
           */
          static void setSubComm(const SubCommId id, const int idx, const std::set<int>& ranks);
+
+         /**
+          * @brief Check transform MPI communiator
+          */
+         static void checkTransformComm(const int traId, const int code);
+
+         /**
+          * @brief Sleep MPI process for given number of seconds
+          */
+         static void sleep(const MHDFloat seconds);
          
       protected:
 
@@ -127,11 +147,6 @@ namespace GeoMHDiSCC {
           * @brief IDs of the CPUs in transform communication groups
           */
          static std::vector<ArrayI> mTransformCpus;
-
-         /**
-          * @brief MPI groups of the CPUs in transform communication groups
-          */
-         static std::vector<MPI_Group> mTransformGroups;
 
          /**
           * @brief MPI communicators of the CPUs in transform communication groups

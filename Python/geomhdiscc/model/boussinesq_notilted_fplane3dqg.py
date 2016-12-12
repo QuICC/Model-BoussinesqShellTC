@@ -71,7 +71,7 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -136,8 +136,6 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
                             bc = {0:11, 'c':-1j*eta2*kx}
                         elif field_row == ("no_velocityz","") and field_col == field_row:
                             bc = {0:11, 'c':eta3}
-                        elif field_row == ("temperature","") and field_col == field_row:
-                            bc = {0:991}
                     else:
                         bc = no_bc()
             
@@ -187,7 +185,7 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
             mat = geo.i1(res[0], bc)
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.sid(res[0], 1, bc)
+            mat = geo.sid(res[0], 0, bc)
 
         elif field_row == ("dz_meantemperature","") and field_col == field_row:
             if kx == 0 and ky == 0:
@@ -261,18 +259,18 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
         elif field_row == ("temperature",""):
             if field_col == ("no_streamfunction",""):
                 if self.linearize:
-                    mat = geo.sid(res[0], 1, bc, -1j*eta2*kx)
+                    mat = geo.sid(res[0], 0, bc, -1j*eta2*kx)
                 else:
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("no_velocityz",""):
                 if self.linearize:
-                    mat = geo.sid(res[0], 1, bc, eta3)
+                    mat = geo.sid(res[0], 0, bc, eta3)
                 else:
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.sid(res[0], 1, bc, -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2))
+                mat = geo.sid(res[0], 0, bc, -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -295,7 +293,19 @@ class BoussinesqNoTiltedFPlane3DQG(base_model.BaseModel):
             mat = geo.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
-            mat = geo.sid(res[0], 1, bc)
+            mat = geo.sid(res[0], 0, bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

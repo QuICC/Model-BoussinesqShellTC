@@ -23,7 +23,15 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ro", "rratio", "heating"]
+        return ["prandtl", "rayleigh", "rratio", "heating"]
+
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        # Unit gap width
+        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
+
+        return d
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -69,7 +77,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -104,7 +112,8 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -195,7 +204,8 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         Ra = eq_params['rayleigh']
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -216,7 +226,8 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -240,7 +251,8 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -280,7 +292,8 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)

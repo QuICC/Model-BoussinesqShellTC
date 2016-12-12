@@ -30,9 +30,14 @@ namespace Debug {
    {
       public:
          /**
-          * @brief initialise the timers
+          * @brief Initialise the timers
           */
          static void init();
+
+         /**
+          * @brief Reset the timers
+          */
+         static void reset();
 
          /**
           * @brief Start clock
@@ -47,6 +52,13 @@ namespace Debug {
           * @param point Location that has been profiled
           */
          static void stop(ProfilerBase::BreakPoint point);
+
+         /**
+          * @brief Get the measured times among whole framework
+          *
+          * @param ts   Timings for the breakpoints
+          */
+         static void getTimings(Array& ts);
 
          /**
           * @brief Analyze the measured times among whole framework

@@ -310,3 +310,13 @@ def surfaceAvg(nx, nz):
 
     mat = c1d.avg(nz)*spsp.kron(c1d.qid(nz,0,c1d.c1dbc.no_bc()), c1d.avg(nx))
     return mat
+
+def stencil(nx, nz, bc, make_square, restriction = None):
+    """Create a galerkin stencil matrix"""
+
+    bcx, bcz = convert_bc(bc)
+    mat_x = c1d.stencil(nx, bcx, make_square)
+    mat_z = c1d.stencil(nz, bcz, make_square)
+    mat = spsp.kron(mat_z, mat_x)
+
+    return c2dbc.constrain(mat, nx, nz, 0, 0, bc, restriction = restriction)

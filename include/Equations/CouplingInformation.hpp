@@ -23,6 +23,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/ModelOperator.hpp"
+#include "Equations/Tools/IEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -117,6 +118,11 @@ namespace Equations {
          IndexType indexType() const;
 
          /**
+          * @brief Get eigen tools
+          */
+         const IEigenTools& eigenTools() const;
+
+         /**
           * @brief Number of blocks in row of the system
           */
          int nBlocks() const;
@@ -143,9 +149,10 @@ namespace Equations {
          /**
           * @brief Index shift for the Galerkin block
           *
+          * @param idx System index
           * @param dim dimension
           */
-         int galerkinShift(const int dim) const;
+         int galerkinShift(const int idx, const int dim) const;
 
          /**
           * @brief Size of system
@@ -234,7 +241,7 @@ namespace Equations {
           * @param rhsCols          Number of columns in RHS for each system
           * @param systemNs         Number of columns in RHS for each system
           */
-         void setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs);
+         void setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const MatrixI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs);
 
          /**
           * @brief Set the index type
@@ -337,6 +344,11 @@ namespace Equations {
          int mFieldStart;
 
          /**
+          * @brief Shared IEigenTools
+          */
+         SharedIEigenTools mspEigenTools;
+
+         /**
           * @brief Storage for the Tau block sizes
           */
          ArrayI mTauNs;
@@ -349,7 +361,7 @@ namespace Equations {
          /**
           * @brief Storage for the Galerkin index shifts
           */
-         ArrayI mGalerkinShifts;
+         MatrixI mGalerkinShifts;
 
          /**
           * @brief Storage for the number of RHS in solver

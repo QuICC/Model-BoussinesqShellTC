@@ -33,6 +33,12 @@ namespace Equations {
    class RandomScalarState: public IScalarEquation
    {
       public:
+         enum SpecialId {
+            ONLYMEAN, ///< Only mean
+            NOMEAN, ///< No mean 
+            NOTHING, ///< Nothing special
+         };
+
          /**
           * @brief Simple constructor
           *
@@ -49,11 +55,11 @@ namespace Equations {
           * @brief Compute the random state as a source term
           *
           * @param compId  ID of the spectral component
-          * @param iX      Index for the X direction
-          * @param iZ      Index for the Z direction
-          * @param iY      Index for the Y direction
+          * @param i      Fast direction
+          * @param j      Middle direction
+          * @param k      Slow direction
           */
-         virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const;
+         virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
          /**
           * @brief Set the unknown name and requirements
@@ -63,7 +69,12 @@ namespace Equations {
          /**
           * @brief Set spectrum variables
           */
-         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D);
+         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const SpecialId id = NOTHING);
+
+         /**
+          * @brief Set spectrum variables
+          */
+         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D, const SpecialId id = NOTHING);
 
       protected:
          /**
@@ -116,6 +127,11 @@ namespace Equations {
           * @brief Starting seed used for random generator
           */
          int mStartSeed;
+
+         /**
+          * @brief ID flag for special setup
+          */
+         SpecialId mSpecial;
    };
 
    /// Typedef for a shared RandomScalarState

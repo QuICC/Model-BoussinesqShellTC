@@ -87,6 +87,22 @@ namespace GeoMHDiSCC {
          void  holdBwd(TBackward &tmp);
 
          /**
+          * @brief Hold storage with specific ID so that it can be recovered later
+          *
+          * @param tmp Storage to hold (put in used map)
+          * @param id  ID used as key in map
+          */
+         void  holdFwd(TForward &tmp, const int id);
+
+         /**
+          * @brief Hold storage with specific ID so that it can be recovered later
+          *
+          * @param tmp Storage to free (put in used map)
+          * @param id  ID used as key in map
+          */
+         void  holdBwd(TBackward &tmp, const int id);
+
+         /**
           * @brief Recover the unfreed temporary forward transform storage used previously
           */
          TForward&  recoverFwd();
@@ -95,6 +111,16 @@ namespace GeoMHDiSCC {
           * @brief Recover the unfreed temporary backward transform storage used previously
           */
          TBackward&  recoverBwd();
+
+         /**
+          * @brief Recover the unfreed temporary forward transform storage with specific ID used previously
+          */
+         TForward&  recoverFwd(const int id);
+
+         /**
+          * @brief Recover the unfreed temporary backward transform storage with specifig ID used previously
+          */
+         TBackward&  recoverBwd(const int id);
 
          /**
           * @brief Free tempory storage after use and put back into queue
@@ -180,6 +206,16 @@ namespace GeoMHDiSCC {
          std::queue<TBackward *> mUsedBQueue;
 
          /**
+          * @brief In-use temporary storage map for TForward data
+          */
+         std::map<int,TForward *> mUsedFMap;
+
+         /**
+          * @brief In-use temporary storage map for TBackward data
+          */
+         std::map<int,TBackward *> mUsedBMap;
+
+         /**
           * @brief Vector of TForward storage
           */
          std::list<TForward>  mFTmp;
@@ -228,6 +264,16 @@ namespace GeoMHDiSCC {
    template <typename TForward, typename TBackward> inline void DynamicPairProvider<TForward, TBackward>::holdBwd(TBackward &tmp)
    {
       this->mUsedBQueue.push(&tmp);
+   }
+
+   template <typename TForward, typename TBackward> inline void DynamicPairProvider<TForward, TBackward>::holdFwd(TForward &tmp, const int id)
+   {
+      this->mUsedFMap.insert(std::make_pair(id, &tmp));
+   }
+
+   template <typename TForward, typename TBackward> inline void DynamicPairProvider<TForward, TBackward>::holdBwd(TBackward &tmp, const int id)
+   {
+      this->mUsedBMap.insert(std::make_pair(id, &tmp));
    }
 
    template <typename TForward, typename TBackward> TForward&  DynamicPairProvider<TForward, TBackward>::provideFwd()
@@ -298,6 +344,34 @@ namespace GeoMHDiSCC {
       return *this->mpBTmp;
    }
 
+   template <typename TForward, typename TBackward> TForward&  DynamicPairProvider<TForward, TBackward>::recoverFwd(const int id)
+   {
+      // Add in an assert for non empty map
+      assert(this->mUsedFMap.count(id) > 0);
+
+      // Get pointer from used map
+      this->mpFTmp = this->mUsedFMap.find(id)->second;
+
+      // Remove pointer from used map
+      this->mUsedFMap.erase(id);
+
+      return *this->mpFTmp;
+   }
+
+   template <typename TForward, typename TBackward> TBackward&  DynamicPairProvider<TForward, TBackward>::recoverBwd(const int id)
+   {
+      // Add in an assert for non empty map
+      assert(this->mUsedBMap.count(id) > 0);
+
+      // Get pointer from used map
+      this->mpBTmp = this->mUsedBMap.find(id)->second;
+
+      // Remove pointer from used map
+      this->mUsedBMap.erase(id);
+
+      return *this->mpBTmp;
+   }
+
    template <typename TForward, typename TBackward> DynamicPairProvider<TForward, TBackward>::DynamicPairProvider()
    {
    }
@@ -333,8 +407,11 @@ namespace GeoMHDiSCC {
 
    template <typename TForward, typename TBackward> void DynamicPairProvider<TForward, TBackward>::addFStorage()
    {
-      // Safety assert to avoid growin to big
-      assert(this->mFTmp.size() < 20);
+      // Avoid growing to big (error in transform most likely)
+      if(this->mFTmp.size() > 20)
+      {
+         throw Exception("Forward transform storage providers became too large!");
+      }
 
       // Create forward storage scalar
       this->mFTmp.push_back(TForward(this->mspFSetup));
@@ -345,8 +422,11 @@ namespace GeoMHDiSCC {
 
    template <typename TForward, typename TBackward> void DynamicPairProvider<TForward, TBackward>::addBStorage()
    {
-      // Safety assert to avoid growin to big
-      assert(this->mBTmp.size() < 20);
+      // Avoid growing to big (error in transform most likely)
+      if(this->mBTmp.size() > 20)
+      {
+         throw Exception("Backward transform storage providers became too large!");
+      }
 
       // Create backward storage scalar
       TBackward   tmp(this->mspBSetup);
@@ -370,6 +450,9 @@ namespace GeoMHDiSCC {
          while(!this->mUsedFQueue.empty()) this->mUsedFQueue.pop();
       }
 
+      // Make sure forward used map is empty
+      this->mUsedFMap.clear();
+
       // Make sure backward queue is empty
       if(!this->mBQueue.empty())
       {
@@ -381,6 +464,9 @@ namespace GeoMHDiSCC {
       {
          while(!this->mUsedBQueue.empty()) this->mUsedBQueue.pop();
       }
+
+      // Make sure backward used map is empty
+      this->mUsedBMap.clear();
    }
 
    #ifdef GEOMHDISCC_STORAGEPROFILE

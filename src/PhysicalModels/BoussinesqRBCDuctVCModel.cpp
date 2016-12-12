@@ -57,7 +57,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCDuctVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
@@ -96,7 +96,7 @@ namespace GeoMHDiSCC {
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spScalar->setSpectrum(-1e-9, 1e-9, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -143,7 +143,7 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITY);
-      spIn->expect(PhysicalNames::PRESSURE);
+      spIn->expect(PhysicalNames::PRESSURE, false);
 
       // Set simulation state
       spVis->setInitialState(spIn);

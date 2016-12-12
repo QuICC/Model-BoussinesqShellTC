@@ -19,7 +19,7 @@ kc = None
 #bc_vel = 1
 #heating = 0
 #bc_temp = 0
-#phi = 0
+#phi = 35
 
 #phi = 45
 #kp = 3.710
@@ -27,14 +27,27 @@ kc = None
 #kp = 60
 
 # NS, FT,
-bc_vel = 0
+bc_vel = 2
 heating = 0
 bc_temp = 0
 phi = 0
 
-res = [64, 0, 0]
-Ta = 1e8;
-kp = 20
+res = [256, 0, 0]
+Ta = 1e14;
+#Ta = 1e28;
+#Rac = 4.0154201784816e+19
+#kc = 60402.637080637
+#kc = 12975.
+#Rac = 8.5994892352444e+16
+#kc = 589.73789705466
+#Rac = 383164282379.47
+#kc = 270.17721182352
+#Rac = 17358622245.099
+#kc = 54;
+#Rac = 34502885.358469
+#Rac = 1.9e6
+
+
 
 #eq_params = {'prandtl':1, 'rayleigh':2.1544e6, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #kp = 54
@@ -74,11 +87,11 @@ kp = 20
 
 # Create parameters (rescaling to proper nondimensionalisation)
 if kc is None:
-    kp = Ta**(1./6.) # Asymptotic prediction for minimum
+    kp = 1.3014*Ta**(1./6.) # Asymptotic prediction for minimum
 else:
     kp = kc
 if Rac is None:
-    Ra = Ta**(2./3.) # Asymptotic prediction for critical Rayleigh number
+    Ra = 8.6510*Ta**(2./3.) # Asymptotic prediction for critical Rayleigh number
 else:
     Ra = Rac
 
@@ -100,16 +113,26 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
-marginal_options['ellipse_radius'] = 1e5
+marginal_options['evp_tol'] = 1e-16
+#marginal_options['euler'] = (int(2e0), 1e-2)
+#marginal_options['conv_idx'] = int(0.1*res[0])
+#marginal_options['spectrum_conv'] = 1e4
+#marginal_options['ellipse_radius'] = 1e5
 marginal_options['curve'] = True
 marginal_options['minimum'] = True
 marginal_options['solve'] = True
+#marginal_options['solve_nev'] = 5
+marginal_options['root_tol'] = 1e-12
+marginal_options['evp_tol'] = 1e-12
 marginal_options['point_k'] = kp
 marginal_options['plot_point'] = True
-marginal_options['plot_spy'] = True
+marginal_options['plot_spy'] = False
 marginal_options['show_spectra'] = True
 marginal_options['show_physical'] = True
-marginal_options['curve_points'] = np.arange(max(0, kp-5), kp+6, 1)
+marginal_options['save_hdf5'] = False
+marginal_options['save_spectra'] = False
+marginal_options['save_physical'] = False
+marginal_options['curve_points'] = np.arange(max(0, kp-15), kp-5, 1)
 
 # Compute 
 MarginalCurve.compute(gevp_opts, marginal_options)

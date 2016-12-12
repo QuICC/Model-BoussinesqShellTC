@@ -54,34 +54,83 @@ namespace GeoMHDiSCC {
       MpiFramework::checkFramework(size);
    }
 
+   void MpiFramework::abort(const int code)
+   {
+      MPI_Abort(MPI_COMM_WORLD, code);
+   }
+
+   void MpiFramework::check(const int ierr, const int code)
+   {
+      if(ierr != MPI_SUCCESS)
+      {
+         MPI_Abort(MPI_COMM_WORLD, code);
+      }
+   }
+
    void MpiFramework::synchronize()
    {
       // Create MPI barrier to force synchronisation
       MPI_Barrier(MPI_COMM_WORLD);
    }
 
+   void MpiFramework::initTransformComm(const int size)
+   {
+      MpiFramework::mTransformCpus.reserve(size);
+      MpiFramework::mTransformComms.reserve(size);
+      MpiFramework::mTransformIds.reserve(size);
+   }
+
    void MpiFramework::addTransformComm(const ArrayI& ids)
    {
+      // Store ranks of CPUs in group
       MpiFramework::mTransformCpus.push_back(ids);
 
-      MPI_Group world;
-      MPI_Group group;
-      MPI_Comm_group(MPI_COMM_WORLD, &world);
-      #if defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
-         MPI_Group_incl(world, ids.size(), const_cast<int*>(ids.data()), &group);
-      #else
-         MPI_Group_incl(world, ids.size(), ids.data(), &group);
-      #endif //defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
-      MPI_Comm comm;
-      MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      // MPI error code
+      int ierr;
 
-      MpiFramework::mTransformGroups.push_back(group);
+      // Split world communicator into sub groups
+      MpiFramework::mTransformComms.push_back(MPI_Comm());
+      int groupId = ids(0);
+      ierr = MPI_Comm_split(MPI_COMM_WORLD, groupId, MpiFramework::id(), &MpiFramework::mTransformComms.back());
+      MpiFramework::check(ierr, 913);
 
-      MpiFramework::mTransformComms.push_back(comm);
+      // Make sure all communicators are real
+      if(MpiFramework::mTransformComms.back() == MPI_COMM_NULL)
+      {
+         MpiFramework::abort(914);
+      }
 
+      // Get rank in sub group
       int rank;
-      MPI_Comm_rank(comm, &rank);
+      ierr = MPI_Comm_rank(MpiFramework::mTransformComms.back(), &rank);
+      MpiFramework::check(ierr, 915);
       MpiFramework::mTransformIds.push_back(rank);
+
+      // Check newly created communicator
+      MpiFramework::checkTransformComm(MpiFramework::mTransformComms.size()-1, 111);
+   }
+
+   void MpiFramework::checkTransformComm(const int traId, const int code)
+   {
+      for(int i = 0; i < MpiFramework::transformCpus(traId).size(); ++i)
+      {
+         int rank = -1;
+         if(MpiFramework::transformCpus(traId)(i) == MpiFramework::id())
+         {
+            rank = MpiFramework::id();
+
+            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::transformComm(traId));
+
+         } else
+         {
+            MPI_Bcast(&rank, 1, MPI_INT, i, MpiFramework::transformComm(traId));
+         }
+
+         if(rank != MpiFramework::transformCpus(traId)(i))
+         {
+            MpiFramework::abort(code);
+         }
+      }
    }
 
    void MpiFramework::syncTransform(const int traId)
@@ -97,11 +146,6 @@ namespace GeoMHDiSCC {
    const ArrayI& MpiFramework::transformCpus(const int traId)
    {
       return MpiFramework::mTransformCpus.at(traId);
-   }
-
-   MPI_Group MpiFramework::transformGroup(const int traId)
-   {
-      return MpiFramework::mTransformGroups.at(traId);
    }
 
    MPI_Comm MpiFramework::transformComm(const int traId)
@@ -140,6 +184,33 @@ namespace GeoMHDiSCC {
       // Finalize HDF5 MPI data
       IoHdf5::finalizeHdf5();
 
+      // Free communicators
+      for(unsigned int i = 0; i < MpiFramework::mTransformComms.size(); i++)
+      {
+         MPI_Comm_free(&MpiFramework::mTransformComms.at(i));
+      }
+
+      // Free sub communicators
+      for(std::map<SubCommId, std::vector<MPI_Comm> >::iterator subCommIt = MpiFramework::mSubComm.begin(); subCommIt != MpiFramework::mSubComm.end(); ++subCommIt)
+      {
+         for(unsigned int i = 0; i < subCommIt->second.size(); i++)
+         {
+            MPI_Comm_free(&subCommIt->second.at(i));
+         }
+      }
+
+      // Free sub groups
+      for(std::map<SubCommId, std::vector<MPI_Group> >::iterator subGroupIt = MpiFramework::mSubGroup.begin(); subGroupIt != MpiFramework::mSubGroup.end(); ++subGroupIt)
+      {
+         for(unsigned int i = 0; i < subGroupIt->second.size(); i++)
+         {
+            MPI_Group_free(&subGroupIt->second.at(i));
+         }
+      }
+
+      // Make sure all finished and are synchronised
+      MPI_Barrier(MPI_COMM_WORLD);
+
       // Finalise MPI system
       MPI_Finalize();
    }
@@ -163,8 +234,13 @@ namespace GeoMHDiSCC {
       assert(mSubGroup.find(id) != mSubGroup.end());
       assert(mSubComm.find(id) != mSubComm.end());
 
+      // MPI error code
+      int ierr;
+
+      // Get world group
       MPI_Group   world;
-      MPI_Comm_group(MPI_COMM_WORLD, &world);
+      ierr = MPI_Comm_group(MPI_COMM_WORLD, &world);
+      MpiFramework::check(ierr, 921);
 
       MPI_Group group;
       MPI_Comm comm;
@@ -179,9 +255,11 @@ namespace GeoMHDiSCC {
       }
 
       // Create sub group
-      MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
+      ierr = MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
+      MpiFramework::check(ierr, 922);
       // Create sub communicator
-      MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      ierr = MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      MpiFramework::check(ierr, 923);
 
       if(comm != MPI_COMM_NULL)
       {
@@ -195,11 +273,21 @@ namespace GeoMHDiSCC {
       MpiFramework::synchronize();
    }
 
+   void MpiFramework::sleep(const MHDFloat seconds)
+   {
+      // Sleep MPI process for given amount of seconds
+      MHDFloat start = MPI_Wtime();
+      MHDFloat tmp = 0.0;
+      while(MPI_Wtime() - start < seconds)
+      {
+         // Do Nothing ... just waiting
+         tmp += 1.0;
+      }
+   }
+
    std::vector<int>  MpiFramework::mTransformIds = std::vector<int>();
 
    std::vector<ArrayI>  MpiFramework::mTransformCpus = std::vector<ArrayI>();
-
-   std::vector<MPI_Group>  MpiFramework::mTransformGroups = std::vector<MPI_Group>();
 
    std::vector<MPI_Comm>  MpiFramework::mTransformComms = std::vector<MPI_Comm>();
 

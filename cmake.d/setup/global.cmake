@@ -79,6 +79,36 @@ endif(splinalgTest)
 
 
 ###################################################
+#---- SPARSE SPD LINEAR ALGEBRA IMPLEMENTATION ---#
+###################################################
+
+if(GEOMHDISCC_SPSPDLINALG STREQUAL "")
+   set(GEOMHDISCC_SPSPDLINALG "SimplicialLDLT")
+endif(GEOMHDISCC_SPSPDLINALG STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_SPSPDLINALG)
+geomhdiscc_provide_choice(GEOMHDISCC_SPSPDLINALGS "Sparse SPD linear algebra" GEOMHDISCC_SPSPDLINALG spspdlinalgTest)
+
+if(spspdlinalgTest)
+   geomhdiscc_add_definition(GEOMHDISCC_SPSPDLINALG)
+endif(spspdlinalgTest)
+
+
+###################################################
+#---- SPARSE TRI LINEAR ALGEBRA IMPLEMENTATION ---#
+###################################################
+
+if(GEOMHDISCC_SPTRILINALG STREQUAL "")
+   set(GEOMHDISCC_SPTRILINALG "SparseLU")
+endif(GEOMHDISCC_SPTRILINALG STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_SPTRILINALG)
+geomhdiscc_provide_choice(GEOMHDISCC_SPTRILINALGS "Sparse triangular linear algebra" GEOMHDISCC_SPTRILINALG sptrilinalgTest)
+
+if(sptrilinalgTest)
+   geomhdiscc_add_definition(GEOMHDISCC_SPTRILINALG)
+endif(sptrilinalgTest)
+
+
+###################################################
 #------------------ LARGE IO FORMAT --------------#
 ###################################################
 
@@ -87,6 +117,22 @@ geomhdiscc_provide_choice(GEOMHDISCC_LARGEIOS "Large IO format" GEOMHDISCC_LARGE
 if(largeioTest)
    geomhdiscc_add_definition(GEOMHDISCC_LARGEIO)
 endif(largeioTest)
+
+
+###################################################
+#-------------- HDF5 COMPLEX FORMAT --------------#
+###################################################
+
+set(GEOMHDISCC_HDF5_CMPLXS "Array" "Struct")
+if(GEOMHDISCC_HDF5_CMPLX STREQUAL "")
+   set(GEOMHDISCC_HDF5_CMPLX "Array")
+endif(GEOMHDISCC_HDF5_CMPLX STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_HDF5_CMPLX)
+geomhdiscc_provide_choice(GEOMHDISCC_HDF5_CMPLXS "HDF5 complex format" GEOMHDISCC_HDF5_CMPLX h5cmplxTest)
+
+if(h5cmplxTest)
+   geomhdiscc_add_definition(GEOMHDISCC_HDF5_CMPLX)
+endif(h5cmplxTest)
 
 
 ###################################################
@@ -101,11 +147,51 @@ endif(mpiimplTest)
 
 
 ###################################################
+#-------- ASSOCIATED LEGENDRE TRANSFORM ----------#
+###################################################
+
+set(GEOMHDISCC_ALEGTRAS "Matrix" "Fly")
+if(GEOMHDISCC_ALEGTRA STREQUAL "")
+   set(GEOMHDISCC_ALEGTRA "Matrix")
+endif(GEOMHDISCC_ALEGTRA STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_ALEGTRA)
+geomhdiscc_provide_choice(GEOMHDISCC_ALEGTRAS "Associated Legendre implementation" GEOMHDISCC_ALEGTRA alegtraTest)
+
+if(alegtraTest)
+   geomhdiscc_add_definition(GEOMHDISCC_ALEGTRA)
+endif(alegtraTest)
+
+
+###################################################
 #----------------- SH NORMALIZATION --------------#
 ###################################################
 
-set(GEOMHDISCC_SHNORM "Unity")
-geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
+set(GEOMHDISCC_SHNORMS "Unity" "Schmidt")
+if(GEOMHDISCC_SHNORM STREQUAL "")
+   set(GEOMHDISCC_SHNORM "Unity")
+endif(GEOMHDISCC_SHNORM STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_SHNORM)
+geomhdiscc_provide_choice(GEOMHDISCC_SHNORMS "Spherical harmonics normalization" GEOMHDISCC_SHNORM shnormTest)
+
+if(shnormTest)
+   geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
+endif(shnormTest)
+
+
+###################################################
+#-------------- WORLAND TRANSFORM ----------------#
+###################################################
+
+set(GEOMHDISCC_WORLANDTRAS "Matrix" "Fly")
+if(GEOMHDISCC_WORLANDTRA STREQUAL "")
+   set(GEOMHDISCC_WORLANDTRA "Matrix")
+endif(GEOMHDISCC_WORLANDTRA STREQUAL "")
+mark_as_advanced(FORCE GEOMHDISCC_WORLANDTRA)
+geomhdiscc_provide_choice(GEOMHDISCC_WORLANDTRAS "Worland implementation" GEOMHDISCC_WORLANDTRA worlandtraTest)
+
+if(worlandtraTest)
+   geomhdiscc_add_definition(GEOMHDISCC_WORLANDTRA)
+endif(worlandtraTest)
 
 
 ###################################################
@@ -127,6 +213,17 @@ if(GEOMHDISCC_MULTPRECISION)
       endif(NOT GEOMHDISCC_LINALG STREQUAL "Eigen")
    endif(mpTest)
 endif(GEOMHDISCC_MULTPRECISION)
+
+###################################################
+#---------- TRANSFORM TREE OPTIMIZATION ----------#
+###################################################
+
+# Disable by default as it doesn't work for all cases
+option(GEOMHDISCC_OPTIMIZE_TREE "Optimize transform tree?" OFF)
+mark_as_advanced(FORCE GEOMHDISCC_OPTIMIZE_TREE)
+if(GEOMHDISCC_OPTIMIZE_TREE)
+   add_definitions("-DGEOMHDISCC_OPTIMIZE_TREE")
+endif(GEOMHDISCC_OPTIMIZE_TREE)
 
 
 ###################################################

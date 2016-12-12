@@ -612,10 +612,10 @@ def gen1_x(nx, q, p, xg, ntrunc = -1):
 
     print("gen1_x:")
     x = sy.Symbol('x')
-    expr = 'x**(-1)'
+    expr = 1/(x+3)
     A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
-    ssol = sphys/x
+    ssol = sphys/(x+3)
     test_forward(A, sphys, ssol, xg, 0)
 
 def genxp(nx, q, p, xg, ntrunc = -1):
@@ -623,7 +623,7 @@ def genxp(nx, q, p, xg, ntrunc = -1):
 
     print("genx"+ str(p) + ":")
     x = sy.Symbol('x')
-    expr = 'x**' + str(p)
+    expr = x**p
     A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sphys*x**p
@@ -634,7 +634,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
 
     print("genlinx"+ str(p) + ":")
     x = sy.Symbol('x')
-    expr = '(1+x)**' + str(p)
+    expr = (1+x)**p
     print(expr)
     A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
@@ -664,7 +664,7 @@ def surfaceFlux(nx, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 16
+    nx = 32
     xg = transf.grid(nx)
 
 #    # run hardcoded operator tests
@@ -675,7 +675,7 @@ if __name__ == "__main__":
 #    d4(nx, xg)
 #    laplh(nx, xg)
 #    lapl2h(nx, xg)
-    continuity(nx, xg)
+#    continuity(nx, xg)
 #    i1(nx, xg)
 #    i2(nx, xg)
 #    i2x1(nx, xg)
@@ -694,13 +694,13 @@ if __name__ == "__main__":
 #    qid(nx, xg)
 
 #    # run generic operator tests
-#    print('Generic operator generator')
-#    gen1_x(nx, 0, 1, xg)
-#    genxp(nx, 0, 1, xg)
-#    genxp(nx, 0, 2, xg)
-#    genxp(nx, 0, 3, xg)
-#    genxp(nx, 0, 4, xg)
-#    genxp(nx, 0, 9, xg)
+    print('Generic operator generator')
+    gen1_x(nx, 0, 1, xg)
+    genxp(nx, 0, 1, xg)
+    genxp(nx, 0, 2, xg)
+    genxp(nx, 0, 3, xg)
+    genxp(nx, 0, 4, xg)
+    genxp(nx, 0, 9, xg)
 #    genlinxp(nx, 0, 1, xg)
 #    genlinxp(nx, 0, 2, xg)
 #    genlinxp(nx, 0, 1.3, xg)

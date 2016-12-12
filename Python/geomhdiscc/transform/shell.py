@@ -90,7 +90,7 @@ def torcheb2D(phys):
 
     return phys
 
-def toslice(spec, nr, maxl, m):
+def toslice(spec, nr, a, b, maxl, m):
     """Transform to latitudinal slice"""
 
     spec = np.reshape(spec, (nr, maxl-m+1), order = 'F')

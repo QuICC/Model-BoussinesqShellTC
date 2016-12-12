@@ -71,13 +71,21 @@ namespace GeoMHDiSCC {
             case 0:
                spScalar->setStateType(Equations::SphereExactStateIds::HARMONIC);
                tSH.clear(); 
-               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
-               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+//               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+//               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+//               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
+//               tSH.push_back(std::tr1::make_tuple(30,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(3,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(4,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(5,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(6,0,MHDComplex(1,0)));
                spScalar->setHarmonicOptions(tSH);
                break;
 
@@ -86,7 +94,7 @@ namespace GeoMHDiSCC {
                break;
          }
 
-         // Add temperature initial state generator
+         // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::SphereExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          switch(3)

@@ -1,6 +1,6 @@
 /** 
  * @file SphereTransformSteps.cpp
- * @brief Source of the implementation of the physical <-> spectral transform steps in a whole sphere
+ * @brief Source of the implementation of the physical <-> spectral transform steps in a whole shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -26,30 +26,36 @@ namespace Transform {
 
 namespace TransformSteps {
 
-   std::vector<IntegratorBranch>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
+   std::vector<TransformPath>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
       assert(components.size() == 1);
-      std::vector<IntegratorBranch> transform;
+      std::vector<TransformPath> transform;
 
       FieldComponents::Spectral::Id scalId = components.at(0).first;
 
       if(isNL)
       {
-         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, scalId, FieldType::SCALAR));
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         transform.back().addEdge(IntegratorNDType::INTG);
+         transform.back().addEdge(Integrator2DType::INTG);
+         transform.back().addEdge(Integrator1DType::INTG, scalId, Arithmetics::ADD);
       } else
       {
-         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, scalId, FieldType::SCALAR));
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         transform.back().addEdge(IntegratorNDType::INTG);
+         transform.back().addEdge(Integrator2DType::INTG);
+         transform.back().addEdge(Integrator1DType::INTG, scalId, Arithmetics::ADD);
       }
 
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+   #if defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
 
-   std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
+   std::vector<TransformPath>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
       assert(components.size() == 2);
-      std::vector<IntegratorBranch> transform;
+      std::vector<TransformPath> transform;
       FieldComponents::Spectral::Id curlId = components.at(0).first;
       int curlFlag = components.at(0).second;
       FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
@@ -61,9 +67,15 @@ namespace TransformSteps {
          if(curlFlag == 0)
          {
             // Compute curl component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGT, curlId, FieldType::VECTOR, Arithmetics::SET));
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIVSINDPHI);
+            transform.back().addEdge(Integrator1DType::INTGT, curlId, Arithmetics::ADD);
 
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGT, curlId, FieldType::VECTOR, Arithmetics::SUB));
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIFF);
+            transform.back().addEdge(Integrator1DType::INTGT, curlId, Arithmetics::SUB);
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -73,40 +85,67 @@ namespace TransformSteps {
          if(curlcurlFlag == 0)
          {
             // Compute curlcurl Q component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ4, curlcurlId, FieldType::VECTOR, Arithmetics::SETNEG));
+            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGLL);
+            transform.back().addEdge(Integrator1DType::INTGQ4, curlcurlId, Arithmetics::SUB);
 
             // Compute curlcurl S component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS4, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIFF);
+            transform.back().addEdge(Integrator1DType::INTGS4, curlcurlId, Arithmetics::ADD);
 
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS4, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIVSINDPHI);
+            transform.back().addEdge(Integrator1DType::INTGS4, curlcurlId, Arithmetics::ADD);
 
          // Integrate for second order spherical equation
          } else if(curlcurlFlag == 1)
          {
             // Compute curlcurl Q component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ2, curlcurlId, FieldType::VECTOR, Arithmetics::SET));
+            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGLL);
+            transform.back().addEdge(Integrator1DType::INTGQ2, curlcurlId, Arithmetics::ADD);
 
             // Compute curlcurl S component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::SUB));
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIFF);
+            transform.back().addEdge(Integrator1DType::INTGS2, curlcurlId, Arithmetics::SUB);
 
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::SUB));
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIVSINDPHI);
+            transform.back().addEdge(Integrator1DType::INTGS2, curlcurlId, Arithmetics::SUB);
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
          }
 
-      // The following assumes the physical values are obtained froma Toroidal/Poloidal decomposition
+      // The following assumes the physical values are obtained from a Toroidal/Poloidal decomposition
       } else
       {
          if(curlFlag == 0 && curlcurlFlag == 0)
          {
             // Compute Toroidal component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVLLDIVSIN, IntegratorBranch::Intg1DType::INTG, curlId, FieldType::VECTOR, Arithmetics::SET));
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIVLLDIVSINDPHI);
+            transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::ADD);
 
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIVLLDIFF, IntegratorBranch::Intg1DType::INTG, curlId, FieldType::VECTOR, Arithmetics::SUB));
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIVLLDIFF);
+            transform.back().addEdge(Integrator1DType::INTG, curlId, Arithmetics::SUB);
 
             // Compute Poloidal component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIVLL, IntegratorBranch::Intg1DType::INTGR, curlcurlId, FieldType::VECTOR, Arithmetics::SET));
+            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIVLL);
+            transform.back().addEdge(Integrator1DType::INTGR, curlcurlId, Arithmetics::ADD);
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -118,226 +157,399 @@ namespace TransformSteps {
 
    #else
 
-   std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
+   std::vector<TransformPath>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
-      std::vector<IntegratorBranch> transform;
+      std::vector<TransformPath> transform;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::R, FieldType::VECTOR));
+      transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+      transform.back().addEdge(IntegratorNDType::INTG);
+      transform.back().addEdge(Integrator2DType::INTG);
+      transform.back().addEdge(Integrator1DType::INTG, FieldComponents::Spectral::R, Arithmetics::ADD);
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THETA, FieldType::VECTOR));
+      transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+      transform.back().addEdge(IntegratorNDType::INTG);
+      transform.back().addEdge(Integrator2DType::INTG);
+      transform.back().addEdge(Integrator1DType::INTG, FieldComponents::Spectral::THETA, Arithmetics::ADD);
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::PHI, FieldType::VECTOR));
+      transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+      transform.back().addEdge(IntegratorNDType::INTG);
+      transform.back().addEdge(Integrator2DType::INTG);
+      transform.back().addEdge(Integrator1DType::INTG, FieldComponents::Spectral::PHI, Arithmetics::ADD);
 
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
 
-   std::vector<ProjectorBranch>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+      transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      transform.back().addEdge(Projector1DType::PROJ);
+      transform.back().addEdge(Projector2DType::PROJ);
+      transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::SCALAR, Arithmetics::ADD);
 
       return transform;
    }
 
-   std::vector<ProjectorBranch>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIFF);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
       } 
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::GRADIENT));
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
       }
 
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
-
-   std::vector<ProjectorBranch>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardGradient2(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
+      std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>  pairId;
+
+      throw Exception("Second derivative is not implementated yet!");
+
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::ONE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, pairId, Arithmetics::ADD);
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, pairId, Arithmetics::ADD);
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::ONE,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, pairId, Arithmetics::ADD);
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::TWO,FieldComponents::Physical::TWO);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, pairId, Arithmetics::ADD);
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::TWO,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, pairId, Arithmetics::ADD);
+      }
+
+      pairId = std::make_pair(FieldComponents::Physical::THREE,FieldComponents::Physical::THREE);
+      if(req.find(pairId)->second)
+      {
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, pairId, Arithmetics::ADD);
+      }
+
+      return transform;
+   }
+
+   #if defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
+
+   std::vector<TransformPath>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
+   {
+      std::vector<TransformPath> transform;
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::PROJLL, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::VECTOR));
+         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::PROJLL);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
-      {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TOR, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THETA, FieldType::VECTOR, Arithmetics::SET));
+      { 
+         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::VECTOR, Arithmetics::ADD));
+         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::DIVRDIFFR);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TOR, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::VECTOR, Arithmetics::SETNEG));
+         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::SUB);
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::VECTOR, Arithmetics::ADD));
+         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::DIVRDIFFR);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
       }
 
       return transform;
    } 
 
-   std::vector<ProjectorBranch>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
+         transform.push_back(TransformPath(id, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIFF);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
+         transform.push_back(TransformPath(id, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::GRADIENT));
+         transform.push_back(TransformPath(id, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
       }
 
       return transform;
    }
 
-   std::vector<ProjectorBranch>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TOR, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::PROJLL, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::CURL, Arithmetics::SET));
+         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::PROJLL);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TOR, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SET));
+         // Toroidal part
+         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVRDIFFR);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::RADLAPL, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SUB));
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIVSINLL, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::ADD));
+         // Poloidal part
+         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::SLAPL);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::SUB);
       }
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TOR, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::SET));
+         // Toroidal part
+         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVRDIFFR);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::RADLAPL, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::ADD));
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIFFLL, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::SUB));
+         // Poloidal part
+         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::SLAPL);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
       }
 
       return transform;
    }
 
-   std::vector<ProjectorBranch>  backwardDivergence()
+   std::vector<TransformPath>  backwardDivergence()
    {
-      std::vector<ProjectorBranch> transform;
+      // The divergence is zero be construction in this case!
+      throw Exception("Divergence should not be used in Toroidal/Poloidal expansion");
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
-
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSINDIFFSIN, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
+      std::vector<TransformPath> transform;
 
       return transform;
    }
    
    #else
 
-   std::vector<ProjectorBranch>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::VECTOR));
+         transform.push_back(TransformPath(FieldComponents::Spectral::R, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::VECTOR));
+         transform.push_back(TransformPath(FieldComponents::Spectral::THETA, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::PHI, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::VECTOR));
+         transform.push_back(TransformPath(FieldComponents::Spectral::PHI, FieldType::VECTOR));
+         transform.back().addEdge(Projector1DType::PROJ);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
       }
 
       return transform;
    }
 
-   std::vector<ProjectorBranch>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
+         transform.push_back(TransformPath(id, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIFF);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
+         transform.push_back(TransformPath(id, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::GRADIENT));
+         transform.push_back(TransformPath(id, FieldType::GRADIENT));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
       }
 
       return transform;
    }
 
-   std::vector<ProjectorBranch>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req)
+   std::vector<TransformPath>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
       if(req.find(FieldComponents::Physical::R)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::R, FieldType::CURL));
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::PHI, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSINDIFFSIN, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::CURL));
+         transform.push_back(TransformPath(FieldComponents::Spectral::THETA, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::SUB);
+
+         transform.push_back(TransformPath(FieldComponents::Spectral::PHI, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIVSINDIFFSIN);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::R, Arithmetics::ADD);
       }
 
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THETA, FieldType::CURL));
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::PHI, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::CURL));
+         transform.push_back(TransformPath(FieldComponents::Spectral::R, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIVSINDPHI);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::ADD);
+
+         transform.push_back(TransformPath(FieldComponents::Spectral::PHI, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVRDIFFR);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::THETA, Arithmetics::SUB);
       }
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::CURL));
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::CURL));
+         transform.push_back(TransformPath(FieldComponents::Spectral::R, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVR);
+         transform.back().addEdge(Projector2DType::DIFF);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::SUB);
+
+         transform.push_back(TransformPath(FieldComponents::Spectral::THETA, FieldType::CURL));
+         transform.back().addEdge(Projector1DType::DIVRDIFFR);
+         transform.back().addEdge(Projector2DType::PROJ);
+         transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::PHI, Arithmetics::ADD);
       }
 
       return transform;
    }
 
-   std::vector<ProjectorBranch>  backwardDivergence()
+   std::vector<TransformPath>  backwardDivergence()
    {
-      std::vector<ProjectorBranch> transform;
+      std::vector<TransformPath> transform;
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::R, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
+      transform.push_back(TransformPath(FieldComponents::Spectral::R, FieldType::DIVERGENCE));
+      transform.back().addEdge(Projector1DType::DIFF);
+      transform.back().addEdge(Projector2DType::PROJ);
+      transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::SCALAR, Arithmetics::ADD);
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::THETA, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSINDIFFSIN, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
+      transform.push_back(TransformPath(FieldComponents::Spectral::THETA, FieldType::DIVERGENCE));
+      transform.back().addEdge(Projector1DType::DIVR);
+      transform.back().addEdge(Projector2DType::DIVSINDIFFSIN);
+      transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::SCALAR, Arithmetics::ADD);
 
-      transform.push_back(ProjectorBranch(FieldComponents::Spectral::PHI, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
+      transform.push_back(TransformPath(FieldComponents::Spectral::PHI, FieldType::DIVERGENCE));
+      transform.back().addEdge(Projector1DType::DIVR);
+      transform.back().addEdge(Projector2DType::DIVSINDPHI);
+      transform.back().addEdge(ProjectorNDType::PROJ, FieldComponents::Physical::SCALAR, Arithmetics::ADD);
 
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
 
 }
 }

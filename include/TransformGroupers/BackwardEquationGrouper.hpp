@@ -11,7 +11,7 @@
 // Configuration includes
 // 
 #include "Framework/FrameworkMacro.h"
-#include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/TransformCommSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 // System includes
@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformGroupers/IBackwardGrouperMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -58,25 +58,27 @@ namespace Transform {
           *
           * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree);
+         virtual ArrayI packs1D(const std::vector<TransformTree>& projectorTree);
 
-         /**
-          * @brief Get the number of required buffer packs for the second exchange
-          *
-          * @param projectorTree Transform projector tree
-          */
-         virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree);
+         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            /**
+             * @brief Get the number of required buffer packs for the second exchange
+             *
+             * @param projectorTree Transform projector tree
+             */
+            virtual ArrayI packs2D(const std::vector<TransformTree>& projectorTree);
+         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
       protected:
          /**
           * @brief Setup grouped first exchange communication
           */
-         void setupGrouped1DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord);
+         void setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup grouped second exchange communication
           */
-         void setupGrouped2DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord);
+         void setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
 
       private: 
    };
@@ -97,16 +99,13 @@ namespace Transform {
       //
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
       std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
-      std::vector<Transform::ProjectorTree>::const_iterator it;
+      std::vector<Transform::TransformTree>::const_iterator it;
       for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
          // Transform scalar variable
-         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         if(it->comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR)
          {
             scalIt = scalars.find(it->name());
-
-            // Sychronize 
-            FrameworkMacro::synchronize();
 
             // Setup the first exchange communication step for scalar fields
             this->setupGrouped1DCommunication(*it, coord);
@@ -131,9 +130,6 @@ namespace Transform {
          {
             vectIt = vectors.find(it->name());
 
-            // Sychronize 
-            FrameworkMacro::synchronize();
-
             // Setup the first exchange communication step for vector fields
             this->setupGrouped1DCommunication(*it, coord);
             // Setup the second exchange communication step for vector fields
@@ -155,25 +151,29 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp())), coord);
+      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Spectral::Id>())), coord);
    }
 
-   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp())), coord);
+      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Spectral::Id>())), coord);
+      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
    }
 
-   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const std::vector<ProjectorTree>& projectorTree)
+   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const std::vector<TransformTree>& projectorTree)
    {
       return this->namePacks1D(projectorTree);
    }
 
-   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs2D(const std::vector<ProjectorTree>& projectorTree)
-   {
-      return this->namePacks2D(projectorTree);
-   }
+   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs2D(const std::vector<TransformTree>& projectorTree)
+      {
+         return this->namePacks2D(projectorTree);
+      }
+   #endif //GEOMHDISCC_SPATIALDIMENSION_3D
 
 }
 }

@@ -19,7 +19,6 @@
 
 // Project includes
 //
-#include "TypeSelectors/EquationEigenSelector.hpp"
 #include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
@@ -74,7 +73,7 @@ namespace Equations {
    void IVectorEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId, Arithmetics::Id arithId)
    {
       // Assert dealiasing has taken place!
-      assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows() < rhs.data().rows());
+      assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows() <= rhs.data().rows());
       assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().cols() == rhs.data().cols());
 
       if(arithId == Arithmetics::SET)
@@ -96,11 +95,8 @@ namespace Equations {
       }
    }
 
-   void IVectorEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   void IVectorEquation::initSpectralMatrices()
    {
-      // Store the boundary condition list
-      this->mspBcIds = spBcIds;
-
       IVectorEquation::SpectralComponent_range range = this->spectralRange();
 
       for(SpectralComponent_iterator it = range.first; it != range.second; ++it)
@@ -124,7 +120,7 @@ namespace Equations {
          // Initialise spectral matrices
          if(needInit)
          {
-            this->initSpectralMatricesComponent(spBcIds, *it);
+            this->initSpectralMatricesComponent(this->mspBcIds, *it);
          }
       }
    }
@@ -136,17 +132,17 @@ namespace Equations {
 
    void  IVectorEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const
    {
-      this->dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->unknown().dom(0).spRes(), this->couplingInfo(comp).eigenTools().getEigs(this->spRes(), matIdx));
    }
 
    void IVectorEquation::setGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
    {
-      this->dispatchGalerkinStencil(comp, mat, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchGalerkinStencil(comp, mat, matIdx, this->unknown().dom(0).spRes(), this->couplingInfo(comp).eigenTools().getEigs(this->spRes(), matIdx));
    }
 
    void IVectorEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const ModelOperator::Id opId, const SpectralFieldId fieldId, const int matIdx) const
    {
-      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->unknown().dom(0).spRes(), this->couplingInfo(compId).eigenTools().getEigs(this->spRes(), matIdx));
    }
 }
 }

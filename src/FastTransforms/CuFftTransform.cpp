@@ -196,10 +196,8 @@ namespace Transform {
       CuFftLibrary::cleanupFft();
    }
 
-   void CuFftTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, CuFftTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void CuFftTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, CuFftTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::MIXED);
 
@@ -241,10 +239,8 @@ namespace Transform {
       rFFTVal *= this->mspSetup->scale();
    }
 
-   void CuFftTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, CuFftTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void CuFftTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, CuFftTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::MIXED);
 
@@ -309,10 +305,8 @@ namespace Transform {
       }
    }
 
-   void CuFftTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, CuFftTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   void CuFftTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, CuFftTransform::IntegratorType::Id integrator)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a non mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPLEX);
 
@@ -353,10 +347,8 @@ namespace Transform {
       rFFTVal *= this->mspSetup->scale();
    }
 
-   void CuFftTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, CuFftTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   void CuFftTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, CuFftTransform::ProjectorType::Id projector)
    {
-      assert(arithId == Arithmetics::SET);
-
       // Assert that a non mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::COMPLEX);
 

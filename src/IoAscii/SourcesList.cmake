@@ -7,4 +7,6 @@ set(MHDSources
    IAsciiRWriter.cpp
    DirectAsciiWriter.cpp
    StdOutPipe.cpp
+   CflTags.cpp
+   CflWriter.cpp
 )

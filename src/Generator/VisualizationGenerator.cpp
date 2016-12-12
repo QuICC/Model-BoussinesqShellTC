@@ -55,6 +55,7 @@ namespace GeoMHDiSCC {
    void VisualizationGenerator::mainRun()
    {
       // Solve the trivial equations
+      this->explicitTrivialEquations(ModelOperator::EXPLICIT_LINEAR);
       this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Compute nonlinear terms

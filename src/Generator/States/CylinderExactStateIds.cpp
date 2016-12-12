@@ -58,5 +58,10 @@ namespace Equations {
       return val;
    }
 
+   MHDFloat CylinderExactStateIds::chebyshev(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x)
+   {
+      return amplitude*std::cos(mode*std::acos(x));
+   }
+
 }
 }
