@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
    namespace Transform {
 
       /**
-       * @brief Struct to contain the steps involved in the physical <-> spectral transforms in a spherical shell
+       * @brief Struct to contain the steps involved in the physical <-> spectral transforms in a whole sphere
        */
       namespace TransformSteps
       {

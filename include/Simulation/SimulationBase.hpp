@@ -400,10 +400,8 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief Initialise the equations (generate operators, etc)
-          *
-          * @param spBcs Boundary condition information
           */
-         void setupEquations(const SharedSimulationBoundary spBcs);
+         void setupEquations();
 
          /**
           * @brief Sort equations and store information for timestep/solver/nothing ranges

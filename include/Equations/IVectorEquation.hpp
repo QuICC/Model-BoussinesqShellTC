@@ -111,7 +111,7 @@ namespace Equations {
           *
           * @param spBcIds   List of boundary condition IDs
           */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
+         virtual void initSpectralMatrices();
 
          /**
           * @brief Generic model operator dispatcher to python scripts
@@ -348,8 +348,14 @@ namespace Equations {
    template <typename TData> void solveStencilUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
    {
       // Create temporary storage for tau data
+      TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
+      Equations::copyUnknown(eq, compId, tmp, matIdx, 0, false, true);
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      Equations::copyUnknown(eq, compId, rhs, matIdx, 0, true, true);
+      #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
+      #else 
+         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
       // Get a restricted stencil matrix
       SparseMatrix stencil(eq.couplingInfo(compId).galerkinN(matIdx),eq.couplingInfo(compId).galerkinN(matIdx));
@@ -377,8 +383,12 @@ namespace Equations {
       int zeroCol = 0;
       if(useShift)
       {
-         zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-         zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+         zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+         #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+            zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+         #else
+            zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+         #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
       }
 
       // matIdx is the index of the slowest varying direction with single RHS
@@ -639,8 +649,12 @@ namespace Equations {
          {
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+            #else
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
             //Safety assertion
             assert(start >= 0);
@@ -689,8 +703,12 @@ namespace Equations {
          {
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+            #else
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
             //Safety assertion
             assert(start >= 0);
@@ -714,7 +732,7 @@ namespace Equations {
             // Get mode indexes
             ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
 
             // Copy data
             int k = start;
@@ -732,9 +750,9 @@ namespace Equations {
          {
             assert(matIdx == 0);
 
-            //int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            //int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-            //int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+            //int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            //int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            //int zeroBlock = eq.couplingInfo(compId).galerkinShift(matIdx,2);
 
             //Safety assertion
             assert(start >= 0);
@@ -785,8 +803,12 @@ namespace Equations {
          #else
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+            #else
+               int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
             // Copy data
             int k = start;
@@ -807,8 +829,12 @@ namespace Equations {
       {
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
          int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
+         #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
+         #else
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
+         #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
 
          //Safety assertion
          assert(start >= 0);
@@ -831,7 +857,7 @@ namespace Equations {
          // Get mode indexes
          ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
-         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
 
          // Copy data
          int k = start;

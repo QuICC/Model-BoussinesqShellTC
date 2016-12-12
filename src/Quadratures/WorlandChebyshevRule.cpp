@@ -36,12 +36,17 @@ namespace GeoMHDiSCC {
 
       for(int k = 0; k < size; k++)
       {
-         igrid(k) = precision::cos((Precision::PI)*(internal::MHDFloat(k)+ MHD_MP(0.5))/internal::MHDFloat(size));
+         // Chebyshev ordering r = (1, 0)
+         //int k_ = k;
+         // Reverse Chebyshev grid r = (0, 1)
+         int k_ = size-k-1;
 
-         igrid(k) = precision::sqrt((igrid(k) + MHD_MP(1.0))/MHD_MP(2.0));
+         igrid(k_) = precision::cos((Precision::PI)*(internal::MHDFloat(k)+ MHD_MP(0.5))/internal::MHDFloat(size));
+
+         igrid(k_) = precision::sqrt((igrid(k_) + MHD_MP(1.0))/MHD_MP(2.0));
       }
 
-      iweights.setConstant(Precision::PI/MHD_MP(size));
+      iweights.setConstant(Precision::PI/(MHD_MP(2.0)*internal::MHDFloat(size)));
 
       // Copy internal precision values into input arrays
       grid = Precision::cast(igrid);

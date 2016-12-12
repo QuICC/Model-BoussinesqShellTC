@@ -269,13 +269,23 @@ namespace GeoMHDiSCC {
    // Configure code to use WFT scheme
    #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
 
+      #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+         #include "PolynomialTransforms/CylinderWorlandTransform.hpp"
+      #elif defined GEOMHDISCC_WORLANDTRA_FLY
+         #include "PolynomialTransforms/CylinderWorlandFlyTransform.hpp"
+      #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
+
       namespace GeoMHDiSCC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef CylinderWorlandTransform Type;
+               #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+                  typedef CylinderWorlandTransform Type;
+               #elif defined GEOMHDISCC_WORLANDTRA_FLY 
+                  typedef CylinderWorlandFlyTransform Type;
+               #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>

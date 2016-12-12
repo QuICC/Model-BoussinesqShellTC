@@ -176,7 +176,7 @@ namespace GeoMHDiSCC {
       Transform::TransformTreeTools::generateTrees(projectorTree, branches, TransformDirection::BACKWARD);
    }
 
-   void RequirementTools::mapEquationVariables(std::vector<Transform::TransformTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear)
+   void RequirementTools::mapEquationVariables(std::vector<Transform::TransformTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear, const SharedSimulationBoundary spBcs)
    {
       // Store the scalar and vector branches
       std::vector<Transform::TransformPath> scalarBranches;
@@ -198,7 +198,7 @@ namespace GeoMHDiSCC {
                (*scalEqIt)->setUnknown(scalarVars.at(scalIt->first));
 
                // Finish initialisation of equation
-               (*scalEqIt)->init();
+               (*scalEqIt)->init(spBcs);
 
                // Check for nonlinear requirements
                if((*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
@@ -257,7 +257,7 @@ namespace GeoMHDiSCC {
                (*vectEqIt)->setUnknown(vectorVars.at(vectIt->first));
 
                // Finish initialisation of equation
-               (*vectEqIt)->init();
+               (*vectEqIt)->init(spBcs);
 
                // Check for nonlinear requirements
                if((*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear())
@@ -427,7 +427,7 @@ namespace GeoMHDiSCC {
       }
 
       // Create the projector tree(s)
-      Transform::TransformTreeTools::generateTrees(projectorTree, branches, TransformDirection::BACKWARD);
+      Transform::TransformTreeTools::generateTrees(projectorTree, branches, TransformDirection::BACKWARD, "imposed");
    }
 
    void RequirementTools::mapImposedVariables(std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars)

@@ -17,7 +17,6 @@
 #include <vector>
 #include <map>
 #include <tr1/tuple>
-#include <string>
 
 // External includes
 //
@@ -35,7 +34,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void TransformTreeTools::generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches, const TransformDirection::Id dir)
+   void TransformTreeTools::generateTrees(std::vector<TransformTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<TransformPath> >& branches, const TransformDirection::Id dir, const std::string& prepend)
    {
       std::string dirName;
       if(dir == TransformDirection::FORWARD)
@@ -44,6 +43,11 @@ namespace Transform {
       } else
       {
          dirName = "backward";
+      }
+
+      if(!prepend.empty())
+      {
+         dirName = prepend + "_" + dirName;
       }
 
       //
@@ -331,70 +335,71 @@ namespace Transform {
       } else
       {
          // Algorithm only works for single branch
-         if(std::distance(edge.edgeRange().first, edge.edgeRange().second) == 1)
+         bool hasSingleLeaf = (std::distance(edge.edgeRange().first, edge.edgeRange().second) == 1);
+
+         // Get edge iterator and make key
+         TransformTreeEdge::EdgeType_iterator edgeIt = edge.rEdgeRange().first;
+         OptKey optKey = std::tr1::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
+
+         // Setup first element of combined field
+         if(std::tr1::get<0>(optIds.find(optKey)->second) > 1)
          {
-            // Get edge iterator and make key
-            TransformTreeEdge::EdgeType_iterator edgeIt = edge.rEdgeRange().first;
-            OptKey optKey = std::tr1::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
+            // Make counter negative to identify them later on
+            std::tr1::get<0>(optIds.find(optKey)->second) = -std::tr1::get<0>(optIds.find(optKey)->second) + 1;
 
-            // Setup first element of combined field
-            if(std::tr1::get<0>(optIds.find(optKey)->second) > 1)
+            // Convert to set
+            Arithmetics::Id arithId;
+            if(edgeIt->arithId() == Arithmetics::ADD)
             {
-               // Make counter negative to identify them later on
-               std::tr1::get<0>(optIds.find(optKey)->second) = -std::tr1::get<0>(optIds.find(optKey)->second) + 1;
+               arithId = Arithmetics::SET;
+            } else if(edgeIt->arithId() == Arithmetics::SUB)
+            {
+               arithId = Arithmetics::SETNEG;
+            } else
+            {
+               arithId = edgeIt->arithId();
+            }
 
-               // Convert to set
-               Arithmetics::Id arithId;
-               if(edgeIt->arithId() == Arithmetics::ADD)
-               {
-                  arithId = Arithmetics::SET;
-               } else if(edgeIt->arithId() == Arithmetics::SUB)
-               {
-                  arithId = Arithmetics::SETNEG;
-               } else
-               {
-                  arithId = edgeIt->arithId();
-               }
-
-               edge.setCombinedInfo(arithId, -1, std::tr1::get<1>(optIds.find(optKey)->second));
-               edge.setArithId(Arithmetics::NONE);
-               edgeIt = edge.delEdge(edgeIt);
+            edge.setCombinedInfo(arithId, -1, std::tr1::get<1>(optIds.find(optKey)->second));
+            edge.setArithId(Arithmetics::NONE);
+            edgeIt = edge.delEdge(edgeIt);
 
             // Setup other elements in combination   
-            } else if(std::tr1::get<0>(optIds.find(optKey)->second) < 0)
+         } else if(std::tr1::get<0>(optIds.find(optKey)->second) < 0)
+         {
+            if(!hasSingleLeaf)
             {
-               if(edgeIt->arithId() == Arithmetics::SET || edgeIt->arithId() == Arithmetics::SETNEG)
-               {
-                  throw Exception("The tree to optimize is not properly setup!");
-               }
-               Arithmetics::Id arithId = edgeIt->arithId();
-               edge.setArithId(Arithmetics::NONE);
+               throw Exception("Tree optimization algorithm doesn't work on this tree!");
+            }
 
-               int holdId;
-               // Setup intermediate elements
-               if(std::tr1::get<0>(optIds.find(optKey)->second) < -1)
-               {
-                  holdId = std::tr1::get<1>(optIds.find(optKey)->second);
-                  edgeIt = edge.delEdge(edgeIt);
+            if(edgeIt->arithId() == Arithmetics::SET || edgeIt->arithId() == Arithmetics::SETNEG)
+            {
+               throw Exception("The tree to optimize is not properly setup!");
+            }
+            Arithmetics::Id arithId = edgeIt->arithId();
+            edge.setArithId(Arithmetics::NONE);
+
+            int holdId;
+            // Setup intermediate elements
+            if(std::tr1::get<0>(optIds.find(optKey)->second) < -1)
+            {
+               holdId = std::tr1::get<1>(optIds.find(optKey)->second);
+               edgeIt = edge.delEdge(edgeIt);
 
                // Setup last element
+            } else
+            {
+               holdId = -1;
+               if(std::tr1::get<2>(optIds.find(optKey)->second))
+               {
+                  edgeIt->setArithId(Arithmetics::SET);
                } else
                {
-                  holdId = -1;
-                  if(std::tr1::get<2>(optIds.find(optKey)->second))
-                  {
-                     edgeIt->setArithId(Arithmetics::SET);
-                  } else
-                  {
-                     edgeIt->setArithId(Arithmetics::ADD);
-                  }
+                  edgeIt->setArithId(Arithmetics::ADD);
                }
-               edge.setCombinedInfo(arithId, std::tr1::get<1>(optIds.find(optKey)->second), holdId);
-               std::tr1::get<0>(optIds.find(optKey)->second) += 1;
             }
-         } else
-         {
-            throw Exception("Tree optimization algorithm doesn't work on this tree!");
+            edge.setCombinedInfo(arithId, std::tr1::get<1>(optIds.find(optKey)->second), holdId);
+            std::tr1::get<0>(optIds.find(optKey)->second) += 1;
          }
       }
    }

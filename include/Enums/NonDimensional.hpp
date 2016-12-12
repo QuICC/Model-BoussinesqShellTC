@@ -31,8 +31,10 @@ namespace GeoMHDiSCC {
          enum Id {
             //
             // Nondimensional numbers
+            /// Eady number
+            EADY = 0,
             /// Ekman number
-            EKMAN = 0,
+            EKMAN,
             /// Magnetic Ekman number
             MAGEKMAN,
             /// Magnetic Prandtl number
@@ -124,6 +126,10 @@ namespace GeoMHDiSCC {
             // Special flags
             /// Flag to filter elevator modes
             ELEVATOR,
+            /// Flag to use fast mean equation
+            FAST_MEAN,
+            /// Flag to use rescaled equation
+            RESCALED,
          };
       };
 }

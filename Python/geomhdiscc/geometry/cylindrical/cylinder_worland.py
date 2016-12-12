@@ -40,6 +40,20 @@ def zblk(nr, nz, m, qr, qz, bc, restriction = None):
     mat = utils.restricted_kron_2d(c1d.zblk(nz,bcz),rad.zblk(nr,m,bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, qr, qz, bc, restriction = restriction)
 
+def i2(nr, nz, m, bc, coeff = 1.0, restriction = None):
+    """Create a i2 in R kronecker with i2 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.qid(nz, 0, bcz), rad.i2(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 1, 0, bc, restriction = restriction)
+
+def i2laplh(nr, nz, m, bc, coeff = 1.0, restriction = None):
+    """Create a i2laph in R kronecker with i2 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.qid(nz, 0, bcz), rad.i2laplh(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 1, 0, bc, restriction = restriction)
+
 def i2j2(nr, nz, m, bc, coeff = 1.0, restriction = None):
     """Create a i2 in R kronecker with i2 in Z"""
 
@@ -47,11 +61,25 @@ def i2j2(nr, nz, m, bc, coeff = 1.0, restriction = None):
     mat = coeff*utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i2(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 1, 2, bc, restriction = restriction)
 
+def i2r_1drj2(nr, nz, m, bc, coeff = 1.0, restriction = None):
+    """Create a i2r_1dr in R kronecker with i2 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i2r_1dr(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m+1, 1, 2, bc, restriction = restriction)
+
 def i2laplhj2(nr, nz, m, bc, coeff = 1.0, restriction = None):
     """Create a i2laph in R kronecker with i2 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i2laplh(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 1, 2, bc, restriction = restriction)
+
+def i2j2e1(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i2 in R kronecker with i2 in Z of the laplacian"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i2d1(nz, bcz, cscale = zscale), rad.i2(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 1, 2, bc, restriction = restriction)
 
 def i2j2lapl(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
@@ -86,8 +114,8 @@ def i4laplhj2e1(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     mat = coeff*utils.restricted_kron_2d(c1d.i2d1(nz, bcz, cscale = zscale), rad.i4laplh(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 2, 2, bc, restriction = restriction)
 
-def i4j2lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
-    """Create a i4 in R kronecker with i2 in Z of the bilaplacian"""
+def i4j2lapllaplh(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i4 in R kronecker with i2 in Z of the laplacian of horizontal laplacian"""
 
     bcr, bcz = convert_bc(bc)
     mat = utils.restricted_kron_2d(c1d.i2(nz, bcz), rad.i4lapl2h(nr, m, bcr), restriction = restriction)
@@ -96,6 +124,57 @@ def i4j2lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     mat = mat + utils.restricted_kron_2d(c1d.i2d2(nz, bcz, cscale = zscale), rad.i4laplh(nr, m, bcr), restriction = restriction)
     mat *= coeff
     return cylbc.constrain(mat, nr, nz, m, 2, 2, bc, restriction = restriction)
+
+def i4j4(nr, nz, m, bc, coeff = 1.0, restriction = None):
+    """Create a i4 in R kronecker with i4 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i4(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
+
+def i4j4e1(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i4 in R kronecker with i4e1 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i4d1(nz, bcz, cscale = zscale), rad.i4(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
+
+def i4drj4(nr, nz, m, bc, coeff = 1.0, restriction = None):
+    """Create a i4dr in R kronecker with i4 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i4dr(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m-1, 2, 4, bc, restriction = restriction)
+
+def i4j4lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i4 in R kronecker with i4 in Z of the bilaplacian"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i4lapl2h(nr, m, bcr), restriction = restriction)
+    bcr[0] = min(bcr[0], 0)
+    bcz[0] = min(bcz[0], 0)
+    mat = mat + utils.restricted_kron_2d(c1d.i4d2(nz, bcz, 2.0, cscale = zscale), rad.i4laplh(nr, m, bcr), restriction = restriction)
+    mat = mat + utils.restricted_kron_2d(c1d.i4d4(nz, bcz, cscale = zscale), rad.i4(nr, m, bcr), restriction = restriction)
+    mat *= coeff
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
+
+def i4laplhj4(nr, nz, m, bc, coeff = 1.0, restriction = None):
+    """Create a i4laplh in R kronecker with i4 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i4laplh(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
+
+def i4j4lapl(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i2 in R kronecker with i2 in Z of the laplacian"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i4laplh(nr, m, bcr), restriction = restriction)
+    bcr[0] = min(bcr[0], 0)
+    bcz[0] = min(bcz[0], 0)
+    mat = mat + utils.restricted_kron_2d(c1d.i4d2(nz, bcz, cscale = zscale), rad.i4(nr, m, bcr), restriction = restriction)
+    mat *= coeff
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
 
 def i6j4(nr, nz, m, bc, coeff = 1.0, restriction = None):
     """Create a i6 in R kronecker with i4 in Z"""
@@ -118,8 +197,8 @@ def i6laplhj4e1(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     mat = coeff*utils.restricted_kron_2d(c1d.i4d1(nz, bcz, cscale = zscale), rad.i6laplh(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 3, 4, bc, restriction = restriction)
 
-def i6j4lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
-    """Create a i6 in R kronecker with i4 in Z of the bilaplacian"""
+def i6j4lapllaplh(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i6 in R kronecker with i4 in Z of the laplacian of horizontal laplacian"""
 
     bcr, bcz = convert_bc(bc)
     mat = utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i6lapl2h(nr, m, bcr), restriction = restriction)
@@ -129,8 +208,8 @@ def i6j4lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     mat *= coeff
     return cylbc.constrain(mat, nr, nz, m, 3, 4, bc, restriction = restriction)
 
-def i6j4lapl3(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
-    """Create a i6 in R kronecker with i4 in Z of the trilaplacian"""
+def i6j4lapl2laplh(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
+    """Create a i6 in R kronecker with i4 in Z of the bilaplacia of horizontal laplacian"""
 
     bcr, bcz = convert_bc(bc)
     mat = utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i6lapl3h(nr, m, bcr), restriction = restriction)
@@ -146,4 +225,49 @@ def qid(nr, nz, m, qr, qz, bc, coeff = 1.0, restriction = None):
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*utils.restricted_kron_2d(c1d.qid(nz,qz,bcz), rad.qid(nr, m, qr,bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, qr, qz, bc, restriction = restriction)
+
+def stencil(nr, nz, m, bc, make_square, restriction = None):
+    """Create a galerkin stencil matrix"""
+        
+    bcr, bcz = convert_bc(bc)
+    mat_r = rad.stencil(nr, m, bcr, make_square)
+    mat_z = c1d.stencil(nz, bcz, make_square)
+    mat = spsp.kron(mat_z, mat_r)
+
+    return cylbc.constrain(mat, nr, nz, m, 0, 0, bc, restriction = restriction)
+
+def tau_mat_r(nr, nz, m, tau, kron_op, qr, qz, bc, location = 't', restriction = None):
+    """Create a block of zeros"""
+
+    bcr, bcz = convert_bc(bc)
+    sr, dr, sz, dz = cylbc.convert_priority(bc.get('priority', 'r'), qr, qz)
+
+    pad = tau.get('pad',0)
+    s = tau.get('kron_shift',0)
+    matR = spsp.lil_matrix((nr,nr))
+    matR = rad.radbc.constrain(matR, m, tau, pad_zeros = pad, location = location)
+    matZ = cylbc.bzid(nz,sz,dz, c1d.c1dbc.no_bc(), location = location)*kron_op(nz+s, bc = {0:0, 'rt':s, 'cr':s})
+
+    matR = rad.radbc.constrain(matR, m, bcr, location = location)
+    matZ = c1d.c1dbc.constrain(matZ, bcz, location = location)
+    mat = utils.restricted_kron_2d(matZ, matR, restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, qr, qz, bc, restriction = restriction)
+
+def tau_mat_z(nr, nz, m, tau, kron_op, qr, qz, bc, location = 't', restriction = None):
+    """Create a block of zeros"""
+
+    bcr, bcz = convert_bc(bc)
+    sr, dr, sz, dz = cylbc.convert_priority(bc.get('priority', 'r'), qr, qz)
+
+    pad = tau.get('pad',0)
+    s = tau.get('kron_shift',0)
+    matR = cylbc.brid(nr,m,sr,dr,rad.radbc.no_bc(), location = location)*kron_op(nr+s, m, bc = {0:0, 'rt':s, 'cr':s})
+    matZ = spsp.lil_matrix((nz,nz))
+    matZ = c1d.c1dbc.constrain(matZ, tau, pad_zeros = pad, location = location)
+
+    matR = rad.radbc.constrain(matR, m, bcr, location = location)
+    matZ = c1d.c1dbc.constrain(matZ, bcz, location = location)
+    mat = utils.restricted_kron_2d(matZ, matR, restriction = restriction)
+
     return cylbc.constrain(mat, nr, nz, m, qr, qz, bc, restriction = restriction)

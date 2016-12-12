@@ -1,6 +1,6 @@
 /** 
  * @file VelocityHeatAdvection.hpp
- * @brief Implementation of a generic primitive velocity heat advection
+ * @brief Implementation of a generic primitive velocity heat advection:
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -35,21 +35,21 @@ namespace Physical {
          /**
           * @brief Set S to primitive velocity heat advection product
           *
-          *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
+          *    \f$ \left(\vec u\cdot\nabla\right)q - u_z = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q - u_z\f$
           */
           static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
 
          /**
           * @brief Add primitive velocity advection heat product to S
           *
-          *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
+          *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q - u_z\f$
           */
           static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract primitive velocity heat advection product from S
           *
-          *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
+          *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q - u_z\f$
           */
           static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
          

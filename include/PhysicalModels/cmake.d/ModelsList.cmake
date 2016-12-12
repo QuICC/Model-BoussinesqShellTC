@@ -8,6 +8,7 @@ set(MHDPhysicalModels
    BoussinesqBeta3DQGPerModel.hpp
    BoussinesqFPlane3DQGModel.hpp
    BoussinesqDynamo3DQGModel.hpp
+   BoussinesqFPlaneNHBGEModel.hpp
    BoussinesqTiltedFPlane3DQGModel.hpp
    BoussinesqNoTiltedFPlane3DQGModel.hpp
    BoussinesqRBCDuctVCModel.hpp
@@ -15,12 +16,15 @@ set(MHDPhysicalModels
    BoussinesqRBCBoxVCModel.hpp
    BoussinesqRBCAnnulusVCModel.hpp
    BoussinesqRBCCylinderVCModel.hpp
+   BoussinesqRBCCylinderModel.hpp
    BoussinesqRRBCDuctVCModel.hpp
    BoussinesqRRBCPlaneModel.hpp
    BoussinesqRRBCPlaneMeanModel.hpp
+   BoussinesqRRBCPlaneDMeanModel.hpp
    BoussinesqRRBCPlaneVCModel.hpp
    BoussinesqRRBCBoxVCModel.hpp
    BoussinesqRRBCAnnulusVCModel.hpp
+   BoussinesqRRBCCylinderModel.hpp
    BoussinesqRRBCCylinderVCModel.hpp
    BoussinesqTCShellModel.hpp
    BoussinesqTCShellStdModel.hpp

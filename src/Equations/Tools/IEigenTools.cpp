@@ -42,24 +42,24 @@ namespace Equations {
       return this->computeNMat(spRes);
    }
 
-   void IEigenTools::setTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution& spRes) const
+   void IEigenTools::setTauN(ArrayI& rTauNs, const SharedResolution& spRes) const
    {
-      this->interpretTauN(rTauNs, tauSize, spRes);
+      this->interpretTauN(rTauNs, spRes);
    }
 
-   void IEigenTools::setGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution& spRes) const
+   void IEigenTools::setGalerkinN(ArrayI& rGalerkinNs, const SharedResolution& spRes) const
    {
-      this->interpretGalerkinN(rGalerkinNs, galerkinSize, spRes);
+      this->interpretGalerkinN(rGalerkinNs, spRes);
    }
 
-   void IEigenTools::setRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution& spRes) const
+   void IEigenTools::setRhsN(ArrayI& rRhsCols, const SharedResolution& spRes) const
    {
-      this->interpretRhsN(rRhsCols, rhsSize, spRes);
+      this->interpretRhsN(rRhsCols, spRes);
    }
 
-   void IEigenTools::setSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution& spRes) const
+   void IEigenTools::setSystemN(ArrayI& rSystemNs, const SharedResolution& spRes) const
    {
-      this->interpretSystemN(rSystemNs, systemSize, spRes);
+      this->interpretSystemN(rSystemNs, spRes);
    }
 
 }

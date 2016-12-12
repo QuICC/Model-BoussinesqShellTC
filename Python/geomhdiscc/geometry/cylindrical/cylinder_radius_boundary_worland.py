@@ -18,7 +18,7 @@ def no_bc():
 
 def constrain(mat, m, bc, pad_zeros = 0, location = 't'):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
-
+    
     if bc[0] > 0:
         bc_mat = apply_tau(mat, m, bc, pad_zeros = pad_zeros, location = location)
     elif bc[0] < 0:
@@ -87,6 +87,8 @@ def apply_tau(mat, m, bc, pad_zeros = 0, location = 't'):
         cond = tau_dlaplh(mat.shape[0], m, bc)
     elif bc[0] == 17:
         cond = tau_lapl2h(mat.shape[0], m, bc)
+    elif bc[0] == 18:
+        cond = tau_origin(mat.shape[0], m, bc)
     elif bc[0] == 20:
         cond = tau_value_diff(mat.shape[0], m, bc)
     elif bc[0] == 21:
@@ -127,6 +129,17 @@ def tau_value(nr, l, bc):
     cond = []
     c = next(it)
     cond.append(c*wb.worland_value(nr, l))
+
+    return np.array(cond)
+
+def tau_origin(nr, l, bc):
+    """Create the value at origin tau line(s)"""
+
+    it = coeff_iterator(bc.get('c',None))
+
+    cond = []
+    c = next(it)
+    cond.append(c*wb.worland_origin(nr, l))
 
     return np.array(cond)
 
@@ -272,6 +285,8 @@ def stencil(nr, m, bc):
         mat = stencil_value_diff(nr, m, bc.get('c',None))
     elif bc[0] == -21:
         mat = stencil_value_diff2(nr, m, bc.get('c',None))
+    elif bc[0] == -22:
+        mat = stencil_value_laplh(nr, m, bc.get('c',None))
     elif bc[0] < -1 and bc[0] > -5:
         mat = restrict_eye(nr, 'cr', -bc[0])
 
@@ -281,7 +296,7 @@ def apply_galerkin(mat, m, bc):
     """Apply a Galerkin stencil on the matrix"""
 
     nr = mat.shape[0]
-    mat = mat*stencil(nr, l, bc)
+    mat = mat*stencil(nr, m, bc)
     return mat
 
 def restrict_eye(nr, t, q):
@@ -310,7 +325,7 @@ def restrict_eye(nr, t, q):
 
     return spsp.diags(diags, offsets, (nrows, ncols))
 
-def stencil_value(nr, l, coeffs = None):
+def stencil_value(nr, m, coeffs = None):
     """Create stencil matrix for a zero boundary value"""
 
     assert(coeffs is None)
@@ -318,13 +333,16 @@ def stencil_value(nr, l, coeffs = None):
     ns = np.arange(0,nr)
     offsets = [-1, 0]
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
-        return -2.0*n/(2.0*n - 1.0)
+        return -wb.worland_norm_row(n,m,-1)*c(n-1.0)*2.0*n/(2.0*n - 1.0)
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return wb.worland_norm_row(n,m,0)*c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -332,23 +350,26 @@ def stencil_value(nr, l, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def stencil_diff(nr, l, coeffs = None):
+def stencil_diff(nr, m, coeffs = None):
     """Create stencil matrix for a zero 1st derivative"""
-
+    
     assert(coeffs is None)
 
     ns = np.arange(0,nr)
     offsets = [-1, 0]
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
-        num = -2.0*m*(4.0*(-1.0 + m)**2 + l*(-3.0 + 4.0*m))
-        den = (-1.0 + 2.0*m)*(l + 4.0*l*m + 4.0*m**2)
-        return num/den
+        num = -2.0*n*(4.0*(-1.0 + n)**2 + m*(-3.0 + 4.0*n))
+        den = (-1.0 + 2.0*n)*(m + 4.0*m*n + 4.0*n**2)
+        return wb.worland_norm_row(n,m,-1)*c(n-1.0)*num/den
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return wb.worland_norm_row(n,m,0)*c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -364,15 +385,18 @@ def stencil_rdiffdivr(nr, l, coeffs = None):
     ns = np.arange(0,nr)
     offsets = [-1, 0]
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
         num = -2.0*n*(3.0 - 3.0*l - 8.0*n + 4.0*l*n + 4.0*n**2)
         den = (-1.0 + 2.0*n)*(-1.0 + l + 4.0*l*n + 4.0*n**2)
-        return num/den
+        return wb.worland_norm_row(n,m,-1)*c(n-1.0)*num/den
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return wb.worland_norm_row(n,m,0)*c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -391,6 +415,9 @@ def stencil_insulating(nr, l, coeffs = None):
     ns = np.arange(parity,2*nr,2)
     offsets = [-1, 0]
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate subdiagonal
     def d_1(n):
         val = -(l + n**2 - 4.0*n + 5.0)/(l + n**2 + 1.0)
@@ -400,11 +427,11 @@ def stencil_insulating(nr, l, coeffs = None):
                 break
             if j > 2:
                 break
-        return val
+        return wb.worland_norm_row(n,m,-1)*c(n-1.0)*val
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return wb.worland_norm_row(n,m,0)*c(n)*np.ones(n.shape)
 
     ds = [d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -412,40 +439,32 @@ def stencil_insulating(nr, l, coeffs = None):
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
-def stencil_value_diff(nr, l, coeffs = None):
+def stencil_value_diff(nr, m, coeffs = None):
     """Create stencil matrix for a zero boundary value and zero 1st derivative"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     assert(coeffs is None)
 
-    ns = np.arange(parity,2*nr,2)
+    ns = np.arange(0,nr)
     offsets = [-2, -1, 0]
+
+    def c(n):
+        return np.ones(n.shape)
 
     # Generate second subdiagonal
     def d_2(n):
-        val = (n - 3.0)/(n - 1.0)
-        for i,j in enumerate(n):
-            if j == 4:
-                val[i] = 1.0/6.0
-                break
-            if j > 4:
-                break
-        return val
+        num = 4.0*(n - 1.0)*n*(2.0*n + m - 3.0)
+        den = (2.0*n - 3.0)*(2.0*n - 1.0)*(2.0*n + m - 1.0)
+        return wb.worland_norm_row(n,m,-2)*c(n-2.0)*num/den
 
     # Generate subdiagonal
     def d_1(n):
-        val = -2.0*n/(n + 1.0)
-        for i,j in enumerate(n):
-            if j == 2:
-                val[i] = -2.0/3.0
-                break
-            if j > 2:
-                break
-        return val
+        num = 4.0*n*(2.0*n + m)
+        den = (2.0*n - 1.0)*(2.0*n + m + 1.0)
+        return -wb.worland_norm_row(n,m,-1)*c(n-1.0)*num/den
 
     # Generate diagonal
     def d0(n):
-        return np.ones(n.shape)
+        return wb.worland_norm_row(n,m,0)*c(n)*np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
@@ -462,6 +481,9 @@ def stencil_value_diff2(nr, l, coeffs = None):
     ns = np.arange(parity,2*nr,2)
     offsets = [-2, -1, 0]
 
+    def c(n):
+        return np.ones(n.shape)
+
     # Generate second subdiagonal
     def d_2(n):
         val_num = (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)
@@ -473,7 +495,7 @@ def stencil_value_diff2(nr, l, coeffs = None):
                 break
             if j > 4:
                 break
-        return val
+        return wb.worland_norm_row(n,m,-2)*c(n-2.0)*val
 
     # Generate subdiagonal
     def d_1(n):
@@ -486,11 +508,44 @@ def stencil_value_diff2(nr, l, coeffs = None):
                 break
             if j > 2:
                 break
-        return val
+        return wb.worland_norm_row(n,m,-1)*c(n-1.0)*val
 
     # Generate diagonal
     def d0(n):
+        return wb.worland_norm_row(n,m,0)*c(n)*np.ones(n.shape)
+
+    ds = [d_2, d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_value_laplh(nr, m, coeffs = None):
+    """Create stencil matrix for a zero boundary value and zero horizontal laplacian"""
+
+    assert(coeffs is None)
+
+    ns = np.arange(0,nr)
+    offsets = [-2, -1, 0]
+
+    def c(n):
         return np.ones(n.shape)
+
+    # Generate second subdiagonal
+    def d_2(n):
+        num = 4.0*(-1.0 + n)*n*(-3.0 + m + 2.0*n)*(11.0 + 4.0*(-3.0 + n)*n + m*(-5.0 + 4.0*n))
+        den = (-1.0 + m + 2.0*n)*(3.0 + 4.0*(-2.0 + n)*n)*(3.0 + 4.0*(-1.0 + n)*n + m*(-1.0 + 4.0*n))
+        return wb.worland_norm_row(n,m,-2)*c(n-2.0)*num/den
+
+    # Generate subdiagonal
+    def d_1(n):
+        num = -4.0*n*(m + 2.0*n)*(5.0 + m + 4.0*m*n + 4.0*n**2)
+        den = (-1.0 + 2.0*n)*(1.0 + m + 2.0*n)*(3.0 + 4.0*n*(1.0 + n) + m*(3.0 + 4.0*n))
+        return wb.worland_norm_row(n,m,-1)*c(n-1.0)*num/den
+
+    # Generate diagonal
+    def d0(n):
+        return wb.worland_norm_row(n,m,0)*c(n)*np.ones(n.shape)
 
     ds = [d_2, d_1, d0]
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)

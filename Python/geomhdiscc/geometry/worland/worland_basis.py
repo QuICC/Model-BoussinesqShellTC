@@ -10,10 +10,13 @@ import scipy.special as special
 def worland_norm(n , l):
     """Normalization factor"""
 
-    if l == 0 and n == 0:
-        return np.sqrt(np.pi/2.0)
+    if l == 0:
+        if n == 0:
+            return np.sqrt(2.0/np.pi)
+        else:
+            return np.sqrt(4.0*np.exp(2.0*special.gammaln(n+1.0) - 2.0*special.gammaln(n+0.5)))
     else:
-        return np.sqrt((2.0*n+l)*np.exp(special.gammaln(n+l) + special.gammaln(n+1.0) - special.gammaln(n+0.5) - special.gammaln(n+l+0.5)))
+        return np.sqrt(2.0*(2.0*n+l)*np.exp(special.gammaln(n+l) + special.gammaln(n+1.0) - special.gammaln(n+0.5) - special.gammaln(n+l+0.5)))
 
 def worland_grid(nr):
     """Physical space grid"""
@@ -32,14 +35,55 @@ def worland_poly(n, l, nr):
 
     return rg**l*special.eval_jacobi(n, -0.5, l - 0.5, 2.0*rg**2 - 1.0)*norm
 
-def worland_norm_row(n , l, k):
+def worland_norm_row(n, l, k):
     """Normalization factor for matrix row"""
-    
-    norm = np.log(2.0*n + l + 2.0*k) - np.log(2.0*n + l)
-    norm += special.gammaln(n + 0.5) - special.gammaln(n + 0.5 + k)
-    norm += special.gammaln(n + l + 0.5) - special.gammaln(n + l + 0.5 + k)
-    norm += special.gammaln(n + l + k) - special.gammaln(n + l)
-    norm += special.gammaln(n + 1.0 + k) - special.gammaln(n + 1.0)
+
+    if n[0] + k < 0:
+        raise RuntimeError("Requested row normalization is inconsistent")
+
+    if l == 0:
+        norm = -np.log(4.0) + 2.0*special.gammaln(n + 0.5) - 2.0*special.gammaln(n + 1.0)
+        if n[0] == 0:
+            norm[0] = (np.log(np.pi) - np.log(2.0))
+    else:
+        norm = -np.log(2.0*(2.0*n + l)) + special.gammaln(n + 0.5) + special.gammaln(n + l + 0.5) - special.gammaln(n + l) - special.gammaln(n + 1.0)
+
+    # Special case for projection on l = 0
+    if l == 0:
+        if n[0] + k == 0:
+            norm[0] += np.log(2.0) - np.log(np.pi)
+            norm[1:] += np.log(4.0) - 2.0*special.gammaln(n[1:] + 0.5 + k) + 2.0*special.gammaln(n[1:] + 1.0 + k)
+        else:
+            norm += np.log(4.0) - 2.0*special.gammaln(n + 0.5 + k) + 2.0*special.gammaln(n + 1.0 + k)
+    else:
+        norm += np.log(2.0*(2.0*n + l + 2.0*k)) - special.gammaln(n + 0.5 + k) - special.gammaln(n + l + 0.5 + k) + special.gammaln(n + l + k) + special.gammaln(n + 1.0 + k)
+
+    return np.sqrt(np.exp(norm))
+
+def worland_norm_row_l_1(n, l, k):
+    """Normalization factor for matrix row from W_n^l to Wn^{l-1}"""
+
+    if n[0] + k < 0:
+        raise RuntimeError("Requested row normalization is inconsistent")
+  
+    if l - 1 == 0:
+        norm = -np.log(4.0) + 2.0*special.gammaln(n + 0.5) - 2.0*special.gammaln(n + 1.0)
+        if n[0] == 0:
+            norm[0] = (np.log(np.pi) - np.log(2.0))
+    elif l == 0:
+        norm = -np.log(2.0*(2.0*n + l + 1.0)) + special.gammaln(n + 0.5) + special.gammaln(n + l + 1.5) - special.gammaln(n + l + 1.0) - special.gammaln(n + 1.0)
+    else:
+        norm = -np.log(2.0*(2.0*n + l - 1.0)) + special.gammaln(n + 0.5) + special.gammaln(n + l - 0.5) - special.gammaln(n + l - 1.0) - special.gammaln(n + 1.0)
+
+    # Special case for projection on l = 0
+    if l == 0:
+        if n[0] + k == 0:
+            norm[0] += np.log(2.0) - np.log(np.pi)
+            norm[1:] += np.log(4.0) - 2.0*special.gammaln(n[1:] + 0.5 + k) + 2.0*special.gammaln(n[1:] + 1.0 + k)
+        else:
+            norm += np.log(4.0) - 2.0*special.gammaln(n + 0.5 + k) + 2.0*special.gammaln(n + 1.0 + k)
+    else:
+        norm += np.log(2.0*(2.0*n + l + 2.0*k)) - special.gammaln(n + 0.5 + k) - special.gammaln(n + l + 0.5 + k) + special.gammaln(n + l + k) + special.gammaln(n + 1.0 + k)
 
     return np.sqrt(np.exp(norm))
 
@@ -48,6 +92,21 @@ def worland_normalize(val, l):
 
     for i in range(0, val.shape[0]):
          val[i] *= worland_norm(i, l)
+
+def worland_origin(nr, l, k = 0, normalize = True):
+    """Compute the value at origin for Worland polynomials"""
+
+    val = np.zeros(nr)
+    val[0] = 1.0
+    if nr > 0:
+        for i in range(1,nr):
+            val[i] = (-1.0)**i*np.exp(special.gammaln(i + l + 0.5) - special.gammaln(i + 1.0) - special.gammaln(l + 0.5))
+
+    # Normalize
+    if normalize:
+        worland_normalize(val, l)
+
+    return val
 
 def worland_value(nr, l, k = 0, normalize = True):
     """Compute the endpoint value for Worland polynomials"""

@@ -12,6 +12,7 @@ import scipy.special as special
 import geomhdiscc.transform.cylinder_worland as transf
 import geomhdiscc.geometry.cylindrical.cylinder_radius_worland as geo
 import geomhdiscc.geometry.worland.worland_basis as wb
+np.set_printoptions(precision=15)
 
 
 def x_to_phys(expr, grid):
@@ -297,17 +298,192 @@ def test_fft(n, m):
     # Print error for FFT transform loop
     print(np.max(np.abs(s.T-fs.T)))
 
+def test_endpoints(n, m):
+    """Test endpoint values"""
+
+    t = []
+    t.append(wb.worland_value(n, m))
+    t.append(wb.worland_diff(n, m))
+    t.append(wb.worland_diff2(n, m))
+    t.append(wb.worland_diff3(n, m))
+    t.append(wb.worland_diff4(n, m))
+    t.append(wb.worland_rdiffdivr(n, m))
+    t.append(wb.worland_divrdiffr(n, m))
+    t.append(wb.worland_laplh_cyl(n, m))
+    t.append(wb.worland_dlaplh_cyl(n, m))
+    t.append(wb.worland_lapl2h_cyl(n, m))
+    t = np.array(t).T
+    np.savetxt("cylinder_worland_endpoints_l"+str(m)+".dat", t)
+    print("Endpoint values:")
+    print("Value, Diff, Diff2, Diff3, Diff4, rdiffdivr, divrdiff, laplh, dlaplh, lapl2h")
+    print(t)
+
+def test_stencils(n, m):
+    """Test endpoint values"""
+
+    print("Stencil errors: m = " + str(m))
+    print("\t Value:")
+    err = geo.radbc.stencil_value(n,m).T*wb.worland_value(n, m)
+    print(np.max(np.abs(err)))
+    print("\t Diff:")
+    val = geo.radbc.stencil_diff(n,m).T*wb.worland_diff(n, m)
+    print(np.max(np.abs(err)))
+    print("\t Value + Diff:")
+    t = np.array([wb.worland_value(n, m), wb.worland_diff(n, m)])
+    err = geo.radbc.stencil_value_diff(n,m).T*t.T
+    print(np.max(np.abs(err),0))
+    # print("\t Value + Diff2:")
+    #t = np.array([wb.worland_value(n, m), wb.worland_diff2(n, m)])
+    #err = geo.radbc.stencil_value_diff2(n,m).T*t.T
+    #print(np.max(np.abs(err),0))
+    print("\t Value + Laplh:")
+    t = np.array([wb.worland_value(n, m), wb.worland_laplh_cyl(n, m)])
+    err = geo.radbc.stencil_value_laplh(n,m).T*t.T
+    print(np.max(np.abs(err),0))
+
+def divr(n):
+    """Test 1/r operator"""
+
+    for i in range(0,1):
+        #m = np.random.randint(1, n-1)
+        #m = m + (m+i)%2
+        m = 32
+        print("1/r operator: m = " + str(m))
+#        A = geo.divr(n, m, {0:0}).tolil()
+#        #A[0,:] = 0
+#        #A[0,-1] = 1
+#        A = A.tocsr()
+
+        # Build unit W_n^{l-1} vector
+        #v = np.array([1.0/i**4 for i in range(1,n+1)])
+        v = np.array([1.0 for i in range(1,n+1)])
+        v[-1:] = 0
+        v = v.reshape((n,1))
+
+        # Remove divergent part (multiply by r^2)
+        pv = transf.torphys(v, m-1, 2*n+m)
+        g = wb.worland_grid(pv.shape[0]/2)
+        g = g.reshape((g.shape[0],1))
+        v = transf.torspec(np.multiply(g**2,pv), m-1, n)
+        v = v.reshape((n,1))
+        pv = transf.torphys(v, m-1, 2*n+m)
+
+        # Make bad v
+        v_bad = v.copy()
+        v_bad[0] += 1.0
+        pv_bad = transf.torphys(v_bad, m-1, 2*n+m)
+
+        print(np.asscalar(v[0]))
+        # 
+        for j in range(4, 24):
+            vt = transf.torphys(v_bad, m-1, 2*n+m)
+            t = 0.5*transf.torspec(vt, m-1, j)
+            mid = np.array([(-1.0)**i*np.exp(special.gammaln(i+m-0.5)-special.gammaln(i+1.0)-special.gammaln(m-0.5))*wb.worland_norm(i,m-1)/wb.worland_norm(0,m-1) for i in range(0,j)])
+            mid = mid.reshape((mid.shape[0],1))
+            mid[0] = 0
+            corr = -np.asscalar(np.dot(mid[:,0],t[:,0]))
+            print(corr)
+            #v_bad[0] = corr
+            print(v_bad[0] - v[0])
+        
+        print("---------------------------------------------------")
+        mid = np.array([(-1.0)**i*np.exp(special.gammaln(i+m-0.5)-special.gammaln(i+1.0)-special.gammaln(m-0.5))*wb.worland_norm(i,m-1)/wb.worland_norm(0,m-1) for i in range(0,n)])
+        mid = mid.reshape((mid.shape[0],1))
+        mid[0] = 0
+#        print(np.multiply(mid, v))
+#        print(np.dot(mid[:,0],v_bad[:,0]))
+#        print(np.dot(mid[:,0],v_bad[:,0]) + v[0])
+#        #print(np.dot(mid[:,0],v_bad[:,0]) + 2.008339172142914)
+#        print(np.dot(mid[:,0],v_bad[:,0]) + 2.001601876723355)
+#        #print(v_bad)
+#        #print(mid[1]*v_bad[1,0])
+#        #print((np.multiply(mid,v_bad)).T)
+#        print(np.cumsum(np.multiply(mid,v_bad)))
+#        print(v)
+        #print(np.cumsum(np.multiply(mid,v_bad[:,0])))
+
+#        # Build clean RHS (shift up and zero last)
+#        rhs = np.zeros(v.shape)
+#        rhs = v_bad.copy()
+#        #rhs[0:-2] = v[1:-1]
+#        #rhs[0:-2] = v[0:-2]
+#
+#        import scipy.io as io
+#        io.mmwrite('matrix_divr.mtx', A)
+#
+#        # Solve for clean LHS
+#        #print(rhs)
+#        lhs = spsplin.spsolve(A, rhs) 
+#        import numpy.linalg as LA
+#        #print(lhs)
+#        lhs = lhs.reshape((n,1))
+#        #lhs[-2] = 0
+#        #print(rhs - A*lhs)
+#
+#        # Plot solution
+#        import matplotlib.pylab as pl
+#        from matplotlib import rc
+#        rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+#        ## for Palatino and other serif fonts use:
+#        #rc('font',**{'family':'serif','serif':['Palatino']})
+#        rc('text', usetex=True)
+#
+#        pl.subplot(221)
+#        pl.title("Spectrum")
+#        pl.semilogy(np.abs(v), 'r<', label = '$W_^{m-1}$', linewidth=2, markersize=10)
+#        pl.semilogy(np.abs(v_bad), 'c+', label = '$W_^{m-1} + \\alpha W_0^{m-1}$', linewidth=2, markersize=10)
+#        pl.semilogy(np.abs(lhs), 'ko', label = '$W_n^m = \\frac{W_n^{m-1}}{r}$', linewidth=2, markersize=10)
+#        r = 0.5*transf.torspec(pv/g, m, n)
+#        r = r.reshape((n,1))
+#        print(r)
+#        pl.semilogy(np.abs(r), 'mx', label = 'Manual clean', linewidth=2, markersize=10)
+#        r_bad = 0.5*transf.torspec(pv_bad/g, m, n)
+#        r_bad = r_bad.reshape((n,1))
+#        pl.semilogy(np.abs(r_bad), 'cd', label = 'Manual bad', linewidth=2, markersize=10)
+#        pl.legend()
+#
+#        pl.subplot(222)
+#        pl.title("Physical")
+#        pl.plot(g, pv, 'r-', label = '$W_^{m-1}$', linewidth = 2)
+#        pl.plot(g, pv/g, 'bx',  label = '$W_n^{m-1}/r$',linewidth = 1)
+#        pl.plot(g, pv_bad, 'c-', label = '$W_n^{m-1} + \\alpha W_0^{m-1}$', linewidth = 2)
+#        pl.plot(g, pv_bad/g, 'm-',  label = '$(W_n^{m-1} + \\alpha W_0^{m-1})/r$',linewidth = 1)
+#        plhs = transf.torphys(lhs, m, 2*n+m)
+#        pl.plot(g, plhs, 'k-',  label = '$W_n^m = W_n^{m-1}/r$',linewidth = 2)
+#        pr = transf.torphys(r, m, 2*n+m)
+#        pl.plot(g, pr, 'k:',  label = '$W_n^m = W_n^{m-1}/r$',linewidth = 2)
+#        pr_bad = transf.torphys(r_bad, m, 2*n+m)
+#        pl.plot(g, pr_bad, 'm:',  label = '$W_n^m = W_n^{m-1}/r$',linewidth = 2)
+#        pl.legend(loc = 'upper left')
+#
+#        pl.subplot(223)
+#        pl.title('Error')
+#        pl.semilogy(g, np.abs(pv/g-plhs), 'k+-', label = 'Clean - Op', linewidth = 2)
+#        pl.semilogy(g, np.abs(pv/g-pr), 'kx:', label = 'Clean - Man clean', linewidth = 2)
+#        pl.semilogy(g, np.abs(pv/g-pr_bad), 'mo:', label = 'Clean - Man bad', linewidth = 2)
+#        pl.legend(loc = 'lower right')
+#
+#        pl.subplot(224)
+#        pl.semilogy(np.abs(lhs - r), 'k+-', label = 'Clean - Op', linewidth = 2)
+#        pl.semilogy(np.abs(lhs - r_bad), 'kx:', label = 'Clean - Man clean', linewidth = 2)
+#        pl.legend()
+#        pl.show()
+
 
 if __name__ == "__main__":
     # Set test parameters
-    n = 16
+    n = 64
     nr = int(np.ceil(3.0*n/2.0 + 3.0*n/4.0 + 1))
     print("Grid: " + str((n, nr)))
     rg = wb.worland_grid(nr)
 
     # run tests
 #    test_worland(nr, 110)
+#    for i in range(0,4):
+#        test_endpoints(n, i)
+#    test_stencils(n, 0)
 #    test_fft(nr, 32)
+    divr(n)
 #    zblk(nr, rg)
 #    i2(n, rg)
 #    i2laplh(nr, rg)
@@ -317,4 +493,4 @@ if __name__ == "__main__":
 #    i6(nr, rg)
 #    i6laplh(nr, rg)
 #    i6lapl2h(nr, rg)
-    i6lapl3h(nr, rg)
+#    i6lapl3h(nr, rg)

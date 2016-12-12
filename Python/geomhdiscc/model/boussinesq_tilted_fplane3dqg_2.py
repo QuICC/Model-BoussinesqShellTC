@@ -73,7 +73,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -360,6 +360,18 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
 
         elif field_row == ("temperature",""):
             mat = geo.i2(res[0], bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

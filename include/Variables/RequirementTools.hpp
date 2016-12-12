@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
           * @param vectorVars          Vector variables
           * @param forwardIsNonlinear  Forward transform works on nonlinear terms
           */
-         static void mapEquationVariables(std::vector<Transform::TransformTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear);
+         static void mapEquationVariables(std::vector<Transform::TransformTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear, const SharedSimulationBoundary spBcs);
 
          /**
           * @brief Initialise imposed variables and variable requirements from equations

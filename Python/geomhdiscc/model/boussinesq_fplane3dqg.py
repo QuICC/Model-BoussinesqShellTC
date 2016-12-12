@@ -71,12 +71,14 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
         if self.use_galerkin:
             if field_row == ("velocityz",""):
+                shift_z = 2
+            elif field_row == ("streamfunction",""):
                 shift_z = 2
             elif field_row == ("temperature",""):
                 shift_z = 2
@@ -121,6 +123,8 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
+                    elif field_col == ("streamfunction",""):
+                        bc = {0:-21, 'rt':0}
                     elif field_col == ("velocityz",""):
                         bc = {0:-20, 'rt':0}
 
@@ -146,7 +150,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityz","") or field_row == ("streamfunction",""):
-                    bc['rt'] = 1
+                    bc['rt'] = 2
                 elif field_row == ("temperature",""):
                     bc['rt'] = 2
 
@@ -155,6 +159,8 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             if self.use_galerkin:
                 if field_col == ("temperature",""):
                     bc = {0:-20, 'rt':0}
+                elif field_col == ("streamfunction",""):
+                    bc = {0:-21, 'rt':0}
                 elif field_col == ("velocityz",""):
                     bc = {0:-20, 'rt':0}
         
@@ -163,6 +169,8 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocityz",""):
+                    bc['rt'] = 2
+                elif field_row == ("streamfunction",""):
                     bc['rt'] = 2
                 elif field_row == ("temperature",""):
                     bc['rt'] = 2

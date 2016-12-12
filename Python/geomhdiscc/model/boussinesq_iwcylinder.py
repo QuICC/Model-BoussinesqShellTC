@@ -65,17 +65,17 @@ class BoussinesqIWCylinder(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]*res[2]
         if self.use_galerkin:
             if field_row == ("velocity","tor"):
-                shift_r = 2
+                shift_r = 1
                 shift_z = 2
             elif field_row == ("velocity","pol"):
-                shift_r = 3
-                shift_z = 4
+                shift_r = 1
+                shift_z = 2
             else:
                 shift_r = 0
                 shift_z = 0
@@ -133,13 +133,13 @@ class BoussinesqIWCylinder(base_model.BaseModel):
 #                    elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
 #                        bc = {'r':{0:0, 'mixed':{0:16, 'pad':2, 'kron_shift':2, 'kron':functools.partial(geo.c1d.i2d1, cscale = zscale)}}, 'z':{0:0}, 'priority':'r'}
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {'r':{0:20}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'r':{0:11, 'mixed':{0:10, 'c':1j*m, 'pad':1, 'kron_shift':1, 'kron':functools.partial(geo.c1d.i1)}}, 'z':{0:0, 'mixed':{0:20, 'kron_shift':0, 'kron':functools.partial(geo.rad.i2laplh)}}, 'priority':'r'}
                     elif field_row == ("velocity","tor") and field_col == ("velocity","pol"):
-                        bc = {'r':{0:0}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:0, 'mixed':{0:11, 'pad':1, 'kron_shift':1, 'kron':functools.partial(geo.c1d.i1d1, cscale=zscale)}}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == field_row:
-                        bc = {'r':{0:30}, 'z':{0:40} , 'priority':'z'}
+                        bc = {'r':{0:22, 'mixed':{0:[17,15], 'c':[-1j*m,-1j*m], 'pad':2, 'kron_shift':2, 'kron':[geo.c1d.i2, functools.partial(geo.c1d.i2d2, cscale=zscale)]}}, 'z':{0:0, 'mixed':{0:40, 'kron_shift':0, 'kron':functools.partial(geo.rad.i2laplh)}}, 'priority':'r'}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
-                        bc = {'r':{0:0, 'mixed':{0:16, 'pad':2, 'kron_shift':2, 'kron':functools.partial(geo.c1d.i2d1, cscale = zscale)}}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'r':{0:0, 'mixed':{0:16, 'pad':2, 'kron_shift':2, 'kron':functools.partial(geo.c1d.i2d1, cscale = zscale)}}, 'z':{0:0}, 'priority':'r'}
 
             # Stress-free/No-slip, Fixed flux/Fixed temperature
             elif bcId == 2:
@@ -210,7 +210,6 @@ class BoussinesqIWCylinder(base_model.BaseModel):
         Ta = eq_params['taylor']
         T = Ta**0.5
         m = eigs[0]
-        print(m)
 
         zscale = 2.0*G
 

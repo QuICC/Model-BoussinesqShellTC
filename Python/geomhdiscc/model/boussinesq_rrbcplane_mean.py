@@ -80,7 +80,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -197,7 +197,7 @@ class BoussinesqRRBCPlane(base_model.BaseModel):
                         if eigs[0] == 0 and eigs[1] == 0:
                             bc = {0:21}
                         else:
-                            bc = {0:40, 'use_parity':True}
+                            bc = {0:41, 'use_parity':True}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","tor"):
                         if eigs[0] == 0 and eigs[1] == 0:
                             bc = {0:0}

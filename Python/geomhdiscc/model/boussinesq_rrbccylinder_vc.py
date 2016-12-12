@@ -7,9 +7,9 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cylindrical.cylinder as geo
+import geomhdiscc.geometry.cylindrical.cylinder_worland as geo
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.cylindrical.cylinder_boundary import no_bc
+from geomhdiscc.geometry.cylindrical.cylinder_boundary_worland import no_bc
 
 
 class BoussinesqRRBCCylinderVC(base_model.BaseModel):
@@ -23,7 +23,15 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "scale3d"]
+        return ["ekman", "prandtl", "rayleigh", "gamma", "scale3d"]
+
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        # Merge aspect ratio into scale factor
+        d = {"scale3d":eq_params["scale3d"]*eq_params["gamma"]}
+
+        return d
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -64,12 +72,12 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]*res[2]
         if self.use_galerkin:
-            if field_row == ("velocity","r") or field_row == ("velocity","theta") or field_row == ("velocity","z") or field_row == ("temperature",""):
+            if field_row in [("velocity","r"), ("velocity","theta"), ("velocity","z"), ("temperature","")]:
                 shift_r = 1
                 shift_z = 2
             else:
@@ -85,6 +93,17 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
 
         block_info = (tau_n, gal_n, (shift_r,0,shift_z), 1)
         return block_info
+
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+
+        # Get boundary condition
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        return geo.stencil(res[0], res[2], m, bc, make_square)
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -416,22 +435,22 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","theta"):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","z"):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_w, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = geo.i2j2r2(res[0], res[2], m%2, bc)
+            mat = geo.i2j2(res[0], res[2], m%2, bc)
 
         elif field_row == ("pressure",""):
             mat = geo.zblk(res[0], res[2], m%2, 1, 1, bc)
