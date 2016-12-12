@@ -34,6 +34,12 @@ namespace IoTools {
          case PhysicalNames::CODENSITY:
             return "Codensity";
 
+         case PhysicalNames::BX:
+            return "Bx";
+
+         case PhysicalNames::BY:
+            return "By";
+
          case PhysicalNames::DENSITY:
             return "Density";
 
@@ -43,8 +49,23 @@ namespace IoTools {
          case PhysicalNames::DX_MEANTEMPERATURE:
             return "D_x mean temperature";
 
+         case PhysicalNames::EMFX:
+            return "Emfx";
+
+         case PhysicalNames::EMFY:
+            return "Emfy";
+
          case PhysicalNames::ENTROPY:
             return "Entropy";
+
+         case PhysicalNames::FBX:
+            return "Fbx";
+
+         case PhysicalNames::FBY:
+            return "Fby";
+
+         case PhysicalNames::FBZ:
+            return "Fbz";
 
          case PhysicalNames::MAGNETIC:
             return "Magnetic";
@@ -196,6 +217,12 @@ namespace IoTools {
          case PhysicalNames::CODENSITY:
             return "codensity";
 
+         case PhysicalNames::BX:
+            return "bx";
+
+         case PhysicalNames::BY:
+            return "by";
+
          case PhysicalNames::DENSITY:
             return "density";
 
@@ -205,8 +232,23 @@ namespace IoTools {
          case PhysicalNames::DX_MEANTEMPERATURE:
             return "dx_meantemperature";
 
+         case PhysicalNames::EMFX:
+            return "emfx";
+
+         case PhysicalNames::EMFY:
+            return "emfy";
+
          case PhysicalNames::ENTROPY:
             return "entropy";
+
+         case PhysicalNames::FBX:
+            return "fbx";
+
+         case PhysicalNames::FBY:
+            return "fby";
+
+         case PhysicalNames::FBZ:
+            return "fbz";
 
          case PhysicalNames::MAGNETIC:
             return "magnetic";

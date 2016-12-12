@@ -225,6 +225,10 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
+   void BoussinesqBeta3DQGPerModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+   }
+
    void BoussinesqBeta3DQGPerModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

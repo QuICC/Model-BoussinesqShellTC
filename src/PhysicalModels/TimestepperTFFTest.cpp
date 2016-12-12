@@ -25,6 +25,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Tests/TimestepperTFFScalar.hpp"
+#include "Equations/Tests/TimestepperTFFTimeAvgScalar.hpp"
 #include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
@@ -43,6 +44,9 @@ namespace GeoMHDiSCC {
    {
       // Add timestepper test equation
       spSim->addScalarEquation<Equations::TimestepperTFFScalar>();
+
+      // Add timestepper time averaged test equation
+      spSim->addScalarEquation<Equations::TimestepperTFFTimeAvgScalar>();
    }
 
    void TimestepperTFFTest::addStates(SharedStateGenerator spGen)
@@ -58,6 +62,11 @@ namespace GeoMHDiSCC {
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
          spExact->setStateType(Equations::CartesianExactStateIds::PEYRET1DA);
 
+         // Add initial field
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::PRESSURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::PEYRET1DA);
+
       // Generate random spectrum
       } else
       {
@@ -69,11 +78,17 @@ namespace GeoMHDiSCC {
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
          spRand->setSpectrum(-1e-7, 1e-7, 1e4, 1e4, 1e4);
+
+         // Add transport initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::PRESSURE);
+         spRand->setSpectrum(-1e-7, 1e-7, 1e4, 1e4, 1e4);
       }
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::PRESSURE);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -87,9 +102,15 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
+      // Add transport field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false, false);
+      spField->setIdentity(PhysicalNames::PRESSURE);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -100,6 +121,7 @@ namespace GeoMHDiSCC {
 
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
+      spIn->expect(PhysicalNames::PRESSURE);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -111,6 +133,16 @@ namespace GeoMHDiSCC {
       IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("temperature", SchemeType::type()));
       spTemp->expect(PhysicalNames::TEMPERATURE);
       spSim->addAsciiOutputFile(spTemp);
+
+      // Create temperature energy writer
+      IoVariable::SharedCartesian1DScalarEnergyWriter spAvgTemp(new IoVariable::Cartesian1DScalarEnergyWriter("time_avg_temperature", SchemeType::type()));
+      spAvgTemp->expect(PhysicalNames::PRESSURE);
+      spSim->addAsciiOutputFile(spAvgTemp);
+   }
+
+   void TimestepperTFFTest::addStatsOutputFiles(SharedSimulation spSim)
+   {
+
    }
 
    void TimestepperTFFTest::addHdf5OutputFiles(SharedSimulation spSim)
@@ -125,6 +157,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+      spState->expect(PhysicalNames::PRESSURE);
 
       spSim->addHdf5OutputFile(spState);
    }
@@ -143,6 +176,7 @@ namespace GeoMHDiSCC {
       {
          spInit->expect(*it);
       }
+      spInit->expect(PhysicalNames::PRESSURE);
 
       // Set simulation state
       spSim->setInitialState(spInit);

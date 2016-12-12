@@ -192,6 +192,10 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
+   void BoussinesqRRBCPlaneMeanModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+   }
+
    void BoussinesqRRBCPlaneMeanModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

@@ -79,6 +79,13 @@ namespace GeoMHDiSCC {
           */
          static void addAsciiOutputFiles(SharedSimulation spSim);
 
+         /** 
+          * @brief Add the required statistics output files
+          * 
+          * @param spSim   Shared simulation object
+          */
+         static void addStatsOutputFiles(SharedSimulation spSim);
+
          /**
           * @brief Add the required HDF5 output files
           *

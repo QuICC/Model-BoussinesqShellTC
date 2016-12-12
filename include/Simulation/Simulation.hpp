@@ -100,7 +100,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Update the time stored in each equation
           */
-         void updateEquationTime(const MHDFloat time);
+         void updateEquationTime(const MHDFloat time, const bool finished);
 
          /**
           * @brief Timestep coordinator

@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
    namespace IoStats {
 
       Cartesian1DScalarKurtWriter::Cartesian1DScalarKurtWriter(const std::string& prefix, const SharedCartesian1DScalarAvgWriter& Avg, const SharedCartesian1DScalarRMSWriter& RMS, const std::string& type)
-         : IStatisticsAsciiEWriter(prefix + KurtTags::BASENAME, KurtTags::EXTENSION, prefix + KurtTags::HEADER, type, KurtTags::VERSION, Dimensions::Space::SPECTRAL),mArea(-1), mKurt(-Array::Ones(2)), mAvg(Avg), mRMS(RMS)
+         : IStatisticsAsciiEWriter(prefix + KurtTags::BASENAME, KurtTags::EXTENSION, prefix + KurtTags::HEADER, type, KurtTags::VERSION, Dimensions::Space::SPECTRAL),mArea(-1), mAvg(Avg), mRMS(RMS), mKurt(-Array::Ones(2))
       {
       }
 
