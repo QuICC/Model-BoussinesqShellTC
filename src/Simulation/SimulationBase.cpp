@@ -34,6 +34,7 @@
 #include "Equations/Tools/EquationTools.hpp"
 #include "Python/PythonModelWrapper.hpp"
 #include "Python/PythonTools.hpp"
+#include "Simulation/SimulationIoTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -313,6 +314,11 @@ namespace GeoMHDiSCC {
       this->mSimIoCtrl.addHdf5OutputFile(spOutFile);
    }
 
+   void SimulationBase::addStatsOutputFile(IoStats::SharedIStatisticsAsciiEWriter spOutFile)
+   {
+      this->mSimIoCtrl.addStatsOutputFile(spOutFile);
+   }
+
    void SimulationBase::initSolvers()
    {
       StageTimer stage;
@@ -461,6 +467,27 @@ namespace GeoMHDiSCC {
          {
             (*hdf5It)->setMesh(this->mTransformCoordinator.mesh());
          }
+      }
+
+      // Loop over all satistics files added to the simulation control
+      SimulationIoControl::stats_iterator  statsIt;
+      for(statsIt = this->mSimIoCtrl.beginStats(); statsIt != this->mSimIoCtrl.endStats(); ++statsIt)
+      {
+         // Loop over all scalars
+         std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
+         for(scalIt = this->mScalarVariables.begin(); scalIt != this->mScalarVariables.end(); scalIt++)
+         {
+            (*statsIt)->addScalar((*scalIt));
+         }
+
+         // Loop over all vector variables
+         std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
+         for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
+         {
+            (*statsIt)->addVector((*vectIt));
+         }
+
+         (*statsIt)->setMesh(this->mTransformCoordinator.mesh());
       }
 
       // Allow for implementation specific tuning

@@ -179,6 +179,13 @@ namespace GeoMHDiSCC {
           */
          void addHdf5OutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile);
 
+         /**
+          * @brief Add Stats output file to solver
+          *
+          * @param spOutFile Shared stats output file
+          */
+         void addStatsOutputFile(IoStats::SharedIStatisticsAsciiEWriter spOutFile);
+
       protected:
          /**
           * @brief Initialise the solvers (done just before preRun)
