@@ -316,7 +316,7 @@ namespace GeoMHDiSCC {
          rMatrix.imag().setFromTriplets(imagTriplets.begin(), imagTriplets.end());
       }
    }
-
+/*
    void PythonWrapper::getMatrix(Matrix& rMatrix, PyObject* pMat)
    {
 	   // TODO: some precondition-checking on the number of dimensions and the size
@@ -338,7 +338,7 @@ namespace GeoMHDiSCC {
 
 	   // resize the eigen::vector and assign the pointer
 	   rVector = Eigen::Map<Eigen::VectorXd>(PyArray_DATA(pVec),len);
-   }
+   }*/
 
    void PythonWrapper::cleanup()
    {

@@ -95,12 +95,12 @@ namespace GeoMHDiSCC {
          /*
           * @brief Fill a full matrix (Eigen::MatrixXd) with data from PyObject
           */
-         static void getMatrix(Matrix& rMatrix, PyObject* pMat);
+//         static void getMatrix(Matrix& rMatrix, PyObject* pMat);
 
          /*
           * @brief Fill a vector (Eigen::VectorXd) with data from PyObject
           */
-         static void getVector(Array& rArray, PyObject* pVec);
+ //        static void getVector(Array& rArray, PyObject* pVec);
 
   
          /**
