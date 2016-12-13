@@ -27,7 +27,6 @@ if __name__=="__main__":
     
     pp.show()
     
-    what is the computer temp?
     
     
     

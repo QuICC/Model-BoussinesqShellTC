@@ -24,6 +24,8 @@
 #include "Resolutions/Resolution.hpp"
 #include "IoVariable/IVariableAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
+#include<utility>
+#include<map>
 
 namespace GeoMHDiSCC{
 
@@ -94,13 +96,15 @@ namespace IoVariable{
 		Matrix mPoints;
 
 		/*
-		 * @brief
+		 * @brief Precomputed M part of the spherical harmonic
 		 */
-		std::vector<std::vector<Array>> Mparts;
+		typedef std::map<std::pair<int,int>,Array> ArrayMap;
+		ArrayMap Mparts;
 
 		/*
-		 *
+		 * @brief Precomputed L part of the spherical harmonic
 		 */
+		ArrayMap Lparts;
 
 		/*
 		 * @brief

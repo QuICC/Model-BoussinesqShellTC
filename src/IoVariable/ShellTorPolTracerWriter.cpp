@@ -117,6 +117,10 @@ namespace IoVariable{
 		PyWrapL.setFunction("lplm");
 		PyWrapM.setFunction("eipm");
 
+		// set up the containers for the computed vectors
+		Lparts = ArrayMap();
+		Mparts = ArrayMap();
+
 
 		// precompute the Spherical harmonic part of the projector
 		#ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
@@ -139,6 +143,7 @@ namespace IoVariable{
 				// retrieve the result
 				Array lplm;
 				PythonWrapper::getVector(lplm,pValue);
+				Lparts[std::make_pair(l,m)] = lplm;
 
 				// prepare the call of eimp
 				PyTuple_SetItem(pArgs,2, vPhi);
@@ -149,6 +154,7 @@ namespace IoVariable{
 				// retrieve the result
 				Array eimp;
 				PythonWrapper::getVector(eimp,pValue);
+				Mparts[std::make_pair(l,m)] = eimp;
 			}
 		}
 		#endif // GEOMHDISCC_SPATIALSCHEME_SLFM
