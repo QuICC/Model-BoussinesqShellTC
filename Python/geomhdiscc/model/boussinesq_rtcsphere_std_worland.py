@@ -23,7 +23,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh"]
+        return ["ekman", "prandtl", "rayleigh"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -51,7 +51,10 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            fields = [field_row]
+            if field_row == ("temperature",""):
+                fields = [("temperature","")]
+            else:
+                fields = []
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
@@ -223,12 +226,6 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2(res[0], l, bc)
-
-        elif field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.qid(res[0], l, 1, bc)
-
-        elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.qid(res[0], l, 2, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

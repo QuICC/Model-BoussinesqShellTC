@@ -41,11 +41,11 @@ namespace Equations {
 
    void BoussinesqTCSphereMomentum::setCoupling()
    {
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
+      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
          int start = 1;
-      #else //if GEOMHDISCC_SPATIALSCHEME_BLFM
+      #elif defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
          int start = 0;
-      #endif //GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
 
