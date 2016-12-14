@@ -20,6 +20,8 @@
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "Quadratures/WorlandChebyshevRule.hpp"
+#include "PolynomialTransforms/WorlandPolynomial.hpp"
+#include "Python/PythonWrapper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -38,6 +40,8 @@ namespace Transform {
 
    SphereWorlandTransform::SphereWorlandTransform()
    {
+      // Initialise the Python interpreter wrapper
+      PythonWrapper::init();
    }
 
    SphereWorlandTransform::~SphereWorlandTransform()
@@ -79,6 +83,9 @@ namespace Transform {
 
    void SphereWorlandTransform::initOperators()
    {
+      // Initialise python wrapper
+      PythonWrapper::import("geomhdiscc.geometry.spherical.sphere_radius_worland");
+
       this->mGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
 
@@ -128,39 +135,39 @@ namespace Transform {
          this->mProjOp.find(ProjectorType::DIVR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          this->mProjOp.find(ProjectorType::DIFF)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          this->mProjOp.find(ProjectorType::DIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DVIRDIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
+         this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          this->mProjOp.find(ProjectorType::SLAPL)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
 
          op.resize(this->mGrid.size(), this->mspSetup->fast().at(iL).size());
 
          // Projector: P
-         Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
          std::map<ProjectorType::Id,std::vector<Matrix> >::iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R Projector: 1/R P
-         Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVR);
+         Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // First derivative: D
-         Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFF);
+         Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // D R
-         Polynomial::WorlandPolynomial::drWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIFFR);
+         Polynomial::WorlandPolynomial::drWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R D R
-         Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
+         Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // Spherical laplacian: D^2 2/R D - l(l+1)/R^2
-         Polynomial::WorlandPolynomial::slaplWnl(op, itmp, l, igrid);
          projIt = this->mProjOp.find(ProjectorType::SLAPL);
+         Polynomial::WorlandPolynomial::slaplWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // Allocate memory for the weighted integrator

@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq inertial wave in a sphere with Chebyshev expansion (Toroidal/Poloidal formulation)"""
+"""Module provides the functions to generate the Boussinesq inertial wave in a sphere with Worland expansion (Toroidal/Poloidal formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,13 +7,13 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.sphere_chebyshev as geo
+import geomhdiscc.geometry.spherical.sphere_worland as geo
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.spherical.sphere_boundary_chebyshev import no_bc
+from geomhdiscc.geometry.spherical.sphere_boundary_worland import no_bc
 
 
 class BoussinesqIWSphere(base_model.BaseModel):
-    """Class to setup the Boussinesq inertial wave in a sphere with Chebyshev expansion (Toroidal/Poloidal formulation)"""
+    """Class to setup the Boussinesq inertial wave in a sphere with Worland expansion (Toroidal/Poloidal formulation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -247,21 +247,21 @@ class BoussinesqIWSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, bc, ns_diff, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i2lapl(res[0], res[1], m, bc, ns_diff, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2r2(res[0], res[1], m, bc, 1j*m*ns_cor, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i2(res[0], res[1], m, bc, 1j*m*ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2r2coriolis(res[0], res[1], m, bc, -ns_cor, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i2coriolis(res[0], res[1], m, bc, -ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4r4coriolis(res[0], res[1], m, bc, ns_cor, l_zero_fix = 'zero', restriction = restriction)
+                mat = geo.i4coriolis(res[0], res[1], m, bc, ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], res[1], m, bc, ns_diff, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+                mat = geo.i4lapl2(res[0], res[1], m, bc, ns_diff, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4r4lapl(res[0], res[1], m, bc, 1j*m*ns_cor, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + geo.i4lapl(res[0], res[1], m, bc, 1j*m*ns_cor, l_zero_fix = 'zero', restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -278,10 +278,29 @@ class BoussinesqIWSphere(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
+            mat = geo.i4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block of boundary operator"""
+
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row in [("velocity","tor"), ("velocity","pol")] and field_row == field_col:
+            mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix = 'zero', restriction = restriction)
+        else:
+            mat = geo.zblk(res[0], res[1], m, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -137,7 +137,7 @@ namespace Transform {
       this->mTriSolver.insert(std::make_pair(ProjectorType::INVLAPLH,std::vector<SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> >()));
       this->mTriSolver.find(ProjectorType::INVLAPLH)->second.reserve(this->mspSetup->slow().size());
 
-      // Prepare arguments to Chebyshev matrices call
+      // Prepare arguments to Python matrices call
       PyObject *pArgs, *pValue;
       pArgs = PyTuple_New(4);
 

@@ -1,8 +1,8 @@
-"""Script to run a marginal curve trace for the Boussinesq inertial wave in a sphere with Chebyshev expansion (Toroidal/Poloidal formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq inertial wave in a sphere with Worland expansion (Toroidal/Poloidal formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_iwsphere_chebyshev as mod
+import geomhdiscc.model.boussinesq_iwsphere as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
@@ -60,7 +60,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-11
 #marginal_options['ellipse_radius'] = 1e5
-marginal_options['geometry'] = 'sphere_chebyshev'
+marginal_options['geometry'] = 'sphere_worland'
 marginal_options['target'] = -0.6547j
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
