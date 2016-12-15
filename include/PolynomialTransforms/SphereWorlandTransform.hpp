@@ -69,8 +69,10 @@ namespace Transform {
           *    - INTGT: integration of QST T component for Toroidal NL (2nd order equation)
           *    - INTGQ2: integration of QST Q component for Poloidal NL (2nd order equation)
           *    - INTGS2: integration of QST S component for Poloidal NL (2nd order equation)
+          *    - ENERGY: compute definite energy integral
+          *    - ENERGYR2: compute definite energy integral with spherical radial weight
           */
-         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
+         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2, ENERGY, ENERGYR2};
       };
 
    };
@@ -147,6 +149,17 @@ namespace Transform {
           * @param projector  Projector to use
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector);
+
+         /**
+          * @brief Compute quadrature integration
+          *
+          * Compute quadrature integration from physical space to spectral space with full output without spectral truncation
+          *
+          * @param rSpecVal   Output spectral coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          */
+         void integrate_full(MatrixZ& rSpecVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**

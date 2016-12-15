@@ -20,6 +20,7 @@
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "Quadratures/WorlandChebyshevRule.hpp"
+#include "Quadratures/LegendreRule.hpp"
 #include "PolynomialTransforms/WorlandPolynomial.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -93,6 +94,14 @@ namespace Transform {
       internal::Array igrid, iweights;
       WorlandChebyshevRule::computeQuadrature(this->mGrid, this->mWeights, igrid, iweights, this->mspSetup->fwdSize());
 
+      // Create legendre grid for energy calculations
+      Array legGrid(this->mspSetup->fwdSize());
+      Array legWeights(this->mspSetup->fwdSize());
+      internal::Array ilegGrid, ilegWeights;
+      LegendreRule::computeQuadrature(legGrid, legWeights, ilegGrid, ilegWeights, this->mspSetup->fwdSize());
+      legGrid.array() = ((legGrid.array() + 1.0)/2.0);
+      ilegGrid.array() = ((ilegGrid.array() + 1.0)/2.0);
+
       // Reserve storage for the projectors, 1st derivative
       this->mProjOp.insert(std::make_pair(ProjectorType::PROJ,std::vector<Matrix>()));
       this->mProjOp.find(ProjectorType::PROJ)->second.reserve(this->mspSetup->slow().size());
@@ -103,7 +112,7 @@ namespace Transform {
       this->mProjOp.insert(std::make_pair(ProjectorType::DIFFR,std::vector<Matrix>()));
       this->mProjOp.find(ProjectorType::DIFFR)->second.reserve(this->mspSetup->slow().size());
       this->mProjOp.insert(std::make_pair(ProjectorType::DIVRDIFFR,std::vector<Matrix>()));
-      this->mProjOp.find(ProjectorType::DVIRDIFFR)->second.reserve(this->mspSetup->slow().size());
+      this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.reserve(this->mspSetup->slow().size());
       this->mProjOp.insert(std::make_pair(ProjectorType::SLAPL,std::vector<Matrix>()));
       this->mProjOp.find(ProjectorType::SLAPL)->second.reserve(this->mspSetup->slow().size());
 
@@ -122,6 +131,14 @@ namespace Transform {
       this->mIntgOp.find(IntegratorType::INTGQ2)->second.reserve(this->mspSetup->slow().size());
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS2,std::vector<Matrix>()));
       this->mIntgOp.find(IntegratorType::INTGS2)->second.reserve(this->mspSetup->slow().size());
+      this->mIntgOp.insert(std::make_pair(IntegratorType::ENERGY,std::vector<Matrix>()));
+      this->mIntgOp.find(IntegratorType::ENERGY)->second.reserve(this->mspSetup->slow().size());
+      this->mIntgOp.insert(std::make_pair(IntegratorType::ENERGYR2,std::vector<Matrix>()));
+      this->mIntgOp.find(IntegratorType::ENERGYR2)->second.reserve(this->mspSetup->slow().size());
+
+      // Prepare arguments to Python matrices call
+      PyObject *pArgs, *pValue;
+      pArgs = PyTuple_New(4);
 
       // Loop over harmonic degrees
       Matrix op;
@@ -130,49 +147,228 @@ namespace Transform {
       {
          int l = this->mspSetup->slow()(iL);
 
-         // Allocate memory for the projectors
-         this->mProjOp.find(ProjectorType::PROJ)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIVR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIFF)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::SLAPL)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-
          op.resize(this->mGrid.size(), this->mspSetup->fast().at(iL).size());
 
          // Projector: P
          std::map<ProjectorType::Id,std::vector<Matrix> >::iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R Projector: 1/R P
          projIt = this->mProjOp.find(ProjectorType::DIVR);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::r_1Wnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // First derivative: D
          projIt = this->mProjOp.find(ProjectorType::DIFF);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // D R
          projIt = this->mProjOp.find(ProjectorType::DIFFR);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::drWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R D R
          projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
-         // Spherical laplacian: D^2 2/R D - l(l+1)/R^2
+         // Spherical laplacian: D^2 + 2/R D - l(l+1)/R^2
          projIt = this->mProjOp.find(ProjectorType::SLAPL);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::slaplWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
-         // Allocate memory for the weighted integrator
-         this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
-         this->mIntgOp.find(IntegratorType::INTG)->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         // Set resolution and l
+         PyTuple_SetItem(pArgs, 0, PyLong_FromLong(this->mspSetup->fast().at(iL).size()));
+         PyTuple_SetItem(pArgs, 1, PyLong_FromLong(l));
+         // ... create boundray condition (none)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         PyTuple_SetItem(pArgs, 2, pValue);
+         // Set coefficient
+         PyTuple_SetItem(pArgs, 3, PyFloat_FromDouble(1.0));
+
+         // Call i2
+         SparseMatrix matI2(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
+         PythonWrapper::setFunction("i2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(matI2, pValue);
+         Py_DECREF(pValue);
+
+         // Call i4
+         SparseMatrix matI4(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
+         PythonWrapper::setFunction("i4");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(matI4, pValue);
+         Py_DECREF(pValue);
+
+         // Call i2r_1d1
+         SparseMatrix matI2R_1D1(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
+         PythonWrapper::setFunction("i2r_1d1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(matI2R_1D1, pValue);
+         Py_DECREF(pValue);
+
+         // Call i4r_1d1
+         SparseMatrix matI4R_1D1(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
+         PythonWrapper::setFunction("i4r_1d1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(matI4R_1D1, pValue);
+         Py_DECREF(pValue);
+
+         // Call r2
+         int energySize = (3*this->mspSetup->fast().at(iL).size())/2;
+         PyTuple_SetItem(pArgs, 0, PyLong_FromLong(energySize+1));
+         SparseMatrix matTmp(energySize+1,energySize+1);
+         PythonWrapper::setFunction("r2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(matTmp, pValue);
+         SparseMatrix matR2(energySize+1,energySize);
+         matR2 = matTmp.leftCols(energySize);
+         matTmp.resize(0,0);
+         Py_DECREF(pValue);
+
+         // Integrator: INTG
+         std::map<IntegratorType::Id,std::vector<Matrix> >::iterator intgIt = this->mIntgOp.find(IntegratorType::INTG);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         intgIt->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: INTGR
+         intgIt = this->mIntgOp.find(IntegratorType::INTGR);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         intgIt->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: INTGQ4
+         intgIt = this->mIntgOp.find(IntegratorType::INTGQ4);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         if(l == 0)
+         {
+            intgIt->second.at(iL).setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI4*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
+         }
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: INTGS4
+         intgIt = this->mIntgOp.find(IntegratorType::INTGS4);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         if(l == 0)
+         {
+            intgIt->second.at(iL).setZero();
+         } else
+         {
+            intgIt->second.at(iL) = (matI4R_1D1*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+         }
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: INTGT
+         intgIt = this->mIntgOp.find(IntegratorType::INTGT);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         if(l == 0)
+         {
+            intgIt->second.at(iL).setZero();
+         } else
+         {
+            intgIt->second.at(iL) = (matI2*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
+         }
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: INTGQ2
+         intgIt = this->mIntgOp.find(IntegratorType::INTGQ2);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         if(l == 0)
+         {
+            intgIt->second.at(iL).setZero();
+         } else
+         {
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI2*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
+         }
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: INTGS2
+         intgIt = this->mIntgOp.find(IntegratorType::INTGS2);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         if(l == 0)
+         {
+            intgIt->second.at(iL).setZero();
+         } else
+         {
+            intgIt->second.at(iL) = (matI2R_1D1*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+         }
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         //
+         // Energy operators
+         //
+         op.resize(legGrid.size(), energySize+1);
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, ilegGrid);
+         Array energyWeights = 0.5*(legWeights.asDiagonal()*op).colwise().sum().transpose();
+
+         // Integrator: ENERGY
+         intgIt = this->mIntgOp.find(IntegratorType::ENERGY);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         op.resize(this->mGrid.size(), energySize);
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
+         intgIt->second.at(iL).setZero();
+         intgIt->second.at(iL).col(0) = (energyWeights.topRows(energySize).transpose()*op.transpose()*this->mWeights.asDiagonal()).transpose();
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: ENERGYR2
+         intgIt = this->mIntgOp.find(IntegratorType::ENERGYR2);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
+         op.resize(this->mGrid.size(), energySize);
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
+         intgIt->second.at(iL).setZero();
+         intgIt->second.at(iL).col(0) = (energyWeights.transpose()*matR2*op.transpose()*this->mWeights.asDiagonal()).transpose();
+         if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
       }
    }
 
@@ -185,12 +381,29 @@ namespace Transform {
       // assert right sizes for output matrix
       assert(rSpecVal.cols() == this->mspSetup->howmany());
 
-      // Compute first derivative integration
-      if(integrator == SphereWorlandTransform::IntegratorType::INTGR)
+      // Compute integration
+      if(this->mIntgOp.count(integrator) == 1)
       {
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
 
-      } else if(integrator == SphereWorlandTransform::IntegratorType::INTG)
+      } else
+      {
+         throw Exception("Requested an unknown integrator");
+      }
+
+   }
+
+   void SphereWorlandTransform::integrate_full(MatrixZ& rSpecVal, const MatrixZ& physVal, SphereWorlandTransform::IntegratorType::Id integrator)
+   {
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rSpecVal.cols() == this->mspSetup->howmany());
+
+      // Compute energy integration
+      if(integrator == SphereWorlandTransform::IntegratorType::ENERGY || integrator == SphereWorlandTransform::IntegratorType::ENERGYR2)
       {
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
 
@@ -210,33 +423,8 @@ namespace Transform {
       assert(rPhysVal.rows() == this->mspSetup->fwdSize());
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
-      // Compute D
-      if(projector == SphereWorlandTransform::ProjectorType::DIFF)
-      {
-         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
-
-      // Compute 1/R
-      } else if(projector == SphereWorlandTransform::ProjectorType::DIVR)
-      {
-         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
-
-      // Compute D R
-      } else if(projector == SphereWorlandTransform::ProjectorType::DIFFR)
-      {
-         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
-
-      // Compute 1/R D R
-      } else if(projector == SphereWorlandTransform::ProjectorType::DIVRDIFFR)
-      {
-         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
-
-      // Compute D^2 + 2/R - l(l+1)/R2
-      } else if(projector == SphereWorlandTransform::ProjectorType::SLAPL)
-      {
-         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
-
-      // Compute simple projection
-      } else if(projector == SphereWorlandTransform::ProjectorType::PROJ)
+      // Compute projection
+      if(this->mProjOp.count(projector) == 1)
       {
          this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 

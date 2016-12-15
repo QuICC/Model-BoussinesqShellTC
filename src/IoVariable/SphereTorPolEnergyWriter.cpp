@@ -46,52 +46,6 @@ namespace IoVariable {
       // Spherical shell volume: 4/3*pi*r_o^3
       this->mVolume = (4.0/3.0)*Math::PI;
 
-      // Initialise python wrapper
-      PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.spherical.sphere_radius");
-
-      // Prepare arguments
-      PyObject *pArgs, *pValue;
-      pArgs = PyTuple_New(3);
-
-      // ... create boundray condition (none)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 2, pValue);
-
-      // Get resolution
-      int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>() + 2;
-      pValue = PyLong_FromLong(cols);
-      PyTuple_SetItem(pArgs, 0, pValue);
-
-      // Set even basis
-      pValue = PyLong_FromLong(0);
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // Call r^2
-      PythonWrapper::setFunction("r2");
-      pValue = PythonWrapper::callFunction(pArgs);
-      // Fill matrix and cleanup
-      SparseMatrix tmpR2;
-      PythonWrapper::fillMatrix(tmpR2, pValue);
-      Py_DECREF(pValue);
-
-      PyObject *pTmp = PyTuple_New(2);
-      pTmp = PyTuple_GetSlice(pArgs, 0, 2);
-      // Call avg
-      PythonWrapper::setFunction("integral");
-      pValue = PythonWrapper::callFunction(pTmp);
-      // Fill matrix and cleanup
-      SparseMatrix tmpAvg;
-      PythonWrapper::fillMatrix(tmpAvg, pValue);
-      Py_DECREF(pValue);
-
-      // Store integral
-      this->mIntgOp = tmpAvg.leftCols(cols-2);
-
-      // Store spherical integral (include r^2 factor)
-      this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
-      PythonWrapper::finalize();
-
       IVariableAsciiEWriter::init();
    }
 
@@ -120,7 +74,7 @@ namespace IoVariable {
       rOutVarTor.rData() = rOutVarTor.rData().array()*rOutVarTor.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate_energy(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
+      coord.transform1D().integrate_full(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGYR2);
 
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mTorEnergy = 0.0;
@@ -146,7 +100,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mTorEnergy += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+               this->mTorEnergy += factor*lfactor*(rInVarTor.slice(k).col(j).row(0).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
@@ -160,10 +114,10 @@ namespace IoVariable {
             // m = 0, no factor of two
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               this->mTorEnergy += lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(0).real())(0);
+               this->mTorEnergy += lfactor*(rInVarTor.slice(k)(0,0).real());
                start = 1;
             }
-            this->mTorEnergy += 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).rightCols(rInVarTor.slice(k).cols()-start).real()).sum();
+            this->mTorEnergy += 2.0*lfactor*(rInVarTor.slice(k).rightCols(rInVarTor.slice(k).cols()-start).row(0).real()).sum();
          }
       #endif // defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
@@ -192,7 +146,7 @@ namespace IoVariable {
       rOutVarPolQ.rData() = rOutVarPolQ.rData().array()*rOutVarPolQ.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate_energy(rInVarPolQ.rData(), rOutVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
+      coord.transform1D().integrate_full(rInVarPolQ.rData(), rOutVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGY);
 
       // Compute energy in Q component of QST decomposition
       #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
@@ -213,7 +167,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = std::pow(lfactor*(lfactor+1.0),2);
 
-               this->mPolEnergy += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+               this->mPolEnergy += factor*lfactor*(rInVarPolQ.slice(k).col(j).row(0).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
@@ -228,10 +182,10 @@ namespace IoVariable {
             // m = 0, no factor of two
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(0).real())(0);
+               this->mPolEnergy += lfactor*(rInVarPolQ.slice(k)(0,0).real());
                start = 1;
             }
-            this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).rightCols(rInVarPolQ.slice(k).cols()-start).real()).sum();
+            this->mPolEnergy += 2.0*lfactor*(rInVarPolQ.slice(k).rightCols(rInVarPolQ.slice(k).cols()-start).row(0).real()).sum();
          }
       #endif // defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
@@ -257,7 +211,7 @@ namespace IoVariable {
       rOutVarPolS.rData() = rOutVarPolS.rData().array()*rOutVarPolS.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate_energy(rInVarPolS.rData(), rOutVarPolS.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
+      coord.transform1D().integrate_full(rInVarPolS.rData(), rOutVarPolS.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGY);
 
       // Compute energy in S component of QST decomposition
       #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
@@ -278,7 +232,7 @@ namespace IoVariable {
                lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
-               this->mPolEnergy += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+               this->mPolEnergy += factor*lfactor*(rInVarPolS.slice(k).col(j).row(0).real()).sum();
             }
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
@@ -293,10 +247,10 @@ namespace IoVariable {
             // m = 0, no factor of two
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(0).real())(0);
+               this->mPolEnergy += lfactor*(rInVarPolS.slice(k)(0,0).real());
                start = 1;
             }
-            this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).rightCols(rInVarPolS.slice(k).cols()-start).real()).sum();
+            this->mPolEnergy += 2.0*lfactor*(rInVarPolS.slice(k).rightCols(rInVarPolS.slice(k).cols()-start).row(0).real()).sum();
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
