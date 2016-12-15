@@ -73,6 +73,13 @@ namespace GeoMHDiSCC {
          static void setVisualizationState(SharedVisualizationGenerator spVis);
 
          /**
+          * @brief Add the required statistics output files
+          *
+          * @param spSim   Shared simulation object
+          */
+         static void addStatsOutputFiles(SharedSimulation spSim);
+
+         /**
           * @brief Add the required ASCII output files
           *
           * @param spSim   Shared simulation object
