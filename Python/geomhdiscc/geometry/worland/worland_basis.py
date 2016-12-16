@@ -14,7 +14,7 @@ def worland_norm(n , l):
         if n == 0:
             return np.sqrt(2.0/np.pi)
         else:
-            return np.sqrt(4.0*np.exp(2.0*special.gammaln(n+1.0) - 2.0*special.gammaln(n+0.5)))
+            return 2.0*np.exp(special.gammaln(n+1.0) - special.gammaln(n+0.5))
     else:
         return np.sqrt(2.0*(2.0*n+l)*np.exp(special.gammaln(n+l) + special.gammaln(n+1.0) - special.gammaln(n+0.5) - special.gammaln(n+l+0.5)))
 

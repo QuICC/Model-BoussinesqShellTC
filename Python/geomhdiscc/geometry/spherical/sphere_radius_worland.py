@@ -36,7 +36,7 @@ def r2(nr, l, bc, coeff = 1.0, zr = 0):
 
     # Generate main diagonal
     def d0(n):
-        if l == 1:
+        if l == 0 or l == 1:
             return wb.worland_norm_row(n,1,0)*1.0/(2.0)
         else:
             return wb.worland_norm_row(n,l,0)*(2.0*l**2 + 4.0*l*n - l + 4.0*n**2 - 1.0)/(2*(l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
