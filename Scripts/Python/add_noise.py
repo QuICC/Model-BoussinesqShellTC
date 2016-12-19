@@ -21,8 +21,8 @@ if __name__=="__main__":
 
         field[:,:]+=np.random.random(field[:,:].shape)*err_magnitude
         
-        print(field[:,:])
+        #print(field[:,:])
 
-    fin['/velocity/velocity_tor'][:,:]
+    #fin['/velocity/velocity_tor'][:,:]
     fin.close()
         
