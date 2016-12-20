@@ -133,7 +133,7 @@ set(GEOMHDISCC_INCLUDES_PYTHON34 "$ENV{EBROOTPYTHON}/include/python3.4m" PARENT_
 set(GEOMHDISCC_LIBDIR_PYTHON34 "$ENV{EBROOTPYTHON}/lib" PARENT_SCOPE)
 
 set(GEOMHDISCC_LIBRARIES_PYTHON35 "python3.5m" "util" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON35 "$ENV{EBROOTPYTHON}/include/python3.5m" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_PYTHON35 "$ENV{EBROOTPYTHON}/include/python3.5m" "/lib/python3.5/site-packages/numpy-1.11.2-py3.5-linux-x86_64.egg/numpy/core/include/lib/python3.5/site-packages/numpy-1.11.2-py3.5-linux-x86_64.egg/numpy/core/include"  PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_PYTHON35 "$ENV{EBROOTPYTHON}/lib" PARENT_SCOPE)
 
 ###################################################

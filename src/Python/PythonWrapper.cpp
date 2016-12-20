@@ -12,6 +12,7 @@
 
 // External includes
 //
+#include <numpy/arrayobject.h>
 
 // Class include
 //
@@ -316,17 +317,17 @@ namespace GeoMHDiSCC {
          rMatrix.imag().setFromTriplets(imagTriplets.begin(), imagTriplets.end());
       }
    }
-/*
+
    void PythonWrapper::getMatrix(Matrix& rMatrix, PyObject* pMat)
    {
 	   // TODO: some precondition-checking on the number of dimensions and the size
 	   // get the size of Python matrix
-	   int* dims;
+	   long* dims;
 	   dims = PyArray_DIMS(pMat);
 
 	   // resize the matrix to correct size and assign the pointer
 	   // note that that numpy default storage is RowMajor whereas Eigen 3.3.1 is ColumnMajor
-	   rMatrix = Eigen::Map<Eigen::Matrix<MHDFloat,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> >(PyArray_DATA(pMat),dims[0],dims[1]);
+	   rMatrix = Eigen::Map<Eigen::Matrix<MHDFloat,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> >((double*)PyArray_DATA(pMat),dims[0],dims[1]);
 
    }
 
@@ -337,8 +338,8 @@ namespace GeoMHDiSCC {
 	   int len = PyArray_DIM(pVec,0);
 
 	   // resize the eigen::vector and assign the pointer
-	   rVector = Eigen::Map<Eigen::VectorXd>(PyArray_DATA(pVec),len);
-   }*/
+	   rVector = Eigen::Map<Eigen::VectorXd>((double*)PyArray_DATA(pVec),len);
+   }
 
    void PythonWrapper::cleanup()
    {
