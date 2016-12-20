@@ -12,6 +12,12 @@ n = sympy.Symbol('n')
 
 symbolic = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l - sympy.Rational(1,2))
 
+def chooseParameters(alpha, beta):
+    """Choose the Jacobi polynomial to use"""
+
+    global symbolic
+    symbolic = mod.SymbolicJacobi(a = alpha, b = beta)
+
 def x1():
     """Sphere x operator"""
 
