@@ -99,12 +99,13 @@ namespace IoVariable{
 		 * @brief Precomputed M part of the spherical harmonic
 		 */
 		typedef std::map<std::pair<int,int>,Array> ArrayMap;
+		typedef std::map<std::pait<int,int>,ArrayZ> ArrayZMap;
 		ArrayMap Mparts;
 
 		/*
 		 * @brief Precomputed L part of the spherical harmonic
 		 */
-		ArrayMap Lparts;
+		ArrayZMap Lparts;
 
 		/*
 		 * @brief
