@@ -211,22 +211,6 @@ namespace Transform {
          PythonWrapper::fillMatrix(matI4, pValue);
          Py_DECREF(pValue);
 
-         // Call i2r_1d1
-         SparseMatrix matI2R_1D1(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i2r_1d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI2R_1D1, pValue);
-         Py_DECREF(pValue);
-
-         // Call i4r_1d1
-         SparseMatrix matI4R_1D1(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i4r_1d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI4R_1D1, pValue);
-         Py_DECREF(pValue);
-
          // Call r2
          int energySize = (3*this->mspSetup->fast().at(iL).size())/2;
          PyTuple_SetItem(pArgs, 0, PyLong_FromLong(energySize+1));
@@ -284,7 +268,10 @@ namespace Transform {
             intgIt->second.at(iL).setZero();
          } else
          {
-            intgIt->second.at(iL) = (matI4R_1D1*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI4*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
          {
@@ -332,7 +319,10 @@ namespace Transform {
             intgIt->second.at(iL).setZero();
          } else
          {
-            intgIt->second.at(iL) = (matI2R_1D1*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI2*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
          {

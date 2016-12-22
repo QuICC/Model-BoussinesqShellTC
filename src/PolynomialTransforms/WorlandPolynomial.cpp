@@ -105,7 +105,6 @@ namespace Polynomial {
       if(nPoly > 1)
       {
          WorlandPolynomial::W0l(idiff.col(1), 1, a1, b1, igrid, WorlandPolynomial::normWDP0ab());
-         idiff.col(1) *= MHD_MP(4.0);
       }
 
       if(nPoly > 2)
@@ -123,6 +122,11 @@ namespace Polynomial {
 
    void WorlandPolynomial::dWnl(Matrix& diff, internal::Matrix& idiff, const int l, const internal::Array& igrid)
    {
+      if(l < 0)
+      {
+         throw Exception("Tried to compute Worland derivative with l < 0");
+      }
+
       if(l == 0)
       {
          WorlandPolynomial::dWn0(diff, idiff, igrid);
@@ -213,6 +217,11 @@ namespace Polynomial {
       int gN = diff.rows();
       int nPoly = diff.cols();
 
+      if(l < 0)
+      {
+         throw Exception("Tried to compute Worland D r operator with l < 0");
+      }
+
       if (nPoly < 1)
       {
          throw Exception("Operator matrix should have at least 1 column");
@@ -294,10 +303,9 @@ namespace Polynomial {
       int gN = diff.rows();
       int nPoly = diff.cols();
 
-      if(l < 1)
+      if(l < 0)
       {
-         std::cerr << "r_1drWnl: Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
-         //throw Exception("Tried to compute Worland polynomial 1/r d/dr r W_n^l with l < 1");
+         throw Exception("Tried to compute Worland 1/r D r operator with l < 0");
       }
 
       if (nPoly < 1)
@@ -470,10 +478,9 @@ namespace Polynomial {
       int gN = diff.rows();
       int nPoly = diff.cols();
 
-      if(l < 1)
+      if(l < 0)
       {
-         std::cerr << "dr_1drWnl: Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
-         //throw Exception("Tried to compute Worland polynomial 1/r d/dr r W_n^l with l < 1");
+         throw Exception("Tried to compute Worland D 1/r D r operator with l < 0");
       }
 
       if (nPoly < 1)
@@ -626,7 +633,7 @@ namespace Polynomial {
 
       if(l < 0)
       {
-         throw Exception("Tried to compute Worland spherical laplacian with l < 0");
+         throw Exception("Tried to compute Worland cylindrical laplacian with l < 0");
       }
 
       if (nPoly < 1)
@@ -715,7 +722,7 @@ namespace Polynomial {
 
       if(l < 0)
       {
-         throw Exception("Tried to compute Worland spherical laplacian with l < 0");
+         throw Exception("Tried to compute Worland 1/r cylindrical laplacian with l < 0");
       }
 
       if (nPoly < 1)
@@ -804,7 +811,7 @@ namespace Polynomial {
 
       if(l < 0)
       {
-         throw Exception("Tried to compute Worland spherical laplacian with l < 0");
+         throw Exception("Tried to compute Worland derivative of cylindrical laplacian with l < 0");
       }
 
       if (nPoly < 1)
@@ -919,10 +926,9 @@ namespace Polynomial {
       int gN = poly.rows();
       int nPoly = poly.cols();
 
-      if (l < 1)
+      if(l < 0)
       {
-         std::cerr << "r_1Wnl: Using inaccurate 1/r calculations! NEEDS TO BE FIXED" << std::endl;
-         //throw Exception("Tried to compute Worland polynomial W_n^l/r with l < 1");
+         throw Exception("Tried to compute Worland 1/r operator with l < 0");
       }
 
       if (nPoly < 1)
@@ -958,12 +964,12 @@ namespace Polynomial {
    {
       internal::Array cs = norm(alpha, beta);
 
-      if(l > 0)
-      {
-         iw0l.array() = igrid.array().pow(l);
-      } else
+      if(l == 0)
       {
          iw0l.setConstant(MHD_MP(1.0));
+      } else
+      {
+         iw0l.array() = igrid.array().pow(l);
       }
 
       iw0l.array() *= cs(0);

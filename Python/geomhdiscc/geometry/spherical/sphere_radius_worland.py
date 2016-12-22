@@ -97,9 +97,11 @@ def i2(nr, l, bc, coeff = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        val = wb.worland_norm_row(n,l,-2)*4.0*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
         if l == 0:
+            val = wb.worland_norm_row(n,l,-2)/((l + 2.0*n - 3.0)*(l + 2.0*n - 1.0))
             val[0] = wb.worland_norm_row(n[0:1],l,-2)*4.0*(l + 1.0)/((l + 1.0)*(l + 2.0)*(l + 3.0))
+        else:
+            val = wb.worland_norm_row(n,l,-2)*4.0*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
         return val
 
     # Generate 1st subdiagonal
@@ -246,9 +248,11 @@ def i4(nr, l, bc, coeff = 1.0):
 
     # Generate 4th subdiagonal
     def d_4(n):
-        val = wb.worland_norm_row(n,l,-4)*16.0*(l + n - 4.0)*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 8.0)*(l + 2.0*n - 7.0)*(l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
         if l == 0:
+            val = wb.worland_norm_row(n,l,-4)/((l + 2.0*n - 7.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 1.0))
             val[0] = wb.worland_norm_row(n[0:1],l,-4)*16.0/((l + 4.0)*(l + 5.0)*(l + 6.0)*(l + 7.0))
+        else:
+            val = wb.worland_norm_row(n,l,-4)*16.0*(l + n - 4.0)*(l + n - 3.0)*(l + n - 2.0)*(l + n - 1.0)/((l + 2.0*n - 8.0)*(l + 2.0*n - 7.0)*(l + 2.0*n - 6.0)*(l + 2.0*n - 5.0)*(l + 2.0*n - 4.0)*(l + 2.0*n - 3.0)*(l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
         return val
 
     # Generate 3rd subdiagonal

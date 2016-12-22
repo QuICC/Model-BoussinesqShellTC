@@ -71,14 +71,6 @@ namespace GeoMHDiSCC {
             case 0:
                spScalar->setStateType(Equations::SphereExactStateIds::HARMONIC);
                tSH.clear(); 
-//               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
-//               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
-//               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-//               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
-//               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
-//               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
-//               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
-//               tSH.push_back(std::tr1::make_tuple(30,0,MHDComplex(1,1)));
                tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
@@ -149,6 +141,11 @@ namespace GeoMHDiSCC {
 
             case 3:
                spVector->setStateType(Equations::SphereExactStateIds::BENCHVELC1);
+               break;
+
+            case 4:
+               spVector->setStateType(Equations::SphereExactStateIds::BENCHVELC2);
+               break;
          }
 
       // Generate random spectrum
