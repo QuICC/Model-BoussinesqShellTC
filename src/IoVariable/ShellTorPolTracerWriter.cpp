@@ -277,6 +277,28 @@ namespace IoVariable{
 
 
 	}
+
+	void ShellTorPolTracerWriter::write(){
+
+		// Create file
+		this->preWrite();
+
+		// get global values from MPI code
+#ifdef GEOMHDISCC_MPI
+		Array tracer = this ->mPolTracer;
+		MPI_Allreduce(MPI_IN_PLACE, tracer.data(), 2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		this->mPolTracer = tracer;
+#endif // GEOMHDISCC_MPI
+
+		// Check is the workflow allows IO to be performed
+		if(FrameworkMacro::allowsIO()){
+			this ->mFile << std::setprecision(14) << this->mTime << '\t' << this->mPolTracer.transpose() < std::endl;
+		}
+
+		// Close file
+		this->postWrite();
+
+	}
 }
 }
 

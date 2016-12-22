@@ -195,7 +195,9 @@ namespace GeoMHDiSCC {
       spSim->addAsciiOutputFile(spVector);
 
       // Create probes
-      Matrix mProbes;
+      Matrix mProbes(2,3);
+      mProbes << 1.0, 1.57079, 0.,
+    		  1.5, 1.57079, 3.141592654;
       // Create probe field writer
       IoVariable::ShellTorPolTracerWriter spVector(new  IoVariable::ShellTorPolTracerWriter("velocity_r", SchemeType::type(), mProbes));
       spVector->expect(PhysicalNames::VELOCITY);
