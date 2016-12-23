@@ -158,7 +158,7 @@ namespace Schemes {
       //
 
       // Get dealiased Worland transform size
-      int nR = Transform::PolynomialTools::dealias(this->mI+1);
+      int nR = Transform::PolynomialTools::dealias(this->mI+this->mL/2+4);
 
       // Get dealiased associated Legendre transform size
       int nTh = Transform::PolynomialTools::dealias(this->mL+1);
@@ -176,7 +176,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      this->setDimension(this->mI+1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
       this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);

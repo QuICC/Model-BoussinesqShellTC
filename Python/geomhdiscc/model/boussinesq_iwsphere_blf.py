@@ -287,3 +287,22 @@ class BoussinesqIWSphere(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block of boundary operator"""
+
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row in [("velocity","tor"), ("velocity","pol")] and field_row == field_col:
+            mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix = 'zero', restriction = restriction)
+        else:
+            mat = geo.zblk(res[0], res[1], m, bc, restriction = restriction)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat

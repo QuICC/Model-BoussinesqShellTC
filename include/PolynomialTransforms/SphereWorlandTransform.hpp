@@ -51,8 +51,10 @@ namespace Transform {
           *    - DIFFR: D r
           *    - DIVRDIFFR: 1/r D r
           *    - SLAPL: spherical laplacian: D^2 + 2/r D - l(l+1)/r^2
+          *    - ENERGY_PROJ:
+          *    - ENERGY_DIFFR:
           */
-         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL};
+         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL, ENERGY_PROJ, ENERGY_DIFFR};
       };
 
       /**
@@ -69,8 +71,10 @@ namespace Transform {
           *    - INTGT: integration of QST T component for Toroidal NL (2nd order equation)
           *    - INTGQ2: integration of QST Q component for Poloidal NL (2nd order equation)
           *    - INTGS2: integration of QST S component for Poloidal NL (2nd order equation)
+          *    - ENERGY_INTG: compute definite energy integral
+          *    - ENERGY_R2: compute definite energy integral with spherical radial weight
           */
-         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
+         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2, ENERGY_INTG, ENERGY_R2};
       };
 
    };
@@ -148,6 +152,17 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector);
 
+         /**
+          * @brief Compute quadrature integration for energy integral
+          *
+          * Compute quadrature integration from energy integral
+          *
+          * @param spectrum   Output energy spectrum
+          * @param specVal    Input physical values
+          * @param integrator Integrator to use
+          */
+         void integrate_energy(Array& spectrum, const MatrixZ& specVal, ProjectorType::Id projector, IntegratorType::Id integrator);
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
@@ -172,6 +187,11 @@ namespace Transform {
           * @brief Compute projection with vector of operators
           */
          void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief Compute energy integration with vector of operators
+          */
+         void setEnergyIntegrator(Array& spectrum, const MatrixZ& specVal, const std::vector<Matrix>& projOps, const std::vector<Matrix>& intgOps);
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1]

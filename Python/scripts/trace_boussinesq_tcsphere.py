@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_tcsphere_std_worland as mod
+import geomhdiscc.model.boussinesq_tcsphere_std as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization

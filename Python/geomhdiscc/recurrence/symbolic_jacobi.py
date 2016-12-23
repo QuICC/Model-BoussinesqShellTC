@@ -12,6 +12,7 @@ n = sympy.Symbol('n')
 import geomhdiscc.recurrence.symbolic_base as base
 
 class SymbolicJacobi(base.SymbolicBase):
+    """Class to compute the symbolic recurrence relation for a Jacobi expansion"""
 
     def __init__(self, a, b):
         """Initialize Jacobi parameters"""
@@ -35,6 +36,8 @@ class SymbolicJacobi(base.SymbolicBase):
         return val
 
     def spectral_monomial(self, p, f, asrow = True):
+        """Recurrence relation for the multiplication by a monomial of a Jacobi expansion"""
+
         # Some assertion for safety
         assert (p >= 0)
         a = self.a
@@ -88,6 +91,8 @@ class SymbolicJacobi(base.SymbolicBase):
         return recurrence
 
     def spectral_increase(self, f, asrow):
+        """Recurrence relation to increase beta parameter of a Jacobi expansion"""
+
         prev = dict(f)
         recurrence = dict()
         a = self.a
@@ -127,6 +132,8 @@ class SymbolicJacobi(base.SymbolicBase):
         return recurrence
 
     def spectral_decrease(self, f, asrow):
+        """Recurrence relation to decrease beta parameter of a Jacobi expansion"""
+
         prev = dict(f)
         recurrence = dict()
         a = self.a
@@ -166,6 +173,8 @@ class SymbolicJacobi(base.SymbolicBase):
         return recurrence
 
     def spectral_integral(self, q, f, asrow = True):
+        """Recurrence relation for the indefinite integral of a Jacobi expansion"""
+
         # Some assertion for safety
         assert (q >= 0)
         a = self.a

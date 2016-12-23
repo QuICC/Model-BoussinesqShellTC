@@ -1,14 +1,14 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating thermal convection in a sphere with Worland expansion (Toroidal/Poloidal formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq rotating thermal convection in a sphere with Chebyshev expansion (Toroidal/Poloidal formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rtcsphere_worland as mod
+import geomhdiscc.model.boussinesq_rtcsphere_blf as mod
 import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRTCSphere()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 
 # Set resolution, parameters, boundary conditions
 Rac = None
@@ -21,7 +21,7 @@ bc_vel = 1; bc_temp = 0
 #Ta = 1e7
 #res = [32, 32, 0]
 #Ta = 1e8
-#res = [32, 32, 0]
+#res = [64, 64, 0]
 #Ta = 1e9
 #res = [48, 48, 0]
 Ta = 1e10
@@ -29,7 +29,7 @@ res = [64, 64, 0]
 #Ta = 1e11
 #res = [96, 96, 0]
 #Ta = 1e12
-#res = [256, 128, 0]
+#res = [128, 128, 0]
 #Ta = 1e13
 #res = [192, 192, 0]
 #Ta = 1e14
@@ -42,8 +42,6 @@ res = [64, 64, 0]
 #res = [512, 1024, 0]
 #Ta = 1e18
 #res = [784, 1536, 0]
-#Ta = 1e19
-#res = [512, 512, 0]
 
 # NS, FT, internal heating
 #bc_vel = 0; bc_temp = 0
@@ -100,7 +98,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-16
-marginal_options['geometry'] = 'sphere_worland'
+marginal_options['geometry'] = 'sphere_chebyshev'
 marginal_options['curve'] = False
 marginal_options['minimum'] = True
 marginal_options['minimum_int'] = True

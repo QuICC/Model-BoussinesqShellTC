@@ -24,7 +24,7 @@ def useLegendreJacobi():
     chooseParameters(0, m)
 
 def useChebyshevZeroJacobi():
-    """Setup Legendre type Jacobi polynomial"""
+    """Setup Chebyshev type Jacobi polynomial for m = 0"""
 
     chooseParameters(-sympy.Rational(1,2), -sympy.Rational(1,2))
 
@@ -62,6 +62,18 @@ def r4():
 
     # Setup terms in recurrence
     terms = [{'q':0, 'p':2, 'd':0, 'c':sympy.Rational(1,4)},{'q':0, 'p':1, 'd':0, 'c':sympy.Rational(1,2)},{'q':0, 'p':0, 'd':0, 'c':sympy.Rational(1,4)}]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def r6():
+    """Cylinder r^6 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':3, 'd':0, 'c':sympy.Rational(1,8)},{'q':0, 'p':2, 'd':0, 'c':sympy.Rational(3,8)},{'q':0, 'p':1, 'd':0, 'c':sympy.Rational(3,8)},{'q':0, 'p':0, 'd':0, 'c':sympy.Rational(1,8)}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals

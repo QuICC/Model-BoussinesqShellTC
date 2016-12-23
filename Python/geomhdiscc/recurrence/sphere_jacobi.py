@@ -12,6 +12,12 @@ n = sympy.Symbol('n')
 
 symbolic = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l - sympy.Rational(1,2))
 
+def chooseParameters(alpha, beta):
+    """Choose the Jacobi polynomial to use"""
+
+    global symbolic
+    symbolic = mod.SymbolicJacobi(a = alpha, b = beta)
+
 def x1():
     """Sphere x operator"""
 
@@ -72,6 +78,18 @@ def i2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i2divrdiff():
+    """Sphere i2 ((i1r1)^2 1/r D) operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':0, 'd':1, 'c':4.0}]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i2lapl():
     """Sphere i2lapl (i1r1i1r1 lapl) operator"""
 
@@ -93,6 +111,18 @@ def i4():
 
     # Setup terms in recurrence
     terms = [{'q':4, 'p':0, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i4divrdiff():
+    """Sphere i4 ((i1r1)^4 1/r D) operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':4, 'p':0, 'd':1, 'c':4.0}]
     r = symbolic.build_recurrence(terms, {0:1})
 
     # Print recurrence relation per diagonals

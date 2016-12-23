@@ -223,29 +223,35 @@ namespace Schemes {
       // Get spectral size of the polynomial transform
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
-      // Storage for the list of indexes
-      std::vector<ArrayI>  fast;
-      fast.reserve(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
-      ArrayI  slow(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
-
-      // Multiplier from second dimension 
-      ArrayI mult(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
-
-      // Get number of transforms and list of indexes
+      // Get number of modes
       int howmany = 0;
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+      }
 
-         slow(i) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i);
+      // Storage for the list of indexes
+      std::vector<ArrayI>  fast;
+      fast.reserve(howmany);
+      ArrayI mult(howmany);
+      ArrayI slow(howmany);
 
-         fast.push_back(ArrayI(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(i)));
-         for(int j = 0; j < fast.at(i).size(); j++)
+      // Get number of transforms and list of indexes
+      int k = 0;
+      for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); j++)
+      {
+         for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(j); i++)
          {
-            fast.at(i)(j) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(j,i);
-         }
+            mult(k) = 1;
+            slow(k) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(i,j);
 
-         mult(i) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+            fast.push_back(ArrayI(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(j)));
+            for(int ii = 0; ii < fast.at(k).size(); ii++)
+            {
+               fast.at(k)(ii) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(ii,j);
+            }
+            k++;
+         }
       }
 
       return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
@@ -330,7 +336,7 @@ namespace Schemes {
       //
 
       // Get dealiased Worland transform size
-      int nR = Transform::PolynomialTools::dealias(this->mI+1);
+      int nR = Transform::PolynomialTools::dealias(this->mI+this->mL/2+4);
 
       // Get dealiased associated Legendre transform size
       int nTh = Transform::PolynomialTools::dealias(this->mL+1);
@@ -348,7 +354,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      this->setDimension(this->mI+1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
       this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);

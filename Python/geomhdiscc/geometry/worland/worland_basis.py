@@ -14,7 +14,7 @@ def worland_norm(n , l):
         if n == 0:
             return np.sqrt(2.0/np.pi)
         else:
-            return np.sqrt(4.0*np.exp(2.0*special.gammaln(n+1.0) - 2.0*special.gammaln(n+0.5)))
+            return 2.0*np.exp(special.gammaln(n+1.0) - special.gammaln(n+0.5))
     else:
         return np.sqrt(2.0*(2.0*n+l)*np.exp(special.gammaln(n+l) + special.gammaln(n+1.0) - special.gammaln(n+0.5) - special.gammaln(n+l+0.5)))
 
@@ -35,8 +35,8 @@ def worland_poly(n, l, nr):
 
     return rg**l*special.eval_jacobi(n, -0.5, l - 0.5, 2.0*rg**2 - 1.0)*norm
 
-def worland_norm_row(n, l, k):
-    """Normalization factor for matrix row"""
+def worland_norm_row(n, l, k, p = 0):
+    """Normalization factor for matrix row. l is from LHS, p allows to shift RHS to l+p"""
 
     if n[0] + k < 0:
         raise RuntimeError("Requested row normalization is inconsistent")
@@ -49,14 +49,14 @@ def worland_norm_row(n, l, k):
         norm = -np.log(2.0*(2.0*n + l)) + special.gammaln(n + 0.5) + special.gammaln(n + l + 0.5) - special.gammaln(n + l) - special.gammaln(n + 1.0)
 
     # Special case for projection on l = 0
-    if l == 0:
+    if l + p == 0:
         if n[0] + k == 0:
             norm[0] += np.log(2.0) - np.log(np.pi)
             norm[1:] += np.log(4.0) - 2.0*special.gammaln(n[1:] + 0.5 + k) + 2.0*special.gammaln(n[1:] + 1.0 + k)
         else:
             norm += np.log(4.0) - 2.0*special.gammaln(n + 0.5 + k) + 2.0*special.gammaln(n + 1.0 + k)
     else:
-        norm += np.log(2.0*(2.0*n + l + 2.0*k)) - special.gammaln(n + 0.5 + k) - special.gammaln(n + l + 0.5 + k) + special.gammaln(n + l + k) + special.gammaln(n + 1.0 + k)
+        norm += np.log(2.0*(2.0*n + l + p + 2.0*k)) - special.gammaln(n + 0.5 + k) - special.gammaln(n + l + p + 0.5 + k) + special.gammaln(n + l + p + k) + special.gammaln(n + 1.0 + k)
 
     return np.sqrt(np.exp(norm))
 

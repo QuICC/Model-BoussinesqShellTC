@@ -23,9 +23,6 @@ def zblk(nr, m, bc):
 def i2(nr, m, bc, coeff = 1.0):
     """Create operator for 2nd integral r^m P_n^{-1/2,m-1/2}(2r^2-1)."""
 
-    # Copy BC dict as we modify it!
-    bc = dict(bc)
-
     ns = np.arange(0, nr+1)
     offsets = np.arange(-2,3)
     nzrow = 1

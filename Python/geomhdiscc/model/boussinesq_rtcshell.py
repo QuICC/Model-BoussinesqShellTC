@@ -385,7 +385,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row in [("velocity","tor"), ("velocity","tor")] and field_row == field_col:
+        if field_row in [("velocity","tor"), ("velocity","pol")] and field_row == field_col:
             mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix = 'zero', restriction = restriction)
         else:
             mat = geo.zblk(res[0], res[1], m, bc, restriction = restriction)
