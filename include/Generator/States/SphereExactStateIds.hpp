@@ -41,15 +41,11 @@ namespace Equations {
        * @brief Enums for the avaialable exact states
        */
       enum Id {
+         NOTUSED = -1,  // Initialisation state (do NOT use)
          // Special states
          CONSTANT = 0,  // All constant
 
          HARMONIC = 10, // Generate spherical harmonic state
-
-         TOROIDAL = 20, // Toroidal Y_l^m
-         POLOIDAL,      // Poloidal Y_l^m
-
-         TORPOL = 30, // Toroidal+Poloidal state
 
          BENCHTEMPC1 = 50, // Initial temperature perturbation state for full sphere benchmark C1
          BENCHVELC1,       // Initial velocity perturbation state for full sphere benchmark C1

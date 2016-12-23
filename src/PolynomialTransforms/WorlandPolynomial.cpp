@@ -21,7 +21,6 @@
 #define GEOMHDISCC_WORLAND_NORM_UNITY
 //#define GEOMHDISCC_WORLAND_NORM_NATURAL
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Polynomial {

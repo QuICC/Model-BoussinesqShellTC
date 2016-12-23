@@ -60,17 +60,9 @@ namespace IoVariable {
       // Recover dealiased BWD data
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
-      // Get FWD storage
-      Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
-
-      // Compute projection transform for first dimension 
-      coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
-
-      // Compute |f|^2
-      rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
-
-      // Compute projection transform for first dimension 
-      coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGYR2);
+      // Compute projection transform for first dimension
+      Array spectrum;
+      coord.transform1D().integrate_energy(spectrum, rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::ENERGY_PROJ, Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGY_R2);
 
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mEnergy = 0.0;
@@ -80,30 +72,32 @@ namespace IoVariable {
          int  m0 = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
          if(m0 == 0)
          {
-            this->mEnergy += (rInVar.slice(0).row(0).real()).sum();
-            start = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0);
+            int n = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0);
+            this->mEnergy += spectrum.segment(0, n).sum();
+            start += n;
          }
 
-         this->mEnergy += 2.0*(rInVar.data().rightCols(rInVar.data().cols()-start).row(0).real()).sum();
+         this->mEnergy += 2.0*spectrum.segment(start, spectrum.size() - start).sum();
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
       #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+         int start = 0;
+         int n = 0;
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int start = 0;
+            n = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k);
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               this->mEnergy += (rInVar.slice(k)(0,0).real());
-               start = 1;
+               this->mEnergy += spectrum(start);
+               start += 1;
+               n -= 1;
             }
-            this->mEnergy += 2.0*(rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).row(0).real()).sum();
+            this->mEnergy += 2.0*spectrum.segment(start,n).sum();
+            start += n;
          }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
-
-      // Free FWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
 
       // Normalize by the spherical volume
       this->mEnergy /= this->mVolume;
