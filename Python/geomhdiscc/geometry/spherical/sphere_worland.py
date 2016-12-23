@@ -99,8 +99,12 @@ def make_sh_qoperator(opm, opp, nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = N
 
         assert(l_zero_fix == 'zero')
         bcr = sphbc.ldependent_bc(bcr, m)
-        rmatm = opm(nr, m, bcr)
-        rmatp = opp(nr, m, bcr)
+        if m == 0:
+            rmatm = spsp.lil_matrix((1,1))
+            rmatp = spsp.lil_matrix((1,1))
+        else:
+            rmatm = opm(nr, m, bcr)
+            rmatp = opp(nr, m, bcr)
         rmatm = fix_l_zero(nr, m, rmatm, bcr, l_zero_fix)
         rmatp = fix_l_zero(nr, m, rmatp, bcr, l_zero_fix)
         mat = coeff*shc(m)*spsp.kron(corm[0,:], rmatm, format = 'coo') + coeff*shc(m)*spsp.kron(corp[0,:],rmatp, format = 'coo')

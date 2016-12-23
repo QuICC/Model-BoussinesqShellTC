@@ -85,7 +85,7 @@ namespace GeoMHDiSCC {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::SphereExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(2)
+         switch(3)
          {
             case 0:
                // Toroidal
