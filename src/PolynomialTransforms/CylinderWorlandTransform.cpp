@@ -260,28 +260,12 @@ namespace Transform {
          PythonWrapper::fillMatrix(matI4, pValue);
          Py_DECREF(pValue);
 
-         // Call i4divrdiff
-         SparseMatrix matI4DIVRDIFF(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i4r_1d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI4DIVRDIFF, pValue);
-         Py_DECREF(pValue);
-
          // Call i6
          SparseMatrix matI6(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
          PythonWrapper::setFunction("i6");
          pValue = PythonWrapper::callFunction(pArgs);
          // Fill matrix
          PythonWrapper::fillMatrix(matI6, pValue);
-         Py_DECREF(pValue);
-
-         // Call i6divrdiff
-         SparseMatrix matI6DIVRDIFF(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i6r_1d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI6DIVRDIFF, pValue);
          Py_DECREF(pValue);
 
          // Call i6laplh
@@ -370,8 +354,10 @@ namespace Transform {
             intgIt->second.at(iL) = (matI2_1*op.transpose()*this->mWeights.asDiagonal()).transpose();
          } else
          {
-            // Mutiply by R in physical space and integrator onto W_n^{l} and apply quasi-inverse
-            intgIt->second.at(iL) = (matI4DIVRDIFF*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI4*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
          {
@@ -408,7 +394,10 @@ namespace Transform {
          } else
          {
             // Multiply by R in physical space and integrator onto W_n^{l} and apply quasi-inverse
-            intgIt->second.at(iL) = (matI6DIVRDIFF*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI6*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
          {
