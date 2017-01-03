@@ -91,7 +91,7 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("velocity","tor"),("velocity","pol"),("temperature","")]:
+            if field_row in [("temperature","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -270,23 +270,6 @@ class BoussinesqRBCCylinder(BoussinesqRBCCylinderConfig, base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2(res[0], res[2], m, bc, restriction = restriction)
-
-        elif field_row == ("velocity","tor") and field_col == field_row:
-            if m == 0:
-                mat = geo.qid(res[0], res[2], 1, 1, 2, bc, -1.0, restriction = restriction)
-                #mat = geo.zblk(res[0], res[2], m, 1, 2, bc, restriction = restriction)
-            else:
-                mat = geo.qid(res[0], res[2], m, 2, 2, bc, -1.0, restriction = restriction)
-                #mat = geo.zblk(res[0], res[2], m, 2, 2, bc, restriction = restriction)
-
-        elif field_row == ("velocity","pol") and field_col == field_row:
-            if m == 0:
-                mat = geo.qid(res[0], res[2], 1, 2, 4, bc, restriction = restriction)
-                #mat = geo.zblk(res[0], res[2], m, 2, 4, bc, restriction = restriction)
-            else:
-                mat = geo.qid(res[0], res[2], m, 3, 4, bc, restriction = restriction)
-                #mat = geo.zblk(res[0], res[2], m, 3, 4, bc, restriction = restriction)
-
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -622,10 +605,6 @@ class BoussinesqRBCCylinderVisu(BoussinesqRBCCylinderConfig, base_model.BaseMode
         if timing == self.EXPLICIT_LINEAR:
             if field_row in [("mean_temperature", ""),("fluct_temperature", "")]:
                 fields = [("temperature","")]
-            elif field_row in [("magnetic", "tor"),("pressure", "tor")]:
-                fields = [("velocity", "tor")]
-            elif field_row in [("magnetic", "pol"),("pressure", "pol")]:
-                fields = [("velocity", "pol")]
             else:
                 fields = []
 
@@ -706,33 +685,9 @@ class BoussinesqRBCCylinderVisu(BoussinesqRBCCylinderConfig, base_model.BaseMode
 
         elif field_row == ("fluct_temperature","") and field_col == ("temperature",""):
             if m == 0:
-                mat = geo.zblk(res[0], res[2], m, 0, 0, bc)
+                mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
             else:
-                mat = geo.qid(res[0], res[2], m, 1, 2, bc)
-
-        elif field_row == ("magnetic","tor") and field_col == ("velocity","tor"):
-            if m == 1:
                 mat = geo.qid(res[0], res[2], m, 0, 0, bc)
-            else:
-                mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
-
-        elif field_row == ("magnetic","pol") and field_col == ("velocity","pol"):
-            if m == 1:
-                mat = geo.qid(res[0], res[2], m, 0, 0, bc)
-            else:
-                mat = geo.zblk(res[0], res[2], m, 3, 4, bc)
-
-        elif field_row == ("pressure","tor") and field_col == ("velocity","tor"):
-            if m == 0:
-                mat = geo.qid(res[0], res[2], m, 0, 0, bc)
-            else:
-                mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
-
-        elif field_row == ("pressure","pol") and field_col == ("velocity","pol"):
-            if m == 0:
-                mat = geo.qid(res[0], res[2], m, 0, 0, bc)
-            else:
-                mat = geo.zblk(res[0], res[2], m, 3, 4, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

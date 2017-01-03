@@ -88,7 +88,7 @@ class BoussinesqRRBCCylinder(BoussinesqRRBCCylinderConfig, base_model.BaseModel)
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("velocity","tor"),("velocity","pol"),("temperature","")]:
+            if field_row in [("temperature","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -242,18 +242,6 @@ class BoussinesqRRBCCylinder(BoussinesqRRBCCylinderConfig, base_model.BaseModel)
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2(res[0], res[2], m, bc, restriction = restriction)
-
-        elif field_row == ("velocity","tor") and field_col == field_row:
-            if m == 0:
-                mat = geo.qid(res[0], res[2], 1, 1, 2, bc, -1.0, restriction = restriction)
-            else:
-                mat = geo.qid(res[0], res[2], m, 2, 2, bc, -1.0, restriction = restriction)
-
-        elif field_row == ("velocity","pol") and field_col == field_row:
-            if m == 0:
-                mat = geo.qid(res[0], res[2], 1, 2, 4, bc, restriction = restriction)
-            else:
-                mat = geo.qid(res[0], res[2], m, 3, 4, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -539,11 +527,11 @@ class BoussinesqRRBCCylinderVisu(BoussinesqRRBCCylinderConfig, base_model.BaseMo
             if m == 0:
                 mat = geo.qid(res[0], res[2], m, 0, 0, bc)
             else:
-                mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
 
         elif field_row == ("fluct_temperature","") and field_col == ("temperature",""):
             if m == 0:
-                mat = geo.zblk(res[0], res[2], m, 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], m, 1, 2, bc)
             else:
                 mat = geo.qid(res[0], res[2], m, 0, 0, bc)
 
