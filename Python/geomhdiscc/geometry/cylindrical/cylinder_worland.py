@@ -41,14 +41,14 @@ def zblk(nr, nz, m, qr, qz, bc, restriction = None):
     return cylbc.constrain(mat, nr, nz, m, qr, qz, bc, restriction = restriction)
 
 def i2(nr, nz, m, bc, coeff = 1.0, restriction = None):
-    """Create a i2 in R kronecker with i2 in Z"""
+    """Create a i2 in R kronecker with I in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*utils.restricted_kron_2d(c1d.qid(nz, 0, bcz), rad.i2(nr, m, bcr), restriction = restriction)
     return cylbc.constrain(mat, nr, nz, m, 1, 0, bc, restriction = restriction)
 
 def i2laplh(nr, nz, m, bc, coeff = 1.0, restriction = None):
-    """Create a i2laph in R kronecker with i2 in Z"""
+    """Create a i2laph in R kronecker with I in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*utils.restricted_kron_2d(c1d.qid(nz, 0, bcz), rad.i2laplh(nr, m, bcr), restriction = restriction)
