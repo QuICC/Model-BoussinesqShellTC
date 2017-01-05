@@ -42,9 +42,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            if field_row in [("velocity","tor"), ("magnetic","tor"), ("magnetic","pol")]:
-                fields = []
-            elif field_row == ("velocity","pol"):
+            if field_row == ("velocity","pol"):
                 fields = [("temperature","")]
             elif field_row == ("temperature",""):
                 fields = [("velocity","pol")]

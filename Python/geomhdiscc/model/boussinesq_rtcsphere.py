@@ -72,7 +72,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","tor") or field_row == ("temperature",""):
+            if field_row in [("velocity","tor"), ("temperature","")]:
                 shift_r = 1
             elif field_row == ("velocity","pol"):
                 shift_r = 2
@@ -151,11 +151,11 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                         bc = {0:-10, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:10}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                             bc = {0:10}
 
             elif bcId == 1:
@@ -166,9 +166,9 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                         bc = {0:-21, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:12}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:21}
             
             # Set LHS galerkin restriction
