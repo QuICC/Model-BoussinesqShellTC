@@ -147,7 +147,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
                     elif field_row == ("magnetic","pol") and field_col == field_row:
                         bc = {0:13, 'c':{'l':l}}
                     elif field_row == ("temperature","") and field_col == field_row:
-                            bc = {0:10}
+                        bc = {0:10}
 
             elif bcId == 1:
                 if self.use_galerkin:
