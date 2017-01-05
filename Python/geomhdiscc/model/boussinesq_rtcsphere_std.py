@@ -23,7 +23,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh"]
+        return ["ekman", "prandtl", "rayleigh"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -201,7 +201,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         l = eigs[0]
 
         Ra = eq_params['rayleigh']
-        T = eq_params['taylor']**0.5
+        T = 1.0/eq_params['ekman']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)

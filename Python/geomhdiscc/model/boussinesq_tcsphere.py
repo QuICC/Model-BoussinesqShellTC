@@ -261,7 +261,7 @@ class BoussinesqTCSphere(base_model.BaseModel):
                     mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0, restriction = restriction)
+                mat = geo.i2lapl(res[0], res[1], m, bc, 1.0/Pr, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -271,19 +271,18 @@ class BoussinesqTCSphere(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        Pr = eq_params['prandtl']
         m = eigs[1]
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2(res[0], res[1], m, bc, 1.0, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+            mat = geo.i2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4lapl(res[0], res[1], m, bc, 1.0, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+            mat = geo.i4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
         elif field_row == ("temperature",""):
-            mat = geo.i2(res[0], res[1], m, bc, Pr, restriction = restriction)
+            mat = geo.i2(res[0], res[1], m, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

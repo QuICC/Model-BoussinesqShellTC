@@ -92,7 +92,7 @@ namespace Equations {
 
       #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
          // Get square root of Taylor number
-         MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
+         MHDFloat T = 1.0/this->eqParams().nd(NonDimensional::EKMAN);
 
          ///
          /// Compute Coriolis term

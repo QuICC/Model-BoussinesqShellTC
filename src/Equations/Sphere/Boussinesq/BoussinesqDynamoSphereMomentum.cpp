@@ -72,7 +72,7 @@ namespace Equations {
    void BoussinesqDynamoSphereMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       // Get square root of Taylor number
-      MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
+      MHDFloat T = 1.0/this->eqParams().nd(NonDimensional::EKMAN);
       MHDFloat Pm = this->eqParams().nd(NonDimensional::MAGPRANDTL);
 
       ///

@@ -23,7 +23,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh"]
+        return ["ekman", "prandtl", "rayleigh"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -255,7 +255,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        T = eq_params['taylor']**0.5
+        T = 1.0/eq_params['ekman']
 
         m = int(eigs[0])
 
@@ -291,7 +291,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = geo.i2(res[0], res[1], m, bc, 1.0/Pr, with_sh_coeff = 'laplh', restriction = restriction)
+                    mat = geo.i2(res[0], res[1], m, bc, 1.0, with_sh_coeff = 'laplh', restriction = restriction)
 
                 else:
                     mat = geo.zblk(res[0], res[1], m, bc)
