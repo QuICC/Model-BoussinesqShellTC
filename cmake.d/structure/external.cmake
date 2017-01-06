@@ -2,12 +2,12 @@
 #-------------- EXTERNAL DIRECTORIES -------------#
 ###################################################
 
-set(GEOMHDISCC_EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/External)
-set(GEOMHDISCC_EIGEN_DIR ${GEOMHDISCC_EXTERNAL_DIR}/eigen3)
-set(GEOMHDISCC_XML_DIR ${GEOMHDISCC_EXTERNAL_DIR}/rapidxml)
-if(GEOMHDISCC_MULTPRECISION)
-   set(GEOMHDISCC_MPWRAPPER_DIR ${GEOMHDISCC_EXTERNAL_DIR}/mpfrc++)
-endif(GEOMHDISCC_MULTPRECISION)
+set(QUICC_EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/External)
+set(QUICC_EIGEN_DIR ${QUICC_EXTERNAL_DIR}/eigen3)
+set(QUICC_XML_DIR ${QUICC_EXTERNAL_DIR}/rapidxml)
+if(QUICC_MULTPRECISION)
+   set(QUICC_MPWRAPPER_DIR ${QUICC_EXTERNAL_DIR}/mpfrc++)
+endif(QUICC_MULTPRECISION)
 
 ###################################################
 #-------- EXTERNAL INCLUDE DIRECTORIES -----------#
@@ -16,9 +16,9 @@ endif(GEOMHDISCC_MULTPRECISION)
 #
 # Set External include directories
 #
-include_directories(${GEOMHDISCC_EIGEN_DIR})
-include_directories(${GEOMHDISCC_EIGEN_DIR}/unsupported)
-include_directories(${GEOMHDISCC_XML_DIR})
-if(GEOMHDISCC_MULTPRECISION)
-   include_directories(${GEOMHDISCC_MPWRAPPER_DIR})
-endif(GEOMHDISCC_MULTPRECISION)
+include_directories(${QUICC_EIGEN_DIR})
+include_directories(${QUICC_EIGEN_DIR}/unsupported)
+include_directories(${QUICC_XML_DIR})
+if(QUICC_MULTPRECISION)
+   include_directories(${QUICC_MPWRAPPER_DIR})
+endif(QUICC_MULTPRECISION)

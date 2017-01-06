@@ -21,12 +21,12 @@ message(STATUS "***********************************************")
 # Choose the dimensionality of the simulation volume.
 # Possible options are: 1D, 2D, 3D
 #
-set(GEOMHDISCC_CODEDIM_DIMENSIONS "1D" "2D" "3D")
+set(QUICC_CODEDIM_DIMENSIONS "1D" "2D" "3D")
 
-quicc_provide_choice(GEOMHDISCC_CODEDIM_DIMENSIONS "Dimension" GEOMHDISCC_CODEDIM dimTest)
+quicc_provide_choice(QUICC_CODEDIM_DIMENSIONS "Dimension" QUICC_CODEDIM dimTest)
 
 if(dimTest)
-   quicc_add_definition(GEOMHDISCC_CODEDIM)
+   quicc_add_definition(QUICC_CODEDIM)
 endif(dimTest)
 
 
@@ -38,12 +38,12 @@ endif(dimTest)
 # Choose the type of geometry the simulation is contained in.
 # Possible options are: Cartesian, Cylindrical, Spherical
 #
-set(GEOMHDISCC_CODEGEOM_GEOMETRIES "Cartesian" "Cylindrical" "Spherical")
+set(QUICC_CODEGEOM_GEOMETRIES "Cartesian" "Cylindrical" "Spherical")
 
-quicc_provide_choice(GEOMHDISCC_CODEGEOM_GEOMETRIES "Geometry" GEOMHDISCC_CODEGEOM geomTest)
+quicc_provide_choice(QUICC_CODEGEOM_GEOMETRIES "Geometry" QUICC_CODEGEOM geomTest)
 
 if(geomTest)
-   quicc_add_definition(GEOMHDISCC_CODEGEOM)
+   quicc_add_definition(QUICC_CODEGEOM)
 endif(geomTest)
 
 
@@ -55,12 +55,12 @@ endif(geomTest)
 # Choose the type of nondimensional parameters
 # Possible options are: EQRaEm, PrRaXGAs
 #
-set(GEOMHDISCC_PARAMETERS_LIST "EQRaEm" "PrRaXGAs")
+set(QUICC_PARAMETERS_LIST "EQRaEm" "PrRaXGAs")
 
-quicc_provide_choice(GEOMHDISCC_PARAMETERS_LIST "Parameters" GEOMHDISCC_PARAMETERS paramTest)
+quicc_provide_choice(QUICC_PARAMETERS_LIST "Parameters" QUICC_PARAMETERS paramTest)
 
 if(paramTest)
-   quicc_add_definition(GEOMHDISCC_PARAMETERS)
+   quicc_add_definition(QUICC_PARAMETERS)
 endif(paramTest)
 
 
@@ -90,16 +90,16 @@ set(MHDSimulationSrcDirs
    Variables
 )
 
-quicc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Simulation MHDSimulationSrcDirs)
+quicc_append_sources(All_Srcs ${QUICC_SRC_DIR}/Simulation MHDSimulationSrcDirs)
 
-if(GEOMHDISCC_CODEGEOM STREQUAL "Cartesian")
+if(QUICC_CODEGEOM STREQUAL "Cartesian")
    include("cmake.d/setup/Cartesian.cmake")
-endif(GEOMHDISCC_CODEGEOM STREQUAL "Cartesian")
+endif(QUICC_CODEGEOM STREQUAL "Cartesian")
 
-if(GEOMHDISCC_CODEGEOM STREQUAL "Cylindrical")
+if(QUICC_CODEGEOM STREQUAL "Cylindrical")
    include("cmake.d/setup/Cylindrical.cmake")
-endif(GEOMHDISCC_CODEGEOM STREQUAL "Cylindrical")
+endif(QUICC_CODEGEOM STREQUAL "Cylindrical")
 
-if(GEOMHDISCC_CODEGEOM STREQUAL "Spherical")
+if(QUICC_CODEGEOM STREQUAL "Spherical")
    include("cmake.d/setup/Spherical.cmake")
-endif(GEOMHDISCC_CODEGEOM STREQUAL "Spherical")
+endif(QUICC_CODEGEOM STREQUAL "Spherical")

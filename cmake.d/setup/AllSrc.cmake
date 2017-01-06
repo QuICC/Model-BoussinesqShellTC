@@ -67,4 +67,4 @@ set(MHDAllSrcDirs
 )
 
 
-quicc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDAllSrcDirs)
+quicc_append_sources(All_Srcs ${QUICC_SRC_DIR} MHDAllSrcDirs)

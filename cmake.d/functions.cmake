@@ -56,7 +56,7 @@ endfunction(quicc_provide_choice)
 function (quicc_load_platform platform)
    include("cmake.d/platforms/${${platform}}.cmake")
    string(TOUPPER "${${platform}}" plat)
-   add_definitions("-DGEOMHDISCC_ON_${plat}")
+   add_definitions("-DQUICC_ON_${plat}")
 endfunction (quicc_load_platform)
 
 #
@@ -80,42 +80,42 @@ function (quicc_link_external varName)
       string(TOUPPER ${tmp} libName)
    endif(NOT ${tmp} STREQUAL "")
    # Check if variable is defined
-   if(DEFINED GEOMHDISCC_LIBRARIES_${libName})
-      list(LENGTH GEOMHDISCC_LIBRARIES_${libName} len)
+   if(DEFINED QUICC_LIBRARIES_${libName})
+      list(LENGTH QUICC_LIBRARIES_${libName} len)
       # Check the number of elements in list and rule out if not equal to 1
       if(${len} EQUAL 1)
          # Check if library requires lookup through find_package
-         if(${GEOMHDISCC_LIBRARIES_${libName}} STREQUAL "auto")
+         if(${QUICC_LIBRARIES_${libName}} STREQUAL "auto")
             find_package(${libName})
             if(${${libName}_FOUND})
-               set(GEOMHDISCC_LIBRARIES_${libName} ${${libName}_LIBRARIES})
+               set(QUICC_LIBRARIES_${libName} ${${libName}_LIBRARIES})
             endif(${${libName}_FOUND})
-         endif(${GEOMHDISCC_LIBRARIES_${libName}} STREQUAL "auto") 
+         endif(${QUICC_LIBRARIES_${libName}} STREQUAL "auto") 
       endif(${len} EQUAL 1)
-   endif(DEFINED GEOMHDISCC_LIBRARIES_${libName})
+   endif(DEFINED QUICC_LIBRARIES_${libName})
    # Loop over all library directories to add 
-   foreach(inc ${GEOMHDISCC_LIBDIR_${libName}})
+   foreach(inc ${QUICC_LIBDIR_${libName}})
       link_directories(${inc})
    endforeach(inc)
    # Loop over all libraries to link to
-   foreach(lib ${GEOMHDISCC_LIBRARIES_${libName}})
+   foreach(lib ${QUICC_LIBRARIES_${libName}})
       link_libraries(${lib})
    endforeach(lib)
    # Loop over all include directories to add 
-   foreach(inc ${GEOMHDISCC_INCLUDES_${libName}})
+   foreach(inc ${QUICC_INCLUDES_${libName}})
       include_directories(${inc})
    endforeach(inc)
    # Get upper case compiler
-   set(tmp ${GEOMHDISCC_COMPILER})
+   set(tmp ${QUICC_COMPILER})
    if(NOT ${tmp} STREQUAL "")
       string(TOUPPER ${tmp} compUP)
    endif(NOT ${tmp} STREQUAL "")
    # Loop over all library directories to add that are compiler specific
-   foreach(inc ${GEOMHDISCC_LIBDIR_${libName}_${compUP}})
+   foreach(inc ${QUICC_LIBDIR_${libName}_${compUP}})
       link_directories(${inc})
    endforeach(inc)
    # Loop over all include directories to add that are compiler specific
-   foreach(inc ${GEOMHDISCC_INCLUDES_${libName}_${compUP}})
+   foreach(inc ${QUICC_INCLUDES_${libName}_${compUP}})
       include_directories(${inc})
    endforeach(inc)
 endfunction (quicc_link_external libName)
@@ -168,7 +168,7 @@ function (quicc_add_executable MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfi
    string(TOUPPER ${MHDScheme} UpMHDScheme)
 
    # Create list of source files
-   set(SrcsList ${MHDExecSrc} ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${MHDModel}.cpp ${${MHDAllSrcs}} ${${MHDModelSrcs}})
+   set(SrcsList ${MHDExecSrc} ${QUICC_SRC_DIR}/PhysicalModels/${MHDModel}.cpp ${${MHDAllSrcs}} ${${MHDModelSrcs}})
 
    # Add executable to target list
    add_executable(${ExecName} ${SrcsList})
@@ -176,10 +176,10 @@ function (quicc_add_executable MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfi
    # Set special properties of target
    if(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_SPATIALDIMENSION_${MHDSchemeDim} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpMHDScheme} -DQUICC_SPATIALDIMENSION_${MHDSchemeDim} -DQUICC_RUNSIM_MODEL=${MHDModel}")
    else(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_SPATIALDIMENSION_${MHDSchemeDim} -DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme}_${MHDForm} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpMHDScheme} -DQUICC_SPATIALDIMENSION_${MHDSchemeDim} -DQUICC_SPATIALSCHEME_${UpMHDScheme}_${MHDForm} -DQUICC_RUNSIM_MODEL=${MHDModel}")
    endif(${MHDForm} STREQUAL "DEFAULT")
 
    # Show message
@@ -197,7 +197,7 @@ function (quicc_add_test MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDE
    string(TOUPPER ${MHDScheme} UpMHDScheme)
 
    # Create list of source files
-   set(SrcsList ${MHDExecSrc} ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${MHDModel}.cpp ${${MHDAllSrcs}} ${${MHDModelSrcs}})
+   set(SrcsList ${MHDExecSrc} ${QUICC_SRC_DIR}/PhysicalModels/${MHDModel}.cpp ${${MHDAllSrcs}} ${${MHDModelSrcs}})
 
    # Add executable to target list
    add_executable(${ExecName} ${SrcsList})
@@ -205,10 +205,10 @@ function (quicc_add_test MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDE
    # Set special properties of target
    if(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_SPATIALDIMENSION_${MHDSchemeDim} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpMHDScheme} -DQUICC_SPATIALDIMENSION_${MHDSchemeDim} -DQUICC_RUNSIM_MODEL=${MHDModel}")
    else(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme} -DGEOMHDISCC_SPATIALDIMENSION_${MHDSchemeDim} -DGEOMHDISCC_SPATIALSCHEME_${UpMHDScheme}_${MHDForm} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpMHDScheme} -DQUICC_SPATIALDIMENSION_${MHDSchemeDim} -DQUICC_SPATIALSCHEME_${UpMHDScheme}_${MHDForm} -DQUICC_RUNSIM_MODEL=${MHDModel}")
    endif(${MHDForm} STREQUAL "DEFAULT")
 
    # Show message

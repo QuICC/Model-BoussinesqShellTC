@@ -35,11 +35,11 @@ message(STATUS "***********************************************")
 include(cmake.d/platforms/base.cmake)
 
 # Choose platform
-quicc_provide_choice(GEOMHDISCC_PLATFORMS "Platform" GEOMHDISCC_PLATFORM platformTest)
+quicc_provide_choice(QUICC_PLATFORMS "Platform" QUICC_PLATFORM platformTest)
 
 if(platformTest)
    # Load platform
-   quicc_load_platform(GEOMHDISCC_PLATFORM)
+   quicc_load_platform(QUICC_PLATFORM)
 
    # Create global configurator
    include(cmake.d/setup/global.cmake)

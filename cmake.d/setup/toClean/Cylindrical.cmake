@@ -22,28 +22,28 @@ message(STATUS "***********************************************")
 # Choose the type of spatial scheme.
 # Possible options are: 
 #
-if(GEOMHDISCC_CODEDIM STREQUAL "1D")
+if(QUICC_CODEDIM STREQUAL "1D")
    message(ERROR "Can't setup a cylindrical simulation in 1D!")
-endif(GEOMHDISCC_CODEDIM STREQUAL "1D")
-if(GEOMHDISCC_CODEDIM STREQUAL "2D")
-   set(GEOMHDISCC_CYLINDRICAL_SCHEMES "TF" "WF")
-endif(GEOMHDISCC_CODEDIM STREQUAL "2D")
-if(GEOMHDISCC_CODEDIM STREQUAL "3D")
-   set(GEOMHDISCC_CYLINDRICAL_SCHEMES "TFT" "TFF" "WFT" "WFF")
-endif(GEOMHDISCC_CODEDIM STREQUAL "3D")
+endif(QUICC_CODEDIM STREQUAL "1D")
+if(QUICC_CODEDIM STREQUAL "2D")
+   set(QUICC_CYLINDRICAL_SCHEMES "TF" "WF")
+endif(QUICC_CODEDIM STREQUAL "2D")
+if(QUICC_CODEDIM STREQUAL "3D")
+   set(QUICC_CYLINDRICAL_SCHEMES "TFT" "TFF" "WFT" "WFF")
+endif(QUICC_CODEDIM STREQUAL "3D")
 
-quicc_provide_choice(GEOMHDISCC_CYLINDRICAL_SCHEMES "Spatial scheme" GEOMHDISCC_SPATIALSCHEME schmTest)
+quicc_provide_choice(QUICC_CYLINDRICAL_SCHEMES "Spatial scheme" QUICC_SPATIALSCHEME schmTest)
 
-option(GEOMHDISCC_FASTCHEBY "Use fast Chebyshev transform?" ON)
+option(QUICC_FASTCHEBY "Use fast Chebyshev transform?" ON)
 
 if(schmTest)
-   if(NOT GEOMHDISCC_FASTCHEBY)
-      string(REGEX REPLACE "T" "Tp" tmp ${GEOMHDISCC_SPATIALSCHEME})
-      set(GEOMHDISCC_SPATIALSCHEME ${tmp})
+   if(NOT QUICC_FASTCHEBY)
+      string(REGEX REPLACE "T" "Tp" tmp ${QUICC_SPATIALSCHEME})
+      set(QUICC_SPATIALSCHEME ${tmp})
       message(STATUS " --> Use slow Chebyshev transform")
-   endif(NOT GEOMHDISCC_FASTCHEBY)
+   endif(NOT QUICC_FASTCHEBY)
 
-   quicc_add_definition(GEOMHDISCC_SPATIALSCHEME)
+   quicc_add_definition(QUICC_SPATIALSCHEME)
 endif(schmTest)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
@@ -67,4 +67,4 @@ set(MHDCylindricalSrcDirs
    Transforms
 )
 
-quicc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Cylindrical MHDCylindricalSrcDirs)
+quicc_append_sources(All_Srcs ${QUICC_SRC_DIR}/Cylindrical MHDCylindricalSrcDirs)
