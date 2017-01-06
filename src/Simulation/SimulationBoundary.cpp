@@ -20,7 +20,7 @@
 #include "IoTools/HumanToId.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    SimulationBoundary::SimulationBoundary(const std::map<std::string,int>& bcIds)
    {

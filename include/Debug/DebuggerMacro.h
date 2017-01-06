@@ -10,7 +10,7 @@
 #ifdef QUICC_DEBUG
    #include "Debug/SerialDebugger.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       /// Typedef for a profiler
       typedef Debug::SerialDebugger DebuggerMacro;
    }

@@ -22,7 +22,7 @@
 //
 #include "Enums/Arithmetics.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

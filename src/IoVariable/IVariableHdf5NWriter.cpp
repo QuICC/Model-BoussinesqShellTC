@@ -22,7 +22,7 @@
 //
 #include "IoVariable/VariableHdf5Tags.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 

@@ -20,7 +20,7 @@
 //
 #include "TransformConfigurators/TransformTreeEdge.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

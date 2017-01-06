@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    Exception::Exception(const std::string& msg)
       : std::runtime_error(msg)   

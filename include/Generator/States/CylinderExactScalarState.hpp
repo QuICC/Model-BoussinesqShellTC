@@ -24,7 +24,7 @@
 #include "Equations/IScalarEquation.hpp"
 #include "Generator/States/CylinderExactStateIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

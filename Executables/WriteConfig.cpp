@@ -34,7 +34,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include MODELHEADER
 
-typedef GeoMHDiSCC::QUICC_RUNSIM_MODEL PModel;
+typedef QuICC::QUICC_RUNSIM_MODEL PModel;
 
 /**
  * @brief Setup and run the simulation
@@ -48,41 +48,41 @@ int run()
    std::string type = PModel::SchemeType::type();
 
    // Initialize the python model wrapper
-   GeoMHDiSCC::PythonModelWrapper::init();
-   GeoMHDiSCC::PythonModelWrapper::import(PModel::PYMODULE);
-   GeoMHDiSCC::PythonModelWrapper::createModel(PModel::PYCLASS);
+   QuICC::PythonModelWrapper::init();
+   QuICC::PythonModelWrapper::import(PModel::PYMODULE);
+   QuICC::PythonModelWrapper::createModel(PModel::PYCLASS);
 
    // Box periodicity
-   std::vector<bool> isPeriodicBox = GeoMHDiSCC::PhysicalModelBase::isPeriodicBox();
+   std::vector<bool> isPeriodicBox = QuICC::PhysicalModelBase::isPeriodicBox();
 
    // Create configuration writer
-   GeoMHDiSCC::IoConfig::ConfigurationWriter writer(dim, isPeriodicBox, type);
+   QuICC::IoConfig::ConfigurationWriter writer(dim, isPeriodicBox, type);
 
    // Create list of field ID strings for boundary conditions
-   std::vector<GeoMHDiSCC::PhysicalNames::Id> fields = GeoMHDiSCC::PhysicalModelBase::fieldIds();
-   std::vector<GeoMHDiSCC::PhysicalNames::Id>::iterator fIt;
+   std::vector<QuICC::PhysicalNames::Id> fields = QuICC::PhysicalModelBase::fieldIds();
+   std::vector<QuICC::PhysicalNames::Id>::iterator fIt;
    std::vector<std::string>   bcNames;
    for(fIt = fields.begin(); fIt != fields.end(); ++fIt)
    {
-      bcNames.push_back(GeoMHDiSCC::IoTools::IdToHuman::toTag(*fIt));
+      bcNames.push_back(QuICC::IoTools::IdToHuman::toTag(*fIt));
    }
 
    // Create list of nondimensional ID strings for physical parameters
-   std::vector<GeoMHDiSCC::NonDimensional::Id> params = GeoMHDiSCC::PhysicalModelBase::paramIds();
-   std::vector<GeoMHDiSCC::NonDimensional::Id>::iterator pIt;
+   std::vector<QuICC::NonDimensional::Id> params = QuICC::PhysicalModelBase::paramIds();
+   std::vector<QuICC::NonDimensional::Id>::iterator pIt;
    std::vector<std::string>   ndNames;
    for(pIt = params.begin(); pIt != params.end(); ++pIt)
    {
-      ndNames.push_back(GeoMHDiSCC::IoTools::IdToHuman::toTag(*pIt));
+      ndNames.push_back(QuICC::IoTools::IdToHuman::toTag(*pIt));
    }
 
    // Add the physical part
-   GeoMHDiSCC::IoConfig::SharedPhysicalPart   spPhys(new GeoMHDiSCC::IoConfig::PhysicalPart(ndNames));
-   writer.addPart(GeoMHDiSCC::IoConfig::SimulationBlocks::PHYSICAL, spPhys);
+   QuICC::IoConfig::SharedPhysicalPart   spPhys(new QuICC::IoConfig::PhysicalPart(ndNames));
+   writer.addPart(QuICC::IoConfig::SimulationBlocks::PHYSICAL, spPhys);
 
    // Add the boundary part
-   GeoMHDiSCC::IoConfig::SharedBoundaryPart   spBound(new GeoMHDiSCC::IoConfig::BoundaryPart(bcNames));
-   writer.addPart(GeoMHDiSCC::IoConfig::SimulationBlocks::BOUNDARY, spBound);
+   QuICC::IoConfig::SharedBoundaryPart   spBound(new QuICC::IoConfig::BoundaryPart(bcNames));
+   writer.addPart(QuICC::IoConfig::SimulationBlocks::BOUNDARY, spBound);
 
    // Initialise writer
    writer.init();
@@ -94,7 +94,7 @@ int run()
    writer.finalize();
 
    // Finalize the python model wrapper
-   GeoMHDiSCC::PythonModelWrapper::finalize();
+   QuICC::PythonModelWrapper::finalize();
 
    return 0;
 }
@@ -108,7 +108,7 @@ int run()
 int main(int argc, char* argv[])
 {
    // Initilise everything that can't be done inside a class
-   GeoMHDiSCC::FrameworkMacro::init();
+   QuICC::FrameworkMacro::init();
 
    // Storage for the return code of run
    int code;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
    code = run();
 
    // Finalise everything that can't be done inside a class
-   GeoMHDiSCC::FrameworkMacro::finalize();
+   QuICC::FrameworkMacro::finalize();
 
    return code;
 }

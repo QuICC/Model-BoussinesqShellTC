@@ -34,7 +34,7 @@
 #include "IoConfig/ConfigParts/IoPart.hpp"
 #include "IoConfig/ConfigParts/StatisticsPart.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoConfig {
 

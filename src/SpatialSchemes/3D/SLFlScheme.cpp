@@ -19,7 +19,7 @@
 //
 #include "PolynomialTransforms/PolynomialTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
    

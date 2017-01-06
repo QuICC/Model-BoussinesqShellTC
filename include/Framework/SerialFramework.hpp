@@ -17,7 +17,7 @@
 //
 #include "Framework/FrameworkBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief This class defines the framework for a serial code

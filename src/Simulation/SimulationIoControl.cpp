@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    SimulationIoControl::SimulationIoControl()
       : mSteps(0), mAsciiRate(-1), mHdf5Rate(-1), mStatsRate(-1), mStatsAvgRate(-1), mActiveStatsUpdate(false), mActiveStatsWrite(true)

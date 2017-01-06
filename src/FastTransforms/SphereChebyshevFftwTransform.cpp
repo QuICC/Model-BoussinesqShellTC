@@ -25,7 +25,7 @@
 #include "FastTransforms/ParityTransformTools.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

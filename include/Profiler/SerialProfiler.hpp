@@ -19,7 +19,7 @@
 //
 #include "Profiler/ProfilerBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Debug {
 

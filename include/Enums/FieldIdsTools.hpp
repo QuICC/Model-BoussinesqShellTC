@@ -22,7 +22,7 @@
 //
 #include "Enums/FieldIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
    
    /**
     * Convert field component to array index

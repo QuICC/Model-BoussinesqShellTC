@@ -21,7 +21,7 @@
 //
 #include "Base/MathConstants.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

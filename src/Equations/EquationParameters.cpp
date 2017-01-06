@@ -19,7 +19,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "IoTools/HumanToId.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

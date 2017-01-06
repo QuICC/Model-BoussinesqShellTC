@@ -11,7 +11,7 @@
    // include MPI timer
    #include "Timers/MpiTimer.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       /// Typedef for a generic Timer based on the MpiTimer
       typedef MpiTimer  TimerMacro;
    }
@@ -19,7 +19,7 @@
    // include serial timer
    #include "Timers/SerialTimer.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       /// Typedef for a generic Timer based on the SerialTimer
       typedef SerialTimer  TimerMacro;
    }

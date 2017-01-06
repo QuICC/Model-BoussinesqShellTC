@@ -31,7 +31,7 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

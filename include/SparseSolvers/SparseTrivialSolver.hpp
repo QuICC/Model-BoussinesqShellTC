@@ -22,7 +22,7 @@
 #include "Enums/SolveTiming.hpp"
 #include "SparseSolvers/SparseSolverBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 

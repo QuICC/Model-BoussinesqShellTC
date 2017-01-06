@@ -21,7 +21,7 @@
 //
 #include "IoConfig/ConfigParts/IConfigurationPart.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoConfig {
 

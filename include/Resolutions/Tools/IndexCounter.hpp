@@ -23,7 +23,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    // Forward declaration to avoid header loop
    class SimulationResolution;

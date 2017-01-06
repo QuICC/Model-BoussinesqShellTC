@@ -23,7 +23,7 @@
    
    #include "Equations/Tools/NoEigenTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -49,7 +49,7 @@
    
    #include "Equations/Tools/Eigen1DTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -76,7 +76,7 @@
 
    #include "Equations/Tools/Eigen2DTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -103,7 +103,7 @@
 
    #include "Equations/Tools/Eigen3DTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -130,7 +130,7 @@
 
    #include "Equations/Tools/Eigen1DTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -157,7 +157,7 @@
 
    #include "Equations/Tools/Eigen1DTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -185,7 +185,7 @@
    #include "Equations/Tools/EigenSHlTools.hpp"
    #include "Equations/Tools/EigenSHlmTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -218,7 +218,7 @@
 
    #include "Equations/Tools/EigenSHmTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -244,7 +244,7 @@
 
    #include "Equations/Tools/Eigen1DTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -271,7 +271,7 @@
    
    #include "Equations/Tools/NoEigenTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 
@@ -298,7 +298,7 @@
    
    #include "Equations/Tools/Eigen1DTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Equations {
 

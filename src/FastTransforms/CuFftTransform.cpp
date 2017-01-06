@@ -20,7 +20,7 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/CuFftLibrary.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

@@ -23,7 +23,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "TransformConfigurators/TransformTree.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

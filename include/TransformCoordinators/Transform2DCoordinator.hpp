@@ -27,7 +27,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "TransformCoordinators/Transform1DCoordinator.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * 

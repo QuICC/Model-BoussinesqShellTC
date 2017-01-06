@@ -23,7 +23,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Equations/IScalarEquation.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

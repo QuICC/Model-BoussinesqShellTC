@@ -22,7 +22,7 @@
 //
 #include "IoTools/Formatter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    ExecutionTimer::ExecutionTimer(const bool autostart)
       : TimerMacro(autostart), mTimes(Array::Zero(TOTAL + 1))

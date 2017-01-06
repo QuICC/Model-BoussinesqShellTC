@@ -20,7 +20,7 @@
 #include "TransformConfigurators/TransformTreeTools.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    RequirementTools::RequirementTools()
    {

@@ -25,7 +25,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 #ifdef QUICC_MULTPRECISION
    const int PrueferAlgorithm::NEWTON_ITERATIONS = 10;

@@ -27,7 +27,7 @@
 // THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
 // QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq rotating thermal convection spherical shell model (Toroidal/Poloidal formulation)

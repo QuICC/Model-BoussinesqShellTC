@@ -13,7 +13,7 @@
    #include "StorageProfiler/StorageProfiler.hpp"
    #include "StorageProfiler/StorageProfilerTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       /// Typedef for a profiler
       typedef Debug::StorageProfiler  StorageProfilerMacro;
    }

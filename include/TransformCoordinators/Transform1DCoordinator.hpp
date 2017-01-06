@@ -29,7 +29,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "TransformConfigurators/TransformTree.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * 

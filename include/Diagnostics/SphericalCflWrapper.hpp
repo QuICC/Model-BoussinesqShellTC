@@ -21,7 +21,7 @@
 #include "Diagnostics/ICflWrapper.hpp"
 #include "Diagnostics/IVelocityWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Diagnostics {
 

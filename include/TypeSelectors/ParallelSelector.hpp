@@ -40,7 +40,7 @@
    #include "TransformGroupers/BackwardTransformGrouper.hpp"
 #endif //QUICC_SPATIALDIMENSION_3D
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Transform {
 

@@ -23,7 +23,7 @@
 #include "VectorFields/VectorField.hpp"
 #include "Variables/Physical/VectorPhysicalVariable.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

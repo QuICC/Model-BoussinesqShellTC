@@ -26,7 +26,7 @@
 #include "Communicators/EndDispatcher.hpp"
 #include "Communicators/CommunicationBuffer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

@@ -27,7 +27,7 @@
 #include "SparseSolvers/SparseSolverBase.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 

@@ -21,7 +21,7 @@
 #include "TypeSelectors/FftSelector.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Transform {
 
@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
    // Configure code to use TTT scheme
    #ifdef QUICC_SPATIALSCHEME_TTT
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -60,7 +60,7 @@ namespace GeoMHDiSCC {
    // Configure code to use TFT scheme
    #ifdef QUICC_SPATIALSCHEME_TFT
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -87,7 +87,7 @@ namespace GeoMHDiSCC {
    // Configure code to use TFF scheme
    #ifdef QUICC_SPATIALSCHEME_TFF
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -114,7 +114,7 @@ namespace GeoMHDiSCC {
       // Configure code to use FFF scheme
       #ifdef QUICC_SPATIALSCHEME_FFF
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -141,7 +141,7 @@ namespace GeoMHDiSCC {
    // Configure code to use CFT scheme
    #ifdef QUICC_SPATIALSCHEME_CFT
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -168,7 +168,7 @@ namespace GeoMHDiSCC {
    // Configure code to use AFT scheme
    #ifdef QUICC_SPATIALSCHEME_AFT
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -201,7 +201,7 @@ namespace GeoMHDiSCC {
          #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
       #endif //defined QUICC_ALEGTRA_MATRIX
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -238,7 +238,7 @@ namespace GeoMHDiSCC {
          #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
       #endif //defined QUICC_ALEGTRA_MATRIX
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -275,7 +275,7 @@ namespace GeoMHDiSCC {
          #include "PolynomialTransforms/CylinderWorlandFlyTransform.hpp"
       #endif //defined QUICC_WORLANDTRA_MATRIX
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -318,7 +318,7 @@ namespace GeoMHDiSCC {
          #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
       #endif //defined QUICC_ALEGTRA_MATRIX
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -353,7 +353,7 @@ namespace GeoMHDiSCC {
    // Configure code to use TT scheme
    #ifdef QUICC_SPATIALSCHEME_TT
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -374,7 +374,7 @@ namespace GeoMHDiSCC {
    // Configure code to use TF scheme
    #ifdef QUICC_SPATIALSCHEME_TF
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Transform {
 
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>

@@ -33,7 +33,7 @@
    #include "Communicators/Converters/MpiConverter.hpp"
 #endif // QUICC_MPI
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

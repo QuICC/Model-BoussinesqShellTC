@@ -26,7 +26,7 @@
 #include "PhysicalOperators/Cross.hpp"
 #include "PhysicalOperators/SphericalCoriolis.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

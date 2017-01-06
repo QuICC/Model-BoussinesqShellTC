@@ -22,7 +22,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Variables/Spectral/ScalarVariable.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

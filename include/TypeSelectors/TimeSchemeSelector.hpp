@@ -24,7 +24,7 @@
 
    #include "Timesteppers/ImExRKCB2.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -39,7 +39,7 @@
 
    #include "Timesteppers/ImExRKCB3a.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -54,7 +54,7 @@
 
    #include "Timesteppers/ImExRKCB3b.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -69,7 +69,7 @@
 
    #include "Timesteppers/ImExRKCB3c.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -84,7 +84,7 @@
 
    #include "Timesteppers/ImExRKCB3d.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -99,7 +99,7 @@
 
    #include "Timesteppers/ImExRKCB3e.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -114,7 +114,7 @@
 
    #include "Timesteppers/ImExRKCB3f.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -129,7 +129,7 @@
 
    #include "Timesteppers/ImExRKCB4.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -144,7 +144,7 @@
 
    #include "Timesteppers/ImExRK3.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 
@@ -159,7 +159,7 @@
 
    #include "Timesteppers/ImExSBDF2.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Timestep {
 

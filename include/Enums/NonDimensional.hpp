@@ -19,7 +19,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
       /**
        * @brief Simple struct holding the mapping for the nondimensional parameters

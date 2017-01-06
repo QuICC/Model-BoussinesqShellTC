@@ -37,7 +37,7 @@
 #include "IoXml/GxlWriter.hpp"
 #include "IoXml/VtpWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

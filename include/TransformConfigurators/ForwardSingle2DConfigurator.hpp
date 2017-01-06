@@ -24,7 +24,7 @@
 #include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/ForwardConfigurator3D.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

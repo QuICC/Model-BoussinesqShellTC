@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    void WorlandChebyshevRule::computeQuadrature(Array& grid, Array& weights, const int size)
    {

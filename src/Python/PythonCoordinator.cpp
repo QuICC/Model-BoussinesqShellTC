@@ -23,7 +23,7 @@
 #include "Exceptions/Exception.hpp"
 #include "IoTools/HumanToId.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    int PythonCoordinator::sCounter = 0;
 

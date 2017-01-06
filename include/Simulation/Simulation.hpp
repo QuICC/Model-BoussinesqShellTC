@@ -22,7 +22,7 @@
 #include "Simulation/SimulationBase.hpp"
 #include "Timesteppers/TimestepCoordinator.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief High level implementation of a simulation's execution steps.

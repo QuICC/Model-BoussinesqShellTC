@@ -31,7 +31,7 @@
 #include "Enums/Dimensions.hpp"
 #include "ScalarFields/ScalarFieldSetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

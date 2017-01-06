@@ -40,7 +40,7 @@
 #include "Generator/Visualizers/NonlinearVectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqRBCCylinderModel::PYMODULE = "boussinesq_rbccylinder";
 

@@ -25,7 +25,7 @@
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoControl {
 

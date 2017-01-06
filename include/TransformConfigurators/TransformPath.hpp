@@ -22,7 +22,7 @@
 #include "Enums/FieldIds.hpp"
 #include "TransformConfigurators/TransformPathEdge.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

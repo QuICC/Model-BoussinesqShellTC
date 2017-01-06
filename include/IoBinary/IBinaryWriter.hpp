@@ -22,7 +22,7 @@
 //
 #include "IoBinary/BinaryFile.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoBinary {
 

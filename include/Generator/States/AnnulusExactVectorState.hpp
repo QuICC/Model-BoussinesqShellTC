@@ -25,7 +25,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "Generator/States/AnnulusExactStateIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

@@ -34,7 +34,7 @@
    #include "Diagnostics/CartesianCflWrapper.hpp"
 #endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL 
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Diagnostics {
 

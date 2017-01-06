@@ -36,7 +36,7 @@
       #include "FastTransforms/ShellChebyshevFftwTransform.hpp"
    #endif //defined QUICC_SPATIALSCHEME_CFT
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Transform {
 
@@ -77,7 +77,7 @@
    #include "FastTransforms/CuFftTransform.hpp"
    #include "FastTransforms/ChebyshevCuFftTransform.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Transform {
 

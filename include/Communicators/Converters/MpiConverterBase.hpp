@@ -35,7 +35,7 @@
 #include "Communicators/Converters/MpiConverterTools.hpp"
 #include "Communicators/CommunicationBuffer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

@@ -19,7 +19,7 @@
 #include "Enums/FieldIds.hpp"
 #include "Variables/FieldRequirement.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of a class to store requirements for the variables

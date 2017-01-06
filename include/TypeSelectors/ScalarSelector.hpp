@@ -29,7 +29,7 @@
    #define DIMENSIONS_ID Dimensions::TWOD
 #endif //QUICC_SPATIALDIMENSION_3D
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /// Namespace containing the required typedefs for a simulation
    namespace Datatypes {

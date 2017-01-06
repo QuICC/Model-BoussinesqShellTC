@@ -12,7 +12,7 @@
    // Include the right header
    #include <Eigen/SuperLUSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the SuperLU version. 
@@ -30,7 +30,7 @@
    // Include the right header
    #include <Eigen/UmfPackSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the UmfPack version. 
@@ -50,7 +50,7 @@
    #include <Eigen/OrderingMethods>
    //#include <Eigen/MetisSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up Eigen's SparseLU version. 
@@ -71,7 +71,7 @@
    // Include the right header
    #include <Eigen/KentLUSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the KentLU version. 
@@ -91,7 +91,7 @@
    #include <Eigen/OrderingMethods>
    //#include <Eigen/MetisSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the SparseQR version. 
@@ -112,7 +112,7 @@
    // Include the right header
    #include <Eigen/SPQRSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the SuiteSparseQR version. 
@@ -130,7 +130,7 @@
    // Include the right header
    #include "../External/Interfaces/PardisoLU.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the Pardiso version. 
@@ -148,7 +148,7 @@
    // Include the right header
    #include <Eigen/PardisoSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the MKL Pardiso version. 
@@ -166,7 +166,7 @@
    // Include the right header
    #include "../External/Interfaces/MumpsLU.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the MUMPS version. 
@@ -184,7 +184,7 @@
    // Include the right header
    #include <Eigen/IterativeLinearSolvers>   
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers. Sets up the BiCGSTAB version. 
@@ -204,7 +204,7 @@
    // Include the right header
    #include <Eigen/UmfPackSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up the UmfPack version. 
@@ -223,7 +223,7 @@
    #include <Eigen/SparseLU>
    #include <Eigen/OrderingMethods>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up Eigen's SparseLU version. 
@@ -241,7 +241,7 @@
    // Include the right header
    #include "../External/Interfaces/MumpsLU.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up the MUMPS version. 
@@ -260,7 +260,7 @@
    #include <Eigen/SparseCholesky>
    #include <Eigen/OrderingMethods>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up Eigen's SimplicialLLT version. 
@@ -279,7 +279,7 @@
    #include <Eigen/SparseCholesky>
    #include <Eigen/OrderingMethods>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for SPD matries. Sets up Eigen's SimplicialLLT version. 
@@ -297,7 +297,7 @@
    // Include the right header
    #include <Eigen/UmfPackSupport>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for triangular matrices. Sets up the UmfPack version. 
@@ -316,7 +316,7 @@
    #include <Eigen/SparseLU>
    #include <Eigen/OrderingMethods>
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for triangular matrices. Sets up Eigen's SparseLU version. 
@@ -334,7 +334,7 @@
    // Include the right header
    #include "../External/Interfaces/MumpsLU.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       namespace Solver {
          /**
           * @brief Selector for the different implementations of the sparse solvers for triangular matrices. Sets up the MUMPS version. 

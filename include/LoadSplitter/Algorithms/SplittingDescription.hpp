@@ -22,7 +22,7 @@
 #include "Enums/Splitting.hpp"
 #include "IoXml/VtpWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

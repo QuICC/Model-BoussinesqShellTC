@@ -20,7 +20,7 @@
 //
 #include "SparseSolvers/SparseDummySolver.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Solver {
 

@@ -24,7 +24,7 @@
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Tools to work with Python objects

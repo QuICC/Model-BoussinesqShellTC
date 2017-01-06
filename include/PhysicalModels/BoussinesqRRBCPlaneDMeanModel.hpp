@@ -27,7 +27,7 @@
 // THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
 // QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq rotating Rayleigh-Benard in a plane layer (toroidal/poloidal formulation) with anisotropic rescaling model

@@ -22,7 +22,7 @@
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

@@ -11,7 +11,7 @@
    // include MPI framework
    #include "Framework/MpiFramework.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       /// Typedef for a generic framework based on the MpiFramework
       typedef MpiFramework  FrameworkMacro;
    }
@@ -19,7 +19,7 @@
    // include serial framework
    #include "Framework/SerialFramework.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       /// Typedef for a generic framework based on the SerialFramework
       typedef SerialFramework  FrameworkMacro;

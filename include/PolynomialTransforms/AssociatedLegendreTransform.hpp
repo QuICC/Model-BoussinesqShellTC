@@ -30,7 +30,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

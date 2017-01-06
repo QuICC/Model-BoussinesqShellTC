@@ -26,7 +26,7 @@
 #include "IoTools/Formatter.hpp"
 #include "IoAscii/DirectAsciiWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Debug {
 

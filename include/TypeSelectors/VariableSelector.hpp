@@ -24,7 +24,7 @@
 #include "Variables/Spectral/ScalarVariable.hpp"
 #include "Variables/Spectral/VectorVariable.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Datatypes {
 

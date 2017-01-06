@@ -38,7 +38,7 @@
 #include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqRTCShellModel::PYMODULE = "boussinesq_rtcshell";
 

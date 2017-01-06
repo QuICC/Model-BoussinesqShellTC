@@ -19,7 +19,7 @@
 #include "Base/Typedefs.hpp"
 #include "Timers/TimerMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Debug {
 

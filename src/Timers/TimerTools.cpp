@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    MHDFloat TimerTools::reset(ITimer& rTimer)
    {

@@ -18,7 +18,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    CoreResolution::CoreResolution(const std::vector<SharedTransformResolution>& transformRes)
       : mTransforms(transformRes)

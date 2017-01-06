@@ -27,7 +27,7 @@
 #include "IoVariable/ContinuityTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 

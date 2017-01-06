@@ -29,7 +29,7 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/IConverter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

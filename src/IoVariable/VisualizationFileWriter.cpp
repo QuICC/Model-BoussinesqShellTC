@@ -25,7 +25,7 @@
 #include "IoVariable/VisualizationFileTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 

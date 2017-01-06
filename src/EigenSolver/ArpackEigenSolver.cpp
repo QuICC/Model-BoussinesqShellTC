@@ -21,7 +21,7 @@
 #include "Exceptions/Exception.hpp"
 #include "../External/Interfaces/ARPACK_Interface.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    ArpackEigenSolver::ArpackEigenSolver()
       : mInfo(0), mSigma(0.0,0.0), mTol(0.0), mMaxIter(300), mNcv(-1), mWhich("LM"), mIpntr(14), mIparam(11)

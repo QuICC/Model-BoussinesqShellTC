@@ -39,7 +39,7 @@
 #include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqDynamoShellStdModel::PYMODULE = "boussinesq_dynamoshell_std";
 

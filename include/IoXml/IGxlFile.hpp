@@ -26,7 +26,7 @@
 #include "Base/Typedefs.hpp"
 #include "IoTools/Formatter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoXml {
 

@@ -28,7 +28,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the physical model factory 

@@ -21,7 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Templated implementation of a data pair storage provider adapting its size dynamically.

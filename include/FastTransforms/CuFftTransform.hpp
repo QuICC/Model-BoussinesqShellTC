@@ -40,7 +40,7 @@
 #include "FastTransforms/FftSetup.hpp"
 #include "FastTransforms/CuFftLibrary.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

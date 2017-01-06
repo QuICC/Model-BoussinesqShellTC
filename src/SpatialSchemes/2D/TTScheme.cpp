@@ -21,7 +21,7 @@
 //
 #include "Resolutions/Tools/RegularIndexCounter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
    

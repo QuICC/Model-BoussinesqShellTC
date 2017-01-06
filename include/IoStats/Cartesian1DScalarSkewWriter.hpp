@@ -26,7 +26,7 @@
 #include "IoStats/Cartesian1DScalarAvgWriter.hpp"
 #include "IoStats/Cartesian1DScalarRMSWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoStats {
 

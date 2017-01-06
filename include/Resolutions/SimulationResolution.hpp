@@ -24,7 +24,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Resolutions/Tools/IndexCounter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Definition of a simulation resolution object

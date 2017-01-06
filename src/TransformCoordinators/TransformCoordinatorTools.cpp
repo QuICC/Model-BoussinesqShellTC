@@ -19,7 +19,7 @@
 //
 #include "Timers/StageTimer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

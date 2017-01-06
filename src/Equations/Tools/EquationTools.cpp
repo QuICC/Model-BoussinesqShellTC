@@ -20,7 +20,7 @@
 //
 #include "Debug/DebuggerMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

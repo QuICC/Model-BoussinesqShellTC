@@ -27,7 +27,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Communicators/Communicator.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Parallel {
       #ifdef QUICC_SPATIALDIMENSION_3D

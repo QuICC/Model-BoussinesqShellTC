@@ -19,7 +19,7 @@
 //
 #include "IoTools/Formatter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    RuntimeStatus::Id SimulationRunControl::SIGNAL_STATUS = RuntimeStatus::GOON;
 

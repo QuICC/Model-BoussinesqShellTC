@@ -11,12 +11,12 @@
 //   #include <StorageProviders/FixedPairProvider.hpp>
 //
 //   // Fixed size storage pair provider
-//   #define StoragePairProviderMacro GeoMHDiSCC::FixedPairProvider
+//   #define StoragePairProviderMacro QuICC::FixedPairProvider
 
    // Include the right header
    #include <StorageProviders/DynamicPairProvider.hpp>
 
    /// Macro to select the type of storage pair provider
-   #define StoragePairProviderMacro GeoMHDiSCC::DynamicPairProvider
+   #define StoragePairProviderMacro QuICC::DynamicPairProvider
 
 #endif // STORAGEPAIRPROVIDERMACRO_H

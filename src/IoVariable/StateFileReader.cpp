@@ -25,7 +25,7 @@
 #include "IoVariable/VariableHdf5Tags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 

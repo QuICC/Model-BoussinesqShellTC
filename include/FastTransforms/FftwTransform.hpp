@@ -32,7 +32,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

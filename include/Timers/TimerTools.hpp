@@ -18,7 +18,7 @@
 #include "Base/Typedefs.hpp"
 #include "Timers/ITimer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of timer tools

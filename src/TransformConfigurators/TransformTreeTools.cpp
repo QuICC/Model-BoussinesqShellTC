@@ -30,7 +30,7 @@
 #include "Exceptions/Exception.hpp"
 #include "IoXml/GxlWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

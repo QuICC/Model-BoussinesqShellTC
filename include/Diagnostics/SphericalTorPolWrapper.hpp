@@ -22,7 +22,7 @@
 #include "Diagnostics/IVelocityWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Diagnostics {
 

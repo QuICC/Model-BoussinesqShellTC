@@ -24,7 +24,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

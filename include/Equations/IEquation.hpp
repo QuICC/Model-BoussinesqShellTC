@@ -36,7 +36,7 @@
 #include "Variables/VariableRequirement.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

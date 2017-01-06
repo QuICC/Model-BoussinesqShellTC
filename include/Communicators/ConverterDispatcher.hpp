@@ -26,7 +26,7 @@
 #include "Communicators/Converters/IConverter.hpp"
 #include "TypeSelectors/IndexConverterSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

@@ -26,7 +26,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Timers/StageTimer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

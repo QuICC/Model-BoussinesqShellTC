@@ -22,7 +22,7 @@
 //
 #include "TransformConfigurators/TransformStepsMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

@@ -27,7 +27,7 @@
 #include "IoVariable/NusseltTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 

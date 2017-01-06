@@ -25,7 +25,7 @@
    // TTT includes
    #include "SpatialSchemes/3D/TTTScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -41,7 +41,7 @@
    // TFT includes
    #include "SpatialSchemes/3D/TFTScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -56,7 +56,7 @@
    // TFF includes
    #include "SpatialSchemes/3D/TFFScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -71,7 +71,7 @@
    // FFF includes
    #include "SpatialSchemes/3D/FFFScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -86,7 +86,7 @@
    // CFT includes
    #include "SpatialSchemes/3D/CFTScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -101,7 +101,7 @@
    // CFT includes
    #include "SpatialSchemes/3D/AFTScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -116,7 +116,7 @@
    // BLFl includes
    #include "SpatialSchemes/3D/BLFlScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -131,7 +131,7 @@
    // BLFm includes
    #include "SpatialSchemes/3D/BLFmScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -146,7 +146,7 @@
    // SLFl includes
    #include "SpatialSchemes/3D/SLFlScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -161,7 +161,7 @@
    // SLFm includes
    #include "SpatialSchemes/3D/SLFmScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -176,7 +176,7 @@
    // WFT includes
    #include "SpatialSchemes/3D/WFTScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -191,7 +191,7 @@
    // WLFl includes
    #include "SpatialSchemes/3D/WLFlScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -206,7 +206,7 @@
    // WLFm includes
    #include "SpatialSchemes/3D/WLFmScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -222,7 +222,7 @@
    // TTT includes
    #include "SpatialSchemes/2D/TTScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 
@@ -238,7 +238,7 @@
    // TF includes
    #include "SpatialSchemes/2D/TFScheme.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       namespace Schemes {
 

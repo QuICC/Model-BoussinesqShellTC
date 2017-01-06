@@ -20,7 +20,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    int fieldIndex(FieldComponents::Physical::Id id)
    {

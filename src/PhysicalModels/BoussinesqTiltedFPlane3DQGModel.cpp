@@ -40,7 +40,7 @@
 #include "Generator/Visualizers/TiltedScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqTiltedFPlane3DQGModel::PYMODULE = "boussinesq_tilted_fplane3dqg_r";
 

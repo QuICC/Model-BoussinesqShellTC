@@ -23,7 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "PhysicalOperators/StreamAdvection.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

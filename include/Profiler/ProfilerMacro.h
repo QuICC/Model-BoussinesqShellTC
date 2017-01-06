@@ -13,7 +13,7 @@
       // include MPI profiler
       #include "Profiler/MpiProfiler.hpp"
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          /// Typedef for a profiler
          typedef Debug::MpiProfiler ProfilerMacro;
       }
@@ -21,33 +21,33 @@
       // include serial profiler
       #include "Profiler/SerialProfiler.hpp"
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          /// Typedef for a profiler
          typedef Debug::SerialProfiler ProfilerMacro;
       }
    #endif // QUICC_MPI
 
    /// Define profiler initialisation macro function
-   #define ProfilerMacro_init()  GeoMHDiSCC::ProfilerMacro::init()
+   #define ProfilerMacro_init()  QuICC::ProfilerMacro::init()
 
    /// Reset profiler reset macro function
-   #define ProfilerMacro_reset()  GeoMHDiSCC::ProfilerMacro::reset()
+   #define ProfilerMacro_reset()  QuICC::ProfilerMacro::reset()
 
    /// Define profiler start macro function
-   #define ProfilerMacro_start(P)  GeoMHDiSCC::ProfilerMacro::start(P)
+   #define ProfilerMacro_start(P)  QuICC::ProfilerMacro::start(P)
 
    /// Define profiler stop macro function
-   #define ProfilerMacro_stop(P)  GeoMHDiSCC::ProfilerMacro::stop(P)
+   #define ProfilerMacro_stop(P)  QuICC::ProfilerMacro::stop(P)
 
    /// Define profiler printInfo macro function
-   #define ProfilerMacro_printInfo()  GeoMHDiSCC::Debug::ProfilerTools::printInfo()
+   #define ProfilerMacro_printInfo()  QuICC::Debug::ProfilerTools::printInfo()
 
    #ifdef QUICC_PROFILER_DETAILED
       /// Define detailed profiler start macro function
-      #define DetailedProfilerMacro_start(P)  GeoMHDiSCC::ProfilerMacro::start(P)
+      #define DetailedProfilerMacro_start(P)  QuICC::ProfilerMacro::start(P)
 
       /// Define detailed profiler stop macro function
-      #define DetailedProfilerMacro_stop(P)  GeoMHDiSCC::ProfilerMacro::stop(P)
+      #define DetailedProfilerMacro_stop(P)  QuICC::ProfilerMacro::stop(P)
    #else
       /// Define empty detailed profiler start macro function
       #define DetailedProfilerMacro_start(P)  

@@ -25,7 +25,7 @@
 #include "IoTools/Formatter.hpp"
 #include "StorageProfiler/StorageProfiler.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Debug {
 

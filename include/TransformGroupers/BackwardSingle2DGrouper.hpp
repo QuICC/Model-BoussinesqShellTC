@@ -23,7 +23,7 @@
 //
 #include "TransformGroupers/IBackwardGrouper3D.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

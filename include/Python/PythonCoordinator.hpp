@@ -20,7 +20,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Small coordinator for the Python interpreter to initialise and finalize with multiple wrappers

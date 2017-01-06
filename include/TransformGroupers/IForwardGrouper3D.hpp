@@ -24,7 +24,7 @@
 #include "TransformConfigurators/TransformTree.hpp"
 #include "TransformGroupers/IForwardGrouper2D.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

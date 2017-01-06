@@ -23,7 +23,7 @@
 //
 #include "IoAscii/CflTags.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoAscii {
 

@@ -19,7 +19,7 @@
 #include "Enums/RuntimeStatus.hpp"
 #include "IoControl/ControlFile.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoControl {
 

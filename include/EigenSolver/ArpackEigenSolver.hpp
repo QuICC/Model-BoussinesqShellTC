@@ -19,7 +19,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of an eigen solver based on ARPACK

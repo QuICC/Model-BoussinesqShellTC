@@ -414,15 +414,15 @@ namespace Eigen {
             #ifdef QUICC_MPI
             if(m_isParallel)
             {
-               DetailedProfilerMacro_start(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
+               DetailedProfilerMacro_start(QuICC::ProfilerMacro::TSTEPMPI);
                mTmp.resize(m_id.lrhs, m_id.nrhs);
                #if defined QUICC_MPIIMPL_MVAPICH || defined QUICC_MPIIMPL_MPICH
-                  MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
+                  MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
                #else
-                  MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
+                  MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
                #endif //defined QUICC_MPIIMPL_MVAPICH || defined QUICC_MPIIMPL_MPICH
                pRhs = mTmp.data();
-               DetailedProfilerMacro_stop(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
+               DetailedProfilerMacro_stop(QuICC::ProfilerMacro::TSTEPMPI);
             } else
             {
                pRhs = pData;
@@ -468,9 +468,9 @@ namespace Eigen {
             #ifdef QUICC_MPI
             if(m_isParallel)
             {
-               DetailedProfilerMacro_start(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
-               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
-               DetailedProfilerMacro_stop(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
+               DetailedProfilerMacro_start(QuICC::ProfilerMacro::TSTEPMPI);
+               MPI_Bcast(pData, nK, QuICC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
+               DetailedProfilerMacro_stop(QuICC::ProfilerMacro::TSTEPMPI);
             }
             #endif //QUICC_MPI
          }

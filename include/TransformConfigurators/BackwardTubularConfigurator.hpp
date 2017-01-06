@@ -23,7 +23,7 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/BackwardConfigurator3D.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

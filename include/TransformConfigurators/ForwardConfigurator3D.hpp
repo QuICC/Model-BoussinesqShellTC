@@ -27,7 +27,7 @@
 #include "TransformConfigurators/ForwardConfigurator2D.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

@@ -24,7 +24,7 @@
 //
 #include "TransformGroupers/IBackwardGrouperMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

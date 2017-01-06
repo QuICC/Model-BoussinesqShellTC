@@ -22,7 +22,7 @@
 //
 #include "Base/Precision.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    void SerialFramework::init()
    {

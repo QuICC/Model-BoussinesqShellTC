@@ -21,7 +21,7 @@
 #define QUICC_WORLAND_NORM_UNITY
 //#define QUICC_WORLAND_NORM_NATURAL
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Polynomial {
 

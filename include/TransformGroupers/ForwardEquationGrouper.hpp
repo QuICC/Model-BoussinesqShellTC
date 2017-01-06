@@ -25,7 +25,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "TransformGroupers/IForwardGrouperMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

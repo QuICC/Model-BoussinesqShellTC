@@ -25,7 +25,7 @@
 #include "TensorFields/SymmetricTensorField.hpp"
 #include "Variables/VariableBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

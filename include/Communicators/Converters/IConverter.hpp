@@ -23,7 +23,7 @@
 #include "Enums/TransformDirection.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

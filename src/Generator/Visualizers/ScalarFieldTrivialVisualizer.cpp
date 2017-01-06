@@ -24,7 +24,7 @@
 #include "TypeSelectors/TransformSelector.hpp"
 #include "Enums/FieldIdsTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

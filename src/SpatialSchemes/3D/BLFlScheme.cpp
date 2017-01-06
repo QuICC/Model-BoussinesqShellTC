@@ -20,7 +20,7 @@
 #include "PolynomialTransforms/PolynomialTools.hpp"
 #include "SpatialSchemes/Tools/ParityTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
    

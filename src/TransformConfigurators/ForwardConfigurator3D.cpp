@@ -22,7 +22,7 @@
 //
 #include "ScalarFields/FieldTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

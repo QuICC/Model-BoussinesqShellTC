@@ -22,7 +22,7 @@
 #include "IoHdf5/IHdf5NWriter.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 

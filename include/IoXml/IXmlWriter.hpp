@@ -25,7 +25,7 @@
 #include "Exceptions/Exception.hpp"
 #include "IoXml/XmlFile.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoXml {
 

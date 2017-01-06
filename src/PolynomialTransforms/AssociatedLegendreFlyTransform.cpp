@@ -21,7 +21,7 @@
 #include "Quadratures/LegendreRule.hpp"
 #include "PolynomialTransforms/AssociatedLegendrePolynomial.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

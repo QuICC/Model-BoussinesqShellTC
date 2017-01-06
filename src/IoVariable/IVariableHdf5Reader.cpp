@@ -24,7 +24,7 @@
 #include "IoVariable/VariableHdf5Tags.hpp"
 #include "IoTools/Formatter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 

@@ -31,43 +31,43 @@
    #define MHD_MP(c) c
 #endif // QUICC_MULTPRECISION
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace internal {
 
       #ifdef QUICC_MULTPRECISION
       //////////////////////////////////////////////////////////////////         
          /// Typedef for the internal float type
-         typedef GeoMHDiSCC::MHDMpFloat MHDFloat;
+         typedef QuICC::MHDMpFloat MHDFloat;
 
          /// Typedef for the internal Array type
-         typedef GeoMHDiSCC::MpArray Array;
+         typedef QuICC::MpArray Array;
 
          /// Typedef for the internal Matrix type
-         typedef GeoMHDiSCC::MpMatrix Matrix;
+         typedef QuICC::MpMatrix Matrix;
 
          /// Typedef for the smart internal Array type
-         typedef GeoMHDiSCC::SharedMpArray SharedArray;
+         typedef QuICC::SharedMpArray SharedArray;
 
          /// Typedef for the smart internal Matrix type
-         typedef GeoMHDiSCC::SharedMpMatrix SharedMatrix;
+         typedef QuICC::SharedMpMatrix SharedMatrix;
       //////////////////////////////////////////////////////////////////
       #else
       //////////////////////////////////////////////////////////////////
          /// Typedef for the internal float type
-         typedef GeoMHDiSCC::MHDFloat MHDFloat;
+         typedef QuICC::MHDFloat MHDFloat;
 
          /// Typedef for the internal Array type
-         typedef GeoMHDiSCC::Array Array;
+         typedef QuICC::Array Array;
 
          /// Typedef for the internal Matrix type
-         typedef GeoMHDiSCC::Matrix Matrix;
+         typedef QuICC::Matrix Matrix;
 
          /// Typedef for the smart internal Array type
-         typedef GeoMHDiSCC::SharedArray SharedArray;
+         typedef QuICC::SharedArray SharedArray;
 
          /// Typedef for the smart internal Matrix type
-         typedef GeoMHDiSCC::SharedMatrix SharedMatrix;
+         typedef QuICC::SharedMatrix SharedMatrix;
       //////////////////////////////////////////////////////////////////
       #endif // QUICC_MULTPRECISION
    }

@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    SerialTimer::SerialTimer(const bool autostart)
    {

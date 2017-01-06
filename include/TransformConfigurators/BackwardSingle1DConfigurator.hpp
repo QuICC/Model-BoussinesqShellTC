@@ -23,7 +23,7 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/BackwardConfiguratorMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

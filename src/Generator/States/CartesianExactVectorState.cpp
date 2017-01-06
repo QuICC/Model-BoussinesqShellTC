@@ -24,7 +24,7 @@
 #include "TypeSelectors/TransformSelector.hpp"
 
 #include <iostream>
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

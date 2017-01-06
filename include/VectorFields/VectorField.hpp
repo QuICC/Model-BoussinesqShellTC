@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

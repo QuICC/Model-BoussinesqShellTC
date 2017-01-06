@@ -23,7 +23,7 @@
 //
 #include "IoTools/Formatter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    StageTimer::StageTimer()
       : mLevel(0), mTimer(false)
