@@ -50,7 +50,7 @@ namespace IoVariable {
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_3d");
+      PythonWrapper::import("quicc.geometry.cartesian.cartesian_3d");
 
       // Prepare arguments
       PyObject *pArgs, *pValue;

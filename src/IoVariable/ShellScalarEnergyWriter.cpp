@@ -50,7 +50,7 @@ namespace IoVariable {
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
+      PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 
       // Prepare arguments
       PyObject *pArgs, *pValue;

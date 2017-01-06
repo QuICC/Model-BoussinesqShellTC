@@ -157,7 +157,7 @@ namespace Transform {
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.cylindrical.annulus_radius");
+      PythonWrapper::import("quicc.geometry.cylindrical.annulus_radius");
 
       // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;

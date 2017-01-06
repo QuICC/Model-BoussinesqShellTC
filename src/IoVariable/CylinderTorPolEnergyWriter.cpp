@@ -54,7 +54,7 @@ namespace IoVariable {
       PythonWrapper::init();
 
       // Load module for R direction (Worland)
-      PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius_worland");
+      PythonWrapper::import("quicc.geometry.cylindrical.cylinder_radius_worland");
 
       // Prepare arguments
       pArgs = PyTuple_New(2);
@@ -82,7 +82,7 @@ namespace IoVariable {
 
       // Cleanup wrapper and load module for Z direction (Chebyshev)
       PythonWrapper::cleanup();
-      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
+      PythonWrapper::import("quicc.geometry.cartesian.cartesian_1d");
 
       // Prepare arguments
       pArgs = PyTuple_New(2);

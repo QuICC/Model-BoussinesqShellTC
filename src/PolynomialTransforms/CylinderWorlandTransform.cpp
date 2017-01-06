@@ -84,7 +84,7 @@ namespace Transform {
    void CylinderWorlandTransform::initOperators()
    {
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius_worland");
+      PythonWrapper::import("quicc.geometry.cylindrical.cylinder_radius_worland");
 
       this->mGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
