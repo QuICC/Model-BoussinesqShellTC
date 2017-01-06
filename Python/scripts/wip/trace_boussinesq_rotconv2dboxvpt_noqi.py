@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rotconv2dboxvpt_noqi as mod
+import quicc.model.boussinesq_rotconv2dboxvpt_noqi as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRotConv2DBoxVPTNoQI()
@@ -82,7 +82,7 @@ if True:
 
 # Solve EVP with sptarn
 if True:
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
     evp_sel = evp_vec[:,-1]
     print(evp_lmb)
@@ -172,7 +172,7 @@ if True:
     pl.show()
     pl.close("all")
 
-    import geomhdiscc.transform.cartesian as transf
+    import quicc.transform.cartesian as transf
     phys_u = transf.tophys2d(mat_u)
     phys_w = transf.tophys2d(mat_w)
     phys_t = transf.tophys2d(mat_t)

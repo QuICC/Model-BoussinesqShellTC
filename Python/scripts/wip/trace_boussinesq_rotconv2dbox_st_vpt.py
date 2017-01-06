@@ -14,7 +14,7 @@ bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # STREAMFUNCTION FORMULATION
 
-import geomhdiscc.model.boussinesq_rotconv2dboxst as mod_st
+import quicc.model.boussinesq_rotconv2dboxst as mod_st
 
 # Create the model and activate linearization
 model = mod_st.BoussinesqRotConv2DBoxST()
@@ -47,7 +47,7 @@ if True:
 
 # Solve EVP with sptarn
 if True:
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
 
@@ -79,7 +79,7 @@ if True:
 
 # VELOCITY_PRESSURE
 
-import geomhdiscc.model.boussinesq_rotconv2dboxvpt as mod_vpt
+import quicc.model.boussinesq_rotconv2dboxvpt as mod_vpt
 
 # Create the model and activate linearization
 model = mod_vpt.BoussinesqRotConv2DBoxVPT()
@@ -190,7 +190,7 @@ if True:
     pl.show()
     pl.close("all")
 
-    import geomhdiscc.transform.cartesian as transf
+    import quicc.transform.cartesian as transf
     phys_s = transf.tophys2d(mat_st_s)
     phys_t = transf.tophys2d(mat_st_t - mat_vpt_t)
     phys_u = transf.tophys2d(mat_st_u - mat_vpt_u)

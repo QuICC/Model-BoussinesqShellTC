@@ -1,7 +1,7 @@
 """Script to run a marginal curve trace for the Boussinesq simple Beta 3DQG model"""
 
 import numpy as np
-import geomhdiscc.model.boussinesq_simplebeta3dqg as mod
+import quicc.model.boussinesq_simplebeta3dqg as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqSimpleBeta3DQG()
@@ -44,6 +44,6 @@ if True:
 
 # Solve EVP with sptarn
 if True:
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
     print(evp_lmb)
