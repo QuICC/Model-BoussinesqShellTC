@@ -3,45 +3,45 @@ set(MHDSources
 )
 
 # Select FFTW transforms
-if(GEOMHDISCC_FFT STREQUAL "FFTW")
+if(QUICC_FFT STREQUAL "FFTW")
    list(APPEND MHDSources 
       FftwLibrary.cpp
       FftwTools.cpp
       FftwTransform.cpp
       )
-   if(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
+   if(QUICC_SPATIALSCHEME STREQUAL "AFT")
       list(APPEND MHDSources 
          ChebyshevFftwTransform.cpp
          AnnulusChebyshevFftwTransform.cpp
          )
-   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "CFT")
+   elseif(QUICC_SPATIALSCHEME STREQUAL "CFT")
       list(APPEND MHDSources 
          ChebyshevFftwTransform.cpp
          CylinderChebyshevFftwTransform.cpp
          ParityTransformTools.cpp
          )
-   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFM")
+   elseif(QUICC_SPATIALSCHEME STREQUAL "SLFL" OR QUICC_SPATIALSCHEME STREQUAL "SLFM")
       list(APPEND MHDSources 
          ShellChebyshevFftwTransform.cpp
          )
-   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFM")
+   elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL" OR QUICC_SPATIALSCHEME STREQUAL "BLFM")
       list(APPEND MHDSources 
          SphereChebyshevFftwTransform.cpp
          ParityTransformTools.cpp
          )
-   else(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
+   else(QUICC_SPATIALSCHEME STREQUAL "AFT")
       list(APPEND MHDSources 
          ChebyshevFftwTransform.cpp
          )
-   endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
-endif(GEOMHDISCC_FFT STREQUAL "FFTW")
+   endif(QUICC_SPATIALSCHEME STREQUAL "AFT")
+endif(QUICC_FFT STREQUAL "FFTW")
 
 # Select cuFFT transforms
-if(GEOMHDISCC_FFT STREQUAL "cuFFT")
+if(QUICC_FFT STREQUAL "cuFFT")
    list(APPEND MHDSources 
       CuFftLibrary.cpp
       CuFftTools.cpp
       CuFftTransform.cpp
       ChebyshevCuFftTransform.cpp
       )
-endif(GEOMHDISCC_FFT STREQUAL "cuFFT")
+endif(QUICC_FFT STREQUAL "cuFFT")

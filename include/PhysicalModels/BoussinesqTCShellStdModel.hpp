@@ -25,9 +25,9 @@
 #include "SpatialSchemes/3D/SLFlScheme.hpp"
 
 // THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
-// GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
+// QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq thermal convection spherical shell model (Toroidal/Poloidal formulation) without coupled solve (standard implementation)

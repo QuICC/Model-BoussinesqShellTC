@@ -22,7 +22,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Debug {
 
@@ -45,7 +45,7 @@ namespace Debug {
    void StorageProfiler::analyze(Array& min, Array& max)
    {
       // Get the "global" requirements from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          // Resize the storage
          Array local = Array::Zero(NMAXSTORAGEPOINT);
          std::map<StoragePoint, MHDFloat>::iterator   reqIt;
@@ -74,7 +74,7 @@ namespace Debug {
          {
             reqIt->second = local(reqIt->first);
          }
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
    }
 
    void StorageProfiler::createNameMap(std::map<StorageProfiler::StoragePoint, std::string>& map)

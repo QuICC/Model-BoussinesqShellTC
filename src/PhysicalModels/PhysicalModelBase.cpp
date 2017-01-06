@@ -29,7 +29,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "IoTools/HumanToId.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    std::vector<PhysicalNames::Id> PhysicalModelBase::fieldIds()
    {

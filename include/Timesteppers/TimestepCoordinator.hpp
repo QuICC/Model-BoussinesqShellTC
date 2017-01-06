@@ -28,7 +28,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "IoAscii/CflWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Timestep {
 

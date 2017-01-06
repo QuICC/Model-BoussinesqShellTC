@@ -26,7 +26,7 @@
 #include "Communicators/EndDispatcher.hpp"
 #include "Communicators/CommunicationBuffer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -66,7 +66,7 @@ namespace Parallel {
              */
             void init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D);
 
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             /**
              * @brief Initialise the coordinator
              *
@@ -78,7 +78,7 @@ namespace Parallel {
              * @param spSetupBwd3D Setup object for the backward 3D type
              */
             void init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D, typename TTypes<Dimensions::Transform::TRA3D>::FwdType::SharedSetupType spSetupFwd3D, typename TTypes<Dimensions::Transform::TRA3D>::BwdType::SharedSetupType spSetupBwd3D);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          /**
           * @brief Initialise the 1D/2D converter
@@ -90,7 +90,7 @@ namespace Parallel {
           */
          void initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splitting::Locations::Id split);
 
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             /**
              * @brief Initialise the 2D/3D converter
              *
@@ -102,7 +102,7 @@ namespace Parallel {
              * @param split      Location where the MPI splitting takes place
              */
             void initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, const ArrayI& packs2DFwd, const ArrayI& packs2DBwd, Splitting::Locations::Id split);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          /**
           * @brief Transfer forward data to next step
@@ -219,14 +219,14 @@ namespace Parallel {
       // Initialise storage for 1D
       this->template storage<Dimensions::Transform::TRA1D>().init(spSetupFwd1D, spSetupBwd1D);
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          MHDFloat mem1D = this->template storage<Dimensions::Transform::TRA1D>().requiredStorage();
          StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem1D);
 
-         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+         #ifdef QUICC_STORAGEPROFILER_DETAILED
             StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM3D, mem1D);
-         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
-      #endif // GEOMHDISCC_STORAGEPROFILE
+         #endif // QUICC_STORAGEPROFILER_DETAILED
+      #endif // QUICC_STORAGEPROFILE
    }
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D)
@@ -239,17 +239,17 @@ namespace Parallel {
       // Initialise storage for 2D
       this->template storage<Dimensions::Transform::TRA2D>().init(spSetupFwd2D, spSetupBwd2D);
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          MHDFloat mem2D = this->template storage<Dimensions::Transform::TRA2D>().requiredStorage();
          StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem2D);
 
-         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+         #ifdef QUICC_STORAGEPROFILER_DETAILED
             StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM3D, mem2D);
-         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
-      #endif // GEOMHDISCC_STORAGEPROFILE
+         #endif // QUICC_STORAGEPROFILER_DETAILED
+      #endif // QUICC_STORAGEPROFILE
    }
 
-   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #ifdef QUICC_SPATIALDIMENSION_3D
       template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D, typename TTypes<Dimensions::Transform::TRA3D>::FwdType::SharedSetupType spSetupFwd3D, typename TTypes<Dimensions::Transform::TRA3D>::BwdType::SharedSetupType spSetupBwd3D)
       {
          Debug::StaticAssert< (static_cast<int>(DIMENSION) > 1) >();
@@ -260,16 +260,16 @@ namespace Parallel {
          // Initialise storage for 3D
          this->template storage<Dimensions::Transform::TRA3D>().init(spSetupFwd3D, spSetupBwd3D);
 
-         #ifdef GEOMHDISCC_STORAGEPROFILE
+         #ifdef QUICC_STORAGEPROFILE
             MHDFloat mem3D = this->template storage<Dimensions::Transform::TRA3D>().requiredStorage();
             StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem3D);
 
-            #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+            #ifdef QUICC_STORAGEPROFILER_DETAILED
                StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM3D, mem3D);
-            #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
-         #endif // GEOMHDISCC_STORAGEPROFILE
+            #endif // QUICC_STORAGEPROFILER_DETAILED
+         #endif // QUICC_STORAGEPROFILE
       }
-   #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+   #endif //QUICC_SPATIALDIMENSION_3D
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splitting::Locations::Id split)
    {
@@ -277,7 +277,7 @@ namespace Parallel {
       // MPI code needs to come first
       // Separating out MPI and serial code makes sure Serial version can be compiled without MPI installed
       //
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          // Load splitting has been done on first dimension
          if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
          {
@@ -294,13 +294,13 @@ namespace Parallel {
             FrameworkMacro::synchronize();
 
             // Create the communication buffers
-            #if defined GEOMHDISCC_MPIPACK_MANUAL
+            #if defined QUICC_MPIPACK_MANUAL
                SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType> >  spBufferOne(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType>());
                SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType> >  spBufferTwo(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType>());
             #else
                SharedPtrMacro<CommunicationBuffer<char> >  spBufferOne(new CommunicationBuffer<char>());
                SharedPtrMacro<CommunicationBuffer<char> >  spBufferTwo(new CommunicationBuffer<char>());
-            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+            #endif //defined QUICC_MPIPACK_MANUAL
 
             // Get maximum number of packs
             int p1DFwd;
@@ -362,7 +362,7 @@ namespace Parallel {
 
          // Set 1D/2D converter
          this->mspConverter2D = spConv;
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
 
       // If only one dimension is split. Else the setup will be done at a later stage to optimise memory/buffer usage.
       if(split != Splitting::Locations::BOTH)
@@ -371,13 +371,13 @@ namespace Parallel {
          this->template converter<Dimensions::Transform::TRA2D>().setup();
       }
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          // Do (MPI) storage profiling on 2D converter
          this->template converter<Dimensions::Transform::TRA2D>().profileStorage();
-      #endif // GEOMHDISCC_STORAGEPROFILE
+      #endif // QUICC_STORAGEPROFILE
    }
 
-   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #ifdef QUICC_SPATIALDIMENSION_3D
       template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, const ArrayI& packs2DFwd, const ArrayI& packs2DBwd, Splitting::Locations::Id split)
       {
          // Initialise 1D/2D converter
@@ -387,7 +387,7 @@ namespace Parallel {
          // MPI code needs to come first
          // Separating out MPI and serial code makes sure Serial version can be compiled without MPI installed
          //
-         #ifdef GEOMHDISCC_MPI
+         #ifdef QUICC_MPI
             // Load splitting has been done on first dimension
             if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
             {
@@ -416,13 +416,13 @@ namespace Parallel {
                FrameworkMacro::synchronize();
 
                // Create the communication buffers
-               #if defined GEOMHDISCC_MPIPACK_MANUAL
+               #if defined QUICC_MPIPACK_MANUAL
                   SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType> > spBufferOne(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType>());
                   SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType> >  spBufferTwo(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType>());
                #else
                   SharedPtrMacro<CommunicationBuffer<char> >  spBufferOne(new CommunicationBuffer<char>());
                   SharedPtrMacro<CommunicationBuffer<char> >  spBufferTwo(new CommunicationBuffer<char>());
-               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+               #endif //defined QUICC_MPIPACK_MANUAL
 
                // Get maximum number of packs
                int p2DFwd;
@@ -485,27 +485,27 @@ namespace Parallel {
                FrameworkMacro::synchronize();
 
                // Create the communication buffers
-               #if defined GEOMHDISCC_MPIPACK_MANUAL
+               #if defined QUICC_MPIPACK_MANUAL
                   SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType> >  spBufferOne(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA1D>::FwdType::PointType>());
                   SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType> >  spBufferTwo(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::BwdType::PointType>());
                   SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType> >  spBufferThree(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA2D>::FwdType::PointType>());
-                  #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+                  #ifdef QUICC_MEMORYUSAGE_HIGH
                      SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType> >  spBufferFour(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType>());
                   #else
                      // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
                      SharedPtrMacro<CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType> >  spBufferFour(new CommunicationBuffer<typename TTypes<Dimensions::Transform::TRA3D>::BwdType::PointType>());
-                  #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+                  #endif //QUICC_MEMORYUSAGE_HIGH
                #else
                   SharedPtrMacro<CommunicationBuffer<char> >  spBufferOne(new CommunicationBuffer<char>());
                   SharedPtrMacro<CommunicationBuffer<char> >  spBufferTwo(new CommunicationBuffer<char>());
                   SharedPtrMacro<CommunicationBuffer<char> >  spBufferThree(new CommunicationBuffer<char>());
-                  #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+                  #ifdef QUICC_MEMORYUSAGE_HIGH
                      SharedPtrMacro<CommunicationBuffer<char> >  spBufferFour(new CommunicationBuffer<char>());
                   #else
                      // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
                      SharedPtrMacro<CommunicationBuffer<char> >  spBufferFour(new CommunicationBuffer<char>());
-                  #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
-               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+                  #endif //QUICC_MEMORYUSAGE_HIGH
+               #endif //defined QUICC_MPIPACK_MANUAL
 
                // Get maximum number of packs
                int p1DFwd;
@@ -546,7 +546,7 @@ namespace Parallel {
                int max3D = std::max(p2DFwd, p2DBwd);
 
                // Allocate shared buffer
-               #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+               #ifdef QUICC_MEMORYUSAGE_HIGH
                   spBufferOne->allocate(spConv12->fwdSizes(), max2D);
                   spBufferFour->allocate(spConv23->bwdSizes(), max3D);
                #else
@@ -555,7 +555,7 @@ namespace Parallel {
                   spBufferFour->allocate(spConv23->bwdSizes(), max3D);
                   // This should be possible but requires cross transform synchronization
                   //spBufferOne->allocateMax(spConv12->fwdSizes(), max2D, spConv23->bwdSizes(), max3D);
-               #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+               #endif //QUICC_MEMORYUSAGE_HIGH
 
                // Allocate 2D buffers
                spBufferTwo->allocate(spConv12->bwdSizes(), max2D);
@@ -567,14 +567,14 @@ namespace Parallel {
                spConv12->setBuffers(spBufferOne, spBufferTwo);
 
                // Set communication buffers for 2D/3D converter
-               #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+               #ifdef QUICC_MEMORYUSAGE_HIGH
                   spConv23->setBuffers(spBufferThree, spBufferFour);
                #else
                   // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
                   spConv23->setBuffers(spBufferThree, spBufferFour);
                   // This should be possible but requires cross transform synchronization
                   //spConv23->setBuffers(spBufferThree, spBufferOne);
-               #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+               #endif //QUICC_MEMORYUSAGE_HIGH
 
                // Set 1D/2D converter
                this->mspConverter2D = spConv12;
@@ -593,7 +593,7 @@ namespace Parallel {
             spConv->init(spRes, Dimensions::Transform::TRA2D);
 
             this->mspConverter3D = spConv;
-         #endif // GEOMHDISCC_MPI
+         #endif // QUICC_MPI
 
          // Setup converter
          this->template converter<Dimensions::Transform::TRA3D>().setup();
@@ -604,12 +604,12 @@ namespace Parallel {
             this->template converter<Dimensions::Transform::TRA2D>().setup();
          }
 
-         #ifdef GEOMHDISCC_STORAGEPROFILE
+         #ifdef QUICC_STORAGEPROFILE
             // Do (MPI) storage profiling on 3D converter
             this->template converter<Dimensions::Transform::TRA3D>().profileStorage();
-         #endif // GEOMHDISCC_STORAGEPROFILE
+         #endif // QUICC_STORAGEPROFILE
       }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
 
 }
 }

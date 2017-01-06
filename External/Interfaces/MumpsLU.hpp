@@ -206,10 +206,10 @@ namespace Eigen {
             m_id.job = 1;
             copyInput(matrix, true);
 
-            #ifdef GEOMHDISCC_DEBUG
+            #ifdef QUICC_DEBUG
                // Write matrix to file
                strncpy(m_id.write_problem, "mumps_matrix", sizeof(m_id.write_problem));
-            #endif //GEOMHDISCC_DEBUG
+            #endif //QUICC_DEBUG
 
             MumpsLU_mumps(&m_id, Scalar());
             m_error = m_id.infog[1-1];
@@ -257,7 +257,7 @@ namespace Eigen {
             MPI_Barrier(m_comm);
 
             m_id.job = -1;
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
                m_id.comm_fortran = MPI_Comm_c2f(m_comm);
                int rank;
                MPI_Comm_rank(m_comm, &rank);
@@ -268,7 +268,7 @@ namespace Eigen {
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
                m_isHost = true;
                m_isParallel = false;
-            #endif // GEOMHDISCC_MPI
+            #endif // QUICC_MPI
             m_id.par = 1;
             m_id.sym = 0;
 
@@ -278,12 +278,12 @@ namespace Eigen {
 
             MumpsLU_mumps(&m_id, Scalar());
             m_error = m_id.infog[1-1];
-            #ifdef GEOMHDISCC_NO_DEBUG
+            #ifdef QUICC_NO_DEBUG
                m_id.icntl[1-1] = 0;
                m_id.icntl[2-1] = 0;
                m_id.icntl[3-1] = 0;
                m_id.icntl[4-1] = 0;
-            #endif // GEOMHDISCC_NO_DEBUG
+            #endif // QUICC_NO_DEBUG
 
             // Force specific ordering algorithm
             //m_id.icntl[7-1] = 3;
@@ -411,25 +411,25 @@ namespace Eigen {
          {
             const Scalar* pRhs;
 
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
             if(m_isParallel)
             {
-               DetailedProfilerMacro_start(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
+               DetailedProfilerMacro_start(QuICC::ProfilerMacro::TSTEPMPI);
                mTmp.resize(m_id.lrhs, m_id.nrhs);
-               #if defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
-                  MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
+               #if defined QUICC_MPIIMPL_MVAPICH || defined QUICC_MPIIMPL_MPICH
+                  MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
                #else
-                  MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
-               #endif //defined GEOMHDISCC_MPIIMPL_MVAPICH || defined GEOMHDISCC_MPIIMPL_MPICH
+                  MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
+               #endif //defined QUICC_MPIIMPL_MVAPICH || defined QUICC_MPIIMPL_MPICH
                pRhs = mTmp.data();
-               DetailedProfilerMacro_stop(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
+               DetailedProfilerMacro_stop(QuICC::ProfilerMacro::TSTEPMPI);
             } else
             {
                pRhs = pData;
             }
             #else
                pRhs = pData;
-            #endif //GEOMHDISCC_MPI
+            #endif //QUICC_MPI
 
             if(m_isHost)
             {
@@ -465,14 +465,14 @@ namespace Eigen {
                }
             }
 
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
             if(m_isParallel)
             {
-               DetailedProfilerMacro_start(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
-               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
-               DetailedProfilerMacro_stop(GeoMHDiSCC::ProfilerMacro::TSTEPMPI);
+               DetailedProfilerMacro_start(QuICC::ProfilerMacro::TSTEPMPI);
+               MPI_Bcast(pData, nK, QuICC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
+               DetailedProfilerMacro_stop(QuICC::ProfilerMacro::TSTEPMPI);
             }
-            #endif //GEOMHDISCC_MPI
+            #endif //QUICC_MPI
          }
 
          mutable ComputationInfo m_info;
@@ -505,18 +505,18 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
    int rhsCols = b.cols();
    eigen_assert((BDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major rhs yet");
    eigen_assert((XDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major result yet");
-   #ifdef GEOMHDISCC_MPI
+   #ifdef QUICC_MPI
       eigen_assert((!m_isParallel || b.cols() == 1) && "Parallel MumpsLU is implemented for a single RHS");
       eigen_assert(b.derived().data() != x.derived().data() && "Parallel execution does not allow x and b to be the same");
-   #endif //GEOMHDISCC_MPI
+   #endif //QUICC_MPI
 
    m_id.job = 3;
    m_id.nrhs = rhsCols;
    m_id.lrhs = m_id.n;
    m_id.icntl[10 - 1] = 3;
-   #ifdef GEOMHDISCC_DEBUG
+   #ifdef QUICC_DEBUG
       m_id.icntl[11-1] = 1;
-   #endif // GEOMHDISCC_DEBUG
+   #endif // QUICC_DEBUG
 
    copyRhs(b.derived().data(), (rhsCols > m_nrhsMem));
 

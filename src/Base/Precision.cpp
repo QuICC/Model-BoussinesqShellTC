@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
    const internal::MHDFloat Precision::PI = precision::acos(MHD_MP(-1.0));
 
 }

@@ -23,7 +23,7 @@
 #include "Enums/RuntimeStatus.hpp"
 #include "IoControl/ControlInterface.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of simulation control structure

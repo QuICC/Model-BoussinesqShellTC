@@ -19,7 +19,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Namespace holding the splitting algorithm related enums

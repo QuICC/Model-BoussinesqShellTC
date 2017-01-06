@@ -36,7 +36,7 @@
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqRRBCDuctVCModel::PYMODULE = "boussinesq_rrbcduct_vc";
 

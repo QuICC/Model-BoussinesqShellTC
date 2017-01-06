@@ -22,7 +22,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    Resolution::Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim, const ArrayI& transDim)
       : mCores(coreRes)
@@ -201,9 +201,9 @@ namespace GeoMHDiSCC {
       rSlow.clear();
       rMiddle.clear();
 
-      #ifdef GEOMHDISCC_MPISPSOLVE
+      #ifdef QUICC_MPISPSOLVE
          // Three dimensional matrices
-         #if defined GEOMHDISCC_SPATIALSCHEME_TTT
+         #if defined QUICC_SPATIALSCHEME_TTT
             int k_;
             int j_;
             rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
@@ -229,7 +229,7 @@ namespace GeoMHDiSCC {
             }
 
          // Two dimensional matrices
-         #elif defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM || defined GEOMHDISCC_SPATIALSCHEME_WFT
+         #elif defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_CFT || defined QUICC_SPATIALSCHEME_AFT || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM || defined QUICC_SPATIALSCHEME_WFT
             // Make sure middle is empty
             rMiddle.clear();
 
@@ -241,7 +241,7 @@ namespace GeoMHDiSCC {
             }
 
          // Two dimensional matrices in 2D simulation
-         #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+         #elif defined QUICC_SPATIALSCHEME_TT
             // Make sure middle is empty
             rMiddle.clear();
 
@@ -254,10 +254,10 @@ namespace GeoMHDiSCC {
 
          #else
             #error "Tried to setup MPI sparse solver for unimplemented scheme."
-         #endif //defined GEOMHDISCC_SPATIALSCHEME_TTT
+         #endif //defined QUICC_SPATIALSCHEME_TTT
       #else
          throw Exception("buildRestriction was called without MPI sparse solver");
-      #endif //GEOMHDISCC_MPISPSOLVE
+      #endif //QUICC_MPISPSOLVE
    }
 
 }

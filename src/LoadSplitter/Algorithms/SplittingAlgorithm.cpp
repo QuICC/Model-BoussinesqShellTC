@@ -28,7 +28,7 @@
 #include "Timers/StageTimer.hpp"
 #include "LoadSplitter/Algorithms/SplittingTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -108,10 +108,10 @@ namespace Parallel {
          {
             SharedTransformResolution  spTRes = this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id, status);
 
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
                FrameworkMacro::synchronize();
                MPI_Allreduce(MPI_IN_PLACE, &status, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-            #endif //GEOMHDISCC_MPI
+            #endif //QUICC_MPI
 
             // Splitting fail, abort
             if(status != 0)
@@ -119,9 +119,9 @@ namespace Parallel {
                break;
             }
 
-            #ifdef GEOMHDISCC_DEBUG
+            #ifdef QUICC_DEBUG
                descr.vtpFiles.at(j)->representResolution(spTRes, id);
-            #endif //GEOMHDISCC_DEBUG
+            #endif //QUICC_DEBUG
 
             // Clear unused indexes for remote resolutions
             if(id != FrameworkMacro::id())
@@ -348,10 +348,10 @@ namespace Parallel {
 
    void SplittingAlgorithm::buildCommunicationStructure(SharedResolution spRes, std::vector<std::multimap<int,int> >& commStructure)
    {
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          // MPI error code
          int ierr;
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
 
       // Clear the communication structure
       std::vector<std::multimap<int,int> >().swap(commStructure);
@@ -457,7 +457,7 @@ namespace Parallel {
                   // Store size of forward coordinates
                   toMatch = fwdMap.size();
 
-               #ifdef GEOMHDISCC_MPI
+               #ifdef QUICC_MPI
                   // Convert coordinates set to matrix to send through MPI
                   matRemote.resize(2, fwdMap.size());
                   int i =0;
@@ -516,15 +516,15 @@ namespace Parallel {
 
                #else
                }
-               #endif // GEOMHDISCC_MPI
+               #endif // QUICC_MPI
             }
 
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
                // Gather total number of match entries
                FrameworkMacro::synchronize();
                ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
                FrameworkMacro::check(ierr, 715);
-            #endif // GEOMHDISCC_MPI
+            #endif // QUICC_MPI
 
             // Check that everything matched
             if(toMatch != matched)
@@ -532,7 +532,7 @@ namespace Parallel {
                throw Exception("The computed index sets don't match!");
             }
 
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
                // Store current filter
                MatrixI locFilter(2, filter.size());
                int i = 0;
@@ -580,7 +580,7 @@ namespace Parallel {
                      }
                   }
                }
-            #endif // GEOMHDISCC_MPI
+            #endif // QUICC_MPI
 
             // Store obtained minimized structure
             std::set<std::pair<int,int> >::iterator filIt;
@@ -697,7 +697,7 @@ namespace Parallel {
                   // Store size of forward coordinates
                   toMatch = fwdMap.size();
 
-               #ifdef GEOMHDISCC_MPI
+               #ifdef QUICC_MPI
                   // Convert coordinates set to matrix to send through MPI
                   matRemote.resize(3, fwdMap.size());
                   int i =0;
@@ -757,15 +757,15 @@ namespace Parallel {
 
                #else
                }
-               #endif // GEOMHDISCC_MPI
+               #endif // QUICC_MPI
             }
 
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
                // Gather total number of match entries
                FrameworkMacro::synchronize();
                ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
                FrameworkMacro::check(ierr, 724);
-            #endif // GEOMHDISCC_MPI
+            #endif // QUICC_MPI
 
             // Check that everything matched
             if(toMatch != matched)
@@ -773,7 +773,7 @@ namespace Parallel {
                throw Exception("The computed index sets don't match!");
             }
 
-            #ifdef GEOMHDISCC_MPI
+            #ifdef QUICC_MPI
                // Store current filter
                MatrixI locFilter(2, filter.size());
                int i = 0;
@@ -821,7 +821,7 @@ namespace Parallel {
                      }
                   }
                }
-            #endif // GEOMHDISCC_MPI
+            #endif // QUICC_MPI
 
             // Store obtained minimized structure
             std::set<std::pair<int,int> >::iterator filIt;

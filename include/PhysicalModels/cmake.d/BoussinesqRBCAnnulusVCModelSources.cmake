@@ -1,13 +1,13 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBCAnnulusVCTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBCAnnulusVCMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBCAnnulusVCContinuity.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/AnnulusExactStateIds.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/AnnulusExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/AnnulusExactVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBCAnnulusVCTransport.cpp
+   ${QUICC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBCAnnulusVCMomentum.cpp
+   ${QUICC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBCAnnulusVCContinuity.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/AnnulusExactStateIds.cpp
+   ${QUICC_SRC_DIR}/Generator/States/AnnulusExactScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/AnnulusExactVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
 )

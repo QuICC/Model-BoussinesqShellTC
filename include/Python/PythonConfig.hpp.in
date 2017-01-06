@@ -16,6 +16,6 @@
 // Project includes
 //
 
-#define GEOMHDISCC_PYTHON_DIR "@GEOMHDISCC_PYTHON_DIR@"
+#define QUICC_PYTHON_DIR "@QUICC_PYTHON_DIR@"
 
 #endif // PYTHONCONFIG_HPP

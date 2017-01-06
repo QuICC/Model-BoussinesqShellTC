@@ -23,7 +23,7 @@
 #include "LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "LoadSplitter/Algorithms/SplittingDescription.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

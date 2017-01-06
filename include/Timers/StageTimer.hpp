@@ -22,7 +22,7 @@
 //
 #include "Base/Typedefs.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of a very simple stage timer

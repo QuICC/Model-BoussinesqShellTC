@@ -18,7 +18,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    TransformResolution::TransformResolution(const std::vector<ArrayI>& fwd, const std::vector<ArrayI>& bwd, const std::vector<ArrayI>& idx2D, const ArrayI& idx3D)
       : mFwd(fwd), mBwd(bwd), mIdx2D(idx2D), mIdx3D(idx3D), mDimF1D(idx3D.size()), mDimB1D(idx3D.size()), mDim2D(idx3D.size()), mDim3D(idx3D.size())

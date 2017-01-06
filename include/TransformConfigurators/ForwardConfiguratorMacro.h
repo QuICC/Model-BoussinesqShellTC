@@ -7,10 +7,10 @@
 #ifndef FORWARDCONFIGURATORMACRO_H
 #define FORWARDCONFIGURATORMACRO_H
 
-#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+#ifdef QUICC_SPATIALDIMENSION_3D
    #include "TransformConfigurators/ForwardConfigurator3D.hpp"
 #else
    #include "TransformConfigurators/ForwardConfigurator2D.hpp"
-#endif // GEOMHDISCC_SPATIALDIMENSION_3D
+#endif // QUICC_SPATIALDIMENSION_3D
 
 #endif // FORWARDCONFIGURATORMACRO_H

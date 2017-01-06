@@ -18,7 +18,7 @@
 #include "Base/Typedefs.hpp"
 #include "IoHdf5/IHdf5Writer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoHdf5 {
 

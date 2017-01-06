@@ -23,7 +23,7 @@
 #include "VectorFields/VectorField.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Physical {
 

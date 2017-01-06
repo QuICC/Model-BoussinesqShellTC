@@ -27,7 +27,7 @@
 #include "TransformConfigurators/ForwardConfigurator2D.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -59,9 +59,9 @@ namespace Transform {
       private: 
    };
 
-#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+#ifdef QUICC_SPATIALDIMENSION_3D
    typedef ForwardConfigurator3D ForwardConfigurator;
-#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+#endif //QUICC_SPATIALDIMENSION_3D
 
 }
 }

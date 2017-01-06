@@ -21,7 +21,7 @@
 //
 #include "Simulation/Simulation.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of a base for all physical models

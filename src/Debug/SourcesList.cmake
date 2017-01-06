@@ -1,10 +1,10 @@
-if(GEOMHDISCC_DEBUG)
+if(QUICC_DEBUG)
    # Create list of sources
    set(MHDSources
       SerialDebugger.cpp
    )
-else(GEOMHDISCC_DEBUG)
+else(QUICC_DEBUG)
    # Create empty list of sources
    set(MHDSources
    )
-endif(GEOMHDISCC_DEBUG)
+endif(QUICC_DEBUG)

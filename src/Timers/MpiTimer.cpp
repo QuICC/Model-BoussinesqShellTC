@@ -21,7 +21,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    MpiTimer::MpiTimer(const bool autostart)
       : mStart(0.0), mStop(0.0)

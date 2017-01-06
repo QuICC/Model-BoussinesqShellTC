@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 
 #include "TypeSelectors/TransformSelector.hpp"
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

@@ -25,7 +25,7 @@
 #include "IoXml/IXmlReader.hpp"
 #include "IoConfig/IConfigurationFile.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoConfig {
 

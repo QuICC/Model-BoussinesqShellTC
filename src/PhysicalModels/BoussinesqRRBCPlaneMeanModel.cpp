@@ -38,7 +38,7 @@
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqRRBCPlaneMeanModel::PYMODULE = "boussinesq_rrbcplane_mean";
 

@@ -20,7 +20,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -50,7 +50,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #if defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
    std::vector<TransformPath>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
@@ -180,7 +180,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #endif //defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
    std::vector<TransformPath>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
@@ -289,7 +289,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #if defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
    std::vector<TransformPath>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
@@ -560,7 +560,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #endif //defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
 }
 }

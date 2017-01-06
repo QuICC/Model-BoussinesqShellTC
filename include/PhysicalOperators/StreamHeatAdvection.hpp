@@ -22,7 +22,7 @@
 #include "Enums/FieldIds.hpp"
 #include "VectorFields/VectorField.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Physical {
 

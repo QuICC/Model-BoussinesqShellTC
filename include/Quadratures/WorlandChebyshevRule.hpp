@@ -17,7 +17,7 @@
 //
 #include "Base/Precision.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Worland Chebyshev quadrature rule

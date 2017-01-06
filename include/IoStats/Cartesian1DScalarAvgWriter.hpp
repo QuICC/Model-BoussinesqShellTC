@@ -24,7 +24,7 @@
 #include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoStats {
 

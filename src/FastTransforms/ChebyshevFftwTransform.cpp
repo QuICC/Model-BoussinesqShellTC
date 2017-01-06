@@ -21,7 +21,7 @@
 #include "FastTransforms/FftwLibrary.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -328,9 +328,9 @@ namespace Transform {
          rChebVal.topRows(this->mspSetup->specSize()) = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*rChebVal;
       }
 
-      #ifdef GEOMHDISCC_DEBUG
+      #ifdef QUICC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
-      #endif //GEOMHDISCC_DEBUG
+      #endif //QUICC_DEBUG
    }
 
    void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
@@ -471,9 +471,9 @@ namespace Transform {
          rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
       }
 
-      #ifdef GEOMHDISCC_DEBUG
+      #ifdef QUICC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
-      #endif //GEOMHDISCC_DEBUG
+      #endif //QUICC_DEBUG
    }
 
    void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
@@ -624,7 +624,7 @@ namespace Transform {
 
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat ChebyshevFftwTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -634,7 +634,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

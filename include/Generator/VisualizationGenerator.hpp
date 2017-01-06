@@ -21,7 +21,7 @@
 //
 #include "Simulation/SimulationBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief High level implementation of a general visualization file generator

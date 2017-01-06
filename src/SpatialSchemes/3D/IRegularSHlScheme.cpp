@@ -21,7 +21,7 @@
 #include "SpatialSchemes/Tools/SHTools.hpp"
 #include "Resolutions/Tools/SHlIndexCounter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
 

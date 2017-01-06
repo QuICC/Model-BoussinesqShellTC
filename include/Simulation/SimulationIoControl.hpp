@@ -21,7 +21,7 @@
 #include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the control instance for the simulation IO related operations

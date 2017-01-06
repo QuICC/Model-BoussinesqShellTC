@@ -19,7 +19,7 @@
 #include "Exceptions/Exception.hpp"
 #include "SpatialSchemes/Tools/RegularTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
 

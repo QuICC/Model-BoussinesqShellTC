@@ -14,7 +14,7 @@
 // include serial communicators
 #include "Communicators/Converters/NoIndexConv.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Parallel {
 
@@ -39,10 +39,10 @@ namespace GeoMHDiSCC {
        * @brief Specialialised IndexConverterSelector for the second transform
        */
       // Configure index converter on spherical harmonics basis with l spectral ordering
-   #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+   #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_WLFL
       #include "Communicators/Converters/SHlIndexConv.hpp"
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Parallel {
 
             template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
@@ -53,10 +53,10 @@ namespace GeoMHDiSCC {
          }
       }
       // Configure index converter on spherical harmonics basis with m spectral ordering
-   #elif defined GEOMHDISCC_SPATIALSCHEME_BLFM  || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+   #elif defined QUICC_SPATIALSCHEME_BLFM  || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_WLFM
       #include "Communicators/Converters/SHmIndexConv.hpp"
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Parallel {
 
             template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
@@ -67,11 +67,11 @@ namespace GeoMHDiSCC {
          }
       }
       // Configure index converter on in-order C2C FFT values (plus-minus frequency order)
-   #elif defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_FFF
+   #elif defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_FFF
 
       #include "Communicators/Converters/PMIndexConv.hpp"
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Parallel {
 
             template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
@@ -83,7 +83,7 @@ namespace GeoMHDiSCC {
       }
    #else
 
-      namespace GeoMHDiSCC {
+      namespace QuICC {
          namespace Parallel {
 
             template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
@@ -93,6 +93,6 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+   #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_WLFL
 
 #endif // INDEXCONVERTERSELCTOR_HPP

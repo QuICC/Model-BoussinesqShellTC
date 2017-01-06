@@ -19,7 +19,7 @@
 //
 #include "Timers/StageTimer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -78,7 +78,7 @@ namespace Transform {
       ArrayI packs1DFwd = spFwdGrouper->packs1D(integratorTree);
       ArrayI packs1DBwd = spBwdGrouper->packs1D(projectorTree);
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          // Get the buffer pack sizes for second dimension
          ArrayI packs2DFwd = spFwdGrouper->packs2D(integratorTree);
          ArrayI packs2DBwd = spBwdGrouper->packs2D(projectorTree);
@@ -88,7 +88,7 @@ namespace Transform {
       #else
          // Initialise the converters
          rCoord.communicator().initConverter(spRes, packs1DFwd, packs1DBwd, spFwdGrouper->split);
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
 
       stage.done();
    }

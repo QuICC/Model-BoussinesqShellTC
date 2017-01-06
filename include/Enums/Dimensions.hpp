@@ -19,7 +19,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Dimensions {
 
@@ -49,13 +49,13 @@ namespace Dimensions {
          TRA2D,
          /// Third transform space
          TRA3D,
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+         #ifdef QUICC_SPATIALDIMENSION_2D
          /// Last dimension
          TRAND = TRA2D,
          #else
          /// Last dimension
          TRAND = TRA3D,
-         #endif //GEOMHDISCC_SPATIALDIMENSION_2D
+         #endif //QUICC_SPATIALDIMENSION_2D
       };
 
       /**
@@ -100,13 +100,13 @@ namespace Dimensions {
          DAT2D,
          /// Third dimension data
          DAT3D,
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+         #ifdef QUICC_SPATIALDIMENSION_2D
          /// Last data dimension
          DATND = DAT2D,
          #else
          /// Last data dimension
          DATND = DAT3D,
-         #endif //GEOMHDISCC_SPATIALDIMENSION_2D
+         #endif //QUICC_SPATIALDIMENSION_2D
       };
    };
 

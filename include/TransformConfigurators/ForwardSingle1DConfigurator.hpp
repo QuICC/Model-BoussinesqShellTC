@@ -3,7 +3,7 @@
  * @brief This class defines the forward transform single first exchange splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D
+#if defined QUICC_MPIALGO_SINGLE1D  || defined QUICC_MPIALGO_COUPLED2D
 
 #ifndef FORWARDSINGLE1DCONFIGURATOR_HPP
 #define FORWARDSINGLE1DCONFIGURATOR_HPP
@@ -24,7 +24,7 @@
 #include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/ForwardConfiguratorMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -143,7 +143,7 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
          TransformTreeEdge::EdgeType_citerator it2D;
 
@@ -170,7 +170,7 @@ namespace Transform {
             // Compute third transform
             ForwardConfigurator2D::integrateND(*it3D, coord);
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
@@ -194,7 +194,7 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
          TransformTreeEdge::EdgeType_citerator it2D;
 
@@ -232,7 +232,7 @@ namespace Transform {
                ForwardConfigurator2D::updateEquation(*it1D, spEquation, coord);
             }
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
@@ -243,4 +243,4 @@ namespace Transform {
 
 #endif // FORWARDSINGLE1DCONFIGURATOR_HPP
 
-#endif //defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D
+#endif //defined QUICC_MPIALGO_SINGLE1D  || defined QUICC_MPIALGO_COUPLED2D

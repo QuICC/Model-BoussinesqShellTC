@@ -21,7 +21,7 @@
 //
 #include "Enums/DimensionTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

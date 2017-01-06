@@ -23,7 +23,7 @@
 #include "Base/Typedefs.hpp"
 #include "Resolutions/TransformResolution.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Definition of a resolution object for a single CPU

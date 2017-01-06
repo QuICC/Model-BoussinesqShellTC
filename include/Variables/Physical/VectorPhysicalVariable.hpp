@@ -25,7 +25,7 @@
 #include "TensorFields/SymmetricTensorField.hpp"
 #include "Variables/VariableBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 
@@ -135,12 +135,12 @@ namespace Datatypes {
           */
          bool hasGrad2() const;
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -334,7 +334,7 @@ namespace Datatypes {
       this->mVGrad2.insert(std::make_pair(id, spGrad2));
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TScalar> MHDFloat VectorPhysicalVariable<TScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -373,7 +373,7 @@ namespace Datatypes {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 }
 }
 

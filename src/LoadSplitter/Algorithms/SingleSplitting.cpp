@@ -22,7 +22,7 @@
 //
 #include "LoadSplitter/Algorithms/SplittingTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -106,19 +106,19 @@ namespace Parallel {
       if(this->mSplit == Splitting::Locations::FIRST)
       {
          // SINGLE1D grouper setup
-         #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
+         #if defined QUICC_TRANSGROUPER_SINGLE1D
             this->mGrouper = Splitting::Groupers::SINGLE1D;
          #else
             this->mGrouper = Splitting::Groupers::EQUATION;
-         #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
+         #endif //defined QUICC_TRANSGROUPER_SINGLE1D
       } else
       {
          // SINGLE2D grouper setup
-         #if defined GEOMHDISCC_TRANSGROUPER_SINGLE2D
+         #if defined QUICC_TRANSGROUPER_SINGLE2D
             this->mGrouper = Splitting::Groupers::SINGLE2D;
          #else
             this->mGrouper = Splitting::Groupers::EQUATION;
-         #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE2D
+         #endif //defined QUICC_TRANSGROUPER_SINGLE2D
       }
    }
 

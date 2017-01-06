@@ -21,7 +21,7 @@
 //
 #include "Resolutions/Tools/RegularIndexCounter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
    
@@ -35,7 +35,7 @@ namespace Schemes {
       TTScheme::tuneMpiResolution(descr);
       
       // Create spectral space sub communicators
-      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
          // Initialise the ranks with local rank
          std::set<int>  ranks;
          for(int cpu = 0; cpu < spRes->nCpu(); ++cpu)
@@ -46,7 +46,7 @@ namespace Schemes {
          FrameworkMacro::initSubComm(FrameworkMacro::SPECTRAL, 1);
 
          FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, 0, ranks);
-      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
    }
 
    void TTScheme::addTransformSetups(SharedResolution spRes) const

@@ -24,7 +24,7 @@
 //
 #include "Resolutions/Tools/RegularIndexCounter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
    
@@ -36,16 +36,16 @@ namespace Schemes {
    void TTTScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
       // Create single rank communicator
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          std::vector<int>  ranks;
 
          // Make single core communicator unless MPI sparse solver is used
-         #ifndef GEOMHDISCC_MPISPSOLVE
+         #ifndef QUICC_MPISPSOLVE
             ranks.push_back(FrameworkMacro::id());
-         #endif //GEOMHDISCC_MPISPSOLVE
+         #endif //QUICC_MPISPSOLVE
 
          FrameworkMacro::setSpectralComm(ranks);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
    }
 
    void TTTScheme::addTransformSetups(SharedResolution spRes) const

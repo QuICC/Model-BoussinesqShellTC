@@ -19,16 +19,16 @@
 #include <cuda_runtime.h>
 #include <cufft.h>
 
-#ifdef GEOMHDISCC_DEBUG
+#ifdef QUICC_DEBUG
    #include <helper_cuda.h>
 #else
    #define checkCudaErrors(x) x
-#endif //GEOMHDISCC_DEBUG
+#endif //QUICC_DEBUG
 
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

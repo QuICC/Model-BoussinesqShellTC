@@ -22,7 +22,7 @@
 #include "Framework/FrameworkBase.hpp"
 #include "Base/Typedefs.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief This class defines the framework for an MPI Parallel code

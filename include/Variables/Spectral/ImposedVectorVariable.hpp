@@ -22,7 +22,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Variables/Spectral/VectorVariable.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 
@@ -69,12 +69,12 @@ namespace Datatypes {
           */
          void setZeros();
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -132,7 +132,7 @@ namespace Datatypes {
       this->mTotal.setZeros();
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TSScalar, typename TPScalar> MHDFloat ImposedVectorVariable<TSScalar,TPScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -145,7 +145,7 @@ namespace Datatypes {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

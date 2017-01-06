@@ -23,7 +23,7 @@
 #include "Exceptions/Exception.hpp"
 #include "IoTools/HumanToId.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    int PythonCoordinator::sCounter = 0;
 
@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
 
          // Setup the search path
          PyObject* sysPath = PySys_GetObject((char*)"path");
-         PyList_Append(sysPath, PyUnicode_FromString(GEOMHDISCC_PYTHON_DIR));
+         PyList_Append(sysPath, PyUnicode_FromString(QUICC_PYTHON_DIR));
       }
 
       PythonCoordinator::registerWrapper();

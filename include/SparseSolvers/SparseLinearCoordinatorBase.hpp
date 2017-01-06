@@ -32,7 +32,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "Timers/StageTimer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 

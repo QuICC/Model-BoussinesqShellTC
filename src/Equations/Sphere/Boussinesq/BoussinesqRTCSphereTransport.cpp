@@ -24,7 +24,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/VelocityAdvection.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

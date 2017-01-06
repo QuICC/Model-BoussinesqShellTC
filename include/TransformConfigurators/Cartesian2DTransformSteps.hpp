@@ -21,7 +21,7 @@
 #include "Enums/FieldIds.hpp"
 #include "TransformConfigurators/TransformPath.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Transform {
 

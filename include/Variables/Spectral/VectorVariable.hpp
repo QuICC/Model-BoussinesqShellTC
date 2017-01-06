@@ -23,7 +23,7 @@
 #include "VectorFields/VectorField.hpp"
 #include "Variables/Physical/VectorPhysicalVariable.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 
@@ -75,12 +75,12 @@ namespace Datatypes {
           */
          void initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -144,7 +144,7 @@ namespace Datatypes {
       this->mspPerturbation = SharedPtrMacro<VectorField<TSScalar,FieldComponents::Spectral::Id> >(new VectorField<TSScalar,FieldComponents::Spectral::Id>(this->spRes()->spSpectralSetup(), map));
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TSScalar, typename TPScalar> MHDFloat VectorVariable<TSScalar,TPScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -155,7 +155,7 @@ namespace Datatypes {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

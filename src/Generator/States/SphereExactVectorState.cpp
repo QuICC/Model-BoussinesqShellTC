@@ -24,7 +24,7 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
@@ -237,12 +237,12 @@ namespace Equations {
     {
       if(this->mSpecTypeId == SphereExactStateIds::HARMONIC && this->mSHModes.count(compId) > 0)
       {
-         #ifdef GEOMHDISCC_SPATIALSCHEME_WLFL
+         #ifdef QUICC_SPATIALSCHEME_WLFL
          std::pair<int,int> key = std::make_pair(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iK),this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ,iK));
-         #endif //GEOMHDISCC_SPATIALSCHEME_WLFL
-         #ifdef GEOMHDISCC_SPATIALSCHEME_WLFM
+         #endif //QUICC_SPATIALSCHEME_WLFL
+         #ifdef QUICC_SPATIALSCHEME_WLFM
          std::pair<int,int> key = std::make_pair(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ,iK),this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iK));
-         #endif //GEOMHDISCC_SPATIALSCHEME_WLFM
+         #endif //QUICC_SPATIALSCHEME_WLFM
          if(this->mSHModes.find(compId)->second.count(key) > 0)
          {
             if(this->mSHModes.find(compId)->second.find(key)->second.count(iN) > 0)

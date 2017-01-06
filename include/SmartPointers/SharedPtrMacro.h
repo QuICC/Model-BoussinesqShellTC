@@ -8,7 +8,7 @@
 #define SHAREDPTRMACRO_H
 
 // Boost Version
-#ifdef GEOMHDISCC_SMARTPTR_BOOST
+#ifdef QUICC_SMARTPTR_BOOST
    // Include the right header
    #include <boost/shared_ptr.hpp>
 
@@ -18,10 +18,10 @@
     * Sets up the Boost version.
     */
    #define SharedPtrMacro boost::shared_ptr
-#endif //GEOMHDISCC_SMARTPTR_BOOST
+#endif //QUICC_SMARTPTR_BOOST
 
 // TR1 Version
-#ifdef GEOMHDISCC_SMARTPTR_TR1
+#ifdef QUICC_SMARTPTR_TR1
    // Include the right header
    #include <tr1/memory>
 
@@ -31,10 +31,10 @@
     * Sets up the TR1 version.
     */
    #define SharedPtrMacro std::tr1::shared_ptr
-#endif //GEOMHDISCC_SMARTPTR_TR1
+#endif //QUICC_SMARTPTR_TR1
 
 // C++0x Version
-#ifdef GEOMHDISCC_SMARTPTR_CXX0X
+#ifdef QUICC_SMARTPTR_CXX0X
    // Include the right header
    #include <memory>
 
@@ -44,6 +44,6 @@
     * Sets up the C++0x version.
     */
    #define SharedPtrMacro std::shared_ptr
-#endif //GEOMHDISCC_SMARTPTR_CXX0X
+#endif //QUICC_SMARTPTR_CXX0X
 
 #endif // SHAREDPTRMACRO_H

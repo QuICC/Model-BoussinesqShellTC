@@ -1,15 +1,15 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqTCSphereTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqTCSphereMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHmTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/SphereScalarEnergyWriter.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/SphereTorPolEnergyWriter.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/SphereExactStateIds.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/SphereExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/SphereExactVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqTCSphereTransport.cpp
+   ${QUICC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqTCSphereMomentum.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/EigenSHmTools.cpp
+   ${QUICC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${QUICC_SRC_DIR}/IoVariable/SphereScalarEnergyWriter.cpp
+   ${QUICC_SRC_DIR}/IoVariable/SphereTorPolEnergyWriter.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/SphereExactStateIds.cpp
+   ${QUICC_SRC_DIR}/Generator/States/SphereExactScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/SphereExactVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
 )

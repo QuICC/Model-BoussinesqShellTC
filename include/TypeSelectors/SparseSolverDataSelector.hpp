@@ -20,12 +20,12 @@
 //
 #include "SparseSolvers/SparseDummySolver.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Solver {
 
       // Configure code to use TTT scheme
-      #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TT
+      #if defined QUICC_SPATIALSCHEME_TTT || defined QUICC_SPATIALSCHEME_TT
          template <template <class,class> class TSolver> class SparseSolverDataSelector
          {
             public:
@@ -46,7 +46,7 @@ namespace GeoMHDiSCC {
                /// Typedef for a complex operator solver
                typedef TSolver<SparseMatrixZ,MatrixZ>  ComplexSolverType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_TTT
+      #endif //QUICC_SPATIALSCHEME_TTT
 
    }
 }

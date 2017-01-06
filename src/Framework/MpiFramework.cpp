@@ -24,7 +24,7 @@
 #include "Base/Precision.hpp"
 #include "IoHdf5/Hdf5File.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    void MpiFramework::init()
    {

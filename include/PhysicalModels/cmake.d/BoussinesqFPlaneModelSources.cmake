@@ -1,10 +1,10 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneStreamfunction.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneVertical.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen2DTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactStateIds.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneStreamfunction.cpp
+   ${QUICC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneTransport.cpp
+   ${QUICC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneVertical.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/Eigen2DTools.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CartesianExactStateIds.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
 )

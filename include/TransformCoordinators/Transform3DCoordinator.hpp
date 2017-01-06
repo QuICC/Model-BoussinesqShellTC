@@ -27,7 +27,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "TransformCoordinators/Transform2DCoordinator.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * 
@@ -150,14 +150,14 @@ namespace GeoMHDiSCC {
       // initialise the third transform
       this->mTransform3D.init(spSetup3D);
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          MHDFloat mem3D = this->mTransform3D.requiredStorage();
          StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORMS, mem3D);
 
-         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+         #ifdef QUICC_STORAGEPROFILER_DETAILED
             StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM3D, mem3D);
-         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
-      #endif // GEOMHDISCC_STORAGEPROFILE
+         #endif // QUICC_STORAGEPROFILER_DETAILED
+      #endif // QUICC_STORAGEPROFILE
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initCommunicator(SharedResolution spRes)

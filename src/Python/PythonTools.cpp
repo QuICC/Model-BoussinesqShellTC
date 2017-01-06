@@ -23,7 +23,7 @@
 #include "IoTools/HumanToId.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    PyObject* PythonTools::makeTuple(const ArrayI& val)
    {

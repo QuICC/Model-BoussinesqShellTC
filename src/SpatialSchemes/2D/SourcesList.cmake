@@ -2,19 +2,19 @@
 set(MHDSources
 )
 
-if(GEOMHDISCC_SPATIALSCHEME STREQUAL "FF")
+if(QUICC_SPATIALSCHEME STREQUAL "FF")
    list(APPEND MHDSources 
       FFScheme.cpp
       IRegular2DScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TF")
+elseif(QUICC_SPATIALSCHEME STREQUAL "TF")
    list(APPEND MHDSources 
       TFScheme.cpp
       IRegular2DScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TT")
+elseif(QUICC_SPATIALSCHEME STREQUAL "TT")
    list(APPEND MHDSources 
       TTScheme.cpp
       IRegular2DScheme.cpp
       )
-endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "FF")
+endif(QUICC_SPATIALSCHEME STREQUAL "FF")

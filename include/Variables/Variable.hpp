@@ -21,7 +21,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Variables/VariableDomain.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

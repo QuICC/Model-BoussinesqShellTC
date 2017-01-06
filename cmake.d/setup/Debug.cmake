@@ -14,21 +14,21 @@ include(cmake.d/functions.cmake)
 ###################################################
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-   set(GEOMHDISCC_DEBUG ON)
+   set(QUICC_DEBUG ON)
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-if(GEOMHDISCC_DEBUG)
+if(QUICC_DEBUG)
    message(STATUS "***********************************************")
    message(STATUS "**************** Debug setup ******************")
    message(STATUS "***********************************************")
    message(STATUS " --> Debug: Active")
-endif(GEOMHDISCC_DEBUG)
+endif(QUICC_DEBUG)
 
-if(GEOMHDISCC_DEBUG)
-   add_definitions("-DGEOMHDISCC_DEBUG")
-else(GEOMHDISCC_DEBUG)
-   add_definitions("-DGEOMHDISCC_NO_DEBUG")
-endif(GEOMHDISCC_DEBUG)
+if(QUICC_DEBUG)
+   add_definitions("-DQUICC_DEBUG")
+else(QUICC_DEBUG)
+   add_definitions("-DQUICC_NO_DEBUG")
+endif(QUICC_DEBUG)
 
 ###################################################
 #------------------- PROFILING -------------------#
@@ -37,32 +37,32 @@ endif(GEOMHDISCC_DEBUG)
 #
 # Use internal profiler and type of profiler
 #
-option(GEOMHDISCC_PROFILE "Activate internal profiler?" OFF)
+option(QUICC_PROFILE "Activate internal profiler?" OFF)
 
-if(NOT GEOMHDISCC_DEBUG AND GEOMHDISCC_PROFILE)
+if(NOT QUICC_DEBUG AND QUICC_PROFILE)
    message(STATUS "***********************************************")
    message(STATUS "**************** Debug setup ******************")
    message(STATUS "***********************************************")
-endif(NOT GEOMHDISCC_DEBUG AND GEOMHDISCC_PROFILE)
+endif(NOT QUICC_DEBUG AND QUICC_PROFILE)
 
-if(GEOMHDISCC_PROFILE)
-   add_definitions("-DGEOMHDISCC_PROFILE")
+if(QUICC_PROFILE)
+   add_definitions("-DQUICC_PROFILE")
 
-   set(GEOMHDISCC_PROFILERS "Coarse" "Detailed")
+   set(QUICC_PROFILERS "Coarse" "Detailed")
 
-   geomhdiscc_provide_choice(GEOMHDISCC_PROFILERS "Profiler" GEOMHDISCC_PROFILER profilerTest)
+   quicc_provide_choice(QUICC_PROFILERS "Profiler" QUICC_PROFILER profilerTest)
 
    if(profilerTest)
-      geomhdiscc_add_definition(GEOMHDISCC_PROFILER)
+      quicc_add_definition(QUICC_PROFILER)
    endif(profilerTest)
 
-   if(GEOMHDISCC_MPI)
-      option(GEOMHDISCC_PROFILE_PERCORE "Write per core profiling data?" OFF)
-      if(GEOMHDISCC_PROFILE_PERCORE)
-         add_definitions("-DGEOMHDISCC_PROFILE_PERCORE")
-      endif(GEOMHDISCC_PROFILE_PERCORE)
-   endif(GEOMHDISCC_MPI)
-endif(GEOMHDISCC_PROFILE)
+   if(QUICC_MPI)
+      option(QUICC_PROFILE_PERCORE "Write per core profiling data?" OFF)
+      if(QUICC_PROFILE_PERCORE)
+         add_definitions("-DQUICC_PROFILE_PERCORE")
+      endif(QUICC_PROFILE_PERCORE)
+   endif(QUICC_MPI)
+endif(QUICC_PROFILE)
 
 ###################################################
 #--------------- STORAGE PROFILING ---------------#
@@ -71,25 +71,25 @@ endif(GEOMHDISCC_PROFILE)
 #
 # Used storage requirements profiler?
 #
-option(GEOMHDISCC_STORAGEPROFILE "Activate internal storage profiler?" OFF)
+option(QUICC_STORAGEPROFILE "Activate internal storage profiler?" OFF)
 
-if(NOT GEOMHDISCC_DEBUG AND NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
+if(NOT QUICC_DEBUG AND NOT QUICC_PROFILE AND QUICC_STORAGEPROFILE)
    message(STATUS "***********************************************")
    message(STATUS "**************** Debug setup ******************")
    message(STATUS "***********************************************")
-endif(NOT GEOMHDISCC_DEBUG AND NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
+endif(NOT QUICC_DEBUG AND NOT QUICC_PROFILE AND QUICC_STORAGEPROFILE)
 
-if(GEOMHDISCC_STORAGEPROFILE)
-   add_definitions("-DGEOMHDISCC_STORAGEPROFILE")
+if(QUICC_STORAGEPROFILE)
+   add_definitions("-DQUICC_STORAGEPROFILE")
 
-   set(GEOMHDISCC_STORAGEPROFILERS "Coarse" "Detailed")
+   set(QUICC_STORAGEPROFILERS "Coarse" "Detailed")
 
-   geomhdiscc_provide_choice(GEOMHDISCC_STORAGEPROFILERS "Storage profiler" GEOMHDISCC_STORAGEPROFILER storageTest)
+   quicc_provide_choice(QUICC_STORAGEPROFILERS "Storage profiler" QUICC_STORAGEPROFILER storageTest)
 
    if(storageTest)
-      geomhdiscc_add_definition(GEOMHDISCC_STORAGEPROFILER)
+      quicc_add_definition(QUICC_STORAGEPROFILER)
    endif(storageTest)
-endif(GEOMHDISCC_STORAGEPROFILE)
+endif(QUICC_STORAGEPROFILE)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
@@ -107,20 +107,20 @@ endif(GEOMHDISCC_STORAGEPROFILE)
 # List of source subdirectories for the Base subframework
 #
 
-if(GEOMHDISCC_DEBUG)
+if(QUICC_DEBUG)
    set(MHDDebugSrcDirs ${MHDDebugSrcDirs} Debug)
-endif(GEOMHDISCC_DEBUG)
+endif(QUICC_DEBUG)
 
-if(GEOMHDISCC_PROFILE)
+if(QUICC_PROFILE)
    set(MHDDebugSrcDirs ${MHDDebugSrcDirs} Profiler)
-endif(GEOMHDISCC_PROFILE)
+endif(QUICC_PROFILE)
 
-if(GEOMHDISCC_STORAGEPROFILE)
+if(QUICC_STORAGEPROFILE)
    set(MHDDebugSrcDirs ${MHDDebugSrcDirs} StorageProfiler)
-endif(GEOMHDISCC_STORAGEPROFILE)
+endif(QUICC_STORAGEPROFILE)
 
 ##### DEVELOPMENT: NEEDS TO BE REMOVED ONCE CODE IS READY
 message(STATUS "!!!WARNING!!! OVERRIDING ACTUAL Debug.cmake DIRECTORY LIST WITH NOTHING")
 set(MHDDebugSrcDirs )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDDebugSrcDirs)
+quicc_append_sources(All_Srcs ${QUICC_SRC_DIR} MHDDebugSrcDirs)

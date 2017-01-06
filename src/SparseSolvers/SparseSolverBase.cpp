@@ -19,7 +19,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 

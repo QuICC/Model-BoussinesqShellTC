@@ -29,11 +29,11 @@
 #include "TypeSelectors/IndexConverterSelector.hpp"
 #include "Communicators/Converters/IConverter.hpp"
 #include "Communicators/Converters/SerialConverter.hpp"
-#ifdef GEOMHDISCC_MPI
+#ifdef QUICC_MPI
    #include "Communicators/Converters/MpiConverter.hpp"
-#endif // GEOMHDISCC_MPI
+#endif // QUICC_MPI
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

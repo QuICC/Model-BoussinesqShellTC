@@ -19,7 +19,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    VariableRequirement::VariableRequirement()
       : mNoField(false,false,false,false)

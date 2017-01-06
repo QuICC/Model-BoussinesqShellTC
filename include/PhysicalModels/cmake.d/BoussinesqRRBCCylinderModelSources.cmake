@@ -1,13 +1,13 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactStateIds.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldTrivialVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderTransport.cpp
+   ${QUICC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderMomentum.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CylinderExactStateIds.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CylinderExactScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CylinderExactVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldTrivialVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
 )

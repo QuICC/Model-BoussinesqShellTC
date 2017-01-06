@@ -28,7 +28,7 @@
 //
 #include "Base/DecoupledComplex.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @name Basic scalar types typedefs

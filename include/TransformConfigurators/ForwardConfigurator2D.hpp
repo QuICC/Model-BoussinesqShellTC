@@ -26,7 +26,7 @@
 #include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/TransformStepsMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -107,9 +107,9 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
    }
 
-#ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+#ifdef QUICC_SPATIALDIMENSION_2D
    typedef ForwardConfigurator2D ForwardConfigurator;
-#endif //GEOMHDISCC_SPATIALDIMENSION_2D
+#endif //QUICC_SPATIALDIMENSION_2D
 
 }
 }

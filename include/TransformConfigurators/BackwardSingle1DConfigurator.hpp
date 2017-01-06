@@ -3,7 +3,7 @@
  * @brief This defines the backward transform first exchange single splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D
+#if defined QUICC_MPIALGO_SINGLE1D  || defined QUICC_MPIALGO_COUPLED2D
 
 #ifndef BACKWARDSINGLE1DCONFIGURATOR_HPP
 #define BACKWARDSINGLE1DCONFIGURATOR_HPP
@@ -23,7 +23,7 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/BackwardConfiguratorMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -138,7 +138,7 @@ namespace Transform {
       TransformTreeEdge::EdgeType_crange rangeSpec = tree.root().edgeRange();
       TransformTreeEdge::EdgeType_crange rangePhys;
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
          TransformTreeEdge::EdgeType_citerator it2D;
 
@@ -179,7 +179,7 @@ namespace Transform {
                BackwardConfigurator2D::projectND(*itPhys, coord);
             }
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
    }
 
    inline void BackwardSingle1DConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
@@ -207,4 +207,4 @@ namespace Transform {
 
 #endif // BACKWARDSINGLE1DCONFIGURATOR_HPP
 
-#endif //defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D
+#endif //defined QUICC_MPIALGO_SINGLE1D  || defined QUICC_MPIALGO_COUPLED2D

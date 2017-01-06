@@ -32,7 +32,7 @@
 #include "Enums/DimensionTools.hpp"
 #include "Resolutions/Resolution.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

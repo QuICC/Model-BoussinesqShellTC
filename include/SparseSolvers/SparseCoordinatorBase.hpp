@@ -25,7 +25,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "SparseSolvers/SparseCoordinatorData.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 

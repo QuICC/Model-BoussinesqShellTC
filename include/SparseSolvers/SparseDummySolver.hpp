@@ -20,7 +20,7 @@
 //
 #include "Enums/SolveTiming.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 

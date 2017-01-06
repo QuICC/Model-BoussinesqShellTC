@@ -25,7 +25,7 @@
 #include "SpatialSchemes/2D/IRegular2DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
 

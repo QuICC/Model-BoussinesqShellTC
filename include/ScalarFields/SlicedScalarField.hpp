@@ -33,7 +33,7 @@
 #include "Enums/Dimensions.hpp"
 #include "ScalarFields/ScalarFieldSetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 
@@ -144,12 +144,12 @@ namespace Datatypes {
           */
          void rescale(const MHDFloat scale);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -249,7 +249,7 @@ namespace Datatypes {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TData, Dimensions::Type DIMENSION> MHDFloat SlicedScalarField<TData, DIMENSION>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -262,7 +262,7 @@ namespace Datatypes {
 
       return static_cast<MHDFloat>(Debug::MemorySize<TData>::BYTES)*mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

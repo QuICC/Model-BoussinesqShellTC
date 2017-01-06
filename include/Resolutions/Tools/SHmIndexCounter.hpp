@@ -25,7 +25,7 @@
 #include "Resolutions/SimulationResolution.hpp"
 #include "Resolutions/CoreResolution.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of spherical harmonic index counter with m spectral ordering

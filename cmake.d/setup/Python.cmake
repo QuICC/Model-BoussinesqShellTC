@@ -9,7 +9,7 @@ INSTALL(DIRECTORY Python/quicc DESTINATION ${PROJECT_BINARY_DIR}/Python FILES_MA
 INSTALL(DIRECTORY Python/scripts DESTINATION ${PROJECT_BINARY_DIR}/Python FILES_MATCHING PATTERN "*.py")
 
 # Set path to installed python package and scripts
-set(GEOMHDISCC_PYTHON_DIR "${PROJECT_BINARY_DIR}/Python")
+set(QUICC_PYTHON_DIR "${PROJECT_BINARY_DIR}/Python")
 
 #
 # Configure the Python embedding wrapper

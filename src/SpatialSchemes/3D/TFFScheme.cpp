@@ -20,7 +20,7 @@
 #include "Resolutions/Tools/DoublePeriodicIndexCounter.hpp"
 
 #include <iostream>
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
 

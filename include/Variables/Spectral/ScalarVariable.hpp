@@ -22,7 +22,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Variables/Physical/ScalarPhysicalVariable.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 
@@ -74,12 +74,12 @@ namespace Datatypes {
           */
          void initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
          /**
@@ -132,7 +132,7 @@ namespace Datatypes {
    {
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TSScalar, typename TPScalar> MHDFloat ScalarVariable<TSScalar,TPScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -143,7 +143,7 @@ namespace Datatypes {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

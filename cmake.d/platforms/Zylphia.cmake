@@ -6,113 +6,113 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(GEOMHDISCC_COMPILERS "GCC" PARENT_SCOPE)
+set(QUICC_COMPILERS "GCC" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
 ###################################################
 
-set(GEOMHDISCC_SMARTPTRS "TR1" "cxx0x" PARENT_SCOPE)
+set(QUICC_SMARTPTRS "TR1" "cxx0x" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE THREADS MODELS ------------#
 ###################################################
 
-set(GEOMHDISCC_THREADSMODELS "None" PARENT_SCOPE)
+set(QUICC_THREADSMODELS "None" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE FFT VERSIONS --------------#
 ###################################################
 
-set(GEOMHDISCC_FFTS "FFTW" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
+set(QUICC_FFTS "FFTW" PARENT_SCOPE)
+set(QUICC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
 
 ###################################################
 #-------------- AVAILABLE FFT PLANS --------------#
 ###################################################
 
-set(GEOMHDISCC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
+set(QUICC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
 
 ###################################################
 #------- AVAILABLE LINEAR ALGEBRA LIBRARIES ------#
 ###################################################
 
-set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
+set(QUICC_LINALGS "Eigen" PARENT_SCOPE)
 
 ###################################################
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "UmfPack" "SparseLU" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
-#set(GEOMHDISCC_LIBRARIES_SPARSELU "/usr/local/lib/libmetis.a" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
+set(QUICC_SPLINALGS "UmfPack" "SparseLU" PARENT_SCOPE)
+set(QUICC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
+#set(QUICC_LIBRARIES_SPARSELU "/usr/local/lib/libmetis.a" PARENT_SCOPE)
+set(QUICC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(GEOMHDISCC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "SparseLU" PARENT_SCOPE)
+set(QUICC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "SparseLU" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(GEOMHDISCC_SPTRILINALGS "SparseLU" "UmfPack" PARENT_SCOPE)
+set(QUICC_SPTRILINALGS "SparseLU" "UmfPack" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 
-set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
+set(QUICC_LARGEIOS "HDF5" PARENT_SCOPE)
+set(QUICC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
 
 ###################################################
 #-------------- MPI IMPLEMENTATION ---------------#
 ###################################################
 
-set(GEOMHDISCC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
+set(QUICC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#
 ###################################################
 
-set(GEOMHDISCC_MPLIBS "mpfr" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
+set(QUICC_MPLIBS "mpfr" PARENT_SCOPE)
+set(QUICC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
 
 ###################################################
 #--------------- COMPILER SETTINGS ---------------#
 ###################################################
 
-set(GEOMHDISCC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
+set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
+set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
+set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_INC_GCC "" PARENT_SCOPE)
+set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_INC_MPI_GCC ${GEOMHDISCC_CC_INC_GCC} PARENT_SCOPE)
+set(QUICC_CC_INC_MPI_GCC ${QUICC_CC_INC_GCC} PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
+set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
+set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
 
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_PYTHONS "python27" "python34" PARENT_SCOPE)
+set(QUICC_PYTHONS "python27" "python34" PARENT_SCOPE)
 
-set(GEOMHDISCC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
-set(GEOMHDISCC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4.so" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_PYTHON34 "/usr/include/python3.4" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON34 "/usr/include/python3.4" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES "" PARENT_SCOPE)
+set(QUICC_LIBRARIES "" PARENT_SCOPE)
+set(QUICC_INCLUDES "" PARENT_SCOPE)

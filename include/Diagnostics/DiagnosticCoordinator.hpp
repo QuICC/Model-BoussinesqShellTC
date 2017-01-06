@@ -24,7 +24,7 @@
 #include "Diagnostics/ICflWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Diagnostics {
 

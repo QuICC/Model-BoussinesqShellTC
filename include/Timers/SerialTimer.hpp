@@ -18,7 +18,7 @@
 //
 #include "Timers/ITimer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of a serial timer

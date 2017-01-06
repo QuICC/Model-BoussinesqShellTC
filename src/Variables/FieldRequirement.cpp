@@ -19,7 +19,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    FieldRequirement::FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl, const bool needGradient2)
       : mIsScalar(isScalar), mNeedSpectral(needSpectral), mNeedPhysical(needPhysical), mNeedGradient(needGradient), mNeedCurl(needCurl), mNeedGradient2(needGradient2), mPhysicalComps(3), mGradientComps(), mCurlComps(3), mGradient2Comps()

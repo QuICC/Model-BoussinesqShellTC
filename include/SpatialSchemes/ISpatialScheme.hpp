@@ -26,7 +26,7 @@
 #include "SpatialSchemes/ISchemeCosts.hpp"
 #include "LoadSplitter/Algorithms/SplittingDescription.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
 

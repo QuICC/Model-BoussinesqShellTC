@@ -18,7 +18,7 @@
 #include "Base/Typedefs.hpp"
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes  {
 

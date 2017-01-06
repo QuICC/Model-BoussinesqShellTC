@@ -18,7 +18,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    void LegendreRule::computeQuadrature(Array& grid, Array& weights, const int size)
    {

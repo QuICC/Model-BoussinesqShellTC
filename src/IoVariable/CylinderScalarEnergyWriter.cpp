@@ -28,7 +28,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -139,7 +139,7 @@ namespace IoVariable {
 //      // Compute integral over Chebyshev expansion and sum harmonics
 //      this->mEnergy = 0.0;
 //
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
 //         double factor = 1.0;
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
 //         {
@@ -156,8 +156,8 @@ namespace IoVariable {
 //               this->mEnergy += factor*(this->mSphIntgOpEven*rInVar.slice(k).col(j).real()).sum();
 //            }
 //         }
-//      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+//      #endif //defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
 //         {
 //            int start = 0;
@@ -168,7 +168,7 @@ namespace IoVariable {
 //            }
 //            this->mEnergy += 2.0*(this->mSphIntgOpEven*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
 //         }
-//      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+//      #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 //
 //      // Free BWD storage
 //      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
@@ -186,9 +186,9 @@ namespace IoVariable {
       this->preWrite();
 
       // Get the "global" Kinetic energy from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          MPI_Allreduce(MPI_IN_PLACE, &this->mEnergy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

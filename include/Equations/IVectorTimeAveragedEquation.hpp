@@ -24,7 +24,7 @@
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IVectorEquation.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

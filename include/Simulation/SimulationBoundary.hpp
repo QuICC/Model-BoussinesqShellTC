@@ -22,7 +22,7 @@
 #include "SmartPointers/SharedPtrMacro.h"
 #include "Enums/FieldIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of a simple simulation wide boundary condition interface

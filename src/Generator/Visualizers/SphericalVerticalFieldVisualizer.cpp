@@ -24,7 +24,7 @@
 #include "TypeSelectors/TransformSelector.hpp"
 #include "PhysicalOperators/SphericalZComponent.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

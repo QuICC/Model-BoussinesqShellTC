@@ -27,7 +27,7 @@
 #include "Enums/DimensionTools.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoXml {
 

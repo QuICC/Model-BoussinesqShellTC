@@ -18,7 +18,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    IndexCounter::IndexCounter()
    {

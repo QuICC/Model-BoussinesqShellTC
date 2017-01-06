@@ -23,7 +23,7 @@
 #include "Enums/TransformDirection.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -100,12 +100,12 @@ namespace Parallel {
           */
          SharedPtrMacro<TIdx>  mspIdxConv;
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Do storage profiling
          */
          virtual void profileStorage() const = 0;
-      #endif // GEOMHDISCC_STORAGEPROFILE
+      #endif // QUICC_STORAGEPROFILE
          
       protected:
 

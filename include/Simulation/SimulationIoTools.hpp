@@ -19,7 +19,7 @@
 #include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the tools for IO related calculations

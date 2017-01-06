@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    RegularIndexCounter::RegularIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
       : IndexCounter(), mspSim(spSim), mspCpu(spCpu)
@@ -87,7 +87,7 @@ namespace GeoMHDiSCC {
       offsets.clear();
       std::vector<OffsetType>  offV;
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          offV.push_back(0);
          offV.push_back(0);
          offV.push_back(0);
@@ -131,6 +131,6 @@ namespace GeoMHDiSCC {
                offsets.push_back(offV);
             }
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
    }
 }

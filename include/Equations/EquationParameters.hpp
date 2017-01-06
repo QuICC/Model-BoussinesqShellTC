@@ -23,7 +23,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/NonDimensional.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

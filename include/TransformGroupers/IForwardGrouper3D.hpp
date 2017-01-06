@@ -24,7 +24,7 @@
 #include "TransformConfigurators/TransformTree.hpp"
 #include "TransformGroupers/IForwardGrouper2D.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -77,11 +77,11 @@ namespace Transform {
    /// Typdef for a smart reference counting pointer to a backward grouper base
    typedef SharedPtrMacro<IForwardGrouper3D>   SharedIForwardGrouper3D;
 
-   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #ifdef QUICC_SPATIALDIMENSION_3D
       typedef IForwardGrouper3D IForwardGrouper;
 
       typedef SharedPtrMacro<IForwardGrouper3D>   SharedIForwardGrouper;
-   #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+   #endif //QUICC_SPATIALDIMENSION_3D
 
 }
 }

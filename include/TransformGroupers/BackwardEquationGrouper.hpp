@@ -3,7 +3,7 @@
  * @brief This class defines a simple equation wise backward transform grouping algorithm (serial algorithm)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_TRANSGROUPER_EQUATION
+#ifdef QUICC_TRANSGROUPER_EQUATION
 
 #ifndef BACKWARDDEQUATIONGROUPER_HPP
 #define BACKWARDDEQUATIONGROUPER_HPP
@@ -24,7 +24,7 @@
 //
 #include "TransformGroupers/IBackwardGrouperMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -60,14 +60,14 @@ namespace Transform {
           */
          virtual ArrayI packs1D(const std::vector<TransformTree>& projectorTree);
 
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             /**
              * @brief Get the number of required buffer packs for the second exchange
              *
              * @param projectorTree Transform projector tree
              */
             virtual ArrayI packs2D(const std::vector<TransformTree>& projectorTree);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
       protected:
          /**
@@ -158,9 +158,9 @@ namespace Transform {
 
    template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Spectral::Id>())), coord);
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
    }
 
    template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const std::vector<TransformTree>& projectorTree)
@@ -168,16 +168,16 @@ namespace Transform {
       return this->namePacks1D(projectorTree);
    }
 
-   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #ifdef QUICC_SPATIALDIMENSION_3D
       template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs2D(const std::vector<TransformTree>& projectorTree)
       {
          return this->namePacks2D(projectorTree);
       }
-   #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+   #endif //QUICC_SPATIALDIMENSION_3D
 
 }
 }
 
 #endif // BACKWARDDEQUATIONGROUPER_HPP
 
-#endif //GEOMHDISCC_TRANSGROUPER_EQUATION
+#endif //QUICC_TRANSGROUPER_EQUATION

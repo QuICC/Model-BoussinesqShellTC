@@ -24,7 +24,7 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/2D/TFScheme.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq Rayleigh-Benard in a plane layer (2D) (velocity-continuity formulation) model
@@ -119,11 +119,11 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-#ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+#ifdef QUICC_MPIALGO_SINGLE2D
 #error "The SINGLE2D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE2D
-#ifdef GEOMHDISCC_MPIALGO_TUBULAR
+#endif //QUICC_MPIALGO_SINGLE2D
+#ifdef QUICC_MPIALGO_TUBULAR
 #error "The TUBULAR parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_TUBULAR
+#endif //QUICC_MPIALGO_TUBULAR
 
 #endif // BOUSSINESQRBCPLANE2DVCMODEL_HPP

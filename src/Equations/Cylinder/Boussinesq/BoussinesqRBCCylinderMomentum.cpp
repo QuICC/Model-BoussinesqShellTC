@@ -25,7 +25,7 @@
 #include "PhysicalOperators/VelocityAdvection.hpp"
 #include "PhysicalOperators/Cross.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
