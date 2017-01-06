@@ -23,7 +23,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh"]
+        return ["ekman", "prandtl", "rayleigh"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -67,7 +67,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","tor") or field_row == ("temperature",""):
+            if field_row in [("velocity","tor"), ("temperature","")]:
                 shift_r = 1
             elif field_row == ("velocity","pol"):
                 shift_r = 2
@@ -146,9 +146,9 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
                         bc = {0:-21, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:12}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:21}
             
             # Set LHS galerkin restriction
@@ -201,7 +201,7 @@ class BoussinesqRTCSphereStd(base_model.BaseModel):
         l = eigs[0]
 
         Ra = eq_params['rayleigh']
-        T = eq_params['taylor']**0.5
+        T = 1.0/eq_params['ekman']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)

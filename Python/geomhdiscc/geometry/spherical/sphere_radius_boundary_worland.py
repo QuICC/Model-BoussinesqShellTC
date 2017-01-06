@@ -165,7 +165,6 @@ def tau_insulating(nr, l, coeffs = None):
     l = coeffs['l']
 
     cond = []
-    cond.append(np.zeros(nr))
     cond.append(c*wb.worland_divrdiffr(nr,l))
 
     return np.array(cond)

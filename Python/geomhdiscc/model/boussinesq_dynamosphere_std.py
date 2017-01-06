@@ -23,7 +23,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh"]
+        return ["magnetic_prandtl", "ekman", "prandtl", "rayleigh"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -42,9 +42,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            if field_row in [("velocity","tor"), ("magnetic","tor"), ("magnetic","pol")]:
-                fields = []
-            elif field_row == ("velocity","pol"):
+            if field_row == ("velocity","pol"):
                 fields = [("temperature","")]
             elif field_row == ("temperature",""):
                 fields = [("velocity","pol")]
@@ -149,7 +147,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
                     elif field_row == ("magnetic","pol") and field_col == field_row:
                         bc = {0:13, 'c':{'l':l}}
                     elif field_row == ("temperature","") and field_col == field_row:
-                            bc = {0:10}
+                        bc = {0:10}
 
             elif bcId == 1:
                 if self.use_galerkin:
@@ -228,7 +226,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Pm = eq_params['magnetic_prandtl']
         Ra = eq_params['rayleigh']
-        T = eq_params['taylor']**(0.5)
+        T = 1.0/eq_params['ekman']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)

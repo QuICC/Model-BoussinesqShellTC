@@ -12,39 +12,39 @@ model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
 bc_vel = 1 # 0: NS, 1: SF
-#Ta = 1e6
+#E = (1.0/1e6)**0.5
 #res = [32, 32, 0]
-#Ta = 1e7
+#E = (1.0/1e7)**0.5
 #res = [32, 32, 0]
-Ta = 1e8
+E = (1.0/1e8)**0.5
 res = [48, 48, 0]
-#Ta = 1e9
+#E = (1.0/1e9)**0.5
 #res = [48, 48, 0]
-#Ta = 1e10
+#E = (1.0/1e10)**0.5
 #res = [64, 64, 0]
-#Ta = 1e11
+#E = (1.0/1e11)**0.5
 #res = [96, 96, 0]
-#Ta = 1e12
+#E = (1.0/1e12)**0.5
 #res = [128, 128, 0]
-#Ta = 1e13
+#E = (1.0/1e13)**0.5
 #res = [192, 192, 0]
-#Ta = 1e14
+#E = (1.0/1e14)**0.5
 #res = [256, 256, 0]
-#Ta = 1e15
+#E = (1.0/1e15)**0.5
 #res = [512, 512, 0]
-#Ta = 1e16
+#E = (1.0/1e16)**0.5
 #res = [512, 768, 0]
-#Ta = 1e17
+#E = (1.0/1e17)**0.5
 #res = [512, 1024, 0]
-#Ta = 1e18
+#E = (1.0/1e18)**0.5
 #res = [784, 1536, 0]
-#Ta = 1e19
+#E = (1.0/1e19)**0.5
 #res = [512, 512, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = 0 #
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
-eq_params = {'taylor':Ta, 'rayleigh':0}
+eq_params = {'ekman':E, 'rayleigh':0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel}
 
 # Wave number function from single "index" (k perpendicular)

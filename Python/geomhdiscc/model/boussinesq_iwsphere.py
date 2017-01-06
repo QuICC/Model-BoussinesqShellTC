@@ -23,7 +23,7 @@ class BoussinesqIWSphere(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor"]
+        return ["ekman"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -233,7 +233,7 @@ class BoussinesqIWSphere(base_model.BaseModel):
 
         assert(eigs[0].is_integer())
 
-        T = eq_params['taylor']**0.5
+        T = 1.0/eq_params['ekman']
         if False:
             ns_diff = 1.0
             ns_cor = T

@@ -74,7 +74,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","tor") or field_row == ("temperature",""):
+            if field_row in [("velocity","tor"), ("temperature","")]:
                 shift_r = 1
             elif field_row == ("velocity","pol"):
                 shift_r = 2
@@ -89,6 +89,22 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
+
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+        
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        # Get boundary condition
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        mat = geo.stencil(res[0], l, bc, make_square)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -122,11 +138,11 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                         bc = {0:-10, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:10}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:20}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_row == ("temperature","") and field_col == field_row:
                             bc = {0:10}
 
             elif bcId == 1:
@@ -137,9 +153,9 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                         bc = {0:-21, 'rt':0}
 
                 else:
-                    if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
+                    if field_row == ("velocity","tor") and field_col == field_row:
                             bc = {0:12}
-                    elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
+                    elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:21}
             
             # Set LHS galerkin restriction
@@ -157,17 +173,17 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-10, 'rt':0}
+                        bc = {0:-10, 'rt':1}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("temperature",""):
-                        bc = {0:-10, 'rt':0}
+                        bc = {0:-10, 'rt':1}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-12, 'rt':0}
+                        bc = {0:-12, 'rt':1}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-21, 'rt':0}
+                        bc = {0:-21, 'rt':2}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -273,6 +289,21 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
         elif field_row == ("temperature",""):
             mat = geo.i2(res[0], l, bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        mat = geo.zblk(res[0], l, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

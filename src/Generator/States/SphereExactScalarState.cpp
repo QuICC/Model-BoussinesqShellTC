@@ -107,7 +107,9 @@ namespace Equations {
          Array funcPh0 = Array::Ones(nPh);
          Array funcPh3 = (3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
 
-         MHDFloat amp0 = 0.5;
+         // Background state is not solved for (no source term but background is imposed explicitly)
+         MHDFloat amp0 = 0.0;
+         //MHDFloat amp0 = 0.5;
          MHDFloat eps = 1e-5;
          MHDFloat amp3 = (eps/8.0)*std::sqrt(35.0/Math::PI);
 
