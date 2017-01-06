@@ -267,7 +267,7 @@ namespace Transform {
       //
 
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.spherical.sphere_radius");
+      PythonWrapper::import("quicc.geometry.spherical.sphere_radius");
 
       // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue, *pRegArgs;

@@ -5,7 +5,7 @@
 #
 # Install Python package and scripts
 #
-INSTALL(DIRECTORY Python/geomhdiscc DESTINATION ${PROJECT_BINARY_DIR}/Python FILES_MATCHING PATTERN "*.py")
+INSTALL(DIRECTORY Python/quicc DESTINATION ${PROJECT_BINARY_DIR}/Python FILES_MATCHING PATTERN "*.py")
 INSTALL(DIRECTORY Python/scripts DESTINATION ${PROJECT_BINARY_DIR}/Python FILES_MATCHING PATTERN "*.py")
 
 # Set path to installed python package and scripts

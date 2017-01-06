@@ -147,7 +147,7 @@ namespace Transform {
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
+      PythonWrapper::import("quicc.geometry.cartesian.cartesian_1d");
 
       // Prepare arguments to d1(...) call
       PyObject *pArgs, *pValue;

@@ -1,6 +1,6 @@
 """Script to run a marginal curve trace for the Boussinesq convection in a rotating sphere"""
 
-import geomhdiscc.model.boussinesq_rotconvsphere as mod
+import quicc.model.boussinesq_rotconvsphere as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRotConvSphere()
@@ -38,6 +38,6 @@ if True:
 
 # Solve EVP with sptarn
 if True:
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
     print(evp_lmb)

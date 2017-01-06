@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbcbox_st as mod
+import quicc.model.boussinesq_rbcbox_st as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBCBoxST()
@@ -78,7 +78,7 @@ if show_spy or show_solution:
     #import mayavi.mbab as ml
 
 if show_solution:
-    import geomhdiscc.transform.cartesian as transf
+    import quicc.transform.cartesian as transf
 
 # Show the "spy" of the two matrices
 if show_spy:
@@ -97,7 +97,7 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     print("Solve EVP")
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
     print(evp_lmb)
 

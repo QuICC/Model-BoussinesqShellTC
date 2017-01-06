@@ -175,7 +175,7 @@ namespace Transform {
       this->mDiffO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius");
+      PythonWrapper::import("quicc.geometry.cylindrical.cylinder_radius");
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
          // Initialise array for division by R

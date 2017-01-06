@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_convchannel as mod
+import quicc.model.boussinesq_convchannel as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqConvChannel()
@@ -46,7 +46,7 @@ if True:
 
 # Solve EVP with sptarn
 if True:
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
 
@@ -78,7 +78,7 @@ if True:
     pl.title('Continuity')
     pl.show()
 
-    import geomhdiscc.transform.cartesian as transf
+    import quicc.transform.cartesian as transf
     phys_u = transf.tophys(sol_u.real)
     phys_v = transf.tophys(sol_v.real)
     phys_w = transf.tophys(sol_w.real)

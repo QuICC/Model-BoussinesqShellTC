@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.test_tttscheme as mod
+import quicc.model.test_tttscheme as mod
 
 # Create the model and activate linearization
 model = mod.TestTTTScheme()
@@ -39,7 +39,7 @@ if show_spy or show_solution:
     #import mayavi.mbab as ml
 
 if show_solution:
-    import geomhdiscc.transform.cartesian as transf
+    import quicc.transform.cartesian as transf
 
 # Show the "spy" of the two matrices
 if show_spy:
@@ -57,7 +57,7 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     print("Solving EVP:")
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e1, np.inf)
     print(evp_lmb)
 

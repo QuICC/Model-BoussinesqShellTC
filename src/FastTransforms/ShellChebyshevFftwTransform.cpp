@@ -180,7 +180,7 @@ namespace Transform {
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
+      PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 
       // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;

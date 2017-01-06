@@ -2,8 +2,8 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbccylinder_par_vc as mod
-import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
+import quicc.model.boussinesq_rbccylinder_par_vc as mod
+import quicc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBCCylinderVC()

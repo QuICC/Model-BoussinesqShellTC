@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.wip.boussinesq_rrb2dbox_vc as mod
+import quicc.model.wip.boussinesq_rrb2dbox_vc as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRRB2DBoxVC()
@@ -37,7 +37,7 @@ if show_spy or show_solution:
     import matplotlib.pylab as pl
 
 if show_solution:
-    import geomhdiscc.transform.cartesian as transf
+    import quicc.transform.cartesian as transf
 
 # Show the "spy" of the two matrices
 if show_spy:
@@ -54,7 +54,7 @@ if write_mtx:
 
 # Solve EVP with sptarn
 if solve_evp:
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
 

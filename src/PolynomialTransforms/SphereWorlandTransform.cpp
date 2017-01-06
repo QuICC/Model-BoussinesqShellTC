@@ -85,7 +85,7 @@ namespace Transform {
    void SphereWorlandTransform::initOperators()
    {
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.spherical.sphere_radius_worland");
+      PythonWrapper::import("quicc.geometry.spherical.sphere_radius_worland");
 
       this->mGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
