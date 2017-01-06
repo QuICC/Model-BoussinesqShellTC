@@ -32,7 +32,7 @@ if(GEOMHDISCC_CODEDIM STREQUAL "3D")
    set(GEOMHDISCC_CARTESIAN_SCHEMES "FFF" "TFF" "FTF" "FFT" "TTF" "TFT" "FTT" "TTT")
 endif(GEOMHDISCC_CODEDIM STREQUAL "3D")
 
-geomhdiscc_provide_choice(GEOMHDISCC_CARTESIAN_SCHEMES "Spatial scheme" GEOMHDISCC_SPATIALSCHEME schmTest)
+quicc_provide_choice(GEOMHDISCC_CARTESIAN_SCHEMES "Spatial scheme" GEOMHDISCC_SPATIALSCHEME schmTest)
 
 option(GEOMHDISCC_FASTCHEBY "Use fast Chebyshev transform?" ON)
 
@@ -43,7 +43,7 @@ if(schmTest)
       message(STATUS " --> Use slow Chebyshev transform")
    endif(NOT GEOMHDISCC_FASTCHEBY)
 
-   geomhdiscc_add_definition(GEOMHDISCC_SPATIALSCHEME)
+   quicc_add_definition(GEOMHDISCC_SPATIALSCHEME)
 endif(schmTest)
 
 
@@ -67,4 +67,4 @@ set(MHDCartesianSrcDirs
    Transforms
 )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Cartesian MHDCartesianSrcDirs)
+quicc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Cartesian MHDCartesianSrcDirs)

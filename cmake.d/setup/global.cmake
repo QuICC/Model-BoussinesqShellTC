@@ -2,17 +2,17 @@
 #--------------------- COMPILER ------------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_COMPILERS "Compiler" GEOMHDISCC_COMPILER compilerTest)
+quicc_provide_choice(GEOMHDISCC_COMPILERS "Compiler" GEOMHDISCC_COMPILER compilerTest)
 
 
 ###################################################
 #----------------- SMART POINTER -----------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_SMARTPTRS "Shared pointer" GEOMHDISCC_SMARTPTR sharedptrTest)
+quicc_provide_choice(GEOMHDISCC_SMARTPTRS "Shared pointer" GEOMHDISCC_SMARTPTR sharedptrTest)
 
 if(sharedptrTest)
-   geomhdiscc_add_definition(GEOMHDISCC_SMARTPTR)
+   quicc_add_definition(GEOMHDISCC_SMARTPTR)
 endif(sharedptrTest)
 
 
@@ -20,10 +20,10 @@ endif(sharedptrTest)
 #------------ THREADS PARALLELISATION ------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_THREADSMODELS "Threads paralellization" GEOMHDISCC_THREADS threadsTest)
+quicc_provide_choice(GEOMHDISCC_THREADSMODELS "Threads paralellization" GEOMHDISCC_THREADS threadsTest)
 
 if(threadsTest)
-   geomhdiscc_add_definition(GEOMHDISCC_THREADS)
+   quicc_add_definition(GEOMHDISCC_THREADS)
 endif(threadsTest)
 
 
@@ -31,10 +31,10 @@ endif(threadsTest)
 #------------- FFT IMPLEMENTATION ----------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_FFTS "FFT implementation" GEOMHDISCC_FFT fftTest)
+quicc_provide_choice(GEOMHDISCC_FFTS "FFT implementation" GEOMHDISCC_FFT fftTest)
 
 if(fftTest)
-   geomhdiscc_add_definition(GEOMHDISCC_FFT)
+   quicc_add_definition(GEOMHDISCC_FFT)
 endif(fftTest)
 
 
@@ -42,10 +42,10 @@ endif(fftTest)
 #------------- FFT PLAN COMPUTATION --------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_FFTPLANS "FFT plan" GEOMHDISCC_FFTPLAN fftplanTest)
+quicc_provide_choice(GEOMHDISCC_FFTPLANS "FFT plan" GEOMHDISCC_FFTPLAN fftplanTest)
 
 if(fftplanTest)
-   geomhdiscc_add_definition(GEOMHDISCC_FFTPLAN)
+   quicc_add_definition(GEOMHDISCC_FFTPLAN)
 endif(fftplanTest)
 
 
@@ -53,10 +53,10 @@ endif(fftplanTest)
 #--------- LINEAR ALGEBRA IMPLEMENTATION ---------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_LINALGS "Linear algebra" GEOMHDISCC_LINALG linalgTest)
+quicc_provide_choice(GEOMHDISCC_LINALGS "Linear algebra" GEOMHDISCC_LINALG linalgTest)
 
 if(linalgTest)
-   geomhdiscc_add_definition(GEOMHDISCC_LINALG)
+   quicc_add_definition(GEOMHDISCC_LINALG)
 endif(linalgTest)
 
 
@@ -64,10 +64,10 @@ endif(linalgTest)
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_SPLINALGS "Sparse linear algebra" GEOMHDISCC_SPLINALG splinalgTest)
+quicc_provide_choice(GEOMHDISCC_SPLINALGS "Sparse linear algebra" GEOMHDISCC_SPLINALG splinalgTest)
 
 if(splinalgTest)
-   geomhdiscc_add_definition(GEOMHDISCC_SPLINALG)
+   quicc_add_definition(GEOMHDISCC_SPLINALG)
 
    if(GEOMHDISCC_SPLINALG STREQUAL "MUMPS")
       option(GEOMHDISCC_MPISPSOLVE "Use MPI sparse solver?" OFF)
@@ -86,10 +86,10 @@ if(GEOMHDISCC_SPSPDLINALG STREQUAL "")
    set(GEOMHDISCC_SPSPDLINALG "SimplicialLDLT")
 endif(GEOMHDISCC_SPSPDLINALG STREQUAL "")
 mark_as_advanced(FORCE GEOMHDISCC_SPSPDLINALG)
-geomhdiscc_provide_choice(GEOMHDISCC_SPSPDLINALGS "Sparse SPD linear algebra" GEOMHDISCC_SPSPDLINALG spspdlinalgTest)
+quicc_provide_choice(GEOMHDISCC_SPSPDLINALGS "Sparse SPD linear algebra" GEOMHDISCC_SPSPDLINALG spspdlinalgTest)
 
 if(spspdlinalgTest)
-   geomhdiscc_add_definition(GEOMHDISCC_SPSPDLINALG)
+   quicc_add_definition(GEOMHDISCC_SPSPDLINALG)
 endif(spspdlinalgTest)
 
 
@@ -101,10 +101,10 @@ if(GEOMHDISCC_SPTRILINALG STREQUAL "")
    set(GEOMHDISCC_SPTRILINALG "SparseLU")
 endif(GEOMHDISCC_SPTRILINALG STREQUAL "")
 mark_as_advanced(FORCE GEOMHDISCC_SPTRILINALG)
-geomhdiscc_provide_choice(GEOMHDISCC_SPTRILINALGS "Sparse triangular linear algebra" GEOMHDISCC_SPTRILINALG sptrilinalgTest)
+quicc_provide_choice(GEOMHDISCC_SPTRILINALGS "Sparse triangular linear algebra" GEOMHDISCC_SPTRILINALG sptrilinalgTest)
 
 if(sptrilinalgTest)
-   geomhdiscc_add_definition(GEOMHDISCC_SPTRILINALG)
+   quicc_add_definition(GEOMHDISCC_SPTRILINALG)
 endif(sptrilinalgTest)
 
 
@@ -112,10 +112,10 @@ endif(sptrilinalgTest)
 #------------------ LARGE IO FORMAT --------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_LARGEIOS "Large IO format" GEOMHDISCC_LARGEIO largeioTest)
+quicc_provide_choice(GEOMHDISCC_LARGEIOS "Large IO format" GEOMHDISCC_LARGEIO largeioTest)
 
 if(largeioTest)
-   geomhdiscc_add_definition(GEOMHDISCC_LARGEIO)
+   quicc_add_definition(GEOMHDISCC_LARGEIO)
 endif(largeioTest)
 
 
@@ -128,10 +128,10 @@ if(GEOMHDISCC_HDF5_CMPLX STREQUAL "")
    set(GEOMHDISCC_HDF5_CMPLX "Array")
 endif(GEOMHDISCC_HDF5_CMPLX STREQUAL "")
 mark_as_advanced(FORCE GEOMHDISCC_HDF5_CMPLX)
-geomhdiscc_provide_choice(GEOMHDISCC_HDF5_CMPLXS "HDF5 complex format" GEOMHDISCC_HDF5_CMPLX h5cmplxTest)
+quicc_provide_choice(GEOMHDISCC_HDF5_CMPLXS "HDF5 complex format" GEOMHDISCC_HDF5_CMPLX h5cmplxTest)
 
 if(h5cmplxTest)
-   geomhdiscc_add_definition(GEOMHDISCC_HDF5_CMPLX)
+   quicc_add_definition(GEOMHDISCC_HDF5_CMPLX)
 endif(h5cmplxTest)
 
 
@@ -139,10 +139,10 @@ endif(h5cmplxTest)
 #--------------- MPI IMPLEMENTATION --------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_MPIIMPLS "MPI implementation" GEOMHDISCC_MPIIMPL mpiimplTest)
+quicc_provide_choice(GEOMHDISCC_MPIIMPLS "MPI implementation" GEOMHDISCC_MPIIMPL mpiimplTest)
 
 if(mpiimplTest)
-   geomhdiscc_add_definition(GEOMHDISCC_MPIIMPL)
+   quicc_add_definition(GEOMHDISCC_MPIIMPL)
 endif(mpiimplTest)
 
 
@@ -155,10 +155,10 @@ if(GEOMHDISCC_ALEGTRA STREQUAL "")
    set(GEOMHDISCC_ALEGTRA "Matrix")
 endif(GEOMHDISCC_ALEGTRA STREQUAL "")
 mark_as_advanced(FORCE GEOMHDISCC_ALEGTRA)
-geomhdiscc_provide_choice(GEOMHDISCC_ALEGTRAS "Associated Legendre implementation" GEOMHDISCC_ALEGTRA alegtraTest)
+quicc_provide_choice(GEOMHDISCC_ALEGTRAS "Associated Legendre implementation" GEOMHDISCC_ALEGTRA alegtraTest)
 
 if(alegtraTest)
-   geomhdiscc_add_definition(GEOMHDISCC_ALEGTRA)
+   quicc_add_definition(GEOMHDISCC_ALEGTRA)
 endif(alegtraTest)
 
 
@@ -171,10 +171,10 @@ if(GEOMHDISCC_SHNORM STREQUAL "")
    set(GEOMHDISCC_SHNORM "Unity")
 endif(GEOMHDISCC_SHNORM STREQUAL "")
 mark_as_advanced(FORCE GEOMHDISCC_SHNORM)
-geomhdiscc_provide_choice(GEOMHDISCC_SHNORMS "Spherical harmonics normalization" GEOMHDISCC_SHNORM shnormTest)
+quicc_provide_choice(GEOMHDISCC_SHNORMS "Spherical harmonics normalization" GEOMHDISCC_SHNORM shnormTest)
 
 if(shnormTest)
-   geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
+   quicc_add_definition(GEOMHDISCC_SHNORM)
 endif(shnormTest)
 
 
@@ -187,10 +187,10 @@ if(GEOMHDISCC_WORLANDTRA STREQUAL "")
    set(GEOMHDISCC_WORLANDTRA "Matrix")
 endif(GEOMHDISCC_WORLANDTRA STREQUAL "")
 mark_as_advanced(FORCE GEOMHDISCC_WORLANDTRA)
-geomhdiscc_provide_choice(GEOMHDISCC_WORLANDTRAS "Worland implementation" GEOMHDISCC_WORLANDTRA worlandtraTest)
+quicc_provide_choice(GEOMHDISCC_WORLANDTRAS "Worland implementation" GEOMHDISCC_WORLANDTRA worlandtraTest)
 
 if(worlandtraTest)
-   geomhdiscc_add_definition(GEOMHDISCC_WORLANDTRA)
+   quicc_add_definition(GEOMHDISCC_WORLANDTRA)
 endif(worlandtraTest)
 
 
@@ -203,7 +203,7 @@ endif(worlandtraTest)
 #
 option(GEOMHDISCC_MULTPRECISION "Use multiple precision computation for initialisation?" OFF)
 if(GEOMHDISCC_MULTPRECISION)
-   geomhdiscc_provide_choice(GEOMHDISCC_MPLIBS "Multiple precision" GEOMHDISCC_MPLIB mpTest)
+   quicc_provide_choice(GEOMHDISCC_MPLIBS "Multiple precision" GEOMHDISCC_MPLIB mpTest)
    if(mpTest)
       if(NOT GEOMHDISCC_LINALG STREQUAL "Eigen")
          message(SEND_ERROR "------->>> Can't use multiple precision computations with selected implementation <<<-------")
@@ -230,4 +230,4 @@ endif(GEOMHDISCC_OPTIMIZE_TREE)
 #------------------ EMBEDDED PYTHON --------------#
 ###################################################
 
-geomhdiscc_provide_choice(GEOMHDISCC_PYTHONS "Python version" GEOMHDISCC_PYTHON pythonTest)
+quicc_provide_choice(GEOMHDISCC_PYTHONS "Python version" GEOMHDISCC_PYTHON pythonTest)

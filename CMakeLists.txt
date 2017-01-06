@@ -1,7 +1,7 @@
 #
 # Project information
 #
-project(GeoMHDiSCC CXX)
+project(QuICC CXX)
 include(cmake.d/MacroOutOfSourceBuild.cmake)
 MACRO_ENSURE_OUT_OF_SOURCE_BUILD(
    "${CMAKE_PROJECT_NAME} requires an out of source build. Delete CMakeCache.txt and CMakeFiles/"
@@ -35,11 +35,11 @@ message(STATUS "***********************************************")
 include(cmake.d/platforms/base.cmake)
 
 # Choose platform
-geomhdiscc_provide_choice(GEOMHDISCC_PLATFORMS "Platform" GEOMHDISCC_PLATFORM platformTest)
+quicc_provide_choice(GEOMHDISCC_PLATFORMS "Platform" GEOMHDISCC_PLATFORM platformTest)
 
 if(platformTest)
    # Load platform
-   geomhdiscc_load_platform(GEOMHDISCC_PLATFORM)
+   quicc_load_platform(GEOMHDISCC_PLATFORM)
 
    # Create global configurator
    include(cmake.d/setup/global.cmake)

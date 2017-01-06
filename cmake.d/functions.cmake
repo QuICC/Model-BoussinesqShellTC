@@ -1,7 +1,7 @@
 #
 # Create a configuration selection entry
 #
-function (geomhdiscc_create_choice choiceList choiceName chosen)
+function (quicc_create_choice choiceList choiceName chosen)
    foreach(choice ${${choiceList}})
       if(DEFINED str)
          set(str "${str}, ${choice}")
@@ -17,12 +17,12 @@ function (geomhdiscc_create_choice choiceList choiceName chosen)
    else(${len} EQUAL 1)
       set(${chosen} ${${chosen}} CACHE STRING ${str} FORCE)
    endif(${len} EQUAL 1)
-endfunction(geomhdiscc_create_choice)
+endfunction(quicc_create_choice)
 
 # 
 # Verify that selected setup is valid
 #
-function (geomhdiscc_check_choice choiceList choiceName chosen out)
+function (quicc_check_choice choiceList choiceName chosen out)
    set(${out} OFF PARENT_SCOPE)
    if(NOT ${chosen} STREQUAL "")
       list(FIND ${choiceList} ${${chosen}} test)
@@ -37,40 +37,40 @@ function (geomhdiscc_check_choice choiceList choiceName chosen out)
    else(NOT ${chosen} STREQUAL "")
       message(SEND_ERROR "------------>>> ${choiceName} is required <<<------------")
    endif(NOT ${chosen} STREQUAL "")
-endfunction(geomhdiscc_check_choice)
+endfunction(quicc_check_choice)
 
 #
 # Provide a configuration selection entry
 #
-function (geomhdiscc_provide_choice choiceList choiceName chosen out)
+function (quicc_provide_choice choiceList choiceName chosen out)
    # Create selection entry
-   geomhdiscc_create_choice(${choice} ${choiceList} ${choiceName} ${chosen})
+   quicc_create_choice(${choice} ${choiceList} ${choiceName} ${chosen})
    # Validate selection
-   geomhdiscc_check_choice(${choice} ${choiceList} ${choiceName} ${chosen} ${out})
+   quicc_check_choice(${choice} ${choiceList} ${choiceName} ${chosen} ${out})
    set(${out} ${${out}} PARENT_SCOPE)
-endfunction(geomhdiscc_provide_choice)
+endfunction(quicc_provide_choice)
 
 #
 # Load platform file and setup requested platform
 #
-function (geomhdiscc_load_platform platform)
+function (quicc_load_platform platform)
    include("cmake.d/platforms/${${platform}}.cmake")
    string(TOUPPER "${${platform}}" plat)
    add_definitions("-DGEOMHDISCC_ON_${plat}")
-endfunction (geomhdiscc_load_platform)
+endfunction (quicc_load_platform)
 
 #
 # Add definition to flags
 #
-function (geomhdiscc_add_definition base)
+function (quicc_add_definition base)
    string(TOUPPER "${base}_${${base}}" def)
    add_definitions("-D${def}")
-endfunction (geomhdiscc_add_definition base)
+endfunction (quicc_add_definition base)
 
 #
 # Link to external libraries
 #
-function (geomhdiscc_link_external varName)
+function (quicc_link_external varName)
    set(tmp ${${varName}})
    if(${ARGC} EQUAL 2 AND NOT ${ARGV1} STREQUAL "None")
       string(TOUPPER ${${ARGV1}} model)
@@ -118,12 +118,12 @@ function (geomhdiscc_link_external varName)
    foreach(inc ${GEOMHDISCC_INCLUDES_${libName}_${compUP}})
       include_directories(${inc})
    endforeach(inc)
-endfunction (geomhdiscc_link_external libName)
+endfunction (quicc_link_external libName)
 
 #
 # Recursive crawler through sources
 #
-function (geomhdiscc_append_sources MHDAll MHDPath MHDDirs)
+function (quicc_append_sources MHDAll MHDPath MHDDirs)
    # Loop over all the subdirectories
    foreach(MHDDir ${${MHDDirs}})
       # Set new path including subdirectory
@@ -135,7 +135,7 @@ function (geomhdiscc_append_sources MHDAll MHDPath MHDDirs)
       include(${MHDNext}/SourcesList.cmake)
       # Check if there are additional subdirectories
       if(DEFINED MHDSrcSubDirs)
-         geomhdiscc_append_sources(${MHDAll} ${MHDNext} MHDSrcSubDirs)
+         quicc_append_sources(${MHDAll} ${MHDNext} MHDSrcSubDirs)
       endif()
       # Loop over all sources and add full path source to list
       foreach(MHDSource ${MHDSources})
@@ -149,7 +149,7 @@ endfunction ()
 #
 # Append path to list of files
 #
-function (geomhdiscc_add_path MHDList MHDPath)
+function (quicc_add_path MHDList MHDPath)
    set(MHDTmp )
    foreach(MHDFile ${${MHDList}})
       list(APPEND MHDTmp ${MHDPath}/${MHDFile})
@@ -160,7 +160,7 @@ endfunction()
 #
 # Create executable
 #
-function (geomhdiscc_add_executable MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
+function (quicc_add_executable MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
    # Create new name for executable
    STRING(REGEX REPLACE "Model" ${MHDPostfix} ExecName ${MHDModel})
 
@@ -189,7 +189,7 @@ endfunction ()
 #
 # Create executable
 #
-function (geomhdiscc_add_test MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
+function (quicc_add_test MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
    # Create new name for executable
    STRING(REGEX REPLACE "Test" ${MHDPostfix} ExecName ${MHDModel})
 

@@ -4,8 +4,8 @@
 
 # Get list of physical models and test models
 include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/ModelsList.cmake)
-geomhdiscc_add_path(MHDPhysicalModels ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels)
-geomhdiscc_add_path(MHDTestModels ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels)
+quicc_add_path(MHDPhysicalModels ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels)
+quicc_add_path(MHDTestModels ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels)
 
 # Loop over all physical models
 foreach(ModelFile ${MHDPhysicalModels})
@@ -45,19 +45,19 @@ foreach(ModelFile ${MHDPhysicalModels})
    include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/${ModelName}Sources.cmake)
 
    # Create simulation target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Model" "RunSimulation.cpp"
+   quicc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Model" "RunSimulation.cpp"
       MHDModelSources All_Srcs)
 
    # Create configuration file target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Config" "WriteConfig.cpp"
+   quicc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Config" "WriteConfig.cpp"
       MHDModelSources All_Srcs)
 
    # Create state file target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "State" "GenerateState.cpp"
+   quicc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "State" "GenerateState.cpp"
       MHDModelSources All_Srcs)
 
    # Create visualization file target
-   geomhdiscc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Visu" "VisualizeState.cpp"
+   quicc_add_executable(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Visu" "VisualizeState.cpp"
       MHDModelSources All_Srcs)
 endforeach(ModelFile)
 
@@ -102,18 +102,18 @@ foreach(ModelFile ${MHDTestModels})
    include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/${ModelName}Sources.cmake)
 
    # Create simulation target
-   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Test" "RunSimulation.cpp"
+   quicc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Test" "RunSimulation.cpp"
       MHDModelSources All_Srcs)
 
    # Create configuration file target
-   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Config" "WriteConfig.cpp"
+   quicc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Config" "WriteConfig.cpp"
       MHDModelSources All_Srcs)
 
    # Create state file target
-   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "State" "GenerateState.cpp"
+   quicc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "State" "GenerateState.cpp"
       MHDModelSources All_Srcs)
 
    # Create visualization file target
-   geomhdiscc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Visu" "VisualizeState.cpp"
+   quicc_add_test(${ModelName} ${Scheme} ${SchemeDim} ${Formulation} "Visu" "VisualizeState.cpp"
       MHDModelSources All_Srcs)
 endforeach(ModelFile)

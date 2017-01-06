@@ -50,10 +50,10 @@ if(GEOMHDISCC_PROFILE)
 
    set(GEOMHDISCC_PROFILERS "Coarse" "Detailed")
 
-   geomhdiscc_provide_choice(GEOMHDISCC_PROFILERS "Profiler" GEOMHDISCC_PROFILER profilerTest)
+   quicc_provide_choice(GEOMHDISCC_PROFILERS "Profiler" GEOMHDISCC_PROFILER profilerTest)
 
    if(profilerTest)
-      geomhdiscc_add_definition(GEOMHDISCC_PROFILER)
+      quicc_add_definition(GEOMHDISCC_PROFILER)
    endif(profilerTest)
 
    if(GEOMHDISCC_MPI)
@@ -84,10 +84,10 @@ if(GEOMHDISCC_STORAGEPROFILE)
 
    set(GEOMHDISCC_STORAGEPROFILERS "Coarse" "Detailed")
 
-   geomhdiscc_provide_choice(GEOMHDISCC_STORAGEPROFILERS "Storage profiler" GEOMHDISCC_STORAGEPROFILER storageTest)
+   quicc_provide_choice(GEOMHDISCC_STORAGEPROFILERS "Storage profiler" GEOMHDISCC_STORAGEPROFILER storageTest)
 
    if(storageTest)
-      geomhdiscc_add_definition(GEOMHDISCC_STORAGEPROFILER)
+      quicc_add_definition(GEOMHDISCC_STORAGEPROFILER)
    endif(storageTest)
 endif(GEOMHDISCC_STORAGEPROFILE)
 
@@ -123,4 +123,4 @@ endif(GEOMHDISCC_STORAGEPROFILE)
 message(STATUS "!!!WARNING!!! OVERRIDING ACTUAL Debug.cmake DIRECTORY LIST WITH NOTHING")
 set(MHDDebugSrcDirs )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDDebugSrcDirs)
+quicc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDDebugSrcDirs)

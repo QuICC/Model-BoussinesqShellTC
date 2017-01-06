@@ -23,10 +23,10 @@ message(STATUS "***********************************************")
 #
 set(GEOMHDISCC_CODEDIM_DIMENSIONS "1D" "2D" "3D")
 
-geomhdiscc_provide_choice(GEOMHDISCC_CODEDIM_DIMENSIONS "Dimension" GEOMHDISCC_CODEDIM dimTest)
+quicc_provide_choice(GEOMHDISCC_CODEDIM_DIMENSIONS "Dimension" GEOMHDISCC_CODEDIM dimTest)
 
 if(dimTest)
-   geomhdiscc_add_definition(GEOMHDISCC_CODEDIM)
+   quicc_add_definition(GEOMHDISCC_CODEDIM)
 endif(dimTest)
 
 
@@ -40,10 +40,10 @@ endif(dimTest)
 #
 set(GEOMHDISCC_CODEGEOM_GEOMETRIES "Cartesian" "Cylindrical" "Spherical")
 
-geomhdiscc_provide_choice(GEOMHDISCC_CODEGEOM_GEOMETRIES "Geometry" GEOMHDISCC_CODEGEOM geomTest)
+quicc_provide_choice(GEOMHDISCC_CODEGEOM_GEOMETRIES "Geometry" GEOMHDISCC_CODEGEOM geomTest)
 
 if(geomTest)
-   geomhdiscc_add_definition(GEOMHDISCC_CODEGEOM)
+   quicc_add_definition(GEOMHDISCC_CODEGEOM)
 endif(geomTest)
 
 
@@ -57,10 +57,10 @@ endif(geomTest)
 #
 set(GEOMHDISCC_PARAMETERS_LIST "EQRaEm" "PrRaXGAs")
 
-geomhdiscc_provide_choice(GEOMHDISCC_PARAMETERS_LIST "Parameters" GEOMHDISCC_PARAMETERS paramTest)
+quicc_provide_choice(GEOMHDISCC_PARAMETERS_LIST "Parameters" GEOMHDISCC_PARAMETERS paramTest)
 
 if(paramTest)
-   geomhdiscc_add_definition(GEOMHDISCC_PARAMETERS)
+   quicc_add_definition(GEOMHDISCC_PARAMETERS)
 endif(paramTest)
 
 
@@ -90,7 +90,7 @@ set(MHDSimulationSrcDirs
    Variables
 )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Simulation MHDSimulationSrcDirs)
+quicc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Simulation MHDSimulationSrcDirs)
 
 if(GEOMHDISCC_CODEGEOM STREQUAL "Cartesian")
    include("cmake.d/setup/Cartesian.cmake")

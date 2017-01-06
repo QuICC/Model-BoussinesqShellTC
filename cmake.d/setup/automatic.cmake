@@ -61,25 +61,25 @@ foreach(inc ${GEOMHDISCC_INCLUDES})
 endforeach(inc)
 
 # Smart pointers libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_SMARTPTR)
+quicc_link_external(GEOMHDISCC_SMARTPTR)
 
 # FFT implementation libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_FFT GEOMHDISCC_THREADS)
+quicc_link_external(GEOMHDISCC_FFT GEOMHDISCC_THREADS)
 
 # Linear algebra libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_LINALG)
+quicc_link_external(GEOMHDISCC_LINALG)
 
 # Sparse linear algebra libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_SPLINALG)
+quicc_link_external(GEOMHDISCC_SPLINALG)
 
 # Sparse SPD linear algebra libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_SPSPDLINALG)
+quicc_link_external(GEOMHDISCC_SPSPDLINALG)
 
 # Large IO format libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_LARGEIO)
+quicc_link_external(GEOMHDISCC_LARGEIO)
 
 # Multiple precision libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_MPLIB)
+quicc_link_external(GEOMHDISCC_MPLIB)
 
 # Multiple precision libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_PYTHON)
+quicc_link_external(GEOMHDISCC_PYTHON)
