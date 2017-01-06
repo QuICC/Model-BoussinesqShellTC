@@ -117,12 +117,12 @@ namespace IoHdf5 {
    template <> inline hid_t Hdf5Types::type<std::complex<float> >()
    {
       // Use simple 2D array for complex data
-      #if defined GEOMHDISCC_HDF5_CMPLX_ARRAY
+      #if defined QUICC_HDF5_CMPLX_ARRAY
          return Hdf5Types::complex_asArray<float>();
       // Use struct for complex data
-      #elif defined GEOMHDISCC_HDF5_CMPLX_STRUCT
+      #elif defined QUICC_HDF5_CMPLX_STRUCT
          return Hdf5Types::complex_asStruct<float>();
-      #endif //defined GEOMHDISCC_HDF5_CMPLX_ARRAY
+      #endif //defined QUICC_HDF5_CMPLX_ARRAY
    }
 
    /**
@@ -131,12 +131,12 @@ namespace IoHdf5 {
    template <> inline hid_t Hdf5Types::type<std::complex<double> >()
    {
       // Use simple 2D array for complex data
-      #if defined GEOMHDISCC_HDF5_CMPLX_ARRAY
+      #if defined QUICC_HDF5_CMPLX_ARRAY
          return Hdf5Types::complex_asArray<double>();
       // Use struct for complex data
-      #elif defined GEOMHDISCC_HDF5_CMPLX_STRUCT
+      #elif defined QUICC_HDF5_CMPLX_STRUCT
          return Hdf5Types::complex_asStruct<double>();
-      #endif //defined GEOMHDISCC_HDF5_CMPLX_ARRAY
+      #endif //defined QUICC_HDF5_CMPLX_ARRAY
    }
 
    template <typename T> inline bool Hdf5Types::isSupported(hid_t type)

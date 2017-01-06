@@ -3,7 +3,7 @@
  * @brief This defines the backward transform second exchange single splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+#ifdef QUICC_MPIALGO_SINGLE2D
 
 #ifndef BACKWARDSINGLE2DCONFIGURATOR_HPP
 #define BACKWARDSINGLE2DCONFIGURATOR_HPP
@@ -193,4 +193,4 @@ namespace Transform {
 
 #endif // BACKWARDSINGLE2DCONFIGURATOR_HPP
 
-#endif //GEOMHDISCC_MPIALGO_SINGLE2D
+#endif //QUICC_MPIALGO_SINGLE2D

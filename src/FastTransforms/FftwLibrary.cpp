@@ -24,15 +24,15 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
   // Fastest FFTW plan creation
-  #ifdef GEOMHDISCC_FFTPLAN_FAST
+  #ifdef QUICC_FFTPLAN_FAST
      unsigned int FftwLibrary::sPlanFlag = FFTW_ESTIMATE;
   // Medium FFTW plan creation
-  #elif defined GEOMHDISCC_FFTPLAN_MEDIUM
+  #elif defined QUICC_FFTPLAN_MEDIUM
      unsigned int FftwLibrary::sPlanFlag = FFTW_MEASURE;
   // Slow FFTW plan creation
-  #elif defined GEOMHDISCC_FFTPLAN_SLOW
+  #elif defined QUICC_FFTPLAN_SLOW
      unsigned int FftwLibrary::sPlanFlag = FFTW_PATIENT;
-  #endif // GEOMHDISCC_FFTW_ESTIMATE
+  #endif // QUICC_FFTW_ESTIMATE
 
    int FftwLibrary::sCounter = 0;
 
@@ -61,7 +61,7 @@ namespace Transform {
 
    void FftwLibrary::initFft()
    {
-      #if defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
+      #if defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
       if(FftwLibrary::sCounter == 0)
       {
          // Initialize FFTW's threads
@@ -75,7 +75,7 @@ namespace Transform {
 
       // Number of threads
       fftw_plan_with_nthreads(2);
-      #endif //defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
+      #endif //defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
    }
 
    void FftwLibrary::cleanupFft()
@@ -83,11 +83,11 @@ namespace Transform {
       // Check if all objects have been destroyed
       if(FftwLibrary::sCounter == 0)
       {
-         #if defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
+         #if defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
             fftw_cleanup_threads();
          #else
             fftw_cleanup();
-         #endif //defined GEOMHDISCC_THREADS_PTHREADS || defined GEOMHDISCC_THREADS_OPENMP
+         #endif //defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
       }
    }
 

@@ -139,7 +139,7 @@ namespace Equations {
    }
 
 // Set test problem for TTT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TTT
+#ifdef QUICC_SPATIALSCHEME_TTT
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -177,10 +177,10 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TTT
+#endif //QUICC_SPATIALSCHEME_TTT
 
 // Set test problem for TFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFT
+#ifdef QUICC_SPATIALSCHEME_TFT
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -230,10 +230,10 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TFT
+#endif //QUICC_SPATIALSCHEME_TFT
 
 // Set test problem for TFF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+#ifdef QUICC_SPATIALSCHEME_TFF
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -283,10 +283,10 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TFF
+#endif //QUICC_SPATIALSCHEME_TFF
 
 // Set test problem for FFF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_FFF
+#ifdef QUICC_SPATIALSCHEME_FFF
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -323,10 +323,10 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_FFF
+#endif //QUICC_SPATIALSCHEME_FFF
 
 // Set test problem for CFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_CFT
+#ifdef QUICC_SPATIALSCHEME_CFT
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -364,10 +364,10 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_CFT
+#endif //QUICC_SPATIALSCHEME_CFT
 
 // Set test problem for SLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_SLF
+#ifdef QUICC_SPATIALSCHEME_SLF
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -405,10 +405,10 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_SLF
+#endif //QUICC_SPATIALSCHEME_SLF
 
 // Set test problem for WFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_WFT
+#ifdef QUICC_SPATIALSCHEME_WFT
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -446,10 +446,10 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_WFT
+#endif //QUICC_SPATIALSCHEME_WFT
 
 // Set test problem for WLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_WLF
+#ifdef QUICC_SPATIALSCHEME_WLF
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -487,7 +487,7 @@ namespace Equations {
 
       return val;
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_WLF
+#endif //QUICC_SPATIALSCHEME_WLF
 
 }
 }

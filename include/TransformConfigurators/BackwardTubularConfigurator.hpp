@@ -3,7 +3,7 @@
  * @brief This defines the backward transform tubular splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_MPIALGO_TUBULAR
+#ifdef QUICC_MPIALGO_TUBULAR
 
 #ifndef BACKWARDTUBULARCONFIGURATOR_HPP
 #define BACKWARDTUBULARCONFIGURATOR_HPP
@@ -206,4 +206,4 @@ namespace Transform {
 
 #endif // BACKWARDTUBULARCONFIGURATOR_HPP
 
-#endif //GEOMHDISCC_MPIALGO_TUBULAR
+#endif //QUICC_MPIALGO_TUBULAR

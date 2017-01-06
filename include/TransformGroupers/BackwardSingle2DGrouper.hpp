@@ -3,7 +3,7 @@
  * @brief This class defines the backward single grouping exchange grouping algorithm for the second exchange
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_TRANSGROUPER_SINGLE2D
+#ifdef QUICC_TRANSGROUPER_SINGLE2D
 
 #ifndef BACKWARDSINGLE2DGROUPER_HPP
 #define BACKWARDSINGLE2DGROUPER_HPP
@@ -211,4 +211,4 @@ namespace Transform {
 
 #endif // BACKWARDSINGLE2DGROUPER_HPP
 
-#endif //GEOMHDISCC_TRANSGROUPER_SINGLE2D
+#endif //QUICC_TRANSGROUPER_SINGLE2D

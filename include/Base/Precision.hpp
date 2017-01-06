@@ -20,7 +20,7 @@
 //
 #include "Base/Typedefs.hpp"
 
-#ifdef GEOMHDISCC_MULTPRECISION
+#ifdef QUICC_MULTPRECISION
    #include "Base/MpTypedefs.hpp"
    
    /// Define a small macro to replace float constants to strings in the case of MP computations
@@ -29,13 +29,13 @@
    #include <tr1/cmath>
    /// For normal computations the macro does nothing
    #define MHD_MP(c) c
-#endif // GEOMHDISCC_MULTPRECISION
+#endif // QUICC_MULTPRECISION
 
 namespace GeoMHDiSCC {
 
    namespace internal {
 
-      #ifdef GEOMHDISCC_MULTPRECISION
+      #ifdef QUICC_MULTPRECISION
       //////////////////////////////////////////////////////////////////         
          /// Typedef for the internal float type
          typedef GeoMHDiSCC::MHDMpFloat MHDFloat;
@@ -69,7 +69,7 @@ namespace GeoMHDiSCC {
          /// Typedef for the smart internal Matrix type
          typedef GeoMHDiSCC::SharedMatrix SharedMatrix;
       //////////////////////////////////////////////////////////////////
-      #endif // GEOMHDISCC_MULTPRECISION
+      #endif // QUICC_MULTPRECISION
    }
 
    /**
@@ -131,14 +131,14 @@ namespace GeoMHDiSCC {
 
    inline void Precision::init()
    {
-      #ifdef GEOMHDISCC_MULTPRECISION
+      #ifdef QUICC_MULTPRECISION
          mpfr::mpreal::set_default_prec(256);
-      #endif // GEOMHDISCC_MULTPRECISION
+      #endif // QUICC_MULTPRECISION
    }
 
    inline SharedArray Precision::cast(internal::SharedArray spIArr)
    {
-      #ifdef GEOMHDISCC_MULTPRECISION
+      #ifdef QUICC_MULTPRECISION
          SharedArray spArr(new Array(spIArr->size()));
 
          // Loop over whole array
@@ -150,12 +150,12 @@ namespace GeoMHDiSCC {
          return spArr;
       #else
          return spIArr;
-      #endif // GEOMHDISCC_MULTPRECISION
+      #endif // QUICC_MULTPRECISION
    }
 
    inline SharedMatrix Precision::cast(internal::SharedMatrix spIMat)
    {
-      #ifdef GEOMHDISCC_MULTPRECISION
+      #ifdef QUICC_MULTPRECISION
          SharedMatrix spMat(new Matrix(spIMat->rows(),spIMat->cols()));
 
          // Loop over whole matrix
@@ -170,12 +170,12 @@ namespace GeoMHDiSCC {
          return spMat;
       #else
          return spIMat;
-      #endif // GEOMHDISCC_MULTPRECISION
+      #endif // QUICC_MULTPRECISION
    }
 
    inline Array Precision::cast(const internal::Array& rIArr)
    {
-      #ifdef GEOMHDISCC_MULTPRECISION
+      #ifdef QUICC_MULTPRECISION
          Array arr(rIArr.size());
 
          // Loop over whole array
@@ -187,12 +187,12 @@ namespace GeoMHDiSCC {
          return arr;
       #else
          return rIArr;
-      #endif // GEOMHDISCC_MULTPRECISION
+      #endif // QUICC_MULTPRECISION
    }
 
    inline Matrix Precision::cast(const internal::Matrix& rIMat)
    {
-      #ifdef GEOMHDISCC_MULTPRECISION
+      #ifdef QUICC_MULTPRECISION
          Matrix mat(rIMat.rows(),rIMat.cols());
 
          // Loop over whole matrix
@@ -207,10 +207,10 @@ namespace GeoMHDiSCC {
          return mat;
       #else
          return rIMat;
-      #endif // GEOMHDISCC_MULTPRECISION
+      #endif // QUICC_MULTPRECISION
    }
 
-#ifdef GEOMHDISCC_MULTPRECISION
+#ifdef QUICC_MULTPRECISION
    /// Create a namespace alias for the internal precision stuff pointing to mpfr namespace
    namespace  precision = mpfr;
    namespace  precisiontr1 = mpfr;
@@ -218,7 +218,7 @@ namespace GeoMHDiSCC {
    /// Create a namespace alias for the internal precision stuff pointing to std namespace
    namespace  precision = std;
    namespace  precisiontr1 = std::tr1;
-#endif // GEOMHDISCC_MULTPRECISION
+#endif // QUICC_MULTPRECISION
 }
 
 #endif // PRECISION_HPP

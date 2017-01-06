@@ -163,12 +163,12 @@ namespace Transform {
           */
          void integrate_energy(Array& spectrum, const MatrixZ& specVal, ProjectorType::Id projector, IntegratorType::Id integrator);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 

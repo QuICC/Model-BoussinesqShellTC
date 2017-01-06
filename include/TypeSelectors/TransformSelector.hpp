@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 }
 
    // Configure code to use TTT scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_TTT
+   #ifdef QUICC_SPATIALSCHEME_TTT
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -55,10 +55,10 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_TTT
+   #endif //QUICC_SPATIALSCHEME_TTT
 
    // Configure code to use TFT scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_TFT
+   #ifdef QUICC_SPATIALSCHEME_TFT
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -82,10 +82,10 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_TFT
+   #endif //QUICC_SPATIALSCHEME_TFT
 
    // Configure code to use TFF scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+   #ifdef QUICC_SPATIALSCHEME_TFF
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -109,10 +109,10 @@ namespace GeoMHDiSCC {
             };
          }
       }
-      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+      #endif //QUICC_SPATIALSCHEME_TFF
 
       // Configure code to use FFF scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_FFF
+      #ifdef QUICC_SPATIALSCHEME_FFF
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -136,10 +136,10 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_FFF
+   #endif //QUICC_SPATIALSCHEME_FFF
 
    // Configure code to use CFT scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
+   #ifdef QUICC_SPATIALSCHEME_CFT
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -163,10 +163,10 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_CFT
+   #endif //QUICC_SPATIALSCHEME_CFT
 
    // Configure code to use AFT scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+   #ifdef QUICC_SPATIALSCHEME_AFT
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -190,16 +190,16 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_AFT
+   #endif //QUICC_SPATIALSCHEME_AFT
 
    // Configure code to use BLF scheme
-   #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+   #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_BLFM
 
-      #if defined GEOMHDISCC_ALEGTRA_MATRIX
+      #if defined QUICC_ALEGTRA_MATRIX
          #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
-      #elif defined GEOMHDISCC_ALEGTRA_FLY 
+      #elif defined QUICC_ALEGTRA_FLY 
          #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
-      #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
+      #endif //defined QUICC_ALEGTRA_MATRIX
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -213,11 +213,11 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               #if defined GEOMHDISCC_ALEGTRA_MATRIX
+               #if defined QUICC_ALEGTRA_MATRIX
                   typedef AssociatedLegendreTransform Type;
-               #elif defined GEOMHDISCC_ALEGTRA_FLY 
+               #elif defined QUICC_ALEGTRA_FLY 
                   typedef AssociatedLegendreFlyTransform Type;
-               #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
+               #endif //defined QUICC_ALEGTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
@@ -227,16 +227,16 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+   #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_BLFM
 
    // Configure code to use SLF scheme
-   #if defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
+   #if defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_SLFM
 
-      #if defined GEOMHDISCC_ALEGTRA_MATRIX
+      #if defined QUICC_ALEGTRA_MATRIX
          #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
-      #elif defined GEOMHDISCC_ALEGTRA_FLY 
+      #elif defined QUICC_ALEGTRA_FLY 
          #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
-      #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
+      #endif //defined QUICC_ALEGTRA_MATRIX
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -250,11 +250,11 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               #if defined GEOMHDISCC_ALEGTRA_MATRIX
+               #if defined QUICC_ALEGTRA_MATRIX
                   typedef AssociatedLegendreTransform Type;
-               #elif defined GEOMHDISCC_ALEGTRA_FLY 
+               #elif defined QUICC_ALEGTRA_FLY 
                   typedef AssociatedLegendreFlyTransform Type;
-               #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
+               #endif //defined QUICC_ALEGTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
@@ -264,16 +264,16 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
+   #endif //defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_SLFM
 
    // Configure code to use WFT scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
+   #ifdef QUICC_SPATIALSCHEME_WFT
 
-      #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+      #if defined QUICC_WORLANDTRA_MATRIX
          #include "PolynomialTransforms/CylinderWorlandTransform.hpp"
-      #elif defined GEOMHDISCC_WORLANDTRA_FLY
+      #elif defined QUICC_WORLANDTRA_FLY
          #include "PolynomialTransforms/CylinderWorlandFlyTransform.hpp"
-      #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
+      #endif //defined QUICC_WORLANDTRA_MATRIX
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -281,11 +281,11 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+               #if defined QUICC_WORLANDTRA_MATRIX
                   typedef CylinderWorlandTransform Type;
-               #elif defined GEOMHDISCC_WORLANDTRA_FLY 
+               #elif defined QUICC_WORLANDTRA_FLY 
                   typedef CylinderWorlandFlyTransform Type;
-               #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
+               #endif //defined QUICC_WORLANDTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
@@ -301,22 +301,22 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_WFT
+   #endif //QUICC_SPATIALSCHEME_WFT
 
    // Configure code to use WLF scheme
-   #if defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+   #if defined QUICC_SPATIALSCHEME_WLFL || defined QUICC_SPATIALSCHEME_WLFM
 
-      #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+      #if defined QUICC_WORLANDTRA_MATRIX
          #include "PolynomialTransforms/SphereWorlandTransform.hpp"
-      #elif defined GEOMHDISCC_WORLANDTRA_FLY
+      #elif defined QUICC_WORLANDTRA_FLY
          #include "PolynomialTransforms/SphereWorlandFlyTransform.hpp"
-      #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
+      #endif //defined QUICC_WORLANDTRA_MATRIX
 
-      #if defined GEOMHDISCC_ALEGTRA_MATRIX
+      #if defined QUICC_ALEGTRA_MATRIX
          #include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
-      #elif defined GEOMHDISCC_ALEGTRA_FLY 
+      #elif defined QUICC_ALEGTRA_FLY 
          #include "PolynomialTransforms/AssociatedLegendreFlyTransform.hpp"
-      #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
+      #endif //defined QUICC_ALEGTRA_MATRIX
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -324,21 +324,21 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               #if defined GEOMHDISCC_WORLANDTRA_MATRIX
+               #if defined QUICC_WORLANDTRA_MATRIX
                   typedef SphereWorlandTransform Type;
-               #elif defined GEOMHDISCC_WORLANDTRA_FLY 
+               #elif defined QUICC_WORLANDTRA_FLY 
                   typedef SphereWorlandFlyTransform Type;
-               #endif //defined GEOMHDISCC_WORLANDTRA_MATRIX
+               #endif //defined QUICC_WORLANDTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               #if defined GEOMHDISCC_ALEGTRA_MATRIX
+               #if defined QUICC_ALEGTRA_MATRIX
                   typedef AssociatedLegendreTransform Type;
-               #elif defined GEOMHDISCC_ALEGTRA_FLY 
+               #elif defined QUICC_ALEGTRA_FLY 
                   typedef AssociatedLegendreFlyTransform Type;
-               #endif //defined GEOMHDISCC_ALEGTRA_MATRIX
+               #endif //defined QUICC_ALEGTRA_MATRIX
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
@@ -348,10 +348,10 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+   #endif //defined QUICC_SPATIALSCHEME_WLFL || defined QUICC_SPATIALSCHEME_WLFM
 
    // Configure code to use TT scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_TT
+   #ifdef QUICC_SPATIALSCHEME_TT
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -369,10 +369,10 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_TT
+   #endif //QUICC_SPATIALSCHEME_TT
 
    // Configure code to use TF scheme
-   #ifdef GEOMHDISCC_SPATIALSCHEME_TF
+   #ifdef QUICC_SPATIALSCHEME_TF
 
       namespace GeoMHDiSCC {
          namespace Transform {
@@ -390,6 +390,6 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_TF
+   #endif //QUICC_SPATIALSCHEME_TF
 
 #endif // TRANSFORMSELECTOR_HPP

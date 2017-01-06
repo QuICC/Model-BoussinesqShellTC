@@ -97,9 +97,9 @@ namespace Transform {
       private: 
    };
 
-#ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+#ifdef QUICC_SPATIALDIMENSION_2D
    typedef BackwardConfigurator2D BackwardConfigurator;
-#endif //GEOMHDISCC_SPATIALDIMENSION_2D
+#endif //QUICC_SPATIALDIMENSION_2D
 
 }
 }

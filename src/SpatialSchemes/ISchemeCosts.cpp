@@ -83,11 +83,11 @@ namespace Schemes {
 
    double ISchemeCosts::memoryScore(SharedResolution spRes)
    {
-      #ifdef GEOMHDISCC_MEMORYUSAGE_LIMITED
+      #ifdef QUICC_MEMORYUSAGE_LIMITED
          return this->mMemory.prod();
       #else
          return 1.0;
-      #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
+      #endif //QUICC_MEMORYUSAGE_LIMITED
    }
 
    void ISchemeCosts::setCost(MHDFloat c, Dimensions::Transform::Id id)

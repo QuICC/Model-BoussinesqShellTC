@@ -1,15 +1,15 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqTCShellTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqTCShellMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHmTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellScalarEnergyWriter.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellTorPolEnergyWriter.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactStateIds.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqTCShellTransport.cpp
+   ${QUICC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqTCShellMomentum.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/EigenSHmTools.cpp
+   ${QUICC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${QUICC_SRC_DIR}/IoVariable/ShellScalarEnergyWriter.cpp
+   ${QUICC_SRC_DIR}/IoVariable/ShellTorPolEnergyWriter.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/ShellExactStateIds.cpp
+   ${QUICC_SRC_DIR}/Generator/States/ShellExactScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
 )

@@ -27,23 +27,23 @@ namespace Parallel {
       {
          setGrouper<Splitting::Groupers::EQUATION>(descr.algorithm, spFwdGrouper, spBwdGrouper);
 
-   #ifdef GEOMHDISCC_MPI
-      #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE1D
+   #ifdef QUICC_MPI
+      #ifdef QUICC_TRANSGROUPER_SINGLE1D
       } else if(descr.grouper == Splitting::Groupers::SINGLE1D)
       {
          setGrouper<Splitting::Groupers::SINGLE1D>(descr.algorithm, spFwdGrouper, spBwdGrouper);
-      #endif //GEOMHDISCC_TRANSGROUPER_SINGLE1D
-      #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE2D
+      #endif //QUICC_TRANSGROUPER_SINGLE1D
+      #ifdef QUICC_TRANSGROUPER_SINGLE2D
       } else if(descr.grouper == Splitting::Groupers::SINGLE2D)
       {
          setGrouper<Splitting::Groupers::SINGLE2D>(descr.algorithm, spFwdGrouper, spBwdGrouper);
-      #endif //GEOMHDISCC_TRANSGROUPER_SINGLE2D
-      #ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
+      #endif //QUICC_TRANSGROUPER_SINGLE2D
+      #ifdef QUICC_TRANSGROUPER_TRANSFORM
       } else if(descr.grouper == Splitting::Groupers::TRANSFORM)
       {
          setGrouper<Splitting::Groupers::TRANSFORM>(descr.algorithm, spFwdGrouper, spBwdGrouper);
-      #endif //GEOMHDISCC_TRANSGROUPER_TRANSFORM
-   #endif //GEOMHDISCC_MPI
+      #endif //QUICC_TRANSGROUPER_TRANSFORM
+   #endif //QUICC_MPI
       } else
       {
          throw Exception("Unknown transform grouper setup");

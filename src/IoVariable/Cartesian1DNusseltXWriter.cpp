@@ -129,9 +129,9 @@ namespace IoVariable {
 //      }
 
       // Get the "global" Nusselt number from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          MPI_Allreduce(MPI_IN_PLACE, nusselt.data(), nusselt.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

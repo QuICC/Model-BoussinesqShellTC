@@ -70,12 +70,12 @@ namespace Datatypes {
           */
          const std::map<std::pair<TType,TType>,TScalar>& data() const;
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
          /**
           * @brief Set internal storage field data
@@ -146,7 +146,7 @@ namespace Datatypes {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TScalar, typename TType> MHDFloat TensorField<TScalar,TType>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -158,7 +158,7 @@ namespace Datatypes {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

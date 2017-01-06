@@ -41,11 +41,11 @@ namespace Equations {
 
    void BoussinesqDynamoCouetteShellInduction::setCoupling()
    {
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+      #ifdef QUICC_SPATIALSCHEME_SLFL
          int start = 1;
-      #else //if GEOMHDISCC_SPATIALSCHEME_SLFM
+      #else //if QUICC_SPATIALSCHEME_SLFM
          int start = 0;
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+      #endif //QUICC_SPATIALSCHEME_SLFL
 
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
 

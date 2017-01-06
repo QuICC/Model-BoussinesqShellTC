@@ -23,7 +23,7 @@ namespace Parallel {
 
    SplittingDescription::SplittingDescription()
    {
-      #ifdef GEOMHDISCC_DEBUG
+      #ifdef QUICC_DEBUG
          IoXml::SharedVtpWriter pVtp(new IoXml::VtpWriter("Data_distribution_TRAB1D"));
          pVtp->init();
          this->vtpFiles.push_back(pVtp);
@@ -33,7 +33,7 @@ namespace Parallel {
          pVtp = IoXml::SharedVtpWriter(new IoXml::VtpWriter("Data_distribution_TRAB3D"));
          pVtp->init();
          this->vtpFiles.push_back(pVtp);
-      #endif //GEOMHDISCC_DEBUG
+      #endif //QUICC_DEBUG
    }
 
    SplittingDescription::~SplittingDescription()

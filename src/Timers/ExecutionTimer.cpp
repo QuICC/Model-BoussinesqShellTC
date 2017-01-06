@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
    void ExecutionTimer::analyze(Array& min, Array& max)
    {
       // Get the "global" times from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          // Resize the storage
          min.resize(this->mTimes.size());
          max.resize(this->mTimes.size());
@@ -68,7 +68,7 @@ namespace GeoMHDiSCC {
 
          // Compute mean times per CPU
          this->mTimes /= static_cast<MHDFloat>(FrameworkMacro::nCpu());
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
    }
 
    void ExecutionTimer::printInfo(std::ostream& stream)

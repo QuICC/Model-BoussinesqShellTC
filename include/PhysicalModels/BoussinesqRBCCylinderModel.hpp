@@ -25,7 +25,7 @@
 #include "SpatialSchemes/3D/WFTScheme.hpp"
 
 // THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
-// GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
+// QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
 
 namespace GeoMHDiSCC {
 
@@ -115,11 +115,11 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-#ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+#ifdef QUICC_MPIALGO_SINGLE2D
 #error "The SINGLE2D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE2D
-#ifdef GEOMHDISCC_MPIALGO_TUBULAR
+#endif //QUICC_MPIALGO_SINGLE2D
+#ifdef QUICC_MPIALGO_TUBULAR
 #error "The TUBULAR parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_TUBULAR
+#endif //QUICC_MPIALGO_TUBULAR
 
 #endif // BOUSSINESQRBCCYLINDERMODEL_HPP

@@ -5,7 +5,7 @@
  */
 
 // Only define in MPI case
-#ifdef GEOMHDISCC_MPI
+#ifdef QUICC_MPI
 
 #ifndef MPITYPES_HPP
 #define MPITYPES_HPP
@@ -74,4 +74,4 @@ namespace Parallel {
 #endif // MPITYPES_HPP
 
 // Only define in MPI case
-#endif //GEOMHDISCC_MPI
+#endif //QUICC_MPI

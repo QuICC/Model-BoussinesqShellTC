@@ -49,16 +49,16 @@ namespace IoVariable {
       assert(std::distance(vRange.first, vRange.second) == 1);
       ContinuityWriter::vector_iterator  vIt = vRange.first;
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          MHDFloat continuity = (vIt->second->dom(0).grad(FieldComponents::Spectral::ONE).comp(FieldComponents::Physical::ONE).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::TWO).comp(FieldComponents::Physical::TWO).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::THREE).comp(FieldComponents::Physical::THREE).data()).array().abs().maxCoeff();
       #else
          MHDFloat continuity = (vIt->second->dom(0).grad(FieldComponents::Spectral::ONE).comp(FieldComponents::Physical::ONE).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::TWO).comp(FieldComponents::Physical::TWO).data()).array().abs().maxCoeff();
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
 
       // Get the "global" velocity divergence from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          MPI_Allreduce(MPI_IN_PLACE, &continuity, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

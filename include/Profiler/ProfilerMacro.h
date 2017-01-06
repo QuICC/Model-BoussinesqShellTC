@@ -7,9 +7,9 @@
 #ifndef PROFILERMACRO_H
 #define PROFILERMACRO_H
 
-#ifdef GEOMHDISCC_PROFILE
+#ifdef QUICC_PROFILE
    #include "Profiler/ProfilerTools.hpp"
-   #ifdef GEOMHDISCC_MPI
+   #ifdef QUICC_MPI
       // include MPI profiler
       #include "Profiler/MpiProfiler.hpp"
 
@@ -25,7 +25,7 @@
          /// Typedef for a profiler
          typedef Debug::SerialProfiler ProfilerMacro;
       }
-   #endif // GEOMHDISCC_MPI
+   #endif // QUICC_MPI
 
    /// Define profiler initialisation macro function
    #define ProfilerMacro_init()  GeoMHDiSCC::ProfilerMacro::init()
@@ -42,7 +42,7 @@
    /// Define profiler printInfo macro function
    #define ProfilerMacro_printInfo()  GeoMHDiSCC::Debug::ProfilerTools::printInfo()
 
-   #ifdef GEOMHDISCC_PROFILER_DETAILED
+   #ifdef QUICC_PROFILER_DETAILED
       /// Define detailed profiler start macro function
       #define DetailedProfilerMacro_start(P)  GeoMHDiSCC::ProfilerMacro::start(P)
 
@@ -54,7 +54,7 @@
 
       /// Define empty detailed profiler stop macro function
       #define DetailedProfilerMacro_stop(P)  
-   #endif // GEOMHDISCC_PROFILER_DETAILED
+   #endif // QUICC_PROFILER_DETAILED
 
 #else
    /// Define profiler initialisation macro function
@@ -77,6 +77,6 @@
 
    /// Define empty profiler printInfo macro function
    #define ProfilerMacro_printInfo()  
-#endif // GEOMHDISCC_PROFILE
+#endif // QUICC_PROFILE
 
 #endif // PROFILERMACRO_H

@@ -115,12 +115,12 @@ namespace Datatypes {
           */
          bool hasGrad2() const;
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -260,7 +260,7 @@ namespace Datatypes {
       this->mspGrad2 = SharedPtrMacro<SymmetricTensorField<TScalar,FieldComponents::Physical::Id> >(new SymmetricTensorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), comps));
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TScalar> MHDFloat ScalarPhysicalVariable<TScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -285,7 +285,7 @@ namespace Datatypes {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 }
 }
 

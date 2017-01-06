@@ -368,7 +368,7 @@ namespace Transform {
       rPhysVal.imag() = this->mTmpR.bottomRows(this->mspSetup->fwdSize());
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat ChebyshevCuFftTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -378,7 +378,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

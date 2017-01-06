@@ -84,11 +84,11 @@ namespace Debug {
             PROBEB,
             PROBEC,
             // Break point bounding value
-            #ifdef GEOMHDISCC_PROFILER_DETAILED
+            #ifdef QUICC_PROFILER_DETAILED
             NBREAKPOINT
             #else
             NBREAKPOINT = IO + 1
-            #endif // GEOMHDISCC_PROFILER_DETAILED
+            #endif // QUICC_PROFILER_DETAILED
          };
 
          /**

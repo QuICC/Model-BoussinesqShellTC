@@ -573,9 +573,9 @@ namespace Transform {
          ParityTransformTools::setParityModes(rChebVal, this->mTmpIn, this->parityBlocks(parity), rChebVal.rows());
       }
 
-      #ifdef GEOMHDISCC_DEBUG
+      #ifdef QUICC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
-      #endif //GEOMHDISCC_DEBUG
+      #endif //QUICC_DEBUG
    }
 
    void SphereChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, SphereChebyshevFftwTransform::ProjectorType::Id projector)
@@ -738,9 +738,9 @@ namespace Transform {
          }
       }
 
-      #ifdef GEOMHDISCC_DEBUG
+      #ifdef QUICC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
-      #endif //GEOMHDISCC_DEBUG
+      #endif //QUICC_DEBUG
    }
 
    void SphereChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, SphereChebyshevFftwTransform::ProjectorType::Id projector)
@@ -1055,7 +1055,7 @@ namespace Transform {
 //      std::cerr << "l = 0: " << err(0) - data(0,0) << " l> 0: " << (err.bottomRows(err.rows()-1).transpose() - data.row(0).rightCols(data.cols()-1)).array().abs().maxCoeff() << std::endl;
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat SphereChebyshevFftwTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -1065,7 +1065,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

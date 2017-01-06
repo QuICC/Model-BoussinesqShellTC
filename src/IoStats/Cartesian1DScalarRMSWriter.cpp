@@ -104,9 +104,9 @@ namespace GeoMHDiSCC {
       {
          // MPI gathering
 
-#ifdef GEOMHDISCC_MPI
+#ifdef QUICC_MPI
          MPI_Allreduce(MPI_IN_PLACE, this->mRMS.data(), this->mRMS.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-#endif //GEOMHDISCC_MPI
+#endif //QUICC_MPI
          this->mRMS /= this->mArea;
          this->mRMS = this->mRMS.array().sqrt();
       }

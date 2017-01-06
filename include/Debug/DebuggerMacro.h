@@ -7,7 +7,7 @@
 #ifndef DEBUGGERMACRO_H
 #define DEBUGGERMACRO_H
 
-#ifdef GEOMHDISCC_DEBUG
+#ifdef QUICC_DEBUG
    #include "Debug/SerialDebugger.hpp"
 
    namespace GeoMHDiSCC {
@@ -51,6 +51,6 @@
 
    /// Define empty timer stop macro
    #define DebuggerMacro_stop(M,T)
-#endif // GEOMHDISCC_DEBUG
+#endif // QUICC_DEBUG
 
 #endif // DEBUGGERMACRO_H

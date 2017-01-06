@@ -50,12 +50,12 @@ namespace Equations {
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
             rTauNs(m) = rTauNs(m)*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
             rTauNs(m) = rTauNs(m)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
-         #endif //GEOMHDISCC_MPISPSOLVE
+         #endif //QUICC_MPISPSOLVE
 
       }
    }
@@ -64,12 +64,12 @@ namespace Equations {
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
             rGalerkinNs(m) = rGalerkinNs(m)*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
             rGalerkinNs(m) = rGalerkinNs(m)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
-         #endif //GEOMHDISCC_MPISPSOLVE
+         #endif //QUICC_MPISPSOLVE
       }
    }
 
@@ -82,12 +82,12 @@ namespace Equations {
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
             rSystemNs(m) = rSystemNs(m)*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
             rSystemNs(m) = rSystemNs(m)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
-         #endif //GEOMHDISCC_MPISPSOLVE
+         #endif //QUICC_MPISPSOLVE
       }
    }
 

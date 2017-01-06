@@ -3,7 +3,7 @@
  * @brief This class defines the backward transform grouping algorithm
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
+#ifdef QUICC_TRANSGROUPER_TRANSFORM
 
 #ifndef BACKWARDTRANSFORMGROUPER_HPP
 #define BACKWARDTRANSFORMGROUPER_HPP
@@ -234,4 +234,4 @@ namespace Transform {
 
 #endif // BACKWARDTRANSFORMGROUPER_HPP
 
-#endif //GEOMHDISCC_TRANSGROUPER_TRANSFORM
+#endif //QUICC_TRANSGROUPER_TRANSFORM

@@ -7,7 +7,7 @@
 #ifndef TIMERMACRO_H
 #define TIMERMACRO_H
 
-#ifdef GEOMHDISCC_MPI
+#ifdef QUICC_MPI
    // include MPI timer
    #include "Timers/MpiTimer.hpp"
 
@@ -23,6 +23,6 @@
       /// Typedef for a generic Timer based on the SerialTimer
       typedef SerialTimer  TimerMacro;
    }
-#endif // GEOMHDISCC_MPI
+#endif // QUICC_MPI
 
 #endif // TIMERMACRO_H

@@ -54,7 +54,7 @@ namespace Equations {
       //
       // Initialise the galerkin stencils (if activated and required)
       //
-      #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+      #ifdef QUICC_BOUNDARYMETHOD_GALERKIN
       // Get the number of systems
       int nSystems = this->couplingInfo(compId).nSystems();
 
@@ -70,7 +70,7 @@ namespace Equations {
             this->setGalerkinStencil(compId, sIt->second.back(), i);
          }
       }
-      #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+      #endif //QUICC_BOUNDARYMETHOD_GALERKIN
 
       //
       // Initialise quasi inverse operator
@@ -491,8 +491,8 @@ namespace Equations {
       PyTuple_SetItem(pArgs, argStart, pList);
 
       // Set the restriction option
-      #ifdef GEOMHDISCC_MPI
-         #ifdef GEOMHDISCC_MPISPSOLVE
+      #ifdef QUICC_MPI
+         #ifdef QUICC_MPISPSOLVE
             std::vector<int> slow;
             std::vector<std::vector<int> > middle;
 
@@ -516,12 +516,12 @@ namespace Equations {
             // MPI code with serial sparse solver
             Py_INCREF(Py_None);
             PyTuple_SetItem(pArgs, argStart+1, Py_None);
-         #endif //GEOMHDISCC_MPISPSOLVE
+         #endif //QUICC_MPISPSOLVE
       #else
          // Serial code can't have any restriction
          Py_INCREF(Py_None);
          PyTuple_SetItem(pArgs, argStart+1, Py_None);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Call model operator Python routine
       PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(opId));
@@ -599,8 +599,8 @@ namespace Equations {
       PyTuple_SetItem(pArgs, 5, pTmp);
 
       // Set the restriction option
-      #ifdef GEOMHDISCC_MPI
-         #ifdef GEOMHDISCC_MPISPSOLVE
+      #ifdef QUICC_MPI
+         #ifdef QUICC_MPISPSOLVE
             std::vector<int> slow;
             std::vector<std::vector<int> > middle;
 
@@ -624,12 +624,12 @@ namespace Equations {
             // MPI code with serial sparse solver
             Py_INCREF(Py_None);
             PyTuple_SetItem(pArgs, 6, Py_None);
-         #endif //GEOMHDISCC_MPISPSOLVE
+         #endif //QUICC_MPISPSOLVE
       #else
          // Serial code can't have any restriction
          Py_INCREF(Py_None);
          PyTuple_SetItem(pArgs, 6, Py_None);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Call model operator Python routine
       PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(opId));

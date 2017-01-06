@@ -27,7 +27,7 @@
 
 namespace GeoMHDiSCC {
 
-#ifdef GEOMHDISCC_MULTPRECISION
+#ifdef QUICC_MULTPRECISION
    const int PrueferAlgorithm::NEWTON_ITERATIONS = 10;
 
    const int PrueferAlgorithm::TAYLOR_ORDER = 60;
@@ -35,7 +35,7 @@ namespace GeoMHDiSCC {
    const int PrueferAlgorithm::NEWTON_ITERATIONS = 5;
 
    const int PrueferAlgorithm::TAYLOR_ORDER = 30;
-#endif //GEOMHDISCC_MULTPRECISION
+#endif //QUICC_MULTPRECISION
 
    void PrueferAlgorithm::refineNode(internal::Array& grid, internal::Array& weights, const int i, const internal::Array& taylor)
    {

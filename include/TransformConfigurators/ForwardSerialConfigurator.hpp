@@ -128,7 +128,7 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
          TransformTreeEdge::EdgeType_citerator it2D;
 
@@ -175,7 +175,7 @@ namespace Transform {
                ForwardConfigurator2D::updateEquation(*itSpec, spEquation, coord);
             }
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);

@@ -20,7 +20,7 @@
 //
 
 // Configure code to use ImExRKCB2
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB2
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB2
 
    #include "Timesteppers/ImExRKCB2.hpp"
 
@@ -32,10 +32,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB2
+#endif //QUICC_TIMESTEPPER_IMEXRKCB2
 
 // Configure code to use ImExRKCB3a
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3A
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3A
 
    #include "Timesteppers/ImExRKCB3a.hpp"
 
@@ -47,10 +47,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3A
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3A
 
 // Configure code to use ImExRKCB3b
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3B
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3B
 
    #include "Timesteppers/ImExRKCB3b.hpp"
 
@@ -62,10 +62,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3B
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3B
 
 // Configure code to use ImExRKCB3c
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3C
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3C
 
    #include "Timesteppers/ImExRKCB3c.hpp"
 
@@ -77,10 +77,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3C
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3C
 
 // Configure code to use ImExRKCB3d
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3D
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3D
 
    #include "Timesteppers/ImExRKCB3d.hpp"
 
@@ -92,10 +92,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3D
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3D
 
 // Configure code to use ImExRKCB3e
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3E
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3E
 
    #include "Timesteppers/ImExRKCB3e.hpp"
 
@@ -107,10 +107,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3E
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3E
 
 // Configure code to use ImExRKCB3f
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB3F
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3F
 
    #include "Timesteppers/ImExRKCB3f.hpp"
 
@@ -122,10 +122,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB3F
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3F
 
 // Configure code to use ImExRKCB4
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRKCB4
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB4
 
    #include "Timesteppers/ImExRKCB4.hpp"
 
@@ -137,10 +137,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRKCB4
+#endif //QUICC_TIMESTEPPER_IMEXRKCB4
 
 // Configure code to use ImExRK3
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXRK3
+#ifdef QUICC_TIMESTEPPER_IMEXRK3
 
    #include "Timesteppers/ImExRK3.hpp"
 
@@ -152,10 +152,10 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXRK3
+#endif //QUICC_TIMESTEPPER_IMEXRK3
 
 // Configure code to use ImExSBDF2
-#ifdef GEOMHDISCC_TIMESTEPPER_IMEXSBDF2
+#ifdef QUICC_TIMESTEPPER_IMEXSBDF2
 
    #include "Timesteppers/ImExSBDF2.hpp"
 
@@ -167,6 +167,6 @@
 
       }
    }
-#endif //GEOMHDISCC_TIMESTEPPER_IMEXSBDF2
+#endif //QUICC_TIMESTEPPER_IMEXSBDF2
 
 #endif // TIMESCHEMESELECTOR_HPP

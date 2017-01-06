@@ -223,7 +223,7 @@ namespace GeoMHDiSCC {
             NOTUSED,
 
             // Define generic enums for cartesian geometry
-            #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
+            #if defined QUICC_SPATIALSCHEME_TTT || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF 
             /// First vector component
             ONE = X,
             /// Second vector component
@@ -231,7 +231,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+            #elif defined QUICC_SPATIALSCHEME_TFF
             /// First vector component
             ONE = Z,
             /// Second vector component
@@ -239,7 +239,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Y,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #elif defined QUICC_SPATIALSCHEME_WFT
             /// First vector component
             ONE = R,
             /// Second vector component
@@ -247,7 +247,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
+            #elif defined QUICC_SPATIALSCHEME_CFT || defined QUICC_SPATIALSCHEME_AFT
             /// First vector component
             ONE = R,
             /// Second vector component
@@ -255,7 +255,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #elif defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFL || defined QUICC_SPATIALSCHEME_WLFM
             /// First vector component
             ONE = R,
             /// Second vector component
@@ -263,7 +263,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = PHI,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+            #elif defined QUICC_SPATIALSCHEME_TT
             /// First vector component
             ONE = X,
             /// Second vector component
@@ -271,7 +271,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = NOTUSED,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TF
+            #elif defined QUICC_SPATIALSCHEME_TF
             /// First vector component
             ONE = Z,
             /// Second vector component
@@ -279,7 +279,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = NOTUSED,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CF || defined GEOMHDISCC_SPATIALSCHEME_AF
+            #elif defined QUICC_SPATIALSCHEME_CF || defined QUICC_SPATIALSCHEME_AF
             /// First vector component
             ONE = R,
             /// Second vector component
@@ -287,7 +287,7 @@ namespace GeoMHDiSCC {
             /// Third vector component
             THREE = NOTUSED,
 
-            #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
+            #endif // defined QUICC_SPATIALSCHEME_TTT || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF
          };
       };
 
@@ -332,7 +332,7 @@ namespace GeoMHDiSCC {
             NOTUSED,
 
             // Define generic enums for cartesian geometry
-            #if defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+            #if defined QUICC_SPATIALSCHEME_TFF_TORPOL || defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL || defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL || defined QUICC_SPATIALSCHEME_WFT_TORPOL
                /// First vector component
                ONE = TOR,
                /// Second vector component
@@ -340,7 +340,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = NOTUSED,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_SLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_BLFM_QST || defined GEOMHDISCC_SPATIALSCHEME_WLFL_QST || defined GEOMHDISCC_SPATIALSCHEME_WLFM_QST
+            #elif defined QUICC_SPATIALSCHEME_SLFL_QST || defined QUICC_SPATIALSCHEME_SLFM_QST || defined QUICC_SPATIALSCHEME_BLFL_QST || defined QUICC_SPATIALSCHEME_BLFM_QST || defined QUICC_SPATIALSCHEME_WLFL_QST || defined QUICC_SPATIALSCHEME_WLFM_QST
                /// First vector component
                ONE = Q,
                /// Second vector component
@@ -348,7 +348,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = T,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
+            #elif defined QUICC_SPATIALSCHEME_TTT || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF 
                /// First vector component
                ONE = X,
                /// Second vector component
@@ -356,7 +356,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+            #elif defined QUICC_SPATIALSCHEME_TFF
                /// First vector component
                ONE = Z,
                /// Second vector component
@@ -364,7 +364,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Y,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #elif defined QUICC_SPATIALSCHEME_WFT
                /// First vector component
                ONE = R,
                /// Second vector component
@@ -372,7 +372,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
+            #elif defined QUICC_SPATIALSCHEME_CFT || defined QUICC_SPATIALSCHEME_AFT
                /// First vector component
                ONE = R,
                /// Second vector component
@@ -380,7 +380,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = Z,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #elif defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFL || defined QUICC_SPATIALSCHEME_WLFM
                /// First vector component
                ONE = R,
                /// Second vector component
@@ -388,7 +388,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = PHI,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TT
+            #elif defined QUICC_SPATIALSCHEME_TT
                /// First vector component
                ONE = X,
                /// Second vector component
@@ -396,7 +396,7 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = NOTUSED,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_TF
+            #elif defined QUICC_SPATIALSCHEME_TF
                /// First vector component
                ONE = Z,
                /// Second vector component
@@ -404,14 +404,14 @@ namespace GeoMHDiSCC {
                /// Third vector component
                THREE = NOTUSED,
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_AF || defined GEOMHDISCC_SPATIALSCHEME_CF 
+            #elif defined QUICC_SPATIALSCHEME_AF || defined QUICC_SPATIALSCHEME_CF 
                /// First vector component
                ONE = R,
                /// Second vector component
                TWO = THETA,
                /// Third vector component
                THREE = NOTUSED,
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+            #endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL || defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL || defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL || defined QUICC_SPATIALSCHEME_WFT_TORPOL
          };
       };
    };

@@ -58,9 +58,9 @@ namespace Transform {
       private: 
    };
 
-#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+#ifdef QUICC_SPATIALDIMENSION_3D
    typedef BackwardConfigurator3D BackwardConfigurator;
-#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+#endif //QUICC_SPATIALDIMENSION_3D
 
 }
 }

@@ -157,17 +157,17 @@ namespace GeoMHDiSCC {
                // Initialise to zero
                rScalarVars.at(infoIt->first)->setZeros();
 
-               #ifdef GEOMHDISCC_STORAGEPROFILE
+               #ifdef QUICC_STORAGEPROFILE
                   StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, rScalarVars.at(infoIt->first)->requiredStorage());
-               #endif // GEOMHDISCC_STORAGEPROFILE
+               #endif // QUICC_STORAGEPROFILE
             } else
             {
                // Initialise to zero
                rVectorVars.at(infoIt->first)->setZeros();
 
-               #ifdef GEOMHDISCC_STORAGEPROFILE
+               #ifdef QUICC_STORAGEPROFILE
                   StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, rVectorVars.at(infoIt->first)->requiredStorage());
-               #endif // GEOMHDISCC_STORAGEPROFILE
+               #endif // QUICC_STORAGEPROFILE
             }
          }
       }
@@ -411,17 +411,17 @@ namespace GeoMHDiSCC {
                // Initialise to zero
                rScalarVars.at(infoIt->first)->setZeros();
 
-               #ifdef GEOMHDISCC_STORAGEPROFILE
+               #ifdef QUICC_STORAGEPROFILE
                   StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, rScalarVars.at(infoIt->first)->requiredStorage());
-               #endif // GEOMHDISCC_STORAGEPROFILE
+               #endif // QUICC_STORAGEPROFILE
             } else
             {
                // Initialise to zero
                rVectorVars.at(infoIt->first)->setZeros();
 
-               #ifdef GEOMHDISCC_STORAGEPROFILE
+               #ifdef QUICC_STORAGEPROFILE
                   StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, rVectorVars.at(infoIt->first)->requiredStorage());
-               #endif // GEOMHDISCC_STORAGEPROFILE
+               #endif // QUICC_STORAGEPROFILE
             }
          }
       }

@@ -45,13 +45,13 @@ namespace Parallel {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class MpiConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>
    {
       public:
-         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         #if defined QUICC_MPIPACK_MANUAL
             typedef SharedPtrMacro<CommunicationBuffer<typename TFwdA::PointType> > SharedFwdBufferType;
             typedef SharedPtrMacro<CommunicationBuffer<typename TBwdB::PointType> > SharedBwdBufferType;
          #else
             typedef SharedPtrMacro<CommunicationBuffer<char> > SharedFwdBufferType;
             typedef SharedPtrMacro<CommunicationBuffer<char> > SharedBwdBufferType;
-         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+         #endif //defined QUICC_MPIPACK_MANUAL
 
          /**
           * @brief Constructor
@@ -190,7 +190,7 @@ namespace Parallel {
           */
          ArrayI   mBackwardPacks;
 
-         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         #if defined QUICC_MPIPACK_MANUAL
             /**
              * @brief Storage for the forward datatypes
              */
@@ -211,7 +211,7 @@ namespace Parallel {
              * @brief Storage for the backward datatypes
              */
             std::vector<MPI_Datatype> mBTypes;
-         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+         #endif //defined QUICC_MPIPACK_MANUAL
 
       private:
          /**
@@ -292,7 +292,7 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::cleanupTypes()
    {
-      #if defined GEOMHDISCC_MPIPACK_MANUAL
+      #if defined QUICC_MPIPACK_MANUAL
          // No cleanup is required
          
       #else
@@ -308,7 +308,7 @@ namespace Parallel {
          {
             MPI_Type_free(&(*it));
          }
-      #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+      #endif //defined QUICC_MPIPACK_MANUAL
    }
 
 }

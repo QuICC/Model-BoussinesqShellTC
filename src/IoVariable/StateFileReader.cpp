@@ -223,7 +223,7 @@ namespace IoVariable {
 
    void StateFileReader::adaptData(Datatypes::SpectralScalarType& rField)
    {
-      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+      #ifdef QUICC_SPATIALSCHEME_TFF
       for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
       {
          if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0, k) == 0 && this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) > this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
@@ -231,7 +231,7 @@ namespace IoVariable {
             rField.setProfile(ArrayZ::Zero(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)), 0, k);
          }
       }
-      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+      #endif //QUICC_SPATIALSCHEME_TFF
    }
 
 }

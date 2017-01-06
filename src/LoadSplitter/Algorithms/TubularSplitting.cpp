@@ -206,21 +206,21 @@ namespace Parallel {
    void TubularSplitting::selectGrouper()
    {
       // TRANSFORM grouper setup
-      #if defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+      #if defined QUICC_TRANSGROUPER_TRANSFORM
          this->mGrouper = Splitting::Groupers::TRANSFORM;
 
       // SINGLE1D grouper setup
-      #elif defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
+      #elif defined QUICC_TRANSGROUPER_SINGLE1D
          this->mGrouper = Splitting::Groupers::SINGLE1D;
 
       // SINGLE2D grouper setup
-      #elif defined GEOMHDISCC_TRANSGROUPER_SINGLE2D
+      #elif defined QUICC_TRANSGROUPER_SINGLE2D
          this->mGrouper = Splitting::Groupers::SINGLE2D;
 
       // EQUATION grouper setup
       #else
          this->mGrouper = Splitting::Groupers::EQUATION;
-      #endif //defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+      #endif //defined QUICC_TRANSGROUPER_TRANSFORM
    }
 
    Array TubularSplitting::computeScore(SharedResolution spResolution)

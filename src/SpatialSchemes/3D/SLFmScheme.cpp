@@ -37,7 +37,7 @@ namespace Schemes {
       SLFmScheme::tuneMpiResolution(descr);
       
       // Create spectral space sub communicators
-      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
          // MPI error code
          int ierr;
@@ -173,7 +173,7 @@ namespace Schemes {
 
          // Synchronize
          FrameworkMacro::synchronize();
-      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
    }
 
    void SLFmScheme::addTransformSetups(SharedResolution spRes) const

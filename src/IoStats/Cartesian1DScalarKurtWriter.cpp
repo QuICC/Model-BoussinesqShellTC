@@ -85,9 +85,9 @@ namespace GeoMHDiSCC {
       {
          // MPI gathering
 
-#ifdef GEOMHDISCC_MPI
+#ifdef QUICC_MPI
          MPI_Allreduce(MPI_IN_PLACE, this->mKurt.data(), this->mKurt.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-#endif //GEOMHDISCC_MPI
+#endif //QUICC_MPI
 
             this->mKurt = this->mKurt.array()/(mRMS->RMS().array()*mRMS->RMS().array()*mRMS->RMS().array()*mRMS->RMS().array());
       }

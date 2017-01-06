@@ -115,12 +115,12 @@ namespace GeoMHDiSCC {
           */
          std::vector<TBackward>&  rBTmps();
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
          /**
@@ -353,7 +353,7 @@ namespace GeoMHDiSCC {
       return *this->mpBTmp;
    }
 
-   #ifdef GEOMHDISCC_STORAGEPROFILE
+   #ifdef QUICC_STORAGEPROFILE
    template <typename TForward, typename TBackward> MHDFloat  FixedPairProvider<TForward, TBackward>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -370,7 +370,7 @@ namespace GeoMHDiSCC {
 
       return mem;
    }
-   #endif // GEOMHDISCC_STORAGEPROFILE
+   #endif // QUICC_STORAGEPROFILE
 
 }
 

@@ -344,21 +344,21 @@ namespace Equations {
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
          Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->cols());
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             // Initialise storage to zero
             tmp.setZero();
             int l;
             int j_;
             int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-            #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                int corrDim = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
             for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
             {
                j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
-               #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+               #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                   j_ -= corrDim;
-               #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+               #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
                {
                   // Compute correct position
@@ -381,7 +381,7 @@ namespace Equations {
                   k++;
                }
             }
-         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
          // Apply operator to field
          Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
@@ -411,11 +411,11 @@ namespace Equations {
          int l = 0;
          int k_;
          int j_;
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
          #else
             int dimK = 1;
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
          int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
          {

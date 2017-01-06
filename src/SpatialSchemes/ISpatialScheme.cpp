@@ -119,7 +119,7 @@ namespace Schemes {
 
    void ISpatialScheme::tuneMpiResolution(const Parallel::SplittingDescription& descr)
    {
-      #if defined GEOMHDISCC_MPI
+      #if defined QUICC_MPI
          FrameworkMacro::initTransformComm(descr.structure.size());
          for(std::vector<std::multimap<int,int> >::const_iterator vIt = descr.structure.begin(); vIt != descr.structure.end(); ++vIt)
          {
@@ -147,7 +147,7 @@ namespace Schemes {
             FrameworkMacro::synchronize();
          }
 
-      #endif //defined GEOMHDISCC_MPI
+      #endif //defined QUICC_MPI
    }
 
 }

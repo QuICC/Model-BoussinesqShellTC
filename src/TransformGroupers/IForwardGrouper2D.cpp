@@ -43,11 +43,11 @@ namespace Transform {
       std::vector<TransformTree>::const_iterator treeIt;
       for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
       {
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int counter = treeIt->nEdges(1);
          #else
             int counter = treeIt->nEdges(0);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
          list.insert(counter);
 
          this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp<FieldComponents::Physical::Id>()), counter));

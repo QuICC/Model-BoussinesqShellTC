@@ -19,7 +19,7 @@
 
 
 // Configure code to use TTT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TTT
+#ifdef QUICC_SPATIALSCHEME_TTT
    
    #include "Equations/Tools/NoEigenTools.hpp"
 
@@ -42,10 +42,10 @@
          }
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TTT
+#endif //QUICC_SPATIALSCHEME_TTT
 
 // Configure code to use TFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFT
+#ifdef QUICC_SPATIALSCHEME_TFT
    
    #include "Equations/Tools/Eigen1DTools.hpp"
 
@@ -69,10 +69,10 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TFT
+#endif //QUICC_SPATIALSCHEME_TFT
 
 // Configure code to use TFF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+#ifdef QUICC_SPATIALSCHEME_TFF
 
    #include "Equations/Tools/Eigen2DTools.hpp"
 
@@ -96,10 +96,10 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TFF
+#endif //QUICC_SPATIALSCHEME_TFF
 
 // Configure code to use FFF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_FFF
+#ifdef QUICC_SPATIALSCHEME_FFF
 
    #include "Equations/Tools/Eigen3DTools.hpp"
 
@@ -123,10 +123,10 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_FFF
+#endif //QUICC_SPATIALSCHEME_FFF
 
 // Configure code to use CFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_CFT
+#ifdef QUICC_SPATIALSCHEME_CFT
 
    #include "Equations/Tools/Eigen1DTools.hpp"
 
@@ -150,10 +150,10 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_CFT
+#endif //QUICC_SPATIALSCHEME_CFT
 
 // Configure code to use AFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+#ifdef QUICC_SPATIALSCHEME_AFT
 
    #include "Equations/Tools/Eigen1DTools.hpp"
 
@@ -177,10 +177,10 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_AFT
+#endif //QUICC_SPATIALSCHEME_AFT
 
 // Configure code to use BLFl, SLFl, WLFl schemes
-#if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+#if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_WLFL
 
    #include "Equations/Tools/EigenSHlTools.hpp"
    #include "Equations/Tools/EigenSHlmTools.hpp"
@@ -211,10 +211,10 @@
       }
    }
 
-#endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+#endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_WLFL
 
 // Configure code to use BLFm, SLFm, WLFm schemes
-#if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+#if defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_WLFM
 
    #include "Equations/Tools/EigenSHmTools.hpp"
 
@@ -237,10 +237,10 @@
          }
       }
    }
-#endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+#endif //defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_WLFM
 
 // Configure code to use WFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_WFT
+#ifdef QUICC_SPATIALSCHEME_WFT
 
    #include "Equations/Tools/Eigen1DTools.hpp"
 
@@ -264,10 +264,10 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_WFT
+#endif //QUICC_SPATIALSCHEME_WFT
 
 // Configure code to use TT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TT
+#ifdef QUICC_SPATIALSCHEME_TT
    
    #include "Equations/Tools/NoEigenTools.hpp"
 
@@ -291,10 +291,10 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TT
+#endif //QUICC_SPATIALSCHEME_TT
 
 // Configure code to use TF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_TF
+#ifdef QUICC_SPATIALSCHEME_TF
    
    #include "Equations/Tools/Eigen1DTools.hpp"
 
@@ -318,4 +318,4 @@
 
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_TF
+#endif //QUICC_SPATIALSCHEME_TF

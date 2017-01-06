@@ -109,7 +109,7 @@ namespace Transform {
       this->mProjOp.insert(std::make_pair(ProjectorType::DIVSIN,std::vector<Matrix>()));
       this->mProjOp.find(ProjectorType::DIVSIN)->second.reserve(this->mspSetup->slow().size());
 
-      #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+      #ifdef QUICC_MEMORYUSAGE_HIGH
       // Reserve storage for the weighted projectors, 1/sin projectors and derivative
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTG,std::vector<Matrix>()));
       this->mIntgOp.find(IntegratorType::INTG)->second.reserve(this->mspSetup->slow().size());
@@ -117,7 +117,7 @@ namespace Transform {
       this->mIntgOp.find(IntegratorType::INTGDIFF)->second.reserve(this->mspSetup->slow().size());
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGDIVSIN,std::vector<Matrix>()));
       this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second.reserve(this->mspSetup->slow().size());
-      #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+      #endif //QUICC_MEMORYUSAGE_HIGH
 
       // Loop over harmonic orders
       Matrix op;
@@ -164,7 +164,7 @@ namespace Transform {
             projIt->second.at(iM).row(iL) = op.col(l - m).transpose();
          }
 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          // Allocate memory for the weighted projector, 1/sin projector and derivatives
          this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
          this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
@@ -173,7 +173,7 @@ namespace Transform {
          this->mIntgOp.find(IntegratorType::INTG)->second.at(iM) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iM)*this->mWeights.asDiagonal()).transpose();
          this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second.at(iM) = (this->mProjOp.find(ProjectorType::DIVSIN)->second.at(iM)*this->mWeights.asDiagonal()).transpose();
          this->mIntgOp.find(IntegratorType::INTGDIFF)->second.at(iM) = (this->mProjOp.find(ProjectorType::DIFF)->second.at(iM)*this->mWeights.asDiagonal()).transpose();
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
       }
 
    }
@@ -190,107 +190,107 @@ namespace Transform {
       // Compute first derivative integration
       if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIFF)
       {
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
          #else
          this->setIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIFF)->second);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIFF)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIFF)->second, this->mLl);
          #else
          this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIFF)->second, this->mLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIFF)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIFF)->second, this->mDivLl);
          #else
          this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIFF)->second, this->mDivLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIVSIN)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second, this->mLl);
          #else
          this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second, this->mLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIVSIN)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second, this->mDivLl);
          #else
          this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second, this->mDivLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVSIN)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
          #else
          this->setIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIVSINDPHI)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegratorDPhi(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second, this->mLl);
          #else
          this->setMultLIntegratorDPhi(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second, this->mLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIVSINDPHI)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegratorDPhi(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second, this->mDivLl);
          #else
          this->setMultLIntegratorDPhi(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second, this->mDivLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVSINDPHI)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setIntegratorDPhi(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second);
          #else
          this->setIntegratorDPhi(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL2)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTG)->second, this->mLl2);
          #else
          this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second, this->mLl2);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTG)->second, this->mLl);
          #else
          this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second, this->mLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLL)
       { 
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTG)->second, this->mDivLl);
          #else
          this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second, this->mDivLl);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTG)
       {
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
          #else
          this->setIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second);
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
 
       } else
       {
@@ -366,13 +366,13 @@ namespace Transform {
       for(size_t i = 0; i < ops.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          int specRows = ops.at(i).cols();
          rSpecVal.block(0, start, specRows, cols) = ops.at(i).transpose()*physVal.block(0,start, physRows, cols);
          #else
          int specRows = ops.at(i).rows();
          rSpecVal.block(0, start, specRows, cols) = ops.at(i)*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
          start += cols;
       }
    }
@@ -385,13 +385,13 @@ namespace Transform {
       for(size_t i = 0; i < ops.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          int specRows = ops.at(i).cols();
          rSpecVal.block(0, start, specRows, cols) = mult.bottomRows(specRows).asDiagonal()*(ops.at(i).transpose()*physVal.block(0,start, physRows, cols));
          #else
          int specRows = ops.at(i).rows();
          rSpecVal.block(0, start, specRows, cols) = mult.bottomRows(specRows).asDiagonal()*(ops.at(i)*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols)));
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
          start += cols;
       }
    }
@@ -405,13 +405,13 @@ namespace Transform {
       {
          MHDComplex dphi = MHDComplex(0,-this->mspSetup->slow()(i));
          int cols = this->mspSetup->mult()(i);
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          int specRows = ops.at(i).cols();
          rSpecVal.block(0, start, specRows, cols) = dphi*ops.at(i).transpose()*physVal.block(0,start, physRows, cols);
          #else
          int specRows = ops.at(i).rows();
          rSpecVal.block(0, start, specRows, cols) = dphi*ops.at(i)*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
          start += cols;
       }
    }
@@ -425,13 +425,13 @@ namespace Transform {
       {
          MHDComplex dphi = MHDComplex(0,-this->mspSetup->slow()(i));
          int cols = this->mspSetup->mult()(i);
-         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         #ifdef QUICC_MEMORYUSAGE_HIGH
          int specRows = ops.at(i).cols();
          rSpecVal.block(0, start, specRows, cols) = mult.bottomRows(specRows).asDiagonal()*(dphi*ops.at(i).transpose()*physVal.block(0,start, physRows, cols));
          #else
          int specRows = ops.at(i).rows();
          rSpecVal.block(0, start, specRows, cols) = mult.bottomRows(specRows).asDiagonal()*(dphi*ops.at(i)*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols)));
-         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+         #endif //QUICC_MEMORYUSAGE_HIGH
          start += cols;
       }
    }
@@ -490,7 +490,7 @@ namespace Transform {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat AssociatedLegendreTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -521,7 +521,7 @@ namespace Transform {
          mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).size();
       }
 
-      #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+      #ifdef QUICC_MEMORYUSAGE_HIGH
       // Storage for the integrator
       std::map<IntegratorType::Id,std::vector<Matrix> >::const_iterator intgIt = this->mIntgOp.find(IntegratorType::INTG);
       for(size_t i = 0; i < intgIt->second.size(); i++)
@@ -542,11 +542,11 @@ namespace Transform {
       {
          mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).size();
       }
-      #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+      #endif //QUICC_MEMORYUSAGE_HIGH
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

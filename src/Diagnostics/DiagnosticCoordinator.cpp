@@ -23,16 +23,16 @@
 //
 #include "Base/MpiTypes.hpp"
 #include "Exceptions/Exception.hpp"
-#if defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL
+#if defined QUICC_SPATIALSCHEME_TFF_TORPOL
    #include "Diagnostics/CartesianTorPolWrapper.hpp"
    #include "Diagnostics/CartesianCflWrapper.hpp"
-#elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
+#elif defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL || defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
    #include "Diagnostics/SphericalTorPolWrapper.hpp"
    #include "Diagnostics/SphericalCflWrapper.hpp"
-#elif defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
+#elif defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_TTT 
    #include "Diagnostics/StreamVerticalWrapper.hpp"
    #include "Diagnostics/CartesianCflWrapper.hpp"
-#endif //defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL 
+#endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL 
 
 namespace GeoMHDiSCC {
 
@@ -55,7 +55,7 @@ namespace Diagnostics {
          this->mFixedStep = std::max(this->mcMinStep, tstep(1));
          this->mFixedStep = std::min(this->mFixedStep, this->mcMaxStep);
 
-      #if defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL
+      #if defined QUICC_SPATIALSCHEME_TFF_TORPOL
       // Create a cartesian toroidal/poloidal warpper
       } else if(vectors.count(PhysicalNames::VELOCITY))
       {
@@ -65,7 +65,7 @@ namespace Diagnostics {
 
          this->mFixedStep = tstep(1);
 
-      #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLFM_TORPOL
+      #elif defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL || defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
       // Create a stream function and vertical velocity wrapper
       } else if(vectors.count(PhysicalNames::VELOCITY))
       {
@@ -75,7 +75,7 @@ namespace Diagnostics {
 
          this->mFixedStep = tstep(1);
 
-      #elif defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TTT 
+      #elif defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_TTT 
       // Create a stream function and vertical velocity wrapper
       } else if(scalars.count(PhysicalNames::STREAMFUNCTION) && scalars.count(PhysicalNames::VELOCITYZ))
       {
@@ -85,7 +85,7 @@ namespace Diagnostics {
 
          this->mFixedStep = tstep(1);
 
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF_TORPOL 
+      #endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL 
 
       // Required wrapper is not implemented
       } else
@@ -154,7 +154,7 @@ namespace Diagnostics {
       //
       // Start of MPI block
       //
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
 
       if(this->mFixedStep <= 0 && this->mspCflWrapper)
       {
@@ -165,7 +165,7 @@ namespace Diagnostics {
       //
       // End of MPI block
       //
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
    }
 
    MHDFloat DiagnosticCoordinator::maxError() const

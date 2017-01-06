@@ -177,7 +177,7 @@ namespace Transform {
       // Initialise python wrapper
       PythonWrapper::import("quicc.geometry.cylindrical.cylinder_radius");
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
+      #if defined QUICC_TRANSOP_FORWARD
          // Initialise array for division by R
          this->mDivR = this->meshGrid().array().pow(-1);
 
@@ -218,7 +218,7 @@ namespace Transform {
          // Fill matrix
          PythonWrapper::fillMatrix(this->mDiffO, pValue);
          Py_DECREF(pValue);
-      #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+      #elif defined QUICC_TRANSOP_BACKWARD
          // Division by R
          this->mDivRE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
          this->mDivRO.resize(this->mspSetup->specSize(),this->mspSetup->specSize()); 
@@ -309,12 +309,12 @@ namespace Transform {
          // Fill matrix
          PythonWrapper::fillMatrix(this->mDivR2O, pValue);
          Py_DECREF(pValue);
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+      #endif //defined QUICC_TRANSOP_FORWARD
 
       // Fill matrix and cleanup
       PythonWrapper::finalize();
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+      #if defined QUICC_TRANSOP_BACKWARD
          // Factorize matrix and free memory
          this->mSDiffE.compute(this->mDiffE);
          // Check for successful factorisation
@@ -359,7 +359,7 @@ namespace Transform {
          {
             throw Exception("Factorization of backward odd division by R^2 failed!");
          }
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+      #endif //defined QUICC_TRANSOP_BACKWARD
    }
 
    void CylinderChebyshevFftwTransform::cleanupFft()
@@ -473,13 +473,13 @@ namespace Transform {
          {
             fftParity = (fftParity + 1) % 2;
 
-            #if defined GEOMHDISCC_TRANSOP_FORWARD
+            #if defined QUICC_TRANSOP_FORWARD
                this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-            #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            #elif defined QUICC_TRANSOP_BACKWARD
                throw Exception("Not yet implemented!");
-            #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+            #endif //defined QUICC_TRANSOP_FORWARD
 
-         #if defined GEOMHDISCC_TRANSOP_BACKWARD
+         #if defined QUICC_TRANSOP_BACKWARD
          // Compute division by R
          } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
          {
@@ -490,7 +490,7 @@ namespace Transform {
          } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
          {
             throw Exception("Not yet implemented!");
-         #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         #endif //defined QUICC_TRANSOP_BACKWARD
 
          // Compute 1/r D r
          } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFF)
@@ -502,12 +502,12 @@ namespace Transform {
          {
             fftParity = (fftParity + 1) % 2;
 
-            #if defined GEOMHDISCC_TRANSOP_FORWARD
+            #if defined QUICC_TRANSOP_FORWARD
                // Compute D f/r part
                this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-            #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            #elif defined QUICC_TRANSOP_BACKWARD
                throw Exception("Backward DIFFDIVR operator is not yet implemented");
-            #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+            #endif //defined QUICC_TRANSOP_FORWARD
          }
 
          // Set the padded values to zero
@@ -516,7 +516,7 @@ namespace Transform {
          // Do transform
          fftw_execute_r2r(this->bPlan(fftParity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
 
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
+         #if defined QUICC_TRANSOP_FORWARD
          // Compute division by R
          if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
          {
@@ -558,7 +558,7 @@ namespace Transform {
          }
          #else
             ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         #endif //defined QUICC_TRANSOP_FORWARD
       }
    }
 
@@ -639,13 +639,13 @@ namespace Transform {
             {
                fftParity = (fftParity + 1) % 2;
 
-               #if defined GEOMHDISCC_TRANSOP_FORWARD
+               #if defined QUICC_TRANSOP_FORWARD
                   this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-               #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+               #elif defined QUICC_TRANSOP_BACKWARD
                   throw Exception("Not yet implemented!");
-               #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+               #endif //defined QUICC_TRANSOP_FORWARD
 
-            #if defined GEOMHDISCC_TRANSOP_BACKWARD
+            #if defined QUICC_TRANSOP_BACKWARD
             // Compute division by R of real part
             } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
             {
@@ -656,7 +656,7 @@ namespace Transform {
             } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
             {
                throw Exception("Not yet implemented!");
-            #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+            #endif //defined QUICC_TRANSOP_BACKWARD
 
             // Compute 1/r D r
             } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFF)
@@ -668,12 +668,12 @@ namespace Transform {
             {
                fftParity = (fftParity + 1) % 2;
 
-               #if defined GEOMHDISCC_TRANSOP_FORWARD
+               #if defined QUICC_TRANSOP_FORWARD
                   // Compute D f/r part
                   this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-               #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+               #elif defined QUICC_TRANSOP_BACKWARD
                   throw Exception("Backward DIFFDIVR operator is not yet implemented");
-               #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+               #endif //defined QUICC_TRANSOP_FORWARD
             }
 
             // Set the padded values to zero
@@ -682,7 +682,7 @@ namespace Transform {
             // Do transform of real part
             fftw_execute_r2r(this->bPlan(fftParity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
 
-            #if defined GEOMHDISCC_TRANSOP_FORWARD
+            #if defined QUICC_TRANSOP_FORWARD
             // Compute division by R
             if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
             {
@@ -723,12 +723,12 @@ namespace Transform {
             }
             #else
                ParityTransformTools::setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         #endif //defined QUICC_TRANSOP_FORWARD
          }
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat CylinderChebyshevFftwTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -738,7 +738,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

@@ -125,7 +125,7 @@ namespace Equations {
       // Generate constant unit field divergence free state for toroidal/poloidal decomposition test
       } else if(typeId == CartesianExactStateIds::TORPOLCNST)
       {
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
             int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
             int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
@@ -141,7 +141,7 @@ namespace Equations {
             Array gK = -42*Array::Ones(1);
             Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
             Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          for(int iK = 0; iK < nK; ++iK)
          {
@@ -160,7 +160,7 @@ namespace Equations {
       // Generate divergence free state for toroidal/poloidal decomposition test
       } else if(typeId == CartesianExactStateIds::TORPOLTFF)
       {
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
             int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
             int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
@@ -176,7 +176,7 @@ namespace Equations {
             Array gK = -42*Array::Ones(1);
             Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
             Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          MHDFloat k_;
          MHDFloat j_;
@@ -349,7 +349,7 @@ namespace Equations {
       {
          Array modeA = this->mModeA.find(compId)->second;
          Array modeK = this->mModeK.find(compId)->second;
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
             int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
             int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
@@ -365,7 +365,7 @@ namespace Equations {
             Array gK = -42*Array::Ones(1);
             Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
             Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          MHDFloat k_;
          MHDFloat j_;

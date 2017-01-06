@@ -5,7 +5,7 @@
  */
 
 /// Set the path to the simulation implementation
-#define MODELPATH PhysicalModels/GEOMHDISCC_RUNSIM_MODEL.hpp
+#define MODELPATH PhysicalModels/QUICC_RUNSIM_MODEL.hpp
 /// Define small macros allowing to convert to string
 #define MAKE_STR_X( _P ) # _P
 /// Define small macros allowing to convert to string
@@ -42,7 +42,7 @@ int run()
    try
    {
       // Create state generator
-      spGen = GeoMHDiSCC::StateGeneratorFactory<GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL>::createGenerator();
+      spGen = GeoMHDiSCC::StateGeneratorFactory<GeoMHDiSCC::QUICC_RUNSIM_MODEL>::createGenerator();
    }
 
    // If exception is thrown, finalise (close files) and return

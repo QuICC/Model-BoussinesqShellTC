@@ -32,7 +32,7 @@ namespace Debug {
 
    void ProfilerTools::writeTimings()
    {
-      #ifdef GEOMHDISCC_PROFILE_PERCORE
+      #ifdef QUICC_PROFILE_PERCORE
          Array ts;
          ProfilerMacro::getTimings(ts);
 
@@ -80,14 +80,14 @@ namespace Debug {
          IoTools::Formatter::printNewline(prof_out.file());
 
          prof_out.finalizeDebug();
-      #endif //GEOMHDISCC_PROFILE_PERCORE
+      #endif //QUICC_PROFILE_PERCORE
    }
 
    void ProfilerTools::printInfo()
    {
-      #ifdef GEOMHDISCC_PROFILE_PERCORE
+      #ifdef QUICC_PROFILE_PERCORE
          ProfilerTools::writeTimings();
-      #endif //GEOMHDISCC_PROFILE_PERCORE
+      #endif //QUICC_PROFILE_PERCORE
 
       // Analyze the data
       Array ts;

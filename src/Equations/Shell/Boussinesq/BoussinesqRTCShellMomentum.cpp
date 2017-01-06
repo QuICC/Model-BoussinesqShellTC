@@ -43,23 +43,23 @@ namespace Equations {
 
    void BoussinesqRTCShellMomentum::setCoupling()
    {
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+      #ifdef QUICC_SPATIALSCHEME_SLFL
          int start = 1;
-      #else //if GEOMHDISCC_SPATIALSCHEME_SLFM
+      #else //if QUICC_SPATIALSCHEME_SLFM
          int start = 0;
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+      #endif //QUICC_SPATIALSCHEME_SLFL
 
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
 
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+      #ifdef QUICC_SPATIALSCHEME_SLFL
          // Create cos(theta) and sin(theta) data for Coriolis term
          int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
          Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
          this->mCosTheta = thGrid.array().cos();
          this->mSinTheta = thGrid.array().sin();
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+      #endif //QUICC_SPATIALSCHEME_SLFL
    }
 
    void BoussinesqRTCShellMomentum::setNLComponents()
@@ -90,7 +90,7 @@ namespace Equations {
             break;
       }
 
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+      #ifdef QUICC_SPATIALSCHEME_SLFL
          // Get square root of Taylor number
          MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
 
@@ -98,7 +98,7 @@ namespace Equations {
          /// Compute Coriolis term
          ///
          Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+      #endif //QUICC_SPATIALSCHEME_SLFL
    }
 
    void BoussinesqRTCShellMomentum::setRequirements()

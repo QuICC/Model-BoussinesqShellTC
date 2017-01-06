@@ -97,7 +97,7 @@ namespace Equations {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
       // Get first dimension
          int n1D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          // Get second dimension
@@ -112,7 +112,7 @@ namespace Equations {
          int z1D = 4;
          int z2D = 4;
          int z3D = 4;
-         #if defined GEOMHDISCC_SPATIALSCHEME_TFF
+         #if defined QUICC_SPATIALSCHEME_TFF
          if(this->mSpecial == ONLYMEAN && !(j_ == 0 && k_ == 0))
          {
             return Datatypes::SpectralScalarType::PointType(0);
@@ -126,7 +126,7 @@ namespace Equations {
             k_ = n2D - k_;
          }
          n2D = n2D/2;
-         #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF
+         #endif //defined QUICC_SPATIALSCHEME_TFF
 
          if(i < n1D-z1D && j_ < n3D - z3D && k_ < n2D - z2D)
          {
@@ -171,7 +171,7 @@ namespace Equations {
          {
             return Datatypes::SpectralScalarType::PointType(0);
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
    }
 
    void RandomScalarState::setRequirements()
@@ -205,7 +205,7 @@ namespace Equations {
 
       val.real() = tmp;
 
-      #if defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
+      #if defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM || defined QUICC_SPATIALSCHEME_AFT || defined QUICC_SPATIALSCHEME_CFT
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             this->makeRandom(tmp, i, j, k);
@@ -214,7 +214,7 @@ namespace Equations {
          {
             val.imag() = 0.0;
          }
-      #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+      #elif defined QUICC_SPATIALSCHEME_TFF
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0 && this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             unsigned int seed = 2;
@@ -249,7 +249,7 @@ namespace Equations {
          {
             val.imag() = 0.0;
          }
-      #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+      #elif defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k) != 0)
          {
             this->makeRandom(tmp, i, j, k);
@@ -258,7 +258,7 @@ namespace Equations {
          {
             val.imag() = 0.0;
          }
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
+      #endif //defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM || defined QUICC_SPATIALSCHEME_AFT || defined QUICC_SPATIALSCHEME_CFT
    }
 
 }

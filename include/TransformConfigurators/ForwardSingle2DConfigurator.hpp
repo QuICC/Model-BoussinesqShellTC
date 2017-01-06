@@ -3,7 +3,7 @@
  * @brief This class defines the forward transform single second exchange splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+#ifdef QUICC_MPIALGO_SINGLE2D
 
 #ifndef FORWARDSINGLE2DCONFIGURATOR_HPP
 #define FORWARDSINGLE2DCONFIGURATOR_HPP
@@ -204,4 +204,4 @@ namespace Transform {
 
 #endif // FORWARDSINGLE2DCONFIGURATOR_HPP
 
-#endif //GEOMHDISCC_MPIALGO_SINGLE2D
+#endif //QUICC_MPIALGO_SINGLE2D

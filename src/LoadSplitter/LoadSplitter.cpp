@@ -55,43 +55,43 @@ namespace Parallel {
       // Check for serial version of code request
       if(this->mNCpu == 1)
       {
-         #ifdef GEOMHDISCC_MPI
+         #ifdef QUICC_MPI
             // We don't deal with a single CPU in MPI mode
             throw Exception("Tried to initialise (MPI) parallelisation with a single CPU");
          #else
             this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SerialSplitting(this->mId, this->mNCpu, dim)));
-         #endif //GEOMHDISCC_MPI
+         #endif //QUICC_MPI
 
       // Setup the parallel version (initialise all algorithms and then choose the best one)
       } else
       {
-         #ifdef GEOMHDISCC_MPI
+         #ifdef QUICC_MPI
             // Check that problem is at least 2D
             if(dim.size() > 1)
             {
-               #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
+               #ifdef QUICC_MPIALGO_SINGLE1D
                   // Add the single splitting algorithm for first data exchange
                   this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->mId, this->mNCpu, dim, Splitting::Locations::FIRST)));
-               #endif //GEOMHDISCC_MPIALGO_SINGLE1D
+               #endif //QUICC_MPIALGO_SINGLE1D
 
-               #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
+               #ifdef QUICC_MPIALGO_COUPLED2D
                   // Add the single splitting algorithm for first data exchange for coupled dimensions
                   this->mAlgorithms.push_back(SharedSplittingAlgorithm(new Coupled2DSplitting(this->mId, this->mNCpu, dim)));
-               #endif //GEOMHDISCC_MPIALGO_COUPLED2D
+               #endif //QUICC_MPIALGO_COUPLED2D
 
 
                // Check if problem is 3D
                if(dim.size() == 3)
                {
-                  #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+                  #ifdef QUICC_MPIALGO_SINGLE2D
                      // Add the single splitting algorithm for second data exchange
                      this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->mId, this->mNCpu, dim, Splitting::Locations::SECOND)));
-                  #endif //GEOMHDISCC_MPIALGO_SINGLE2D
+                  #endif //QUICC_MPIALGO_SINGLE2D
 
-                  #ifdef GEOMHDISCC_MPIALGO_TUBULAR
+                  #ifdef QUICC_MPIALGO_TUBULAR
                      // Add the tubular splitting algorithm
                      this->mAlgorithms.push_back(SharedSplittingAlgorithm(new TubularSplitting(this->mId, this->mNCpu, dim)));
-                  #endif //GEOMHDISCC_MPIALGO_TUBULAR
+                  #endif //QUICC_MPIALGO_TUBULAR
                }
 
             // 1D problems can't be parallelised with the current algorithms
@@ -102,7 +102,7 @@ namespace Parallel {
          #else
             // nCpu can't be bigger than one without MPI
             throw Exception("Initialisation of nCPU > 1 without MPI is not possible!");
-         #endif //GEOMHDISCC_MPI
+         #endif //QUICC_MPI
       }
 
       // Safety check to make sure at least one algorithm has been initialised
@@ -147,10 +147,10 @@ namespace Parallel {
                      }
                   }
 
-                  #ifdef GEOMHDISCC_DEBUG
+                  #ifdef QUICC_DEBUG
                   // Show description of tested splittings
                   this->describeSplitting(scored.second.second, true);
-                  #endif // GEOMHDISCC_DEBUG
+                  #endif // QUICC_DEBUG
                }
             }
          }
@@ -168,13 +168,13 @@ namespace Parallel {
          // Describe the splitting with the highest score
          this->describeSplitting(this->mScores.rbegin()->second.second);
 
-         #ifdef GEOMHDISCC_DEBUG
+         #ifdef QUICC_DEBUG
             for(std::vector<IoXml::SharedVtpWriter>::const_iterator it = this->mScores.rbegin()->second.second.vtpFiles.begin(); it != this->mScores.rbegin()->second.second.vtpFiles.end(); ++it)
             {
                (*it)->write();
                (*it)->finalize();
             }
-         #endif //GEOMHDISCC_DEBUG
+         #endif //QUICC_DEBUG
 
          // Return the splitting with the highest score
          return this->mScores.rbegin()->second;

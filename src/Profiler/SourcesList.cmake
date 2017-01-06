@@ -1,4 +1,4 @@
-if(GEOMHDISCC_PROFILE)
+if(QUICC_PROFILE)
    # Create list of sources
    set(MHDSources
       ProfilerBase.cpp
@@ -6,13 +6,13 @@ if(GEOMHDISCC_PROFILE)
    )
 
    # Add in the parallel or serial profiler depending on setup
-   if(GEOMHDISCC_MPI)
+   if(QUICC_MPI)
       list(APPEND MHDSources MpiProfiler.cpp)
-   else(GEOMHDISCC_MPI)
+   else(QUICC_MPI)
       list(APPEND MHDSources SerialProfiler.cpp)
-   endif(GEOMHDISCC_MPI)
-else(GEOMHDISCC_PROFILE)
+   endif(QUICC_MPI)
+else(QUICC_PROFILE)
    # Create empty list of sources
    set(MHDSources
    )
-endif(GEOMHDISCC_PROFILE)
+endif(QUICC_PROFILE)

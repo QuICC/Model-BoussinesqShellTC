@@ -136,12 +136,12 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 

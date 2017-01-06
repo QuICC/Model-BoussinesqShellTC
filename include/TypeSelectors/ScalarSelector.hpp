@@ -23,11 +23,11 @@
 #include "ScalarFields/ScalarFieldSetup.hpp"
 #include "ScalarFields/FlatScalarField.hpp"
 
-#ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+#ifdef QUICC_SPATIALDIMENSION_3D
    #define DIMENSIONS_ID Dimensions::THREED
 #else
    #define DIMENSIONS_ID Dimensions::TWOD
-#endif //GEOMHDISCC_SPATIALDIMENSION_3D
+#endif //QUICC_SPATIALDIMENSION_3D
 
 namespace GeoMHDiSCC {
 
@@ -37,7 +37,7 @@ namespace GeoMHDiSCC {
       template<Dimensions::Transform::Id TId> struct ScalarSelector;
 
       // Configure code to use TTT scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_TTT
+      #ifdef QUICC_SPATIALSCHEME_TTT
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
@@ -58,10 +58,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_TTT
+      #endif //QUICC_SPATIALSCHEME_TTT
 
       // Configure code to use TFT scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_TFT
+      #ifdef QUICC_SPATIALSCHEME_TFT
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -82,10 +82,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_TFT
+      #endif //QUICC_SPATIALSCHEME_TFT
 
       // Configure code to use TFF scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+      #ifdef QUICC_SPATIALSCHEME_TFF
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -106,10 +106,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+      #endif //QUICC_SPATIALSCHEME_TFF
 
       // Configure code to use FFF scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_FFF
+      #ifdef QUICC_SPATIALSCHEME_FFF
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -130,10 +130,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_FFF
+      #endif //QUICC_SPATIALSCHEME_FFF
 
       // Configure code to use CFT scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
+      #ifdef QUICC_SPATIALSCHEME_CFT
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -154,10 +154,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_CFT
+      #endif //QUICC_SPATIALSCHEME_CFT
 
       // Configure code to use AFT scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+      #ifdef QUICC_SPATIALSCHEME_AFT
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -178,10 +178,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_AFT
+      #endif //QUICC_SPATIALSCHEME_AFT
 
       // Configure code to use BLF scheme
-      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFM
+      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_BLFM
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -202,10 +202,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_BLF
+      #endif //QUICC_SPATIALSCHEME_BLF
 
       // Configure code to use SLF scheme
-      #if defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
+      #if defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_SLFM
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -226,10 +226,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
          };
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
+      #endif //defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_SLFM
 
       // Configure code to use WFT scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
+      #ifdef QUICC_SPATIALSCHEME_WFT
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -250,10 +250,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_WFT
+      #endif //QUICC_SPATIALSCHEME_WFT
 
       // Configure code to use WLF scheme
-      #if defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+      #if defined QUICC_SPATIALSCHEME_WLFL || defined QUICC_SPATIALSCHEME_WLFM
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
@@ -274,10 +274,10 @@ namespace GeoMHDiSCC {
    
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
          };
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_WLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+      #endif //defined QUICC_SPATIALSCHEME_WLFL || defined QUICC_SPATIALSCHEME_WLFM
 
       // Configure code to use TT scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_TT
+      #ifdef QUICC_SPATIALSCHEME_TT
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDFloat, Dimensions::TWOD> FwdType;
@@ -291,10 +291,10 @@ namespace GeoMHDiSCC {
 
             typedef  FlatScalarField<MHDFloat, Dimensions::TWOD> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_TT
+      #endif //QUICC_SPATIALSCHEME_TT
 
       // Configure code to use TF scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_TF
+      #ifdef QUICC_SPATIALSCHEME_TF
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
          {
             typedef  FlatScalarField<MHDComplex, Dimensions::TWOD> FwdType;
@@ -308,7 +308,7 @@ namespace GeoMHDiSCC {
 
             typedef  FlatScalarField<MHDComplex, Dimensions::TWOD> BwdType;
          };
-      #endif //GEOMHDISCC_SPATIALSCHEME_TF
+      #endif //QUICC_SPATIALSCHEME_TF
 
       /// Typedef for the spectral space scalar
       typedef ScalarSelector<Dimensions::Transform::TRA1D>::BwdType SpectralScalarType;

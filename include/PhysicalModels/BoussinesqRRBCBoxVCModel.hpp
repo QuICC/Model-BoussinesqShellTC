@@ -119,17 +119,17 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-#if defined GEOMHDISCC_MPIALGO_COUPLED2D && !defined GEOMHDISCC_MPISPSOLVE
+#if defined QUICC_MPIALGO_COUPLED2D && !defined QUICC_MPISPSOLVE
 #error "The COUPLED2D parallelisation is not supported without MPI sparse solver!" 
-#endif //GEOMHDISCC_MPIALGO_COUPLED2D && !defined GEOMHDISCC_MPISPSOLVE
-#if defined GEOMHDISCC_MPIALGO_SINGLE1D && !defined GEOMHDISCC_MPISPSOLVE
+#endif //QUICC_MPIALGO_COUPLED2D && !defined QUICC_MPISPSOLVE
+#if defined QUICC_MPIALGO_SINGLE1D && !defined QUICC_MPISPSOLVE
 #error "The SINGLE1D parallelisation is not supported without MPI sparse solver!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE1D && !defined GEOMHDISCC_MPISPSOLVE
-#if defined GEOMHDISCC_MPIALGO_SINGLE2D && !defined GEOMHDISCC_MPISPSOLVE
+#endif //QUICC_MPIALGO_SINGLE1D && !defined QUICC_MPISPSOLVE
+#if defined QUICC_MPIALGO_SINGLE2D && !defined QUICC_MPISPSOLVE
 #error "The SINGLE2D parallelisation is not supported without MPI sparse solver!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE2D && !defined GEOMHDISCC_MPISPSOLVE
-#if defined GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_MPISPSOLVE
+#endif //QUICC_MPIALGO_SINGLE2D && !defined QUICC_MPISPSOLVE
+#if defined QUICC_MPIALGO_TUBULAR && !defined QUICC_MPISPSOLVE
 #error "The TUBULAR parallelisation is not supported without MPI sparse solver!" 
-#endif //GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_MPISPSOLVE
+#endif //QUICC_MPIALGO_TUBULAR && !defined QUICC_MPISPSOLVE
 
 #endif // BOUSSINESQRRBCBOXVCMODEL_HPP

@@ -94,11 +94,11 @@ namespace Transform {
    /// Typdef for a smart reference counting pointer to a backward grouper base
    typedef SharedPtrMacro<IBackwardGrouper2D>   SharedIBackwardGrouper2D;
 
-   #ifdef GEOMHDISCC_SPATIALDIMENSION_2D
+   #ifdef QUICC_SPATIALDIMENSION_2D
       typedef IBackwardGrouper2D IBackwardGrouper;
 
       typedef SharedPtrMacro<IBackwardGrouper2D>   SharedIBackwardGrouper;
-   #endif //GEOMHDISCC_SPATIALDIMENSION_2D
+   #endif //QUICC_SPATIALDIMENSION_2D
 
 }
 }

@@ -39,11 +39,11 @@ namespace IoHdf5 {
       // Default options are fine for serial case
       //
 
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          // Create file access property list
          hid_t fPList = H5Pcreate(H5P_FILE_ACCESS);
 
-         #ifdef GEOMHDISCC_ON_JANUS
+         #ifdef QUICC_ON_JANUS
             // Deactivate incompatible ROMIO features
             MPI_Info info;
             MPI_Info_create(&info);
@@ -58,10 +58,10 @@ namespace IoHdf5 {
          #else
             // Create the MPI IO access property
             H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, MPI_INFO_NULL);
-         #endif // GEOMHDISCC_ON_JANUS
+         #endif // QUICC_ON_JANUS
       #else
          hid_t fPList(H5P_DEFAULT);
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
 
       return fPList;
    }
@@ -72,7 +72,7 @@ namespace IoHdf5 {
       // Default options are fine for serial case
       //
 
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          // Create dataset transfer property list
          hid_t dsPList = H5Pcreate(H5P_DATASET_XFER);
 
@@ -83,7 +83,7 @@ namespace IoHdf5 {
          //H5Pset_dxpl_mpio(dsPList, H5FD_MPIO_INDEPENDENT);
       #else
          hid_t dsPList(H5P_DEFAULT);
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
 
       return dsPList;
    }

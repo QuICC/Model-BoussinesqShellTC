@@ -196,12 +196,12 @@ namespace Transform {
           */
          void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 

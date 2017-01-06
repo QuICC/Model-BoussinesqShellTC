@@ -3,7 +3,7 @@
  * @brief This class defines the forward transform grouping algorithm
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
+#ifdef QUICC_TRANSGROUPER_TRANSFORM
 
 #ifndef FORWARDTRANSFORMGROUPER_HPP
 #define FORWARDTRANSFORMGROUPER_HPP
@@ -250,4 +250,4 @@ namespace Transform {
 
 #endif // FORWARDTRANSFORMGROUPER_HPP
 
-#endif //GEOMHDISCC_TRANSGROUPER_TRANSFORM
+#endif //QUICC_TRANSGROUPER_TRANSFORM

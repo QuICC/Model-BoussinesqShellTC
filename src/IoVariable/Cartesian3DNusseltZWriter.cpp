@@ -113,9 +113,9 @@ namespace IoVariable {
       }
 
       // Get the "global" field
-      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE 
+      #if defined QUICC_MPI && defined QUICC_MPISPSOLVE 
          MPI_Reduce(MPI_IN_PLACE, field.data(), field.rows(), MPI_DOUBLE, MPI_SUM, 0, GeoMHDiSCC::FramworkMacro::getSubComm(MpiFramwork::LOCAL));
-      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
       Matrix nusselt = -this->mNusseltOp*field;
       assert(nusselt.rows() == nusselt.cols() && nusselt.rows() == 1);

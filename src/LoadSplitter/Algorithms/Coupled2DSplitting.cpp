@@ -81,11 +81,11 @@ namespace Parallel {
    void Coupled2DSplitting::selectGrouper()
    {
       // SINGLE1D or TRANSFORM grouper setup
-      #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
+      #if defined QUICC_TRANSGROUPER_SINGLE1D
          this->mGrouper = Splitting::Groupers::SINGLE1D;
       #else
          this->mGrouper = Splitting::Groupers::EQUATION;
-      #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
+      #endif //defined QUICC_TRANSGROUPER_SINGLE1D
    }
 
    Array Coupled2DSplitting::computeScore(SharedResolution spResolution)

@@ -33,7 +33,7 @@ namespace Schemes {
       WLFmScheme::tuneMpiResolution(descr);
       
       // Create spectral space sub communicators
-      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
          // MPI error code
          int ierr;
 
@@ -197,7 +197,7 @@ namespace Schemes {
          // Free communicator
          ierr = MPI_Comm_free(&comm);
          FrameworkMacro::check(ierr, 825);
-      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
    }
 
    void WLFmScheme::addTransformSetups(SharedResolution spRes) const

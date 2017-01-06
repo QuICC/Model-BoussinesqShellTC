@@ -18,8 +18,8 @@
 //
 #include "Exceptions/Exception.hpp"
 
-#define GEOMHDISCC_WORLAND_NORM_UNITY
-//#define GEOMHDISCC_WORLAND_NORM_NATURAL
+#define QUICC_WORLAND_NORM_UNITY
+//#define QUICC_WORLAND_NORM_NATURAL
 
 namespace GeoMHDiSCC {
 
@@ -979,110 +979,110 @@ namespace Polynomial {
    //
    ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWPnab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWPnab;
       #else 
          return &WorlandPolynomial::naturalWPnab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWP1ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWP1ab;
       #else 
          return &WorlandPolynomial::naturalWP1ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWP0ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWP0ab;
       #else 
          return &WorlandPolynomial::naturalWP0ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWDPnab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWDPnab;
       #else 
          return &WorlandPolynomial::naturalWDPnab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWDP1ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWDP1ab;
       #else 
          return &WorlandPolynomial::naturalWDP1ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWDP0ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWDP0ab;
       #else 
          return &WorlandPolynomial::naturalWDP0ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWD2Pnab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWD2Pnab;
       #else 
          return &WorlandPolynomial::naturalWD2Pnab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD2P1ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWD2P1ab;
       #else 
          return &WorlandPolynomial::naturalWD2P1ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD2P0ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWD2P0ab;
       #else 
          return &WorlandPolynomial::naturalWD2P0ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerNAB  WorlandPolynomial::normWD3Pnab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWD3Pnab;
       #else 
          return &WorlandPolynomial::naturalWD3Pnab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD3P1ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWD3P1ab;
       #else 
          return &WorlandPolynomial::naturalWD3P1ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    ThreeTermRecurrence::NormalizerAB  WorlandPolynomial::normWD3P0ab()
    {
-      #ifdef GEOMHDISCC_WORLAND_NORM_UNITY
+      #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandPolynomial::unitWD3P0ab;
       #else 
          return &WorlandPolynomial::naturalWD3P0ab;
-      #endif //GEOMHDISCC_WORLAND_NORM_UNITY
+      #endif //QUICC_WORLAND_NORM_UNITY
    }
 
    //

@@ -91,12 +91,12 @@ namespace Datatypes {
           */
          void initPhysicalGradient2(const FieldComponents::Spectral::Id id, const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
          /**
@@ -190,7 +190,7 @@ namespace Datatypes {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TVariable, int DOMAINS> MHDFloat  VariableDomain<TVariable,DOMAINS>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -202,7 +202,7 @@ namespace Datatypes {
       }
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

@@ -3,7 +3,7 @@
  * @brief This class defines a simple equation wise forward transform grouping algorithm (serial algorithm)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_TRANSGROUPER_EQUATION
+#ifdef QUICC_TRANSGROUPER_EQUATION
 
 #ifndef FORWARDEQUATIONGROUPER_HPP
 #define FORWARDEQUATIONGROUPER_HPP
@@ -61,14 +61,14 @@ namespace Transform {
           */
          virtual ArrayI packs1D(const std::vector<TransformTree>& integratorTree);
 
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             /**
              * @brief Get the number of required buffer packs for the second exchange
              *
              * @param integratorTree Transform integrator tree
              */
             virtual ArrayI packs2D(const std::vector<TransformTree>& integratorTree);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
       protected:
          /**
@@ -170,11 +170,11 @@ namespace Transform {
 
    template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          int packs = this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Physical::Id>()));
 
          TConfigurator::setup2DCommunication(packs, coord);
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
    }
 
    template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const std::vector<TransformTree>& integratorTree)
@@ -182,16 +182,16 @@ namespace Transform {
       return this->namePacks1D(integratorTree);
    }
 
-   #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+   #ifdef QUICC_SPATIALDIMENSION_3D
       template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const std::vector<TransformTree>& integratorTree)
       {  
          return this->namePacks2D(integratorTree);
       }
-   #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+   #endif //QUICC_SPATIALDIMENSION_3D
 
 }
 }
 
 #endif // FORWARDEQUATIONGROUPER_HPP
 
-#endif //GEOMHDISCC_TRANSGROUPER_EQUATION
+#endif //QUICC_TRANSGROUPER_EQUATION

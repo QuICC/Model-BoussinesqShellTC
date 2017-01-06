@@ -106,7 +106,7 @@ namespace Equations {
       MHDFloat ratio1D = this->mRatio1D.find(compId)->second;
       MHDFloat ratio2D = this->mRatio2D.find(compId)->second;
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          // Get ratios for components
          MHDFloat ratio3D = this->mRatio3D.find(compId)->second;
 
@@ -124,14 +124,14 @@ namespace Equations {
          int z1D = 4;
          int z2D = 4;
          int z3D = 4;
-         #if defined GEOMHDISCC_SPATIALSCHEME_TFF
+         #if defined QUICC_SPATIALSCHEME_TFF
          z2D = 2;
          if(k_ >= n2D/2)
          {
             k_ = n2D - k_;
          }
          n2D = n2D/2;
-         #endif //defined GEOMHDISCC_SPATIALSCHEME_TFF
+         #endif //defined QUICC_SPATIALSCHEME_TFF
 
          if(i < n1D-z1D && j_ < n3D - z3D && k_ < n2D - z2D)
          {
@@ -176,7 +176,7 @@ namespace Equations {
          {
             return Datatypes::SpectralScalarType::PointType(0);
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
    }
 
    void RandomVectorState::setRequirements()
@@ -210,7 +210,7 @@ namespace Equations {
 
       val.real() = tmp;
 
-      #if defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+      #if defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM || defined QUICC_SPATIALSCHEME_AFT || defined QUICC_SPATIALSCHEME_CFT || defined QUICC_SPATIALSCHEME_WFT
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             this->makeRandom(tmp, i, j, k, minVal, maxVal);
@@ -219,7 +219,7 @@ namespace Equations {
          {
             val.imag() = 0.0;
          }
-      #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+      #elif defined QUICC_SPATIALSCHEME_TFF
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0 && this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             unsigned int seed = 2;
@@ -254,7 +254,7 @@ namespace Equations {
          {
             val.imag() = 0.0;
          }
-      #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+      #elif defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k) != 0)
          {
             this->makeRandom(tmp, i, j, k, minVal, maxVal);
@@ -263,7 +263,7 @@ namespace Equations {
          {
             val.imag() = 0.0;
          }
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+      #endif //defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM || defined QUICC_SPATIALSCHEME_AFT || defined QUICC_SPATIALSCHEME_CFT || defined QUICC_SPATIALSCHEME_WFT
    }
 
    void RandomVectorState::setNLComponents()

@@ -105,12 +105,12 @@ namespace Timestep {
       }
       
       // Gather error across processes
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
       if(this->mError > 0.0)
       {
          MPI_Allreduce(MPI_IN_PLACE, &this->mError, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
       }
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
       
       // No error control and no CFL condition
       MHDFloat newErrorDt = 0.0;
@@ -276,49 +276,49 @@ namespace Timestep {
 
       // General linear solver
       oss << "General solver: ";
-      #if defined GEOMHDISCC_SPLINALG_MUMPS
+      #if defined QUICC_SPLINALG_MUMPS
          oss << "MUMPS";
-      #elif defined GEOMHDISCC_SPLINALG_UMFPACK
+      #elif defined QUICC_SPLINALG_UMFPACK
          oss << "UmfPack";
-      #elif defined GEOMHDISCC_SPLINALG_SPARSELU
+      #elif defined QUICC_SPLINALG_SPARSELU
          oss << "SparseLU";
       #else
          oss << "(unknown)";
-      #endif //defined GEOMHDISCC_SPLINALG_MUMPS
+      #endif //defined QUICC_SPLINALG_MUMPS
 
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");
 
       // Triangular linear solver
       oss << "Triangular solver: ";
-      #if defined GEOMHDISCC_SPTRILINALG_SPARSELU
+      #if defined QUICC_SPTRILINALG_SPARSELU
          oss << "SparseLU";
-      #elif defined GEOMHDISCC_SPTRILINALG_MUMPS
+      #elif defined QUICC_SPTRILINALG_MUMPS
          oss << "MUMPS";
-      #elif defined GEOMHDISCC_SPTRILINALG_UMFPACK
+      #elif defined QUICC_SPTRILINALG_UMFPACK
          oss << "UmfPack";
       #else
          oss << "(unknown)";
-      #endif //defined GEOMHDISCC_SPTRILINALG_SPARSELU
+      #endif //defined QUICC_SPTRILINALG_SPARSELU
 
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");
 
       // SPD linear solver
       oss << "SPD solver: ";
-      #if defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
+      #if defined QUICC_SPSPDLINALG_SIMPLICIALLDLT
          oss << "SimplicialLDLT";
-      #elif defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLLT
+      #elif defined QUICC_SPSPDLINALG_SIMPLICIALLLT
          oss << "SimplicialLLT";
-      #elif defined GEOMHDISCC_SPSPDLINALG_MUMPS
+      #elif defined QUICC_SPSPDLINALG_MUMPS
          oss << "MUMPS";
-      #elif defined GEOMHDISCC_SPSPDLINALG_UMFPACK
+      #elif defined QUICC_SPSPDLINALG_UMFPACK
          oss << "UmfPack";
-      #elif defined GEOMHDISCC_SPSPDLINALG_SPARSELU
+      #elif defined QUICC_SPSPDLINALG_SPARSELU
          oss << "SparseLU";
       #else
          oss << "(unknown)";
-      #endif //defined GEOMHDISCC_SPSPDLINALG_SIMPLICIALLDLT
+      #endif //defined QUICC_SPSPDLINALG_SIMPLICIALLDLT
 
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");

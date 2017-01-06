@@ -2,6 +2,6 @@
 set(MHDSources
 )
 
-if(GEOMHDISCC_SPLINALG STREQUAL "Pardiso")
+if(QUICC_SPLINALG STREQUAL "Pardiso")
    list(APPEND MHDSources Pardiso_Real.cpp Pardiso_Complex.cpp)
-endif(GEOMHDISCC_SPLINALG STREQUAL "Pardiso")
+endif(QUICC_SPLINALG STREQUAL "Pardiso")

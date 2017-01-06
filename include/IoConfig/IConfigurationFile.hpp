@@ -374,7 +374,7 @@ namespace IoConfig {
       //
       // Start of MPI block
       //
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
 
       // Create MPI compatible storage for the integer values
       std::vector<int> iData;
@@ -534,7 +534,7 @@ namespace IoConfig {
       //
       // End of MPI block
       //
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
    }
 
 }

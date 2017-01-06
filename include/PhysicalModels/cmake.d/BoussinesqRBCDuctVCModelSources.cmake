@@ -1,16 +1,16 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRBCDuctVCTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRBCDuctVCMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRBCDuctVCContinuity.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactStateIds.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/ContinuityTags.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/ContinuityWriter.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${QUICC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRBCDuctVCTransport.cpp
+   ${QUICC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRBCDuctVCMomentum.cpp
+   ${QUICC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRBCDuctVCContinuity.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/Eigen1DTools.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CartesianExactStateIds.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/CartesianExactVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/IoVariable/ContinuityTags.cpp
+   ${QUICC_SRC_DIR}/IoVariable/ContinuityWriter.cpp
+   ${QUICC_SRC_DIR}/IoVariable/EnergyTags.cpp
 )
