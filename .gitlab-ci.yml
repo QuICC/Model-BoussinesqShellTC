@@ -1,0 +1,13 @@
+before_script:
+  - mkdir QuICC_builds
+  - cd QuICC_builds
+  
+BoussinesqDynamoSphereStd:
+  script:
+    - mkdir -p BoussinesqDynamoSphereStd/Serial
+    - cd BoussinesqDynamoSphereStd/Serial
+    - cmake
+    - make -j 4 BoussinesqDynamoSphereStdConfig
+    - make -j 4 BoussinesqDynamoSphereStdState
+    - make -j 4 BoussinesqDynamoSphereStdModel
+    - make -j 4 BoussinesqDynamoSphereStdVisu
