@@ -1,22 +1,32 @@
 before_script:
    - git submodule sync
    - git submodule update --init
-   - mkdir QuICC_builds
-   - cd QuICC_builds
+   - mkdir QuICC_build
+   - cd QuICC_build
 
-.VariableTemplate: 
+.SerialBuildCB2: 
    variables: &ModelVariables
       CI_QUICC_BOUNDARYMETHOD: "Tau"
+      CI_QUICC_MPIALGO: "Serial"
       CI_QUICC_FFT: "FFTW"
       CI_QUICC_PYTHON: "python34"
       CI_QUICC_SMARTPTR: "TR1"
       CI_QUICC_SPLINALG: "UmfPack"
       CI_QUICC_TIMESTEPPER: "ImExRKCB2"
 
+.SerialBuildRK3: 
+   variables: &ModelVariables
+      CI_QUICC_BOUNDARYMETHOD: "Tau"
+      CI_QUICC_MPIALGO: "Serial"
+      CI_QUICC_FFT: "FFTW"
+      CI_QUICC_PYTHON: "python34"
+      CI_QUICC_SMARTPTR: "TR1"
+      CI_QUICC_SPLINALG: "UmfPack"
+      CI_QUICC_TIMESTEPPER: "ImExRK3"
+
 .ModelTemplate: &ModelBuild
    script:
-      - mkdir -p ${MODELNAME}/${CI_QUICC_MPIALGO}
-      - cd ${MODELNAME}/${CI_QUICC_MPIALGO}
+      - export
       - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM} ${CI_PROJECT_DIR} >& /dev/null || true
       - cmake -DQUICC_BOUNDARYMETHOD=${CI_QUICC_BOUNDARYMETHOD} -DQUICC_FFTPLAN=${CI_QUICC_FFT} -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${CI_QUICC_MPIALGO} -DQUICC_PYTHON=${CI_QUICC_PYTHON} -DQUICC_SMARTPTR=${CI_QUICC_SMARTPTR} -DQUICC_SPLINALG=${CI_QUICC_SPLINALG} -DQUICC_TIMESTEPPER=${CI_QUICC_TIMESTEPPER} ${CI_PROJECT_DIR} >& /dev/null || true
       - cmake -DQUICC_TRANSGROUPER=Equation ${CI_PROJECT_DIR}
@@ -32,158 +42,123 @@ before_script:
 #####################
 
 BoussinesqFPlane3DQG:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqFPlane3DQG"
+   variables: *SerialBuildCB2Vars
    <<: *ModelBuild
 
 BoussinesqTiltedFPlane3DQG:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqTiltedFPlane3DQG"
+   variables: *SerialBuildCB2Vars
    <<: *ModelBuild
 
 BoussinesqNoTiltedFPlane3DQG:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqNoTiltedFPlane3DQG"
+   variables: *SerialBuildCB2Vars
    <<: *ModelBuild
 
 BoussinesqFPlaneNHBGE:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqFPlaneNHBGE"
+   variables: *SerialBuildCB2Vars
    <<: *ModelBuild
 
 BoussinesqRRBCPlane:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqRRBCPlane"
+   variables: *SerialBuildCB2Vars
    <<: *ModelBuild
 
 #####################
 #### CYLINDRICAL ####
 #####################
 
-BoussinesqRBCCylinder:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqRBCCylinder"
-   <<: *ModelBuild
-
-BoussinesqRRBCCylinder:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqRRBCCylinder"
-   <<: *ModelBuild
-
-#####################
-##### SPHERICAL #####
-#####################
-
-BoussinesqTCSphere:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqTCSphere"
-      CI_QUICC_TIMESTEPPER: "ImExRKCB3c"
-   <<: *ModelBuild
-  
-BoussinesqRTCSphere:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqRTCSphere"
-      CI_QUICC_TIMESTEPPER: "ImExRKCB3c"
-   <<: *ModelBuild
-  
-BoussinesqDynamoSphere:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqDynamoSphere"
-   <<: *ModelBuild
-  
-BoussinesqTCSphereStd:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqTCSphereStd"
-   <<: *ModelBuild
-  
-BoussinesqRTCSphereStd:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqRTCSphereStd"
-   <<: *ModelBuild
-  
-BoussinesqDynamoSphereStd:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqDynamoSphereStd"
-   <<: *ModelBuild
-  
-BoussinesqCouetteShell:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqCouetteShell"
-   <<: *ModelBuild
-  
-BoussinesqDynamoCouetteShell:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqDynamoCouetteShell"
-   <<: *ModelBuild
-  
-BoussinesqTCShell:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqTCShell"
-   <<: *ModelBuild
-  
-BoussinesqRTCShell:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqRTCShell"
-   <<: *ModelBuild
-  
-BoussinesqDynamoShell:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqDynamoShell"
-   <<: *ModelBuild
-  
-BoussinesqTCShellStd:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqTCShellStd"
-   <<: *ModelBuild
-  
-BoussinesqRTCShellStd:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqRTCShellStd"
-   <<: *ModelBuild
-  
-BoussinesqDynamoShellStd:
-   variables: *ModelVariables
-   variables:
-      CI_QUICC_MPIALGO: "Serial"
-      MODELNAME: "BoussinesqDynamoShellStd"
-   <<: *ModelBuild
+#BoussinesqRBCCylinder:
+#   variables: *SerialBuildCB2Vars
+#   <<: *ModelBuild
+#
+#BoussinesqRRBCCylinder:
+#   variables: *SerialBuildCB2Vars
+#   <<: *ModelBuild
+#
+######################
+###### SPHERICAL #####
+######################
+#
+#BoussinesqTCSphere:
+#   variables: *SerialBuildCB2Vars
+#   variables:
+#      MODELNAME: "BoussinesqTCSphere"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqRTCSphere:
+#   variables:
+#      MODELNAME: "BoussinesqRTCSphere"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqDynamoSphere:
+#   variables:
+#      MODELNAME: "BoussinesqDynamoSphere"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqTCSphereStd:
+#   variables:
+#      MODELNAME: "BoussinesqTCSphereStd"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqRTCSphereStd:
+#   variables:
+#      MODELNAME: "BoussinesqRTCSphereStd"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqDynamoSphereStd:
+#   variables:
+#      MODELNAME: "BoussinesqDynamoSphereStd"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqCouetteShell:
+#   variables:
+#      MODELNAME: "BoussinesqCouetteShell"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqDynamoCouetteShell:
+#   variables:
+#      MODELNAME: "BoussinesqDynamoCouetteShell"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqTCShell:
+#   variables:
+#      MODELNAME: "BoussinesqTCShell"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqRTCShell:
+#   variables:
+#      MODELNAME: "BoussinesqRTCShell"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqDynamoShell:
+#   variables:
+#      MODELNAME: "BoussinesqDynamoShell"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqTCShellStd:
+#   variables: *ModelVariables
+#   variables:
+#      CI_QUICC_MPIALGO: "Serial"
+#      MODELNAME: "BoussinesqTCShellStd"
+#   <<: *ModelBuild
+#  
+#BoussinesqRTCShellStd:
+#   variables:
+#      MODELNAME: "BoussinesqRTCShellStd"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
+#  
+#BoussinesqDynamoShellStd:
+#   variables:
+#      MODELNAME: "BoussinesqDynamoShellStd"
+#      CI_QUICC_MPIALGO: "Serial"
+#   <<: *ModelBuild
