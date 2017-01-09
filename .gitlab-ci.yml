@@ -5,7 +5,7 @@ before_script:
    - cd QuICC_build
 
 .SerialBuildCB2: 
-   variables: &ModelVariables
+   variables: &SerialBuildCB2Vars
       CI_QUICC_BOUNDARYMETHOD: "Tau"
       CI_QUICC_MPIALGO: "Serial"
       CI_QUICC_FFT: "FFTW"
@@ -15,7 +15,7 @@ before_script:
       CI_QUICC_TIMESTEPPER: "ImExRKCB2"
 
 .SerialBuildRK3: 
-   variables: &ModelVariables
+   variables: &SerialBuildRK3Vars
       CI_QUICC_BOUNDARYMETHOD: "Tau"
       CI_QUICC_MPIALGO: "Serial"
       CI_QUICC_FFT: "FFTW"
