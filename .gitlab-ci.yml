@@ -6,7 +6,9 @@ BoussinesqDynamoSphereStd:
   script:
     - mkdir -p BoussinesqDynamoSphereStd/Serial
     - cd BoussinesqDynamoSphereStd/Serial
-    - cmake -DQUICC_PLATFORM=Lothlorien -DQUICC_COMPILER=GCC -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFT=FFTW -DQUICC_FFTPLAN=Medium -DQUICC_LARGEIO=HDF5 -DQUICC_MPIALGO=Serial -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_TRANSGROUPER=Equation -DQUICC_MEMORYUSAGE=High -DQUICC_TIMESTEPPER=ImExRKCB2 -DQUICC_SPLINALG=UmfPack ../../../
+    - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=Lothlorien  ../../../ || true
+    - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=Serial -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2  ../../../ || true
+    - cmake -DQUICC_TRANSGROUPER=Equation ../../../
     - make -j 4 BoussinesqDynamoSphereStdConfig
     - make -j 4 BoussinesqDynamoSphereStdState
     - make -j 4 BoussinesqDynamoSphereStdModel
