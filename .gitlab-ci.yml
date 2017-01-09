@@ -1,4 +1,6 @@
 before_script:
+  - git submodule init
+  - git submodule update
   - mkdir QuICC_builds
   - cd QuICC_builds
   
@@ -9,6 +11,7 @@ BoussinesqDynamoSphereStd:
     - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=Lothlorien  ../../../ || true
     - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=Serial -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2  ../../../ || true
     - cmake -DQUICC_TRANSGROUPER=Equation ../../../
+    - make install
     - make -j 4 BoussinesqDynamoSphereStdConfig
     - make -j 4 BoussinesqDynamoSphereStdState
     - make -j 4 BoussinesqDynamoSphereStdModel
