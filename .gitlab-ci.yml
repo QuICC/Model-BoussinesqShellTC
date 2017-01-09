@@ -1,18 +1,33 @@
 before_script:
-  - git submodule sync
-  - git submodule update --init
-  - mkdir QuICC_builds
-  - cd QuICC_builds
+   - git submodule sync
+   - git submodule update --init
+   - mkdir QuICC_builds
+   - cd QuICC_builds
+
+.ModelTemplate: &ModelBuild
+   script:
+      - mkdir -p ${EXENAME}/${PARANAME}
+      - cd ${EXENAME}/${PARANAME}
+      - echo ${CI_PROJECT_DIR}
+      - echo ${CI_QUICC_PARAMAKE}
+      - echo ${CI_QUICC_PLATFORM}
+      - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM}  ../../../ || true
+      - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${PARANAME} -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2  ../../../ || true
+      - cmake -DQUICC_TRANSGROUPER=Equation ../../../
+      - make install
+        #- make -j ${CI_QUICC_PARMAKE} ${EXENAME}Config
+        #- make -j ${CI_QUICC_PARMAKE} ${EXENAME}State
+      - make -j ${CI_QUICC_PARMAKE} ${EXENAME}Model
+        #- make -j ${CI_QUICC_PARMAKE} ${EXENAME}Visu
   
 BoussinesqDynamoSphereStd:
-  script:
-    - mkdir -p BoussinesqDynamoSphereStd/Serial
-    - cd BoussinesqDynamoSphereStd/Serial
-    - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=Lothlorien  ../../../ || true
-    - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=Serial -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2  ../../../ || true
-    - cmake -DQUICC_TRANSGROUPER=Equation ../../../
-    - make install
-    - make -j 4 BoussinesqDynamoSphereStdConfig
-    - make -j 4 BoussinesqDynamoSphereStdState
-    - make -j 4 BoussinesqDynamoSphereStdModel
-    - make -j 4 BoussinesqDynamoSphereStdVisu
+   variables:
+      PARANAME: "Serial"
+      EXENAME: "BoussinesqDynamoSphereStd"
+   <<: *ModelBuild
+  
+BoussinesqDynamoShellStd:
+   variables:
+      PARANAME: "Serial"
+      EXENAME: "BoussinesqDynamoShellStd"
+   <<: *ModelBuild
