@@ -4,7 +4,7 @@ before_script:
    - mkdir QuICC_builds
    - cd QuICC_builds
 
-.ModelTemplate: &ModelBuild
+.VariableTemplate: &ModelVariables
    variables:
       CI_QUICC_BOUNDARYMETHOD: "Tau"
       CI_QUICC_FFT: "FFTW"
@@ -12,6 +12,8 @@ before_script:
       CI_QUICC_SMARTPTR: "TR1"
       CI_QUICC_SPLINALG: "UmfPack"
       CI_QUICC_TIMESTEPPER: "ImExRKCB2"
+
+.ModelTemplate: &ModelBuild
    script:
       - mkdir -p ${MODELNAME}/${CI_QUICC_MPIALGO}
       - cd ${MODELNAME}/${CI_QUICC_MPIALGO}
@@ -30,31 +32,31 @@ before_script:
 #####################
 
 BoussinesqFPlane3DQG:
-   variables:
+   variables: *ModelVariables
       CI_QUICC_MPIALGO: "Serial"
       MODELNAME: "BoussinesqFPlane3DQG"
    <<: *ModelBuild
 
 BoussinesqTiltedFPlane3DQG:
-   variables:
+   variables: *ModelVariables
       CI_QUICC_MPIALGO: "Serial"
       MODELNAME: "BoussinesqTiltedFPlane3DQG"
    <<: *ModelBuild
 
 BoussinesqNoTiltedFPlane3DQG:
-   variables:
+   variables: *ModelVariables
       CI_QUICC_MPIALGO: "Serial"
       MODELNAME: "BoussinesqNoTiltedFPlane3DQG"
    <<: *ModelBuild
 
 BoussinesqFPlaneNHBGE:
-   variables:
+   variables: *ModelVariables
       CI_QUICC_MPIALGO: "Serial"
       MODELNAME: "BoussinesqFPlaneNHBGE"
    <<: *ModelBuild
 
 BoussinesqRRBCPlane:
-   variables:
+   variables: *ModelVariables
       CI_QUICC_MPIALGO: "Serial"
       MODELNAME: "BoussinesqRRBCPlane"
    <<: *ModelBuild
@@ -80,18 +82,18 @@ BoussinesqRRBCCylinder:
 #####################
 
 BoussinesqTCSphere:
-   variables:
+   variables: *ModelVariables
       CI_QUICC_MPIALGO: "Serial"
       MODELNAME: "BoussinesqTCSphere"
       CI_QUICC_TIMESTEPPER: "ImExRKCB3c"
    <<: *ModelBuild
   
 BoussinesqRTCSphere:
-   <<: *ModelBuild
-   variables:
+   variables: *ModelVariables
       CI_QUICC_MPIALGO: "Serial"
       MODELNAME: "BoussinesqRTCSphere"
       CI_QUICC_TIMESTEPPER: "ImExRKCB3c"
+   <<: *ModelBuild
   
 BoussinesqDynamoSphere:
    variables:
