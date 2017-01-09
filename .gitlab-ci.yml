@@ -6,26 +6,45 @@ before_script:
 
 .ModelTemplate: &ModelBuild
    script:
-      - echo ${PARANAME}
-      - echo ${MODELNAME}
       - mkdir -p ${MODELNAME}/${PARANAME}
       - cd ${MODELNAME}/${PARANAME}
-      - echo ${CI_PROJECT_DIR}
-      - echo ${CI_QUICC_PARAMAKE}
-      - echo ${CI_QUICC_PLATFORM}
-      - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM} ${CI_PROJECT_DIR} || true
-      - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${PARANAME} -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2 ${CI_PROJECT_DIR} || true
+      - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM} ${CI_PROJECT_DIR} >& /dev/null || true
+      - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${PARANAME} -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2 ${CI_PROJECT_DIR} >& /dev/null || true
       - cmake -DQUICC_TRANSGROUPER=Equation ${CI_PROJECT_DIR}
       - make install
-        #- make -j ${CI_QUICC_PARMAKE} ${MODELNAME}Config
-        #- make -j ${CI_QUICC_PARMAKE} ${MODELNAME}State
-      - make -j ${CI_QUICC_PARMAKE} ${MODELNAME}Model
-        #- make -j ${CI_QUICC_PARMAKE} ${MODELNAME}Visu
+        #- make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}Config
+        #- make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}State
+      - make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}Model
+        #- make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}Visu
+  
+BoussinesqTCSphereStd:
+   variables:
+      PARANAME: "Serial"
+      MODELNAME: "BoussinesqTCSphereStd"
+   <<: *ModelBuild
+  
+BoussinesqRTCSphereStd:
+   variables:
+      PARANAME: "Serial"
+      MODELNAME: "BoussinesqRTCSphereStd"
+   <<: *ModelBuild
   
 BoussinesqDynamoSphereStd:
    variables:
       PARANAME: "Serial"
       MODELNAME: "BoussinesqDynamoSphereStd"
+   <<: *ModelBuild
+  
+BoussinesqTCShellStd:
+   variables:
+      PARANAME: "Serial"
+      MODELNAME: "BoussinesqDynamoShellStd"
+   <<: *ModelBuild
+  
+BoussinesqRTCShellStd:
+   variables:
+      PARANAME: "Serial"
+      MODELNAME: "BoussinesqRTCShellStd"
    <<: *ModelBuild
   
 BoussinesqDynamoShellStd:
