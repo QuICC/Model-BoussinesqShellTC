@@ -41,7 +41,7 @@ before_script:
 #####################
 
 BoussinesqFPlane3DQG:
-   variables: *SerialBuildCB2Vars
+   variables: *SerialBuildRK3Vars
    <<: *ModelBuild
 
 BoussinesqTiltedFPlane3DQG:
@@ -100,11 +100,11 @@ BoussinesqDynamoSphereStd:
    variables: *SerialBuildCB2Vars
    <<: *ModelBuild
   
-BoussinesqCouetteShell:
+BoussinesqCouetteShellStd:
    variables: *SerialBuildCB2Vars
    <<: *ModelBuild
   
-BoussinesqDynamoCouetteShell:
+BoussinesqDynamoCouetteShellStd:
    variables: *SerialBuildCB2Vars
    <<: *ModelBuild
   
