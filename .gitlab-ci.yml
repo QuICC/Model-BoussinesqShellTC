@@ -26,15 +26,14 @@ before_script:
 
 .ModelTemplate: &ModelBuild
    script:
-      - export
       - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM} ${CI_PROJECT_DIR} >& /dev/null || true
       - cmake -DQUICC_BOUNDARYMETHOD=${CI_QUICC_BOUNDARYMETHOD} -DQUICC_FFTPLAN=${CI_QUICC_FFT} -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${CI_QUICC_MPIALGO} -DQUICC_PYTHON=${CI_QUICC_PYTHON} -DQUICC_SMARTPTR=${CI_QUICC_SMARTPTR} -DQUICC_SPLINALG=${CI_QUICC_SPLINALG} -DQUICC_TIMESTEPPER=${CI_QUICC_TIMESTEPPER} ${CI_PROJECT_DIR} >& /dev/null || true
       - cmake -DQUICC_TRANSGROUPER=Equation ${CI_PROJECT_DIR}
       - make install
-        #- make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}Config
-        #- make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}State
-      - make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}Model
-        #- make -j ${CI_QUICC_PARAMAKE} ${MODELNAME}Visu
+        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Config
+        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}State
+      - make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Model
+        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Visu
         
 
 #####################
@@ -65,100 +64,70 @@ BoussinesqRRBCPlane:
 #### CYLINDRICAL ####
 #####################
 
-#BoussinesqRBCCylinder:
-#   variables: *SerialBuildCB2Vars
-#   <<: *ModelBuild
-#
-#BoussinesqRRBCCylinder:
-#   variables: *SerialBuildCB2Vars
-#   <<: *ModelBuild
-#
-######################
-###### SPHERICAL #####
-######################
-#
-#BoussinesqTCSphere:
-#   variables: *SerialBuildCB2Vars
-#   variables:
-#      MODELNAME: "BoussinesqTCSphere"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqRTCSphere:
-#   variables:
-#      MODELNAME: "BoussinesqRTCSphere"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqDynamoSphere:
-#   variables:
-#      MODELNAME: "BoussinesqDynamoSphere"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqTCSphereStd:
-#   variables:
-#      MODELNAME: "BoussinesqTCSphereStd"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqRTCSphereStd:
-#   variables:
-#      MODELNAME: "BoussinesqRTCSphereStd"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqDynamoSphereStd:
-#   variables:
-#      MODELNAME: "BoussinesqDynamoSphereStd"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqCouetteShell:
-#   variables:
-#      MODELNAME: "BoussinesqCouetteShell"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqDynamoCouetteShell:
-#   variables:
-#      MODELNAME: "BoussinesqDynamoCouetteShell"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqTCShell:
-#   variables:
-#      MODELNAME: "BoussinesqTCShell"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqRTCShell:
-#   variables:
-#      MODELNAME: "BoussinesqRTCShell"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqDynamoShell:
-#   variables:
-#      MODELNAME: "BoussinesqDynamoShell"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqTCShellStd:
-#   variables: *ModelVariables
-#   variables:
-#      CI_QUICC_MPIALGO: "Serial"
-#      MODELNAME: "BoussinesqTCShellStd"
-#   <<: *ModelBuild
-#  
-#BoussinesqRTCShellStd:
-#   variables:
-#      MODELNAME: "BoussinesqRTCShellStd"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
-#  
-#BoussinesqDynamoShellStd:
-#   variables:
-#      MODELNAME: "BoussinesqDynamoShellStd"
-#      CI_QUICC_MPIALGO: "Serial"
-#   <<: *ModelBuild
+BoussinesqRBCCylinder:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+BoussinesqRRBCCylinder:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+#####################
+##### SPHERICAL #####
+#####################
+
+BoussinesqTCSphere:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCSphere:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoSphere:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqTCSphereStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCSphereStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoSphereStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqCouetteShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoCouetteShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqTCShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqTCShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
