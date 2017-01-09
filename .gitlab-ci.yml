@@ -6,28 +6,30 @@ before_script:
 
 .ModelTemplate: &ModelBuild
    script:
-      - mkdir -p ${EXENAME}/${PARANAME}
-      - cd ${EXENAME}/${PARANAME}
+      - echo ${PARANAME}
+      - echo ${MODELNAME}
+      - mkdir -p ${MODELNAME}/${PARANAME}
+      - cd ${MODELNAME}/${PARANAME}
       - echo ${CI_PROJECT_DIR}
       - echo ${CI_QUICC_PARAMAKE}
       - echo ${CI_QUICC_PLATFORM}
-      - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM}  ../../../ || true
-      - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${PARANAME} -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2  ../../../ || true
-      - cmake -DQUICC_TRANSGROUPER=Equation ../../../
+      - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM} ${CI_PROJECT_DIR} || true
+      - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${PARANAME} -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2 ${CI_PROJECT_DIR} || true
+      - cmake -DQUICC_TRANSGROUPER=Equation ${CI_PROJECT_DIR}
       - make install
-        #- make -j ${CI_QUICC_PARMAKE} ${EXENAME}Config
-        #- make -j ${CI_QUICC_PARMAKE} ${EXENAME}State
-      - make -j ${CI_QUICC_PARMAKE} ${EXENAME}Model
-        #- make -j ${CI_QUICC_PARMAKE} ${EXENAME}Visu
+        #- make -j ${CI_QUICC_PARMAKE} ${MODELNAME}Config
+        #- make -j ${CI_QUICC_PARMAKE} ${MODELNAME}State
+      - make -j ${CI_QUICC_PARMAKE} ${MODELNAME}Model
+        #- make -j ${CI_QUICC_PARMAKE} ${MODELNAME}Visu
   
 BoussinesqDynamoSphereStd:
    variables:
       PARANAME: "Serial"
-      EXENAME: "BoussinesqDynamoSphereStd"
+      MODELNAME: "BoussinesqDynamoSphereStd"
    <<: *ModelBuild
   
 BoussinesqDynamoShellStd:
    variables:
       PARANAME: "Serial"
-      EXENAME: "BoussinesqDynamoShellStd"
+      MODELNAME: "BoussinesqDynamoShellStd"
    <<: *ModelBuild
