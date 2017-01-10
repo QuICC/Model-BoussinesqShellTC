@@ -1,18 +1,133 @@
 before_script:
-  - git submodule sync
-  - git submodule update --init
-  - mkdir QuICC_builds
-  - cd QuICC_builds
+   - git submodule sync
+   - git submodule update --init
+   - mkdir QuICC_build
+   - cd QuICC_build
+
+.SerialBuildCB2: 
+   variables: &SerialBuildCB2Vars
+      CI_QUICC_BOUNDARYMETHOD: "Tau"
+      CI_QUICC_MPIALGO: "Serial"
+      CI_QUICC_FFT: "FFTW"
+      CI_QUICC_PYTHON: "python34"
+      CI_QUICC_SMARTPTR: "TR1"
+      CI_QUICC_SPLINALG: "UmfPack"
+      CI_QUICC_TIMESTEPPER: "ImExRKCB2"
+
+.SerialBuildRK3: 
+   variables: &SerialBuildRK3Vars
+      CI_QUICC_BOUNDARYMETHOD: "Tau"
+      CI_QUICC_MPIALGO: "Serial"
+      CI_QUICC_FFT: "FFTW"
+      CI_QUICC_PYTHON: "python34"
+      CI_QUICC_SMARTPTR: "TR1"
+      CI_QUICC_SPLINALG: "UmfPack"
+      CI_QUICC_TIMESTEPPER: "ImExRK3"
+
+.ModelTemplate: &ModelBuild
+   script:
+      - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM} ${CI_PROJECT_DIR} >& /dev/null || true
+      - cmake -DQUICC_BOUNDARYMETHOD=${CI_QUICC_BOUNDARYMETHOD} -DQUICC_FFTPLAN=${CI_QUICC_FFT} -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${CI_QUICC_MPIALGO} -DQUICC_PYTHON=${CI_QUICC_PYTHON} -DQUICC_SMARTPTR=${CI_QUICC_SMARTPTR} -DQUICC_SPLINALG=${CI_QUICC_SPLINALG} -DQUICC_TIMESTEPPER=${CI_QUICC_TIMESTEPPER} ${CI_PROJECT_DIR} >& /dev/null || true
+      - cmake -DQUICC_TRANSGROUPER=Equation ${CI_PROJECT_DIR}
+      - make install
+        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Config
+        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}State
+      - make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Model
+        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Visu
+        
+
+#####################
+##### CARTESIAN #####
+#####################
+
+BoussinesqFPlane3DQG:
+   variables: *SerialBuildRK3Vars
+   <<: *ModelBuild
+
+BoussinesqTiltedFPlane3DQG:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+BoussinesqNoTiltedFPlane3DQG:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+BoussinesqFPlaneNHBGE:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+BoussinesqRRBCPlane:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+#####################
+#### CYLINDRICAL ####
+#####################
+
+BoussinesqRBCCylinder:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+BoussinesqRRBCCylinder:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+
+#####################
+##### SPHERICAL #####
+#####################
+
+BoussinesqTCSphere:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCSphere:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoSphere:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqTCSphereStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCSphereStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
   
 BoussinesqDynamoSphereStd:
-  script:
-    - mkdir -p BoussinesqDynamoSphereStd/Serial
-    - cd BoussinesqDynamoSphereStd/Serial
-    - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=Lothlorien  ../../../ || true
-    - cmake -DQUICC_BOUNDARYMETHOD=Tau -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=Serial -DQUICC_PYTHON=python34 -DQUICC_SMARTPTR=TR1 -DQUICC_SPLINALG=UmfPack -DQUICC_TIMESTEPPER=ImExRKCB2  ../../../ || true
-    - cmake -DQUICC_TRANSGROUPER=Equation ../../../
-    - make install
-    - make -j 4 BoussinesqDynamoSphereStdConfig
-    - make -j 4 BoussinesqDynamoSphereStdState
-    - make -j 4 BoussinesqDynamoSphereStdModel
-    - make -j 4 BoussinesqDynamoSphereStdVisu
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqCouetteShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoCouetteShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqTCShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoShell:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqTCShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqRTCShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
+  
+BoussinesqDynamoShellStd:
+   variables: *SerialBuildCB2Vars
+   <<: *ModelBuild
