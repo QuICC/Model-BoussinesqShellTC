@@ -70,12 +70,12 @@ namespace TransformSteps {
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTGI2);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
-            transform.back().addEdge(Integrator1DType::INTGI4DIVRM0, curlId, Arithmetics::SUB);
+            transform.back().addEdge(Integrator1DType::INTGI4DIVRM0, curlId, Arithmetics::ADD);
 
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTGI2);
             transform.back().addEdge(Integrator2DType::INTG);
-            transform.back().addEdge(Integrator1DType::INTGI4DIVRDIFFR_I2, curlId, Arithmetics::ADD);
+            transform.back().addEdge(Integrator1DType::INTGI4DIVRDIFFR_I2, curlId, Arithmetics::SUB);
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
