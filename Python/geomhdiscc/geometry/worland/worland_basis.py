@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 import scipy.special as special
 
-import geomhdiscc.base.utils as utils
+import quicc.base.utils as utils
 
 def worland_norm(n , l):
     """Normalization factor"""
