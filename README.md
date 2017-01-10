@@ -1,6 +1,6 @@
-### Quasi-Inverse Convection Code
+# Quasi-Inverse Convection Code
 
-# QuICC is a simulation framework for solving the Navier-Stokes equations in spherical, cylindrical and Cartesian geometry.
+### QuICC is a simulation framework for solving the Navier-Stokes equations in spherical, cylindrical and Cartesian geometry.
 
 ## Features:
 
