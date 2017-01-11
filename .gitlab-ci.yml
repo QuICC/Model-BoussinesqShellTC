@@ -74,7 +74,6 @@ BoussinesqTCShell:
       - master
    script:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
-      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
 BoussinesqTCShellStd:
    stage: build
@@ -90,7 +89,6 @@ BoussinesqRTCShell:
       - master
    script:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
-      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
 BoussinesqRTCShellStd:
    stage: build
@@ -104,7 +102,6 @@ BoussinesqDynamoShell:
    stage: build
    script:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
-      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
 BoussinesqDynamoShellStd:
    stage: build
@@ -118,7 +115,6 @@ BoussinesqTCSphere:
       - master
    script:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
-      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
 BoussinesqTCSphereStd:
    stage: build
@@ -134,7 +130,6 @@ BoussinesqRTCSphere:
       - master
    script:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
-      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
 BoussinesqRTCSphereStd:
    stage: build
@@ -148,7 +143,6 @@ BoussinesqDynamoSphere:
    stage: build
    script:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
-      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
 BoussinesqDynamoSphereStd:
    stage: build
