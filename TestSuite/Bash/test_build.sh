@@ -4,9 +4,6 @@ set -euf
 set -o pipefail
 #set -x
 
-echo "Installing Python files ..."
-make install > /dev/null
-
 echo "CMake configuration ..."
 PROJECT_DIR=$1
 QUICC_PLATFORM=$2
@@ -26,6 +23,9 @@ fi
 cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${QUICC_PLATFORM} ${PROJECT_DIR} >& /dev/null || true
 cmake -DQUICC_BOUNDARYMETHOD=${QUICC_BOUNDARYMETHOD} -DQUICC_FFTPLAN=${QUICC_FFT} -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${QUICC_MPIALGO} -DQUICC_PYTHON=${QUICC_PYTHON} -DQUICC_SMARTPTR=${QUICC_SMARTPTR} -DQUICC_SPLINALG=${QUICC_SPLINALG} -DQUICC_TIMESTEPPER=${QUICC_TIMESTEPPER} ${PROJECT_DIR} >& /dev/null || true
 cmake -DQUICC_TRANSGROUPER=${QUICC_TRANSGROUPER} ${PROJECT_DIR}
+
+echo "Installing Python files ..."
+make install > /dev/null
 
 echo "Building ..."
 short_cartesian_models="BoussinesqFPlane3DQG BoussinesqRRBCPlane "
