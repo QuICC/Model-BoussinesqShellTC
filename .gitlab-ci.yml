@@ -22,6 +22,7 @@ SerialLongCartesianBuild:
    script:
       - mkdir Release-Serial-Cartesian
       - cd Release-Serial-Cartesian
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial long_cartesian ${RUNNER_QUICC_PARAMAKE}
 
@@ -32,6 +33,7 @@ SerialShortCylindricalBuild:
    script:
       - mkdir Release-Serial-Cylindrical
       - cd Release-Serial-Cylindrical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial short_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
@@ -42,6 +44,7 @@ SerialLongCylindricalBuild:
    script:
       - mkdir Release-Serial-Cylindrical
       - cd Release-Serial-Cylindrical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial long_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
@@ -52,6 +55,7 @@ SerialShortSphericalBuild:
    script:
       - mkdir Release-Serial-Spherical
       - cd Release-Serial-Spherical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial short_spherical ${RUNNER_QUICC_PARAMAKE}
 
@@ -62,6 +66,7 @@ SerialLongSphericalBuild:
    script:
       - mkdir Release-Serial-Spherical
       - cd Release-Serial-Spherical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial long_spherical ${RUNNER_QUICC_PARAMAKE}
 
@@ -72,6 +77,7 @@ TubularShortCartesianBuild:
    script:
       - mkdir Release-Tubular-Cartesian
       - cd Release-Tubular-Cartesian
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular short_cartesian ${RUNNER_QUICC_PARAMAKE}
 
@@ -82,6 +88,7 @@ TubularLongCartesianBuild:
    script:
       - mkdir Release-Tubular-Cartesian
       - cd Release-Tubular-Cartesian
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular long_cartesian ${RUNNER_QUICC_PARAMAKE}
 
@@ -92,6 +99,7 @@ TubularShortCylindricalBuild:
    script:
       - mkdir Release-Tubular-Cylindrical
       - cd Release-Tubular-Cylindrical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular short_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
@@ -102,6 +110,7 @@ TubularLongCylindricalBuild:
    script:
       - mkdir Release-Tubular-Cylindrical
       - cd Release-Tubular-Cylindrical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular long_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
@@ -112,6 +121,7 @@ TubularShortSphericalBuild:
    script:
       - mkdir Release-Tubular-Spherical
       - cd Release-Tubular-Spherical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular short_spherical ${RUNNER_QUICC_PARAMAKE}
 
@@ -122,5 +132,6 @@ TubularLongSphericalBuild:
    script:
       - mkdir Release-Tubular-Spherical
       - cd Release-Tubular-Spherical
+      - mkdir -p TestSuite/Bash
       - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh TestSuite/Bash/
       - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular long_spherical ${RUNNER_QUICC_PARAMAKE}
