@@ -354,9 +354,9 @@ namespace IoVariable {
          Array energy(2);
 
          MPI_Allreduce(MPI_IN_PLACE, LTorSpectrum.data(), LTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         //MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum, 2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         //MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum, 2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         //MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum, 2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         //MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum.data(), MTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         //MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum.data(), LPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         //MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum.data(), MPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
       #endif //QUICC_MPI
 
