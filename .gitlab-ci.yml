@@ -1,133 +1,113 @@
 before_script:
    - git submodule sync
    - git submodule update --init
-   - mkdir QuICC_build
-   - cd QuICC_build
+   - mkdir QuICC_builds
+   - cd QuICC_builds
 
-.SerialBuildCB2: 
-   variables: &SerialBuildCB2Vars
-      CI_QUICC_BOUNDARYMETHOD: "Tau"
-      CI_QUICC_MPIALGO: "Serial"
-      CI_QUICC_FFT: "FFTW"
-      CI_QUICC_PYTHON: "python34"
-      CI_QUICC_SMARTPTR: "TR1"
-      CI_QUICC_SPLINALG: "UmfPack"
-      CI_QUICC_TIMESTEPPER: "ImExRKCB2"
-
-.SerialBuildRK3: 
-   variables: &SerialBuildRK3Vars
-      CI_QUICC_BOUNDARYMETHOD: "Tau"
-      CI_QUICC_MPIALGO: "Serial"
-      CI_QUICC_FFT: "FFTW"
-      CI_QUICC_PYTHON: "python34"
-      CI_QUICC_SMARTPTR: "TR1"
-      CI_QUICC_SPLINALG: "UmfPack"
-      CI_QUICC_TIMESTEPPER: "ImExRK3"
-
-.ModelTemplate: &ModelBuild
+SerialShortCartesianBuild:
+   stage: build
+   except:
+      - master
    script:
-      - cmake -DCMAKE_BUILD_TYPE=Release -DQUICC_PLATFORM=${CI_QUICC_PLATFORM} ${CI_PROJECT_DIR} >& /dev/null || true
-      - cmake -DQUICC_BOUNDARYMETHOD=${CI_QUICC_BOUNDARYMETHOD} -DQUICC_FFTPLAN=${CI_QUICC_FFT} -DQUICC_FFTPLAN=Medium -DQUICC_MEMORYUSAGE=High -DQUICC_MPIALGO=${CI_QUICC_MPIALGO} -DQUICC_PYTHON=${CI_QUICC_PYTHON} -DQUICC_SMARTPTR=${CI_QUICC_SMARTPTR} -DQUICC_SPLINALG=${CI_QUICC_SPLINALG} -DQUICC_TIMESTEPPER=${CI_QUICC_TIMESTEPPER} ${CI_PROJECT_DIR} >& /dev/null || true
-      - cmake -DQUICC_TRANSGROUPER=Equation ${CI_PROJECT_DIR}
-      - make install
-        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Config
-        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}State
-      - make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Model
-        #- make -j ${CI_QUICC_PARAMAKE} ${CI_BUILD_NAME}Visu
-        
+      - mkdir Release-Serial-Cartesian
+      - cd Release-Serial-Cartesian
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial short_cartesian ${RUNNER_QUICC_PARAMAKE}
 
-#####################
-##### CARTESIAN #####
-#####################
+SerialLongCartesianBuild:
+   stage: build
+   only:
+      - master
+   script:
+      - mkdir Release-Serial-Cartesian
+      - cd Release-Serial-Cartesian
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial long_cartesian ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqFPlane3DQG:
-   variables: *SerialBuildRK3Vars
-   <<: *ModelBuild
+SerialShortCylindricalBuild:
+   stage: build
+   except:
+      - master
+   script:
+      - mkdir Release-Serial-Cylindrical
+      - cd Release-Serial-Cylindrical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial short_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqTiltedFPlane3DQG:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
+SerialLongCylindricalBuild:
+   stage: build
+   only:
+      - master
+   script:
+      - mkdir Release-Serial-Cylindrical
+      - cd Release-Serial-Cylindrical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial long_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqNoTiltedFPlane3DQG:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
+SerialShortSphericalBuild:
+   stage: build
+   except:
+      - master
+   script:
+      - mkdir Release-Serial-Spherical
+      - cd Release-Serial-Spherical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial short_spherical ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqFPlaneNHBGE:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
+SerialLongSphericalBuild:
+   stage: build
+   only:
+      - master
+   script:
+      - mkdir Release-Serial-Spherical
+      - cd Release-Serial-Spherical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial long_spherical ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqRRBCPlane:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
+TubularShortCartesianBuild:
+   stage: build
+   except:
+      - master
+   script:
+      - mkdir Release-Tubular-Cartesian
+      - cd Release-Tubular-Cartesian
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular short_cartesian ${RUNNER_QUICC_PARAMAKE}
 
-#####################
-#### CYLINDRICAL ####
-#####################
+TubularLongCartesianBuild:
+   stage: build
+   only:
+      - master
+   script:
+      - mkdir Release-Tubular-Cartesian
+      - cd Release-Tubular-Cartesian
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular long_cartesian ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqRBCCylinder:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
+TubularShortCylindricalBuild:
+   stage: build
+   except:
+      - master
+   script:
+      - mkdir Release-Tubular-Cylindrical
+      - cd Release-Tubular-Cylindrical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular short_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqRRBCCylinder:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
+TubularLongCylindricalBuild:
+   stage: build
+   only:
+      - master
+   script:
+      - mkdir Release-Tubular-Cylindrical
+      - cd Release-Tubular-Cylindrical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular long_cylindrical ${RUNNER_QUICC_PARAMAKE}
 
-#####################
-##### SPHERICAL #####
-#####################
+TubularShortSphericalBuild:
+   stage: build
+   except:
+      - master
+   script:
+      - mkdir Release-Tubular-Spherical
+      - cd Release-Tubular-Spherical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular short_spherical ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqTCSphere:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqRTCSphere:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqDynamoSphere:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqTCSphereStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqRTCSphereStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqDynamoSphereStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqCouetteShellStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqDynamoCouetteShellStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqTCShell:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqRTCShell:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqDynamoShell:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqTCShellStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqRTCShellStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
-  
-BoussinesqDynamoShellStd:
-   variables: *SerialBuildCB2Vars
-   <<: *ModelBuild
+TubularLongSphericalBuild:
+   stage: build
+   only:
+      - master
+   script:
+      - mkdir Release-Tubular-Spherical
+      - cd Release-Tubular-Spherical
+      - bash TestSuite/Bash/test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular long_spherical ${RUNNER_QUICC_PARAMAKE}
