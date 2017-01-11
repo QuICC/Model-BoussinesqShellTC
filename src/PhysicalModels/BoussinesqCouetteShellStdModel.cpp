@@ -197,7 +197,7 @@ namespace QuICC {
    void BoussinesqCouetteShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
-      std::vector<PhysicalNames::Id>::const_iterator  it;
+      std::vector<PhysicalNames::Id>::const_iterator it;
       std::vector<PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
