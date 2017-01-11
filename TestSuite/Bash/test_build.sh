@@ -4,6 +4,13 @@ set -euf
 set -o pipefail
 #set -x
 
+# Store current directory
+current_dir=`pwd`
+
+echo "Make directory structure ..."
+mkdir Release-${3}-${4}
+cd Release-${3}-${4}
+
 echo "CMake configuration ..."
 PROJECT_DIR=$1
 QUICC_PLATFORM=$2
@@ -27,29 +34,12 @@ cmake -DQUICC_TRANSGROUPER=${QUICC_TRANSGROUPER} ${PROJECT_DIR}
 echo "Installing Python files ..."
 make install > /dev/null
 
-echo "Building ..."
-short_cartesian_models="BoussinesqFPlane3DQG BoussinesqRRBCPlane "
-short_cylindrical_models="BoussinesqRBCCylinder"
-short_spherical_models="BoussinesqDynamoShellStd BoussinesqDynamoSphere"
-long_cartesian_models="BoussinesqFPlane3DQG BoussinesqTiltedFPlane3DQG BoussinesqNoTiltedFPlane3DQG BoussinesqFPlaneNHBGE BoussinesqRRBCPlane"
-long_cylindrical_models="BoussinesqRBCCylinder BoussinesqRRBCCylinder"
-long_spherical_models="BoussinesqTCShellStd BoussinesqRTCShellStd BoussinesqDynamoShellStd BoussinesqTCShell BoussinesqRTCShell BoussinesqDynamoShell BoussinesqTCSphere BoussinesqRTCSphere BoussinesqDynamoSphere BoussinesqTCSphereStd BoussinesqRTCSphereStd BoussinesqDynamoSphereStd"
-builds_list="${4}_models"
-builds=${!builds_list}
+echo "Building $4 ..."
+CI_QUICC_PARAMAKE=$5
+#make -j ${CI_QUICC_PARAMAKE} ${4}Config
+#make -j ${CI_QUICC_PARAMAKE} ${4}State
+make -j ${CI_QUICC_PARAMAKE} ${4}Model > /dev/null
+#make -j ${CI_QUICC_PARAMAKE} ${4}Visu
 
-if [ $# -le 4 ]
-then
-	CI_QUICC_PARAMAKE=1
-else
-	CI_QUICC_PARAMAKE=$5
-fi
-
-for b in ${builds}
-do
-	echo "   $b"
-	#make -j ${CI_QUICC_PARAMAKE} ${BUILD_NAME}Config
-	#make -j ${CI_QUICC_PARAMAKE} ${BUILD_NAME}State
-	make -j ${CI_QUICC_PARAMAKE} ${b}Model > /dev/null
-	#make -j ${CI_QUICC_PARAMAKE} ${BUILD_NAME}Visu
-done
+cd ${current_dir}
 echo "Done"
