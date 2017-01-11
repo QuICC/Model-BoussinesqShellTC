@@ -18,7 +18,7 @@ BoussinesqFPlane3DQG:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqTitledFPlane3DQG:
+BoussinesqTiltedFPlane3DQG:
    stage: build
    only:
       - master
@@ -26,7 +26,7 @@ BoussinesqTitledFPlane3DQG:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
 
-BoussinesqNoTitledFPlane3DQG:
+BoussinesqNoTiltedFPlane3DQG:
    stage: build
    only:
       - master
