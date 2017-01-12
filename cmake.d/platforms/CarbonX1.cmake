@@ -121,4 +121,4 @@ set(QUICC_INCLUDES_PYTHON35 "/usr/include/python3.5m" "/usr/lib/python3/dist-pac
 ###################################################
 
 set(QUICC_LIBRARIES "" PARENT_SCOPE)
-set(QUICC_INCLUDES "/usr/include/hdf5/openmpi" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)
+set(QUICC_INCLUDES "/usr/include/hdf5/serial" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)

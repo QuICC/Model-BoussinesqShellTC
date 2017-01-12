@@ -25,6 +25,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.hpp"
+#include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -189,9 +190,14 @@ namespace QuICC {
    void BoussinesqCouetteShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create kinetic energy writer
-      IoVariable::SharedShellTorPolEnergySpectraWriter spVector(new IoVariable::ShellTorPolEnergySpectraWriter("kinetic", SchemeType::type()));
+      IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
+
+	 // Create kinetic energy spectral writer
+     IoVariable::SharedShellTorPolEnergySpectraWriter spVector2(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
+	 spVector2->expect(PhysicalNames::VELOCITY);
+	 spSim->addAsciiOutputFile(spVector2);
    }
 
    void BoussinesqCouetteShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)

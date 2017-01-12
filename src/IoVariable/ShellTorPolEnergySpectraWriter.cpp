@@ -356,9 +356,9 @@ namespace IoVariable {
       	  //Array energy(2);
       	  std::cout << "Pre MPIAllreduce\n" ;
          MPI_Allreduce(MPI_IN_PLACE, LTorSpectrum.data(), LTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         //MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum.data(), MTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         //MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum.data(), LPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         //MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum.data(), MPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum.data(), MTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum.data(), LPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum.data(), MPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          std::cout << "Post MPIAllreduce\n" ;
 
       #endif //QUICC_MPI
@@ -367,7 +367,10 @@ namespace IoVariable {
       if(FrameworkMacro::allowsIO())
       {
          //this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTorEnergy + this->mPolEnergy << "\t" << this->mTorEnergy << "\t" << this->mPolEnergy << std::endl;
-    	 this->mFile << std::setprecision(14) << this->mTime << "\t" << LTorSpectrum.transpose() << std::endl;
+    	 this->mFile << std::setprecision(14) << this->mTime << "\t" << LTorSpectrum.transpose() << '\t';
+    	 this->mFile << std::setprecision(14) << "\t" << MTorSpectrum.transpose() << '\t';
+    	 this->mFile << std::setprecision(14) << "\t" << LPolSpectrum.transpose() << '\t';
+    	 this->mFile << std::setprecision(14) << "\t" << MPolSpectrum.transpose() << std::endl;
       }
 
       // Close file
