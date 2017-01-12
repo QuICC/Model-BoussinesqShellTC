@@ -28,6 +28,8 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
+#include<iostream>
+
 namespace QuICC {
 
 namespace IoVariable {
