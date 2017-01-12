@@ -351,12 +351,13 @@ namespace IoVariable {
 
       // Get the "global" Kinetic energy from MPI code
       #ifdef QUICC_MPI
-         Array energy(2);
-
+      	  //Array energy(2);
+      	  std::cout << "Pre MPIAllreduce\n" ;
          MPI_Allreduce(MPI_IN_PLACE, LTorSpectrum.data(), LTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          //MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum.data(), MTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          //MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum.data(), LPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          //MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum.data(), MPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         std::cout << "Post MPIAllreduce\n" ;
 
       #endif //QUICC_MPI
 
