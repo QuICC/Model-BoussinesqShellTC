@@ -24,25 +24,22 @@ if __name__=="__main__":
     a, b = shell_radius.linear_r2x(ro, rratio)
 
     # get the matrices
-    nr = file['truncation/spectral/dim1D'].value
+    nr = file['truncation/spectral/dim1D'].value+2
     bc = dict()
     bc[0]=0
-    R2 = shell_radius.r2(nr, a, b, bc)
-    Integral = shell_radius.integral(nr, a, b)
+    IntgOp = shell_radius.r2(nr, a, b, bc)
+    SphIntgOp = shell_radius.integral(nr, a, b)
 
-    print(R2.todense())
-    print(Integral.todense())
-    raise RuntimeError
 
     pp.figure()
     to_select = ['velocity/velocity_tor', 'velocity/velocity_pol']
     df = pd.DataFrame()
     for field in to_select:
-        a = file[field][:]
+        a = file[field][:]*file[field][:]
 
         for aa in a:
-            print(np.dot(Integral,aa))
-            print(np.dot(R2,aa))
+            print(aa)
+            print(np.dot(SphIntgOp,aa))
             raise RuntimeError
         vec = (a**2).sum(1).sum(1)
         index = 0
