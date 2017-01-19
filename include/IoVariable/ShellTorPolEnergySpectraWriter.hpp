@@ -85,6 +85,12 @@ namespace IoVariable {
           */
          Matrix mPolEnergy;
 
+         /*
+          * @brief Storage for the radial spectral decomposition
+          */
+         Array mTorRadial;
+         Array mPolRadial;
+
          /**
           * @brief Chebyshev operator to integrate in radius
           */
