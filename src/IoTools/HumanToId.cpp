@@ -49,6 +49,10 @@ namespace IoTools {
       {
          return NonDimensional::MAGPRANDTL;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::POINCARE))
+      {
+         return NonDimensional::POINCARE;
+
       } else if(id == IdToHuman::toTag(NonDimensional::PRANDTL))
       {
          return NonDimensional::PRANDTL;

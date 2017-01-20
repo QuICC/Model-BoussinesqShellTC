@@ -41,6 +41,8 @@ namespace QuICC {
             MAGPRANDTL,
             /// Prandtl number
             PRANDTL,
+            /// Poincare number
+            POINCARE,
             /// Rayleigh number
             RAYLEIGH,
             /// Roberts number
