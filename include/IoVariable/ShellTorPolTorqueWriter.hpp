@@ -71,20 +71,9 @@ namespace IoVariable {
 
       private:
          /**
-          * @brief Spherical volume to normalize energy to energy density
+          * @brief Torque value to be computed and printed
           */
-         MHDFloat mVolume;
-
-         /**
-          * @brief Storage for the Toroidal energy
-          */
-         MHDFloat mTorEnergy;
-
-         /**
-          * @brief Storage for the Poloidal energy
-          */
-         MHDFloat mPolEnergy;
-
+         MHDFloat mTorque;
    };
 
    inline bool ShellTorPolTorqueWriter::isHeavy() const
