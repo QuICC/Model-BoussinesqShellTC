@@ -27,6 +27,7 @@
 #include "Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
+#include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"

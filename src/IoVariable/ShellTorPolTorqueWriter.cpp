@@ -200,7 +200,7 @@ namespace IoVariable {
 			   int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 			   lfactor = l*(l+1.0);
 
-			   Array temp = -this->mProjDr*vRange.first.slice(k).col(j).real()*ri+2*this->mProj*vrange.first.slice(k).col(j).real();
+			   Array temp = -this->mProjDr*vRange.first.slice(k).col(j).real()*ri+2*this->mProj*vRange.first.slice(k).col(j).real();
 			   this->mTorque = temp[1];
 
 			}
@@ -217,7 +217,7 @@ namespace IoVariable {
 			for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-				Array temp = -this->mProjDr*vRange.first.slice(k).col(j).real()*ri+2*this->mProj*vrange.first.slice(k).col(j).real();
+				Array temp = -this->mProjDr*vRange.first.slice(k).col(j).real()*ri+2*this->mProj*vRange.first.slice(k).col(j).real();
 				this->mTorque = temp[1];
 			}
 
@@ -248,6 +248,7 @@ namespace IoVariable {
          this->mPolEnergy = energy(1);
       #endif //QUICC_MPI
 
+         /*
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
@@ -263,7 +264,7 @@ namespace IoVariable {
          FrameworkMacro::abort(99);
 
          throw Exception("Toroidal/Poloidal energy is NaN!");
-      }
+      }*/
    }
 
 }
