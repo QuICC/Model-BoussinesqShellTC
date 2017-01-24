@@ -198,6 +198,11 @@ namespace QuICC {
      IoVariable::SharedShellTorPolEnergySpectraWriter spVector2(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
 	 spVector2->expect(PhysicalNames::VELOCITY);
 	 spSim->addAsciiOutputFile(spVector2);
+
+	 // Create torque writer
+	 IoVariable::SharedShellTorPolTorqueWriter spVector3(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
+	 spVector3->expect(PhysicalNames::VELOCITY);
+	 spSim->addAsciiOutputFile(spVector3);
    }
 
    void BoussinesqCouetteShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)

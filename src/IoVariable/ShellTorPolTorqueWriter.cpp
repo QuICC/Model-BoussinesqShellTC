@@ -43,7 +43,117 @@ namespace IoVariable {
 
    void ShellTorPolTorqueWriter::init()
    {
-      IVariableAsciiEWriter::init();
+	   this->mComputeFlag = false;
+#ifdef QUICC_SPATIALSCHEME_SLFM
+	 double factor = 1.0;
+	 // Loop over harmonic order m
+	 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+	 {
+		// determine current m
+		int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+		// m = 0, no factor of two
+
+
+		for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+		{
+		   int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+		   if( m==0 && l==1){
+			   this->mComputeFlag = true;
+		   }
+		}
+	 }
+#endif //defined QUICC_SPATIALSCHEME_SLFM
+#ifdef QUICC_SPATIALSCHEME_SLFL
+	 double factor=1.;
+	 // Loop over harmonic degree l
+	 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+	 {
+		int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+
+
+		for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
+			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+			if( m ==0 && l==1){
+				this->mComputeFlag = true;
+			}
+		}
+
+	 }
+#endif //QUICC_SPATIALSCHEME_SLFL
+
+	 if(this->mComputeFlag){
+		  // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
+		  MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
+		  MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
+		  this->mVolume = (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
+
+		  // Initialise python wrapper
+		  PythonWrapper::init();
+		  PythonWrapper::import("quicc.geometry.spherical.shell_radius");
+
+		  // Prepare arguments
+		  PyObject *pArgs, *pValue, *pABBoundary;
+		  pArgs = PyTuple_New(4);
+
+		  // ... compute a, b factors
+		  PyObject *pTmp = PyTuple_New(2);
+		  PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(ro);
+		  PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second));
+		  PythonWrapper::setFunction("linear_r2x");
+		  pValue = PythonWrapper::callFunction(pTmp);
+		  MHDFloat a = PyTuple_GetItem(pValue,0);
+		  MHDFloat b = PyTuple_GetItem(pValue,1);
+
+		  // prepare the next function call
+		  pArgs = PyTuple_New(2);
+
+		  // create boundray conditions (none)
+		  pValue = PyDict_New();
+
+		  PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(20));
+		  PyTuple_SetItem(pArgs, 1, pValue);
+
+		  // Get resolution
+		  //int nR = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>() + 2;
+		  int nR = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+
+
+		  PyTuple_SetItem(pArgs, 0, PyLong_FromLong(nR));
+
+		  // Call zblk
+		  PythonWrapper::setFunction("zblk");
+		  pValue = PythonWrapper::callFunction(pArgs);
+		  // Fill matrix and cleanup
+		  this->mProj = SparseMatrix(nR,nR);
+		  PythonWrapper::fillMatrix(this->mProj, pValue);
+
+
+		  pTmp = PyTuple_GetSlice(pArgs, 0, 3);
+
+		  // add specifics to boundary conditions
+		   = PyDict_New();
+		  PyDict_SetItem(pABBoundary, PyString_FromString("a"), PyFloat_FromDouble(a));
+		  PyDict_SetItem(pABBoundary, PyString_FromString("b"), PyFloat_FromDouble(b));
+		  PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(21));
+		  PyTuple_SetItem(pArgs, 1, pValue);
+		  PyDict_SetItem(pValue, PyString_FromString("c"), pABBoundary);
+
+		  // Call avg
+		  PythonWrapper::setFunction("zblk");
+		  pValue = PythonWrapper::callFunction(pTmp);
+		  // Fill matrix and cleanup
+		  this->mProjDr = SparseMatrix(nR,nR);
+		  PythonWrapper::fillMatrix(this->mProjDr, pValue);
+		  Py_DECREF(pValue);
+		  Py_DECREF(pABBoundary);
+		  PythonWrapper::finalize();
+	 }
+
+
+	  // call init in the base class
+	  IVariableAsciiEWriter::init();
    }
 
    void ShellTorPolTorqueWriter::compute(Transform::TransformCoordinatorType& coord)
@@ -56,6 +166,7 @@ namespace IoVariable {
 	    * compute the "bad way"
 	    */
 
+	   if(this->mComputeFlag){
 	  // get iterator to field
 	  vector_iterator vIt;
 	  vector_iterator_range vRange = this->vectorRange();
@@ -63,27 +174,11 @@ namespace IoVariable {
 	  assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::TOR);
 	  assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
-	  // Dealias toroidal variable data
-	  coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
+	  // retrieve ri
+	  MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
+	  MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
 
-	  // Recover dealiased BWD data
-	  Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
-	  // Get FWD storage
-	  Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
-
-	  // Compute projection transform for first dimension
-	  coord.transform1D().project(rOutVarTor.rData(), rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
-
-	  // Compute |f|^2
-	  rOutVarTor.rData() = rOutVarTor.rData().array()*rOutVarTor.rData().conjugate().array();
-
-	  // Compute projection transform for first dimension
-	  coord.transform1D().integrate_full(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
-
-	  // Compute integral over Chebyshev expansion and sum harmonics
-
-	  MHDFloat lfactor = 0.0;
 	  #ifdef QUICC_SPATIALSCHEME_SLFM
 		 double factor = 1.0;
 		 // Loop over harmonic order m
@@ -105,8 +200,9 @@ namespace IoVariable {
 			   int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 			   lfactor = l*(l+1.0);
 
-			   this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
-			   this->mTorRadial += factor*lfactor*(rOutVarTor.slice(k).col(j).real());
+			   Array temp = -this->mProjDr*vRange.first.slice(k).col(j).real()*ri+2*this->mProj*vrange.first.slice(k).col(j).real();
+			   this->mTorque = temp[1];
+
 			}
 		 }
 	  #endif //defined QUICC_SPATIALSCHEME_SLFM
@@ -120,26 +216,17 @@ namespace IoVariable {
 
 			for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-				if(m==0){
-					factor = 1.0;
-				} else {
-					factor = 2.0;
-				}
-				this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
-				this->mTorRadial += factor*lfactor*(rOutVarTor.slice(k).col(j).real());
+
+				Array temp = -this->mProjDr*vRange.first.slice(k).col(j).real()*ri+2*this->mProj*vrange.first.slice(k).col(j).real();
+				this->mTorque = temp[1];
 			}
 
 		 }
 	  #endif //QUICC_SPATIALSCHEME_SLFL
 
-	  // Free BWD storage
-	  coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
+	   }
 
-	  // Free FWD storage
-	  coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
 
-	  // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
-	  this->mTorEnergy /= 2*this->mVolume;
 
    }
 

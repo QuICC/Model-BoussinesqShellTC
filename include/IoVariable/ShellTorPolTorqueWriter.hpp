@@ -74,6 +74,7 @@ namespace IoVariable {
           * @brief Torque value to be computed and printed
           */
          MHDFloat mTorque;
+         bool mComputeFlag;
    };
 
    inline bool ShellTorPolTorqueWriter::isHeavy() const
