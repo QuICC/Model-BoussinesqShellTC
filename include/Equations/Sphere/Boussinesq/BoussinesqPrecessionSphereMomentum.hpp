@@ -70,14 +70,19 @@ namespace Equations {
          virtual void setNLComponents();
 
          /**
-          * @brief Storage for the cos(theta) grid values (if required)
+          * @brief Storage for the r grid values
           */
-         Array mCosTheta;
+         Array mTheta;
 
          /**
-          * @brief Storage for the sin(theta) grid values (if required)
+          * @brief Storage for the theta grid values
           */
-         Array mSinTheta;
+         Array mTheta;
+
+         /**
+          * @brief Storage for the phi grid values
+          */
+         Array mPhi;
 
       private:
    };
