@@ -272,8 +272,8 @@ namespace IoVariable {
 
 
 
-         if(FrameworkMacto::allowsIO()){
-        	 MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, 322, MPI_COMM_WORLD);
+         if(FrameworkMacro::allowsIO()){
+        	 MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, 322, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
              this->mTorque = Torque;
          }
