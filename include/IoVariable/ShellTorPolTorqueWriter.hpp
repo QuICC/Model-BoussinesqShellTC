@@ -82,7 +82,7 @@ namespace IoVariable {
 
    inline bool ShellTorPolTorqueWriter::isHeavy() const
    {
-      return false;
+      return true;
    }
 
    /// Typedef for a shared pointer of a HDF5 state file writer

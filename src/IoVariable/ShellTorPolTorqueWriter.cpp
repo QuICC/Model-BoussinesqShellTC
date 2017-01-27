@@ -39,7 +39,7 @@ namespace IoVariable {
    ShellTorPolTorqueWriter::ShellTorPolTorqueWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorque(1.2345),mProj(),mFactor(0.)
    {
-	   std::cout << "constructor!";
+
    }
 
    ShellTorPolTorqueWriter::~ShellTorPolTorqueWriter()
@@ -90,7 +90,7 @@ namespace IoVariable {
 #endif //QUICC_SPATIALSCHEME_SLFL
 
 
-	 //if(this->mComputeFlag){
+	 if(this->mComputeFlag){
 
 
 		  // compute the prefactor
@@ -176,8 +176,8 @@ namespace IoVariable {
 
 		  this->mProj = (-diffProj*ri+2*valueProj).row(0);
 		  PythonWrapper::finalize();
-	 //}
-		  std::cout << this->mProj << std:: endl;
+	 }
+
 
 
 	  // call init in the base class
@@ -186,22 +186,16 @@ namespace IoVariable {
 
    void ShellTorPolTorqueWriter::compute(Transform::TransformCoordinatorType& coord)
    {
-	   std::cout << "compute!\n" ;
-	   std::cout << this->mProj << std:: endl;
-
 
 
 	   /*
 	    * compute the "bad way"
 	    */
 
-	  //if(this->mComputeFlag){
+	  if(this->mComputeFlag){
 		  std::cout << "we are in the compute loop\n";
 
 
-	 // initialize torque to a standard value
-
-		//  this->mTorque = 1.;
 	  // get iterator to field
 	  vector_iterator vIt;
 	  vector_iterator_range vRange = this->vectorRange();
@@ -259,7 +253,7 @@ namespace IoVariable {
 		 }
 	  #endif //QUICC_SPATIALSCHEME_SLFL
 
-	   //}
+	   }
 
    }
 
@@ -270,15 +264,20 @@ namespace IoVariable {
 
       // Get the "global" Kinetic energy from MPI code
       #ifdef QUICC_MPI
-         Array energy(2);
+         MHDFloat Torque = this->mTorque;
 
-         energy(0) = this->mTorEnergy;
-         energy(1) = this->mPolEnergy;
+         if(this->mComputeFlag){
+        	 MPI_Send(&Torque, 1, MPI_DOUBLE, 0, 322, MPI_COMM_WORLD);
+         }
 
-         MPI_Allreduce(MPI_IN_PLACE, energy.data(), 2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-         this->mTorEnergy = energy(0);
-         this->mPolEnergy = energy(1);
+
+         if(FrameworkMacto::allowsIO()){
+        	 MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, 322, MPI_COMM_WORLD);
+
+             this->mTorque = Torque;
+         }
+
       #endif //QUICC_MPI
 
 
