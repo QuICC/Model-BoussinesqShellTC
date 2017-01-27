@@ -75,6 +75,9 @@ namespace IoVariable {
           */
          MHDFloat mTorque;
          bool mComputeFlag;
+         Array mProj;
+
+         MHDFloat mFactor;
    };
 
    inline bool ShellTorPolTorqueWriter::isHeavy() const

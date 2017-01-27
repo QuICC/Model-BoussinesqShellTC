@@ -19,23 +19,24 @@ if __name__=="__main__":
 
     #data = np.mean(data,axis=0)
 
-    #pp.figure()
-    #pp.ion()
-    """ for i in range(datafull.shape[0]-1,datafull.shape[0]):
+    pp.figure()
+    pp.ion()
+    for i in range(datafull.shape[0]):
         pp.clf()
-        """
-    data = datafull[-1,:]
 
-    print (data.shape)
-    Lmax = data.shape[0]/4
+        data = datafull[i,:]
 
-    pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
-    pp.loglog(data[Lmax:2*Lmax], label='M spectrum, toroidal')
-    pp.loglog(data[2*Lmax:3*Lmax], label='L spectrum, poloidal')
-    pp.plot(data[3*Lmax:-1], label='M spectrum, poloidal')
+        print (data.shape)
+        Lmax = data.shape[0]/4
 
-    pp.legend()
-    pp.show()
+        pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
+        pp.loglog(data[Lmax:2*Lmax], label='M spectrum, toroidal')
+        pp.loglog(data[2*Lmax:3*Lmax], label='L spectrum, poloidal')
+        pp.plot(data[3*Lmax:-1], label='M spectrum, poloidal')
+
+        pp.legend()
+        pp.draw()
+        pp.pause(0.1)
 
 
 
