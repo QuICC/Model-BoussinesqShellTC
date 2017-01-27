@@ -39,7 +39,7 @@ namespace IoVariable {
    ShellTorPolTorqueWriter::ShellTorPolTorqueWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorque(1.2345),mProj(),mFactor(0.)
    {
-	   std::cout << "culo!";
+	   std::cout << "constructor!";
    }
 
    ShellTorPolTorqueWriter::~ShellTorPolTorqueWriter()
@@ -48,7 +48,7 @@ namespace IoVariable {
 
    void ShellTorPolTorqueWriter::init()
    {
-	   std::cout << "cacca!";
+	   std::cout << "init!";
 	   this->mComputeFlag = true;
 #ifdef QUICC_SPATIALSCHEME_SLFM
 	 // Loop over harmonic order m
@@ -186,6 +186,7 @@ namespace IoVariable {
 
    void ShellTorPolTorqueWriter::compute(Transform::TransformCoordinatorType& coord)
    {
+	   std::cout << "compute!\n" ;
 	   std::cout << this->mProj << std:: endl;
 
 
