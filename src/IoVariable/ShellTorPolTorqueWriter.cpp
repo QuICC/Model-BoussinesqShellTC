@@ -267,14 +267,15 @@ namespace IoVariable {
          MHDFloat Torque = this->mTorque;
 
          if(this->mComputeFlag){
+        	 std::cout << Torque << std::endl;
         	 MPI_Send(&Torque, 1, MPI_DOUBLE, 0, 322, MPI_COMM_WORLD);
          }
 
-
+         int value  = MPI_Barrier(MPI_COMM_WORLD);
 
          if(FrameworkMacro::allowsIO()){
         	 MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, 322, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
+        	 std::cout << Torque << std::endl;
              this->mTorque = Torque;
          }
 
