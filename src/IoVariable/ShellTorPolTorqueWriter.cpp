@@ -269,7 +269,7 @@ namespace IoVariable {
       #ifdef QUICC_MPI
          MHDFloat Torque = this->mTorque;
 
-         MPI_Request SendReq, RecvReq
+         MPI_Request SendReq, RecvReq;
 
          if(this->mComputeFlag && FrameworkMacro::id()!=0){
         	 std::cout << Torque << std::endl;
