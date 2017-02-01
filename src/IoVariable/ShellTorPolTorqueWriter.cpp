@@ -279,7 +279,7 @@ namespace IoVariable {
          int value  = MPI_Barrier(MPI_COMM_WORLD);
 
          if(FrameworkMacro::allowsIO() && !(this->mComputeFlag)){
-        	 MPI_IRecv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &RecvReq);
+        	 MPI_Irecv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &RecvReq);
         	 std::cout << Torque << std::endl;
              this->mTorque = Torque;
          }
