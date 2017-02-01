@@ -271,7 +271,7 @@ namespace IoVariable {
 
          MPI_Request SendReq, RecvReq;
 
-         if(this->mComputeFlag && FrameworkMacro::id()!=0){
+         if(this->mComputeFlag){
         	 std::cout << Torque << std::endl;
         	 MPI_Isend(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD, &SendReq);
          }
