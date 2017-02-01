@@ -36,7 +36,7 @@ if __name__=="__main__":
 
         pp.legend()
         pp.draw()
-        pp.pause(0.1)
+        pp.pause(0.01)
 
 
 
