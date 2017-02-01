@@ -269,15 +269,17 @@ namespace IoVariable {
       #ifdef QUICC_MPI
          MHDFloat Torque = this->mTorque;
 
+         MPI_Request SendReq, RecvReq
+
          if(this->mComputeFlag && FrameworkMacro::id()!=0){
         	 std::cout << Torque << std::endl;
-        	 MPI_Isend(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        	 MPI_Isend(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD, &SendReq);
          }
 
          int value  = MPI_Barrier(MPI_COMM_WORLD);
 
          if(FrameworkMacro::allowsIO() && !(this->mComputeFlag)){
-        	 MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        	 MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &RecvReq);
         	 std::cout << Torque << std::endl;
              this->mTorque = Torque;
          }
