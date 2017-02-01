@@ -271,7 +271,7 @@ namespace IoVariable {
 
          if(this->mComputeFlag && FrameworkMacro::id()!=0){
         	 std::cout << Torque << std::endl;
-        	 MPI_Isend(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD);
+        	 MPI_Isend(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
          }
 
          int value  = MPI_Barrier(MPI_COMM_WORLD);
