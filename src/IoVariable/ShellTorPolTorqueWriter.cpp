@@ -49,7 +49,7 @@ namespace IoVariable {
    void ShellTorPolTorqueWriter::init()
    {
 	   std::cout << "init!";
-	   this->mComputeFlag = true;
+	   this->mComputeFlag = false;
 #ifdef QUICC_SPATIALSCHEME_SLFM
 	 // Loop over harmonic order m
 	 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
