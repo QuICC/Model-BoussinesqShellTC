@@ -196,62 +196,62 @@ namespace IoVariable {
 		  std::cout << "we are in the compute loop\n";
 
 
-	  // get iterator to field
-	  vector_iterator vIt;
-	  vector_iterator_range vRange = this->vectorRange();
-	  assert(std::distance(vRange.first, vRange.second) == 1);
-	  assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::TOR);
-	  assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
+		  // get iterator to field
+		  vector_iterator vIt;
+		  vector_iterator_range vRange = this->vectorRange();
+		  assert(std::distance(vRange.first, vRange.second) == 1);
+		  assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::TOR);
+		  assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
-	  // retrieve ri
-	  MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
-	  MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
-
-
-
-	  #ifdef QUICC_SPATIALSCHEME_SLFM
-		 // Loop over harmonic order m
-		 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-		 {
-			// determine current m
-			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-			// m = 0, no factor of two
-
-			for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
-			{
-			   int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-
-			   if(l==1 && m==0){
-				   std::cout << "computation in taking place\n";
-
-				   MHDFloat temp = this->mProj.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
-				   this->mTorque = temp*this->mFactor;
-				   //break;
-			   }
-
-			}
-		 }
-	  #endif //defined QUICC_SPATIALSCHEME_SLFM
-	  #ifdef QUICC_SPATIALSCHEME_SLFL
-		 // Loop over harmonic degree l
-		 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-		 {
-			int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+		  // retrieve ri
+		  MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
+		  MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
 
 
-			for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
-				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-				if(l==1 && m==0){
+
+		  #ifdef QUICC_SPATIALSCHEME_SLFM
+			 // Loop over harmonic order m
+			 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+			 {
+				// determine current m
+				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+				// m = 0, no factor of two
+
+				for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+				{
+				   int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+				   if(l==1 && m==0){
 					   std::cout << "computation in taking place\n";
 
-					MHDFloat temp = this->mProj.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
-					this->mTorque = temp*this->mFactor;
-					//break;
-				}
-			}
+					   MHDFloat temp = this->mProj.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
+					   this->mTorque = temp*this->mFactor;
+					   //break;
+				   }
 
-		 }
-	  #endif //QUICC_SPATIALSCHEME_SLFL
+				}
+			 }
+		  #endif //defined QUICC_SPATIALSCHEME_SLFM
+		  #ifdef QUICC_SPATIALSCHEME_SLFL
+			 // Loop over harmonic degree l
+			 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+			 {
+				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+
+
+				for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
+					int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+					if(l==1 && m==0){
+						   std::cout << "computation in taking place\n";
+
+						MHDFloat temp = this->mProj.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
+						this->mTorque = temp*this->mFactor;
+						//break;
+					}
+				}
+
+			 }
+		  #endif //QUICC_SPATIALSCHEME_SLFL
 
 	   }
 
@@ -267,22 +267,22 @@ namespace IoVariable {
 
       // Get the "global" Kinetic energy from MPI code
       #ifdef QUICC_MPI
-         MHDFloat Torque = this->mTorque;
+	 MHDFloat Torque = this->mTorque;
 
-         MPI_Request SendReq, RecvReq;
+	 MPI_Request SendReq, RecvReq;
 
-         if(this->mComputeFlag && !FrameworkMacro::allowsIO()){
-        	 std::cout << Torque << std::endl;
-        	 MPI_Isend(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD, &SendReq);
-         }
+	 if(this->mComputeFlag){
+		 std::cout << Torque << std::endl;
+		 MPI_Isend(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD, &SendReq);
+	 }
 
-         int value  = MPI_Barrier(MPI_COMM_WORLD);
+	 //int value  = MPI_Barrier(MPI_COMM_WORLD);
 
-         if(FrameworkMacro::allowsIO() && !this->mComputeFlag){
-        	 MPI_Irecv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &RecvReq);
-        	 std::cout << Torque << std::endl;
-             this->mTorque = Torque;
-         }
+	 if(FrameworkMacro::allowsIO()){
+		 MPI_Irecv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &RecvReq);
+		 std::cout << Torque << std::endl;
+		 this->mTorque = Torque;
+	 }
 
       #endif //QUICC_MPI
 
