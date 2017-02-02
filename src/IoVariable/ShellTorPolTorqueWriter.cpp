@@ -48,7 +48,7 @@ namespace IoVariable {
 
    void ShellTorPolTorqueWriter::init()
    {
-	   std::cout << "init!";
+
 	   this->mComputeFlag = false;
 #ifdef QUICC_SPATIALSCHEME_SLFM
 	 // Loop over harmonic order m
@@ -91,11 +91,6 @@ namespace IoVariable {
 
 
 	 if(this->mComputeFlag){
-
-
-		  // compute the prefactor
-
-
 
 		  // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
 		  MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
@@ -148,9 +143,6 @@ namespace IoVariable {
 		  PythonWrapper::fillMatrix(valueProj, pValue);
 		  Py_DECREF(pValue);
 
-
-
-		  //pTmp = PyTuple_GetSlice(pArgs, 0, 3);
 
 		  // add specifics to boundary conditions
 		  pDict1 = PyDict_New();
@@ -221,7 +213,8 @@ namespace IoVariable {
 				   int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
 				   if(l==1 && m==0){
-					   std::cout << "computation in taking place\n";
+
+					   // compute torqu
 
 					   MHDFloat temp = this->mProj.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
 					   this->mTorque = temp*this->mFactor;
@@ -231,6 +224,7 @@ namespace IoVariable {
 				}
 			 }
 		  #endif //defined QUICC_SPATIALSCHEME_SLFM
+
 		  #ifdef QUICC_SPATIALSCHEME_SLFL
 			 // Loop over harmonic degree l
 			 for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -238,13 +232,15 @@ namespace IoVariable {
 				// determine current l
 				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
 
-
+				// loop over order m
 				for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
+					// determine current m
 					int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
 					if(l==1 && m==0){
-						   std::cout << "computation in taking place\n";
+
+						// compute torque
 
 						MHDFloat temp = this->mProj.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
 						this->mTorque = temp*this->mFactor;
@@ -267,23 +263,23 @@ namespace IoVariable {
       // Define the comunication tag
       int tag = 1815;
 
-      // Get the "global" Kinetic energy from MPI code
+      // message pass the torque
       #ifdef QUICC_MPI
 		 MHDFloat Torque = this->mTorque;
 
 		 MPI_Request SendReq, RecvReq;
 
 		 if(this->mComputeFlag){
-			 std::cout << Torque << std::endl;
+			 // send if the core computed
 			 MPI_Send(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD);
 		 }
 
-		 //int value  = MPI_Barrier(MPI_COMM_WORLD);
 
 		 if(FrameworkMacro::allowsIO()){
+			 // recieve if the core needs to write
 			 MPI_Status status;
 			 MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
-			 std::cout << Torque << std::endl;
+
 			 this->mTorque = Torque;
 		 }
 
