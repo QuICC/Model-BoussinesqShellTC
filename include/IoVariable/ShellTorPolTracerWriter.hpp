@@ -27,7 +27,7 @@
 #include<utility>
 #include<map>
 
-namespace GeoMHDiSCC{
+namespace QuICC{
 
 namespace IoVariable{
 
@@ -45,7 +45,7 @@ namespace IoVariable{
 		 * @param prefix Prefix to use for the file name
 		 * @param type Type of the file (typically scheme name)
 		 */
-		ShellTorPolTracerWriter(const std::string& prefix, const std::string& type);
+		ShellTorPolTracerWriter(const std::string& prefix, const std::string& type, const Matrix& Points);
 
 		/*
 		 * @brief Destructor
@@ -70,7 +70,7 @@ namespace IoVariable{
 		/*
 		 *@brief Requires heavy computations?
 		 */
-		virtual bool isHeavy();
+		virtual bool isHeavy() const;
 
 	protected:
 
@@ -99,13 +99,13 @@ namespace IoVariable{
 		 * @brief Precomputed M part of the spherical harmonic
 		 */
 		typedef std::map<std::pair<int,int>,Array> ArrayMap;
-		typedef std::map<std::pait<int,int>,ArrayZ> ArrayZMap;
-		ArrayMap Mparts;
+		typedef std::map<std::pair<int,int>,ArrayZ> ArrayZMap;
+		ArrayZMap Mparts;
 
 		/*
 		 * @brief Precomputed L part of the spherical harmonic
 		 */
-		ArrayZMap Lparts;
+		ArrayMap Lparts;
 
 		/*
 		 * @brief
@@ -121,20 +121,23 @@ namespace IoVariable{
 		 * If we decide that we need current Tracers as well
 		Matrix mProjTricurlMat;
 		 */
-
-
-
-		inline bool ShellTorPolTracerWriter::isHeavy() const
-		{
-			return true;
-		}
-
-		typedef SharedPtrMacro<ShellTorPolTracerWriter> SharedShellTorPolTracerWriter;
-
-
-
 	};
 
+
+
+
+	inline bool ShellTorPolTracerWriter::isHeavy() const
+	{
+		return true;
+	}
+
+	typedef SharedPtrMacro<ShellTorPolTracerWriter> SharedShellTorPolTracerWriter;
+
+
+
+
 }
 
 }
+
+#endif

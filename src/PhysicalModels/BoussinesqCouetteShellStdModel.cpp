@@ -199,9 +199,9 @@ namespace QuICC {
       mProbes << 1.0, 1.57079, 0.,
     		  1.5, 1.57079, 3.141592654;
       // Create probe field writer
-      IoVariable::ShellTorPolTracerWriter spVector(new  IoVariable::ShellTorPolTracerWriter("velocity_r", SchemeType::type(), mProbes));
-      spVector->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spVector);
+      IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_r", SchemeType::type(), mProbes));
+      spVector2->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector2);
    }
 
    void BoussinesqCouetteShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)

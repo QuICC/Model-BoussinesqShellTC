@@ -341,6 +341,16 @@ namespace QuICC {
 	   rVector = Eigen::Map<Eigen::VectorXd>((double*)PyArray_DATA(pVec),len);
    }
 
+   void PythonWrapper::getVector(ArrayZ& rVector, PyObject* pVec)
+   {
+
+	   // get the  lenght of the vector
+	   int len = PyArray_DIM(pVec,0);
+
+	   // resize the eigen::vector and assign the pointer
+	   rVector = Eigen::Map<Eigen::VectorXcd>((std::complex<double>*)PyArray_DATA(pVec),len);
+   }
+
    void PythonWrapper::cleanup()
    {
       // Clean up

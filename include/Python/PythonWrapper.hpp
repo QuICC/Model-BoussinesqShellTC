@@ -102,6 +102,11 @@ namespace QuICC {
           */
          static void getVector(Array& rArray, PyObject* pVec);
 
+         /*
+          * @brief Fill a complex vector (Eigen::VectorXcd) with data from PyObjct
+          */
+         static void getVector(ArrayZ& rArrayZ, PyObject* pVec);
+
   
          /**
           * @brief Cleanup wrapper without finalize

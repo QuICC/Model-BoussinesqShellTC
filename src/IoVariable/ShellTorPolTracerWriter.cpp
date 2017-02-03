@@ -25,8 +25,9 @@
 #include"IoVariable/EnergyTags.hpp"
 #include"TypeSelectors/ScalarSelector.hpp"
 #include"Python/PythonWrapper.hpp"
+#include <numpy/ndarrayobject.h>
 
-namespace GeoMHDiSCC{
+namespace QuICC{
 
 namespace IoVariable{
 
@@ -58,7 +59,7 @@ namespace IoVariable{
 
 		// initialize the Python wrapper
 		PythonWrapper::init();
-		PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
+		PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 		PythonWrapper::import("geomhdiscc.projection.shell");
 		//PythonWrapper::import("geomhdiscc.projection.spherical");
 
@@ -81,12 +82,12 @@ namespace IoVariable{
 		PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue,0));
 		PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue,1));
 		int nR = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-		PyTuple_SetItem(pArgs,0,PyLong_FromLong(nR)));
+		PyTuple_SetItem(pArgs,0,PyLong_FromLong(nR));
 
 		// TODO: decide how the argument r positions is passed
 		Array xRadial = mPoints.col(0);
 		int m = xRadial.rows();
-		int dims[1];
+		long int dims[1];
 		dims[0]=m;
 		pTmp = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,xRadial.data());
 		PyTuple_SetItem(pArgs,3,pTmp);
@@ -96,14 +97,14 @@ namespace IoVariable{
 		pValue = PythonWrapper::callFunction(pArgs);
 
 		// Fill matrix and cleanup
-		mProjMat = Matrix(m,cols);
+		mProjMat = Matrix(m,nR);
 		PythonWrapper::getMatrix(mProjMat, pValue);
 		Py_DECREF(pValue);
 
 		// function call for the dT_dr and cleanup
 		PythonWrapper::setFunction("proj_dradial_dr");
 		pValue = PythonWrapper::callFunction(pArgs);
-		mProjDrMat = Matrix(m,cols);
+		mProjDrMat = Matrix(m,nR);
 		PythonWrapper::getMatrix(mProjDrMat,pValue);
 
 		// create PyObjects for the 2 vectors theta and phi
@@ -111,21 +112,14 @@ namespace IoVariable{
 		vTheta = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,mPoints.col(1).data());
 		vPhi = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,mPoints.col(2).data());
 
-		// create 2 instances for the execution of eimp and lplm
-		PythonWrapper PyWrapL();
-		PythonWrapper PyWrapM();
-		PyWrapL.import("geomhdiscc.projection.spherical");
-		PyWrapM.import("geomhdiscc.projection.spherical");
-		PyWrapL.setFunction("lplm");
-		PyWrapM.setFunction("eipm");
+		//
+		PythonWrapper::setFunction("lplm");
 
 		// set up the containers for the computed vectors
 		Lparts = ArrayMap();
-		Mparts = ArrayZMap();
 
-
-		// precompute the Spherical harmonic part of the projector
-		#ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+		// precompute the assoc_legendre part of the projector
+		#ifdef QUICC_SPATIALSCHEME_SLFM
 		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
 			// k  is the index to the degree m
 			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
@@ -136,34 +130,23 @@ namespace IoVariable{
 				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
 				// prepare the call of lplm
-				pArgs = PyTuple_New(3)
+				pArgs = PyTuple_New(3);
 				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
 				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
 				PyTuple_SetItem(pArgs,2,vTheta);
 
 				// set the function to lplm
-				pValue = PyWrapL.callFunction(pArgs);
+				pValue = PythonWrapper::callFunction(pArgs);
 
 				// retrieve the result
 				Array lplm;
 				PythonWrapper::getVector(lplm,pValue);
 				Lparts[std::make_pair(l,m)] = lplm;
 
-				// prepare the call of eimp
-				PyTuple_SetItem(pArgs,2, vPhi);
-
-				// set the function to eimp
-				pValue = PPyWrapM.callFunction(pArgs);
-
-				// retrieve the result
-				Array eimp;
-				PythonWrapper::getVector(eimp,pValue);
-				Mparts[std::make_pair(l,m)] = eimp;
 			}
 		}
 		#endif // GEOMHDISCC_SPATIALSCHEME_SLFM
-
-		#ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+		#ifdef QUICC_SPATIALSCHEME_SLFL
 		for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
 			// j  is the index to the order l
 			int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(j);
@@ -174,32 +157,82 @@ namespace IoVariable{
 				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(k, j);
 
 				// prepare the call of lplm
-				pArgs = PyTuple_New(3)
+				pArgs = PyTuple_New(3);
 				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
 				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
 				PyTuple_SetItem(pArgs,2,vTheta);
 
 				// set the function to lplm
-				pValue = PyWrapL.callFunction(pArgs);
+				pValue = PythonWrapper::callFunction(pArgs);
 
 				// retrieve the result
 				Array lplm;
 				PythonWrapper::getVector(lplm,pValue);
 				Lparts[std::make_pair(l,m)] = lplm;
 
-				// prepare the call of eimp
-				PyTuple_SetItem(pArgs,2, vPhi);
-
-				// set the function to eimp
-				pValue = PPyWrapM.callFunction(pArgs);
-
-				// retrieve the result
-				ArrayZ eimp;
-				PythonWrapper::getVector(eimp,pValue);
-				Mparts[std::make_pair(l,m)] = eimp;
 			}
 		}
 		#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+
+
+		PythonWrapper::setFunction("eipm");
+
+		// set up the containers for the computed vector
+		Mparts = ArrayZMap();
+
+		// precompute the assoc_legendre part of the projector
+			#ifdef QUICC_SPATIALSCHEME_SLFM
+			for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
+				// k  is the index to the degree m
+				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+
+				for(int j=0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j){
+
+					// j index is the l order
+					int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+					// prepare the call of eimp
+					pArgs = PyTuple_New(3);
+					PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+					PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+					PyTuple_SetItem(pArgs,2, vPhi);
+
+					// set the function to eimp
+					pValue = PythonWrapper::callFunction(pArgs);
+
+					// retrieve the result
+					ArrayZ eimp;
+					PythonWrapper::getVector(eimp,pValue);
+					Mparts[std::make_pair(l,m)] = eimp;
+				}
+			}
+			#endif // GEOMHDISCC_SPATIALSCHEME_SLFM
+			#ifdef QUICC_SPATIALSCHEME_SLFL
+			for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
+				// j  is the index to the order l
+				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(j);
+
+				for(int k=0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(j); ++k){
+
+					// k index is the m degree
+					int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(k, j);
+
+					// prepare the call of eimp
+					pArgs = PyTuple_New(3);
+					PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+					PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+					PyTuple_SetItem(pArgs,2, vPhi);
+
+					// set the function to eimp
+					pValue = PythonWrapper::callFunction(pArgs);
+
+					// retrieve the result
+					ArrayZ eimp;
+					PythonWrapper::getVector(eimp,pValue);
+					Mparts[std::make_pair(l,m)] = eimp;
+				}
+			}
+			#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
 
 
@@ -217,7 +250,7 @@ namespace IoVariable{
 		vector_iterator vIt;
 		vector_iterator_range vRange = this->vectorRange();
 		assert(std::distance(vRange.first,vRange.second)==1);
-		assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::POL)
+		assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::POL);
 
 		// Initialize the probes to zero
 		this->mPolTracer *= 0.0;
@@ -263,9 +296,6 @@ namespace IoVariable{
 		}
 		#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
-		// free BWD and TWD storage
-		coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPol);
-		coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPol);
 
 
 
@@ -285,7 +315,7 @@ namespace IoVariable{
 
 		// Check is the workflow allows IO to be performed
 		if(FrameworkMacro::allowsIO()){
-			this ->mFile << std::setprecision(14) << this->mTime << '\t' << this->mPolTracer.transpose() < std::endl;
+			this ->mFile << std::setprecision(14) << this->mTime << '\t' << this->mPolTracer.transpose() << std::endl;
 		}
 
 		// Close file
