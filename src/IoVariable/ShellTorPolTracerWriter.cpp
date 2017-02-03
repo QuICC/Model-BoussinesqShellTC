@@ -60,7 +60,7 @@ namespace IoVariable{
 		PythonWrapper::init();
 		PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
 		PythonWrapper::import("geomhdiscc.projection.shell");
-		PythonWrapper::import("geomhdiscc.projection.spherical");
+		//PythonWrapper::import("geomhdiscc.projection.spherical");
 
 		// prepare arguments for the linear_2x call
 		PyObject *pArgs, * pValue, *pTmp;
@@ -74,12 +74,14 @@ namespace IoVariable{
 		// function call linear_2x
 		PythonWrapper::setFunction("linear_r2x");
 		pValue = PythonWrapper::callFunction(pTmp);
+		MHDFloat a =PyFloat_AsDouble(PyTuple_GetItem(pValue,0));
+		MHDFloat b =PyFloat_AsDouble(PyTuple_GetItem(pValue,1));
 
 		// store arguments and prepare for the proj_radial function call
 		PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue,0));
 		PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue,1));
-		int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>()+2;
-		PyTuple_SetItem(pArgs,0,PyLong_FromLong(cols));
+		int nR = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+		PyTuple_SetItem(pArgs,0,PyLong_FromLong(nR)));
 
 		// TODO: decide how the argument r positions is passed
 		Array xRadial = mPoints.col(0);
@@ -94,9 +96,9 @@ namespace IoVariable{
 		pValue = PythonWrapper::callFunction(pArgs);
 
 		// Fill matrix and cleanup
-
 		mProjMat = Matrix(m,cols);
 		PythonWrapper::getMatrix(mProjMat, pValue);
+		Py_DECREF(pValue);
 
 		// function call for the dT_dr and cleanup
 		PythonWrapper::setFunction("proj_dradial_dr");
@@ -217,15 +219,6 @@ namespace IoVariable{
 		assert(std::distance(vRange.first,vRange.second)==1);
 		assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::POL)
 
-		// dealias toroidal  variable data
-		coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
-
-		// Recover dealiased BWD data
-		Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-		// Get FWD storage
-		Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
-
 		// Initialize the probes to zero
 		this->mPolTracer *= 0.0;
 
@@ -241,7 +234,7 @@ namespace IoVariable{
 				// j index is the l order
 				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-				ArrayZ temp = this->mProjMat * rInVarPol.slice(k).col(j);
+				ArrayZ temp = this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(k).col(j);
 
 				this->mPolTracer += (this->Lparts[std::make_pair(l,m)].array()*this->Mparts[std::make_pair(l,m)].array()*temp.array()).real()*factor*l*(l+1);
 
@@ -260,7 +253,7 @@ namespace IoVariable{
 
 				double factor = (m==0) ? 1.0 : 2.0;
 
-				ArrayZ temp = this->mProjMat * rInVarPol.slice(j).col(k);
+				ArrayZ temp = this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k);
 
 				this->mPolTracer += (this->Lparts[std::make_pair(l,m)].array()*this->Mparts[std::make_pair(l,m)].array()*temp.array()).real()*factor*l*(l+1);
 
