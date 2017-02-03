@@ -16,6 +16,39 @@ def zblk(nx, bc, location = 't'):
     mat = spsp.coo_matrix((nx,nx))
     return c1dbc.constrain(mat,bc, location = location)
 
+def z1(nx, bc, coeff = 1.0, cscale = 2.0, zr = 0, location = 't'):
+    """Create operator for multiplication by x of T_n(x)"""
+
+    ns = np.arange(0, nx, 1)
+    offsets = np.arange(-1,2,1)
+    nzrow = -1
+
+    cnst = coeff/cscale
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return (cnst/2.0)*np.ones(n.shape)
+
+    # Generate diagonal
+    def d0(n):
+        return cnst*np.ones(n.shape)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return (cnst/2.0)*np.ones(n.shape)
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = spsp.diags(diags, offsets, format = 'lil')
+    if zr > 0 and location == 'b':
+        mat[-zr:,:] = 0
+    elif zr > 0 and location == 't':
+        mat[0:zr,:] = 0
+    mat = mat.tocoo()
+
+    return c1dbc.constrain(mat, bc)
+
 def d1(nx, bc, coeff = 1.0, cscale = 1.0, zr = 1):
     """Create operator for 1st derivative"""
 
@@ -112,6 +145,41 @@ def i1(nx, bc, coeff = 1.0):
     mat = spsp.diags(diags, offsets, format = 'coo')
     return c1dbc.constrain(mat, bc)
 
+def i1z1(nx, bc, coeff = 1.0, cscale = 2.0):
+    """Create operator for 1st integral of multiplication by x in x of T_n(x)"""
+
+    ns = np.arange(0, nx, 1)
+    offsets = np.arange(-2,3,1)
+    nzrow = 0
+
+    cnst = coeff/cscale
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return cnst/(4.0*n)
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return cnst/(2.0*n)
+
+    # Generate diagonal
+    def d0(n):
+        return cnst*np.zeros(n.shape)
+
+    # Generate 1st subdiagonal
+    def d1(n):
+        return -cnst/(2.0*n)
+
+    # Generate 1st superdiagonal
+    def d2(n):
+        return -cnst/(4.0*n)
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = spsp.diags(diags, offsets, format = 'coo')
+    return c1dbc.constrain(mat, bc)
+
 def i2(nx, bc, coeff = 1.0):
     """Create operator for 2nd integral in x of T_n(x)"""
     
@@ -132,6 +200,49 @@ def i2(nx, bc, coeff = 1.0):
         return coeff/(4.0*n*(n + 1.0))
 
     ds = [d_2, d0, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = spsp.diags(diags, offsets, format='coo')
+    return c1dbc.constrain(mat, bc)
+
+def i2z1(nx, bc, coeff = 1.0, cscale = 2.0):
+    """Create operator for 2nd integral in x of z of T_n(x)"""
+    
+    ns = np.arange(0, nx, 1)
+    offsets = np.arange(-3,4,1)
+    nzrow = 1
+
+    cnst = coeff/cscale
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return coeff/(8.0*n*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return coeff/(4.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -coeff/(8.0*n*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -coeff/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -coeff/(8.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return coeff/(4.0*n*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return coeff/(8.0*n*(n + 1.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = spsp.diags(diags, offsets, format='coo')

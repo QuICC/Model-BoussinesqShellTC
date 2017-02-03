@@ -23,7 +23,6 @@
 #include "PolynomialTransforms/WorlandPolynomial.hpp"
 #include "Python/PythonWrapper.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {

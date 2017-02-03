@@ -14,4 +14,5 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldTrivialVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldTrivialVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/NonlinearVectorFieldVisualizer.cpp
 )

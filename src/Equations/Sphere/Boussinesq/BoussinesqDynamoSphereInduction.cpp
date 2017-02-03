@@ -62,7 +62,7 @@ namespace Equations {
    void BoussinesqDynamoSphereInduction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       ///
-      /// Compute \f$\vec u\wedge\vec B\right)\f$
+      /// Compute \f$\left(\vec u\wedge\vec B\right)\f$
       ///
       switch(compId)
       {

@@ -13,6 +13,7 @@
 
 // System includes
 //
+#include <limits>
 
 // External includes
 //
@@ -199,8 +200,11 @@ namespace Equations {
 
          /**
           * @brief Set current simulation time to allow for timedependent implementations
+          *
+          * @param time       Current simulation time
+          * @param finished   Flag for completed multistage timestep
           */
-         void  setTime(const MHDFloat time);
+         virtual void  setTime(const MHDFloat time, const bool finished);
 
          /**
           * @brief Get the nonlinear integration components order
@@ -360,6 +364,32 @@ namespace Equations {
 
    /// Typedef for a smart EquationData
    typedef SharedPtrMacro<EquationData> SharedEquationData;
+
+   /**
+    * @brief Update time average
+    */
+   template <typename TData> TData incrementTimeAverage(const TData avg, const TData newData, const MHDFloat time, const MHDFloat timestep);
+   MHDFloat incrementTimeAverage(const MHDComplex avg, const MHDFloat newData, const MHDFloat time, const MHDFloat timestep);
+
+   /**
+    * @brief Don't update time average
+    */
+   template <typename TData> TData noupdateTimeAverage(const TData avg, const TData newData);
+   MHDFloat noupdateTimeAverage(const MHDComplex avg, const MHDFloat newData);
+
+
+   template <typename TData> TData incrementTimeAverage(const TData avg, const TData newData, const MHDFloat time, const MHDFloat timestep)
+   {
+      MHDFloat stepWeight = timestep/time;
+      MHDFloat avgWeight = (time-timestep)/time;
+
+      return avgWeight*avg + stepWeight*newData;
+   }
+
+   template <typename TData> TData noupdateTimeAverage(const TData avg, const TData newData)
+   {
+      return avg;
+   }
 }
 }
 

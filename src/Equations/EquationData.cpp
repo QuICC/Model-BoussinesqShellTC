@@ -341,7 +341,7 @@ namespace Equations {
       return this->mTime;
    }
 
-   void  EquationData::setTime(const MHDFloat time)
+   void  EquationData::setTime(const MHDFloat time, const bool finished)
    {
       this->mTime = time;
    }
@@ -354,6 +354,20 @@ namespace Equations {
    void EquationData::addNLComponent(const FieldComponents::Spectral::Id compId, const int flag)
    {
       this->mNLComponents.push_back(std::make_pair(compId,flag));
+   }
+
+   MHDFloat incrementTimeAverage(const MHDComplex avg, const MHDFloat newData, const MHDFloat time, const MHDFloat timestep)
+   {
+      throw Exception("Setup is wrong, should not have been called!");
+
+      return std::numeric_limits<MHDFloat>::quiet_NaN();
+   }
+
+   MHDFloat noupdateTimeAverage(const MHDComplex avg, const MHDFloat newData)
+   {
+      throw Exception("Setup is wrong, should not have been called!");
+
+      return std::numeric_limits<MHDFloat>::quiet_NaN();
    }
 }
 }

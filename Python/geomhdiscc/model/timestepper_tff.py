@@ -46,7 +46,10 @@ class TimestepperTFF(base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            fields = []
+            if field_row in [("pressure","")]:
+                fields = [("temperature","")]
+            else:
+                fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
@@ -154,6 +157,22 @@ class TimestepperTFF(base_model.BaseModel):
             bc = no_bc()
 
         return bc
+
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit linear term"""
+
+        zscale = eq_params['scale1d']
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+
+        if field_row == ("pressure","") and field_col == ("temperature",""):
+            mat = geo.qid(res[0], 0, bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
 
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""

@@ -37,6 +37,7 @@
 #include "Generator/Visualizers/ScalarFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
+#include "Generator/Visualizers/NonlinearVectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -50,7 +51,7 @@ namespace GeoMHDiSCC {
       // Add transport equation
       spSim->addScalarEquation<Equations::BoussinesqRBCCylinderTransport>();
       
-      // Add Navier-Stokes equation (X,Y,Z components)
+      // Add Navier-Stokes equation
       spSim->addVectorEquation<Equations::BoussinesqRBCCylinderMomentum>();
    }
 
@@ -66,18 +67,13 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CylinderExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::R, Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::R, 1.0e0, 1.0, 1.0e0, 0.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::THETA, Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::THETA, 1.0e0, 0.0, 1.0e0, 1.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 0.0, 1.0e0, 0.0, 1.0e0, 1.0);
+         spVector->setSpectralType(FieldComponents::Spectral::TOR, Equations::CylinderExactStateIds::SPEC_UNIT);
+         spVector->setSpectralType(FieldComponents::Spectral::POL, Equations::CylinderExactStateIds::SPEC_UNIT);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CylinderExactStateIds::POLYCOSPOLY);
-         spScalar->setModeOptions(1e0, 2.0, 1e0, 2.0, 1e0, 1.0);
+         spScalar->setSpectralType(Equations::CylinderExactStateIds::SPEC_UNIT);
 
       // Generate random spectrum
       } else
@@ -112,6 +108,7 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldTrivialVisualizer spSTrivial;
       Equations::SharedVectorFieldVisualizer spVector;
       Equations::SharedVectorFieldTrivialVisualizer spVTrivial;
+      Equations::SharedNonlinearVectorFieldVisualizer spVNL;
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
@@ -138,6 +135,11 @@ namespace GeoMHDiSCC {
       spVTrivial->setFields(true, false, true);
       spVTrivial->setIdentity(PhysicalNames::MAGNETIC);
 
+      // Add velocity fields visualization
+      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
+      spVTrivial->setFields(true, false, true);
+      spVTrivial->setIdentity(PhysicalNames::PRESSURE);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
@@ -145,6 +147,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::FLUCT_TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::MAGNETIC);
+      spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
 

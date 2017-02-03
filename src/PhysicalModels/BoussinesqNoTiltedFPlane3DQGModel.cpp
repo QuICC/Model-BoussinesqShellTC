@@ -226,6 +226,10 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
+   void BoussinesqNoTiltedFPlane3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+   }
+
    void BoussinesqNoTiltedFPlane3DQGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

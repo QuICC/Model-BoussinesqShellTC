@@ -8,7 +8,7 @@ import numpy as np
 
 from geomhdiscc.transform.spherical import eqgrid
 
-min_x_points = 100
+min_x_points = 200
 
 def grid(nx):
     """Create the Chebyshev grid"""

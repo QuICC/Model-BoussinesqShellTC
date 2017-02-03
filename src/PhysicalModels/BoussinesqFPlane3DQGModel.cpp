@@ -32,6 +32,10 @@
 #include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
+#include "IoStats/Cartesian1DScalarAvgWriter.hpp"
+#include "IoStats/Cartesian1DScalarRMSWriter.hpp"
+#include "IoStats/Cartesian1DScalarSkewWriter.hpp"
+#include "IoStats/Cartesian1DScalarKurtWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -145,7 +149,7 @@ namespace GeoMHDiSCC {
       
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false, false);
+      spField->setFields(true, true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
@@ -158,12 +162,18 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
+      // Add vorticity profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false, false);
+      spField->setIdentity(PhysicalNames::VORTICITYZ);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -177,6 +187,7 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::STREAMFUNCTION);
       spIn->expect(PhysicalNames::VELOCITYZ);
       spIn->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spIn->expect(PhysicalNames::VORTICITYZ);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -216,8 +227,33 @@ namespace GeoMHDiSCC {
 
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spState->expect(PhysicalNames::VORTICITYZ);
 
       spSim->addHdf5OutputFile(spState);
+   }
+
+   void BoussinesqFPlane3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+      // Create Avg temperature writer
+      IoStats::SharedCartesian1DScalarAvgWriter spAvg(new IoStats::Cartesian1DScalarAvgWriter("temperature", SchemeType::type()));
+      spAvg->expect(PhysicalNames::TEMPERATURE);
+      spSim->addStatsOutputFile(spAvg);
+
+      // Create RMS temperature writer
+      IoStats::SharedCartesian1DScalarRMSWriter spRMS(new IoStats::Cartesian1DScalarRMSWriter("temperature", spAvg,  SchemeType::type()));
+      spRMS->expect(PhysicalNames::TEMPERATURE);
+      spSim->addStatsOutputFile(spRMS);
+      
+      // Create skew temperature writer
+      IoStats::SharedCartesian1DScalarSkewWriter spSkew(new IoStats::Cartesian1DScalarSkewWriter("temperature", spAvg, spRMS,  SchemeType::type()));
+      spSkew->expect(PhysicalNames::TEMPERATURE);
+      spSim->addStatsOutputFile(spSkew);
+      
+      // Create kurt temperature writer
+      IoStats::SharedCartesian1DScalarKurtWriter spKurt(new IoStats::Cartesian1DScalarKurtWriter("temperature", spAvg, spRMS,  SchemeType::type()));
+      spKurt->expect(PhysicalNames::TEMPERATURE);
+      spSim->addStatsOutputFile(spKurt);
+      
    }
 
    void BoussinesqFPlane3DQGModel::setInitialState(SharedSimulation spSim)

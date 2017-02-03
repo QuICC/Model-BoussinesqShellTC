@@ -174,6 +174,10 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
+   void BoussinesqRRBCDuctVCModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+   }
+
    void BoussinesqRRBCDuctVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

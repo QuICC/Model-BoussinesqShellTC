@@ -158,6 +158,13 @@ def i4j4lapl2(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     mat *= coeff
     return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
 
+def i4laplhj4(nr, nz, m, bc, coeff = 1.0, restriction = None):
+    """Create a i4laplh in R kronecker with i4 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*utils.restricted_kron_2d(c1d.i4(nz, bcz), rad.i4laplh(nr, m, bcr), restriction = restriction)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc, restriction = restriction)
+
 def i4j4lapl(nr, nz, m, bc, coeff = 1.0, zscale = 1.0, restriction = None):
     """Create a i2 in R kronecker with i2 in Z of the laplacian"""
 
@@ -255,7 +262,7 @@ def tau_mat_z(nr, nz, m, tau, kron_op, qr, qz, bc, location = 't', restriction =
 
     pad = tau.get('pad',0)
     s = tau.get('kron_shift',0)
-    matR = cylbc.brid(nr,m,sr,dr,rad.radbc.no_bc(), location = location)*kron_op(nr+s, m, {0:0, 'rt':s, 'cr':s})
+    matR = cylbc.brid(nr,m,sr,dr,rad.radbc.no_bc(), location = location)*kron_op(nr+s, m, bc = {0:0, 'rt':s, 'cr':s})
     matZ = spsp.lil_matrix((nz,nz))
     matZ = c1d.c1dbc.constrain(matZ, tau, pad_zeros = pad, location = location)
 

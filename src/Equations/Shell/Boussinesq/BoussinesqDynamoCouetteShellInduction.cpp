@@ -64,7 +64,7 @@ namespace Equations {
 	  // Import the Rossby number for scaling the induction term
 	   MHDFloat Ro = std::abs(this->eqParams().nd(NonDimensional::ROSSBY));
       ///
-      /// Compute \f$\vec u\wedge\vec B + B0\right)\f$
+      /// Compute \f$\left(\vec u\wedge\vec B + B0\right)\f$
       ///
       switch(compId)
       {

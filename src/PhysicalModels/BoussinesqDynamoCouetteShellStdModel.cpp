@@ -365,6 +365,10 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
+   void BoussinesqDynamoCouetteShellStdModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
+   }
+
    void BoussinesqDynamoCouetteShellStdModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

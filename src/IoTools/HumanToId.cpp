@@ -33,7 +33,11 @@ namespace IoTools {
       //
       // Nondimensional numbers
       // 
-      if(id == IdToHuman::toTag(NonDimensional::EKMAN))
+      if(id == IdToHuman::toTag(NonDimensional::EADY))
+      {
+         return NonDimensional::EADY;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::EKMAN))
       {
          return NonDimensional::EKMAN;
 
@@ -263,6 +267,14 @@ namespace IoTools {
       {
          return PhysicalNames::CODENSITY;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::BX))
+      {
+         return PhysicalNames::BX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::BY))
+      {
+         return PhysicalNames::BY;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::DENSITY))
       {
          return PhysicalNames::DENSITY;
@@ -275,9 +287,29 @@ namespace IoTools {
       {
          return PhysicalNames::DX_MEANTEMPERATURE;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::EMFX))
+      {
+         return PhysicalNames::EMFX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::EMFY))
+      {
+         return PhysicalNames::EMFY;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::ENTROPY))
       {
          return PhysicalNames::ENTROPY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FBX))
+      {
+         return PhysicalNames::FBX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FBY))
+      {
+         return PhysicalNames::FBY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::FBZ))
+      {
+         return PhysicalNames::FBZ;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::MAGNETIC))
       {

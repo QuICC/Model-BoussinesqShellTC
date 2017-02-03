@@ -23,6 +23,18 @@ namespace Datatypes  {
 
    namespace internal
    {
+      template <typename TData> class GetScalar
+      {
+         public:
+            typedef typename TData::Scalar  Scalar;
+      };
+      
+      template <> class GetScalar<DecoupledZMatrix>
+      {
+         public:
+            typedef MHDComplex Scalar;
+      };
+
       /**
        * @brief Get stored value as complex number from DecoupledComplex storage
        *

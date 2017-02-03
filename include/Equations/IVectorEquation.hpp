@@ -251,7 +251,9 @@ namespace Equations {
                   l = start + j_ + i;
 
                   // Copy timestep output into field
-                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, l),i,j,matIdx);
+                  typename Datatypes::internal::GetScalar<TData>::Scalar dataPoint = Datatypes::internal::getScalar(*solution, l);
+                  dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, matIdx);
+                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(dataPoint,i,j,matIdx);
                }
             }
          #else
@@ -262,7 +264,9 @@ namespace Equations {
                for(int i = 0; i < rows; i++)
                {
                   // Copy timestep output into field
-                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, k),i,j,matIdx);
+                  typename Datatypes::internal::GetScalar<TData>::Scalar dataPoint = Datatypes::internal::getScalar(*solution, k);
+                  dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, matIdx);
+                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(dataPoint,i,j,matIdx);
 
                   // increase linear storage counter
                   k++;
@@ -281,7 +285,9 @@ namespace Equations {
             for(int i = 0; i < rows; i++)
             {
                // Copy timestep output into field
-               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, i + solStart,j),i,j,matIdx);
+               typename Datatypes::internal::GetScalar<TData>::Scalar dataPoint = Datatypes::internal::getScalar(*solution, i + solStart,j);
+               dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, matIdx);
+               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(dataPoint,i,j,matIdx);
             }
          }
 
@@ -296,7 +302,9 @@ namespace Equations {
          for(int i = 0; i < rows; i++)
          {
             // Copy timestep output into field
-            this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution,k),i,mode(1),mode(0));
+            typename Datatypes::internal::GetScalar<TData>::Scalar dataPoint = Datatypes::internal::getScalar(*solution, k);
+            dataPoint = this->updateStoredSolution(dataPoint, compId, i, mode(1), mode(0));
+            this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(dataPoint,i,mode(1),mode(0));
 
             // increase linear storage counter
             k++;
@@ -328,7 +336,9 @@ namespace Equations {
                   l = solStart + k_ + j_ + i;
 
                   // Copy timestep output into field
-                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, l),i,j,k);
+                  typename Datatypes::internal::GetScalar<TData>::Scalar dataPoint = Datatypes::internal::getScalar(*solution, l);
+                  dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, k);
+                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(dataPoint,i,j,k);
                }
             }
          }

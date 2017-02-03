@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CylinderExactScalarState::CylinderExactScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTypeId(CylinderExactStateIds::CONSTANT), mModeA(3), mModeK(3)
+      : IScalarEquation(spEqParams), mTypeId(CylinderExactStateIds::NOTUSED), mSpecTypeId(CylinderExactStateIds::NOTUSED), mModeA(3), mModeK(3)
    {
    }
 
@@ -45,9 +45,14 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void CylinderExactScalarState::setStateType(const CylinderExactStateIds::Id id)
+   void CylinderExactScalarState::setPhysicalType(const CylinderExactStateIds::Id id)
    {
       this->mTypeId = id;
+   }
+
+   void CylinderExactScalarState::setSpectralType(const CylinderExactStateIds::Id id)
+   {
+      this->mSpecTypeId = id;
    }
 
    void CylinderExactScalarState::setModeOptions(const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2, const MHDFloat a3, const MHDFloat k3)
@@ -63,7 +68,9 @@ namespace Equations {
 
    void CylinderExactScalarState::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false, false);
+      bool hasNL = (this->mTypeId != CylinderExactStateIds::NOTUSED);
+      bool hasSource =  (this->mSpecTypeId != CylinderExactStateIds::NOTUSED);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false);
    }
 
    void CylinderExactScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
@@ -116,34 +123,6 @@ namespace Equations {
 
                      rNLComp.setPoint(valR*valT*valZ, iZ, iT, iR);
 
-                  } else if(this->mTypeId == CylinderExactStateIds::TESTUNITSPECTRUM)
-                  {
-                     MHDFloat val = 0.0;
-                     MHDFloat valR = 0.0;
-                     MHDFloat valT = 0.0;
-                     MHDFloat valZ = 0.0;
-//                     for(int jM = 0; jM <= this->mModeK(1);  ++jM)
-//                     {
-//                        valR = 0.0;
-//                        for(int jR = 0; jR <= this->mModeK(0); jR++)
-//                        {
-//                           valR += std::pow(r_, 2*jR);
-//                        }
-//                        valR *= std::pow(r_, jM);
-//
-//                        valT = CylinderExactStateIds::cos(1.0,jM,t_) + CylinderExactStateIds::sin(1.0,jM,t_);
-//
-//                        valZ = 0.0;
-//                        for(int jZ = 0; jZ <= this->mModeK(2); jZ++)
-//                        {
-//                           valZ += CylinderExactStateIds::chebyshev(1.0, jZ, z_);
-//                        }
-//                        val += valR*valT*valZ;
-//                     }
-                     val = (std::pow(r_, 5))*(CylinderExactStateIds::cos(1.0,5,t_))*(CylinderExactStateIds::chebyshev(1.0,2,z_));
-
-                     rNLComp.setPoint(val, iZ, iT, iR);
-
                   } else
                   {
                      throw Exception("Unknown exact state");
@@ -154,12 +133,31 @@ namespace Equations {
       }
    }
 
-    Datatypes::SpectralScalarType::PointType CylinderExactScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+    Datatypes::SpectralScalarType::PointType CylinderExactScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int iR, const int iZ, const int iM) const
     {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      return Datatypes::SpectralScalarType::PointType(0);
+      if(this->mSpecTypeId == CylinderExactStateIds::SPEC_UNIT)
+      {
+         int m = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iM);
+         if(m == 1)
+         {
+            int z = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iZ,iM);
+            if(z == 0)
+            {
+               if(iR < 6)
+               {
+                  return Datatypes::SpectralScalarType::PointType(1.0);
+               }
+            }
+         }
+
+         return Datatypes::SpectralScalarType::PointType(0);
+      } else
+      {
+         return Datatypes::SpectralScalarType::PointType(0);
+      }
     }
 
    void CylinderExactScalarState::setRequirements()

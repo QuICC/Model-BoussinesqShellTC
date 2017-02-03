@@ -20,7 +20,7 @@
 namespace GeoMHDiSCC {
 
    SimulationIoControl::SimulationIoControl()
-      : mSteps(0), mAsciiRate(-1), mHdf5Rate(-1)
+      : mSteps(0), mAsciiRate(-1), mHdf5Rate(-1), mStatsRate(-1), mStatsAvgRate(-1), mActiveStatsUpdate(false), mActiveStatsWrite(true)
    {
    }
 
@@ -67,6 +67,30 @@ namespace GeoMHDiSCC {
       return (this->mHdf5Rate > 0 && this->mSteps % this->mHdf5Rate == 0);
    }
 
+   void SimulationIoControl::activateStats()
+   {
+      bool writeTrigger = (this->mStatsRate > 0 && this->mSteps % this->mStatsRate == 0);
+      bool updateTrigger = (this->mStatsAvgRate > 0 && this->mSteps % this->mStatsAvgRate == 0);
+
+      this->mActiveStatsUpdate = (writeTrigger || updateTrigger);
+   }
+
+   void SimulationIoControl::disableStats()
+   {
+      this->mActiveStatsUpdate = false;
+   }
+
+   bool SimulationIoControl::isStatsTime() const
+   {
+      bool writeTrigger = (this->mStatsRate > 0 && this->mSteps % this->mStatsRate == 0);
+      return writeTrigger;
+   }
+
+   bool SimulationIoControl::isStatsUpdateTime() const
+   {
+      return this->mActiveStatsUpdate;
+   }
+
    void SimulationIoControl::writeFiles(const MHDFloat time, const MHDFloat timestep)
    {
       if(this->isAsciiTime())
@@ -77,6 +101,15 @@ namespace GeoMHDiSCC {
       if(this->isHdf5Time())
       {
          this->writeHdf5(time,timestep);
+      }
+
+      // Activate stats
+      this->activateStats();
+
+      if(this->isStatsTime())
+      {
+         this->prepareStats(time,timestep);
+         this->mActiveStatsWrite = true;
       }
    }
 
@@ -101,6 +134,11 @@ namespace GeoMHDiSCC {
       this->mHdf5Writers.push_back(spOutFile);
    }
 
+   void SimulationIoControl::addStatsOutputFile(IoStats::SharedIStatisticsAsciiEWriter spOutFile)
+   {
+      this->mStatsWriters.push_back(spOutFile);
+   }
+
    void SimulationIoControl::initWriters()
    {  
       // First check that all ASCII writers are full
@@ -120,6 +158,16 @@ namespace GeoMHDiSCC {
          if(!(*itHdf5)->isFull())
          {
             throw Exception("There are missing variables in the HDF5 writers");
+         }
+      }
+
+      // First check that all ASCII writers are full
+      SimulationIoControl::stats_iterator itStats;
+      for(itStats = this->mStatsWriters.begin(); itStats < this->mStatsWriters.end(); itStats++)
+      {
+         if(!(*itStats)->isFull())
+         {
+            throw Exception("There are missing variables in the statistics writers");
          }
       }
 
@@ -144,6 +192,13 @@ namespace GeoMHDiSCC {
          (*itHdf5)->setPhysical(phys);
          (*itHdf5)->init();
       }
+
+      // Iterate over all statistics writer
+      for(itStats = this->mStatsWriters.begin(); itStats < this->mStatsWriters.end(); itStats++)
+      {
+         (*itStats)->setPhysical(phys);
+         (*itStats)->init();
+      }
    }
 
    void SimulationIoControl::finalizeWriters()
@@ -163,27 +218,60 @@ namespace GeoMHDiSCC {
          (*itHdf5)->finalize();
       }
       this->mHdf5Writers.clear();
+
+      // Iterate over all statistics writer
+      SimulationIoControl::stats_iterator itStats;
+      for(itStats = this->mStatsWriters.begin(); itStats < this->mStatsWriters.end(); itStats++)
+      {
+         (*itStats)->finalize();
+      }
+      this->mStatsWriters.clear();
    }
 
    void SimulationIoControl::writeAscii(const MHDFloat time, const MHDFloat timestep)
    {
       // Iterate over all ASCII writer
-      SimulationIoControl::ascii_iterator itAscii;
-      for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
+      SimulationIoControl::ascii_iterator it;
+      for(it = this->mAsciiWriters.begin(); it < this->mAsciiWriters.end(); it++)
       {
-         (*itAscii)->setSimTime(time,timestep);
-         (*itAscii)->write();
+         (*it)->setSimTime(time,timestep);
+         (*it)->write();
       }
    }
 
    void SimulationIoControl::writeHdf5(const MHDFloat time, const MHDFloat timestep)
    {
       // Iterate over all HDF5 writer
-      SimulationIoControl::hdf5_iterator itHdf5;
-      for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
+      SimulationIoControl::hdf5_iterator it;
+      for(it = this->mHdf5Writers.begin(); it < this->mHdf5Writers.end(); it++)
       {
-         (*itHdf5)->setSimTime(time,timestep);
-         (*itHdf5)->write();
+         (*it)->setSimTime(time,timestep);
+         (*it)->write();
+      }
+   }
+
+   void SimulationIoControl::prepareStats(const MHDFloat time, const MHDFloat timestep)
+   {
+      // Iterate over all statistics writer
+      SimulationIoControl::stats_iterator it;
+      for(it = this->mStatsWriters.begin(); it < this->mStatsWriters.end(); it++)
+      {
+         (*it)->setSimTime(time,timestep);
+      }
+   }
+
+   void SimulationIoControl::writeStats()
+   {
+      if(this->mActiveStatsWrite)
+      {
+         // Iterate over all statistics writer
+         SimulationIoControl::stats_iterator it;
+         for(it = this->mStatsWriters.begin(); it < this->mStatsWriters.end(); it++)
+         {
+            (*it)->write();
+         }
+
+         this->mActiveStatsWrite = false;
       }
    }
 
@@ -206,6 +294,10 @@ namespace GeoMHDiSCC {
 
       // Set HDF5 rate from config file
       this->mHdf5Rate = this->mspCfgFile->spIo()->fValue("hdf5");
+
+      // Set statistics rate from config file
+      this->mStatsRate = this->mspCfgFile->spStats()->fValue("output_rate");
+      this->mStatsAvgRate = this->mspCfgFile->spStats()->fValue("time_avg_rate");
    }
 
    void SimulationIoControl::initStdOut()
@@ -323,6 +415,16 @@ namespace GeoMHDiSCC {
    SimulationIoControl::hdf5_iterator  SimulationIoControl::endHdf5()
    {
       return this->mHdf5Writers.end();
+   }
+
+   SimulationIoControl::stats_iterator  SimulationIoControl::beginStats()
+   {
+      return this->mStatsWriters.begin();
+   }
+
+   SimulationIoControl::stats_iterator  SimulationIoControl::endStats()
+   {
+      return this->mStatsWriters.end();
    }
 
    Array SimulationIoControl::configRun() const
