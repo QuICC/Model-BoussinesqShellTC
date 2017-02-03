@@ -7,11 +7,11 @@ The sources are under Git to provide versioning. If you're not familiar with Git
 
 2. Get the sources:
 
-   #$>git clone gitolite@base13.ch:GeoMHDiSCC.git
+   #$>git clone gitolite@base13.ch:QuICC.git
 
 3. Go into new diretory
 
-   #$>cd GeoMHDiSCC
+   #$>cd QuICC
 
 4. Get external modules (currently only Eigen):
 

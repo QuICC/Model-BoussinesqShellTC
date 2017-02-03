@@ -29,7 +29,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "TransformConfigurators/TransformTree.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * 
@@ -194,14 +194,14 @@ namespace GeoMHDiSCC {
       // initialise the first transform
       this->mTransform1D.init(spSetup1D);
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          MHDFloat mem1D = this->mTransform1D.requiredStorage();
          StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORMS, mem1D);
 
-         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+         #ifdef QUICC_STORAGEPROFILER_DETAILED
             StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM1D, mem1D);
-         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
-      #endif // GEOMHDISCC_STORAGEPROFILE
+         #endif // QUICC_STORAGEPROFILER_DETAILED
+      #endif // QUICC_STORAGEPROFILE
    }
 
   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initCommunicator(SharedResolution spRes)

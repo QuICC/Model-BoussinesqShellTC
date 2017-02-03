@@ -27,7 +27,7 @@
 #include "SparseSolvers/SparseSolverBase.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 
@@ -269,9 +269,9 @@ namespace Solver {
       typename std::map<MHDFloat, std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > > >::iterator sIt = this->mSolver.find(this->mId);
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
-         #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
          //internal::solveWrapper<TOperator,TData>(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
          internal::solveWrapper(this->mSolution.at(i), sIt->second.at(i), this->mRHSData.at(i));
@@ -310,13 +310,13 @@ namespace Solver {
 
          for(size_t i = 0; i < it->second.size(); ++i)
          {
-            #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
                FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
 
                SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type(FrameworkMacro::getSubComm(FrameworkMacro::SPECTRAL, i)));
             #else
                SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
-            #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
             sIt->second.push_back(solver);
          }
@@ -335,9 +335,9 @@ namespace Solver {
          {
             if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
             {
-               #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+               #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
                   FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
-               #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+               #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
                typename std::map<MHDFloat, std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > > >::iterator sIt = this->mSolver.find(it->first);
                // Safety assert to make sur matrix is compressed

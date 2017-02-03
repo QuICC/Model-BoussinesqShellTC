@@ -1,17 +1,17 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHlTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EigenSHlmTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellScalarEnergyWriter.cpp
-   ${GEOMHDISCC_SRC_DIR}/IoVariable/ShellTorPolEnergyWriter.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactStateIds.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/SphericalVerticalFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellTransport.cpp
+   ${QUICC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellMomentum.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/EigenSHlTools.cpp
+   ${QUICC_SRC_DIR}/Equations/Tools/EigenSHlmTools.cpp
+   ${QUICC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${QUICC_SRC_DIR}/IoVariable/ShellScalarEnergyWriter.cpp
+   ${QUICC_SRC_DIR}/IoVariable/ShellTorPolEnergyWriter.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/ShellExactStateIds.cpp
+   ${QUICC_SRC_DIR}/Generator/States/ShellExactScalarState.cpp
+   ${QUICC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/SphericalVerticalFieldVisualizer.cpp
 )

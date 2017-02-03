@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @name Kronecker product of real operators

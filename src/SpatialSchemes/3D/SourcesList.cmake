@@ -2,69 +2,69 @@
 set(MHDSources
    )
 
-if(GEOMHDISCC_SPATIALSCHEME STREQUAL "TTT")
+if(QUICC_SPATIALSCHEME STREQUAL "TTT")
    list(APPEND MHDSources 
       IRegular3DScheme.cpp
       TTTScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TFT")
+elseif(QUICC_SPATIALSCHEME STREQUAL "TFT")
    list(APPEND MHDSources 
       IRegular3DScheme.cpp
       TFTScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TFF")
+elseif(QUICC_SPATIALSCHEME STREQUAL "TFF")
    list(APPEND MHDSources 
       IRegular3DScheme.cpp
       TFFScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "FFF")
+elseif(QUICC_SPATIALSCHEME STREQUAL "FFF")
    list(APPEND MHDSources 
       IRegular3DScheme.cpp
       FFFScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "CFT")
+elseif(QUICC_SPATIALSCHEME STREQUAL "CFT")
    list(APPEND MHDSources 
       IRegular3DScheme.cpp
       CFTScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
+elseif(QUICC_SPATIALSCHEME STREQUAL "AFT")
    list(APPEND MHDSources 
       IRegular3DScheme.cpp
       AFTScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "WFT")
+elseif(QUICC_SPATIALSCHEME STREQUAL "WFT")
    list(APPEND MHDSources 
       IRegular3DScheme.cpp
       WFTScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFL")
+elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL")
    list(APPEND MHDSources 
       IRegularSHlScheme.cpp
       BLFlScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLFM")
+elseif(QUICC_SPATIALSCHEME STREQUAL "BLFM")
    list(APPEND MHDSources 
       IRegularSHmScheme.cpp
       BLFmScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL")
+elseif(QUICC_SPATIALSCHEME STREQUAL "SLFL")
    list(APPEND MHDSources 
       IRegularSHlScheme.cpp
       SLFlScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFM")
+elseif(QUICC_SPATIALSCHEME STREQUAL "SLFM")
    list(APPEND MHDSources 
       IRegularSHmScheme.cpp
       SLFmScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "WLFL")
+elseif(QUICC_SPATIALSCHEME STREQUAL "WLFL")
    list(APPEND MHDSources 
       IRegularSHlScheme.cpp
       WLFlScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "WLFM")
+elseif(QUICC_SPATIALSCHEME STREQUAL "WLFM")
    list(APPEND MHDSources 
       IRegularSHmScheme.cpp
       WLFmScheme.cpp
       )
-endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TTT")
+endif(QUICC_SPATIALSCHEME STREQUAL "TTT")

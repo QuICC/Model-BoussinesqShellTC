@@ -22,12 +22,12 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/BLFmScheme.hpp"
+#include "SpatialSchemes/3D/WLFmScheme.hpp"
 
 // THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
-// GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
+// QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq thermal convection sphere model (Toroidal/Poloidal formulation)
@@ -45,7 +45,7 @@ namespace GeoMHDiSCC {
          static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::BLFmScheme SchemeType;
+         typedef Schemes::WLFmScheme SchemeType;
 
          /**
           * @brief Add the required equations
@@ -122,11 +122,11 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
+#ifdef QUICC_MPIALGO_SINGLE1D
 #error "The SINGLE1D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE1D
-#if defined GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_SPLINALG_MUMPS && !defined GEOMHDISCC_MPISPSOLVE
+#endif //QUICC_MPIALGO_SINGLE1D
+#if defined QUICC_MPIALGO_TUBULAR && !defined QUICC_SPLINALG_MUMPS && !defined QUICC_MPISPSOLVE
 #error "The TUBULAR parallelisation is not supported!" 
-#endif //defined GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_SPLINALG_MUMPS && !defined GEOMHDISCC_MPISPSOLVE
+#endif //defined QUICC_MPIALGO_TUBULAR && !defined QUICC_SPLINALG_MUMPS && !defined QUICC_MPISPSOLVE
 
 #endif // BOUSSINESQTCSPHEREMODEL_HPP

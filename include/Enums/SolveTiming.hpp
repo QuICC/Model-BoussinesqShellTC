@@ -19,7 +19,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Some timing enums for equation solves

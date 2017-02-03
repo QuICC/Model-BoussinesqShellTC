@@ -7,13 +7,13 @@
 #ifndef STORAGEPROFILERMACRO_H
 #define STORAGEPROFILERMACRO_H
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    // include storage profiler
    #include "StorageProfiler/MemorySize.hpp"
    #include "StorageProfiler/StorageProfiler.hpp"
    #include "StorageProfiler/StorageProfilerTools.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       /// Typedef for a profiler
       typedef Debug::StorageProfiler  StorageProfilerMacro;
    }
@@ -31,6 +31,6 @@
    /// Define storage profiler printInfo macro function
    #define StorageProfilerMacro_printInfo()  
 
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 #endif // STORAGEPROFILERMACRO_H

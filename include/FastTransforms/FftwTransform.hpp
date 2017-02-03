@@ -32,7 +32,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -180,12 +180,12 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 

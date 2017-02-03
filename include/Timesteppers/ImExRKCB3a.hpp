@@ -20,7 +20,7 @@
 //
 #include "Base/Typedefs.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Timestep {
 
@@ -150,5 +150,10 @@ namespace Timestep {
    };
 }
 }
+
+// 
+// Block compilation using this timestepper (Comment out for testing purposes only)
+//
+#error "The ImExRKCB3a timestepper is broken and does not provide accurate results. Switch to another timestepper." 
 
 #endif // IMEXRKCB3A_HPP

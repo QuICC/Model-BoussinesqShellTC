@@ -21,7 +21,7 @@
 #include "Quadratures/LegendreRule.hpp"
 #include "PolynomialTransforms/AssociatedLegendrePolynomial.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -109,11 +109,11 @@ namespace Transform {
       {
          maxCols =  std::max(maxCols, static_cast<int>(this->mspSetup->fast().at(iM).size()));
       }
-      #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+      #ifdef QUICC_MEMORYUSAGE_HIGH
          this->mOpCols = maxCols;
       #else
          this->mOpCols = std::min(maxCols, this->mcMaxOpCols);
-      #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
+      #endif //QUICC_MEMORYUSAGE_HIGH
       this->mOp.resize(this->mspSetup->fwdSize(), this->mOpCols);
 
       // Initize temporary storage
@@ -602,7 +602,7 @@ namespace Transform {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat AssociatedLegendreFlyTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -614,7 +614,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

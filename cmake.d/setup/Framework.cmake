@@ -21,12 +21,12 @@ message(STATUS "***********************************************")
 # Choose the type of memory usage setup the code is using.
 # Possible options are: High, Limited
 #
-set(GEOMHDISCC_MEMORYUSAGES "High" "Limited")
+set(QUICC_MEMORYUSAGES "High" "Limited")
 
-geomhdiscc_provide_choice(GEOMHDISCC_MEMORYUSAGES "Memory usage" GEOMHDISCC_MEMORYUSAGE memoryTest)
+quicc_provide_choice(QUICC_MEMORYUSAGES "Memory usage" QUICC_MEMORYUSAGE memoryTest)
 
 if(memoryTest)
-   geomhdiscc_add_definition(GEOMHDISCC_MEMORYUSAGE)
+   quicc_add_definition(QUICC_MEMORYUSAGE)
 endif(memoryTest)
 
 
@@ -38,24 +38,24 @@ endif(memoryTest)
 # Choose the type of MPI parallelisation or serial setup.
 # Possible options are: Serial, Auto, Single1D, Single2D, Tubular
 #
-set(GEOMHDISCC_MPIALGOS "Serial" "Auto" "Single1D" "Single2D" "Tubular" "Coupled2D")
+set(QUICC_MPIALGOS "Serial" "Auto" "Single1D" "Single2D" "Tubular" "Coupled2D")
 
-geomhdiscc_provide_choice(GEOMHDISCC_MPIALGOS "MPI algorithm" GEOMHDISCC_MPIALGO mpiTest)
+quicc_provide_choice(QUICC_MPIALGOS "MPI algorithm" QUICC_MPIALGO mpiTest)
 
 if(mpiTest)
-   if(NOT GEOMHDISCC_MPIALGO STREQUAL "Serial")
-      set(GEOMHDISCC_MPI ON)
-      add_definitions("-DGEOMHDISCC_MPI")
-   endif(NOT GEOMHDISCC_MPIALGO STREQUAL "Serial")
+   if(NOT QUICC_MPIALGO STREQUAL "Serial")
+      set(QUICC_MPI ON)
+      add_definitions("-DQUICC_MPI")
+   endif(NOT QUICC_MPIALGO STREQUAL "Serial")
 
-   if(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
-      geomhdiscc_add_definition(GEOMHDISCC_MPIALGO)
-   else(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
+   if(NOT QUICC_MPIALGO STREQUAL "Auto")
+      quicc_add_definition(QUICC_MPIALGO)
+   else(NOT QUICC_MPIALGO STREQUAL "Auto")
       set(algos "Single1D" "Single2D" "Tubular" "Coupled2D")
-      foreach(GEOMHDISCC_MPIALGO ${algos})
-         geomhdiscc_add_definition(GEOMHDISCC_MPIALGO)
-      endforeach(GEOMHDISCC_MPIALGO ${algos})
-   endif(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
+      foreach(QUICC_MPIALGO ${algos})
+         quicc_add_definition(QUICC_MPIALGO)
+      endforeach(QUICC_MPIALGO ${algos})
+   endif(NOT QUICC_MPIALGO STREQUAL "Auto")
 endif(mpiTest)
 
 
@@ -69,33 +69,33 @@ endif(mpiTest)
 #
 
 if(mpiTest)
-   set(GEOMHDISCC_GROUPERS_SERIAL "Equation" "Auto")
-   set(GEOMHDISCC_GROUPERS_SINGLE1D "Equation" "Auto" "Single1D")
-   set(GEOMHDISCC_GROUPERS_SINGLE2D "Equation" "Auto" "Single2D")
-   set(GEOMHDISCC_GROUPERS_TUBULAR "Equation" "Auto" "Single1D" "Single2D" "Transform")
-   set(GEOMHDISCC_GROUPERS_COUPLED2D "Equation" "Auto" "Single1D")
-   string(TOUPPER "GEOMHDISCC_GROUPERS_${GEOMHDISCC_MPIALGO}" upGrouper)
+   set(QUICC_GROUPERS_SERIAL "Equation" "Auto")
+   set(QUICC_GROUPERS_SINGLE1D "Equation" "Auto" "Single1D")
+   set(QUICC_GROUPERS_SINGLE2D "Equation" "Auto" "Single2D")
+   set(QUICC_GROUPERS_TUBULAR "Equation" "Auto" "Single1D" "Single2D" "Transform")
+   set(QUICC_GROUPERS_COUPLED2D "Equation" "Auto" "Single1D")
+   string(TOUPPER "QUICC_GROUPERS_${QUICC_MPIALGO}" upGrouper)
 
-   geomhdiscc_provide_choice(${upGrouper} "Transform grouping" GEOMHDISCC_TRANSGROUPER groupTest)
+   quicc_provide_choice(${upGrouper} "Transform grouping" QUICC_TRANSGROUPER groupTest)
 
    if(groupTest)
-      if(GEOMHDISCC_MPI)
-         if(NOT GEOMHDISCC_TRANSGROUPER STREQUAL "Auto")
-            geomhdiscc_add_definition(GEOMHDISCC_TRANSGROUPER)
-            if(NOT GEOMHDISCC_TRANSGROUPER STREQUAL "Equation")
-               set(GEOMHDISCC_TRANSGROUPER "Equation")
-               geomhdiscc_add_definition(GEOMHDISCC_TRANSGROUPER)
-            endif(NOT GEOMHDISCC_TRANSGROUPER STREQUAL "Equation")
-         else(NOT GEOMHDISCC_TRANSGROUPER STREQUAL "Auto")
+      if(QUICC_MPI)
+         if(NOT QUICC_TRANSGROUPER STREQUAL "Auto")
+            quicc_add_definition(QUICC_TRANSGROUPER)
+            if(NOT QUICC_TRANSGROUPER STREQUAL "Equation")
+               set(QUICC_TRANSGROUPER "Equation")
+               quicc_add_definition(QUICC_TRANSGROUPER)
+            endif(NOT QUICC_TRANSGROUPER STREQUAL "Equation")
+         else(NOT QUICC_TRANSGROUPER STREQUAL "Auto")
             set(groupers "Equation" "Single1D" "Single2D" "Transform")
-            foreach(GEOMHDISCC_TRANSGROUPER ${groupers})
-               geomhdiscc_add_definition(GEOMHDISCC_TRANSGROUPER)
-            endforeach(GEOMHDISCC_TRANSGROUPER ${groupers})
-         endif(NOT GEOMHDISCC_TRANSGROUPER STREQUAL "Auto")
-      else(GEOMHDISCC_MPI)
-         set(GEOMHDISCC_TRANSGROUPER "Equation")
-         geomhdiscc_add_definition(GEOMHDISCC_TRANSGROUPER)
-      endif(GEOMHDISCC_MPI)
+            foreach(QUICC_TRANSGROUPER ${groupers})
+               quicc_add_definition(QUICC_TRANSGROUPER)
+            endforeach(QUICC_TRANSGROUPER ${groupers})
+         endif(NOT QUICC_TRANSGROUPER STREQUAL "Auto")
+      else(QUICC_MPI)
+         set(QUICC_TRANSGROUPER "Equation")
+         quicc_add_definition(QUICC_TRANSGROUPER)
+      endif(QUICC_MPI)
    endif(groupTest)
 endif(mpiTest)
 
@@ -104,36 +104,36 @@ endif(mpiTest)
 #--------------- MPI DATA PACKING ----------------#
 ###################################################
 
-if(GEOMHDISCC_MPI)
-   set(GEOMHDISCC_MPIPACKS "MPI" "Manual")
-   if(GEOMHDISCC_MPIPACK STREQUAL "")
-      set(GEOMHDISCC_MPIPACK "MPI")
-   endif(GEOMHDISCC_MPIPACK STREQUAL "")
-   mark_as_advanced(FORCE GEOMHDISCC_MPIPACK)
-   geomhdiscc_provide_choice(GEOMHDISCC_MPIPACKS "MPI data packing" GEOMHDISCC_MPIPACK mpipackTest)
+if(QUICC_MPI)
+   set(QUICC_MPIPACKS "MPI" "Manual")
+   if(QUICC_MPIPACK STREQUAL "")
+      set(QUICC_MPIPACK "MPI")
+   endif(QUICC_MPIPACK STREQUAL "")
+   mark_as_advanced(FORCE QUICC_MPIPACK)
+   quicc_provide_choice(QUICC_MPIPACKS "MPI data packing" QUICC_MPIPACK mpipackTest)
 
    if(mpipackTest)
-      geomhdiscc_add_definition(GEOMHDISCC_MPIPACK)
+      quicc_add_definition(QUICC_MPIPACK)
    endif(mpipackTest)
-endif(GEOMHDISCC_MPI)
+endif(QUICC_MPI)
 
 
 ###################################################
 #--------------- MPI COMMUNICATION ---------------#
 ###################################################
 
-if(GEOMHDISCC_MPI)
-   set(GEOMHDISCC_MPICOMMS "SendRecv" "AllToAll")
-   if(GEOMHDISCC_MPICOMM STREQUAL "")
-      set(GEOMHDISCC_MPICOMM "AllToAll")
-   endif(GEOMHDISCC_MPICOMM STREQUAL "")
-   mark_as_advanced(FORCE GEOMHDISCC_MPICOMM)
-   geomhdiscc_provide_choice(GEOMHDISCC_MPICOMMS "MPI communication" GEOMHDISCC_MPICOMM mpicommTest)
+if(QUICC_MPI)
+   set(QUICC_MPICOMMS "SendRecv" "AllToAll")
+   if(QUICC_MPICOMM STREQUAL "")
+      set(QUICC_MPICOMM "AllToAll")
+   endif(QUICC_MPICOMM STREQUAL "")
+   mark_as_advanced(FORCE QUICC_MPICOMM)
+   quicc_provide_choice(QUICC_MPICOMMS "MPI communication" QUICC_MPICOMM mpicommTest)
 
    if(mpicommTest)
-      geomhdiscc_add_definition(GEOMHDISCC_MPICOMM)
+      quicc_add_definition(QUICC_MPICOMM)
    endif(mpicommTest)
-endif(GEOMHDISCC_MPI)
+endif(QUICC_MPI)
 
 
 ###################################################
@@ -144,12 +144,12 @@ endif(GEOMHDISCC_MPI)
 # Choose the type of boundray method the code is using.
 # Possible options are: Galerkin, Tau
 #
-set(GEOMHDISCC_BOUNDARYMETHODS "Galerkin" "Tau")
+set(QUICC_BOUNDARYMETHODS "Galerkin" "Tau")
 
-geomhdiscc_provide_choice(GEOMHDISCC_BOUNDARYMETHODS "Boundary method" GEOMHDISCC_BOUNDARYMETHOD boundaryTest)
+quicc_provide_choice(QUICC_BOUNDARYMETHODS "Boundary method" QUICC_BOUNDARYMETHOD boundaryTest)
 
 if(boundaryTest)
-   geomhdiscc_add_definition(GEOMHDISCC_BOUNDARYMETHOD)
+   quicc_add_definition(QUICC_BOUNDARYMETHOD)
 endif(boundaryTest)
 
 
@@ -161,12 +161,12 @@ endif(boundaryTest)
 # Choose the type of time integration the code is using.
 # Possible options are: ImExRKCB2, ImExRKCB3a, ImExRKCB3b, ImExRKCB3c, ImExRKCB3d, ImExRKCB3e, ImExRKCB3f, ImExRKCB4, ImExRK3, ImExSBDF2
 #
-set(GEOMHDISCC_TIMESTEPPERS "ImExRKCB2" "ImExRKCB3a" "ImExRKCB3b" "ImExRKCB3c" "ImExRKCB3d" "ImExRKCB3e" "ImExRKCB3f" "ImExRKCB4" "ImExRK3" "ImExSBDF2")
+set(QUICC_TIMESTEPPERS "ImExRKCB2" "ImExRKCB3a" "ImExRKCB3b" "ImExRKCB3c" "ImExRKCB3d" "ImExRKCB3e" "ImExRKCB3f" "ImExRKCB4" "ImExRK3" "ImExSBDF2")
 
-geomhdiscc_provide_choice(GEOMHDISCC_TIMESTEPPERS "Time integrator" GEOMHDISCC_TIMESTEPPER timeTest)
+quicc_provide_choice(QUICC_TIMESTEPPERS "Time integrator" QUICC_TIMESTEPPER timeTest)
 
 if(timeTest)
-   geomhdiscc_add_definition(GEOMHDISCC_TIMESTEPPER)
+   quicc_add_definition(QUICC_TIMESTEPPER)
 endif(timeTest)
 
 
@@ -195,4 +195,4 @@ set(MHDFrameworkSrcDirs
 message(STATUS "!!!WARNING!!! OVERRIDING ACTUAL Framework.cmake DIRECTORY LIST WITH NOTHING")
 set(MHDFrameworkSrcDirs )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDFrameworkSrcDirs)
+quicc_append_sources(All_Srcs ${QUICC_SRC_DIR} MHDFrameworkSrcDirs)

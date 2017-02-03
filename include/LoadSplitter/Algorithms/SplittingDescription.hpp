@@ -22,7 +22,7 @@
 #include "Enums/Splitting.hpp"
 #include "IoXml/VtpWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -78,12 +78,12 @@ namespace Parallel {
           */
          std::vector<std::multimap<int,int> >   structure;
 
-         #ifdef GEOMHDISCC_DEBUG
+         #ifdef QUICC_DEBUG
          /**
           * @brief Storage for data distribution visualization files
           */
          std::vector<IoXml::SharedVtpWriter> vtpFiles;
-         #endif //GEOMHDISCC_DEBUG
+         #endif //QUICC_DEBUG
          
       protected:
 

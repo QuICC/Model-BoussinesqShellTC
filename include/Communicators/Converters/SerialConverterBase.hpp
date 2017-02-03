@@ -29,7 +29,7 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/IConverter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -213,7 +213,7 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> typename TBwdB::PointType SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::bwdPoint(const TBwdB& in, const int i, const int j, const int k)
    {
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
             int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,k);
@@ -244,12 +244,12 @@ namespace Parallel {
          {
             return in.point(this->mspIdxConv->i(i));
          }
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> typename TBwdB::PointType& SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::rBwdPoint(TBwdB& rOut, const int i, const int j, const int k)
    {
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
             int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,k);
@@ -281,7 +281,7 @@ namespace Parallel {
          {
             return rOut.rPoint(this->mspIdxConv->i(i));
          }
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
    }
 
 }

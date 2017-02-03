@@ -17,7 +17,7 @@
 //
 #include "Base/Precision.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of an iterative quadrature rule computation.

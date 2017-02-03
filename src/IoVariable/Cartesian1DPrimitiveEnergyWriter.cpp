@@ -28,7 +28,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -48,7 +48,7 @@ namespace IoVariable {
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
+      PythonWrapper::import("quicc.geometry.cartesian.cartesian_1d");
 
       // Prepare arguments
       PyObject *pArgs, *pValue;
@@ -159,7 +159,7 @@ namespace IoVariable {
       this->preWrite();
 
       // Get the "global" Kinetic energy from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          Array energy(3);
 
          energy(0) = this->mXEnergy;
@@ -171,7 +171,7 @@ namespace IoVariable {
          this->mXEnergy = energy(0);
          this->mYEnergy = energy(1);
          this->mZEnergy = energy(2);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

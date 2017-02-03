@@ -24,7 +24,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
@@ -41,11 +41,11 @@ namespace Equations {
 
    void BoussinesqDynamoSphereInduction::setCoupling()
    {
-      #ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
+      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          int start = 1;
-      #else //if GEOMHDISCC_SPATIALSCHEME_BLFM
+      #elif defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
          int start = 0;
-      #endif //GEOMHDISCC_SPATIALSCHEME_BLFL
+      #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
 

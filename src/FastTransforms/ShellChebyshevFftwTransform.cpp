@@ -28,7 +28,7 @@
 #include "FastTransforms/FftwLibrary.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -180,7 +180,7 @@ namespace Transform {
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
+      PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 
       // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;
@@ -393,9 +393,9 @@ namespace Transform {
          rChebVal.topRows(this->mspSetup->specSize()) = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*rChebVal;
       }
 
-      #ifdef GEOMHDISCC_DEBUG
+      #ifdef QUICC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
-      #endif //GEOMHDISCC_DEBUG
+      #endif //QUICC_DEBUG
    }
 
    void ShellChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector)
@@ -567,9 +567,9 @@ namespace Transform {
          rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
       }
 
-      #ifdef GEOMHDISCC_DEBUG
+      #ifdef QUICC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
-      #endif //GEOMHDISCC_DEBUG
+      #endif //QUICC_DEBUG
    }
 
    void ShellChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector)
@@ -868,7 +868,7 @@ namespace Transform {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat ShellChebyshevFftwTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -878,7 +878,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

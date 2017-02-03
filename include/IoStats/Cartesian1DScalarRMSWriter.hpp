@@ -25,7 +25,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "IoStats/Cartesian1DScalarAvgWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoStats {
 

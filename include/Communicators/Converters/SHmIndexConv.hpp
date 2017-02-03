@@ -20,7 +20,7 @@
 //
 #include "Resolutions/Resolution.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

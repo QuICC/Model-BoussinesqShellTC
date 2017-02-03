@@ -7,11 +7,11 @@
 #ifndef FRAMEWORKMACRO_H
 #define FRAMEWORKMACRO_H
 
-#ifdef GEOMHDISCC_MPI
+#ifdef QUICC_MPI
    // include MPI framework
    #include "Framework/MpiFramework.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
       /// Typedef for a generic framework based on the MpiFramework
       typedef MpiFramework  FrameworkMacro;
    }
@@ -19,11 +19,11 @@
    // include serial framework
    #include "Framework/SerialFramework.hpp"
 
-   namespace GeoMHDiSCC {
+   namespace QuICC {
 
       /// Typedef for a generic framework based on the SerialFramework
       typedef SerialFramework  FrameworkMacro;
    }
-#endif // GEOMHDISCC_MPI
+#endif // QUICC_MPI
 
 #endif // FRAMEWORKMACRO_H

@@ -24,7 +24,7 @@
 #include "IoVariable/VariableHdf5Tags.hpp"
 #include "IoTools/Formatter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -132,9 +132,9 @@ namespace IoVariable {
 
       // Get the "global" local minimum for MPI code
       this->mCollIoRead = this->mFileOffsets.size();
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          MPI_Allreduce(MPI_IN_PLACE, &this->mCollIoRead, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
-      #endif // GEOMHDISCC_MPI
+      #endif // QUICC_MPI
    }
 
    SharedSimulationResolution IVariableHdf5Reader::getFileTruncation() const

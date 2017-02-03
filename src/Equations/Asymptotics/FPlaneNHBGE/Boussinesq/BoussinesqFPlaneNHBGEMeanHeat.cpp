@@ -22,7 +22,7 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
@@ -68,7 +68,9 @@ namespace Equations {
          {
             if(iX == 0)
             {
-               return Datatypes::SpectralScalarType::PointType(-1.0);
+               // Get paramters
+               MHDFloat Ea = this->eqParams().nd(NonDimensional::EADY);
+               return Datatypes::SpectralScalarType::PointType(Ea);
             }
          }
       } 

@@ -24,7 +24,7 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/3D/TFFScheme.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq F-plane NHBGE model
@@ -71,6 +71,13 @@ namespace GeoMHDiSCC {
           * @param spSim   Shared visualization generator
           */
          static void setVisualizationState(SharedVisualizationGenerator spVis);
+
+         /**
+          * @brief Add the required statistics output files
+          *
+          * @param spSim   Shared simulation object
+          */
+         static void addStatsOutputFiles(SharedSimulation spSim);
 
          /**
           * @brief Add the required ASCII output files

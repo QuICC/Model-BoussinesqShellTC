@@ -37,7 +37,7 @@
 #include "Timers/StageTimer.hpp"
 #include "Simulation/SimulationIoTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    Simulation::Simulation()
       : SimulationBase()

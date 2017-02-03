@@ -26,7 +26,7 @@
 #include "Exceptions/Exception.hpp"
 #include "Enums/DimensionTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoXml {
 

@@ -29,7 +29,7 @@
 #include "Python/PythonWrapper.hpp"
 #include "Base/DecoupledComplexInternal.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -50,7 +50,7 @@ namespace IoVariable {
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_3d");
+      PythonWrapper::import("quicc.geometry.cartesian.cartesian_3d");
 
       // Prepare arguments
       PyObject *pArgs, *pValue;
@@ -113,9 +113,9 @@ namespace IoVariable {
       }
 
       // Get the "global" field
-      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE 
-         MPI_Reduce(MPI_IN_PLACE, field.data(), field.rows(), MPI_DOUBLE, MPI_SUM, 0, GeoMHDiSCC::FramworkMacro::getSubComm(MpiFramwork::LOCAL));
-      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #if defined QUICC_MPI && defined QUICC_MPISPSOLVE 
+         MPI_Reduce(MPI_IN_PLACE, field.data(), field.rows(), MPI_DOUBLE, MPI_SUM, 0, QuICC::FramworkMacro::getSubComm(MpiFramwork::LOCAL));
+      #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
       Matrix nusselt = -this->mNusseltOp*field;
       assert(nusselt.rows() == nusselt.cols() && nusselt.rows() == 1);

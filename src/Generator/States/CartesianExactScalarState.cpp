@@ -23,7 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
@@ -88,7 +88,7 @@ namespace Equations {
 
       } else if(this->mTypeId == CartesianExactStateIds::PEYRET1DA)
       {
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
             int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
             int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
@@ -104,7 +104,7 @@ namespace Equations {
             Array gK = -42*Array::Ones(1);
             Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
             Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          MHDFloat k_;
          //MHDFloat j_;
@@ -130,7 +130,7 @@ namespace Equations {
 
       } else if(this->mTypeId == CartesianExactStateIds::PLANFORMSQUARES)
       {
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
             int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
             int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
@@ -146,7 +146,7 @@ namespace Equations {
             Array gK = -42*Array::Ones(1);
             Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
             Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          int k_;
          int j_;
@@ -177,7 +177,7 @@ namespace Equations {
          }
       } else
       {
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
             int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
             int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
@@ -193,7 +193,7 @@ namespace Equations {
             Array gK = -42*Array::Ones(1);
             Array gJ = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nJ);
             Array gI = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nI);
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
 
          MHDFloat k_;
          MHDFloat j_;

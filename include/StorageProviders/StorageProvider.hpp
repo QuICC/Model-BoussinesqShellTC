@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Templated implementation of a single data storage provider.
@@ -94,12 +94,12 @@ namespace GeoMHDiSCC {
           */
          std::vector<TData>&  rTmps();
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -253,7 +253,7 @@ namespace GeoMHDiSCC {
       return *this->mpTmp;
    }
 
-   #ifdef GEOMHDISCC_STORAGEPROFILE
+   #ifdef QUICC_STORAGEPROFILE
    template <typename TData> MHDFloat  StorageProvider<TData>::required() const
    {
       MHDFloat mem = 0.0;
@@ -265,7 +265,7 @@ namespace GeoMHDiSCC {
 
       return mem;
    }
-   #endif // GEOMHDISCC_STORAGEPROFILE
+   #endif // QUICC_STORAGEPROFILE
 
 }
 

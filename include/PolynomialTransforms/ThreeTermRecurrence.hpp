@@ -24,7 +24,7 @@
 //
 #include "Base/Precision.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Polynomial {
 

@@ -24,7 +24,7 @@
 #include "Base/MpiTypes.hpp"
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Statistics {
 

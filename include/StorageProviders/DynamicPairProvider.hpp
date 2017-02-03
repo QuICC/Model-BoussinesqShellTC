@@ -21,7 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Templated implementation of a data pair storage provider adapting its size dynamically.
@@ -150,12 +150,12 @@ namespace GeoMHDiSCC {
           */
          std::list<TBackward>&  rBTmps();
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -469,7 +469,7 @@ namespace GeoMHDiSCC {
       this->mUsedBMap.clear();
    }
 
-   #ifdef GEOMHDISCC_STORAGEPROFILE
+   #ifdef QUICC_STORAGEPROFILE
    template <typename TForward, typename TBackward> MHDFloat  DynamicPairProvider<TForward, TBackward>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -486,7 +486,7 @@ namespace GeoMHDiSCC {
 
       return mem;
    }
-   #endif // GEOMHDISCC_STORAGEPROFILE
+   #endif // QUICC_STORAGEPROFILE
 
 }
 

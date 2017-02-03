@@ -3,9 +3,9 @@
 import numpy as np
 import functools
 
-#import geomhdiscc.model.compressible_rrbcplane_rescaled as mod
-import geomhdiscc.model.compressible_rrbcplane as mod
-import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
+#import quicc.model.compressible_rrbcplane_rescaled as mod
+import quicc.model.compressible_rrbcplane as mod
+import quicc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.CompressibleRRBCPlane()

@@ -22,7 +22,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    SimulationResolution::SimulationResolution(const ArrayI& phys, const ArrayI& spec, const ArrayI& trans)
       : mBoxScale(Array::Ones(spec.size()))

@@ -30,7 +30,7 @@
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string TestFFFModel::PYMODULE = "test_fff";
 

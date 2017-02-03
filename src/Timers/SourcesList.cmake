@@ -7,8 +7,8 @@ set(MHDSources
 )
 
 # Add in the parallel or serial timers depending on setup
-if(GEOMHDISCC_MPI)
+if(QUICC_MPI)
    list(APPEND MHDSources MpiTimer.cpp)
-else(GEOMHDISCC_MPI)
+else(QUICC_MPI)
    list(APPEND MHDSources SerialTimer.cpp)
-endif(GEOMHDISCC_MPI)
+endif(QUICC_MPI)

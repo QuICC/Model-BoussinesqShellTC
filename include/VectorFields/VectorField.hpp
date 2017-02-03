@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 
@@ -68,12 +68,12 @@ namespace Datatypes {
           */
          const std::map<TType,TScalar>& data() const;
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
          /**
           * @brief Set internal storage field data
@@ -144,7 +144,7 @@ namespace Datatypes {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TScalar, typename TType> MHDFloat VectorField<TScalar,TType>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -156,7 +156,7 @@ namespace Datatypes {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

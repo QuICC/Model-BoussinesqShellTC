@@ -21,7 +21,7 @@
 #include "Equations/Tools/EquationConditions.hpp"
 #include "Equations/Tools/EquationSorters.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

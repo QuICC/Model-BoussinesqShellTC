@@ -22,28 +22,28 @@ message(STATUS "***********************************************")
 # Choose the type of spatial scheme.
 # Possible options are: 
 #
-if(GEOMHDISCC_CODEDIM STREQUAL "1D")
+if(QUICC_CODEDIM STREQUAL "1D")
    message(ERROR "Can't setup a spherical simulation in 1D!")
-endif(GEOMHDISCC_CODEDIM STREQUAL "1D")
-if(GEOMHDISCC_CODEDIM STREQUAL "2D")
-   set(GEOMHDISCC_SPHERICAL_SCHEMES "SH")
-endif(GEOMHDISCC_CODEDIM STREQUAL "2D")
-if(GEOMHDISCC_CODEDIM STREQUAL "3D")
-   set(GEOMHDISCC_SPHERICAL_SCHEMES "FDSH" "TSH" "WSH")
-endif(GEOMHDISCC_CODEDIM STREQUAL "3D")
+endif(QUICC_CODEDIM STREQUAL "1D")
+if(QUICC_CODEDIM STREQUAL "2D")
+   set(QUICC_SPHERICAL_SCHEMES "SH")
+endif(QUICC_CODEDIM STREQUAL "2D")
+if(QUICC_CODEDIM STREQUAL "3D")
+   set(QUICC_SPHERICAL_SCHEMES "FDSH" "TSH" "WSH")
+endif(QUICC_CODEDIM STREQUAL "3D")
 
-geomhdiscc_provide_choice(GEOMHDISCC_SPHERICAL_SCHEMES "Spatial scheme" GEOMHDISCC_SPATIALSCHEME schmTest)
+quicc_provide_choice(QUICC_SPHERICAL_SCHEMES "Spatial scheme" QUICC_SPATIALSCHEME schmTest)
 
-option(GEOMHDISCC_FASTCHEBY "Use fast Chebyshev transform?" ON)
+option(QUICC_FASTCHEBY "Use fast Chebyshev transform?" ON)
 
 if(schmTest)
-   if(NOT GEOMHDISCC_FASTCHEBY)
-      string(REGEX REPLACE "T" "Tp" tmp ${GEOMHDISCC_SPATIALSCHEME})
-      set(GEOMHDISCC_SPATIALSCHEME ${tmp})
+   if(NOT QUICC_FASTCHEBY)
+      string(REGEX REPLACE "T" "Tp" tmp ${QUICC_SPATIALSCHEME})
+      set(QUICC_SPATIALSCHEME ${tmp})
       message(STATUS " --> Use slow Chebyshev transform")
-   endif(NOT GEOMHDISCC_FASTCHEBY)
+   endif(NOT QUICC_FASTCHEBY)
 
-   geomhdiscc_add_definition(GEOMHDISCC_SPATIALSCHEME)
+   quicc_add_definition(QUICC_SPATIALSCHEME)
 endif(schmTest)
 
 
@@ -68,4 +68,4 @@ set(MHDSphericalSrcDirs
    Transforms
 )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Spherical MHDSphericalSrcDirs)
+quicc_append_sources(All_Srcs ${QUICC_SRC_DIR}/Spherical MHDSphericalSrcDirs)

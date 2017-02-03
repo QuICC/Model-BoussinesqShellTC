@@ -25,7 +25,7 @@
 #include "TypeSelectors/TimeSchemeSelector.hpp"
 #include "SparseSolvers/SparseLinearSolver.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Timestep {
 

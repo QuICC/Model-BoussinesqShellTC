@@ -23,7 +23,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/ISpatialScheme.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
 

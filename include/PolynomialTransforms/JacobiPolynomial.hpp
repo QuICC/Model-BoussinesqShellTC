@@ -24,7 +24,7 @@
 #include "Base/Precision.hpp"
 #include "PolynomialTransforms/ThreeTermRecurrence.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Polynomial {
 

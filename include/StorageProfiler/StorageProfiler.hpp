@@ -23,7 +23,7 @@
 //
 #include "Base/Typedefs.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Debug {
 

@@ -22,7 +22,7 @@
 #include "TransformConfigurators/ProjectorBranch3D.hpp"
 #include "TransformConfigurators/IntegratorBranch3D.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    namespace Transform {
 

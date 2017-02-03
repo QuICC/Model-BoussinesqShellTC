@@ -26,7 +26,7 @@
 #include "Equations/IScalarEquation.hpp"
 #include "Generator/States/SphereExactStateIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
@@ -37,7 +37,7 @@ namespace Equations {
    {
       public:
          /// Typedef to simplify notations for harmonic mode
-         typedef std::tr1::tuple<int, int, MHDComplex> HarmonicModeType;
+         typedef std::map<std::pair<int, int>, std::map<int,MHDComplex> > HarmonicModeType;
 
          /**
           * @brief Simple constructor
@@ -80,11 +80,16 @@ namespace Equations {
          void setStateType(const SphereExactStateIds::Id id);
 
          /**
+          * @brief Set the spectral state type id
+          */
+         void setSpectralType(const SphereExactStateIds::Id id);
+
+         /**
           * @brief Set options for the harmonics states
           *
           * @param modes   List of harmonics with amplitude to create
           */
-         void setHarmonicOptions(const std::vector<HarmonicModeType>& modes);
+         void setHarmonicOptions(const HarmonicModeType& modes);
 
       protected:
          /**
@@ -104,9 +109,14 @@ namespace Equations {
          SphereExactStateIds::Id mTypeId;
 
          /**
+          * @brief Type of the spectral state to generate
+          */
+         SphereExactStateIds::Id mSpecTypeId;
+
+         /**
           * @brief Storage for the list of spherical harmonic modes to generate
           */
-         std::vector<HarmonicModeType> mSHModes;
+         HarmonicModeType mSHModes;
    };
 
    /// Typedef for a shared SphereExactScalarState

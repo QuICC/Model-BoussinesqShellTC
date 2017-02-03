@@ -19,7 +19,7 @@
 #include "Exceptions/Exception.hpp"
 #include "TypeSelectors/FftSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Schemes {
    

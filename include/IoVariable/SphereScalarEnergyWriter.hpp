@@ -24,7 +24,7 @@
 #include "IoVariable/IVariableAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -81,9 +81,9 @@ namespace IoVariable {
          MHDFloat mEnergy;
 
          /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor) for even basis
+          * @brief Integration operator for spherical integral in radius (include r^2 factor)
           */
-         SparseMatrix mSphIntgOpEven;
+         SparseMatrix mSphIntgOp;
    };
 
    inline bool SphereScalarEnergyWriter::isHeavy() const

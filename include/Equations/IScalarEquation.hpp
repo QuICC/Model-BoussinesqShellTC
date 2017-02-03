@@ -28,7 +28,7 @@
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
@@ -223,20 +223,20 @@ namespace Equations {
          int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
 
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             // Add source data
             int l;
             int j_;
             int dimI = this->spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-            #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                int corrDim = this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
             for(int j = 0; j < cols; j++)
             {
                j_ = this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
-               #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+               #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                   j_ -= corrDim;
-               #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+               #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                for(int i = 0; i < rows; i++)
                {
                   // Compute correct position
@@ -264,7 +264,7 @@ namespace Equations {
                   k++;
                }
             }
-         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
       } else if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
       {
@@ -310,11 +310,11 @@ namespace Equations {
          int l;
          int k_;
          int j_;
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int dimK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
          #else
             int dimK = 1;
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
          int dimJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          for(int k = 0; k < this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
          {
@@ -343,11 +343,11 @@ namespace Equations {
       TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
       Equations::copyUnknown(eq, compId, tmp, matIdx, 0, false, true);
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+      #if defined QUICC_SPATIALSCHEME_WFT
          Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
       #else 
          Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
+      #endif //defined QUICC_SPATIALSCHEME_WFT
 
       // Get a restricted stencil matrix
       SparseMatrix stencil(eq.couplingInfo(compId).galerkinN(matIdx),eq.couplingInfo(compId).galerkinN(matIdx));
@@ -385,11 +385,11 @@ namespace Equations {
       if(useShift)
       {
          zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-         #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+         #if defined QUICC_SPATIALSCHEME_WFT
             zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
          #else
             zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
-         #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
+         #endif //defined QUICC_SPATIALSCHEME_WFT
       }
 
       // matIdx is the index of the slowest varying direction with a single RHS
@@ -401,14 +401,14 @@ namespace Equations {
          //Safety assertion
          assert(start >= 0);
 
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             // Add source data
             int l;
             int j_;
             int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-            #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                int corrDim = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+            #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
             if(isSet)
             {
                ///\mhdBug This is overkill
@@ -418,9 +418,9 @@ namespace Equations {
                for(int j = zeroCol; j < cols; j++)
                {
                   j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
-                  #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+                  #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                      j_ -= corrDim;
-                  #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+                  #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                   for(int i = zeroRow; i < rows; i++)
                   {
                      // Compute correct position
@@ -435,9 +435,9 @@ namespace Equations {
                for(int j = zeroCol; j < cols; j++)
                {
                   j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
-                  #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+                  #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                      j_ -= corrDim;
-                  #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+                  #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                   for(int i = zeroRow; i < rows; i++)
                   {
                      // Compute correct position
@@ -478,7 +478,7 @@ namespace Equations {
                   }
                }
             }
-         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
       // matIdx is the index of the slowest varying direction with multiple RHS
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
@@ -522,11 +522,11 @@ namespace Equations {
          ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
          int rows = eq.unknown().dom(0).perturbation().slice(mode(0)).rows();
 
-         #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         #ifdef QUICC_SPATIALSCHEME_TFF
          // Filter out complex conjugate modes to be safe
          if(!(mode(3) == 0 && mode(2) > eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2))
          {
-         #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+         #endif //QUICC_SPATIALSCHEME_TFF
 
          // Copy data
          int k = start;
@@ -552,12 +552,12 @@ namespace Equations {
             }
          }
 
-         #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         #ifdef QUICC_SPATIALSCHEME_TFF
          } else
          {
             setZeroNonlinear(eq, compId, storage, matIdx, start);
          }
-         #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+         #endif //QUICC_SPATIALSCHEME_TFF
 
       // There is a single matrix
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
@@ -571,11 +571,11 @@ namespace Equations {
          int l;
          int k_;
          int j_;
-         #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+         #ifdef QUICC_SPATIALDIMENSION_3D
             int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
          #else
             int dimK = 1;
-         #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+         #endif //QUICC_SPATIALDIMENSION_3D
          int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          if(isSet)
          {
@@ -658,29 +658,29 @@ namespace Equations {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #if defined QUICC_SPATIALSCHEME_WFT
                int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
             #else
                int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #endif //defined QUICC_SPATIALSCHEME_WFT
 
             //Safety assertion
             assert(start >= 0);
 
-            #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
                // Add source data
                int l;
                int j_;
                int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-               #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+               #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                   int corrDim = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
-               #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+               #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                for(int j = zeroCol; j < cols; j++)
                {
                   j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
-                  #if defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+                  #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                      j_ -= corrDim;
-                  #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+                  #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
                   for(int i = zeroRow; i < rows; i++)
                   {
                      // Compute correct position
@@ -704,7 +704,7 @@ namespace Equations {
                      k++;
                   }
                }
-            #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
          // matIdx is the index of the slowest varying direction with multiple RHS
          } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
@@ -712,11 +712,11 @@ namespace Equations {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #if defined QUICC_SPATIALSCHEME_WFT
                int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
             #else
                int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #endif //defined QUICC_SPATIALSCHEME_WFT
 
             //Safety assertion
             assert(start >= 0);
@@ -769,11 +769,11 @@ namespace Equations {
             int l;
             int k_;
             int j_;
-            #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            #ifdef QUICC_SPATIALDIMENSION_3D
                int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
             #else
                int dimK = 1;
-            #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+            #endif //QUICC_SPATIALDIMENSION_3D
             int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
             for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
@@ -803,7 +803,7 @@ namespace Equations {
          //Safety assertion
          assert(start >= 0);
 
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             for(int k = 0; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
                // Set value to zero
@@ -813,11 +813,11 @@ namespace Equations {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-            #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #if defined QUICC_SPATIALSCHEME_WFT
                int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
             #else
                int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
-            #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
+            #endif //defined QUICC_SPATIALSCHEME_WFT
 
             // Set data to zero
             int k = start;
@@ -832,7 +832,7 @@ namespace Equations {
                   k++;
                }
             }
-         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
          // matIdx is the index of the slowest varying direction with multiple RHS
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
@@ -840,11 +840,11 @@ namespace Equations {
          int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
          int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
-         #if defined GEOMHDISCC_SPATIALSCHEME_WFT
+         #if defined QUICC_SPATIALSCHEME_WFT
             int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
          #else
             int zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
-         #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT
+         #endif //defined QUICC_SPATIALSCHEME_WFT
 
          //Safety assertion
          assert(start >= 0);
@@ -888,7 +888,7 @@ namespace Equations {
          assert(matIdx == 0);
          assert(start >= 0);
 
-         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             for(int k = 0; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
                // Set value to zero
@@ -899,11 +899,11 @@ namespace Equations {
             int l;
             int k_;
             int j_;
-            #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+            #ifdef QUICC_SPATIALDIMENSION_3D
                int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
             #else
                int dimK = 1;
-            #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+            #endif //QUICC_SPATIALDIMENSION_3D
             int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
             for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
@@ -921,7 +921,7 @@ namespace Equations {
                   }
                }
             }
-         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+         #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
       }
    }
 }

@@ -23,7 +23,7 @@
 #include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/BackwardConfiguratorMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -134,7 +134,7 @@ namespace Transform {
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
 
-      #ifdef GEOMHDISCC_SPATIALDIMENSION_3D
+      #ifdef QUICC_SPATIALDIMENSION_3D
          // Iterators for the second transforms
          TransformTreeEdge::EdgeType_citerator it2D;
 
@@ -181,7 +181,7 @@ namespace Transform {
                BackwardConfigurator2D::projectND(*itPhys, coord);
             }
          }
-      #endif //GEOMHDISCC_SPATIALDIMENSION_3D
+      #endif //QUICC_SPATIALDIMENSION_3D
    }
 
    template <typename TVariable> void BackwardSerialConfigurator::secondStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)

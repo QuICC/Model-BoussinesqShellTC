@@ -18,7 +18,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Polynomial {
 
@@ -279,7 +279,7 @@ namespace Polynomial {
       }
    }
 
-#if defined GEOMHDISCC_SHNORM_SCHMIDT
+#if defined QUICC_SHNORM_SCHMIDT
 
    void AssociatedLegendrePolynomial::Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid)
    {
@@ -399,7 +399,7 @@ namespace Polynomial {
       }
    }
 
-#elif defined GEOMHDISCC_SHNORM_UNITY
+#elif defined QUICC_SHNORM_UNITY
 
    void AssociatedLegendrePolynomial::Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid)
    {
@@ -561,7 +561,7 @@ namespace Polynomial {
          op.array() *= precision::sqrt(internal::MHDFloat(2*m + 3));
       }
    }
-#endif //defined GEOMHDISCC_SHNORM_SCHMIDT
+#endif //defined QUICC_SHNORM_SCHMIDT
 
    AssociatedLegendrePolynomial::AssociatedLegendrePolynomial()
    {

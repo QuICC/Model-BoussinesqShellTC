@@ -25,7 +25,7 @@
 #include "IoXml/IXmlWriter.hpp"
 #include "IoXml/IVtpFile.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoXml {
 

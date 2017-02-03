@@ -28,7 +28,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -48,7 +48,7 @@ namespace IoVariable {
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
+      PythonWrapper::import("quicc.geometry.cartesian.cartesian_1d");
 
       // Prepare arguments
       PyObject *pArgs, *pValue;
@@ -98,7 +98,7 @@ namespace IoVariable {
       this->preWrite();
 
       // Get the "global" Kinetic energy from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          int n = 3;
          if(this->mHasZonalX)
          {
@@ -143,7 +143,7 @@ namespace IoVariable {
             this->mYZonalYEnergy = energy(i);
             this->mZZonalYEnergy = energy(i+1);
          }
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
@@ -169,9 +169,9 @@ namespace IoVariable {
       // Abort if kinetic energy is NaN
       if(std::isnan(this->mXEnergy) || std::isnan(this->mYEnergy) || std::isnan(this->mZEnergy))
       {
-         #ifdef GEOMHDISCC_MPI
+         #ifdef QUICC_MPI
             MPI_Abort(MPI_COMM_WORLD, 99);
-         #endif //GEOMHDISCC_MPI
+         #endif //QUICC_MPI
 
          throw Exception("Magnetic energy is NaN!");
       }

@@ -2,9 +2,9 @@
 
 import numpy as np
 
-#import geomhdiscc.model.boussinesq_rbcduct_vc_diff as mod
-import geomhdiscc.model.boussinesq_rbcduct_vc2 as mod
-import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
+#import quicc.model.boussinesq_rbcduct_vc_diff as mod
+import quicc.model.boussinesq_rbcduct_vc2 as mod
+import quicc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBCDuctVC()

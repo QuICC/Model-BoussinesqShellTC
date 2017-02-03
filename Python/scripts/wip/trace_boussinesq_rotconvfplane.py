@@ -1,6 +1,6 @@
 """Script to run a marginal curve trace for the Boussinesq convection in a rotating F-plane model"""
 
-import geomhdiscc.model.boussinesq_rotconvfplane as mod
+import quicc.model.boussinesq_rotconvfplane as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRotConvFPlane()

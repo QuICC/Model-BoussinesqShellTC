@@ -19,7 +19,7 @@
 #include "Base/Typedefs.hpp"
 #include "IoAscii/IAsciiEWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoAscii {
 

@@ -25,9 +25,9 @@
 #include "SpatialSchemes/3D/SLFlScheme.hpp"
 
 // THIS IS NOT A COMMENT BUT AN OPTION READ BY CMAKE
-// GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
+// QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq spherical Couette dynamo in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)

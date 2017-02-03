@@ -28,7 +28,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/Arithmetics.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 

@@ -25,7 +25,7 @@
 //
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

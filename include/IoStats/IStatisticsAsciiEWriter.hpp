@@ -23,7 +23,7 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoStats {
 

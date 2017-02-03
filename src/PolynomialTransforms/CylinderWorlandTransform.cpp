@@ -23,7 +23,7 @@
 #include "PolynomialTransforms/WorlandPolynomial.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -84,7 +84,7 @@ namespace Transform {
    void CylinderWorlandTransform::initOperators()
    {
       // Initialise python wrapper
-      PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius_worland");
+      PythonWrapper::import("quicc.geometry.cylindrical.cylinder_radius_worland");
 
       this->mGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
@@ -137,7 +137,7 @@ namespace Transform {
       this->mTriSolver.insert(std::make_pair(ProjectorType::INVLAPLH,std::vector<SharedPtrMacro<Solver::SparseTriSelector<SparseMatrix>::Type> >()));
       this->mTriSolver.find(ProjectorType::INVLAPLH)->second.reserve(this->mspSetup->slow().size());
 
-      // Prepare arguments to Chebyshev matrices call
+      // Prepare arguments to Python matrices call
       PyObject *pArgs, *pValue;
       pArgs = PyTuple_New(4);
 
@@ -148,27 +148,17 @@ namespace Transform {
       {
          int l = this->mspSetup->slow()(iL);
 
-         // Allocate memory for the projectors
-         this->mProjOp.find(ProjectorType::PROJ)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIVRM0)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIFF)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIFF_PROJ)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIVRDIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::LAPLH)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::LAPLH_DIVRDIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIVRLAPLHM0)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIFFLAPLH)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-         this->mProjOp.find(ProjectorType::DIFFLAPLH_DIFFDIVRDIFFR)->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
-
          op.resize(this->mGrid.size(), this->mspSetup->fast().at(iL).size());
 
          // Projector: P
          std::map<ProjectorType::Id,std::vector<Matrix> >::iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::Wnl(op, ipoly, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // 1/R Projector: 1/R P, set to 0 for m = 0 (always appears combined with \partial_\theta)
          projIt = this->mProjOp.find(ProjectorType::DIVRM0);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          if(l == 0)
          {
             op.setZero();
@@ -180,11 +170,13 @@ namespace Transform {
 
          // Projector: D P
          projIt = this->mProjOp.find(ProjectorType::DIFF);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::dWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // Projector: D P m > 0, P m = 0
          projIt = this->mProjOp.find(ProjectorType::DIFF_PROJ);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          if(l == 0)
          {
             Polynomial::WorlandPolynomial::Wnl(op, itmp, 1, igrid);
@@ -196,16 +188,19 @@ namespace Transform {
 
          // Projector: 1/R D R P
          projIt = this->mProjOp.find(ProjectorType::DIVRDIFFR);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // Projector: horizontal laplacian
          projIt = this->mProjOp.find(ProjectorType::LAPLH);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::claplhWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // Projector: horizontal laplacian m > 0, 1/r D r m = 0
          projIt = this->mProjOp.find(ProjectorType::LAPLH_DIVRDIFFR);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          if(l == 0)
          {
             Polynomial::WorlandPolynomial::r_1drWnl(op, itmp, 1, igrid);
@@ -217,6 +212,7 @@ namespace Transform {
 
          // Projector: 1/R horizontal laplacian, set to 0 for m = 0 (always appears combined with \partial_\theta)
          projIt = this->mProjOp.find(ProjectorType::DIVRLAPLHM0);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          if(l == 0)
          {
             op.setZero();
@@ -228,11 +224,13 @@ namespace Transform {
 
          // Projector: diff horizontal laplacian
          projIt = this->mProjOp.find(ProjectorType::DIFFLAPLH);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          Polynomial::WorlandPolynomial::dclaplhWnl(op, itmp, l, igrid);
          projIt->second.at(iL) = op.transpose();
 
          // Projector: diff horizontal laplacian m > 0, D 1/r D r m =0
          projIt = this->mProjOp.find(ProjectorType::DIFFLAPLH_DIFFDIVRDIFFR);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), this->mGrid.size()));
          if(l == 0)
          {
             Polynomial::WorlandPolynomial::dr_1drWnl(op, itmp, 1, igrid);
@@ -260,28 +258,12 @@ namespace Transform {
          PythonWrapper::fillMatrix(matI4, pValue);
          Py_DECREF(pValue);
 
-         // Call i4divrdiff
-         SparseMatrix matI4DIVRDIFF(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i4r_1d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI4DIVRDIFF, pValue);
-         Py_DECREF(pValue);
-
          // Call i6
          SparseMatrix matI6(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
          PythonWrapper::setFunction("i6");
          pValue = PythonWrapper::callFunction(pArgs);
          // Fill matrix
          PythonWrapper::fillMatrix(matI6, pValue);
-         Py_DECREF(pValue);
-
-         // Call i6divrdiff
-         SparseMatrix matI6DIVRDIFF(this->mspSetup->fast().at(iL).size(),this->mspSetup->fast().at(iL).size());
-         PythonWrapper::setFunction("i6r_1d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(matI6DIVRDIFF, pValue);
          Py_DECREF(pValue);
 
          // Call i6laplh
@@ -325,16 +307,9 @@ namespace Transform {
             Py_DECREF(pValue);
          }
 
-         // Allocate memory for the weighted integrator
-         this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
-         this->mIntgOp.find(IntegratorType::INTGI4DIVRM0)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
-         this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR_I2)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
-         this->mIntgOp.find(IntegratorType::INTGI6DIVRM0)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
-         this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR_I4)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
-         this->mIntgOp.find(IntegratorType::INTGI6LAPLH_I4DR)->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
-
          // Integrator: INTG
          std::map<IntegratorType::Id,std::vector<Matrix> >::iterator intgIt = this->mIntgOp.find(IntegratorType::INTG);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          intgIt->second.at(iL) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
          {
@@ -343,17 +318,15 @@ namespace Transform {
 
          // Integrator I4DIVRM0
          intgIt =  this->mIntgOp.find(IntegratorType::INTGI4DIVRM0);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          if(l == 0)
          {
             intgIt->second.at(iL).setZero();
          } else
          {
-            // Integrator onto W_n^{l-1} basis
             Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
             intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
-            // Compute 1/r on W_n^{l-1}, integrator onto W_n^{l-1} and apply quasi-inverse
             Polynomial::WorlandPolynomial::r_1Wnl(op, ipoly, std::abs(l-1), igrid);
-            // Integrator onto W_n^{l-1} and apply quasi-inverse
             intgIt->second.at(iL) = (matI4*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
@@ -363,15 +336,17 @@ namespace Transform {
 
          // Integrator I4DIVRDIFFR_I2
          intgIt =  this->mIntgOp.find(IntegratorType::INTGI4DIVRDIFFR_I2);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          if(l == 0)
          {
-            // Integrator onto W_n^{1} basis
             Polynomial::WorlandPolynomial::Wnl(op, ipoly, 1, igrid);
             intgIt->second.at(iL) = (matI2_1*op.transpose()*this->mWeights.asDiagonal()).transpose();
          } else
          {
-            // Mutiply by R in physical space and integrator onto W_n^{l} and apply quasi-inverse
-            intgIt->second.at(iL) = (matI4DIVRDIFF*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI4*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
          {
@@ -380,17 +355,15 @@ namespace Transform {
 
          // Integrator I6DIVRM0
          intgIt =  this->mIntgOp.find(IntegratorType::INTGI6DIVRM0);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          if(l == 0)
          {
             intgIt->second.at(iL).setZero();
          } else
          {
-            // Integrator onto W_n^{l-1} basis
             Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
             intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
-            // Compute 1/r on W_n^{l-1}, integrator onto W_n^{l-1} and apply quasi-inverse
             Polynomial::WorlandPolynomial::r_1Wnl(op, ipoly, std::abs(l-1), igrid);
-            // Integrator onto W_n^{l-1} and apply quasi-inverse
             intgIt->second.at(iL) = (matI6*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
@@ -400,15 +373,17 @@ namespace Transform {
 
          // Integrator I6DIVRDIFFR_I4
          intgIt =  this->mIntgOp.find(IntegratorType::INTGI6DIVRDIFFR_I4);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          if(l == 0)
          {
-            // Integrator onto W_n^{1} basis
             Polynomial::WorlandPolynomial::Wnl(op, ipoly, 1, igrid);
             intgIt->second.at(iL) = (matI4_1*op.transpose()*this->mWeights.asDiagonal()).transpose();
          } else
          {
-            // Multiply by R in physical space and integrator onto W_n^{l} and apply quasi-inverse
-            intgIt->second.at(iL) = (matI6DIVRDIFF*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*this->mGrid.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::Wnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (op.transpose()*this->mWeights.asDiagonal()).transpose();
+            Polynomial::WorlandPolynomial::r_1drWnl(op, ipoly, std::abs(l-1), igrid);
+            intgIt->second.at(iL) = (matI6*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()*op*intgIt->second.at(iL).transpose()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
          {
@@ -417,13 +392,12 @@ namespace Transform {
 
          // Integrator I6LAPLH_I4DR
          intgIt =  this->mIntgOp.find(IntegratorType::INTGI6LAPLH_I4DR);
+         intgIt->second.push_back(Matrix(this->mGrid.size(), this->mspSetup->fast().at(iL).size()));
          if(l == 0)
          {
-            // Integrator onto W_n^{l} and apply quasi-inverse
             intgIt->second.at(iL) = (matI4DR*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          } else
          {
-            // Integrator onto W_n^{l} and apply quasi-inverse
             intgIt->second.at(iL) = (matI6LAPLH*this->mProjOp.find(ProjectorType::PROJ)->second.at(iL)*this->mWeights.asDiagonal()).transpose();
          }
          if(intgIt->second.at(iL).rows() != this->mGrid.size()|| intgIt->second.at(iL).cols() != this->mspSetup->fast().at(iL).size())
@@ -508,7 +482,7 @@ namespace Transform {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat CylinderWorlandTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -537,7 +511,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

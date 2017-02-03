@@ -27,7 +27,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the state generator model factory 

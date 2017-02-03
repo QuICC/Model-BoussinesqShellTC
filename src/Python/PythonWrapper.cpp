@@ -25,7 +25,7 @@
 #include "Exceptions/Exception.hpp"
 #include "IoTools/HumanToId.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    PyObject* PythonWrapper::mpModule = NULL;
 

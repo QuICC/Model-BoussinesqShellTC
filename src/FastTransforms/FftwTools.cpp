@@ -20,7 +20,7 @@
 #include "IoTools/Formatter.hpp"
 #include "Framework/FrameworkMacro.h"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

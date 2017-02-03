@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rotconvcylinder as mod
+import quicc.model.boussinesq_rotconvcylinder as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRotConvCylinder()
@@ -39,6 +39,6 @@ if True:
 
 # Solve EVP with sptarn
 if False:
-    import geomhdiscc.linear_stability.solver as solver
+    import quicc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
     print(evp_lmb)

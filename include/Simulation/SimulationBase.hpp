@@ -44,7 +44,7 @@
 #include "Diagnostics/DiagnosticCoordinator.hpp"
 //#include "Statistics/StatisticCoordinator.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief High level implementation of a base for the simulations

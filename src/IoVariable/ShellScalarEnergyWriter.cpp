@@ -28,7 +28,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -50,7 +50,7 @@ namespace IoVariable {
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
+      PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 
       // Prepare arguments
       PyObject *pArgs, *pValue;
@@ -123,7 +123,7 @@ namespace IoVariable {
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mEnergy = 0.0;
 
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+      #ifdef QUICC_SPATIALSCHEME_SLFM
          int start = 0;
          int  m0 = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
          if(m0 == 0)
@@ -133,8 +133,8 @@ namespace IoVariable {
          }
 
          this->mEnergy += 2.0*(this->mSphIntgOp*rInVar.data().rightCols(rInVar.data().cols()-start).real()).sum();
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+      #endif //defined QUICC_SPATIALSCHEME_SLFM
+      #ifdef QUICC_SPATIALSCHEME_SLFL
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int start = 0;
@@ -145,7 +145,7 @@ namespace IoVariable {
             }
             this->mEnergy += 2.0*(this->mSphIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
          }
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+      #endif //QUICC_SPATIALSCHEME_SLFL
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
@@ -163,9 +163,9 @@ namespace IoVariable {
       this->preWrite();
 
       // Get the "global" Kinetic energy from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          MPI_Allreduce(MPI_IN_PLACE, &this->mEnergy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

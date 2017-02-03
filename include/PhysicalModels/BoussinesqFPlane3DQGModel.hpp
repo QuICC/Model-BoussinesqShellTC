@@ -24,7 +24,7 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/3D/TFFScheme.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq F-plane 3DQG model
@@ -113,6 +113,34 @@ namespace GeoMHDiSCC {
           */
          ~BoussinesqFPlane3DQGModel();
    };
+
+// 
+// Block compilation of unusable timestepping schemes
+//
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB2
+#error "The ImExRKCB2 timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB2
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3A
+#error "The ImExRKCB3A timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3A
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3B
+#error "The ImExRKCB3B timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3B
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3C
+#error "The ImExRKCB3C timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3C
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3D
+#error "The ImExRKCB3D timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3D
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3E
+#error "The ImExRKCB3E timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3E
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB3F
+#error "The ImExRKCB3F timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB3F
+#ifdef QUICC_TIMESTEPPER_IMEXRKCB4
+#error "The ImExRKCB4 timestepper is not supported!" 
+#endif //QUICC_TIMESTEPPER_IMEXRKCB4
 
 }
 

@@ -31,7 +31,7 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -101,12 +101,12 @@ namespace Parallel {
           */
          virtual void prepareBackwardReceive();
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Do storage profiling
          */
          virtual void profileStorage() const;
-      #endif // GEOMHDISCC_STORAGEPROFILE
+      #endif // QUICC_STORAGEPROFILE
          
       protected:
 
@@ -177,11 +177,11 @@ namespace Parallel {
       this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(spRes, id));
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::profileStorage() const
    {
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

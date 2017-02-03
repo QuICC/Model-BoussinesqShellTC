@@ -24,7 +24,7 @@
 #include "Exceptions/Exception.hpp"
 #include "IoTools/HumanToId.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    PyObject* PythonModelWrapper::mpModule = NULL;
 
@@ -49,7 +49,7 @@ namespace GeoMHDiSCC {
 
       // Get string object for module name
       PyObject* pName;
-      pName = PyUnicode_FromString(("geomhdiscc.model."+module).c_str());
+      pName = PyUnicode_FromString(("quicc.model."+module).c_str());
 
       // Import module
       PythonModelWrapper::mpModule = PyImport_Import(pName);
@@ -83,10 +83,10 @@ namespace GeoMHDiSCC {
          throw Exception("Python model creation error!");
       }
 
-      #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+      #ifdef QUICC_BOUNDARYMETHOD_GALERKIN
       // Set the galerkin flag for the python dispatchers
       PyObject_SetAttrString(PythonModelWrapper::mpModel, (char *)"use_galerkin", Py_True);
-      #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+      #endif //QUICC_BOUNDARYMETHOD_GALERKIN
    }
 
    void PythonModelWrapper::setFunction(const std::string& func)

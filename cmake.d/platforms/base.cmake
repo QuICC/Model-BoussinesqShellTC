@@ -11,5 +11,5 @@ foreach(Platform ${Platforms})
    # Extract platform name
    get_filename_component(PlatformName ${Platform} NAME_WE)
 
-   set(GEOMHDISCC_PLATFORMS ${PlatformName} ${GEOMHDISCC_PLATFORMS})
+   set(QUICC_PLATFORMS ${PlatformName} ${QUICC_PLATFORMS})
 endforeach(Platform ${Platforms})

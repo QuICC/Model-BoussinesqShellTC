@@ -1,69 +1,69 @@
 /** 
- * @namespace  GeoMHDiSCC
+ * @namespace QuICC
  * @brief This is the main namespace for the whole code.
  *
  * Everything should be at least in this namespace
  *
- * @namespace GeoMHDiSCC::internal
+ * @namespace QuICC::internal
  * @brief This namespace provides all the multiple precision computations related code.
  *
- * @namespace GeoMHDiSCC::Debug
+ * @namespace QuICC::Debug
  * @brief This namespace provides all the debugging related code.
  *
- * @namespace GeoMHDiSCC::Diagnostics
+ * @namespace QuICC::Diagnostics
  * @brief This namespace provides the diagnostics related code.
  *
- * @namespace GeoMHDiSCC::Dimensions
+ * @namespace QuICC::Dimensions
  * @brief This namespace provides all the dimensionality related code.
  *
- * @namespace GeoMHDiSCC::Equations
+ * @namespace QuICC::Equations
  * @brief This namespace provides all the equation related code.
  *
- * @namespace GeoMHDiSCC::IoAscii
+ * @namespace QuICC::IoAscii
  * @brief This namespace provides all the ASCII IO related code.
  *
- * @namespace GeoMHDiSCC::IoBinary
+ * @namespace QuICC::IoBinary
  * @brief This namespace provides all the binary ASCII IO related code.
  *
- * @namespace GeoMHDiSCC::IoConfig
+ * @namespace QuICC::IoConfig
  * @brief This namespace provides all the configuration file IO related code.
  *
- * @namespace GeoMHDiSCC::IoControl
+ * @namespace QuICC::IoControl
  * @brief This namespace provides all the IO control related code.
  *
- * @namespace GeoMHDiSCC::IoHdf5
+ * @namespace QuICC::IoHdf5
  * @brief This namespace provides all the HDF5 IO related code.
  *
- * @namespace GeoMHDiSCC::IoTools
+ * @namespace QuICC::IoTools
  * @brief This namespace provides all the IO tools related code.
  *
- * @namespace GeoMHDiSCC::IoVariable
+ * @namespace QuICC::IoVariable
  * @brief This namespace provides all the high level variable IO related code.
  *
- * @namespace GeoMHDiSCC::IoXml
+ * @namespace QuICC::IoXml
  * @brief This namespace provides all the XML IO related code.
  *
- * @namespace GeoMHDiSCC::Parallel
+ * @namespace QuICC::Parallel
  * @brief This namespace provides all the parallelisation related code.
  *
- * @namespace GeoMHDiSCC::Physical
+ * @namespace QuICC::Physical
  * @brief This namespace provides all the physical space computation related code.
  *
- * @namespace GeoMHDiSCC::Schemes
+ * @namespace QuICC::Schemes
  * @brief This namespace provides all the spatial schemes related code.
  *
- * @namespace GeoMHDiSCC::Solver
+ * @namespace QuICC::Solver
  * @brief This namespace provides all the linear solver related code.
  *
- * @namespace GeoMHDiSCC::Spectral
+ * @namespace QuICC::Spectral
  * @brief This namespace provides all the spectral space related code.
  *
- * @namespace GeoMHDiSCC::Timestep
+ * @namespace QuICC::Timestep
  * @brief This namespace provides all the timestep related code.
  *
- * @namespace GeoMHDiSCC::Transform
+ * @namespace QuICC::Transform
  * @brief This namespace provides all the transform related code
  *
- * @namespace GeoMHDiSCC::TestSuite
+ * @namespace QuICC::TestSuite
  * @brief This namespace provides all the TestSuite related code
  */

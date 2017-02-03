@@ -5,7 +5,7 @@
  */
 
 /// Set the path to the simulation implementation
-#define MODELPATH PhysicalModels/GEOMHDISCC_RUNSIM_MODEL.hpp
+#define MODELPATH PhysicalModels/QUICC_RUNSIM_MODEL.hpp
 /// Define small macros allowing to convert to string
 #define MAKE_STR_X( _P ) # _P
 /// Define small macros allowing to convert to string
@@ -36,17 +36,17 @@ int run()
    int status = 0;
 
    // Create simulation
-   GeoMHDiSCC::SharedStateGenerator   spGen;
+   QuICC::SharedStateGenerator   spGen;
 
    // Exception handling during the initialisation part
    try
    {
       // Create state generator
-      spGen = GeoMHDiSCC::StateGeneratorFactory<GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL>::createGenerator();
+      spGen = QuICC::StateGeneratorFactory<QuICC::QUICC_RUNSIM_MODEL>::createGenerator();
    }
 
    // If exception is thrown, finalise (close files) and return
-   catch(GeoMHDiSCC::Exception& e)
+   catch(QuICC::Exception& e)
    {
       std::cerr << e.what() << std::endl;
 
@@ -74,7 +74,7 @@ int run()
 int main(int argc, char* argv[])
 {
    // Initilise everything that can't be done inside a class
-   GeoMHDiSCC::FrameworkMacro::init();
+   QuICC::FrameworkMacro::init();
 
    // Storage for the return code of run
    int code;
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
    code = run();
 
    // Finalise everything that can't be done inside a class
-   GeoMHDiSCC::FrameworkMacro::finalize();
+   QuICC::FrameworkMacro::finalize();
 
    return code;
 }

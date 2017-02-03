@@ -22,10 +22,9 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "PhysicalOperators/VelocityAdvection.hpp"
 #include "PhysicalOperators/Cross.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

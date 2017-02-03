@@ -24,7 +24,7 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/3D/FFFScheme.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of test mode equation for the FFF scheme

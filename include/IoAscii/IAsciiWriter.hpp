@@ -22,7 +22,7 @@
 //
 #include "IoAscii/AsciiFile.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoAscii {
 

@@ -23,7 +23,7 @@
 #include "Enums/FieldIds.hpp"
 #include "Enums/SolveTiming.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Solver {
 

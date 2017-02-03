@@ -24,7 +24,7 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/3D/TFFScheme.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of the Boussinesq tilted F-plane 3DQG model (nonorthogonal formulation)

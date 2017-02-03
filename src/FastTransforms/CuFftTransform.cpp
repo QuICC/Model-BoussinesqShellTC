@@ -20,7 +20,7 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/CuFftLibrary.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -417,7 +417,7 @@ namespace Transform {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    MHDFloat CuFftTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
@@ -427,7 +427,7 @@ namespace Transform {
 
       return mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

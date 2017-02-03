@@ -6,8 +6,8 @@
 # General directories
 # 
 # Some directories
-set(GEOMHDISCC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-set(GEOMHDISCC_SRC_DIR ${CMAKE_SOURCE_DIR}/src)
+set(QUICC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+set(QUICC_SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 
 ###################################################
 #---------- GLOBAL INCLUDE DIRECTORIES -----------#
@@ -16,4 +16,4 @@ set(GEOMHDISCC_SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 #
 # Set General include directories
 #
-include_directories(${GEOMHDISCC_INCLUDE_DIR})
+include_directories(${QUICC_INCLUDE_DIR})

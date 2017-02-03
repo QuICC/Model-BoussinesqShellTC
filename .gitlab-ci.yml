@@ -1,0 +1,151 @@
+before_script:
+   - git submodule sync
+   - git submodule update --init
+   - mkdir QuICC_builds
+   - cd QuICC_builds
+   - cp ${CI_PROJECT_DIR}/TestSuite/Bash/test_build.sh .
+
+stages:
+   - build
+
+#######################################
+############## Cartesian ##############
+#######################################
+
+BoussinesqFPlane3DQG:
+   stage: build
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqTiltedFPlane3DQG:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqNoTiltedFPlane3DQG:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqFPlaneNHBGE:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqRRBCPlane:
+   stage: build
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+#######################################
+############# Cylindrical #############
+#######################################
+
+BoussinesqRBCCylinder:
+   stage: build
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqRRBCCylinder:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+#######################################
+############## Spherical ##############
+#######################################
+
+BoussinesqTCShell:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqTCShellStd:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqRTCShell:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqRTCShellStd:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqDynamoShell:
+   stage: build
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqDynamoShellStd:
+   stage: build
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqTCSphere:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqTCSphereStd:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqRTCSphere:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqRTCSphereStd:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqDynamoSphere:
+   stage: build
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqDynamoSphereStd:
+   stage: build
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}

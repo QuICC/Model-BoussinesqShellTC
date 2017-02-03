@@ -26,7 +26,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Timers/StageTimer.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -78,12 +78,12 @@ namespace Parallel {
           */
          virtual void prepareBackwardReceive();
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          /**
          * @brief Do storage profiling
          */
          virtual void profileStorage() const;
-      #endif // GEOMHDISCC_STORAGEPROFILE
+      #endif // QUICC_STORAGEPROFILE
          
       protected:
          /**
@@ -568,12 +568,12 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
       {
-         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         #if defined QUICC_MPIPACK_MANUAL
             MpiConverterTools<TFwdA::FieldDimension>::template pack<typename TFwdA::PointType>(this->mspFBuffers->at(id), this->mspFBuffers->pos(id), data, this->mFTypes.at(id));
          #else
             int ierr = MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mspFBuffers->pos(id)), FrameworkMacro::transformComm(this->mTraId));
             FrameworkMacro::check(ierr, 761);
-         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+         #endif //defined QUICC_MPIPACK_MANUAL
       }
 
       // Stop detailed profiler
@@ -600,12 +600,12 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)
       {
-         #if defined GEOMHDISCC_MPIPACK_MANUAL
+         #if defined QUICC_MPIPACK_MANUAL
             MpiConverterTools<TBwdB::FieldDimension>::template pack<typename TBwdB::PointType>(this->mspBBuffers->at(id), this->mspBBuffers->pos(id), data, this->mBTypes.at(id));
          #else
             int ierr = MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mspBBuffers->pos(id)), FrameworkMacro::transformComm(this->mTraId));
             FrameworkMacro::check(ierr, 762);
-         #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+         #endif //defined QUICC_MPIPACK_MANUAL
       }
 
       // Stop detailed profiler
@@ -632,7 +632,7 @@ namespace Parallel {
             DetailedProfilerMacro_start(ProfilerMacro::FWDRECVWAIT);
 
             // Wait for some of the requests to finish
-            #ifdef GEOMHDISCC_DEBUG
+            #ifdef QUICC_DEBUG
                MPI_Status stats[this->nFCpu()];
                int ierr = MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), stats);
                FrameworkMacro::check(ierr, 771);
@@ -640,7 +640,7 @@ namespace Parallel {
             #else
                int ierr = MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
                FrameworkMacro::check(ierr, 771);
-            #endif //GEOMHDISCC_DEBUG
+            #endif //QUICC_DEBUG
 
             // Stop detailed profiler
             DetailedProfilerMacro_stop(ProfilerMacro::FWDRECVWAIT);
@@ -655,12 +655,12 @@ namespace Parallel {
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
 
-               #if defined GEOMHDISCC_MPIPACK_MANUAL
+               #if defined QUICC_MPIPACK_MANUAL
                   MpiConverterTools<TFwdA::FieldDimension>::template unpack<typename TFwdA::PointType>(rData, this->mFTypes.at(pos), this->mspFBuffers->at(pos), this->mspFBuffers->pos(pos));
                #else
                   int ierr = MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mspFBuffers->pos(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
                   FrameworkMacro::check(ierr, 763);
-               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+               #endif //defined QUICC_MPIPACK_MANUAL
             }
 
             // Stop detailed profiler
@@ -684,12 +684,12 @@ namespace Parallel {
          {
             DebuggerMacro_msg("Unpacking FWD packs", 5);
 
-            #if defined GEOMHDISCC_MPIPACK_MANUAL
+            #if defined QUICC_MPIPACK_MANUAL
                MpiConverterTools<TFwdA::FieldDimension>::template unpack<typename TFwdA::PointType>(rData, this->mFTypes.at(id), this->mspFBuffers->at(id), this->mspFBuffers->pos(id));
             #else
                int ierr = MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mspFBuffers->pos(id)), rData.rData().data(), 1, this->mFTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
                FrameworkMacro::check(ierr, 764);
-            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+            #endif //defined QUICC_MPIPACK_MANUAL
 
          }
 
@@ -718,7 +718,7 @@ namespace Parallel {
             DetailedProfilerMacro_start(ProfilerMacro::BWDRECVWAIT);
 
             // Wait for some of the requests to finish
-            #ifdef GEOMHDISCC_DEBUG
+            #ifdef QUICC_DEBUG
                MPI_Status stats[this->nBCpu()];
                int ierr = MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), stats);
                FrameworkMacro::check(ierr, 772);
@@ -726,7 +726,7 @@ namespace Parallel {
             #else 
                int ierr = MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
                FrameworkMacro::check(ierr, 772);
-            #endif //GEOMHDISCC_DEBUG
+            #endif //QUICC_DEBUG
 
             // Stop detailed profiler
             DetailedProfilerMacro_stop(ProfilerMacro::BWDRECVWAIT);
@@ -741,12 +741,12 @@ namespace Parallel {
                DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
 
-               #if defined GEOMHDISCC_MPIPACK_MANUAL
+               #if defined QUICC_MPIPACK_MANUAL
                   MpiConverterTools<TBwdB::FieldDimension>::template unpack<typename TBwdB::PointType>(rData, this->mBTypes.at(pos), this->mspBBuffers->at(pos), this->mspBBuffers->pos(pos));
                #else
                   int ierr = MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mspBBuffers->pos(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), FrameworkMacro::transformComm(this->mTraId));
                   FrameworkMacro::check(ierr, 765);
-               #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+               #endif //defined QUICC_MPIPACK_MANUAL
             }
 
             // Stop detailed profiler
@@ -770,12 +770,12 @@ namespace Parallel {
          {
             DebuggerMacro_msg("Unpacking BWD packs", 5);
 
-            #if defined GEOMHDISCC_MPIPACK_MANUAL
+            #if defined QUICC_MPIPACK_MANUAL
                MpiConverterTools<TBwdB::FieldDimension>::template unpack<typename TBwdB::PointType>(rData, this->mBTypes.at(id), this->mspBBuffers->at(id), this->mspBBuffers->pos(id));
             #else
                int ierr = MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mspBBuffers->pos(id)), rData.rData().data(), 1, this->mBTypes.at(id), FrameworkMacro::transformComm(this->mTraId));
                FrameworkMacro::check(ierr, 766);
-            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+            #endif //defined QUICC_MPIPACK_MANUAL
          }
 
          // Stop detailed profiler
@@ -866,13 +866,13 @@ namespace Parallel {
             assert(static_cast<size_t>(grpSrc) < this->mRecvFRequests.at(packs).size());
 
             // initialise the Recv request
-            #if defined GEOMHDISCC_MPIPACK_MANUAL
+            #if defined QUICC_MPIPACK_MANUAL
                ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MpiTypes::template type<typename TFwdA::PointType>(), src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
                FrameworkMacro::check(ierr, 981);
             #else
                ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
                FrameworkMacro::check(ierr, 981);
-            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+            #endif //defined QUICC_MPIPACK_MANUAL
          }
 
          // Create send backward requests
@@ -895,13 +895,13 @@ namespace Parallel {
             assert(static_cast<size_t>(grpDest) < this->mSendBRequests.at(packs).size());
 
             // initialise the Send request
-            #if defined GEOMHDISCC_MPIPACK_MANUAL
+            #if defined QUICC_MPIPACK_MANUAL
                ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MpiTypes::template type<typename TBwdB::PointType>(), dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
                FrameworkMacro::check(ierr, 982);
             #else
                ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
                FrameworkMacro::check(ierr, 982);
-            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+            #endif //defined QUICC_MPIPACK_MANUAL
          }
       }
 
@@ -941,11 +941,11 @@ namespace Parallel {
             tag = src + tagShift;
 
             // initialise the Recv request
-            #if defined GEOMHDISCC_MPIPACK_MANUAL
+            #if defined QUICC_MPIPACK_MANUAL
                ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MpiTypes::template type<typename TBwdB::PointType>(), src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
             #else
                ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
-            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+            #endif //defined QUICC_MPIPACK_MANUAL
             FrameworkMacro::check(ierr, 983);
          }
 
@@ -965,12 +965,12 @@ namespace Parallel {
             dest = this->fCpu(grpDest);
 
             // initialise the Send request
-            #if defined GEOMHDISCC_MPIPACK_MANUAL
+            #if defined QUICC_MPIPACK_MANUAL
                ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MpiTypes::template type<typename TFwdA::PointType>(), dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
             #else
                ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, FrameworkMacro::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
                FrameworkMacro::check(ierr, 984);
-            #endif //defined GEOMHDISCC_MPIPACK_MANUAL
+            #endif //defined QUICC_MPIPACK_MANUAL
          }
       }
    }
@@ -1017,7 +1017,7 @@ namespace Parallel {
       }
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterSendRecv<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::profileStorage() const
    {
       MHDFloat memTypes = 0.0;
@@ -1034,13 +1034,13 @@ namespace Parallel {
       memTypes += 0.0;
 
       StorageProfilerMacro_update(StorageProfilerMacro::MPI, memTypes + memComm);
-      #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+      #ifdef QUICC_STORAGEPROFILER_DETAILED
          StorageProfilerMacro_update(StorageProfilerMacro::MPITYPES, memTypes);
 
          StorageProfilerMacro_update(StorageProfilerMacro::MPICOMM, memComm);
-      #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
+      #endif // QUICC_STORAGEPROFILER_DETAILED
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

@@ -3,7 +3,7 @@
  * @brief This class defines the forward transform tubular splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#ifdef GEOMHDISCC_MPIALGO_TUBULAR
+#ifdef QUICC_MPIALGO_TUBULAR
 
 #ifndef FORWARDTUBULARCONFIGURATOR_HPP
 #define FORWARDTUBULARCONFIGURATOR_HPP
@@ -24,7 +24,7 @@
 #include "TransformConfigurators/TransformTree.hpp"
 #include "TransformConfigurators/ForwardConfigurator3D.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -240,4 +240,4 @@ namespace Transform {
 
 #endif // FORWARDTUBULARCONFIGURATOR_HPP
 
-#endif //GEOMHDISCC_MPIALGO_TUBULAR
+#endif //QUICC_MPIALGO_TUBULAR

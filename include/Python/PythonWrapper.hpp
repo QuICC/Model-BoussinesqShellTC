@@ -24,7 +24,7 @@
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief This class is a small wrapper for the Python embedding

@@ -25,7 +25,7 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "PhysicalOperators/StreamHeatAdvection.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

@@ -37,7 +37,7 @@
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqFPlaneNHBGEModel::PYMODULE = "boussinesq_fplanenhbge";
 
@@ -218,6 +218,10 @@ namespace GeoMHDiSCC {
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
 
       spSim->addHdf5OutputFile(spState);
+   }
+
+   void BoussinesqFPlaneNHBGEModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
    }
 
    void BoussinesqFPlaneNHBGEModel::setInitialState(SharedSimulation spSim)

@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Resolutions/TransformSetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 

@@ -25,7 +25,7 @@
 #include "Enums/ModelOperator.hpp"
 #include "Equations/Tools/IEigenTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

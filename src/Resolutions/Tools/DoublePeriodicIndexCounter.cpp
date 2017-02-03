@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    DoublePeriodicIndexCounter::DoublePeriodicIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
       : IndexCounter(), mspSim(spSim), mspCpu(spCpu)

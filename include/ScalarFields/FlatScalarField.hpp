@@ -31,7 +31,7 @@
 #include "Enums/Dimensions.hpp"
 #include "ScalarFields/ScalarFieldSetup.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Datatypes {
 
@@ -245,12 +245,12 @@ namespace Datatypes {
           */
          void rescale(const MHDFloat scale);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
 
          /**
           * @brief Get the number of slices
@@ -575,14 +575,14 @@ namespace Datatypes {
       return this->mspSetup->nBlock();
    }
 
-#ifdef GEOMHDISCC_STORAGEPROFILE
+#ifdef QUICC_STORAGEPROFILE
    template <typename TData, Dimensions::Type DIMENSION> MHDFloat FlatScalarField<TData, DIMENSION>::requiredStorage() const
    {
       MHDFloat mem = this->mspField->size();
 
       return static_cast<MHDFloat>(Debug::MemorySize<TData>::BYTES)*mem;
    }
-#endif // GEOMHDISCC_STORAGEPROFILE
+#endif // QUICC_STORAGEPROFILE
 
 }
 }

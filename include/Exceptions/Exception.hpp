@@ -14,7 +14,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Simple exception class

@@ -34,7 +34,7 @@
 #include "Generator/Visualizers/VorticityStreamVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg";
 

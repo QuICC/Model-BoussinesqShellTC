@@ -25,7 +25,7 @@
 #include "SpatialSchemes/ISpatialScheme.hpp"
 #include "LoadSplitter/Algorithms/SplittingDescription.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 

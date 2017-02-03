@@ -20,7 +20,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -50,7 +50,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #if defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
    std::vector<TransformPath>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
@@ -70,12 +70,12 @@ namespace TransformSteps {
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTGI2);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
-            transform.back().addEdge(Integrator1DType::INTGI4DIVRM0, curlId, Arithmetics::SUB);
+            transform.back().addEdge(Integrator1DType::INTGI4DIVRM0, curlId, Arithmetics::ADD);
 
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTGI2);
             transform.back().addEdge(Integrator2DType::INTG);
-            transform.back().addEdge(Integrator1DType::INTGI4DIVRDIFFR_I2, curlId, Arithmetics::ADD);
+            transform.back().addEdge(Integrator1DType::INTGI4DIVRDIFFR_I2, curlId, Arithmetics::SUB);
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -180,7 +180,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #endif //defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
    std::vector<TransformPath>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
@@ -289,7 +289,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #if defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
    std::vector<TransformPath>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
@@ -560,7 +560,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_WFT_TORPOL
+   #endif //defined QUICC_SPATIALSCHEME_WFT_TORPOL
 
 }
 }

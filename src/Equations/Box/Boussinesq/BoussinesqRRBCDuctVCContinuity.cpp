@@ -23,7 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 

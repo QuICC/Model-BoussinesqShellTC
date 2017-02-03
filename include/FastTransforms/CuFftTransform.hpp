@@ -25,11 +25,11 @@
 #include <cuda_runtime.h>
 #include <cufft.h>
 
-#ifdef GEOMHDISCC_DEBUG
+#ifdef QUICC_DEBUG
    #include <helper_cuda.h>
 #else
    #define checkCudaErrors(x) x
-#endif //GEOMHDISCC_DEBUG
+#endif //QUICC_DEBUG
 
 // Project includes
 //
@@ -40,7 +40,7 @@
 #include "FastTransforms/FftSetup.hpp"
 #include "FastTransforms/CuFftLibrary.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -170,12 +170,12 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 

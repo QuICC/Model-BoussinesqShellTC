@@ -25,11 +25,11 @@
 #include <cuda_runtime.h>
 #include <cufft.h>
 
-#ifdef GEOMHDISCC_DEBUG
+#ifdef QUICC_DEBUG
    #include <helper_cuda.h>
 #else
    #define checkCudaErrors(x) x
-#endif //GEOMHDISCC_DEBUG
+#endif //QUICC_DEBUG
 
 // Project includes
 //
@@ -41,7 +41,7 @@
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Transform {
 
@@ -178,12 +178,12 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
 
-     #ifdef GEOMHDISCC_STORAGEPROFILE
+     #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-     #endif // GEOMHDISCC_STORAGEPROFILE
+     #endif // QUICC_STORAGEPROFILE
          
       protected:
 

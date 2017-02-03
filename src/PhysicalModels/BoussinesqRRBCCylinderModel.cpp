@@ -25,6 +25,8 @@
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
+#include "IoVariable/CylinderScalarEnergyWriter.hpp"
+#include "IoVariable/CylinderTorPolEnergyWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
@@ -34,9 +36,11 @@
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/ScalarFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
+#include "Generator/Visualizers/NonlinearVectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqRRBCCylinderModel::PYMODULE = "boussinesq_rrbccylinder";
 
@@ -63,18 +67,13 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CylinderExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::R, Equations::CylinderExactStateIds::TESTUNITSPECTRUM);
-         spVector->setModeOptions(FieldComponents::Physical::R, 1.0e0, 1.0, 1.0e0, 0.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::THETA, Equations::CylinderExactStateIds::TESTUNITSPECTRUM);
-         spVector->setModeOptions(FieldComponents::Physical::THETA, 1.0e0, 0.0, 1.0e0, 1.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CylinderExactStateIds::TESTUNITSPECTRUM);
-         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 0.0, 1.0e0, 0.0, 1.0e0, 1.0);
+         spVector->setSpectralType(FieldComponents::Spectral::TOR, Equations::CylinderExactStateIds::SPEC_UNIT);
+         spVector->setSpectralType(FieldComponents::Spectral::POL, Equations::CylinderExactStateIds::SPEC_UNIT);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CylinderExactStateIds::TESTUNITSPECTRUM);
-         spScalar->setModeOptions(1e0, 5.0, 1e0, 5.0, 1e0, 5.0);
+         spScalar->setSpectralType(Equations::CylinderExactStateIds::SPEC_UNIT);
 
       // Generate random spectrum
       } else
@@ -173,6 +172,10 @@ namespace GeoMHDiSCC {
          spState->expect(*it);
       }
       spSim->addHdf5OutputFile(spState);
+   }
+
+   void BoussinesqRRBCCylinderModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
    }
 
    void BoussinesqRRBCCylinderModel::setInitialState(SharedSimulation spSim)

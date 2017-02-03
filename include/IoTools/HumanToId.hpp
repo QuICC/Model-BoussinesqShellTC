@@ -23,7 +23,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "Enums/ModelOperator.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoTools {
 

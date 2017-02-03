@@ -20,7 +20,7 @@
 //
 #include "Enums/Dimensions.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Dimensions {
 

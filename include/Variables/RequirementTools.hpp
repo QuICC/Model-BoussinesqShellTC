@@ -23,7 +23,7 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/TransformTree.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of requirement tools for equations and variables

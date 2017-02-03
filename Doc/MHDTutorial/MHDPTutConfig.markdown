@@ -4,27 +4,27 @@ Configure {#mhdPTutConfig}
 CMake is used to generate the Makefile that will allow the compilation of the simulations. The build process uses an out-of-source approach to keep 
 the sources clean. The following steps are required to create and configure the build. To fix the notations, we assume:
 
-   - The sources are in: /home/myself/GeoMHDiSCC
+   - The sources are in: /home/myself/QuICC
 
    - The binaries should be somewhere under: /scratch/myself
 
    1. Create a new directory where you'll like all the binaries to be (Warning: directory might grow large!):
 
-      #$>mkdir /scratch/myself/GeoMHDiSCC
+      #$>mkdir /scratch/myself/QuICC
 
    2. Binaries with different options/parallelisations need to have separate directories
 
-      #$>mkdir /scratch/myself/GeoMHDiSCC/Release-Serial #(serial version)
+      #$>mkdir /scratch/myself/QuICC/Release-Serial #(serial version)
 
-      #$>mkdir /scratch/myself/GeoMHDiSCC/Release-Tubular #(tubular parallelisation)
+      #$>mkdir /scratch/myself/QuICC/Release-Tubular #(tubular parallelisation)
 
    3. Change into one of the newly create directories,as an example Release-Tubular/:
 
-      #$>cd /scratch/myself/GeoMHDiSCC/Release-Tubular
+      #$>cd /scratch/myself/QuICC/Release-Tubular
 
    4. Initialise CMake and start the configuration process:
 
-      #$>ccmake /home/myself/GeoMHDiSCC
+      #$>ccmake /home/myself/QuICC
 
    5. Set the build type and the platform. Press 'c' to reconfigure. More options should now be avaiable (depending on platform)
 
@@ -48,7 +48,7 @@ CMAKE\_INSTALL\_PREFIX
 
    Leave at default values unless you know what you're doing.
 
-GEOMHDISCC\_PLATFORM
+QUICC\_PLATFORM
 --------------------
    
    The platforms files are located in code directory under cmake.d/platforms. The define platform specific information like compilers, path to libraries, etc. Below are a few examples.
@@ -60,13 +60,13 @@ GEOMHDISCC\_PLATFORM
    - Lothlorien
    - Theodosia
 
-GEOMHDISCC\_BOUNDARYMETHOD
+QUICC\_BOUNDARYMETHOD
 -------------------------
 
    - Tau: The simulation will use a spectral Tau method for the boundary conditions 
    - Galerkin: The simulation will use a spectral Galerkin method where possible. This is still in a test phase.
 
-GEOMHDISCC\_COMPILER
+QUICC\_COMPILER
 --------------------
 
    Compiler to use. This option is platform specific. Below are few examples.
@@ -75,7 +75,7 @@ GEOMHDISCC\_COMPILER
    - Intel
    - Clang
 
-GEOMHDISCC\_FFT
+QUICC\_FFT
 ---------------
 
    FFT library to use for the transforms. This option is platform specific. There are currently two implemented interfaces. The main one is FFTW. There is also a GPU version based on cuFFT but does not (yet) provide any performance boost.
@@ -83,7 +83,7 @@ GEOMHDISCC\_FFT
    - FFTW
    - cuFFT
 
-GEOMHDISCC\_FFTPLAN
+QUICC\_FFTPLAN
 ------------------
 
    FFTW plan generation flag. 
@@ -92,14 +92,14 @@ GEOMHDISCC\_FFTPLAN
    - Medium: Plan is slower to generate, but might be faster than the one from the Fast option. Can be useful, but might become extremely slow in MPI code.
    - Slow: Plan can be very slow to generate. It involves testing a plethora of possible algorithms for the FFT plan. Rarely useful for our FFT sizes.
 
-GEOMHDISCC\_LARGEIO
+QUICC\_LARGEIO
 -------------------
    
    Format used for the large state files.
 
    - HDF5
 
-GEOMHDISCC\_LINALG
+QUICC\_LINALG
 ------------------
 
    Linear algebra library to use. This option will eventually be removed. 
@@ -107,7 +107,7 @@ GEOMHDISCC\_LINALG
    - Eigen: Use the Eigen template library.
    - (LAPACK): Obsolete option to LAPACK and will be eventually removed
 
-GEOMHDISCC\_MEMORYUSAGE
+QUICC\_MEMORYUSAGE
 -----------------------
 
    Placeholder for restricted memory algorithms.
@@ -115,7 +115,7 @@ GEOMHDISCC\_MEMORYUSAGE
    - High:  Will always produce the fastest code but requires the most memory.
    - (Limited): Will eventually provide a slower code path to reduce memory usage.
 
-GEOMHDISCC\_MPIALGO
+QUICC\_MPIALGO
 -------------------
 
    Parallelisation algorith to use. Note that not all options will work for all simulations. Compilation will fail abort if this option is not compatible with the simulation.
@@ -127,7 +127,7 @@ GEOMHDISCC\_MPIALGO
    - Fixed: Parallelise between the first and the second transform but with additional constrains required for problems with 2 finite directions.
    - Tubular: Pencil like parallelisation. When avaiable this will nearly always be the fastest
 
-GEOMHDISCC\_MULTPRECISION
+QUICC\_MULTPRECISION
 -------------------------
 
    Placeholder to allow initialisation calculations to be done in arbitrary precission.
@@ -135,7 +135,7 @@ GEOMHDISCC\_MULTPRECISION
    - (ON) 
    - OFF 
 
-GEOMHDISCC\_PROFILE
+QUICC\_PROFILE
 -------------------
    
    Activate the performance profiler.
@@ -143,7 +143,7 @@ GEOMHDISCC\_PROFILE
    - ON: Will open an additional option requesing the type of profiler: Coarse or Detailled. Coarse profiler should not have a significant overhead.
    - OFF
 
-GEOMHDISCC\_SMARTPTR
+QUICC\_SMARTPTR
 --------------------
 
    Smart pointer implementation. Smart pointers are not part of the current default C++ implementation.
@@ -152,14 +152,14 @@ GEOMHDISCC\_SMARTPTR
    - TR1: Use the Technical Report 1 version. Should be avaiable in any reasonably recent compiler.
    - (C++0x): For much newer compilers, with C++11 support
 
-GEOMHDISCC\_SPEIGSOLVER
+QUICC\_SPEIGSOLVER
 -----------------------
 
    Obsolete option that will be removed
 
    - ARPACK
 
-GEOMHDISCC\_SPLINALG
+QUICC\_SPLINALG
 -------------------
 
    Sparse solver. The available options are platform dependent.
@@ -174,7 +174,7 @@ GEOMHDISCC\_SPLINALG
    - [SparseQR]: Experimental QR solver. Do not use except for testing
    - [BiCGStab]: Experimental iterative solver. Do not use except for testing
 
-GEOMHDISCC\_STORAGEPROFILE
+QUICC\_STORAGEPROFILE
 --------------------------
 
    Memory profiler. This is currently not providing very useful information as it hasn't been updated in a while.
@@ -182,15 +182,15 @@ GEOMHDISCC\_STORAGEPROFILE
    - OFF
    - (ON)
 
-GEOMHDISCC\_TEST
+QUICC\_TEST
 ----------------
 
-   Activate the TestSuite avaialbe as a separate repository GeoMHDiSCC\_TestSuite.
+   Activate the TestSuite avaialbe as a separate repository QuICC\_TestSuite.
 
    - OFF
    - (ON)
 
-GEOMHDISCC\_TIMESTEPPER
+QUICC\_TIMESTEPPER
 -----------------------
 
    Selection of implemented timesteppers:
@@ -198,7 +198,7 @@ GEOMHDISCC\_TIMESTEPPER
    - ImExRK3: Spalart's RK3 timestep scheme
    - ImSBDF2: Standard SBDF2 scheme, does currently not support a clean restart.
 
-GEOMHDISCC\_TRANSGROUPER
+QUICC\_TRANSGROUPER
 ------------------------
 
    MPI parallelisation communication grouping strategy.

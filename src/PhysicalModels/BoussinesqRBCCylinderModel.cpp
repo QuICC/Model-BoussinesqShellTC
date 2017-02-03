@@ -40,7 +40,7 @@
 #include "Generator/Visualizers/NonlinearVectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const std::string BoussinesqRBCCylinderModel::PYMODULE = "boussinesq_rbccylinder";
 
@@ -130,24 +130,12 @@ namespace GeoMHDiSCC {
       spVector->setFields(true, false, true);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
-      // Add velocity fields visualization
-      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
-      spVTrivial->setFields(true, false, true);
-      spVTrivial->setIdentity(PhysicalNames::MAGNETIC);
-
-      // Add velocity fields visualization
-      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
-      spVTrivial->setFields(true, false, true);
-      spVTrivial->setIdentity(PhysicalNames::PRESSURE);
-
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::MEAN_TEMPERATURE);
       spOut->expect(PhysicalNames::FLUCT_TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
-      spOut->expect(PhysicalNames::MAGNETIC);
-      spOut->expect(PhysicalNames::PRESSURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -190,6 +178,10 @@ namespace GeoMHDiSCC {
          spState->expect(*it);
       }
       spSim->addHdf5OutputFile(spState);
+   }
+
+   void BoussinesqRBCCylinderModel::addStatsOutputFiles(SharedSimulation spSim)
+   {
    }
 
    void BoussinesqRBCCylinderModel::setInitialState(SharedSimulation spSim)

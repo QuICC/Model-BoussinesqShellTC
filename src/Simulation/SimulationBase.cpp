@@ -36,7 +36,7 @@
 #include "Python/PythonTools.hpp"
 #include "Simulation/SimulationIoTools.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    SimulationBase::SimulationBase()
       : mExecutionTimer(true), mSimRunCtrl(), mDiagnostics(), mForwardIsNonlinear(true)

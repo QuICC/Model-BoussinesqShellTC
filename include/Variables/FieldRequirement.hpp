@@ -18,7 +18,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    /**
     * @brief Implementation of a class to store requirements for a field

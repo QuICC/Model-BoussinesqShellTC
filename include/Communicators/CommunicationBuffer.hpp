@@ -23,7 +23,7 @@
 // Project includes
 //
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
@@ -147,17 +147,17 @@ namespace Parallel {
       // Allocate large buffer
       this->mData = new TData[this->mTotal];
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          MHDFloat mem = 0.0;
 
          mem += Debug::MemorySize<TData>::BYTES*this->mTotal;
 
          StorageProfilerMacro_update(StorageProfilerMacro::MPI, mem);
 
-         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+         #ifdef QUICC_STORAGEPROFILER_DETAILED
             StorageProfilerMacro_update(StorageProfilerMacro::MPIBUFFERS, mem);
-         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
-      #endif // GEOMHDISCC_STORAGEPROFILE
+         #endif // QUICC_STORAGEPROFILER_DETAILED
+      #endif // QUICC_STORAGEPROFILE
    }
 
    template <typename TData> void CommunicationBuffer<TData>::allocateMax(const std::vector<int>& aSizes, const int maxAPacks, const std::vector<int>& bSizes, const int maxBPacks)
@@ -198,17 +198,17 @@ namespace Parallel {
 
       this->mData = new TData[this->mTotal];
 
-      #ifdef GEOMHDISCC_STORAGEPROFILE
+      #ifdef QUICC_STORAGEPROFILE
          MHDFloat mem = 0.0;
 
          mem += Debug::MemorySize<TData>::BYTES*this->mTotal;
 
          StorageProfilerMacro_update(StorageProfilerMacro::MPI, mem);
 
-         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+         #ifdef QUICC_STORAGEPROFILER_DETAILED
             StorageProfilerMacro_update(StorageProfilerMacro::MPIBUFFERS, mem);
-         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
-      #endif // GEOMHDISCC_STORAGEPROFILE
+         #endif // QUICC_STORAGEPROFILER_DETAILED
+      #endif // QUICC_STORAGEPROFILE
    }
 
    template <typename TData> inline int CommunicationBuffer<TData>::total() const

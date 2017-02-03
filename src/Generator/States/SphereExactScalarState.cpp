@@ -24,12 +24,12 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Equations {
 
    SphereExactScalarState::SphereExactScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTypeId(SphereExactStateIds::CONSTANT)
+      : IScalarEquation(spEqParams), mTypeId(SphereExactStateIds::NOTUSED), mSpecTypeId(SphereExactStateIds::NOTUSED)
    {
    }
 
@@ -51,14 +51,31 @@ namespace Equations {
       this->mTypeId = id;
    }
 
-   void SphereExactScalarState::setHarmonicOptions(const std::vector<SphereExactScalarState::HarmonicModeType>& modes)
+   void SphereExactScalarState::setSpectralType(const SphereExactStateIds::Id id)
+   {
+      this->mSpecTypeId = id;
+   }
+
+   void SphereExactScalarState::setHarmonicOptions(const SphereExactScalarState::HarmonicModeType& modes)
    {
       this->mSHModes = modes;
    }
 
    void SphereExactScalarState::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false, false);
+      bool hasNL = false;
+      bool hasSource = false;
+      if(this->mTypeId != SphereExactStateIds::NOTUSED)
+      {
+         hasNL = true;
+      }
+
+      if(this->mSpecTypeId != SphereExactStateIds::NOTUSED)
+      {
+         hasSource = true;
+      }
+
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false);
    }
 
    void SphereExactScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
@@ -71,52 +88,8 @@ namespace Equations {
          rNLComp.rData().setConstant(42);
       } else if(this->mTypeId == SphereExactStateIds::HARMONIC)
       {
-         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
-         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+         throw Exception("HARMONIC state is not implemented in physical space");
 
-         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR);
-         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
-         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
-
-         Array sphHarm(nPh);
-         MHDFloat funcR;
-         typedef std::vector<HarmonicModeType>::const_iterator ModeIt;
-         ModeIt it;
-         std::pair<ModeIt, ModeIt>  modeRange = std::make_pair(this->mSHModes.begin(), this->mSHModes.end());
-
-         rNLComp.rData().setConstant(0);
-         MHDFloat r;
-         MHDFloat theta;
-         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
-         for(int iR = 0; iR < nR; ++iR)
-         {
-            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
-            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
-            {
-               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
-               for(it = modeRange.first; it != modeRange.second; ++it)
-               {
-                  int l = std::tr1::get<0>(*it);
-                  int m = std::tr1::get<1>(*it);
-
-                  funcR = 1.0;
-                  for(int n = 1; n < 23; ++n)
-                  {
-                     funcR += std::pow(r,2*n);
-                  }
-                  funcR *= std::pow(r,l);
-
-                  MHDComplex amplitude = std::tr1::get<2>(*it);
-
-                  // Spherical harmonic Y_l^m
-                  sphHarm = SphereExactStateIds::sph_harmonic(amplitude, l, m, theta, phGrid);
-
-                  rNLComp.addProfile(funcR*sphHarm,iTh,iR);
-               }
-            }
-         }
       } else if(this->mTypeId == SphereExactStateIds::BENCHTEMPC1)
       {
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
@@ -134,7 +107,9 @@ namespace Equations {
          Array funcPh0 = Array::Ones(nPh);
          Array funcPh3 = (3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
 
-         MHDFloat amp0 = 0.5;
+         // Background state is not solved for (no source term but background is imposed explicitly)
+         MHDFloat amp0 = 0.0;
+         //MHDFloat amp0 = 0.5;
          MHDFloat eps = 1e-5;
          MHDFloat amp3 = (eps/8.0)*std::sqrt(35.0/Math::PI);
 
@@ -166,12 +141,36 @@ namespace Equations {
       }
    }
 
-    Datatypes::SpectralScalarType::PointType SphereExactScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+    Datatypes::SpectralScalarType::PointType SphereExactScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int iN, const int iJ, const int iK) const
     {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      return Datatypes::SpectralScalarType::PointType(0);
+      if(this->mSpecTypeId == SphereExactStateIds::HARMONIC)
+      {
+         #ifdef QUICC_SPATIALSCHEME_WLFL
+         std::pair<int,int> key = std::make_pair(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iK),this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ,iK));
+         #endif //QUICC_SPATIALSCHEME_WLFL
+         #ifdef QUICC_SPATIALSCHEME_WLFM
+         std::pair<int,int> key = std::make_pair(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ,iK),this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iK));
+         #endif //QUICC_SPATIALSCHEME_WLFM
+         if(this->mSHModes.count(key) > 0)
+         {
+            if(this->mSHModes.find(key)->second.count(iN) > 0)
+            {
+               return this->mSHModes.find(key)->second.find(iN)->second;
+            } else
+            {
+               return Datatypes::SpectralScalarType::PointType(0.0);
+            }
+         } else
+         {
+            return Datatypes::SpectralScalarType::PointType(0);
+         }
+      } else
+      {
+         return Datatypes::SpectralScalarType::PointType(0);
+      }
     }
 
    void SphereExactScalarState::setRequirements()

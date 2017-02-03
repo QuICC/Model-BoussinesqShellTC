@@ -3,8 +3,8 @@
 import numpy as np
 import functools
 
-import geomhdiscc.model.boussinesq_rrbcplane_mean as mod
-import geomhdiscc.linear_stability.marginal_curve as MarginalCurve
+import quicc.model.boussinesq_rrbcplane_mean as mod
+import quicc.linear_stability.marginal_curve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRRBCPlane()

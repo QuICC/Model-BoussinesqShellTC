@@ -28,7 +28,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoVariable {
 
@@ -54,7 +54,7 @@ namespace IoVariable {
       PythonWrapper::init();
 
       // Load module for R direction (Worland)
-      PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius_worland");
+      PythonWrapper::import("quicc.geometry.cylindrical.cylinder_radius_worland");
 
       // Prepare arguments
       pArgs = PyTuple_New(2);
@@ -82,7 +82,7 @@ namespace IoVariable {
 
       // Cleanup wrapper and load module for Z direction (Chebyshev)
       PythonWrapper::cleanup();
-      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
+      PythonWrapper::import("quicc.geometry.cartesian.cartesian_1d");
 
       // Prepare arguments
       pArgs = PyTuple_New(2);
@@ -146,7 +146,7 @@ namespace IoVariable {
 //      this->mPolEnergy = 0.0;
 //
 //      MHDFloat lfactor = 0.0;
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
 //         double factor = 1.0;
 //         // Loop over harmonic order m
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -168,8 +168,8 @@ namespace IoVariable {
 //               this->mTorEnergy += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
 //            }
 //         }
-//      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+//      #endif //defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 //         // Loop over harmonic degree l
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
 //         {
@@ -184,7 +184,7 @@ namespace IoVariable {
 //            }
 //            this->mTorEnergy += 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).rightCols(rInVarTor.slice(k).cols()-start).real()).sum();
 //         }
-//      #endif // defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+//      #endif // defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 //
 //      // Free BWD storage
 //      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
@@ -214,7 +214,7 @@ namespace IoVariable {
 //      coord.transform1D().integrate_energy(rInVarPolQ.rData(), rOutVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 //
 //      // Compute energy in Q component of QST decomposition
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
 //         // Loop over harmonic order m
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
 //         {
@@ -235,8 +235,8 @@ namespace IoVariable {
 //               this->mPolEnergy += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
 //            }
 //         }
-//      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+//      #endif //defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 //         lfactor = 0.0;
 //         // Loop over harmonic degree l
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -252,7 +252,7 @@ namespace IoVariable {
 //            }
 //            this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).rightCols(rInVarPolQ.slice(k).cols()-start).real()).sum();
 //         }
-//      #endif // defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+//      #endif // defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 //
 //      // Free BWD storage
 //      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPolQ);
@@ -279,7 +279,7 @@ namespace IoVariable {
 //      coord.transform1D().integrate_energy(rInVarPolS.rData(), rOutVarPolS.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 //
 //      // Compute energy in S component of QST decomposition
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
 //         // Loop over harmonic order m
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
 //         {
@@ -300,8 +300,8 @@ namespace IoVariable {
 //               this->mPolEnergy += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
 //            }
 //         }
-//      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
-//      #if defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+//      #endif //defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+//      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFM
 //         lfactor = 0.0;
 //         // Loop over harmonic degree l
 //         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -317,7 +317,7 @@ namespace IoVariable {
 //            }
 //            this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).rightCols(rInVarPolS.slice(k).cols()-start).real()).sum();
 //         }
-//      #endif //defined GEOMHDISCC_SPATIALSCHEME_BLFL || defined GEOMHDISCC_SPATIALSCHEME_WLFL
+//      #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 //
 //      // Free BWD storage
 //      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPolS);
@@ -335,7 +335,7 @@ namespace IoVariable {
       this->preWrite();
 
       // Get the "global" Kinetic energy from MPI code
-      #ifdef GEOMHDISCC_MPI
+      #ifdef QUICC_MPI
          Array energy(2);
 
          energy(0) = this->mTorEnergy;
@@ -345,7 +345,7 @@ namespace IoVariable {
 
          this->mTorEnergy = energy(0);
          this->mPolEnergy = energy(1);
-      #endif //GEOMHDISCC_MPI
+      #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

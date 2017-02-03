@@ -17,7 +17,7 @@
 //
 #include "IoBinary/IBinaryWriter.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace IoBinary {
 

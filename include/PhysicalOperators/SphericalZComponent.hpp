@@ -24,7 +24,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Resolutions/Resolution.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Physical {
 

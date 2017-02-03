@@ -18,7 +18,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
    const int FrameworkBase::IO_RANK = 0;
 

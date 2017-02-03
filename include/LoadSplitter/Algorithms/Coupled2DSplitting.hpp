@@ -22,7 +22,7 @@
 #include "LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "Resolutions/TransformResolution.hpp"
 
-namespace GeoMHDiSCC {
+namespace QuICC {
 
 namespace Parallel {
 
