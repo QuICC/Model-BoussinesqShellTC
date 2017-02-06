@@ -26,6 +26,7 @@
 #include"TypeSelectors/ScalarSelector.hpp"
 #include"Python/PythonWrapper.hpp"
 #include <numpy/ndarrayobject.h>
+#include <iostream>
 
 namespace QuICC{
 
@@ -60,8 +61,7 @@ namespace IoVariable{
 		// initialize the Python wrapper
 		PythonWrapper::init();
 		PythonWrapper::import("quicc.geometry.spherical.shell_radius");
-		PythonWrapper::import("geomhdiscc.projection.shell");
-		//PythonWrapper::import("geomhdiscc.projection.spherical");
+
 
 		// prepare arguments for the linear_2x call
 		PyObject *pArgs, * pValue, *pTmp;
@@ -86,13 +86,14 @@ namespace IoVariable{
 
 		// TODO: decide how the argument r positions is passed
 		Array xRadial = mPoints.col(0);
-		int m = xRadial.rows();
-		long int dims[1];
-		dims[0]=m;
-		pTmp = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,xRadial.data());
+		long int m = xRadial.size();
+
+		pTmp = PyArray_SimpleNewFromData(1, &m, NPY_DOUBLE, (void*)temp);
 		PyTuple_SetItem(pArgs,3,pTmp);
 
 		// function call proj_radial
+
+		PythonWrapper::import("quicc.projection.shell");
 		PythonWrapper::setFunction("proj_radial");
 		pValue = PythonWrapper::callFunction(pArgs);
 
@@ -113,6 +114,7 @@ namespace IoVariable{
 		vPhi = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,mPoints.col(2).data());
 
 		//
+		PythonWrapper::import("quicc.projection.spherical");
 		PythonWrapper::setFunction("lplm");
 
 		// set up the containers for the computed vectors

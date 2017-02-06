@@ -202,6 +202,7 @@ namespace QuICC {
       IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_r", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector2);
+
    }
 
    void BoussinesqCouetteShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
