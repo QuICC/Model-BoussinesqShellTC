@@ -88,7 +88,7 @@ namespace IoVariable{
 		Array xRadial = mPoints.col(0);
 		long int m = xRadial.size();
 
-		pTmp = PyArray_SimpleNewFromData(1, &m, NPY_DOUBLE, (void*)temp);
+		pTmp = PyArray_SimpleNewFromData(1, &m, NPY_DOUBLE, (void*)xRadial.data());
 		PyTuple_SetItem(pArgs,3,pTmp);
 
 		// function call proj_radial
@@ -110,8 +110,8 @@ namespace IoVariable{
 
 		// create PyObjects for the 2 vectors theta and phi
 		PyObject *vPhi, *vTheta;
-		vTheta = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,mPoints.col(1).data());
-		vPhi = PyArray_SimpleNewFromData(1,dims,NPY_FLOAT64,mPoints.col(2).data());
+		vTheta = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(1).data());
+		vPhi = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(2).data());
 
 		//
 		PythonWrapper::import("quicc.projection.spherical");
