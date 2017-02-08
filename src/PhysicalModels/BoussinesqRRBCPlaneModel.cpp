@@ -1,6 +1,6 @@
 /** 
  * @file BoussinesqRRBCPlaneModel.cpp
- * @brief Source of the rotating Boussinesq Rayleigh-Benard convection in a plane layer (velocity-continuity formulation) model
+ * @brief Source of the rotating Boussinesq Rayleigh-Benard convection in a plane layer (toroidal/poloidal formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
