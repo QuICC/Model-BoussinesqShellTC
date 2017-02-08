@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
+"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/Poloidal formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,7 +13,7 @@ from quicc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
 class BoussinesqRBCPlaneConfig:
-    """Class to setup the Boussinesq Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
+    """Class to setup the Boussinesq Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/Poloidal formulation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -23,7 +23,7 @@ class BoussinesqRBCPlaneConfig:
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "scale1d", "fast_mean", "rescaled"]
+        return ["prandtl", "rayleigh", "scale1d", "fast_mean"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -218,18 +218,6 @@ class BoussinesqRBCPlane(BoussinesqRBCPlaneConfig, base_model.BaseModel):
                     elif field_col == ("temperature",""):
                         bc = {0:-21, 'rt':2}
 
-                elif bcId == 2:
-                    if field_col == ("velocity","tor"):
-                        if eigs[0] == 0 and eigs[1] == 0:
-                            bc = {0:-21, 'rt':2}
-                        else:
-                            bc = {0:-21, 'rt':2}
-                    elif field_col == ("velocity","pol"):
-                        if eigs[0] == 0 and eigs[1] == 0:
-                            bc = {0:-21, 'rt':2}
-                        else:
-                            bc = {0:-23, 'rt':2}
-
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
@@ -419,10 +407,6 @@ class BoussinesqRBCPlane(BoussinesqRBCPlaneConfig, base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
 
-        kx = eigs[0]
-        ky = eigs[1]
-
-        # Mixed Galerkin/tau pumping boundary condition
         mat = geo.zblk(res[0], bc)
 
         if mat is None:

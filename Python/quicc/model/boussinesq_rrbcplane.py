@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/Poloidal formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,7 +13,7 @@ from quicc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
 class BoussinesqRRBCPlaneConfig:
-    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/poloidal formulation)"""
+    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Toroidal/Poloidal formulation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
