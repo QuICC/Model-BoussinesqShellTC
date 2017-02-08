@@ -1,8 +1,8 @@
 set(MHDPhysicalModels 
    # 2D models
-   BoussinesqRBCPlane2DVCModel.hpp
-   BoussinesqRBCSquareVCModel.hpp
-   BoussinesqRBCSquareSModel.hpp
+   #BoussinesqRBCPlane2DVCModel.hpp
+   #BoussinesqRBCSquareVCModel.hpp
+   #BoussinesqRBCSquareSModel.hpp
    # 3D models
    BoussinesqBeta3DQGModel.hpp
    BoussinesqBeta3DQGPerModel.hpp
@@ -11,21 +11,22 @@ set(MHDPhysicalModels
    BoussinesqFPlaneNHBGEModel.hpp
    BoussinesqTiltedFPlane3DQGModel.hpp
    BoussinesqNoTiltedFPlane3DQGModel.hpp
-   BoussinesqRBCDuctVCModel.hpp
-   BoussinesqRBCPlaneVCModel.hpp
-   BoussinesqRBCBoxVCModel.hpp
-   BoussinesqRBCAnnulusVCModel.hpp
-   BoussinesqRBCCylinderVCModel.hpp
+   #BoussinesqRBCDuctVCModel.hpp
+   #BoussinesqRBCPlaneVCModel.hpp
+   BoussinesqRBCPlaneModel.hpp
+   #BoussinesqRBCBoxVCModel.hpp
+   #BoussinesqRBCAnnulusVCModel.hpp
+   #BoussinesqRBCCylinderVCModel.hpp
    BoussinesqRBCCylinderModel.hpp
-   BoussinesqRRBCDuctVCModel.hpp
+   #BoussinesqRRBCDuctVCModel.hpp
    BoussinesqRRBCPlaneModel.hpp
    BoussinesqRRBCPlaneMeanModel.hpp
    BoussinesqRRBCPlaneDMeanModel.hpp
-   BoussinesqRRBCPlaneVCModel.hpp
-   BoussinesqRRBCBoxVCModel.hpp
-   BoussinesqRRBCAnnulusVCModel.hpp
+   #BoussinesqRRBCPlaneVCModel.hpp
+   #BoussinesqRRBCBoxVCModel.hpp
+   #BoussinesqRRBCAnnulusVCModel.hpp
    BoussinesqRRBCCylinderModel.hpp
-   BoussinesqRRBCCylinderVCModel.hpp
+   #BoussinesqRRBCCylinderVCModel.hpp
    BoussinesqTCShellModel.hpp
    BoussinesqTCShellStdModel.hpp
    BoussinesqRTCShellModel.hpp

@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRRBCPlaneModel.cpp
- * @brief Source of the rotating Boussinesq Rayleigh-Benard convection in a plane layer (toroidal/poloidal formulation) model
+ * @file BoussinesqRBCPlaneModel.cpp
+ * @brief Source of the Boussinesq Rayleigh-Benard convection in a plane layer (toroidal/poloidal formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,13 +15,13 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRRBCPlaneModel.hpp"
+#include "PhysicalModels/BoussinesqRBCPlaneModel.hpp"
 
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRRBCPlaneTransport.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRRBCPlaneMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCPlaneTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRBCPlaneMomentum.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
@@ -40,20 +40,20 @@
 
 namespace QuICC {
 
-   const std::string BoussinesqRRBCPlaneModel::PYMODULE = "boussinesq_rrbcplane";
+   const std::string BoussinesqRBCPlaneModel::PYMODULE = "boussinesq_rbcplane";
 
-   const std::string BoussinesqRRBCPlaneModel::PYCLASS = "BoussinesqRRBCPlane";
+   const std::string BoussinesqRBCPlaneModel::PYCLASS = "BoussinesqRBCPlane";
 
-   void BoussinesqRRBCPlaneModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRBCPlaneModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqRRBCPlaneTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCPlaneTransport>();
       
       // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqRRBCPlaneMomentum>();
+      spSim->addVectorEquation<Equations::BoussinesqRBCPlaneMomentum>();
    }
 
-   void BoussinesqRRBCPlaneModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRBCPlaneModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -99,7 +99,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRRBCPlaneModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCPlaneModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -135,7 +135,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRRBCPlaneModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCPlaneModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -148,7 +148,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRRBCPlaneModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCPlaneModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create temperature energy writer
       IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("temperature", SchemeType::type()));
@@ -166,7 +166,7 @@ namespace QuICC {
       spSim->addAsciiOutputFile(spNusselt);
    }
 
-   void BoussinesqRRBCPlaneModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCPlaneModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -182,11 +182,11 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRRBCPlaneModel::addStatsOutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCPlaneModel::addStatsOutputFiles(SharedSimulation spSim)
    {
    }
 
-   void BoussinesqRRBCPlaneModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRBCPlaneModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
