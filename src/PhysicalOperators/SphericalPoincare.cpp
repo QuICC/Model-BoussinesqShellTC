@@ -34,18 +34,18 @@ namespace Physical {
       MHDFloat coeff;
       if(compId == FieldComponents::Physical::R)
       {
-         rS.setZero();
+         rS.setZeros();
       } else if(compId == FieldComponents::Physical::THETA)
       {
          for(int iR = 0; iR < nR; ++iR)
          {
+            coeff = -csa*rGrid(spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
             nTh = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR); 
-            coeff = csa*rGrid(spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
                iTh_ = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
 
-               rS.setProfile(-coeff*(phGrid + t).array().cos(), iTh, iR);
+               rS.setProfile((coeff*(phGrid.array() + t).array().cos()).matrix(), iTh, iR);
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
@@ -58,7 +58,7 @@ namespace Physical {
             {
                iTh_ = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
 
-               rS.setProfile(coeff*std::cos(thGrid(iTh_))*(phGrid + t).array().sin(), iTh, iR);
+               rS.setProfile((coeff*std::cos(thGrid(iTh_))*(phGrid.array() + t).array().sin()).matrix(), iTh, iR);
             }
          }
       }
@@ -87,7 +87,7 @@ namespace Physical {
             {
                iTh_ = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
 
-               rS.subProfile(coeff*(phGrid + t).array().cos(), iTh, iR);
+               rS.subProfile((coeff*(phGrid.array() + t).array().cos()).matrix(), iTh, iR);
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
@@ -100,7 +100,7 @@ namespace Physical {
             {
                iTh_ = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
 
-               rS.addProfile(coeff*std::cos(thGrid(iTh_))*(phGrid + t).array().sin(), iTh, iR);
+               rS.addProfile((coeff*std::cos(thGrid(iTh_))*(phGrid.array() + t).array().sin()).matrix(), iTh, iR);
             }
          }
       }
@@ -129,7 +129,7 @@ namespace Physical {
             {
                iTh_ = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
 
-               rS.addProfile(coeff*(phGrid + t).array().cos(), iTh, iR);
+               rS.addProfile((coeff*(phGrid.array() + t).array().cos()).matrix(), iTh, iR);
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
@@ -142,7 +142,7 @@ namespace Physical {
             {
                iTh_ = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
 
-               rS.subProfile(coeff*std::cos(thGrid(iTh_))*(phGrid + t).array().sin(), iTh, iR);
+               rS.subProfile((coeff*std::cos(thGrid(iTh_))*(phGrid.array() + t).array().sin()).matrix(), iTh, iR);
             }
          }
       }

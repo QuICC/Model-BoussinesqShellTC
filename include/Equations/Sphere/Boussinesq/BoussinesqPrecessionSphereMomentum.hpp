@@ -69,10 +69,11 @@ namespace Equations {
           */
          virtual void setNLComponents();
 
+      private:
          /**
           * @brief Storage for the r grid values
           */
-         Array mTheta;
+         Array mR;
 
          /**
           * @brief Storage for the theta grid values
@@ -83,8 +84,6 @@ namespace Equations {
           * @brief Storage for the phi grid values
           */
          Array mPhi;
-
-      private:
    };
 
 }

@@ -24,7 +24,8 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
-#include "PhysicalOperators/SphericalCoriolis.hpp"
+#include "PhysicalOperators/SphericalPrecession.hpp"
+#include "PhysicalOperators/SphericalPoincare.hpp"
 
 namespace QuICC {
 
@@ -53,13 +54,13 @@ namespace Equations {
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
 
-      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
-         // Create cos(theta) and sin(theta) data for Coriolis term
-         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
-         this->mCosTheta = thGrid.array().cos();
-         this->mSinTheta = thGrid.array().sin();
-      #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
+      // Create R, theta and phi physical grids
+      int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+      this->mR = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR);
+      int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+      this->mTheta = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+      int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+      this->mPhi = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
    }
 
    void BoussinesqPrecessionRTCSphereMomentum::setNLComponents()
@@ -90,15 +91,20 @@ namespace Equations {
             break;
       }
 
+      ///
+      /// Compute Coriolis + Precession term
+      ///
+      MHDFloat Po = this->eqParams().nd(NonDimensional::POINCARE);
+      MHDFloat alpha = (this->eqParams().nd(NonDimensional::ALPHA)*Math::PI/180.);
       #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
-         // Get square root of Taylor number
-         MHDFloat T = 1.0/this->eqParams().nd(NonDimensional::EKMAN);
-
-         ///
-         /// Compute Coriolis term
-         ///
-         Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
+         MHDFloat corC = 1.0;
+      #elif defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+         MHDFloat corC = 0.0;
       #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
+      Physical::SphericalPrecession::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, corC, Po, 2.0);
+
+      /// Compute Poincare term
+      Physical::SphericalPoincare::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mR, this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, Po);
    }
 
    void BoussinesqPrecessionRTCSphereMomentum::setRequirements()

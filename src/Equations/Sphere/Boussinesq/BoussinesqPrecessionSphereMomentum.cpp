@@ -1,6 +1,6 @@
 /** 
  * @file BoussinesqPrecessionSphereMomentum.cpp
- * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq precession convection in a sphere model
+ * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq precession in a sphere model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -24,7 +24,8 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
-#include "PhysicalOperators/SphericalCoriolis.hpp"
+#include "PhysicalOperators/SphericalPrecession.hpp"
+#include "PhysicalOperators/SphericalPoincare.hpp"
 
 namespace QuICC {
 
@@ -53,7 +54,7 @@ namespace Equations {
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
 
-      // Create cos(theta) and sin(theta) data for Coriolis term
+      // Create R, theta and phi physical grids
       int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
       this->mR = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR);
       int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
@@ -94,7 +95,7 @@ namespace Equations {
       /// Compute Coriolis + Precession term
       ///
       MHDFloat Po = this->eqParams().nd(NonDimensional::POINCARE);
-      MHDFloat alpha = this->eqParams().nd(NonDimensional::ALPHA);
+      MHDFloat alpha = (this->eqParams().nd(NonDimensional::ALPHA)*Math::PI/180.);
       #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          MHDFloat corC = 1.0;
       #elif defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
@@ -103,7 +104,7 @@ namespace Equations {
       Physical::SphericalPrecession::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, corC, Po, 2.0);
 
       /// Compute Poincare term
-      Physical::SphericalPoincare::sub(rNLComp, compId, this->unknown().dom(0).spRes(), this->mR, this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, Po);
+      Physical::SphericalPoincare::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mR, this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, Po);
    }
 
    void BoussinesqPrecessionSphereMomentum::setRequirements()

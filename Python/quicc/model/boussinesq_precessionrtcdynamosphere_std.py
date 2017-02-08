@@ -224,14 +224,13 @@ class BoussinesqPrecessionRTCDynamoSphereStd(base_model.BaseModel):
         l = eigs[0]
 
         Pr = eq_params['prandtl']
-        Pm = eq_params['magnetic_prandtl']
         Ra = eq_params['rayleigh']
-        T = 1.0/eq_params['ekman']
+        E = eq_params['ekman']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4(res[0], l, bc, (Pm**2*Ra*T/Pr)*l*(l+1.0))
+            mat = geo.i4(res[0], l, bc, (Ra*E/Pr)*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             mat = geo.i2(res[0], l, bc, -l*(l+1.0))
@@ -263,25 +262,26 @@ class BoussinesqPrecessionRTCDynamoSphereStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
+        E = eq_params['ekman']
         Pr = eq_params['prandtl']
         Pm = eq_params['magnetic_prandtl']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2lapl(res[0], l, bc, Pm*l*(l+1.0))
+            mat = geo.i2lapl(res[0], l, bc, E*l*(l+1.0))
 
         elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4lapl2(res[0], l, bc, Pm*l*(l+1.0))
+            mat = geo.i4lapl2(res[0], l, bc, E*l*(l+1.0))
 
         elif field_row == ("magnetic","tor") and field_col == field_row:
-            mat = geo.i2lapl(res[0], l, bc, l*(l+1.0))
+            mat = geo.i2lapl(res[0], l, bc, (E/Pm)*l*(l+1.0))
 
         elif field_row == ("magnetic","pol") and field_col == field_row:
-            mat = geo.i2lapl(res[0], l, bc, l*(l+1.0))
+            mat = geo.i2lapl(res[0], l, bc, (E/Pm)*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2lapl(res[0], l, bc, Pm/Pr)
+            mat = geo.i2lapl(res[0], l, bc, E/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

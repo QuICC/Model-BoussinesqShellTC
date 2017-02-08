@@ -24,7 +24,8 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
-#include "PhysicalOperators/SphericalCoriolis.hpp"
+#include "PhysicalOperators/SphericalPrecession.hpp"
+#include "PhysicalOperators/SphericalPoincare.hpp"
 
 namespace QuICC {
 
@@ -53,13 +54,13 @@ namespace Equations {
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
 
-      #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
-         // Create cos(theta) and sin(theta) data for Coriolis term
-         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
-         this->mCosTheta = thGrid.array().cos();
-         this->mSinTheta = thGrid.array().sin();
-      #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
+      // Create R, theta and phi physical grids
+      int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+      this->mR = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR);
+      int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+      this->mTheta = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+      int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+      this->mPhi = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
    }
 
    void BoussinesqPrecessionRTCDynamoSphereMomentum::setNLComponents()
@@ -71,10 +72,6 @@ namespace Equations {
 
    void BoussinesqPrecessionRTCDynamoSphereMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
-      // Get square root of Taylor number
-      MHDFloat T = 1.0/this->eqParams().nd(NonDimensional::EKMAN);
-      MHDFloat Pm = this->eqParams().nd(NonDimensional::MAGPRANDTL);
-
       ///
       /// Compute \f$\vec u\wedge\left(\nabla\wedge\vec u\right) + \left(\nabla\wedge\vec B\right)\wedge\vec B\f$
       ///
@@ -82,27 +79,35 @@ namespace Equations {
       {
          case(FieldComponents::Physical::R):
             Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
             break;
          case(FieldComponents::Physical::THETA):
             Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
+            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
             break;
          case(FieldComponents::Physical::PHI):
             Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
             break;
          default:
             assert(false);
             break;
       }
 
+      ///
+      /// Compute Coriolis + Precession term
+      ///
+      MHDFloat Po = this->eqParams().nd(NonDimensional::POINCARE);
+      MHDFloat alpha = (this->eqParams().nd(NonDimensional::ALPHA)*Math::PI/180.);
       #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
-         ///
-         /// Compute Coriolis term
-         ///
-         Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T*Pm);
+         MHDFloat corC = 1.0;
+      #elif defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+         MHDFloat corC = 0.0;
       #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
+      Physical::SphericalPrecession::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, corC, Po, 2.0);
+
+      /// Compute Poincare term
+      Physical::SphericalPoincare::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mR, this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, Po);
    }
 
    void BoussinesqPrecessionRTCDynamoSphereMomentum::setRequirements()

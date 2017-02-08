@@ -69,17 +69,21 @@ namespace Equations {
           */
          virtual void setNLComponents();
 
-         /**
-          * @brief Storage for the cos(theta) grid values (if required)
-          */
-         Array mCosTheta;
-
-         /**
-          * @brief Storage for the sin(theta) grid values (if required)
-          */
-         Array mSinTheta;
-
       private:
+         /**
+          * @brief Storage for the r grid values
+          */
+         Array mR;
+
+         /**
+          * @brief Storage for the theta grid values
+          */
+         Array mTheta;
+
+         /**
+          * @brief Storage for the phi grid values
+          */
+         Array mPhi;
    };
 
 }
