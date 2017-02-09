@@ -35,7 +35,7 @@ namespace IoVariable{
 	 * @brief Constructor
 	 */
 	ShellTorPolTracerWriter::ShellTorPolTracerWriter(const std::string& prefix, const std::string& type, const Matrix& Points)
-		:IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix+EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorTracer(Points.rows()), mPolTracer(Points.rows()), mPoints(Points)
+		:IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix+EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mRpart(Points.rows()), mThetapart(Points.rows()), mPhipart(Points.rows()), mPoints(Points)
 	{
 
 	}
@@ -59,7 +59,6 @@ namespace IoVariable{
 
 		// initialize the Python wrapper
 		PythonWrapper::init();
-		PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 
 
 		// prepare arguments for the linear_2x call
@@ -71,12 +70,12 @@ namespace IoVariable{
 		PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second));
 		PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second));
 
-		// function call linear_2x
+		// import python module shell_radius and function call linear_r2x
+		PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 		PythonWrapper::setFunction("linear_r2x");
 		pValue = PythonWrapper::callFunction(pTmp);
-		MHDFloat a =PyFloat_AsDouble(PyTuple_GetItem(pValue,0));
-		MHDFloat b =PyFloat_AsDouble(PyTuple_GetItem(pValue,1));
-		Py_DECREF(pTmp);
+		//MHDFloat a =PyFloat_AsDouble(PyTuple_GetItem(pValue,0));
+		//MHDFloat b =PyFloat_AsDouble(PyTuple_GetItem(pValue,1));
 
 		// store arguments and prepare for the proj_radial function call
 		PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue,0));
@@ -84,42 +83,52 @@ namespace IoVariable{
 		int nR = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 		PyTuple_SetItem(pArgs,0,PyLong_FromLong(nR));
 
-		// TODO: decide how the argument r positions is passed
+		// prepare the mPoints[:,0] argument for python
 		Array xRadial = mPoints.col(0);
 		int m = xRadial.size();
 
-		//pTmp = PyArray_SimpleNewFromData(1, &m, NPY_DOUBLE, ((void*) xRadial.data()));
+		// prepare the list to pass
 		pTmp = PyList_New(m);
 		for(int i=0; i<m; ++i){
 			PyList_SetItem(pTmp, i, PyFloat_FromDouble(xRadial(i)));
 		}
 		PyTuple_SetItem(pArgs,3,pTmp);
+		//PyObject* pTmp2 =
+
+		// load module quicc.projection.shell
+		PythonWrapper::import("quicc.projection.shell");
 
 		// function call proj_radial
-
-		PythonWrapper::import("quicc.projection.shell");
 		PythonWrapper::setFunction("proj_radial");
 		pValue = PythonWrapper::callFunction(pArgs);
 
-		// Fill matrix and cleanup
-		mProjMat = Matrix(m,nR);
+		// Fill matrix mProjMat and cleanup
+		this->mProjMat = Matrix(m,nR);
 		PythonWrapper::getMatrix(mProjMat, pValue);
-		Py_DECREF(pValue);
+		//Py_DECREF(pValue);
 
-		std::cout << mProjMat << std::endl;
-
-		// function call for the dT_dr and cleanup
+		//Py_INCREF(pArgs);
+		// function call for the dT_dr part (proj_dradial_dr)
 		PythonWrapper::setFunction("proj_dradial_dr");
 		pValue = PythonWrapper::callFunction(pArgs);
-		mProjDrMat = Matrix(m,nR);
+
+		// Fill mProjDrMat and cleanup
+		this->mProjDrMat = Matrix(m,nR);
 		PythonWrapper::getMatrix(mProjDrMat,pValue);
-		Py_DECREF(pValue);
-		std::cout << mProjDrMat << std::endl;
+		//Py_DECREF(pValue);
+
+		//Py_INCREF(pArgs);
+		// function call for the T/r part (proj_radial_r)
+		PythonWrapper::setFunction("proj_radial_r");
+		pValue = PythonWrapper::callFunction(pArgs);
+
+		// fill matrix mProjInvrMat and cleanup
+		this->mProjInvrMat = Matrix(m, nR);
+		PythonWrapper::getMatrix(mProjInvrMat, pValue);
+		//Py_DECREF(pValue);
 
 		// create PyObjects for the 2 vectors theta and phi
 		PyObject *vPhi, *vTheta;
-		//vTheta = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(1).data());
-		//vPhi = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(2).data());
 		vPhi = PyList_New(m);
 		vTheta = PyList_New(m);
 		for(int i = 0; i<m; ++i){
@@ -128,14 +137,74 @@ namespace IoVariable{
 
 		}
 
-		//
+		// load quicc.projection spherical and prepare the eipm function call
 		PythonWrapper::import("quicc.projection.spherical");
+
+		// prepare the temporary container Mparts
+		ArrayZMap Mparts = ArrayZMap();
+
+		// precompute the exponential aximuthal part of Y_l^m and friends
+		#ifdef QUICC_SPATIALSCHEME_SLFM
+		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
+			// k  is the index to the degree m
+			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+
+			for(int j=0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j){
+
+				// j index is the l order
+				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+				// prepare the call of eimp
+				pArgs = PyTuple_New(3);
+				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+				PyTuple_SetItem(pArgs,2, vPhi);
+
+				// set the function to eimp
+				pValue = PythonWrapper::callFunction(pArgs);
+
+				// retrieve the result
+				ArrayZ eimp;
+				PythonWrapper::getVector(eimp,pValue);
+				Mparts[std::make_pair(l,m)] = eimp;
+			}
+		}
+		#endif // GEOMHDISCC_SPATIALSCHEME_SLFM
+		#ifdef QUICC_SPATIALSCHEME_SLFL
+		for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
+			// j  is the index to the order l
+			int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(j);
+
+			for(int k=0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(j); ++k){
+
+				// k index is the m degree
+				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(k, j);
+
+				// prepare the call of eimp
+				pArgs = PyTuple_New(3);
+				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+				PyTuple_SetItem(pArgs,2, vPhi);
+
+				// set the function to eimp
+				pValue = PythonWrapper::callFunction(pArgs);
+
+				// retrieve the result
+				ArrayZ eimp;
+				PythonWrapper::getVector(eimp,pValue);
+				Mparts[std::make_pair(l,m)] = eimp;
+			}
+		}
+		#endif //QUICC_SPATIALSCHEME_SLFL
+
+
+
 		PythonWrapper::setFunction("lplm");
 
 		// set up the containers for the computed vectors
-		Lparts = ArrayMap();
+		YlmParts = ArrayZMap();
 
-		// precompute the assoc_legendre part of the projector
+		// precompute the Ylm of the projector
 		#ifdef QUICC_SPATIALSCHEME_SLFM
 		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
 			// k  is the index to the degree m
@@ -158,11 +227,13 @@ namespace IoVariable{
 				// retrieve the result
 				Array lplm;
 				PythonWrapper::getVector(lplm,pValue);
-				Lparts[std::make_pair(l,m)] = lplm;
+
+				// set the Ylm
+				YlmParts[std::make_pair(l,m)] = lplm*Mparts[std::make_pair(l,m)];
 
 			}
 		}
-		#endif // GEOMHDISCC_SPATIALSCHEME_SLFM
+		#endif // QUICC_SPATIALSCHEME_SLFM
 		#ifdef QUICC_SPATIALSCHEME_SLFL
 		for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
 			// j  is the index to the order l
@@ -185,71 +256,144 @@ namespace IoVariable{
 				// retrieve the result
 				Array lplm;
 				PythonWrapper::getVector(lplm,pValue);
-				Lparts[std::make_pair(l,m)] = lplm;
+
+				// set the Ylm
+				YlmParts[std::make_pair(l,m)] = lplm*Mparts[std::make_pair(l,m)];
 
 			}
 		}
 		#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
+		PythonWrapper::setFunction("dplm");
 
-		PythonWrapper::setFunction("eipm");
+		// set up the containers for the computed vectors
+		dYlmdthParts = ArrayZMap();
 
-		// set up the containers for the computed vector
-		Mparts = ArrayZMap();
+		// precompute the d Ylm d theta part of the projector
+		#ifdef QUICC_SPATIALSCHEME_SLFM
+		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
+			// k  is the index to the degree m
+			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
 
-		// precompute the assoc_legendre part of the projector
-			#ifdef QUICC_SPATIALSCHEME_SLFM
-			for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
-				// k  is the index to the degree m
-				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+			for(int j=0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j){
 
-				for(int j=0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j){
+				// j index is the l order
+				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-					// j index is the l order
-					int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+				// prepare the call of lplm
+				pArgs = PyTuple_New(3);
+				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+				PyTuple_SetItem(pArgs,2,vTheta);
 
-					// prepare the call of eimp
+				// set the function to lplm
+				pValue = PythonWrapper::callFunction(pArgs);
+
+				// retrieve the result
+				Array dplm;
+				PythonWrapper::getVector(dplm,pValue);
+
+				// set the dYlm /d theta
+				dYlmdthParts[std::make_pair(l,m)] = dplm*Mparts[std::make_pair(l,m)];
+
+			}
+		}
+		#endif // QUICC_SPATIALSCHEME_SLFM
+		#ifdef QUICC_SPATIALSCHEME_SLFL
+		for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
+			// j  is the index to the order l
+			int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(j);
+
+			for(int k=0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(j); ++k){
+
+				// k index is the m degree
+				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(k, j);
+
+					// prepare the call of lplm
 					pArgs = PyTuple_New(3);
 					PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
 					PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
-					PyTuple_SetItem(pArgs,2, vPhi);
+					PyTuple_SetItem(pArgs,2,vTheta);
 
-					// set the function to eimp
+					// set the function to lplm
 					pValue = PythonWrapper::callFunction(pArgs);
 
 					// retrieve the result
-					ArrayZ eimp;
-					PythonWrapper::getVector(eimp,pValue);
-					Mparts[std::make_pair(l,m)] = eimp;
-				}
+					Array dplm;
+					PythonWrapper::getVector(dplm,pValue);
+
+					// set the dYlm /d theta
+					dYlmdthParts[std::make_pair(l,m)] = dplm*Mparts[std::make_pair(l,m)];
+
 			}
-			#endif // GEOMHDISCC_SPATIALSCHEME_SLFM
-			#ifdef QUICC_SPATIALSCHEME_SLFL
-			for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
-				// j  is the index to the order l
-				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(j);
+		}
+		#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
-				for(int k=0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(j); ++k){
+		PythonWrapper::setFunction("lplm_sin");
 
-					// k index is the m degree
-					int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(k, j);
+		// set up the containers for the computed vectors
+		YlmIsinParts = ArrayZMap();
 
-					// prepare the call of eimp
-					pArgs = PyTuple_New(3);
-					PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
-					PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
-					PyTuple_SetItem(pArgs,2, vPhi);
+		// precompute the d Ylm d theta part of the projector
+		#ifdef QUICC_SPATIALSCHEME_SLFM
+		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
+			// k  is the index to the degree m
+			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
 
-					// set the function to eimp
-					pValue = PythonWrapper::callFunction(pArgs);
+			for(int j=0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j){
 
-					// retrieve the result
-					ArrayZ eimp;
-					PythonWrapper::getVector(eimp,pValue);
-					Mparts[std::make_pair(l,m)] = eimp;
-				}
+				// j index is the l order
+				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+				// prepare the call of lplm
+				pArgs = PyTuple_New(3);
+				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+				PyTuple_SetItem(pArgs,2,vTheta);
+
+				// set the function to lplm
+				pValue = PythonWrapper::callFunction(pArgs);
+
+				// retrieve the result
+				Array lplm_sin;
+				PythonWrapper::getVector(lplm_sin,pValue);
+
+				// set the dYlm /d theta
+				YlmIsinParts[std::make_pair(l,m)] = lplm_sin*Mparts[std::make_pair(l,m)]*m*1i;
+
 			}
-			#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+		}
+		#endif // QUICC_SPATIALSCHEME_SLFM
+		#ifdef QUICC_SPATIALSCHEME_SLFL
+		for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
+			// j  is the index to the order l
+			int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(j);
+
+			for(int k=0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(j); ++k){
+
+				// k index is the m degree
+				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(k, j);
+
+				// prepare the call of lplm
+				pArgs = PyTuple_New(3);
+				PyTuple_SetItem(pArgs,0,PyLong_FromLong(l));
+				PyTuple_SetItem(pArgs,1,PyLong_FromLong(m));
+				PyTuple_SetItem(pArgs,2,vTheta);
+
+				// set the function to lplm
+				pValue = PythonWrapper::callFunction(pArgs);
+
+				// retrieve the result
+				Array lplm_sin;
+				PythonWrapper::getVector(lplm_sin,pValue);
+
+				// set the dYlm /d theta
+				YlmIsinParts[std::make_pair(l,m)] = lplm_sin*Mparts[std::make_pair(l,m)]*m*1i;
+
+			}
+		}
+		#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+
 
 
 
@@ -271,7 +415,9 @@ namespace IoVariable{
 		assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
 		// Initialize the probes to zero
-		this->mPolTracer.setZero();
+		this->mRpart.setZero();
+		this->mThetapart.setZero();
+		this->mPhipart.setZero();
 
 		Array tempPolTraces(this->mPoints.rows());
 		#ifdef  QUICC_SPATIALSCHEME_SLFM
@@ -286,9 +432,17 @@ namespace IoVariable{
 				// j index is the l order
 				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-				ArrayZ temp = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*Mparts[std::make_pair(l,m)].array();
-				Array temp2 = (temp.real().array()*Lparts[std::make_pair(l,m)].array()*factor*l*(l+1));
-				this->mPolTracer += temp2 ;
+				// compute R component from poloidal part
+				ArrayZ tempR = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*YlmParts[std::make_pair(l,m)].array();
+				this->mRpart += tempR.real()*factor*l*(l+1));
+
+				ArrayZ tempPol = this->mProjDrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k);
+				ArrayZ tempTor = this->mProjInvrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(j).col(k);
+
+				this->mThetapart += (tempPol.array()*dYlmdthParts[std:::make_pair(l,m)].array()+tempTor.array()*YlmIsinParts[std::make_pair(l,m)].array()).real()*factor;
+
+				this->mPhipart += (tempPol.array()*YlmIsinParts[std::make_pair(l,m)].array() - tempTor.array()*dYlmdthParts[std::make_pair(l,m)].array()).real()*factor;
+
 			}
 		}
 		#endif //GEOMHDISCC_SPATIALSCHEME_SLFM
@@ -304,12 +458,18 @@ namespace IoVariable{
 
 				double factor = (m==0) ? 1.0 : 2.0;
 
+				// compute R component from poloidal part
+				ArrayZ tempR = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*YlmParts[std::make_pair(l,m)].array();
+				this->mRpart += tempR.real()*factor*l*(l+1);
 
-				ArrayZ temp = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*Mparts[std::make_pair(l,m)].array();
-				Array temp2 = (temp.real().array()*Lparts[std::make_pair(l,m)].array()*factor*l*(l+1));
-				this->mPolTracer += temp2 ;
+				ArrayZ tempPol = this->mProjDrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k);
+				ArrayZ tempTor = this->mProjInvrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(j).col(k);
 
+				Array temp1 = (tempPol.array()*dYlmdthParts[std::make_pair(l,m)].array()+tempTor.array()*YlmIsinParts[std::make_pair(l,m)].array()).real();
+				this->mThetapart += temp1*factor;
 
+				Array temp2 = (tempPol.array()*YlmIsinParts[std::make_pair(l,m)].array() - tempTor.array()*dYlmdthParts[std::make_pair(l,m)].array()).real();
+				this->mPhipart += temp2*factor;
 
 			}
 		}
@@ -326,15 +486,16 @@ namespace IoVariable{
 		this->preWrite();
 
 		// get global values from MPI code
-#ifdef GEOMHDISCC_MPI
-		Array tracer = this ->mPolTracer;
+		#ifdef GEOMHDISCC_MPI
+
+		Array tracer = this ->mRpart;
 		MPI_Allreduce(MPI_IN_PLACE, tracer.data(), 2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		this->mPolTracer = tracer;
-#endif // GEOMHDISCC_MPI
+		#endif // GEOMHDISCC_MPI
 
 		// Check is the workflow allows IO to be performed
 		if(FrameworkMacro::allowsIO()){
-			this ->mFile << std::setprecision(14) << this->mTime << '\t' << this->mPolTracer.transpose() << std::endl;
+			this ->mFile << std::setprecision(14) << this->mTime << '\t' << this->mRpart.transpose() << std::endl;
 		}
 
 		// Close file

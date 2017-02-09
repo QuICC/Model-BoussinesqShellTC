@@ -84,7 +84,11 @@ namespace IoVariable{
 		/*
 		 * @brief Vector that stores the projection of the Poloidal field
 		 */
-		Array mPolTracer;
+		Array mRpart;
+
+		Array mThetapart;
+
+		Array mPhipart;
 
 		// TODO: are other fields that we need?
 		// TODO: mPoints (given at constructor time?),
@@ -95,26 +99,40 @@ namespace IoVariable{
 		Matrix mPoints;
 
 		/*
-		 * @brief Precomputed M part of the spherical harmonic
+		 * @brief types for storing precomputed Y_l^m
 		 */
-		typedef std::map<std::pair<int,int>,Array> ArrayMap;
+		//typedef std::map<std::pair<int,int>,Array> ArrayMap;
 		typedef std::map<std::pair<int,int>,ArrayZ> ArrayZMap;
-		ArrayZMap Mparts;
 
 		/*
-		 * @brief Precomputed L part of the spherical harmonic
+		 * @brief Precomputed Y_l^m
 		 */
-		ArrayMap Lparts;
+		ArrayZMap YlmParts;
 
 		/*
-		 * @brief
+		 * @brief Precomputed dY_l^m/d\theta
+		 */
+		ArrayZMap  dYlmdthParts;
+
+		/*
+		 * @brief Precomputed  dY_l^m/d\phi *1 /sin\theta
+		 */
+		ArrayZMap YlmIsinParts;
+
+		/*
+		 * @brief first matrix, precomputed spectral->physical of T__n(r)/r**2
 		 */
 		Matrix mProjMat;
 
 		/*
-		 * @brief
+		 * @brief 2nd matrix, precomputed, spectral->physical of \frac{\partial T_n(r)}{\partial r} /r
 		 */
 		Matrix mProjDrMat;
+
+		/*
+		 * @brief third matrix, precomputed spectral->physical of T_n(r)/r
+		 */
+		Matrix mProjInvrMat;
 
 		/*
 		 * If we decide that we need current Tracers as well
