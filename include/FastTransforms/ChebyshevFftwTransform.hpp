@@ -67,9 +67,9 @@ namespace Transform {
          // INTGI4: Chebyshev integrator with i4
          // INTGI2D1: Chebyshev integrator with i2d1
          // INTGI4D1: Chebyshev integrator with i4d1
-         // INTGI2D1MI2: Chebyshev integrator with i2d1 and i2 for mean
          // INTGI4D1MI2: Chebyshev integrator with i4d1 and i2 for mean
-         enum Id {INTG, INTGI2, INTGI4, INTGI2D1, INTGI4D1, INTGI2D1MI2, INTGI4D1MI2};
+         // INTGI2MI2D1: Chebyshev integrator with i2 and i2d1 for mean
+         enum Id {INTG, INTGI2, INTGI4, INTGI2D1, INTGI4D1, INTGI4D1MI2, INTGI2MI2D1};
       };
 
    };
