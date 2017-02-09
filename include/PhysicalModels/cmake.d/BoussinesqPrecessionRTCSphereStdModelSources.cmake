@@ -13,4 +13,5 @@ set(MHDModelSources
    ${QUICC_SRC_DIR}/Generator/States/SphereExactVectorState.cpp
    ${QUICC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
    ${QUICC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+   ${QUICC_SRC_DIR}/Generator/Visualizers/SphericalVerticalFieldVisualizer.cpp
 )

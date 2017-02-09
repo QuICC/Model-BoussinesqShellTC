@@ -35,6 +35,7 @@
 #include "Generator/States/SphereExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
+#include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace QuICC {
@@ -159,6 +160,7 @@ namespace QuICC {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
       Equations::SharedVectorFieldVisualizer spVector;
+      Equations::SharedSphericalVerticalFieldVisualizer spVertical;
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
@@ -167,13 +169,25 @@ namespace QuICC {
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, true);
+      spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
+
+      // Add vertical velocity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::VECTOR);
+      spVertical->setIdentity(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITY);
+
+      // Add vertical vorticity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::CURL);
+      spVertical->setIdentity(PhysicalNames::VORTICITYZ, PhysicalNames::VELOCITY);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 

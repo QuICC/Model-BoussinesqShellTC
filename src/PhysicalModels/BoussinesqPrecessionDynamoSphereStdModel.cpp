@@ -31,6 +31,7 @@
 #include "Generator/States/SphereExactStateIds.hpp"
 #include "Generator/States/SphereExactVectorState.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
+#include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace QuICC {
@@ -172,20 +173,33 @@ namespace QuICC {
    {
       // Shared pointer to basic field visualizer
       Equations::SharedVectorFieldVisualizer spVector;
+      Equations::SharedSphericalVerticalFieldVisualizer spVertical;
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, true);
+      spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
+
+      // Add vertical velocity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::VECTOR);
+      spVertical->setIdentity(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITY);
+
+      // Add vertical vorticity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::CURL);
+      spVertical->setIdentity(PhysicalNames::VORTICITYZ, PhysicalNames::VELOCITY);
 
       // Add magnetic field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, true);
+      spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::MAGNETIC);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VORTICITYZ);
       spOut->expect(PhysicalNames::MAGNETIC);
       spVis->addHdf5OutputFile(spOut);
    }
