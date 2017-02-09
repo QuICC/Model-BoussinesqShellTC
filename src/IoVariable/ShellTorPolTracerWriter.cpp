@@ -25,6 +25,7 @@
 #include"IoVariable/EnergyTags.hpp"
 #include"TypeSelectors/ScalarSelector.hpp"
 #include"Python/PythonWrapper.hpp"
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/ndarrayobject.h>
 #include <iostream>
 
@@ -77,6 +78,7 @@ namespace IoVariable{
 		pValue = PythonWrapper::callFunction(pTmp);
 		MHDFloat a =PyFloat_AsDouble(PyTuple_GetItem(pValue,0));
 		MHDFloat b =PyFloat_AsDouble(PyTuple_GetItem(pValue,1));
+		Py_DECREF(pTmp);
 
 		// store arguments and prepare for the proj_radial function call
 		PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue,0));
@@ -86,9 +88,13 @@ namespace IoVariable{
 
 		// TODO: decide how the argument r positions is passed
 		Array xRadial = mPoints.col(0);
-		long int m = xRadial.size();
+		int m = xRadial.size();
 
-		pTmp = PyArray_SimpleNewFromData(1, &m, NPY_DOUBLE, (void*)xRadial.data());
+		//pTmp = PyArray_SimpleNewFromData(1, &m, NPY_DOUBLE, ((void*) xRadial.data()));
+		pTmp = PyList_New(m);
+		for(int i=0; i<m; ++i){
+			PyList_SetItem(pTmp, i, PyFloat_FromDouble(xRadial(i)));
+		}
 		PyTuple_SetItem(pArgs,3,pTmp);
 
 		// function call proj_radial
@@ -102,16 +108,27 @@ namespace IoVariable{
 		PythonWrapper::getMatrix(mProjMat, pValue);
 		Py_DECREF(pValue);
 
+		std::cout << mProjMat << std::endl;
+
 		// function call for the dT_dr and cleanup
 		PythonWrapper::setFunction("proj_dradial_dr");
 		pValue = PythonWrapper::callFunction(pArgs);
 		mProjDrMat = Matrix(m,nR);
 		PythonWrapper::getMatrix(mProjDrMat,pValue);
+		Py_DECREF(pValue);
+		std::cout << mProjDrMat << std::endl;
 
 		// create PyObjects for the 2 vectors theta and phi
 		PyObject *vPhi, *vTheta;
-		vTheta = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(1).data());
-		vPhi = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(2).data());
+		//vTheta = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(1).data());
+		//vPhi = PyArray_SimpleNewFromData(1,&m,NPY_FLOAT64,mPoints.col(2).data());
+		vPhi = PyList_New(m);
+		vTheta = PyList_New(m);
+		for(int i = 0; i<m; ++i){
+			PyList_SetItem(vTheta,i,  PyFloat_FromDouble(mPoints.col(1)(i)));
+			PyList_SetItem(vPhi,i,  PyFloat_FromDouble(mPoints.col(2)(i)));
+
+		}
 
 		//
 		PythonWrapper::import("quicc.projection.spherical");
@@ -252,12 +269,14 @@ namespace IoVariable{
 		vector_iterator vIt;
 		vector_iterator_range vRange = this->vectorRange();
 		assert(std::distance(vRange.first,vRange.second)==1);
-		assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::POL);
+		assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::TOR);
+		assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
 		// Initialize the probes to zero
-		this->mPolTracer *= 0.0;
+		this->mPolTracer.setZero();
 
-		#ifdef  GEOMHDISCC_SPATIALSCHEME_SLFM
+		Array tempPolTraces(this->mPoints.rows());
+		#ifdef  QUICC_SPATIALSCHEME_SLFM
 		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
 			// k  is the index to the degree m
 			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
@@ -269,14 +288,13 @@ namespace IoVariable{
 				// j index is the l order
 				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-				ArrayZ temp = this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(k).col(j);
-
-				this->mPolTracer += (this->Lparts[std::make_pair(l,m)].array()*this->Mparts[std::make_pair(l,m)].array()*temp.array()).real()*factor*l*(l+1);
-
+				ArrayZ temp = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*Mparts[std::make_pair(l,m)].array();
+				Array temp2 = (temp.real().array()*Lparts[std::make_pair(l,m)].array()*factor*l*(l+1));
+				this->mPolTracer += temp2 ;
 			}
 		}
 		#endif //GEOMHDISCC_SPATIALSCHEME_SLFM
-		#ifdef  GEOMHDISCC_SPATIALSCHEME_SLFL
+		#ifdef  QUICC_SPATIALSCHEME_SLFL
 		for( int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++j){
 			// j  is the index to the order l
 			int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(j);
@@ -288,9 +306,10 @@ namespace IoVariable{
 
 				double factor = (m==0) ? 1.0 : 2.0;
 
-				ArrayZ temp = this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k);
 
-				this->mPolTracer += (this->Lparts[std::make_pair(l,m)].array()*this->Mparts[std::make_pair(l,m)].array()*temp.array()).real()*factor*l*(l+1);
+				ArrayZ temp = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*Mparts[std::make_pair(l,m)].array();
+				Array temp2 = (temp.real().array()*Lparts[std::make_pair(l,m)].array()*factor*l*(l+1));
+				this->mPolTracer += temp2 ;
 
 
 

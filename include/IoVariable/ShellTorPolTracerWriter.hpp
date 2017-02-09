@@ -79,7 +79,6 @@ namespace IoVariable{
 		/*
 		 * @brief Vector that stores the projection of the Toroidal field
 		 */
-		// TODO: find out what's the default type for tensors of first order aka std::vector<double>
 		Array mTorTracer;
 
 		/*

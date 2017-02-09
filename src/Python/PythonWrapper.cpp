@@ -327,7 +327,8 @@ namespace QuICC {
 
 	   // resize the matrix to correct size and assign the pointer
 	   // note that that numpy default storage is RowMajor whereas Eigen 3.3.1 is ColumnMajor
-	   rMatrix = Eigen::Map<Eigen::Matrix<MHDFloat,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> >((double*)PyArray_DATA(pMat),dims[0],dims[1]);
+	   //rMatrix = Eigen::Map<Eigen::Matrix<MHDFloat,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> >((double*)PyArray_DATA(pMat),dims[0],dims[1]);
+	   rMatrix = Eigen::Map<Matrix>((double*)PyArray_DATA(pMat),dims[0],dims[1]);
 
    }
 
