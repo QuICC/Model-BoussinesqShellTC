@@ -65,15 +65,15 @@ namespace Equations {
       {
          case(FieldComponents::Physical::X):
             Physical::Cross<FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::Y,FieldComponents::Physical::Z>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 0*T*Pm);
+            Physical::Cross<FieldComponents::Physical::Y,FieldComponents::Physical::Z>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
             break;
          case(FieldComponents::Physical::Y):
             Physical::Cross<FieldComponents::Physical::Z,FieldComponents::Physical::X>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::Z,FieldComponents::Physical::X>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 0*T*Pm);
+            Physical::Cross<FieldComponents::Physical::Z,FieldComponents::Physical::X>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
             break;
          case(FieldComponents::Physical::Z):
             Physical::Cross<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::X,FieldComponents::Physical::Y>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 0*T*Pm);
+            Physical::Cross<FieldComponents::Physical::X,FieldComponents::Physical::Y>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
             break;
          default:
             assert(false);
