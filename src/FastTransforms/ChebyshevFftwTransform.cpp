@@ -402,16 +402,16 @@ namespace Transform {
       {
          rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
-      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2D1MI2)
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2MI2D1)
       {
          // Mean has different operator
          if(this->mspSetup->idBlocks().size() > 0)
          {
-            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
-            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
          } else
          {
-            rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+            rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
          }
 
       } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI4D1MI2)
@@ -442,16 +442,16 @@ namespace Transform {
       {
          rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
-      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2D1MI2)
+      } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI2MI2D1)
       {
          // Mean has different operator
          if(this->mspSetup->idBlocks().size() > 0)
          {
-            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
-            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
+            rChebVal.block(0, 0, this->mspSetup->specSize(), 1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.col(0);
+            rChebVal.block(0, 1, this->mspSetup->specSize(), rChebVal.cols()-1).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut.rightCols(rChebVal.cols()-1);
          } else
          {
-            rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2D1)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+            rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(ChebyshevFftwTransform::IntegratorType::INTGI2)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
          }
 
       } else if(integrator == ChebyshevFftwTransform::IntegratorType::INTGI4D1MI2)

@@ -22,6 +22,7 @@ set(MHDPhysicalModels
    BoussinesqRRBCPlaneModel.hpp
    BoussinesqRRBCPlaneMeanModel.hpp
    BoussinesqRRBCPlaneDMeanModel.hpp
+   BoussinesqDynamoPlaneModel.hpp
    #BoussinesqRRBCPlaneVCModel.hpp
    #BoussinesqRRBCBoxVCModel.hpp
    #BoussinesqRRBCAnnulusVCModel.hpp

@@ -94,6 +94,8 @@ def apply_tau(mat, bc, pad_zeros = 0, location = 't'):
         cond = tau_valuediff(mat.shape[1], 0, bc)
     elif bc[0] == 23:
         cond = tau_diff2(mat.shape[1], 0, bc)
+    elif bc[0] == 24:
+        cond = tau_insulating(mat.shape[1], 0, bc)
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc)
     elif bc[0] == 41:
@@ -185,6 +187,37 @@ def tau_diff2(nx, pos, bc):
 
     if pos <= 0:
         cond.append((c/3.0)*(ns**4 - ns**2)*alt_ones(nx, 1))
+
+    if bc.get('use_parity', True) and pos == 0:
+        t = cond[0].copy()
+        cond[0] = (cond[0] + cond[1])/2.0
+        cond[1] = (t - cond[1])/2.0
+
+    return np.array(cond)
+
+def tau_insulating(nx, pos, bc):
+    """Create the tau line(s) for a insulating boundary"""
+
+    k_perp = bc['k_perp']
+    it = coeff_iterator(bc.get('c',None), pos)
+
+    cond = []
+    c = next(it)*tau_c()
+    ns = np.arange(0,nx)
+    if pos >= 0:
+        # D + a P 
+        cnst = k_perp*c*tau_c()
+        cond.append(cnst*np.ones(nx))
+        cond[-1][0] /= tau_c()
+        cond[-1] += c*ns**2
+        c = next(it)*tau_c()
+
+    if pos <= 0:
+        # D - a P 
+        cnst = -k_perp*c*tau_c()
+        cond.append(cnst*alt_ones(nx, 1))
+        cond[-1][0] /= tau_c()
+        cond[-1] += c*ns**2*alt_ones(nx, 0)
 
     if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
