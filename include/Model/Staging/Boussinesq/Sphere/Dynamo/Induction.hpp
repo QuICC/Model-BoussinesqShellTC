@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamoSphereInduction.hpp
+ * @file Induction.hpp
  * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMOSPHEREINDUCTION_HPP
-#define BOUSSINESQDYNAMOSPHEREINDUCTION_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SPHERE_DYNAMO_INDUCTION_HPP
+#define QUICC_MODEL_BOUSSINESQ_SPHERE_DYNAMO_INDUCTION_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Sphere {
+
+namespace Dynamo {
+
    /**
     * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo in a sphere
     */
-   class BoussinesqDynamoSphereInduction: public IVectorEquation
+   class Induction: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqDynamoSphereInduction(SharedEquationParameters spEqParams);
+         Induction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamoSphereInduction();
+         virtual ~Induction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -74,5 +80,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMOSPHEREINDUCTION_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SPHERE_DYNAMO_INDUCTION_HPP

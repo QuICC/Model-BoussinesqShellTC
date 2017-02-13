@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
+
 // Configuration includes
 //
 
@@ -15,17 +19,17 @@
 
 // Class include
 //
-#include "PhysicalModels/PhysicalModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/TCStd/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/TC/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/TC/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Sphere/Boussinesq/BoussinesqTCSphereTransport.hpp"
-#include "Equations/Sphere/Boussinesq/BoussinesqTCSphereMomentum.hpp"
 #include "IoVariable/SphereScalarEnergyWriter.hpp"
 #include "IoVariable/SphereTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -35,9 +39,17 @@
 #include "Generator/States/SphereExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
+
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Sphere {
+
+namespace TCStd {
 
    const std::string PhysicalModel::PYMODULE = "boussinesq_tcsphere_std";
 
@@ -46,10 +58,10 @@ namespace QuICC {
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqTCSphereTransport>();
-      
-      // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqTCSphereMomentum>();
+      spSim->addScalarEquation<Equations::Boussinesq::Sphere::TC::Transport>();
+                                                              
+      // Add Navier-Stokes equation                           
+      spSim->addVectorEquation<Equations::Boussinesq::Sphere::TC::Momentum>();
    }
 
    void PhysicalModel::addStates(SharedStateGenerator spGen)
@@ -229,4 +241,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

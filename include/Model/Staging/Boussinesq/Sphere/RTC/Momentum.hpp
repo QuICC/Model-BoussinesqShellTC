@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRTCSphereMomentum.hpp
+ * @file Momentum.hpp
  * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRTCSPHEREMOMENTUM_HPP
-#define BOUSSINESQRTCSPHEREMOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SPHERE_RTC_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SPHERE_RTC_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Sphere {
+
+namespace RTC {
+
    /**
     * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection in a sphere
     */
-   class BoussinesqRTCSphereMomentum: public IVectorEquation
+   class Momentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqRTCSphereMomentum(SharedEquationParameters spEqParams);
+         Momentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRTCSphereMomentum();
+         virtual ~Momentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -84,5 +90,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQRTCSPHEREMOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SPHERE_RTC_MOMENTUM_HPP

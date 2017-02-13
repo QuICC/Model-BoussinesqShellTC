@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamoSphereInduction.cpp
+ * @file Induction.cpp
  * @brief Source of the implementation of the vector induction equation in the Boussinesq thermal convection dynamo in a sphere model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Sphere/Boussinesq/BoussinesqDynamoSphereInduction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/Dynamo/Induction.hpp )
 
 // Project includes
 //
@@ -28,18 +32,24 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamoSphereInduction::BoussinesqDynamoSphereInduction(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Sphere {
+
+namespace Dynamo {
+
+   Induction::Induction(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamoSphereInduction::~BoussinesqDynamoSphereInduction()
+   Induction::~Induction()
    {
    }
 
-   void BoussinesqDynamoSphereInduction::setCoupling()
+   void Induction::setCoupling()
    {
       #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          int start = 1;
@@ -52,14 +62,14 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
    }
 
-   void BoussinesqDynamoSphereInduction::setNLComponents()
+   void Induction::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::POL,0);
 
       this->addNLComponent(FieldComponents::Spectral::TOR,1);
    }
 
-   void BoussinesqDynamoSphereInduction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void Induction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       ///
       /// Compute \f$\left(\vec u\wedge\vec B\right)\f$
@@ -81,7 +91,7 @@ namespace Equations {
       }
    }
 
-   void BoussinesqDynamoSphereInduction::setRequirements()
+   void Induction::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::MAGNETIC);
@@ -96,5 +106,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, false));
    }
 
+}
+}
+}
 }
 }

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqTCSphereTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq thermal convection in a sphere
+ * @file Momentum.hpp
+ * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQTCSPHERETRANSPORT_HPP
-#define BOUSSINESQTCSPHERETRANSPORT_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,22 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Sphere {
+
+namespace TC {
+
    /**
-    * @brief Implementation of the transport equation for the Boussinesq thermal convection in a sphere 
+    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection in a sphere
     */
-   class BoussinesqTCSphereTransport: public IScalarEquation
+   class Momentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqTCSphereTransport(SharedEquationParameters spEqParams);
+         Momentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqTCSphereTransport();
+         virtual ~Momentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -64,10 +70,18 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents();
+
       private:
    };
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQTCSPHERETRANSPORT_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP

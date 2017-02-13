@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamoSphereMomentum.cpp
- * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq thermal convection dynamo in a sphere model
+ * @file Momentum.cpp
+ * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq rotating thermal convection in a sphere model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -16,7 +20,7 @@
 
 // Class include
 //
-#include "Equations/Sphere/Boussinesq/BoussinesqDynamoSphereMomentum.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/RTC/Momentum.hpp )
 
 // Project includes
 //
@@ -30,18 +34,24 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamoSphereMomentum::BoussinesqDynamoSphereMomentum(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Sphere {
+
+namespace RTC {
+
+   Momentum::Momentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamoSphereMomentum::~BoussinesqDynamoSphereMomentum()
+   Momentum::~Momentum()
    {
    }
 
-   void BoussinesqDynamoSphereMomentum::setCoupling()
+   void Momentum::setCoupling()
    {
       #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          int start = 1;
@@ -62,35 +72,28 @@ namespace Equations {
       #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
    }
 
-   void BoussinesqDynamoSphereMomentum::setNLComponents()
+   void Momentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqDynamoSphereMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
-   {
-      // Get square root of Taylor number
-      MHDFloat T = 1.0/this->eqParams().nd(NonDimensional::EKMAN);
-      MHDFloat Pm = this->eqParams().nd(NonDimensional::MAGPRANDTL);
-
+   void Momentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   {  
       ///
-      /// Compute \f$\vec u\wedge\left(\nabla\wedge\vec u\right) + \left(\nabla\wedge\vec B\right)\wedge\vec B\f$
+      /// Compute \f$\left(\nabla\wedge\vec u\right)\wedge\vec u\f$
       ///
       switch(compId)
       {
          case(FieldComponents::Physical::R):
             Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
             break;
          case(FieldComponents::Physical::THETA):
             Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
             break;
          case(FieldComponents::Physical::PHI):
             Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T*Pm);
             break;
          default:
             assert(false);
@@ -98,14 +101,17 @@ namespace Equations {
       }
 
       #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
+         // Get square root of Taylor number
+         MHDFloat T = 1.0/this->eqParams().nd(NonDimensional::EKMAN);
+
          ///
          /// Compute Coriolis term
          ///
-         Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T*Pm);
+         Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
       #endif //defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
    }
 
-   void BoussinesqDynamoSphereMomentum::setRequirements()
+   void Momentum::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -115,10 +121,10 @@ namespace Equations {
 
       // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
-
-      // Add magnetic to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
-      this->mRequirements.addField(PhysicalNames::MAGNETIC, FieldRequirement(false, true, true, false, true));
    }
 
+}
+}
+}
 }
 }

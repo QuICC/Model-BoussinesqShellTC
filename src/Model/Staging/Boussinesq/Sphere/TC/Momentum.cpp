@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqTCSphereMomentum.cpp
+ * @file Momentum.cpp
  * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq thermal convection in a sphere model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Sphere/Boussinesq/BoussinesqTCSphereMomentum.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/TC/Momentum.hpp )
 
 // Project includes
 //
@@ -28,18 +32,24 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqTCSphereMomentum::BoussinesqTCSphereMomentum(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Sphere {
+
+namespace TC {
+
+   Momentum::Momentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqTCSphereMomentum::~BoussinesqTCSphereMomentum()
+   Momentum::~Momentum()
    {
    }
 
-   void BoussinesqTCSphereMomentum::setCoupling()
+   void Momentum::setCoupling()
    {
       #if defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          int start = 1;
@@ -52,14 +62,14 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
    }
 
-   void BoussinesqTCSphereMomentum::setNLComponents()
+   void Momentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqTCSphereMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Momentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       ///
       /// Compute \f$\vec u\wedge\left(\nabla\wedge\vec u\right)\f$
@@ -81,7 +91,7 @@ namespace Equations {
       }
    }
 
-   void BoussinesqTCSphereMomentum::setRequirements()
+   void Momentum::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -93,5 +103,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
    }
 
+}
+}
+}
 }
 }
