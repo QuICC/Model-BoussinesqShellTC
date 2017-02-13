@@ -6,7 +6,7 @@
 //#include <Python.h>
 
 /// Set the path to the simulation implementation
-#define MODELPATH PhysicalModels/QUICC_RUNSIM_MODEL.hpp
+#define MODELPATH QUICC_MODEL_PATH/QUICC_RUNSIM_PATH/PhysicalModel.hpp
 /// Define small macros allowing to convert to string
 #define MAKE_STR_X( _P ) # _P
 /// Define small macros allowing to convert to string
@@ -26,7 +26,7 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "Simulation/Simulation.hpp"
-#include "PhysicalModels/ModelFactory.hpp"
+#include "Model/ModelFactory.hpp"
 #include MODELHEADER
 
 /**
@@ -43,7 +43,7 @@ int run()
    try
    {
       // Create simulation
-      spSim = QuICC::ModelFactory<QuICC::QUICC_RUNSIM_MODEL>::createSimulation();
+      spSim = QuICC::ModelFactory<QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel>::createSimulation();
    }
 
    // If exception is thrown, finalise (close files) and return

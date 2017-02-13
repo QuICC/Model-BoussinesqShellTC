@@ -1,0 +1,19 @@
+set(MHDSources
+   Bx.cpp
+   By.cpp
+   Emfx.cpp
+   Emfy.cpp
+   fbx.cpp
+   fby.cpp
+   fbz.cpp
+   MeanHeat.cpp
+   PhysicalModel.cpp
+   Pressure.cpp
+   Streamfunction.cpp
+   Transport.cpp
+   VelocityZ.cpp
+   VorticityZ.cpp
+)
+
+set(MHDSrcSubDirs
+)

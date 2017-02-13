@@ -5,7 +5,7 @@
  */
 
 /// Set the path to the simulation implementation
-#define MODELPATH PhysicalModels/QUICC_RUNSIM_MODEL.hpp
+#define MODELPATH QUICC_MODEL_PATH/QUICC_RUNSIM_PATH/PhysicalModel.hpp
 /// Define small macros allowing to convert to string
 #define MAKE_STR_X( _P ) # _P
 /// Define small macros allowing to convert to string
@@ -25,7 +25,7 @@
 //
 #include "Python/PythonModelWrapper.hpp"
 #include "Exceptions/Exception.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "IoConfig/ConfigurationWriter.hpp"
@@ -34,7 +34,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include MODELHEADER
 
-typedef QuICC::QUICC_RUNSIM_MODEL PModel;
+typedef QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel PModel;
 
 /**
  * @brief Setup and run the simulation
@@ -53,13 +53,13 @@ int run()
    QuICC::PythonModelWrapper::createModel(PModel::PYCLASS);
 
    // Box periodicity
-   std::vector<bool> isPeriodicBox = QuICC::PhysicalModelBase::isPeriodicBox();
+   std::vector<bool> isPeriodicBox = QuICC::Model::PhysicalModelBase::isPeriodicBox();
 
    // Create configuration writer
    QuICC::IoConfig::ConfigurationWriter writer(dim, isPeriodicBox, type);
 
    // Create list of field ID strings for boundary conditions
-   std::vector<QuICC::PhysicalNames::Id> fields = QuICC::PhysicalModelBase::fieldIds();
+   std::vector<QuICC::PhysicalNames::Id> fields = QuICC::Model::PhysicalModelBase::fieldIds();
    std::vector<QuICC::PhysicalNames::Id>::iterator fIt;
    std::vector<std::string>   bcNames;
    for(fIt = fields.begin(); fIt != fields.end(); ++fIt)
@@ -68,7 +68,7 @@ int run()
    }
 
    // Create list of nondimensional ID strings for physical parameters
-   std::vector<QuICC::NonDimensional::Id> params = QuICC::PhysicalModelBase::paramIds();
+   std::vector<QuICC::NonDimensional::Id> params = QuICC::Model::PhysicalModelBase::paramIds();
    std::vector<QuICC::NonDimensional::Id>::iterator pIt;
    std::vector<std::string>   ndNames;
    for(pIt = params.begin(); pIt != params.end(); ++pIt)
