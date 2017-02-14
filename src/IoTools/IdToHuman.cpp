@@ -523,6 +523,9 @@ namespace IoTools {
          case NonDimensional::MAGPRANDTL:
             return "magnetic_prandtl";
 
+         case NonDimensional::POINCARE:
+            return "poincare";
+
          case NonDimensional::PRANDTL:
             return "prandtl";
 

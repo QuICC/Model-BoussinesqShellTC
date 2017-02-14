@@ -46,6 +46,11 @@ namespace Equations {
          virtual ~VelocityStreamVisualizer();
 
          /**
+          * @brief Set the unknown name and requirements
+          */
+         void setIdentity(const PhysicalNames::Id name);
+
+         /**
           * @brief Set which fields to output
           */
          void setFields(const bool viewField, const bool viewGradient);
