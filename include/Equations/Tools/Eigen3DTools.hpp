@@ -31,7 +31,7 @@ namespace Equations {
 /**
  * @brief Tools for equations with three eigen directions
  */
-   class Eigen3DToos: public IEigenTools 
+   class Eigen3DTools: public IEigenTools 
    {
       public:
          /**

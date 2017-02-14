@@ -1,4 +1,7 @@
 set(MHDSources
+   LinearScalar.cpp
+   LinearVector.cpp
+   NonlinearScalar.cpp
 )
 
 set(MHDSrcSubDirs
