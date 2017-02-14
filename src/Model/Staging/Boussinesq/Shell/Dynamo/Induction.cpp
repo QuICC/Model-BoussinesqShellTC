@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamoShellInduction.cpp
+ * @file Induction.cpp
  * @brief Source of the implementation of the vector induction equation in the Boussinesq thermal convection dynamo in a spherical shell model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellInduction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Dynamo/Induction.hpp )
 
 // Project includes
 //
@@ -28,18 +32,24 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamoShellInduction::BoussinesqDynamoShellInduction(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace Dynamo {
+
+   Induction::Induction(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamoShellInduction::~BoussinesqDynamoShellInduction()
+   Induction::~Induction()
    {
    }
 
-   void BoussinesqDynamoShellInduction::setCoupling()
+   void Induction::setCoupling()
    {
       #ifdef QUICC_SPATIALSCHEME_SLFL
          int start = 1;
@@ -52,14 +62,14 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
    }
 
-   void BoussinesqDynamoShellInduction::setNLComponents()
+   void Induction::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::POL,0);
 
       this->addNLComponent(FieldComponents::Spectral::TOR,1);
    }
 
-   void BoussinesqDynamoShellInduction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void Induction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       ///
       /// Compute \f$\left(\vec u\wedge\vec B\right)\f$
@@ -81,7 +91,7 @@ namespace Equations {
       }
    }
 
-   void BoussinesqDynamoShellInduction::setRequirements()
+   void Induction::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::MAGNETIC);
@@ -96,5 +106,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, false));
    }
 
+}
+}
+}
 }
 }

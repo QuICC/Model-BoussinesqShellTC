@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqTCShellMomentum.hpp
+ * @file Momentum.hpp
  * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQTCSHELLMOMENTUM_HPP
-#define BOUSSINESQTCSHELLMOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_TC_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_TC_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace TC {
+
    /**
     * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection in a spherical shell
     */
-   class BoussinesqTCShellMomentum: public IVectorEquation
+   class Momentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqTCShellMomentum(SharedEquationParameters spEqParams);
+         Momentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqTCShellMomentum();
+         virtual ~Momentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -74,5 +80,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQTCSHELLMOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_TC_MOMENTUM_HPP

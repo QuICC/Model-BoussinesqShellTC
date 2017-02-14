@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamoShellMomentum.cpp
+ * @file Momentum.cpp
  * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq thermal convection dynamo in a spherical shell model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -16,7 +20,7 @@
 
 // Class include
 //
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellMomentum.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Dynamo/Momentum.hpp )
 
 // Project includes
 //
@@ -30,18 +34,24 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamoShellMomentum::BoussinesqDynamoShellMomentum(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace Dynamo {
+
+   Momentum::Momentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamoShellMomentum::~BoussinesqDynamoShellMomentum()
+   Momentum::~Momentum()
    {
    }
 
-   void BoussinesqDynamoShellMomentum::setCoupling()
+   void Momentum::setCoupling()
    {
       #ifdef QUICC_SPATIALSCHEME_SLFL
          int start = 1;
@@ -62,14 +72,14 @@ namespace Equations {
       #endif //QUICC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqDynamoShellMomentum::setNLComponents()
+   void Momentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqDynamoShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void Momentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       // Get square root of Taylor number
       MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
@@ -105,7 +115,7 @@ namespace Equations {
       #endif //QUICC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqDynamoShellMomentum::setRequirements()
+   void Momentum::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -120,5 +130,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::MAGNETIC, FieldRequirement(false, true, true, false, true));
    }
 
+}
+}
+}
 }
 }

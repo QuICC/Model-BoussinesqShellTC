@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamoShellMomentum.hpp
- * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection dynamo spherical shell
+ * @file Momentum.hpp
+ * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette dynamo in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMOSHELLMOMENTUM_HPP
-#define BOUSSINESQDYNAMOSHELLMOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTEDYNAMO_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTEDYNAMO_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace CouetteDynamo {
+
    /**
-    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection dynamo in a spherical shell
+    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette dynamo in a spherical shell
     */
-   class BoussinesqDynamoShellMomentum: public IVectorEquation
+   class Momentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqDynamoShellMomentum(SharedEquationParameters spEqParams);
+         Momentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamoShellMomentum();
+         virtual ~Momentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -84,5 +90,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMOSHELLMOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTEDYNAMO_MOMENTUM_HPP

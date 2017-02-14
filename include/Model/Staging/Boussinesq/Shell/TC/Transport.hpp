@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamoShellTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq thermal convection dynamo in a spherical shell
+ * @file Transport.hpp
+ * @brief Implementation of the transport equation for the Boussinesq thermal convection in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMOSHELLTRANSPORT_HPP
-#define BOUSSINESQDYNAMOSHELLTRANSPORT_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_TC_TRANSPORT_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_TC_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace TC {
+
    /**
-    * @brief Implementation of the transport equation for the Boussinesq thermal convection dynamo in a spherical shell 
+    * @brief Implementation of the transport equation for the Boussinesq thermal convection in a spherical shell 
     */
-   class BoussinesqDynamoShellTransport: public IScalarEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqDynamoShellTransport(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamoShellTransport();
+         virtual ~Transport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMOSHELLTRANSPORT_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_TC_TRANSPORT_HPP

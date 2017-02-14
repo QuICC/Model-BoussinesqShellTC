@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqDynamoShellStdModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq thermal convection dynamo in a spherical shell model (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMOSHELLSTDMODEL_HPP
-#define BOUSSINESQDYNAMOSHELLSTDMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMOSTD_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMOSTD_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,10 +29,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace DynamoStd {
+
    /**
     * @brief Implementation of the Boussinesq thermal convection dynamo in a spherical shell model (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
     */
-   class BoussinesqDynamoShellStdModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -109,14 +117,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqDynamoShellStdModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqDynamoShellStdModel();
+         ~PhysicalModel();
    };
 
 }
+}
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMOSHELLSTDMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMOSTD_PHYSICALMODEL_HPP

@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqDynamoShellModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq thermal convection dynamo in a spherical shell model (Toroidal/Poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMOSHELLMODEL_HPP
-#define BOUSSINESQDYNAMOSHELLMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMO_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMO_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,10 +29,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace Dynamo {
+
    /**
     * @brief Implementation of the Boussinesq thermal convection dynamo in a spherical shell model (Toroidal/Poloidal formulation)
     */
-   class BoussinesqDynamoShellModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -109,14 +117,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqDynamoShellModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqDynamoShellModel();
+         ~PhysicalModel();
    };
 
+}
+}
+}
+}
 }
 
 // 
@@ -129,4 +141,4 @@ namespace QuICC {
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //defined QUICC_MPIALGO_TUBULAR && !defined QUICC_SPLINALG_MUMPS && !defined QUICC_MPISPSOLVE
 
-#endif // BOUSSINESQDYNAMOSHELLMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMO_PHYSICALMODEL_HPP

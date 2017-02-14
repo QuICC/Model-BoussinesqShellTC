@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamoCouetteShellInduction.cpp
+ * @file Induction.cpp
  * @brief Source of the implementation of the vector induction equation in the Boussinesq spherical Couette dynamo in a spherical shell model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoCouetteShellInduction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/CouetteDynamo/Induction.hpp )
 
 // Project includes
 //
@@ -28,18 +32,24 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamoCouetteShellInduction::BoussinesqDynamoCouetteShellInduction(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace CouetteDynamo {
+
+   Induction::Induction(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamoCouetteShellInduction::~BoussinesqDynamoCouetteShellInduction()
+   Induction::~Induction()
    {
    }
 
-   void BoussinesqDynamoCouetteShellInduction::setCoupling()
+   void Induction::setCoupling()
    {
       #ifdef QUICC_SPATIALSCHEME_SLFL
          int start = 1;
@@ -52,14 +62,14 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
    }
 
-   void BoussinesqDynamoCouetteShellInduction::setNLComponents()
+   void Induction::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::POL,0);
 
       this->addNLComponent(FieldComponents::Spectral::TOR,1);
    }
 
-   void BoussinesqDynamoCouetteShellInduction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void Induction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       ///
       /// Compute \f$\left(\vec u\wedge\vec B + B0\right)\f$
@@ -84,7 +94,7 @@ namespace Equations {
       }
    }
 
-   void BoussinesqDynamoCouetteShellInduction::setRequirements()
+   void Induction::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::MAGNETIC);
@@ -102,5 +112,8 @@ namespace Equations {
       this->mImposedRequirements.addField(PhysicalNames::IMPOSED_MAGNETIC, FieldRequirement(false, true, true, false, false));
    }
 
+}
+}
+}
 }
 }

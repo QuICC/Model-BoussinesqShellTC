@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqTCShellStdModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,17 +19,17 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqTCShellStdModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/TCStd/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/TC/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/TC/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqTCShellTransport.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqTCShellMomentum.hpp"
 #include "IoVariable/ShellScalarEnergyWriter.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -35,24 +39,32 @@
 #include "Generator/States/ShellExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
 
-   const std::string BoussinesqTCShellStdModel::PYMODULE = "boussinesq_tcshell_std";
+namespace Model {
 
-   const std::string BoussinesqTCShellStdModel::PYCLASS = "BoussinesqTCShellStd";
+namespace Boussinesq {
 
-   void BoussinesqTCShellStdModel::addEquations(SharedSimulation spSim)
+namespace Shell {
+
+namespace TCStd {
+
+   const std::string PhysicalModel::PYMODULE = "boussinesq_tcshell_std";
+
+   const std::string PhysicalModel::PYCLASS = "BoussinesqTCShellStd";
+
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqTCShellTransport>();
-      
-      // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqTCShellMomentum>();
+      spSim->addScalarEquation<Equations::Boussinesq::Shell::TC::Transport>();
+                                                           
+      // Add Navier-Stokes equation                        
+      spSim->addVectorEquation<Equations::Boussinesq::Shell::TC::Momentum>();
    }
 
-   void BoussinesqTCShellStdModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
@@ -156,7 +168,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqTCShellStdModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -179,7 +191,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqTCShellStdModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -192,7 +204,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqTCShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create temperature energy writer
       IoVariable::SharedShellScalarEnergyWriter spScalar(new IoVariable::ShellScalarEnergyWriter("temperature", SchemeType::type()));
@@ -205,7 +217,7 @@ namespace QuICC {
       spSim->addAsciiOutputFile(spVector);
    }
 
-   void BoussinesqTCShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -220,11 +232,11 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqTCShellStdModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
    }
 
-   void BoussinesqTCShellStdModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -243,4 +255,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

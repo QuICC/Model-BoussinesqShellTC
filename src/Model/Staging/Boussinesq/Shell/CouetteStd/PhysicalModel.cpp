@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqCouetteShellStdModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,16 +19,16 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqCouetteShellStdModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/CouetteStd/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -32,21 +36,29 @@
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
 
-   const std::string BoussinesqCouetteShellStdModel::PYMODULE = "boussinesq_couetteshell_std";
+namespace Model {
 
-   const std::string BoussinesqCouetteShellStdModel::PYCLASS = "BoussinesqCouetteShellStd";
+namespace Boussinesq {
 
-   void BoussinesqCouetteShellStdModel::addEquations(SharedSimulation spSim)
+namespace Shell {
+
+namespace CouetteStd {
+
+   const std::string PhysicalModel::PYMODULE = "boussinesq_couetteshell_std";
+
+   const std::string PhysicalModel::PYCLASS = "BoussinesqCouetteShellStd";
+
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqCouetteShellMomentum>();
+      spSim->addVectorEquation<Equations::Boussinesq::Shell::Couette::Momentum>();
    }
 
-   void BoussinesqCouetteShellStdModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
@@ -132,7 +144,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqCouetteShellStdModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedVectorFieldVisualizer spVector;
@@ -174,7 +186,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqCouetteShellStdModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -186,7 +198,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqCouetteShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create kinetic energy writer
       IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
@@ -194,7 +206,7 @@ namespace QuICC {
       spSim->addAsciiOutputFile(spVector);
    }
 
-   void BoussinesqCouetteShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -209,11 +221,11 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqCouetteShellStdModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
    }
 
-   void BoussinesqCouetteShellStdModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -232,4 +244,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqTCShellModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQTCSHELLMODEL_HPP
-#define BOUSSINESQTCSHELLMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_TC_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_TC_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,10 +29,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace TC {
+
    /**
     * @brief Implementation of the Boussinesq thermal convection spherical shell model (Toroidal/Poloidal formulation)
     */
-   class BoussinesqTCShellModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -109,14 +117,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqTCShellModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqTCShellModel();
+         ~PhysicalModel();
    };
 
+}
+}
+}
+}
 }
 
 // 
@@ -129,4 +141,4 @@ namespace QuICC {
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //defined QUICC_MPIALGO_TUBULAR && !defined QUICC_SPLINALG_MUMPS && !defined QUICC_MPISPSOLVE
 
-#endif // BOUSSINESQTCSHELLMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_TC_PHYSICALMODEL_HPP

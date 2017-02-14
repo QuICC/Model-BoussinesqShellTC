@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamoCouetteShellMomentum.cpp
+ * @file Momentum.cpp
  * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq spherical Couette dynamo in a spherical shell model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -16,7 +20,7 @@
 
 // Class include
 //
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoCouetteShellMomentum.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/CouetteDynamo/Momentum.hpp )
 
 // Project includes
 //
@@ -30,18 +34,24 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamoCouetteShellMomentum::BoussinesqDynamoCouetteShellMomentum(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace CouetteDynamo {
+
+   Momentum::Momentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamoCouetteShellMomentum::~BoussinesqDynamoCouetteShellMomentum()
+   Momentum::~Momentum()
    {
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::setCoupling()
+   void Momentum::setCoupling()
    {
       #ifdef QUICC_SPATIALSCHEME_SLFL
          int start = 1;
@@ -62,14 +72,14 @@ namespace Equations {
       #endif //QUICC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::setNLComponents()
+   void Momentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void Momentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {  
       MHDFloat Ro = std::abs(this->eqParams().nd(NonDimensional::ROSSBY));
 
@@ -103,7 +113,7 @@ namespace Equations {
       #endif //QUICC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqDynamoCouetteShellMomentum::setRequirements()
+   void Momentum::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -118,5 +128,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::MAGNETIC, FieldRequirement(false, true, true, false, true));
    }
 
+}
+}
+}
 }
 }

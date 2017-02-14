@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqTCShellTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq thermal convection in a spherical shell
+ * @file Momentum.hpp
+ * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQTCSHELLTRANSPORT_HPP
-#define BOUSSINESQTCSHELLTRANSPORT_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_RTC_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_RTC_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,22 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace RTC {
+
    /**
-    * @brief Implementation of the transport equation for the Boussinesq thermal convection in a spherical shell 
+    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection in a spherical shell
     */
-   class BoussinesqTCShellTransport: public IScalarEquation
+   class Momentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqTCShellTransport(SharedEquationParameters spEqParams);
+         Momentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqTCShellTransport();
+         virtual ~Momentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -64,10 +70,28 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents();
+
+         /**
+          * @brief Storage for the cos(theta) grid values (if required)
+          */
+         Array mCosTheta;
+
+         /**
+          * @brief Storage for the sin(theta) grid values (if required)
+          */
+         Array mSinTheta;
+
       private:
    };
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQTCSHELLTRANSPORT_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_RTC_MOMENTUM_HPP

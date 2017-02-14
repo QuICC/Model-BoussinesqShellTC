@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqCouetteShellStdModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQCOUETTESHELLSTDMODEL_HPP
-#define BOUSSINESQCOUETTESHELLSTDMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTESTD_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTESTD_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,10 +29,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace CouetteStd {
+
    /**
     * @brief Implementation of the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
     */
-   class BoussinesqCouetteShellStdModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -109,14 +117,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqCouetteShellStdModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqCouetteShellStdModel();
+         ~PhysicalModel();
    };
 
 }
+}
+}
+}
+}
 
-#endif // BOUSSINESQCOUETTESHELLSTDMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTESTD_PHYSICALMODEL_HPP

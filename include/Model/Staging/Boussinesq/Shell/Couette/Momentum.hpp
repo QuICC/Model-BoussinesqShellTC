@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamoShellInduction.hpp
- * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo spherical shell
+ * @file Momentum.hpp
+ * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMOSHELLINDUCTION_HPP
-#define BOUSSINESQDYNAMOSHELLINDUCTION_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace Couette {
+
    /**
-    * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo in a spherical shell
+    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette in a spherical shell
     */
-   class BoussinesqDynamoShellInduction: public IVectorEquation
+   class Momentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqDynamoShellInduction(SharedEquationParameters spEqParams);
+         Momentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamoShellInduction();
+         virtual ~Momentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,10 +75,23 @@ namespace Equations {
           */
          virtual void setNLComponents();
 
+         /**
+          * @brief Storage for the cos(theta) grid values (if required)
+          */
+         Array mCosTheta;
+
+         /**
+          * @brief Storage for the sin(theta) grid values (if required)
+          */
+         Array mSinTheta;
+
       private:
    };
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMOSHELLINDUCTION_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP

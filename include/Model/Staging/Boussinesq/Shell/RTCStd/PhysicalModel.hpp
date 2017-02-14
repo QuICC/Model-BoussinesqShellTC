@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqRTCShellStdModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRTCSHELLSTDMODEL_HPP
-#define BOUSSINESQRTCSHELLSTDMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_RTCSTD_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_RTCSTD_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,10 +29,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace RTCStd {
+
    /**
     * @brief Implementation of the Boussinesq rotating thermal convection spherical shell model (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
     */
-   class BoussinesqRTCShellStdModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -109,14 +117,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqRTCShellStdModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqRTCShellStdModel();
+         ~PhysicalModel();
    };
 
 }
+}
+}
+}
+}
 
-#endif // BOUSSINESQRTCSHELLSTDMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_RTCSTD_PHYSICALMODEL_HPP

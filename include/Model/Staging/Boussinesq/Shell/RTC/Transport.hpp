@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRTCShellTransport.hpp
+ * @file Transport.hpp
  * @brief Implementation of the transport equation for the Boussinesq rotating thermal convection in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRTCSHELLTRANSPORT_HPP
-#define BOUSSINESQRTCSHELLTRANSPORT_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_RTC_TRANSPORT_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_RTC_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace RTC {
+
    /**
     * @brief Implementation of the transport equation for the Boussinesq rotating thermal convection in a spherical shell 
     */
-   class BoussinesqRTCShellTransport: public IScalarEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqRTCShellTransport(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRTCShellTransport();
+         virtual ~Transport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -67,7 +73,11 @@ namespace Equations {
       private:
    };
 
+
+}
+}
+}
 }
 }
 
-#endif // BOUSSINESQRTCSHELLTRANSPORT_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_RTC_TRANSPORT_HPP

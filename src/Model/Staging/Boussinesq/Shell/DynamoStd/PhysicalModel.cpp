@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamoShellStdModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of the Boussinesq thermal convection dynamo in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,18 +19,18 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqDynamoShellStdModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/DynamoStd/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Dynamo/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Dynamo/Momentum.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Dynamo/Induction.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellTransport.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellMomentum.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellInduction.hpp"
 #include "IoVariable/ShellScalarEnergyWriter.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
@@ -37,27 +41,35 @@
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
 
-   const std::string BoussinesqDynamoShellStdModel::PYMODULE = "boussinesq_dynamoshell_std";
+namespace Model {
 
-   const std::string BoussinesqDynamoShellStdModel::PYCLASS = "BoussinesqDynamoShellStd";
+namespace Boussinesq {
 
-   void BoussinesqDynamoShellStdModel::addEquations(SharedSimulation spSim)
+namespace Shell {
+
+namespace DynamoStd {
+
+   const std::string PhysicalModel::PYMODULE = "boussinesq_dynamoshell_std";
+
+   const std::string PhysicalModel::PYCLASS = "BoussinesqDynamoShellStd";
+
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqDynamoShellTransport>();
-      
-      // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqDynamoShellMomentum>();
-      
-      // Add induction equation
-      spSim->addVectorEquation<Equations::BoussinesqDynamoShellInduction>();
+      spSim->addScalarEquation<Equations::Boussinesq::Shell::Dynamo::Transport>();
+                                                             
+      // Add Navier-Stokes equation                          
+      spSim->addVectorEquation<Equations::Boussinesq::Shell::Dynamo::Momentum>();
+                                                             
+      // Add induction equation                              
+      spSim->addVectorEquation<Equations::Boussinesq::Shell::Dynamo::Induction>();
    }
 
-   void BoussinesqDynamoShellStdModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
@@ -244,7 +256,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqDynamoShellStdModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -286,7 +298,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqDynamoShellStdModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -300,7 +312,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqDynamoShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create temperature energy writer
       IoVariable::SharedShellScalarEnergyWriter spScalar(new IoVariable::ShellScalarEnergyWriter("temperature", SchemeType::type()));
@@ -318,7 +330,7 @@ namespace QuICC {
       spSim->addAsciiOutputFile(spVector);
    }
 
-   void BoussinesqDynamoShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -333,11 +345,11 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqDynamoShellStdModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
    }
 
-   void BoussinesqDynamoShellStdModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -356,4 +368,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

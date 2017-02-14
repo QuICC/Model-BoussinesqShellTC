@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamoCouetteShellMomentum.hpp
- * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette dynamo in a spherical shell
+ * @file Induction.hpp
+ * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMOCOUETTESHELLMOMENTUM_HPP
-#define BOUSSINESQDYNAMOCOUETTESHELLMOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMO_INDUCTION_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMO_INDUCTION_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Shell {
+
+namespace Dynamo {
+
    /**
-    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette dynamo in a spherical shell
+    * @brief Implementation of the vector induction equation for the Boussinesq thermal convection dynamo in a spherical shell
     */
-   class BoussinesqDynamoCouetteShellMomentum: public IVectorEquation
+   class Induction: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqDynamoCouetteShellMomentum(SharedEquationParameters spEqParams);
+         Induction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamoCouetteShellMomentum();
+         virtual ~Induction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,20 +75,13 @@ namespace Equations {
           */
          virtual void setNLComponents();
 
-         /**
-          * @brief Storage for the cos(theta) grid values (if required)
-          */
-         Array mCosTheta;
-
-         /**
-          * @brief Storage for the sin(theta) grid values (if required)
-          */
-         Array mSinTheta;
-
       private:
    };
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMOCOUETTESHELLMOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_DYNAMO_INDUCTION_HPP

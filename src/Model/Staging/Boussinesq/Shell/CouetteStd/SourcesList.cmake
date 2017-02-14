@@ -1,5 +1,4 @@
 set(MHDSources
-   Momentum.cpp
    PhysicalModel.cpp
 )
 
