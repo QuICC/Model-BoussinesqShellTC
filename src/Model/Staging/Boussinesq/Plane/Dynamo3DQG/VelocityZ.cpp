@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGVelocityZ.cpp
+ * @file VelocityZ.cpp
  * @brief Source of the implementation of the upright vertical velocity equation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVelocityZ.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/VelocityZ.hpp )
 
 // Project includes
 //
@@ -28,23 +32,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGVelocityZ::BoussinesqDynamo3DQGVelocityZ(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   VelocityZ::VelocityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGVelocityZ::~BoussinesqDynamo3DQGVelocityZ()
+   VelocityZ::~VelocityZ()
    {
    }
 
-   void BoussinesqDynamo3DQGVelocityZ::setCoupling()
+   void VelocityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqDynamo3DQGVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void VelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -58,7 +68,7 @@ namespace Equations {
 //      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()).matrix());
    }
 
-   void BoussinesqDynamo3DQGVelocityZ::setRequirements()
+   void VelocityZ::setRequirements()
    {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
@@ -94,5 +104,8 @@ namespace Equations {
       this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient(gradComps);
    }
 
+}
+}
+}
 }
 }

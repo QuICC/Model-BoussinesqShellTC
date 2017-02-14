@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqFPlane3DQGVorticityZ.cpp
+ * @file VorticityZ.cpp
  * @brief Source of the implementation of the vertical vorticity computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/VorticityZ.hpp"
 
 // Project includes
 //
@@ -26,23 +26,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGVorticityZ::BoussinesqFPlane3DQGVorticityZ(SharedEquationParameters spEqParams)
+   VorticityZ::VorticityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlane3DQGVorticityZ::~BoussinesqFPlane3DQGVorticityZ()
+   VorticityZ::~VorticityZ()
    {
    }
 
-   void BoussinesqFPlane3DQGVorticityZ::setCoupling()
+   void VorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
-   void BoussinesqFPlane3DQGVorticityZ::setRequirements()
+   void VorticityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VORTICITYZ);

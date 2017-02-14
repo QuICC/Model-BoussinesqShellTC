@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGEmfx.cpp
+ * @file Emfx.cpp
  * @brief Source of the implementation of the mean Bx in the Dynamo 3DQG model
  * @author Meredith / Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfx.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Emfx.hpp )
 
 // Project includes
 //
@@ -27,23 +31,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGEmfx::BoussinesqDynamo3DQGEmfx(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   Emfx::Emfx(SharedEquationParameters spEqParams)
       : IScalarTimeAveragedEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGEmfx::~BoussinesqDynamo3DQGEmfx()
+   Emfx::~Emfx()
    {
    }
 
-   void BoussinesqDynamo3DQGEmfx::setCoupling()
+   void Emfx::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
-   void BoussinesqDynamo3DQGEmfx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Emfx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -61,7 +71,7 @@ namespace Equations {
    }
 
 
-   void BoussinesqDynamo3DQGEmfx::setRequirements()
+   void Emfx::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::EMFX);
@@ -85,5 +95,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, false, true, false));
    }
 
+}
+}
+}
 }
 }

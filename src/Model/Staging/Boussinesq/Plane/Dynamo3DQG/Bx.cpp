@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGBx.cpp
+ * @file Bx.cpp
  * @brief Source of the implementation of the vertical vorticity computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBx.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Bx.hpp )
 
 // Project includes
 //
@@ -26,23 +30,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGBx::BoussinesqDynamo3DQGBx(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   Bx::Bx(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGBx::~BoussinesqDynamo3DQGBx()
+   Bx::~Bx()
    {
    }
 
-   void BoussinesqDynamo3DQGBx::setCoupling()
+   void Bx::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, false);
    }
 
-   void BoussinesqDynamo3DQGBx::setRequirements()
+   void Bx::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::BX);
@@ -56,5 +66,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::EMFY, FieldRequirement(true, true, false, false));
    }
 
+}
+}
+}
 }
 }

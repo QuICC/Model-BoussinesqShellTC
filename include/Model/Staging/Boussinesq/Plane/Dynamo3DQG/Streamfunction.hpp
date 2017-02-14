@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamo3DQGStreamfunction.hpp
+ * @file Streamfunction.hpp
  * @brief Implementation of the streamfunction equation for the Boussinesq F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMO3DQGSTREAMFUNCTION_HPP
-#define BOUSSINESQDYNAMO3DQGSTREAMFUNCTION_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_STREAMFUNCTION_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_STREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
    /**
     * @brief Implementation of the streamfunction equation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGStreamfunction: public IScalarEquation
+   class Streamfunction: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqDynamo3DQGStreamfunction(SharedEquationParameters spEqParams);
+         Streamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamo3DQGStreamfunction();
+         virtual ~Streamfunction();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMO3DQGSTREAMFUNCTION_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_STREAMFUNCTION_HPP

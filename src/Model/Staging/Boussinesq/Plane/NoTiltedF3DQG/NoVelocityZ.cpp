@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqNoTiltedFPlane3DQGNoVelocityZ.cpp
+ * @file NoVelocityZ.cpp
  * @brief Source of the implementation of the non orthogonal vertical velocity computation in the tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGNoVelocityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/NoVelocityZ.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqNoTiltedFPlane3DQGNoVelocityZ::BoussinesqNoTiltedFPlane3DQGNoVelocityZ(SharedEquationParameters spEqParams)
+   NoVelocityZ::NoVelocityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqNoTiltedFPlane3DQGNoVelocityZ::~BoussinesqNoTiltedFPlane3DQGNoVelocityZ()
+   NoVelocityZ::~NoVelocityZ()
    {
    }
 
-   void BoussinesqNoTiltedFPlane3DQGNoVelocityZ::setCoupling()
+   void NoVelocityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqNoTiltedFPlane3DQGNoVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void NoVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -58,7 +58,7 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::NO_STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0/eta3);
    }
 
-   void BoussinesqNoTiltedFPlane3DQGNoVelocityZ::setRequirements()
+   void NoVelocityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::NO_VELOCITYZ);

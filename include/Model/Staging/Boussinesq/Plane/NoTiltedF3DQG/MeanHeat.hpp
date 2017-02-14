@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqNoTiltedFPlane3DQGMeanHeat.hpp
+ * @file MeanHeat.hpp
  * @brief Implementation of the mean heat computation for the Boussinesq tilted F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQNOTILTEDFPLANE3DQGMEANHEAT_HPP
-#define BOUSSINESQNOTILTEDFPLANE3DQGMEANHEAT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_MEANHEAT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_MEANHEAT_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq tilted F-plane 3DQG model
     */
-   class BoussinesqNoTiltedFPlane3DQGMeanHeat: public IScalarEquation
+   class MeanHeat: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqNoTiltedFPlane3DQGMeanHeat(SharedEquationParameters spEqParams);
+         MeanHeat(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqNoTiltedFPlane3DQGMeanHeat();
+         virtual ~MeanHeat();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -80,4 +80,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQNOTILTEDFPLANE3DQGMEANHEAT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_MEANHEAT_HPP

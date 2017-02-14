@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGPerMeanHeat.hpp
+ * @file MeanHeat.hpp
  * @brief Implementation of the mean heat equation for the periodic Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGPERMEANHEAT_HPP
-#define BOUSSINESQBETA3DQGPERMEANHEAT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_MEANHEAT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_MEANHEAT_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the mean heat equation for the periodic Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGPerMeanHeat: public IScalarEquation
+   class MeanHeat: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqBeta3DQGPerMeanHeat(SharedEquationParameters spEqParams);
+         MeanHeat(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGPerMeanHeat();
+         virtual ~MeanHeat();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQBETA3DQGPERMEANHEAT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_MEANHEAT_HPP

@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqFPlane3DQGStreamfunction.cpp
+ * @file Streamfunction.cpp
  * @brief Source of the implementation of the streamfunction equation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/Streamfunction.hpp"
 
 // Project includes
 //
@@ -28,23 +28,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGStreamfunction::BoussinesqFPlane3DQGStreamfunction(SharedEquationParameters spEqParams)
+   Streamfunction::Streamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlane3DQGStreamfunction::~BoussinesqFPlane3DQGStreamfunction()
+   Streamfunction::~Streamfunction()
    {
    }
 
-   void BoussinesqFPlane3DQGStreamfunction::setCoupling()
+   void Streamfunction::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqFPlane3DQGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Streamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -56,7 +56,7 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
-   void BoussinesqFPlane3DQGStreamfunction::setRequirements()
+   void Streamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);

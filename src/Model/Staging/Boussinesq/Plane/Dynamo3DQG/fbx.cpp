@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGfbx.cpp
+ * @file fbx.cpp
  * @brief Source of the implementation of the mean heat computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbx.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/fbx.hpp )
 
 // Project includes
 //
@@ -28,24 +32,30 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGfbx::BoussinesqDynamo3DQGfbx(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   fbx::fbx(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGfbx::~BoussinesqDynamo3DQGfbx()
+   fbx::~fbx()
    {
    }
 
-   void BoussinesqDynamo3DQGfbx::setCoupling()
+   void fbx::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, true);
    }
 
-   void BoussinesqDynamo3DQGfbx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void fbx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -61,7 +71,7 @@ namespace Equations {
       rNLComp.setData(MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array()).matrix());
    }
 
-   Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGfbx::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType fbx::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -80,7 +90,7 @@ namespace Equations {
       return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
-   void BoussinesqDynamo3DQGfbx::setRequirements()
+   void fbx::setRequirements()
    {
       // Set fluctuating bx field as equation unknown
       this->setName(PhysicalNames::FBX);
@@ -118,5 +128,8 @@ namespace Equations {
 //
       this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient2(grad2Comps);
    }
+}
+}
+}
 }
 }

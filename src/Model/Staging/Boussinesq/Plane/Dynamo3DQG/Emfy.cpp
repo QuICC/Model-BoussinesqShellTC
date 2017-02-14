@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGEmfy.cpp
+ * @file Emfy.cpp
  * @brief Source of the implementation of EMF y in the Dynamo 3DQG model
  * @author Meredith / Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfy.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Emfy.hpp )
 
 // Project includes
 //
@@ -27,23 +31,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGEmfy::BoussinesqDynamo3DQGEmfy(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   Emfy::Emfy(SharedEquationParameters spEqParams)
       : IScalarTimeAveragedEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGEmfy::~BoussinesqDynamo3DQGEmfy()
+   Emfy::~Emfy()
    {
    }
 
-   void BoussinesqDynamo3DQGEmfy::setCoupling()
+   void Emfy::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
-   void BoussinesqDynamo3DQGEmfy::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Emfy::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -60,7 +70,7 @@ namespace Equations {
 
    }
 
-   Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGEmfy::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType Emfy::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -79,7 +89,7 @@ namespace Equations {
       return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
-   void BoussinesqDynamo3DQGEmfy::setRequirements()
+   void Emfy::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::EMFY);
@@ -103,5 +113,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, false, true, false));
    }
 
+}
+}
+}
 }
 }

@@ -226,6 +226,7 @@ endfunction ()
 function (quicc_walk_models MHDAll MHDPath MHDDirs MHDSrcRef MHDStateRef)
    # Loop over all the subdirectories
    foreach(MHDDir ${MHDDirs})
+      set(MHDCurrent ${MHDAll})
       # Set new path including subdirectory
       set(MHDNext ${MHDPath}/${MHDDir})
       # Unset list of subdirectories and sources
@@ -233,32 +234,35 @@ function (quicc_walk_models MHDAll MHDPath MHDDirs MHDSrcRef MHDStateRef)
       set(MHDSrcSubDirs)
       # Include SourcesList.cmake file
       include(${MHDNext}/SourcesList.cmake)
+      # Loop over all sources and add full path source to list
+      foreach(MHDSource ${MHDSources})
+         list(APPEND MHDCurrent ${MHDNext}/${MHDSource})
+      endforeach(MHDSource)
       # Check if there are additional subdirectories
       if(DEFINED MHDSrcSubDirs)
-         quicc_walk_models("${MHDAll}" "${MHDNext}" "${MHDSrcSubDirs}" "${MHDSrcRef}" "${MHDStateRef}")
+         quicc_walk_models("${MHDCurrent}" "${MHDNext}" "${MHDSrcSubDirs}" "${MHDSrcRef}" "${MHDStateRef}")
       endif()
       if(MHDSources MATCHES PhysicalModel.cpp)
-         set(MHDModSrcs ${${MHDAll}})
-         foreach(MHDSource ${MHDSources})
-            list(APPEND MHDModSrcs ${MHDNext}/${MHDSource})
-         endforeach(MHDSource)
          string(REGEX REPLACE ${MHDSrcRef} "" MHDModPath ${MHDNext})
-         quicc_target_model("${MHDModPath}" "${MHDStateRef}" "${MHDModSrcs}")
-      else()
-         # Loop over all sources and add full path source to list
-         foreach(MHDSource ${MHDSources})
-            list(APPEND ${MHDAll} ${MHDNext}/${MHDSource})
-         endforeach(MHDSource)
-         # Update the list of all sources in parent scope
-         set(${MHDAll} ${${MHDAll}} PARENT_SCOPE)
+         quicc_target_model("${MHDModPath}" "${MHDStateRef}" "${MHDCurrent}")
       endif()
    endforeach(MHDDir)
 endfunction ()
 
 function (quicc_find_models Path ModelDir ModelState)
-   set(MHDTmp ${ModelDir} ${ModelDir}/${ModelState})
-   set(MHDLocal )
-   quicc_walk_models(MHDLocal "${Path}" "${MHDTmp}" "${Path}" "${ModelDir}/${ModelState}")
+   # Unset list of subdirectories and sources
+   set(MHDCurrent)
+   set(MHDSources)
+   set(MHDSrcSubDirs)
+   # Include SourcesList.cmake file
+   set(MHDNext ${Path}/${ModelDir})
+   include(${MHDNext}/SourcesList.cmake)
+   foreach(MHDSource ${MHDSources})
+      list(APPEND MHDCurrent ${MHDNext}/${MHDSource})
+   endforeach(MHDSource)
+
+   set(MHDTmp ${ModelDir}/${ModelState})
+   quicc_walk_models("${MHDCurrent}" "${Path}" "${MHDTmp}" "${Path}" "${ModelDir}/${ModelState}")
 endfunction ()
 
 function (quicc_target_model MHDModPath MHDStateRef MHDModSrcs)

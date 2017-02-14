@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGStreamfunction.hpp
+ * @file Streamfunction.hpp
  * @brief Implementation of the streamfunction equation for the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGSTREAMFUNCTION_HPP
-#define BOUSSINESQBETA3DQGSTREAMFUNCTION_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_STREAMFUNCTION_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_STREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the streamfunction equation for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGStreamfunction: public IScalarEquation
+   class Streamfunction: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqBeta3DQGStreamfunction(SharedEquationParameters spEqParams);
+         Streamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGStreamfunction();
+         virtual ~Streamfunction();
          
       protected:
          /**
@@ -61,5 +67,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQBETA3DQGSTREAMFUNCTION_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_STREAMFUNCTION_HPP

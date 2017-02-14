@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqFPlaneNHBGEVorticityZ.cpp
+ * @file VorticityZ.cpp
  * @brief Source of the implementation of the vertical vorticity computation in the F-plane NHBGE model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGEVorticityZ.hpp"
+#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/VorticityZ.hpp"
 
 // Project includes
 //
@@ -26,23 +26,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqFPlaneNHBGEVorticityZ::BoussinesqFPlaneNHBGEVorticityZ(SharedEquationParameters spEqParams)
+   VorticityZ::VorticityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlaneNHBGEVorticityZ::~BoussinesqFPlaneNHBGEVorticityZ()
+   VorticityZ::~VorticityZ()
    {
    }
 
-   void BoussinesqFPlaneNHBGEVorticityZ::setCoupling()
+   void VorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
-   void BoussinesqFPlaneNHBGEVorticityZ::setRequirements()
+   void VorticityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VORTICITYZ);

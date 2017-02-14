@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqTiltedFPlane3DQGVelocityZ.cpp
+ * @file VelocityZ.cpp
  * @brief Source of the implementation of the upright vertical velocity equation in the tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGVelocityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/VelocityZ.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqTiltedFPlane3DQGVelocityZ::BoussinesqTiltedFPlane3DQGVelocityZ(SharedEquationParameters spEqParams)
+   VelocityZ::VelocityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqTiltedFPlane3DQGVelocityZ::~BoussinesqTiltedFPlane3DQGVelocityZ()
+   VelocityZ::~VelocityZ()
    {
    }
 
-   void BoussinesqTiltedFPlane3DQGVelocityZ::setCoupling()
+   void VelocityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false);
    }
 
-   void BoussinesqTiltedFPlane3DQGVelocityZ::setRequirements()
+   void VelocityZ::setRequirements()
    {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);

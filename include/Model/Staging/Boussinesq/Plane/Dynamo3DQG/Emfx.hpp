@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamo3DQGEmfx.hpp
+ * @file Emfx.hpp
  * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMO3DQGEMFX_HPP
-#define BOUSSINESQDYNAMO3DQGEMFX_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_EMFX_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_EMFX_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGEmfx: public IScalarTimeAveragedEquation
+   class Emfx: public IScalarTimeAveragedEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqDynamo3DQGEmfx(SharedEquationParameters spEqParams);
+         Emfx(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamo3DQGEmfx();
+         virtual ~Emfx();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -78,5 +84,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMO3DQGEMFX_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_EMFX_HPP

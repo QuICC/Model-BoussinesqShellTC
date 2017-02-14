@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGTransport.hpp
+ * @file Transport.hpp
  * @brief Implementation of the transport equation for the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGTRANSPORT_HPP
-#define BOUSSINESQBETA3DQGTRANSPORT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_TRANSPORT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the transport equation for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGTransport: public IScalarEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqBeta3DQGTransport(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGTransport();
+         virtual ~Transport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQBETA3DQGTRANSPORT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_TRANSPORT_HPP

@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGPerVelocityZ.cpp
+ * @file VelocityZ.cpp
  * @brief Source of the implementation of the vertical velocity computation in the periodic Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVelocityZ.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/VelocityZ.hpp )
 
 // Project includes
 //
@@ -27,23 +31,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGPerVelocityZ::BoussinesqBeta3DQGPerVelocityZ(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
+   VelocityZ::VelocityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGPerVelocityZ::~BoussinesqBeta3DQGPerVelocityZ()
+   VelocityZ::~VelocityZ()
    {
    }
 
-   void BoussinesqBeta3DQGPerVelocityZ::setCoupling()
+   void VelocityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqBeta3DQGPerVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void VelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -55,7 +65,7 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqBeta3DQGPerVelocityZ::setRequirements()
+   void VelocityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
@@ -82,5 +92,8 @@ namespace Equations {
       this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient(gradComps);
    }
 
+}
+}
+}
 }
 }

@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqFPlaneNHBGEModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq F-plane NHBGE model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANENHBGEMODEL_HPP
-#define BOUSSINESQFPLANENHBGEMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_PLANE_NHBGE_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_PLANE_NHBGE_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,7 +29,7 @@ namespace QuICC {
    /**
     * @brief Implementation of the Boussinesq F-plane NHBGE model
     */
-   class BoussinesqFPlaneNHBGEModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -106,14 +106,14 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqFPlaneNHBGEModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqFPlaneNHBGEModel();
+         ~PhysicalModel();
    };
 
 }
 
-#endif // BOUSSINESQFPLANENHBGEMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_PLANE_NHBGE_PHYSICALMODEL_HPP

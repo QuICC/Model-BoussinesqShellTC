@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGStreamfunction.cpp
+ * @file Streamfunction.cpp
  * @brief Source of the implementation of the streamfunction equation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGStreamfunction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Streamfunction.hpp )
 
 // Project includes
 //
@@ -28,23 +32,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGStreamfunction::BoussinesqDynamo3DQGStreamfunction(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   Streamfunction::Streamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGStreamfunction::~BoussinesqDynamo3DQGStreamfunction()
+   Streamfunction::~Streamfunction()
    {
    }
 
-   void BoussinesqDynamo3DQGStreamfunction::setCoupling()
+   void Streamfunction::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqDynamo3DQGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Streamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -58,7 +68,7 @@ namespace Equations {
 //      rNLComp.addData((-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()) - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*(this->scalar(PhysicalNames::FBY).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array() - this->scalar(PhysicalNames::FBX).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array())).matrix());
    }
 
-   void BoussinesqDynamo3DQGStreamfunction::setRequirements()
+   void Streamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
@@ -117,5 +127,8 @@ namespace Equations {
       this->updateFieldRequirements(PhysicalNames::FBX).updateGradient2(grad2Comps);
    }
 
+}
+}
+}
 }
 }

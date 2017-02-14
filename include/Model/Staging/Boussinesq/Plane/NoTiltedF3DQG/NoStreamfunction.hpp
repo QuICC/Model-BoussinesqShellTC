@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqNoTiltedFPlane3DQGNoStreamfunction.hpp
+ * @file NoStreamfunction.hpp
  * @brief Implementation of the non orthogonal streamfunction computation for the Boussinesq tilted F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQNOTILTEDFPLANE3DQGNOSTREAMFUNTION_HPP
-#define BOUSSINESQNOTILTEDFPLANE3DQGNOSTREAMFUNTION_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOSTREAMFUNTION_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOSTREAMFUNTION_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the non orthogonal streamfunction computation for the Boussinesq tilted F-plane 3DQG model
     */
-   class BoussinesqNoTiltedFPlane3DQGNoStreamfunction: public IScalarEquation
+   class NoStreamfunction: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqNoTiltedFPlane3DQGNoStreamfunction(SharedEquationParameters spEqParams);
+         NoStreamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqNoTiltedFPlane3DQGNoStreamfunction();
+         virtual ~NoStreamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQNOTILTEDFPLANE3DQGNOSTREAMFUNTION_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOSTREAMFUNTION_HPP

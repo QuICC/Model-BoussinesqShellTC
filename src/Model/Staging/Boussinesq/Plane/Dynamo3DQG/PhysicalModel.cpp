@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of the Boussinesq F-plane 3DQG physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,28 +19,28 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqDynamo3DQGModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Streamfunction.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/VelocityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/VorticityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Pressure.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/MeanHeat.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Emfx.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Emfy.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/Bx.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/By.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/fbx.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/fby.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/fbz.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVelocityZ.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGTransport.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVorticityZ.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGPressure.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGMeanHeat.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfx.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGEmfy.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBx.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGBy.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbx.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfby.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbz.hpp"
 #include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
@@ -45,58 +49,66 @@
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
 
-   const std::string BoussinesqDynamo3DQGModel::PYMODULE = "boussinesq_dynamo3dqg";
+namespace Model {
 
-   const std::string BoussinesqDynamo3DQGModel::PYCLASS = "BoussinesqDynamo3DQG";
+namespace Boussinesq {
 
-   void BoussinesqDynamo3DQGModel::addEquations(SharedSimulation spSim)
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   const std::string PhysicalModel::PYMODULE = "boussinesq_dynamo3dqg";
+
+   const std::string PhysicalModel::PYCLASS = "BoussinesqDynamo3DQG";
+
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add upright streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::Streamfunction>();
 
       // Add upright vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGVelocityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::VelocityZ>();
 
       // Add upright transport equation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGTransport>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::Transport>();
 
 
       // Add vertical vorticity equation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGVorticityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::VorticityZ>();
 
       // Add mean heat computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGMeanHeat>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::MeanHeat>();
 
       // Add Emfx computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGEmfx>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::Emfx>();
 
       // Add Emfy computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGEmfy>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::Emfy>();
 
       // Add Emfy computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBx>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::Bx>();
 
       // Add Emfy computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGBy>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::By>();
 
       // Add fbx computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfbx>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::fbx>();
 
       // Add fby computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfby>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::fby>();
 
       // Add fbz heat computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGfbz>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::fbz>();
 
       // Add fbz heat computation
-      spSim->addScalarEquation<Equations::BoussinesqDynamo3DQGPressure>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Dynamo3DQG::Pressure>();
    }
 
-   void BoussinesqDynamo3DQGModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -222,7 +234,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqDynamo3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -293,7 +305,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqDynamo3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -314,7 +326,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqDynamo3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
       //IoVariable::SharedNusseltWriter spNusselt(new IoVariable::NusseltWriter(SchemeType::type()));
@@ -350,7 +362,7 @@ namespace QuICC {
 
    }
 
-   void BoussinesqDynamo3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
       // Create Avg temperature writer
       IoStats::SharedCartesian1DScalarAvgWriter spAvg(new IoStats::Cartesian1DScalarAvgWriter("temperature",SchemeType::type()));
@@ -360,7 +372,7 @@ namespace QuICC {
    }
 
 
-   void BoussinesqDynamo3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -383,7 +395,7 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqDynamo3DQGModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -406,4 +418,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

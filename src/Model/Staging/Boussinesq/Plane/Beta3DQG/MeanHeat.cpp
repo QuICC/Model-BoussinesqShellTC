@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGPerMeanHeat.cpp
+ * @file MeanHeat.cpp
  * @brief Source of the implementation of the mean heat equation in the periodic Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanHeat.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/MeanHeat.hpp )
 
 // Project includes
 //
@@ -29,23 +33,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGPerMeanHeat::BoussinesqBeta3DQGPerMeanHeat(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
+   MeanHeat::MeanHeat(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGPerMeanHeat::~BoussinesqBeta3DQGPerMeanHeat()
+   MeanHeat::~MeanHeat()
    {
    }
 
-   void BoussinesqBeta3DQGPerMeanHeat::setCoupling()
+   void MeanHeat::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
-   void BoussinesqBeta3DQGPerMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void MeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -60,7 +70,7 @@ namespace Equations {
       rNLComp.setData((-Pr*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
-   void BoussinesqBeta3DQGPerMeanHeat::setRequirements()
+   void MeanHeat::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::DX_MEANTEMPERATURE);
@@ -87,5 +97,8 @@ namespace Equations {
       this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient(gradComps);
    }
 
+}
+}
+}
 }
 }

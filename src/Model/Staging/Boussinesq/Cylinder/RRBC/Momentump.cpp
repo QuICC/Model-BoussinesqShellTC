@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqRRBCCylinderMomentum.cpp
+ * @file Momentum.cpp
  * @brief Source of the implementation of the vector momentum equation in rotating Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderMomentum.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Cylinder/RRBC/Momentum.hpp )
 
 // Project includes
 //
@@ -29,32 +33,38 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqRRBCCylinderMomentum::BoussinesqRRBCCylinderMomentum(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Cylinder {
+
+namespace RRBC {
+
+   Momentum::Momentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRRBCCylinderMomentum::~BoussinesqRRBCCylinderMomentum()
+   Momentum::~Momentum()
    {
    }
 
-   void BoussinesqRRBCCylinderMomentum::setCoupling()
+   void Momentum::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, 0, true, false);
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqRRBCCylinderMomentum::setNLComponents()
+   void Momentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqRRBCCylinderMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void Momentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       // Get Prandtl number
       MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
@@ -79,7 +89,7 @@ namespace Equations {
       }
    }
 
-   void BoussinesqRRBCCylinderMomentum::setRequirements()
+   void Momentum::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -91,5 +101,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
    }
 
+}
+}
+}
 }
 }

@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGStreamfunction.cpp
+ * @file Streamfunction.cpp
  * @brief Source of the implementation of the streamfunction equation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGStreamfunction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/Streamfunction.hpp )
 
 // Project includes
 //
@@ -26,23 +30,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGStreamfunction::BoussinesqBeta3DQGStreamfunction(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
+   Streamfunction::Streamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGStreamfunction::~BoussinesqBeta3DQGStreamfunction()
+   Streamfunction::~Streamfunction()
    {
    }
 
-   void BoussinesqBeta3DQGStreamfunction::setCoupling()
+   void Streamfunction::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, false);
    }
 
-   void BoussinesqBeta3DQGStreamfunction::setRequirements()
+   void Streamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
@@ -54,5 +64,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, true));
    }
 
+}
+}
+}
 }
 }

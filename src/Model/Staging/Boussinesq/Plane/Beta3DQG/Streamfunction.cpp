@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGPerStreamfunction.cpp
+ * @file Streamfunction.cpp
  * @brief Source of the implementation of the streamfunction equation in the periodic Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerStreamfunction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/Streamfunction.hpp )
 
 // Project includes
 //
@@ -27,23 +31,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGPerStreamfunction::BoussinesqBeta3DQGPerStreamfunction(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
+   Streamfunction::Streamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGPerStreamfunction::~BoussinesqBeta3DQGPerStreamfunction()
+   Streamfunction::~Streamfunction()
    {
    }
 
-   void BoussinesqBeta3DQGPerStreamfunction::setCoupling()
+   void Streamfunction::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqBeta3DQGPerStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Streamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -55,7 +65,7 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
-   void BoussinesqBeta3DQGPerStreamfunction::setRequirements()
+   void Streamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
@@ -82,5 +92,8 @@ namespace Equations {
       this->updateFieldRequirements(PhysicalNames::VORTICITYZ).updateGradient(gradComps);
    }
 
+}
+}
+}
 }
 }

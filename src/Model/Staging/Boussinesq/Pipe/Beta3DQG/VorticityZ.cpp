@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGVorticityZ.cpp
+ * @file VorticityZ.cpp
  * @brief Source of the implementation of the vertical vorticity computation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticityZ.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/VorticityZ.hpp )
 
 // Project includes
 //
@@ -27,23 +31,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGVorticityZ::BoussinesqBeta3DQGVorticityZ(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
+   VorticityZ::VorticityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGVorticityZ::~BoussinesqBeta3DQGVorticityZ()
+   VorticityZ::~VorticityZ()
    {
    }
 
-   void BoussinesqBeta3DQGVorticityZ::setCoupling()
+   void VorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqBeta3DQGVorticityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void VorticityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -55,7 +65,7 @@ namespace Equations {
       Physical::StreamAdvection<>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 0.0);
    }
 
-   void BoussinesqBeta3DQGVorticityZ::setRequirements()
+   void VorticityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VORTICITYZ);
@@ -70,5 +80,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
    }
 
+}
+}
+}
 }
 }

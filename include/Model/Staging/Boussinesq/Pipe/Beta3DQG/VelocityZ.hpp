@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGVelocityZ.hpp
+ * @file VelocityZ.hpp
  * @brief Implementation of the vertical velocity computation for the Boussinesq Beta 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGVELOCITYZ_HPP
-#define BOUSSINESQBETA3DQGVELOCITYZ_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_VELOCITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_VELOCITYZ_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the vertical velocity computation for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGVelocityZ: public IScalarEquation
+   class VelocityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqBeta3DQGVelocityZ(SharedEquationParameters spEqParams);
+         VelocityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGVelocityZ();
+         virtual ~VelocityZ();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQBETA3DQGVELOCITYZ_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_VELOCITYZ_HPP

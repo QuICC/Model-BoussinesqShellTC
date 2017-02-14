@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqNoTiltedFPlane3DQGTransport.cpp
+ * @file Transport.cpp
  * @brief Source of the implementation of the transport equation in the tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGTransport.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/Transport.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqNoTiltedFPlane3DQGTransport::BoussinesqNoTiltedFPlane3DQGTransport(SharedEquationParameters spEqParams)
+   Transport::Transport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqNoTiltedFPlane3DQGTransport::~BoussinesqNoTiltedFPlane3DQGTransport()
+   Transport::~Transport()
    {
    }
 
-   void BoussinesqNoTiltedFPlane3DQGTransport::setCoupling()
+   void Transport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqNoTiltedFPlane3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Transport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -65,7 +65,7 @@ namespace Equations {
       rNLComp.subData(eta2*(this->scalar(PhysicalNames::NO_STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::X).data().array()*this->scalar(PhysicalNames::DZ_MEANTEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
-   void BoussinesqNoTiltedFPlane3DQGTransport::setRequirements()
+   void Transport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);

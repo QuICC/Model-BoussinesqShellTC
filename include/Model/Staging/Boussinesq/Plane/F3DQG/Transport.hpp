@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlane3DQGTransport.hpp
+ * @file Transport.hpp
  * @brief Implementation of the transport equation for the Boussinesq F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGTRANSPORT_HPP
-#define BOUSSINESQFPLANE3DQGTRANSPORT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_TRANSPORT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the transport equation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlane3DQGTransport: public IScalarEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqFPlane3DQGTransport(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlane3DQGTransport();
+         virtual ~Transport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANE3DQGTRANSPORT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_TRANSPORT_HPP

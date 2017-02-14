@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqNoTiltedFPlane3DQGNoVorticityZ.hpp
+ * @file NoVorticityZ.hpp
  * @brief Implementation of the non orthogonal vertical vorticity computation for the Boussinesq tilted F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQNOTILTEDFPLANE3DQGNOVORTICITYZ_HPP
-#define BOUSSINESQNOTILTEDFPLANE3DQGNOVORTICITYZ_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOVORTICITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOVORTICITYZ_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the non orthogonal vertical vorticity computation for the Boussinesq tilted F-plane 3DQG model
     */
-   class BoussinesqNoTiltedFPlane3DQGNoVorticityZ: public IScalarEquation
+   class NoVorticityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqNoTiltedFPlane3DQGNoVorticityZ(SharedEquationParameters spEqParams);
+         NoVorticityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqNoTiltedFPlane3DQGNoVorticityZ();
+         virtual ~NoVorticityZ();
          
       protected:
          /**
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQNOTILTEDFPLANE3DQGNOVORTICITYZ_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOVORTICITYZ_HPP

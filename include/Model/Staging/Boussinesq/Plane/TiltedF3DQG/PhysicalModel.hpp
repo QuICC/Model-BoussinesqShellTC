@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqTiltedFPlane3DQGModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQTILTEDFPLANE3DQGMODEL_HPP
-#define BOUSSINESQTILTEDFPLANE3DQGMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_PLANE_TILTEDF3DQG_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_PLANE_TILTEDF3DQG_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,7 +29,7 @@ namespace QuICC {
    /**
     * @brief Implementation of the Boussinesq tilted F-plane 3DQG model
     */
-   class BoussinesqTiltedFPlane3DQGModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -106,14 +106,14 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqTiltedFPlane3DQGModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqTiltedFPlane3DQGModel();
+         ~PhysicalModel();
    };
 
 }
 
-#endif // BOUSSINESQTILTEDFPLANE3DQGMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_PLANE_TILTEDF3DQG_PHYSICALMODEL_HPP

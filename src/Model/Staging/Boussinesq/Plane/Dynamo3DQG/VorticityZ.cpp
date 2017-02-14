@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGVorticityZ.cpp
+ * @file VorticityZ.cpp
  * @brief Source of the implementation of the vertical vorticity computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGVorticityZ.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/VorticityZ.hpp )
 
 // Project includes
 //
@@ -26,23 +30,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGVorticityZ::BoussinesqDynamo3DQGVorticityZ(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   VorticityZ::VorticityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGVorticityZ::~BoussinesqDynamo3DQGVorticityZ()
+   VorticityZ::~VorticityZ()
    {
    }
 
-   void BoussinesqDynamo3DQGVorticityZ::setCoupling()
+   void VorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
-   void BoussinesqDynamo3DQGVorticityZ::setRequirements()
+   void VorticityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VORTICITYZ);
@@ -54,5 +64,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, false));
    }
 
+}
+}
+}
 }
 }

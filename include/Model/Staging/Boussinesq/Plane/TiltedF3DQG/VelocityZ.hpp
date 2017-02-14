@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqTiltedFPlane3DQGVelocityZ.hpp
+ * @file VelocityZ.hpp
  * @brief Implementation of the upright vertical velocity equation for the Boussinesq tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQTILTEDFPLANE3DQGVELOCITYZ_HPP
-#define BOUSSINESQTILTEDFPLANE3DQGVELOCITYZ_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_TILTEDF3DQG_VELOCITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_TILTEDF3DQG_VELOCITYZ_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the upright vertical velocity equation for the Boussinesq tilted F-plane 3DQG model
     */
-   class BoussinesqTiltedFPlane3DQGVelocityZ: public IScalarEquation
+   class VelocityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqTiltedFPlane3DQGVelocityZ(SharedEquationParameters spEqParams);
+         VelocityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqTiltedFPlane3DQGVelocityZ();
+         virtual ~VelocityZ();
          
       protected:
          /**
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQTILTEDFPLANE3DQGVELOCITYZ_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_TILTEDF3DQG_VELOCITYZ_HPP

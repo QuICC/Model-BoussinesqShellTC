@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGTransport.cpp
+ * @file Transport.cpp
  * @brief Source of the implementation of the transport equation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGTransport.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/Transport.hpp )
 
 // Project includes
 //
@@ -29,23 +33,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGTransport::BoussinesqBeta3DQGTransport(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
+   Transport::Transport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGTransport::~BoussinesqBeta3DQGTransport()
+   Transport::~Transport()
    {
    }
 
-   void BoussinesqBeta3DQGTransport::setCoupling()
+   void Transport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqBeta3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Transport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -57,7 +67,7 @@ namespace Equations {
       Physical::StreamHeatAdvection<>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 0.0);
    }
 
-   void BoussinesqBeta3DQGTransport::setRequirements()
+   void Transport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
@@ -72,5 +82,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 
+}
+}
+}
 }
 }

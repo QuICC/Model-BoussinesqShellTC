@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqFPlane3DQGModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of the Boussinesq F-plane 3DQG physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqFPlane3DQGModel.hpp"
+#include "PhysicalModels/PhysicalModel.hpp"
 
 // Project includes
 //
@@ -43,11 +43,11 @@
 
 namespace QuICC {
 
-   const std::string BoussinesqFPlane3DQGModel::PYMODULE = "boussinesq_fplane3dqg";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_fplane3dqg";
 
-   const std::string BoussinesqFPlane3DQGModel::PYCLASS = "BoussinesqFPlane3DQG";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqFPlane3DQG";
 
-   void BoussinesqFPlane3DQGModel::addEquations(SharedSimulation spSim)
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add upright streamfunction equation
       spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGStreamfunction>();
@@ -67,7 +67,7 @@ namespace QuICC {
       spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGMeanHeat>();
    }
 
-   void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -137,7 +137,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqFPlane3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -177,7 +177,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqFPlane3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -193,7 +193,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
       IoVariable::SharedCartesian1DNusseltZWriter spNusselt(new IoVariable::Cartesian1DNusseltZWriter(SchemeType::type()));
@@ -212,7 +212,7 @@ namespace QuICC {
       spSim->addAsciiOutputFile(spStream);
    }
 
-   void BoussinesqFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -232,7 +232,7 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqFPlane3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
       // Create Avg temperature writer
       IoStats::SharedCartesian1DScalarAvgWriter spAvg(new IoStats::Cartesian1DScalarAvgWriter("temperature", SchemeType::type()));
@@ -256,7 +256,7 @@ namespace QuICC {
       
    }
 
-   void BoussinesqFPlane3DQGModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;

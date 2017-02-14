@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlaneNHBGETransport.hpp
+ * @file Transport.hpp
  * @brief Implementation of the transport equation for the Boussinesq F-plane NHBGE model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANENHBGETRANSPORT_HPP
-#define BOUSSINESQFPLANENHBGETRANSPORT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_TRANSPORT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the transport equation for the Boussinesq F-plane NHBGE model
     */
-   class BoussinesqFPlaneNHBGETransport: public IScalarEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqFPlaneNHBGETransport(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlaneNHBGETransport();
+         virtual ~Transport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANENHBGETRANSPORT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_TRANSPORT_HPP

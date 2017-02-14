@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlaneNHBGEVelocityZ.hpp
+ * @file VelocityZ.hpp
  * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane NHBGE model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANENHBGEVELOCITYZ_HPP
-#define BOUSSINESQFPLANENHBGEVELOCITYZ_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_VELOCITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_VELOCITYZ_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane NHBGE model
     */
-   class BoussinesqFPlaneNHBGEVelocityZ: public IScalarEquation
+   class VelocityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlaneNHBGEVelocityZ(SharedEquationParameters spEqParams);
+         VelocityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlaneNHBGEVelocityZ();
+         virtual ~VelocityZ();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANENHBGEVELOCITYZ_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_VELOCITYZ_HPP

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlane3DQGVorticityZ.hpp
+ * @file VorticityZ.hpp
  * @brief Implementation of the vertical vorticity computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGVORTICITYZ_HPP
-#define BOUSSINESQFPLANE3DQGVORTICITYZ_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_VORTICITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_VORTICITYZ_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the vertical vorticity computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlane3DQGVorticityZ: public IScalarEquation
+   class VorticityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlane3DQGVorticityZ(SharedEquationParameters spEqParams);
+         VorticityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlane3DQGVorticityZ();
+         virtual ~VorticityZ();
          
       protected:
          /**
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANE3DQGVORTICITYZ_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_VORTICITYZ_HPP

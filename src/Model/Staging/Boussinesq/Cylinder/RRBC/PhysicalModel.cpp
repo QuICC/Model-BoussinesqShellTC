@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqRRBCCylinderModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of Boussinesq rotating Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,13 +19,13 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRRBCCylinderModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Cylinder/RRBC/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Cylinder/RRBC/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Cylinder/RRBC/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderTransport.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderMomentum.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
@@ -38,24 +42,32 @@
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/NonlinearVectorFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
 
-   const std::string BoussinesqRRBCCylinderModel::PYMODULE = "boussinesq_rrbccylinder";
+namespace Model {
 
-   const std::string BoussinesqRRBCCylinderModel::PYCLASS = "BoussinesqRRBCCylinder";
+namespace Boussinesq {
 
-   void BoussinesqRRBCCylinderModel::addEquations(SharedSimulation spSim)
+namespace Cylinder {
+
+namespace RRBC {
+
+   const std::string PhysicalModel::PYMODULE = "boussinesq_rrbccylinder";
+
+   const std::string PhysicalModel::PYCLASS = "BoussinesqRRBCCylinder";
+
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqRRBCCylinderTransport>();
-      
-      // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqRRBCCylinderMomentum>();
+      spSim->addScalarEquation<Equations::Boussinesq::Cylinder::RRBC::Transport>();
+                                                                
+      // Add Navier-Stokes equation (X,Y,Z components)          
+      spSim->addVectorEquation<Equations::Boussinesq::Cylinder::RRBC::Momentum>();
    }
 
-   void BoussinesqRRBCCylinderModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -101,7 +113,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRRBCCylinderModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -137,7 +149,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRRBCCylinderModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -150,7 +162,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRRBCCylinderModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
 ///      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
@@ -159,7 +171,7 @@ namespace QuICC {
 ///      spSim->addAsciiOutputFile(spState);
    }
 
-   void BoussinesqRRBCCylinderModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -174,11 +186,11 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRRBCCylinderModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
    }
 
-   void BoussinesqRRBCCylinderModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -197,4 +209,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

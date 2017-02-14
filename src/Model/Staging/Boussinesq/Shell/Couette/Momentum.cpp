@@ -38,7 +38,7 @@ namespace Boussinesq {
 
 namespace Shell {
 
-namespace CouetteDynamo {
+namespace Couette {
 
    Momentum::Momentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)

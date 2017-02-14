@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGPerVorticityZ.hpp
+ * @file VorticityZ.hpp
  * @brief Implementation of the vertical voriticity computation for the periodic Boussinesq Beta 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGPERVORTICITYZ_HPP
-#define BOUSSINESQBETA3DQGPERVORTICITYZ_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_VORTICITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_VORTICITYZ_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the  vertical voriticity computation for the periodic Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGPerVorticityZ: public IScalarEquation
+   class VorticityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqBeta3DQGPerVorticityZ(SharedEquationParameters spEqParams);
+         VorticityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGPerVorticityZ();
+         virtual ~VorticityZ();
          
       protected:
          /**
@@ -61,5 +67,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQBETA3DQGPERVORTICITYZ_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_VORTICITYZ_HPP

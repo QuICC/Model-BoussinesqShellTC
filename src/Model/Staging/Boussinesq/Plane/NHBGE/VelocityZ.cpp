@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqFPlaneNHBGEVelocityZ.cpp
+ * @file VelocityZ.cpp
  * @brief Source of the implementation of the upright vertical velocity equation in the F-plane NHBGE model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGEVelocityZ.hpp"
+#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/VelocityZ.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqFPlaneNHBGEVelocityZ::BoussinesqFPlaneNHBGEVelocityZ(SharedEquationParameters spEqParams)
+   VelocityZ::VelocityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlaneNHBGEVelocityZ::~BoussinesqFPlaneNHBGEVelocityZ()
+   VelocityZ::~VelocityZ()
    {
    }
 
-   void BoussinesqFPlaneNHBGEVelocityZ::setCoupling()
+   void VelocityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqFPlaneNHBGEVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void VelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -55,7 +55,7 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqFPlaneNHBGEVelocityZ::setRequirements()
+   void VelocityZ::setRequirements()
    {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);

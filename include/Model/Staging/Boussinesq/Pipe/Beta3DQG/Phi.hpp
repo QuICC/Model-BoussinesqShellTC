@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGPhi.hpp
+ * @file Phi.hpp
  * @brief Implementation of the phi equation (D_z w) for the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGPHI_HPP
-#define BOUSSINESQBETA3DQGPHI_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_PHI_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_PHI_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the phi equation (D_z w) for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGPhi: public IScalarEquation
+   class Phi: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqBeta3DQGPhi(SharedEquationParameters spEqParams);
+         Phi(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGPhi();
+         virtual ~Phi();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQBETA3DQGPHI_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PIPE_BETA3DQG_PHI_HPP

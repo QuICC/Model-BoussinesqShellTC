@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqTiltedFPlane3DQGStreamfunction.cpp
+ * @file Streamfunction.cpp
  * @brief Source of the implementation of the streamfunction equation in tilted the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/Streamfunction.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqTiltedFPlane3DQGStreamfunction::BoussinesqTiltedFPlane3DQGStreamfunction(SharedEquationParameters spEqParams)
+   Streamfunction::Streamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqTiltedFPlane3DQGStreamfunction::~BoussinesqTiltedFPlane3DQGStreamfunction()
+   Streamfunction::~Streamfunction()
    {
    }
 
-   void BoussinesqTiltedFPlane3DQGStreamfunction::setCoupling()
+   void Streamfunction::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false);
    }
 
-   void BoussinesqTiltedFPlane3DQGStreamfunction::setRequirements()
+   void Streamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);

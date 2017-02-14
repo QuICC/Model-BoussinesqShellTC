@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamo3DQGPressure.hpp
+ * @file Pressure.hpp
  * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMO3DQGPRESSURE_HPP
-#define BOUSSINESQDYNAMO3DQGPRESSURE_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_PRESSURE_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_PRESSURE_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGPressure: public IScalarEquation
+   class Pressure: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqDynamo3DQGPressure(SharedEquationParameters spEqParams);
+         Pressure(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamo3DQGPressure();
+         virtual ~Pressure();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -79,5 +85,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMO3DQGPRESSURE_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_PRESSURE_HPP

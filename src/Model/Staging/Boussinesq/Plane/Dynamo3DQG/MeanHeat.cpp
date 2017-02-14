@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqDynamo3DQGMeanHeat.cpp
+ * @file MeanHeat.cpp
  * @brief Source of the implementation of the mean heat computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGMeanHeat.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Dynamo3DQG/MeanHeat.hpp )
 
 // Project includes
 //
@@ -27,23 +31,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqDynamo3DQGMeanHeat::BoussinesqDynamo3DQGMeanHeat(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
+   MeanHeat::MeanHeat(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqDynamo3DQGMeanHeat::~BoussinesqDynamo3DQGMeanHeat()
+   MeanHeat::~MeanHeat()
    {
    }
 
-   void BoussinesqDynamo3DQGMeanHeat::setCoupling()
+   void MeanHeat::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true);
    }
 
-   void BoussinesqDynamo3DQGMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void MeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -58,7 +68,7 @@ namespace Equations {
       rNLComp.setData((Pr*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
-   Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGMeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType MeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -77,7 +87,7 @@ namespace Equations {
       return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
-   void BoussinesqDynamo3DQGMeanHeat::setRequirements()
+   void MeanHeat::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::DZ_MEANTEMPERATURE);
@@ -95,5 +105,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, false, true, false));
    }
 
+}
+}
+}
 }
 }

@@ -1,5 +1,5 @@
 /** 
- * @file Cartesian3DNusseltZWriterriter.hpp
+ * @file Cartesian3DNusseltZWriter.hpp
  * @brief Implementation of the ASCII Nusselt number writer for a 3D box through Z
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -31,7 +31,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of the ASCII Nusselt number writer for a 3D box through Z
     */
-   class Cartesian3DNusseltZWriterriter: public IVariableAsciiEWriter
+   class Cartesian3DNusseltZWriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -39,12 +39,12 @@ namespace IoVariable {
           *
           * @param type Type of the file (typically scheme name)
           */
-         Cartesian3DNusseltZWriterriter(std::string type);
+         Cartesian3DNusseltZWriter(std::string type);
 
          /**
           * @brief Destructor
           */
-         virtual ~Cartesian3DNusseltZWriterriter();
+         virtual ~Cartesian3DNusseltZWriter();
 
          /**
           * @brief Initialise the operator and file
@@ -67,7 +67,7 @@ namespace IoVariable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef SharedPtrMacro<Cartesian3DNusseltZWriterriter> SharedCartesian3DNusseltZWriterriter;
+   typedef SharedPtrMacro<Cartesian3DNusseltZWriter> SharedCartesian3DNusseltZWriter;
 
 }
 }

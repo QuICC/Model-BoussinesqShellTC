@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqBeta3DQGModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGMODEL_HPP
-#define BOUSSINESQBETA3DQGMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_PIPE_BETA3DQG_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_PIPE_BETA3DQG_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -26,10 +26,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Pipe {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the Boussinesq beta 3DQG model
     */
-   class BoussinesqBeta3DQGModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -106,14 +114,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqBeta3DQGModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqBeta3DQGModel();
+         ~PhysicalModel();
    };
 
+}
+}
+}
+}
 }
 
 // 
@@ -130,4 +142,4 @@ namespace QuICC {
 #endif //QUICC_MPIALGO_TUBULAR
 
 
-#endif // BOUSSINESQBETA3DQGMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_PIPE_BETA3DQG_PHYSICALMODEL_HPP

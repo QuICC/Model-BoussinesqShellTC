@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCCYLINDERMODEL_HPP
-#define BOUSSINESQRBCCYLINDERMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_CYLINDER_RBC_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_CYLINDER_RBC_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,10 +29,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Cylinder {
+
+namespace RBC {
+
    /**
     * @brief Implementation of Boussinesq Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation) model
     */
-   class BoussinesqRBCCylinderModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -109,14 +117,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqRBCCylinderModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqRBCCylinderModel();
+         ~PhysicalModel();
    };
 
+}
+}
+}
+}
 }
 
 // 
@@ -129,4 +141,4 @@ namespace QuICC {
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //QUICC_MPIALGO_TUBULAR
 
-#endif // BOUSSINESQRBCCYLINDERMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_CYLINDER_RBC_PHYSICALMODEL_HPP

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlaneNHBGEStreamfunction.hpp
+ * @file Streamfunction.hpp
  * @brief Implementation of the streamfunction equation for the Boussinesq F-plane NHBGE model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANENHBGESTREAMFUNCTION_HPP
-#define BOUSSINESQFPLANENHBGESTREAMFUNCTION_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_STREAMFUNCTION_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_STREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the streamfunction equation for the Boussinesq F-plane NHBGE model
     */
-   class BoussinesqFPlaneNHBGEStreamfunction: public IScalarEquation
+   class Streamfunction: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlaneNHBGEStreamfunction(SharedEquationParameters spEqParams);
+         Streamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlaneNHBGEStreamfunction();
+         virtual ~Streamfunction();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANENHBGESTREAMFUNCTION_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_STREAMFUNCTION_HPP

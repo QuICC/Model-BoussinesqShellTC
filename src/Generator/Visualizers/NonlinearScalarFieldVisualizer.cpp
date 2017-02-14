@@ -63,7 +63,7 @@ namespace Equations {
       {
          // Assert on scalar component is used
          assert(id == FieldComponents::Physical::SCALAR);                                                                                                        
-         Physical::VelocityHeatAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->scalar(PhysicalNames::TEMPERATURE).dom(0).grad(), 1.0);
+         Physical::VelocityHeatAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->scalar(this->name()).dom(0).grad(), 1.0);
       }
    }
 
@@ -78,7 +78,14 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?, need curl?, need diff2?
-      this->mRequirements.addField(this->name(), FieldRequirement(true, true, this->mViewField, this->mViewGradient, false, this->mViewGradient2));
+      if(this->mNonlinearType == NonlinearScalarVisualizerIds::CYLINDER_HEAT_ADVECTION)
+      {
+         // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
+         this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, true));
+
+         // Add X velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
+         this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false));
+      }
    }
 
 }

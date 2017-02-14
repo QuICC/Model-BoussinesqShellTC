@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqRBCPlaneMomentum.cpp
+ * @file Momentum.cpp
  * @brief Source of the implementation of the vector momentum equation for Rayleigh-Benard convection in a plane layer (toroidal/poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Box/Boussinesq/BoussinesqRBCPlaneMomentum.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/RBC/Momentum.hpp )
 
 // Project includes
 //
@@ -28,32 +32,38 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqRBCPlaneMomentum::BoussinesqRBCPlaneMomentum(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace RBC {
+
+   Momentum::Momentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRBCPlaneMomentum::~BoussinesqRBCPlaneMomentum()
+   Momentum::~Momentum()
    {
    }
 
-   void BoussinesqRBCPlaneMomentum::setCoupling()
+   void Momentum::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, 0, true, false);
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqRBCPlaneMomentum::setNLComponents()
+   void Momentum::setNLComponents()
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, 0);
 
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void BoussinesqRBCPlaneMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   void Momentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       ///
       /// Compute \f$\left(\nabla\wedge\vec u\right)\wedge\vec u\f$
@@ -75,7 +85,7 @@ namespace Equations {
       }
    }
 
-   void BoussinesqRBCPlaneMomentum::setRequirements()
+   void Momentum::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -87,5 +97,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
    }
 
+}
+}
+}
 }
 }

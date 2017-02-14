@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqTiltedFPlane3DQGStreamfunction.hpp
+ * @file Streamfunction.hpp
  * @brief Implementation of the streamfunction equation for the Boussinesq tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQTILTEDFPLANE3DQGSTREAMFUNCTION_HPP
-#define BOUSSINESQTILTEDFPLANE3DQGSTREAMFUNCTION_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_TILTEDF3DQG_STREAMFUNCTION_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_TILTEDF3DQG_STREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the streamfunction equation for the Boussinesq tilted F-plane 3DQG model
     */
-   class BoussinesqTiltedFPlane3DQGStreamfunction: public IScalarEquation
+   class Streamfunction: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqTiltedFPlane3DQGStreamfunction(SharedEquationParameters spEqParams);
+         Streamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqTiltedFPlane3DQGStreamfunction();
+         virtual ~Streamfunction();
          
       protected:
          /**
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQTILTEDFPLANE3DQGSTREAMFUNCTION_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_TILTEDF3DQG_STREAMFUNCTION_HPP

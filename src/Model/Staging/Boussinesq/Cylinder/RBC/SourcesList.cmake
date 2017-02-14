@@ -1,5 +1,5 @@
 set(MHDSources
-   Momentump.cpp
+   Momentum.cpp
    PhysicalModel.cpp
    Transport.cpp
 )

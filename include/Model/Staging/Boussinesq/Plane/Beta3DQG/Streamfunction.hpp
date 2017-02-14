@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGPerStreamfunction.hpp
+ * @file Streamfunction.hpp
  * @brief Implementation of the streamfunction equation for the periodic Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGPERSTREAMFUNCTION_HPP
-#define BOUSSINESQBETA3DQGPERSTREAMFUNCTION_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_STREAMFUNCTION_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_STREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
    /**
     * @brief Implementation of the streamfunction equation for the periodic Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGPerStreamfunction: public IScalarEquation
+   class Streamfunction: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqBeta3DQGPerStreamfunction(SharedEquationParameters spEqParams);
+         Streamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGPerStreamfunction();
+         virtual ~Streamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQBETA3DQGPERSTREAMFUNCTION_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_BETA3DQG_STREAMFUNCTION_HPP

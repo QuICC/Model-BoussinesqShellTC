@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRBCCylinderTransport.hpp
+ * @file Transport.hpp
  * @brief Implementation of the transport equation for Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCCYLINDERTRANSPORT_HPP
-#define BOUSSINESQRBCCYLINDERTRANSPORT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_CYLINDER_RBC_TRANSPORT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_CYLINDER_RBC_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Cylinder {
+
+namespace RBC {
+
    /**
     * @brief Implementation of the transport equation for Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation)
     */
-   class BoussinesqRBCCylinderTransport: public IScalarEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRBCCylinderTransport(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRBCCylinderTransport();
+         virtual ~Transport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,5 +75,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQRBCCYLINDERTRANSPORT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_CYLINDER_RBC_TRANSPORT_HPP

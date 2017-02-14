@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMO3DQGMODEL_HPP
-#define BOUSSINESQDYNAMO3DQGMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_PLANE_DYNAMO3DQG_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_PLANE_DYNAMO3DQG_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -26,10 +26,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
    /**
     * @brief Implementation of the Boussinesq F-plane Dynamo 3DQG model
     */
-   class BoussinesqDynamo3DQGModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -106,14 +114,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqDynamo3DQGModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqDynamo3DQGModel();
+         ~PhysicalModel();
    };
 
 }
+}
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMO3DQGMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_PLANE_DYNAMO3DQG_PHYSICALMODEL_HPP

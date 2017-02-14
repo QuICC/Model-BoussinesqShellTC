@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqFPlaneNHBGETransport.cpp
+ * @file Transport.cpp
  * @brief Source of the implementation of the transport equation in the F-plane NHBGE model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGETransport.hpp"
+#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/Transport.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqFPlaneNHBGETransport::BoussinesqFPlaneNHBGETransport(SharedEquationParameters spEqParams)
+   Transport::Transport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlaneNHBGETransport::~BoussinesqFPlaneNHBGETransport()
+   Transport::~Transport()
    {
    }
 
-   void BoussinesqFPlaneNHBGETransport::setCoupling()
+   void Transport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqFPlaneNHBGETransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Transport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -60,7 +60,7 @@ namespace Equations {
       rNLComp.addData((this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::DZ_MEANTEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
-   void BoussinesqFPlaneNHBGETransport::setRequirements()
+   void Transport::setRequirements()
    {
       // Set temperature as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);

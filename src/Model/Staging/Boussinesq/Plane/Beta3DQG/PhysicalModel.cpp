@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGPerModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of the Boussinesq F-plane 3DQG physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,54 +19,62 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqBeta3DQGPerModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/Streamfunction.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/VelocityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/VorticityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/MeanHeat.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVelocityZ.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanHeat.hpp"
 #include "IoVariable/Cartesian1DNusseltXWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
 
-   const std::string BoussinesqBeta3DQGPerModel::PYMODULE = "boussinesq_beta3dqg_per";
+namespace Model {
 
-   const std::string BoussinesqBeta3DQGPerModel::PYCLASS = "BoussinesqBeta3DQGPer";
+namespace Boussinesq {
 
-   void BoussinesqBeta3DQGPerModel::addEquations(SharedSimulation spSim)
+namespace Plane {
+
+namespace Beta3DQG {
+
+   const std::string PhysicalModel::PYMODULE = "boussinesq_beta3dqg_per";
+
+   const std::string PhysicalModel::PYCLASS = "BoussinesqBeta3DQGPer";
+
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerStreamfunction>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Beta3DQG::Streamfunction>();
       
       // Add vertical velocity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerVelocityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Beta3DQG::VelocityZ>();
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerTransport>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Beta3DQG::Transport>();
       
       // Add vertical vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerVorticityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Beta3DQG::VorticityZ>();
 
       
       // Add mean heat computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanHeat>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::Beta3DQG::MeanHeat>();
    }
 
-   void BoussinesqBeta3DQGPerModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -130,7 +142,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGPerModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -170,7 +182,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGPerModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -186,7 +198,7 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqBeta3DQGPerModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
       IoVariable::SharedCartesian1DNusseltXWriter spNusselt(new IoVariable::Cartesian1DNusseltXWriter(SchemeType::type()));
@@ -206,7 +218,7 @@ namespace QuICC {
       spSim->addAsciiOutputFile(spStream);
    }
 
-   void BoussinesqBeta3DQGPerModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -225,11 +237,11 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqBeta3DQGPerModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
    }
 
-   void BoussinesqBeta3DQGPerModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -248,4 +260,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

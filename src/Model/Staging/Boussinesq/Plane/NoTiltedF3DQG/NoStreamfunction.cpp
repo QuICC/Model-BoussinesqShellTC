@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqNoTiltedFPlane3DQGNoStreamfunction.cpp
+ * @file NoStreamfunction.cpp
  * @brief Source of the implementation of the non orthogonal streamfuntion computation in the tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGNoStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/NoStreamfunction.hpp"
 
 // Project includes
 //
@@ -27,23 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqNoTiltedFPlane3DQGNoStreamfunction::BoussinesqNoTiltedFPlane3DQGNoStreamfunction(SharedEquationParameters spEqParams)
+   NoStreamfunction::NoStreamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqNoTiltedFPlane3DQGNoStreamfunction::~BoussinesqNoTiltedFPlane3DQGNoStreamfunction()
+   NoStreamfunction::~NoStreamfunction()
    {
    }
 
-   void BoussinesqNoTiltedFPlane3DQGNoStreamfunction::setCoupling()
+   void NoStreamfunction::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqNoTiltedFPlane3DQGNoStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void NoStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -58,7 +58,7 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::NO_VORTICITYZ).dom(0).grad(), 1.0/eta3);
    }
 
-   void BoussinesqNoTiltedFPlane3DQGNoStreamfunction::setRequirements()
+   void NoStreamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::NO_STREAMFUNCTION);

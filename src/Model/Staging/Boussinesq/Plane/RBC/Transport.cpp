@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqRBCPlaneTransport.cpp
+ * @file Transport.cpp
  * @brief Source of the implementation of the transport equation for Rayleigh-Benard convection in a plane layer (toroidal/poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Box/Boussinesq/BoussinesqRBCPlaneTransport.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/RBC/Transport.hpp )
 
 // Project includes
 //
@@ -28,23 +32,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqRBCPlaneTransport::BoussinesqRBCPlaneTransport(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace RBC {
+
+   Transport::Transport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRBCPlaneTransport::~BoussinesqRBCPlaneTransport()
+   Transport::~Transport()
    {
    }
 
-   void BoussinesqRBCPlaneTransport::setCoupling()
+   void Transport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqRBCPlaneTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Transport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -56,7 +66,7 @@ namespace Equations {
       Physical::VelocityHeatAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqRBCPlaneTransport::setRequirements()
+   void Transport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
@@ -71,5 +81,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false));
    }
 
+}
+}
+}
 }
 }

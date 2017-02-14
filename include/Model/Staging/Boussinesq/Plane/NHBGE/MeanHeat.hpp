@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlaneNHBGEMeanHeat.hpp
+ * @file MeanHeat.hpp
  * @brief Implementation of the mean heat computation for the Boussinesq F-plane NHBGE model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANENHBGEMEANHEAT_HPP
-#define BOUSSINESQFPLANENHBGEMEANHEAT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_MEANHEAT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_MEANHEAT_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq F-plane NHBGE model
     */
-   class BoussinesqFPlaneNHBGEMeanHeat: public IScalarEquation
+   class MeanHeat: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlaneNHBGEMeanHeat(SharedEquationParameters spEqParams);
+         MeanHeat(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlaneNHBGEMeanHeat();
+         virtual ~MeanHeat();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -80,4 +80,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANENHBGEMEANHEAT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NHBGE_MEANHEAT_HPP

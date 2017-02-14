@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqFPlane3DQGModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGMODEL_HPP
-#define BOUSSINESQFPLANE3DQGMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_PLANE_F3DQG_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_PLANE_F3DQG_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,7 +29,7 @@ namespace QuICC {
    /**
     * @brief Implementation of the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlane3DQGModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -106,12 +106,12 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqFPlane3DQGModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqFPlane3DQGModel();
+         ~PhysicalModel();
    };
 
 // 
@@ -144,4 +144,4 @@ namespace QuICC {
 
 }
 
-#endif // BOUSSINESQFPLANE3DQGMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_PLANE_F3DQG_PHYSICALMODEL_HPP

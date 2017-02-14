@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGPerVorticityZ.cpp
+ * @file VorticityZ.cpp
  * @brief Source of the implementation of the vertical vorticity computation in the periodic Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/VorticityZ.hpp )
 
 // Project includes
 //
@@ -26,23 +30,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGPerVorticityZ::BoussinesqBeta3DQGPerVorticityZ(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
+   VorticityZ::VorticityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGPerVorticityZ::~BoussinesqBeta3DQGPerVorticityZ()
+   VorticityZ::~VorticityZ()
    {
    }
 
-   void BoussinesqBeta3DQGPerVorticityZ::setCoupling()
+   void VorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
-   void BoussinesqBeta3DQGPerVorticityZ::setRequirements()
+   void VorticityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VORTICITYZ);
@@ -54,5 +64,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, false));
    }
 
+}
+}
+}
 }
 }

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamo3DQGBx.hpp
+ * @file Bx.hpp
  * @brief Implementation of the vertical vorticity computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMO3DQGBX_HPP
-#define BOUSSINESQDYNAMO3DQGBX_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_BX_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_BX_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
    /**
     * @brief Implementation of the vertical vorticity computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGBx: public IScalarEquation
+   class Bx: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqDynamo3DQGBx(SharedEquationParameters spEqParams);
+         Bx(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamo3DQGBx();
+         virtual ~Bx();
          
       protected:
          /**
@@ -61,5 +67,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMO3DQGBX_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_BX_HPP

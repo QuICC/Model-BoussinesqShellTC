@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqRBCPlaneModel.hpp
+ * @file PhysicalModel.hpp
  * @brief Implementation of the Boussinesq Rayleigh-Benard in a plane layer (toroidal/poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCPLANEMODEL_HPP
-#define BOUSSINESQRBCPLANEMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_PLANE_RBC_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_PLANE_RBC_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -29,10 +29,18 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace RBC {
+
    /**
     * @brief Implementation of the Boussinesq Rayleigh-Benard in a plane layer (toroidal/poloidal formulation)
     */
-   class BoussinesqRBCPlaneModel
+   class PhysicalModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -109,14 +117,18 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         BoussinesqRBCPlaneModel();
+         PhysicalModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqRBCPlaneModel();
+         ~PhysicalModel();
    };
 
 }
+}
+}
+}
+}
 
-#endif // BOUSSINESQRBCPLANEMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_PLANE_RBC_PHYSICALMODEL_HPP

@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqRRBCCylinderTransport.cpp
+ * @file Transport.cpp
  * @brief Source of the implementation of the transport equation in rotating Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Cylinder/Boussinesq/BoussinesqRRBCCylinderTransport.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Cylinder/RRBC/Transport.hpp )
 
 // Project includes
 //
@@ -28,23 +32,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqRRBCCylinderTransport::BoussinesqRRBCCylinderTransport(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Cylinder {
+
+namespace RRBC {
+
+   Transport::Transport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRRBCCylinderTransport::~BoussinesqRRBCCylinderTransport()
+   Transport::~Transport()
    {
    }
 
-   void BoussinesqRRBCCylinderTransport::setCoupling()
+   void Transport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
-   void BoussinesqRRBCCylinderTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Transport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -56,7 +66,7 @@ namespace Equations {
       Physical::VelocityHeatAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqRRBCCylinderTransport::setRequirements()
+   void Transport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
@@ -71,5 +81,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false));
    }
 
+}
+}
+}
 }
 }

@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqTiltedFPlane3DQGNoVelocityZ.cpp
+ * @file NoVelocityZ.cpp
  * @brief Source of the implementation of the non orthogonal vertical velocity computation in the tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGNoVelocityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/NoVelocityZ.hpp"
 
 // Project includes
 //
@@ -27,7 +27,7 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqTiltedFPlane3DQGNoVelocityZ::BoussinesqTiltedFPlane3DQGNoVelocityZ(SharedEquationParameters spEqParams, const SolveTiming::Id time)
+   NoVelocityZ::NoVelocityZ(SharedEquationParameters spEqParams, const SolveTiming::Id time)
       : IScalarEquation(spEqParams)
    {
       // Set solver timing
@@ -37,11 +37,11 @@ namespace Equations {
       this->setRequirements();
    }
 
-   BoussinesqTiltedFPlane3DQGNoVelocityZ::~BoussinesqTiltedFPlane3DQGNoVelocityZ()
+   NoVelocityZ::~NoVelocityZ()
    {
    }
 
-   void BoussinesqTiltedFPlane3DQGNoVelocityZ::setCoupling()
+   void NoVelocityZ::setCoupling()
    {
       if(this->solveTiming() == SolveTiming::BEFORE)
       {
@@ -52,7 +52,7 @@ namespace Equations {
       }
    }
 
-   void BoussinesqTiltedFPlane3DQGNoVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void NoVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -67,7 +67,7 @@ namespace Equations {
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::NO_STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0/eta3);
    }
 
-   void BoussinesqTiltedFPlane3DQGNoVelocityZ::setRequirements()
+   void NoVelocityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::NO_VELOCITYZ);

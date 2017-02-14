@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqDynamo3DQGMeanHeat.hpp
+ * @file MeanHeat.hpp
  * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQDYNAMO3DQGMEANHEAT_HPP
-#define BOUSSINESQDYNAMO3DQGMEANHEAT_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_MEANHEAT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_MEANHEAT_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Dynamo3DQG {
+
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqDynamo3DQGMeanHeat: public IScalarEquation
+   class MeanHeat: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqDynamo3DQGMeanHeat(SharedEquationParameters spEqParams);
+         MeanHeat(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqDynamo3DQGMeanHeat();
+         virtual ~MeanHeat();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -79,5 +85,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQDYNAMO3DQGMEANHEAT_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_DYNAMO3DQG_MEANHEAT_HPP

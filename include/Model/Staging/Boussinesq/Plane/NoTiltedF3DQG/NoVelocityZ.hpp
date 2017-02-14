@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqNoTiltedFPlane3DQGNoVelocityZ.hpp
+ * @file NoVelocityZ.hpp
  * @brief Implementation of the non orthogonal vertical velocity computation for the Boussinesq tilted F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQNOTILTEDFPLANE3DQGNOVELOCITYZ_HPP
-#define BOUSSINESQNOTILTEDFPLANE3DQGNOVELOCITYZ_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOVELOCITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOVELOCITYZ_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of the non orthogonal vertical velocity computation for the Boussinesq tilted F-plane 3DQG model
     */
-   class BoussinesqNoTiltedFPlane3DQGNoVelocityZ: public IScalarEquation
+   class NoVelocityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqNoTiltedFPlane3DQGNoVelocityZ(SharedEquationParameters spEqParams);
+         NoVelocityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqNoTiltedFPlane3DQGNoVelocityZ();
+         virtual ~NoVelocityZ();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQNOTILTEDFPLANE3DQGNOVELOCITYZ_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_NOTILTEDF3DQG_NOVELOCITYZ_HPP

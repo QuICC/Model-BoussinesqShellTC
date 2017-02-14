@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGPerTransport.cpp
+ * @file Transport.cpp
  * @brief Source of the implementation of the transport equation in the periodic Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/Beta3DQG/Transport.hpp )
 
 // Project includes
 //
@@ -29,23 +33,29 @@ namespace QuICC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGPerTransport::BoussinesqBeta3DQGPerTransport(SharedEquationParameters spEqParams)
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace Beta3DQG {
+
+   Transport::Transport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGPerTransport::~BoussinesqBeta3DQGPerTransport()
+   Transport::~Transport()
    {
    }
 
-   void BoussinesqBeta3DQGPerTransport::setCoupling()
+   void Transport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
-   void BoussinesqBeta3DQGPerTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Transport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -57,7 +67,7 @@ namespace Equations {
       Physical::StreamHeatAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqBeta3DQGPerTransport::setRequirements()
+   void Transport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
@@ -84,5 +94,8 @@ namespace Equations {
       this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient(gradComps);
    }
 
+}
+}
+}
 }
 }

@@ -1,8 +1,12 @@
 /** 
- * @file BoussinesqBeta3DQGModel.cpp
+ * @file PhysicalModel.cpp
  * @brief Source of the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -15,47 +19,55 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqBeta3DQGModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/Streamfunction.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/VorticityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Pipe/Beta3DQG/VelocityZ.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGTransport.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticityZ.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVelocityZ.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VorticityStreamVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
 
-   const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg";
+namespace Model {
 
-   const std::string BoussinesqBeta3DQGModel::PYCLASS = "BoussinesqBeta3DQG";
+namespace Boussinesq {
 
-   void BoussinesqBeta3DQGModel::addEquations(SharedSimulation spSim)
+namespace Pipe {
+
+namespace Beta3DQG {
+
+   const std::string PhysicalModel::PYMODULE = "boussinesq_beta3dqg";
+
+   const std::string PhysicalModel::PYCLASS = "BoussinesqBeta3DQG";
+
+   void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::Boussinesq::Pipe::Beta3DQG::Streamfunction>();
       
       // Add vertical velocity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVelocityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Pipe::Beta3DQG::VelocityZ>();
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>();
+      spSim->addScalarEquation<Equations::Boussinesq::Pipe::Beta3DQG::Transport>();
       
       // Add vertical vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Pipe::Beta3DQG::VorticityZ>();
    }
 
-   void BoussinesqBeta3DQGModel::addStates(SharedStateGenerator spGen)
+   void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -122,7 +134,7 @@ namespace QuICC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void PhysicalModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -156,7 +168,7 @@ namespace QuICC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void PhysicalModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -171,13 +183,13 @@ namespace QuICC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqBeta3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void BoussinesqBeta3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -192,11 +204,11 @@ namespace QuICC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqBeta3DQGModel::addStatsOutputFiles(SharedSimulation spSim)
+   void PhysicalModel::addStatsOutputFiles(SharedSimulation spSim)
    {
    }
 
-   void BoussinesqBeta3DQGModel::setInitialState(SharedSimulation spSim)
+   void PhysicalModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<PhysicalNames::Id>::const_iterator  it;
@@ -215,4 +227,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

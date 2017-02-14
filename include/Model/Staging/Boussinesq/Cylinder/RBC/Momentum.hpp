@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRBCCylinderMomentum.hpp
+ * @file Momentum.hpp
  * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCCYLINDERMOMENTUM_HPP
-#define BOUSSINESQRBCCYLINDERMOMENTUM_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_CYLINDER_RBC_MOMENTUM_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_CYLINDER_RBC_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -27,10 +27,16 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Cylinder {
+
+namespace RBC {
+
    /**
     * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a cylinder (toroidal-poloidal formulation)
     */
-   class BoussinesqRBCCylinderMomentum: public IVectorEquation
+   class Momentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +44,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRBCCylinderMomentum(SharedEquationParameters spEqParams);
+         Momentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRBCCylinderMomentum();
+         virtual ~Momentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -74,5 +80,8 @@ namespace Equations {
 
 }
 }
+}
+}
+}
 
-#endif // BOUSSINESQRBCCYLINDERMOMENTUM_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_CYLINDER_RBC_MOMENTUM_HPP

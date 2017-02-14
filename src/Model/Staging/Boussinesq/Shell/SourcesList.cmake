@@ -2,12 +2,9 @@ set(MHDSources
 )
 
 set(MHDSrcSubDirs
-   CouetteDynamoStd
-   CouetteStd
+   CouetteDynamo
+   Couette
    Dynamo
-   DynamoStd
    RTC
-   RTCStd
    TC
-   TCStd
 )

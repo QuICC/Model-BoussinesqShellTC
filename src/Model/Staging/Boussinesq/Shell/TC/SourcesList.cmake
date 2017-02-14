@@ -1,6 +1,9 @@
 set(MHDSources
-   PhysicalModel.cpp
+   Momentum.cpp
+   Transport.cpp
 )
 
 set(MHDSrcSubDirs
+   Explicit
+   Implicit
 )
