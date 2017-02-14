@@ -165,3 +165,35 @@ BoussinesqSphereDynamoExplicit:
    script:
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
       - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqSpherePrecessionExplicit:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqSpherePrecessionRTCExplicit:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqSpherePrecessionDynamoExplicit:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+
+BoussinesqSpherePrecessionRTCDynamoExplicit:
+   stage: build
+   only:
+      - master
+   script:
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Serial ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
+      - bash test_build.sh ${CI_PROJECT_DIR} ${RUNNER_QUICC_PLATFORM} Tubular ${CI_BUILD_NAME} ${RUNNER_QUICC_PARAMAKE}
