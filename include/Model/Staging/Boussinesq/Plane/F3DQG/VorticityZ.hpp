@@ -27,6 +27,12 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace F3DQG {
+
    /**
     * @brief Implementation of the vertical vorticity computation for the Boussinesq F-plane 3DQG model
     */
@@ -59,6 +65,9 @@ namespace Equations {
       private:
    };
 
+}
+}
+}
 }
 }
 

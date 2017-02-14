@@ -27,6 +27,12 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NoTiltedF3DQG {
+
    /**
     * @brief Implementation of the mean heat computation for the Boussinesq tilted F-plane 3DQG model
     */
@@ -77,6 +83,9 @@ namespace Equations {
       private:
    };
 
+}
+}
+}
 }
 }
 

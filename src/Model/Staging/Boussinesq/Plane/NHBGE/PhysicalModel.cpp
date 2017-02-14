@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
+
 // Configuration includes
 //
 
@@ -15,29 +19,37 @@
 
 // Class include
 //
-#include "PhysicalModels/PhysicalModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NHBGE/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NHBGE/Streamfunction.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NHBGE/VelocityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NHBGE/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NHBGE/VorticityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NHBGE/MeanHeat.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGEStreamfunction.hpp"
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGEVelocityZ.hpp"
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGETransport.hpp"
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGEVorticityZ.hpp"
-#include "Equations/Asymptotics/FPlaneNHBGE/Boussinesq/BoussinesqFPlaneNHBGEMeanHeat.hpp"
 #include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
+
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NHBGE {
 
    const std::string PhysicalModel::PYMODULE = "boussinesq_fplanenhbge";
 
@@ -46,21 +58,21 @@ namespace QuICC {
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add upright streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlaneNHBGEStreamfunction>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NHBGE::Streamfunction>();
       
       // Add upright vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlaneNHBGEVelocityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NHBGE::VelocityZ>();
       
       // Add upright transport equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlaneNHBGETransport>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NHBGE::Transport>();
 
 
       // Add vertical vorticity equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlaneNHBGEVorticityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NHBGE::VorticityZ>();
 
       
       // Add mean heat computation
-      spSim->addScalarEquation<Equations::BoussinesqFPlaneNHBGEMeanHeat>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NHBGE::MeanHeat>();
    }
 
    void PhysicalModel::addStates(SharedStateGenerator spGen)
@@ -243,4 +255,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

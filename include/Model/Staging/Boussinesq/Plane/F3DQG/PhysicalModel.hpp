@@ -26,6 +26,14 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace F3DQG {
+
    /**
     * @brief Implementation of the Boussinesq F-plane 3DQG model
     */
@@ -142,6 +150,10 @@ namespace QuICC {
 #error "The ImExRKCB4 timestepper is not supported!" 
 #endif //QUICC_TIMESTEPPER_IMEXRKCB4
 
+}
+}
+}
+}
 }
 
 #endif // QUICC_MODEL_BOUSSINESQ_PLANE_F3DQG_PHYSICALMODEL_HPP

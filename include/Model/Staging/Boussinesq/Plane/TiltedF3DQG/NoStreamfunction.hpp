@@ -27,6 +27,12 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace TiltedF3DQG {
+
    /**
     * @brief Implementation of the non orthogonal streamfunction computation for the Boussinesq tilted F-plane 3DQG model
     */
@@ -68,6 +74,9 @@ namespace Equations {
       private:
    };
 
+}
+}
+}
 }
 }
 

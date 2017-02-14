@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
+
 // Configuration includes
 //
 
@@ -15,7 +19,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/VelocityZ.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/TiltedF3DQG/VelocityZ.hpp )
 
 // Project includes
 //
@@ -26,6 +30,12 @@
 namespace QuICC {
 
 namespace Equations {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace TiltedF3DQG {
 
    VelocityZ::VelocityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
@@ -55,5 +65,8 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
    }
 
+}
+}
+}
 }
 }

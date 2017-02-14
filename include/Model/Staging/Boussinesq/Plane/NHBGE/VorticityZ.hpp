@@ -27,6 +27,12 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NHBGE {
+
    /**
     * @brief Implementation of the vertical vorticity computation for the Boussinesq F-plane NHBGE model
     */
@@ -59,6 +65,9 @@ namespace Equations {
       private:
    };
 
+}
+}
+}
 }
 }
 

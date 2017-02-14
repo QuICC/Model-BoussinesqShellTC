@@ -27,6 +27,12 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NoTiltedF3DQG {
+
    /**
     * @brief Implementation of the non orthogonal vertical velocity computation for the Boussinesq tilted F-plane 3DQG model
     */
@@ -67,6 +73,9 @@ namespace Equations {
       private:
    };
 
+}
+}
+}
 }
 }
 

@@ -26,6 +26,14 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NoTiltedF3DQG {
+
    /**
     * @brief Implementation of the Boussinesq tilted F-plane 3DQG model (nonorthogonal formulation)
     */
@@ -114,6 +122,10 @@ namespace QuICC {
          ~PhysicalModel();
    };
 
+}
+}
+}
+}
 }
 
 #endif // QUICC_MODEL_BOUSSINESQ_PLANE_NOTILTEDF3DQG_PHYSICALMODEL_HPP

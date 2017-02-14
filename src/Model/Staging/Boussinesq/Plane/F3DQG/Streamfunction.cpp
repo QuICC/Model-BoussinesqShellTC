@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
+
 // Configuration includes
 //
 
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/Streamfunction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/F3DQG/Streamfunction.hpp )
 
 // Project includes
 //
@@ -27,6 +31,12 @@
 namespace QuICC {
 
 namespace Equations {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace F3DQG {
 
    Streamfunction::Streamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
@@ -101,5 +111,8 @@ namespace Equations {
 //      this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient2(grad2Comps);
    }
 
+}
+}
+}
 }
 }

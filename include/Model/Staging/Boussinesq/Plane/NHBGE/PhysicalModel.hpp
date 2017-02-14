@@ -26,6 +26,14 @@
 
 namespace QuICC {
 
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NHBGE {
+
    /**
     * @brief Implementation of the Boussinesq F-plane NHBGE model
     */
@@ -114,6 +122,10 @@ namespace QuICC {
          ~PhysicalModel();
    };
 
+}
+}
+}
+}
 }
 
 #endif // QUICC_MODEL_BOUSSINESQ_PLANE_NHBGE_PHYSICALMODEL_HPP

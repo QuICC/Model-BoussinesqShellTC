@@ -27,6 +27,12 @@ namespace QuICC {
 
 namespace Equations {
 
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NHBGE {
+
    /**
     * @brief Implementation of the transport equation for the Boussinesq F-plane NHBGE model
     */
@@ -67,6 +73,9 @@ namespace Equations {
       private:
    };
 
+}
+}
+}
 }
 }
 

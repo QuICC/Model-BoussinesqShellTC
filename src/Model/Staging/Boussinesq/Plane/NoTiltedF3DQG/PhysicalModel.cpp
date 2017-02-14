@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
+
 // Configuration includes
 //
 
@@ -15,20 +19,20 @@
 
 // Class include
 //
-#include "PhysicalModels/PhysicalModel.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NoTiltedF3DQG/PhysicalModel.hpp )
 
 // Project includes
 //
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NoTiltedF3DQG/NoStreamfunction.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NoTiltedF3DQG/NoVelocityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NoTiltedF3DQG/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NoTiltedF3DQG/NoVorticityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NoTiltedF3DQG/MeanHeat.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGTransport.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGNoStreamfunction.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGNoVelocityZ.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGNoVorticityZ.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqNoTiltedFPlane3DQGMeanHeat.hpp"
 #include "IoVariable/Cartesian1DNusseltZWriter.hpp"
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
@@ -36,9 +40,17 @@
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/TiltedScalarFieldVisualizer.hpp"
-#include "PhysicalModels/PhysicalModelBase.hpp"
+#include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
+
+namespace Model {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NoTiltedF3DQG {
 
    const std::string PhysicalModel::PYMODULE = "boussinesq_notilted_fplane3dqg_r";
 
@@ -47,20 +59,20 @@ namespace QuICC {
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add non orthogonal streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqNoTiltedFPlane3DQGNoStreamfunction>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NoTiltedF3DQG::NoStreamfunction>();
       
       // Add non orthogonal vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqNoTiltedFPlane3DQGNoVelocityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NoTiltedF3DQG::NoVelocityZ>();
       
       // Add upright transport equation
-      spSim->addScalarEquation<Equations::BoussinesqNoTiltedFPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NoTiltedF3DQG::Transport>();
 
       // Add non orthogonal vertical vorticity equation
-      spSim->addScalarEquation<Equations::BoussinesqNoTiltedFPlane3DQGNoVorticityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NoTiltedF3DQG::NoVorticityZ>();
 
       
       // Add mean heat computation
-      spSim->addScalarEquation<Equations::BoussinesqNoTiltedFPlane3DQGMeanHeat>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::NoTiltedF3DQG::MeanHeat>();
    }
 
    void PhysicalModel::addStates(SharedStateGenerator spGen)
@@ -249,4 +261,8 @@ namespace QuICC {
       spSim->setInitialState(spInit);
    }
 
+}
+}
+}
+}
 }

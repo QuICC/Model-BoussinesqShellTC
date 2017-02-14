@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
+
 // Configuration includes
 //
 
@@ -14,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/NoStreamfunction.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/NoTiltedF3DQG/NoStreamfunction.hpp )
 
 // Project includes
 //
@@ -26,6 +30,12 @@
 namespace QuICC {
 
 namespace Equations {
+
+namespace Boussinesq {
+
+namespace Plane {
+
+namespace NoTiltedF3DQG {
 
    NoStreamfunction::NoStreamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
@@ -85,5 +95,8 @@ namespace Equations {
       this->updateFieldRequirements(PhysicalNames::NO_VORTICITYZ).updateGradient(gradComps);
    }
 
+}
+}
+}
 }
 }
