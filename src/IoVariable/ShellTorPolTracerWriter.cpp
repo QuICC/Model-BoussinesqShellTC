@@ -506,7 +506,7 @@ namespace IoVariable{
 		// Allreduce the R components
 		Array R = this ->mRpart;
 		MPI_Allreduce(MPI_IN_PLACE, R.data(), R.rows(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-		this->mPolTracer = R;
+		this->mRpart = R;
 
 		// Allreduce the Theta component
 		Array Theta = this->mThetapart;
