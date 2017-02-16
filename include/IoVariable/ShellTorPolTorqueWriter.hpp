@@ -29,7 +29,8 @@ namespace QuICC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical shell
+    * @brief Implementation of the ASCII spherical harmonics inner sphere torque calculation
+    * for a Toroidal/Poloidal field in a spherical shell
     */
    class ShellTorPolTorqueWriter: public IVariableAsciiEWriter
    {
@@ -70,13 +71,26 @@ namespace IoVariable {
       protected:
 
       private:
+
          /**
           * @brief Torque value to be computed and printed
           */
          MHDFloat mTorque;
+
+         /*
+          * @brief bool flag to signal different cores whether they have the T_1^0 field or not
+          */
          bool mComputeFlag;
+
+         /*
+          * @brief array storing the evaluated basis of r d/dr (1/r T) de factor beying a projection from spectral
+          * to physical value at the boundary
+          */
          Array mProj;
 
+         /*
+          * @brief precomputed E-dependent scaling for the torque
+          */
          MHDFloat mFactor;
    };
 

@@ -86,7 +86,7 @@ namespace IoVariable {
          Matrix mPolEnergy;
 
          /*
-          * @brief Storage for the radial spectral decomposition
+          * @brief Storage for the radial spectral decomposition, unused
           */
          Array mTorRadial;
          Array mPolRadial;

@@ -62,6 +62,7 @@ namespace IoVariable {
       // resize the mTorEnergy and mPolEnergy matrices
       mTorEnergy = Matrix(Lmax, Mmax);
       mPolEnergy = Matrix(Lmax, Mmax);
+
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("quicc.geometry.spherical.shell_radius");
@@ -74,6 +75,8 @@ namespace IoVariable {
       PyObject *pTmp = PyTuple_New(2);
       PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second));
       PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second));
+
+      // function call linear_r2x
       PythonWrapper::setFunction("linear_r2x");
       pValue = PythonWrapper::callFunction(pTmp);
       PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
@@ -376,8 +379,8 @@ namespace IoVariable {
          MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum.data(), MTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum.data(), LPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum.data(), MPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, mTorRadial.data(), mTorRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, mPolRadial.data(), mPolRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         //MPI_Allreduce(MPI_IN_PLACE, mTorRadial.data(), mTorRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         //MPI_Allreduce(MPI_IN_PLACE, mPolRadial.data(), mPolRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          std::cout << "Post MPIAllreduce\n" ;
 
       #endif //QUICC_MPI
