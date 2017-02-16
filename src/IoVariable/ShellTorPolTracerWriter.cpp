@@ -504,24 +504,24 @@ namespace IoVariable{
 		#ifdef QUICC_MPI
 
 		// Allreduce the R components
-		Array R = this ->mRpart;
-		MPI_Allreduce(MPI_IN_PLACE, R.data(), R.rows(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		Array R = this->mRpart;
+		MPI_Allreduce(MPI_IN_PLACE, R.data(), R.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		this->mRpart = R;
 
 		// Allreduce the Theta component
 		Array Theta = this->mThetapart;
-		MPI_Allreduce(MPI_IN_PLACE, Theta.data(), Theta.rows(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, Theta.data(), Theta.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		this->mThetapart = Theta;
 
 		// Allreduce the Phi component
 		Array Phi = this->mPhipart;
-		MPI_Allreduce(MPI_IN_PLACE, Phi.data(), Phi.rows(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, Phi.data(), Phi.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		this->mPhipart = Phi;
 		#endif // QUICC_MPI
 
 		// Check is the workflow allows IO to be performed
 		if(FrameworkMacro::allowsIO()){
-			this ->mFile << std::setprecision(14) << this->mTime << '\t' << this->mRpart.transpose();
+			this ->mFile << std::setprecision(14) << this->mTime << '\t' << this->mRpart.transpose() << '\t';
 			this ->mFile << std::setprecision(14) << this->mThetapart.transpose() << '\t' << this->mPhipart.transpose()<< std::endl;
 		}
 

@@ -200,6 +200,7 @@ namespace QuICC {
     		  0.9, 0.0, 3.141592654,
 			  0.95, 0.0, 3.141592654,
 			  1.0, 0.0, 3.141592654;
+
       // Create probe field writer
       IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
