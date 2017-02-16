@@ -77,21 +77,12 @@ namespace IoVariable{
 	private:
 
 		/*
-		 * @brief Vector that stores the projection of the Toroidal field
-		 */
-		Array mTorTracer;
-
-		/*
-		 * @brief Vector that stores the projection of the Poloidal field
+		 * @brief Vectors that stores the projection of the Poloidal field
 		 */
 		Array mRpart;
-
 		Array mThetapart;
-
 		Array mPhipart;
 
-		// TODO: are other fields that we need?
-		// TODO: mPoints (given at constructor time?),
 
 		/*
 		 * @briefs Position of the probes, size(mPoints)=[M,3], written in (r,theta,phi)
@@ -135,7 +126,7 @@ namespace IoVariable{
 		Matrix mProjInvrMat;
 
 		/*
-		 * If we decide that we need current Tracers as well
+		 * If we decide that we need J probes as well
 		Matrix mProjTricurlMat;
 		 */
 	};

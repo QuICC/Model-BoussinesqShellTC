@@ -9,29 +9,6 @@ from numpy.polynomial import legendre as leg
 import scipy.special as spe
 
 
-def totphys(spec, maxl, m, x):
-    """Tranform theta spectral coefficients to physical values"""
-
-    mat = plm(maxl, m, x)
-    phys = mat.dot(spec)
-
-    return phys
-
-def totleg(phys, maxl, m):
-    """Tranform theta physical values to spectral coefficients"""
-
-    nt = 3*(maxl - m + 1)//2
-    x, w = leg.leggauss(nt)
-    mat = plm(maxl, m).T
-    spec = mat.dot(np.diag(w).dot(phys))
-
-    return spec
-
-def eqgrid(m, phi = 2*np.pi):
-    """Create a equatorial (phi) grid for given harmonic order"""
-
-    return np.linspace(0, phi, max(min_phi_points,3*m))
-
 def plm(l, m, x):
 
     """Compute the normalized associated legendre polynomial projection matrix"""
@@ -63,12 +40,14 @@ def pmm(maxl, m, x):
     return mat
 
 def lplm(l, m, x):
-    # return an orthonormal assoc legendre func
 
+    # return an orthonormal assoc legendre function
+    # wapper for plm
     x = np.array(x)
 
     y = plm(l, m, x)
     return y
+
 """
 def dplm0(l, m, x):
     # return the deriavative of an orthonormal assoc legendre func
@@ -110,8 +89,7 @@ def dplm4(l, m, x):
     y = -(l+m) * (l-m+1)*sin_the * spe.lpmv(m-1,l,x) -m *x*spe.lpmv(m,l,x)
 
     return y * (spe.gamma(l - m + 1) / spe.gamma(l + m + 1) * (2 * l + 1) / 4 / np.pi) ** .5 /sin_the
-"""
-"""
+
 def dplm_1(l, m, x):
     # derivative associated legendre function
     # implementation Hollerbach style, stable on the poles
@@ -123,23 +101,7 @@ def dplm_1(l, m, x):
     y = -1./2*((l+m)*(l-m+1)*spe.lpmv(m-1,l,x)-spe.lpmv(m+1,l,x))
 
     return y * (spe.gamma(l - m + 1) / spe.gamma(l + m + 1) * (2 * l + 1) / 4 / np.pi) ** .5
-"""
 
-def dplm(l, m, x):
-    # derivative associated legendre function
-    # implementation Hollerbach style, stable on the poles
-    # fully normalized
-
-    x = np.array(x)
-    """
-    if(l==0 and m==0):
-        return np.zeros_like(x)
-    """
-    y = -1./2*(((l+m)*(l-m+1))**0.5*plm(l,m-1,x)-((l-m)*(l+m+1))**.5*plm(l, m+1, x))
-
-    return y
-
-"""
 def dplm_1(l, m, x):
 
     x = np.array(x)
@@ -158,9 +120,31 @@ def lplm_sin_1(l, m, x):
         y = spe.lpmv(m, l, x)/(1-x**2)**.5
 
     return y*(spe.gamma(l-m+1)/spe.gamma(l+m+1)*(2*l+1)/4/np.pi)**.5
+
+
+def deipm(l, m, phi):
+    phi = np.array(phi)
+    # compute the derivative  wrt phi of the azimuthal part of  Y_l^m
+    return 1j*m*np.exp(m*phi*1j)
+
 """
+
+def dplm(l, m, x):
+
+    # returns the derivative associated legendre function
+    # implementation Hollerbach style, stable on the poles
+    # fully normalized
+    x = np.array(x)
+    y = -1./2*(((l+m)*(l-m+1))**0.5*plm(l,m-1,x)-((l-m)*(l+m+1))**.5*plm(l, m+1, x))
+
+    return y
+
+
 def lplm_sin(l, m, x):
 
+    # return associated legendre function /sin_theta
+    # implemented with the recurrence relation for P_l^m(x)/(1-x**2)**.5 when possible (aka m!=0)
+    # fully normalized
 
     x = np.array(x)
     if m!=0:
@@ -172,16 +156,14 @@ def lplm_sin(l, m, x):
 
 def eipm(l, m, phi):
 
-    # convert phi argument into a numpy array
+    # returns the azimuthal part of a Ylm spherical harmonic
+    # the spherical harmonic is fully normalized, but the normalization
+    # is hidden in the associated legendre function part
     phi = np.array(phi)
 
     # compute the azimuthal part of spherical harmonics e^{imphi}
     return np.exp(m*phi*1j)
 
-def deipm(l, m, phi):
-    phi = np.array(phi)
-    # compute the derivative  wrt phi of the azimuthal part of  Y_l^m
-    return 1j*m*np.exp(m*phi*1j)
 
 if __name__=="__main__":
     # main function, used for testing the routines
@@ -192,9 +174,9 @@ if __name__=="__main__":
 
     print(plm(40,1,x)-lplm(40,1,x))
 
-    #print(dplm(0,0,x)-dplm2(0,0,x))
+    print(dplm(0,0,x))
 
-    print(lplm_sin(5,1,x)-lplm_sin_2(5,1,x))
+
 
 
 
