@@ -83,7 +83,7 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
 
         return fields
 
-    def block_size(self, res, field_row):
+    def block_size(self, res, eigs, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -92,6 +92,8 @@ class BoussinesqDynamo3DQG(base_model.BaseModel):
                 shift_z = 2
             elif field_row == ("temperature",""):
                 shift_z = 2
+            elif field_row == ("streamfunction",""):
+                shift_z = 2    
             else:
                 shift_z = 0
 
