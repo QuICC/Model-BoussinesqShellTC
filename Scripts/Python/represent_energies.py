@@ -31,7 +31,12 @@ if __name__=="__main__":
         for folder in os.listdir('.'):
             if (os.path.isdir(folder)):
                 print(folder)
-                datatemp = pd.read_csv(folder + '/' + filename, sep='\t', skiprows=3, names=['time', 'total', 'toroidal', 'poloidal'])
+                try:
+                    datatemp = pd.read_csv(folder + '/' + filename, sep='\t', skiprows=3, names=['time', 'total', 'toroidal', 'poloidal'])
+                except IOError as e:
+                    print(e)
+
+
                 data.append(datatemp)
         data = pd.concat(data, ignore_index=True)
         data.reindex()
