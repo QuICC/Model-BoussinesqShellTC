@@ -40,6 +40,7 @@ set(MHDPhysicalModels
    BoussinesqDynamoSphereStdModel.hpp
    BoussinesqCouetteShellStdModel.hpp
    BoussinesqDynamoCouetteShellStdModel.hpp
+   BoussinesqCouetteShellHyperviscousModel.hpp
    )
 
 set(MHDTestModels 
