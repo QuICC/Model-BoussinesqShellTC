@@ -54,7 +54,7 @@ namespace RRBC {
 
    const std::string PhysicalModel::PYMODULE = "boussinesq_rrbcplane";
 
-   const std::string PhysicalModel::PYCLASS = "";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqRRBCPlane";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {

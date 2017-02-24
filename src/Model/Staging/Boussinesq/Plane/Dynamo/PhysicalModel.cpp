@@ -55,7 +55,7 @@ namespace Dynamo {
 
    const std::string PhysicalModel::PYMODULE = "boussinesq_dynamoplane";
 
-   const std::string PhysicalModel::PYCLASS = "";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqDynamoPlane";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
