@@ -1,5 +1,5 @@
 /** 
- * @file SphericalCflWrapper.cpp
+ * @file ISphericalCflWrapper.cpp
  * @brief Source of the CFL constraint wrapper in a spherical geometry
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Diagnostics/SphericalCflWrapper.hpp"
+#include "Diagnostics/ISphericalCflWrapper.hpp"
 
 // Project includes
 //
@@ -24,18 +24,22 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   SphericalCflWrapper::SphericalCflWrapper(const SharedIVelocityWrapper spVelocity, const std::vector<Array>& mesh)
+   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVelocityWrapper spVelocity)
       : ICflWrapper(spVelocity), mcCourant(0.65)
+   {
+   }
+
+   ISphericalCflWrapper::~ISphericalCflWrapper()
+   {
+   }
+
+   void ISphericalCflWrapper::init(const std::vector<Array>& mesh)
    {
       // Initialize the mesh
       this->initMesh(mesh);
    }
 
-   SphericalCflWrapper::~SphericalCflWrapper()
-   {
-   }
-
-   void SphericalCflWrapper::initMesh(const std::vector<Array>& mesh)
+   void ISphericalCflWrapper::initMesh(const std::vector<Array>& mesh)
    {
       // Compute the mesh spacings
       this->mMeshSpacings.reserve(2);
@@ -45,8 +49,6 @@ namespace Diagnostics {
 
       // Storage for horizontal average grid spacing
       this->mMeshSpacings.push_back(Array(mesh.at(0).size()));
-
-      MHDFloat maxL = static_cast<MHDFloat>(this->mspVelocity->spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL));
 
       // Compute grid spacings
       for(int j = 0; j < mesh.at(0).size(); ++j)
@@ -68,11 +70,12 @@ namespace Diagnostics {
          }
 
          // Compute average horizontal grid spacing
-         this->mMeshSpacings.at(1)(j) = mesh.at(0)(j)/std::sqrt(maxL*(maxL + 1.0));
+         MHDFloat effL = this->effectiveMaxL(mesh.at(0)(j));
+         this->mMeshSpacings.at(1)(j) = mesh.at(0)(j)/std::sqrt(effL*(effL + 1.0));
       }
    }
 
-   MHDFloat SphericalCflWrapper::initialCfl() const
+   MHDFloat ISphericalCflWrapper::initialCfl() const
    {
       MHDFloat cfl = this->cfl();
 
@@ -83,7 +86,7 @@ namespace Diagnostics {
       return cfl;
    }
 
-   MHDFloat SphericalCflWrapper::cfl() const
+   MHDFloat ISphericalCflWrapper::cfl() const
    {
       // Compute most stringent CFL condition
       MHDFloat cfl = 1.0;

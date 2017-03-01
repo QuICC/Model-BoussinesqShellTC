@@ -35,14 +35,18 @@ namespace Diagnostics {
           * @brief Constructor
           *
           * @param Velocity wrapper
-          * @param Vector of physical space grid
           */
-         CartesianCflWrapper(const SharedIVelocityWrapper spVelocity, const std::vector<Array>& mesh);
+         CartesianCflWrapper(const SharedIVelocityWrapper spVelocity);
 
          /**
           * @brief Constructor
           */
          ~CartesianCflWrapper();
+
+         /**
+          * @brief Initialize wrapper
+          */
+         virtual void init(const std::vector<Array>& mesh);
 
          /**
           * @brief Get initial CFL constraint

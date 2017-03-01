@@ -45,6 +45,11 @@ namespace Diagnostics {
          ~ICflWrapper();
 
          /**
+          * @brief Initialize wrapper
+          */
+         virtual void init(const std::vector<Array>& mesh) = 0;
+
+         /**
           * @brief Get initial CFL constraint
           */
          virtual MHDFloat initialCfl() const = 0;

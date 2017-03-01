@@ -24,15 +24,19 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   CartesianCflWrapper::CartesianCflWrapper(const SharedIVelocityWrapper spVelocity, const std::vector<Array>& mesh)
+   CartesianCflWrapper::CartesianCflWrapper(const SharedIVelocityWrapper spVelocity)
       : ICflWrapper(spVelocity), mcCourant(0.65)
    {
-      // Initialize the mesh
-      this->initMesh(mesh);
    }
 
    CartesianCflWrapper::~CartesianCflWrapper()
    {
+   }
+
+   void CartesianCflWrapper::init(const std::vector<Array>& mesh)
+   {
+      // Initialize the mesh
+      this->initMesh(mesh);
    }
 
    void CartesianCflWrapper::initMesh(const std::vector<Array>& mesh)
