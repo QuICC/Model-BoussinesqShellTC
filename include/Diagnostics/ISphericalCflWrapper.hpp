@@ -1,11 +1,11 @@
 /**
- * @file SphericalCflWrapper.hpp
+ * @file ISphericalCflWrapper.hpp
  * @brief CFL constraint in a spherical geometry 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPHERICALCFLWRAPPER_HPP
-#define SPHERICALCFLWRAPPER_HPP
+#ifndef QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
+#define QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
 
 // Configuration includes
 //
@@ -28,7 +28,7 @@ namespace Diagnostics {
    /**
     * @brief CFL constraint in a spherical geometry
     */
-   class SphericalCflWrapper: public ICflWrapper
+   class ISphericalCflWrapper: public ICflWrapper
    {
       public:
          /**
@@ -37,12 +37,17 @@ namespace Diagnostics {
           * @param Velocity wrapper
           * @param Vector of physical space grid
           */
-         SphericalCflWrapper(const SharedIVelocityWrapper spVelocity, const std::vector<Array>& mesh);
+         ISphericalCflWrapper(const SharedIVelocityWrapper spVelocity);
 
          /**
           * @brief Constructor
           */
-         ~SphericalCflWrapper();
+         ~ISphericalCflWrapper();
+
+         /**
+          * @brief Initialize wrapper
+          */
+         virtual void init(const std::vector<Array>& mesh);
 
          /**
           * @brief Get initial CFL constraint
@@ -57,6 +62,11 @@ namespace Diagnostics {
       protected:
 
       private:
+         /**
+          * @brief Get effective max harmonic degree L
+          */
+         virtual MHDFloat effectiveMaxL(const MHDFloat r) const = 0;
+
          /**
           * @brief Initialise the mesh spacings
           */
@@ -73,9 +83,9 @@ namespace Diagnostics {
          std::vector<Array> mMeshSpacings;
    };
 
-   /// Typedef for a shared SphericalCflWrapper
-   typedef SharedPtrMacro<SphericalCflWrapper> SharedSphericalCflWrapper;
+   /// Typedef for a shared ISphericalCflWrapper
+   typedef SharedPtrMacro<ISphericalCflWrapper> SharedISphericalCflWrapper;
 }
 }
 
-#endif // SPHERICALCFLWRAPPER_HPP
+#endif // QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
