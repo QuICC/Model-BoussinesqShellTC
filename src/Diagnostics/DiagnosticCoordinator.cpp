@@ -42,7 +42,7 @@ namespace QuICC {
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcMaxStep(0.1), mcMinStep(1e-11), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : mcMaxStep(0.1), mcMinStep(1e-10), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
    {
    }
 

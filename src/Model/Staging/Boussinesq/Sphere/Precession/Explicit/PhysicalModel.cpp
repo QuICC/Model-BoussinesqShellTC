@@ -73,7 +73,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::SphereExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(3)
+         switch(4)
          {
             case 0:
                // Toroidal
@@ -125,8 +125,8 @@ namespace Explicit {
          // Add scalar random initial state generator 
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
-         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-10, 1e-10, 1e2, 1e2, 1e2);
+         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-10, 1e-10, 1e2, 1e2, 1e2);
       }
 
       // Add output file
