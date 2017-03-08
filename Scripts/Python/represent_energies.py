@@ -13,7 +13,7 @@ if __name__=="__main__":
 
     try:
         argv = sys.argv
-        print argv
+        #print argv
         filename = argv[1]
     except RuntimeError as e:
         print(e)
@@ -24,34 +24,49 @@ if __name__=="__main__":
 
     try:
 
+        #folder_name = os.path.relpath("..","../..")
+        folder_name = os.path.relpath(".", "..")
         data = pd.read_csv(filename, sep='\t', skiprows=3, names=['time', 'total', 'toroidal', 'poloidal'])
 
     except IOError as e:
+        folder_name = os.path.relpath(".","..")
         data = []
         for folder in os.listdir('.'):
             if (os.path.isdir(folder)):
-                print(folder)
+                #print(folder)
                 try:
                     datatemp = pd.read_csv(folder + '/' + filename, sep='\t', skiprows=3, names=['time', 'total', 'toroidal', 'poloidal'])
+                    data.append(datatemp)
                 except IOError as e:
-                    print(e)
+                    #print(e)
+                    pass
 
 
-                data.append(datatemp)
+
         data = pd.concat(data, ignore_index=True)
         data.reindex()
-        print(data.head())
+        #print(data.head())
         data.sort(['time'], inplace=True)
         pass
 
+    data['time'] -= min(data['time'])
     data = data[data['total']<1e2]
-
-    data.plot(x='time',y=['total', 'toroidal','poloidal'])
     
     idx = max(data.index)
-    print('Final Toroidal to Total energy ratio of: '+str(data['toroidal'][idx]/data['total'][idx]))
-    
-    pp.show()
+    string_ratio = str("%.2f" % (data['toroidal'][idx]/data['total'][idx]*100))
+    #print('Final Toroidal to Total energy ratio of: '+string_ratio)
+
+    ax = data.plot(x='time',y=['total', 'toroidal','poloidal'])
+    ax.set_title(folder_name+',  toroidal/total energy ratio: '+ string_ratio+'%')
+    ax.set_xlabel('t')
+    ax.set_ylabel('E')
+
+
+    try:
+        fout = argv[2]
+        pp.savefig(fout)
+    except IndexError as e:
+        pp.show()
     
     
     
