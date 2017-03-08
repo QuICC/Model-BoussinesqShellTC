@@ -24,7 +24,7 @@
 #include"IoTools/IdToHuman.hpp"
 #include"IoVariable/EnergyTags.hpp"
 #include"TypeSelectors/ScalarSelector.hpp"
-#include"Python/PythonWrapper.hpp"
+#include"Python/PythonWrapperNumpy.hpp"
 #include <iostream>
 
 namespace QuICC{
@@ -58,7 +58,7 @@ namespace IoVariable{
 		MHDFloat rratio = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
 
 		// initialize the Python wrapper
-		PythonWrapper::init();
+		PythonWrapperNumpy::init();
 
 
 		// prepare arguments for the linear_2x call
@@ -71,9 +71,9 @@ namespace IoVariable{
 		PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second));
 
 		// import python module shell_radius and function call linear_r2x
-		PythonWrapper::import("quicc.geometry.spherical.shell_radius");
-		PythonWrapper::setFunction("linear_r2x");
-		pValue = PythonWrapper::callFunction(pTmp);
+		PythonWrapperNumpy::import("quicc.geometry.spherical.shell_radius");
+		PythonWrapperNumpy::setFunction("linear_r2x");
+		pValue = PythonWrapperNumpy::callFunction(pTmp);
 
 
 		// store arguments and prepare for the proj_radial function call
@@ -94,33 +94,33 @@ namespace IoVariable{
 		PyTuple_SetItem(pArgs,3,pTmp);
 
 		// load module quicc.projection.shell
-		PythonWrapper::import("quicc.projection.shell");
+		PythonWrapperNumpy::import("quicc.projection.shell");
 
 		// function call proj_radial
-		PythonWrapper::setFunction("proj_radial");
-		pValue = PythonWrapper::callFunction(pArgs);
+		PythonWrapperNumpy::setFunction("proj_radial");
+		pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 		// Fill matrix mProjMat and cleanup
 		this->mProjMat = Matrix(n,nR);
-		PythonWrapper::getMatrix(mProjMat, pValue);
+		PythonWrapperNumpy::getMatrix(mProjMat, pValue);
 		Py_DECREF(pValue);
 
 		// function call for the dT_dr part (proj_dradial_dr)
-		PythonWrapper::setFunction("proj_dradial_dr");
-		pValue = PythonWrapper::callFunction(pArgs);
+		PythonWrapperNumpy::setFunction("proj_dradial_dr");
+		pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 		// Fill mProjDrMat and cleanup
 		this->mProjDrMat = Matrix(n,nR);
-		PythonWrapper::getMatrix(mProjDrMat,pValue);
+		PythonWrapperNumpy::getMatrix(mProjDrMat,pValue);
 		Py_DECREF(pValue);
 
 		// function call for the T/r part (proj_radial_r)
-		PythonWrapper::setFunction("proj_radial_r");
-		pValue = PythonWrapper::callFunction(pArgs);
+		PythonWrapperNumpy::setFunction("proj_radial_r");
+		pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 		// fill matrix mProjInvrMat and cleanup
 		this->mProjInvrMat = Matrix(n, nR);
-		PythonWrapper::getMatrix(mProjInvrMat, pValue);
+		PythonWrapperNumpy::getMatrix(mProjInvrMat, pValue);
 		Py_DECREF(pValue);
 
 		// create PyObjects for the 2 vectors theta and phi
@@ -134,8 +134,8 @@ namespace IoVariable{
 		}
 
 		// load quicc.projection spherical and prepare the eipm function call
-		PythonWrapper::import("quicc.projection.spherical");
-		PythonWrapper::setFunction("eipm");
+		PythonWrapperNumpy::import("quicc.projection.spherical");
+		PythonWrapperNumpy::setFunction("eipm");
 
 		// prepare the temporary container Mparts
 		ArrayZMap Mparts = ArrayZMap();
@@ -158,11 +158,11 @@ namespace IoVariable{
 				PyTuple_SetItem(pArgs,2, vPhi);
 
 				// set the function to eimp
-				pValue = PythonWrapper::callFunction(pArgs);
+				pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 				// retrieve the result
 				ArrayZ eimp(n);
-				PythonWrapper::getVector(eimp,pValue);
+				PythonWrapperNumpy::getVector(eimp,pValue);
 				Mparts[std::make_pair(l,m)] = eimp;
 			}
 		}
@@ -184,11 +184,11 @@ namespace IoVariable{
 				PyTuple_SetItem(pArgs,2, vPhi);
 
 				// set the function to eimp
-				pValue = PythonWrapper::callFunction(pArgs);
+				pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 				// retrieve the result
 				ArrayZ eimp(n);
-				PythonWrapper::getVector(eimp,pValue);
+				PythonWrapperNumpy::getVector(eimp,pValue);
 				Mparts[std::make_pair(l,m)] = eimp;
 			}
 		}
@@ -196,7 +196,7 @@ namespace IoVariable{
 
 
 		// prepare the lplmfunction call
-		PythonWrapper::setFunction("lplm");
+		PythonWrapperNumpy::setFunction("lplm");
 
 		// set up the containers for the computed vectors
 		YlmParts = ArrayZMap();
@@ -219,11 +219,11 @@ namespace IoVariable{
 				PyTuple_SetItem(pArgs,2,vTheta);
 
 				// set the function to lplm
-				pValue = PythonWrapper::callFunction(pArgs);
+				pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 				// retrieve the result
 				Array lplm(n);
-				PythonWrapper::getVector(lplm,pValue);
+				PythonWrapperNumpy::getVector(lplm,pValue);
 
 				// set the Ylm
 				YlmParts[std::make_pair(l,m)] = lplm.array()*Mparts[std::make_pair(l,m)].array();
@@ -248,11 +248,11 @@ namespace IoVariable{
 				PyTuple_SetItem(pArgs,2,vTheta);
 
 				// set the function to lplm
-				pValue = PythonWrapper::callFunction(pArgs);
+				pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 				// retrieve the result
 				Array lplm(n);
-				PythonWrapper::getVector(lplm,pValue);
+				PythonWrapperNumpy::getVector(lplm,pValue);
 
 				// set the Ylm
 				YlmParts[std::make_pair(l,m)] = lplm.array()*Mparts[std::make_pair(l,m)].array();
@@ -262,7 +262,7 @@ namespace IoVariable{
 		#endif //QUICC_SPATIALSCHEME_SLFL
 
 		// prepare the dplm function call
-		PythonWrapper::setFunction("dplm");
+		PythonWrapperNumpy::setFunction("dplm");
 
 		// set up the containers for the computed vectors
 		dYlmdthParts = ArrayZMap();
@@ -285,11 +285,11 @@ namespace IoVariable{
 				PyTuple_SetItem(pArgs,2,vTheta);
 
 				// set the function to lplm
-				pValue = PythonWrapper::callFunction(pArgs);
+				pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 				// retrieve the result
 				Array dplm(n);
-				PythonWrapper::getVector(dplm,pValue);
+				PythonWrapperNumpy::getVector(dplm,pValue);
 
 				// set the dYlm /d theta
 				dYlmdthParts[std::make_pair(l,m)] = dplm.array()*Mparts[std::make_pair(l,m)].array();
@@ -314,11 +314,11 @@ namespace IoVariable{
 					PyTuple_SetItem(pArgs,2,vTheta);
 
 					// set the function to lplm
-					pValue = PythonWrapper::callFunction(pArgs);
+					pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 					// retrieve the result
 					Array dplm(n);
-					PythonWrapper::getVector(dplm,pValue);
+					PythonWrapperNumpy::getVector(dplm,pValue);
 
 					// set the dYlm /d theta
 					dYlmdthParts[std::make_pair(l,m)] = dplm.array()*Mparts[std::make_pair(l,m)].array();
@@ -328,7 +328,7 @@ namespace IoVariable{
 		#endif //QUICC_SPATIALSCHEME_SLFL
 
 		// prepare the lplm_sin function call
-		PythonWrapper::setFunction("lplm_sin");
+		PythonWrapperNumpy::setFunction("lplm_sin");
 
 		// set up the containers for the computed vectors
 		YlmIsinParts = ArrayZMap();
@@ -351,11 +351,11 @@ namespace IoVariable{
 				PyTuple_SetItem(pArgs,2,vTheta);
 
 				// set the function to lplm
-				pValue = PythonWrapper::callFunction(pArgs);
+				pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 				// retrieve the result
 				Array lplm_sin(n);
-				PythonWrapper::getVector(lplm_sin,pValue);
+				PythonWrapperNumpy::getVector(lplm_sin,pValue);
 
 				// set the dYlm /d theta
 				YlmIsinParts[std::make_pair(l,m)] = lplm_sin.array()*Mparts[std::make_pair(l,m)].array()*m*1i;
@@ -380,11 +380,11 @@ namespace IoVariable{
 				PyTuple_SetItem(pArgs,2,vTheta);
 
 				// set the function to lplm
-				pValue = PythonWrapper::callFunction(pArgs);
+				pValue = PythonWrapperNumpy::callFunction(pArgs);
 
 				// retrieve the result
 				Array lplm_sin(n);
-				PythonWrapper::getVector(lplm_sin,pValue);
+				PythonWrapperNumpy::getVector(lplm_sin,pValue);
 
 				// set the dYlm /d theta
 				YlmIsinParts[std::make_pair(l,m)] = lplm_sin.array()*Mparts[std::make_pair(l,m)].array()*m*1i;

@@ -91,22 +91,6 @@ namespace QuICC {
           * @brief Fill sparse matrix with data from Python call
           */
          static void fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat);
-
-         /*
-          * @brief Fill a full matrix (Eigen::MatrixXd) with data from PyObject
-          */
-         static void getMatrix(Matrix& rMatrix, PyObject* pMat);
-
-         /*
-          * @brief Fill a vector (Eigen::VectorXd) with data from PyObject
-          */
-         static void getVector(Array& rArray, PyObject* pVec);
-
-         /*
-          * @brief Fill a complex vector (Eigen::VectorXcd) with data from PyObjct
-          */
-         static void getVector(ArrayZ& rArrayZ, PyObject* pVec);
-
   
          /**
           * @brief Cleanup wrapper without finalize
@@ -120,7 +104,6 @@ namespace QuICC {
          
       protected:
 
-      private:
          /**
           * @brief Constructor
           */
@@ -130,6 +113,8 @@ namespace QuICC {
           * @brief Destructor
           */
          ~PythonWrapper();
+
+      private:
 
          /**
           * @brief Python module object

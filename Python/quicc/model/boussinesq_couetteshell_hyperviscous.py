@@ -4,9 +4,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
-import scipy.sparse as spsp
 
-import quicc.base.utils as utils
 import quicc.geometry.spherical.shell_radius as geo
 import quicc.base.base_model as base_model
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
