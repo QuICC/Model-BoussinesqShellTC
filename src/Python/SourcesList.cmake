@@ -3,5 +3,4 @@ set(MHDSources
    PythonTools.cpp
    PythonModelWrapper.cpp
    PythonWrapper.cpp
-   PythonWrapperNumpy.cpp
 )
