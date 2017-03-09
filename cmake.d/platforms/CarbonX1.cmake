@@ -75,6 +75,8 @@ set(QUICC_INCLUDES "/usr/include/hdf5/openmpi/" PARENT_SCOPE)
 ###################################################
 
 set(QUICC_MPIIMPLS "OpenMPI" "MPICH"  PARENT_SCOPE)
+set(QUICC_MPI_LIBRARIES "/usr/lib/openmpi/lib" PARENT_SCOPE)
+set(QUICC_MPI_INCLUDES "/usr/lib/openmpi/include" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#
@@ -120,4 +122,3 @@ set(QUICC_INCLUDES_PYTHON35 "/usr/include/python3.5m" "/usr/lib/python3/dist-pac
 
 set(QUICC_LIBRARIES "" PARENT_SCOPE)
 set(QUICC_INCLUDES "/usr/include/hdf5/serial" "/usr/local/eigen3" "/usr/local/include/eigen3/unsupported" PARENT_SCOPE)
-
