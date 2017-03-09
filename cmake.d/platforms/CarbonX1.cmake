@@ -75,6 +75,8 @@ set(QUICC_INCLUDES "/usr/include/hdf5/openmpi/" PARENT_SCOPE)
 ###################################################
 
 set(QUICC_MPIIMPLS "OpenMPI" "MPICH"  PARENT_SCOPE)
+set(QUICC_MPI_LIBRARIES "/usr/lib/openmpi/lib" PARENT_SCOPE)
+set(QUICC_MPI_INCLUDES "/usr/lib/openmpi/include" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#

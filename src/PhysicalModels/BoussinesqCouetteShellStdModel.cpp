@@ -27,6 +27,8 @@
 #include "Equations/Shell/Boussinesq/BoussinesqCouetteShellMomentum.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "IoVariable/ShellTorPolTracerWriter.hpp"
+#include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
+#include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
@@ -194,6 +196,7 @@ namespace QuICC {
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
 
+
       // Create probes
       Matrix mProbes(4,3);
       mProbes << 0.85, 0.0, 3.141592654,
@@ -205,13 +208,22 @@ namespace QuICC {
       IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector2);
+      // Create kinetic energy spectral writer
+      IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector2->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector3);
+      
+      // Create torque writer
+      IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
+      spVector3->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector4);
 
    }
 
    void BoussinesqCouetteShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
-      std::vector<PhysicalNames::Id>::const_iterator  it;
+      std::vector<PhysicalNames::Id>::const_iterator it;
       std::vector<PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO

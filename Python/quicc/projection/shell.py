@@ -56,10 +56,8 @@ if __name__=="__main__":
     x1 = np.array([0.9,0.95,1.])
     #x2 = np.array([0.7,0.8,0.9,1.])
     x2 =np.array([-1,1])
-    #print(projphyslmn(10,2,4,x,eq_params))
     (a,b) = (0.5,1.0)
 
-    print(proj_radial(10,a,b,x2))
 
 
 

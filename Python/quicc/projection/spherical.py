@@ -5,9 +5,6 @@ from __future__ import unicode_literals
 
 import numpy as np
 
-from numpy.polynomial import legendre as leg
-import scipy.special as spe
-
 
 def plm(l, m, x):
 
@@ -172,9 +169,6 @@ if __name__=="__main__":
     x = np.cos(theta)
     phi = np.linspace(0, 2*np.pi,10)
 
-    print(plm(40,1,x)-lplm(40,1,x))
-
-    print(dplm(0,0,x))
 
 
 
