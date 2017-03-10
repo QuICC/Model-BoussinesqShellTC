@@ -58,9 +58,9 @@ namespace Explicit {
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add Navier-Stokes equation for kinematic dynamo
-      spSim->addVectorEquation<Equations::Boussinesq::Shell::Couette::Momentum>();
+      //spSim->addVectorEquation<Equations::Boussinesq::Shell::Couette::Momentum>();
       // Add Navier-Stokes equation for fully nonlinear dynamo
-      //spSim->addVectorEquation<Equations::Boussinesq::Shell::CouetteDynamo::Momentum>();
+      spSim->addVectorEquation<Equations::Boussinesq::Shell::CouetteDynamo::Momentum>();
 
       // Add induction equation
       spSim->addVectorEquation<Equations::Boussinesq::Shell::CouetteDynamo::Induction>();
@@ -291,7 +291,7 @@ namespace Explicit {
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::MAGNETIC);
-      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC);
+      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC); // TODO: NL/ is it necessary to dump the vertical field?
       spGen->addHdf5OutputFile(spOut);
    }
 

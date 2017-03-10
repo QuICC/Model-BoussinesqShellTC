@@ -103,8 +103,6 @@ namespace QuICC {
          static void finalize();
          
       protected:
-
-      private:
          /**
           * @brief Constructor
           */
@@ -115,6 +113,7 @@ namespace QuICC {
           */
          ~PythonWrapper();
 
+      private:
          /**
           * @brief Python module object
           */

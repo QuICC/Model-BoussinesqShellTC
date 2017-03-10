@@ -23,7 +23,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "magnetic_prandtl", "rratio"]
+        return ["ekman", "rossby", "modified_elsasser", "magnetic_prandtl", "rratio"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -197,9 +197,10 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         E = eq_params['ekman']
-        Ro = eq_params['rossby']
+        #Ro = eq_params['rossby']
         Pm = eq_params['magnetic_prandtl']
-        Rm = Pm*abs(Ro)/E
+        #Rm = Pm*abs(Ro)/E # TODO: decide wether this term should not rather be Rm = E/Pm
+        Em = E/Pm
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -215,10 +216,10 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
             mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0)*E)
 
         elif field_row == ("magnetic","tor") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0)/Rm)
+            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0)*Em)
 
         elif field_row == ("magnetic","pol") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0)/Rm)
+            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0)*Em)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

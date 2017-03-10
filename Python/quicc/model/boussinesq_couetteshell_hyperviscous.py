@@ -4,15 +4,13 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
-import scipy.sparse as spsp
 
-import quicc.base.utils as utils
 import quicc.geometry.spherical.shell_radius as geo
 import quicc.base.base_model as base_model
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
 
 
-class BoussinesqCouetteShellStdConfig:
+class BoussinesqCouetteShellHyperviscousConfig:
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
@@ -65,7 +63,7 @@ class BoussinesqCouetteShellStdConfig:
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
 
-class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.BaseModel):
+class BoussinesqCouetteShellHyperviscous(BoussinesqCouetteShellHyperviscousConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
@@ -195,6 +193,11 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
         assert(eigs[0].is_integer())
         l = eigs[0]
 
+        # applies a constant Ekman up to 50 and then let scale from 50 onward
+        if l>=50:
+            E = E * (l/50.)**2
+
+
         ro = self.automatic_parameters(eq_params)['ro']
         a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
@@ -264,7 +267,7 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
             return base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
 
 
-class BoussinesqCouetteShellStdVisu(BoussinesqCouetteShellStdConfig, base_model.BaseModel):
+class BoussinesqCouetteShellHyperviscousVisu(BoussinesqCouetteShellHyperviscousConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):

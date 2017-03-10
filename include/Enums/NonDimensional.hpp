@@ -39,6 +39,9 @@ namespace QuICC {
             MAGEKMAN,
             /// Magnetic Prandtl number
             MAGPRANDTL,
+			   // Nicolò Lardelli
+			   /// Modified Elsasser number
+			   MODELSASSER,
             /// Prandtl number
             PRANDTL,
             /// Poincare number
