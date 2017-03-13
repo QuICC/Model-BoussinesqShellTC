@@ -138,7 +138,7 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
-            # No-slip / Fixed temperature
+            # No-slip / Insulator / Fixed temperature
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
@@ -180,7 +180,7 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
 
-            # Stress-free / Fixed flux
+            # Stress-free / Conductor / Fixed flux
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
@@ -190,6 +190,13 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                             bc = {0:-21, 'rt':0}
                         else:
                             bc = {0:-41, 'rt':0}
+                    elif field_col == ("magnetic","tor"):
+                        bc = {0:-21, 'rt':0}
+                    elif field_col == ("magnetic","pol"):
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:-21, 'rt':0}
+                        else:
+                            bc = {0:-20, 'rt':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-21, 'rt':0}
 
@@ -204,6 +211,13 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                             bc = {0:21}
                         else:
                             bc = {0:41}
+                    elif field_row == ("magnetic","tor") and field_col == field_row:
+                        bc = {0:21}
+                    elif field_row == ("magnetic","pol") and field_col == field_row:
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:21}
+                        else:
+                            bc = {0:20}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:21}
 
@@ -297,6 +311,13 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                             bc = {0:-21, 'rt':2}
                         else:
                             bc = {0:-41, 'rt':4}
+                    elif field_col == ("magnetic","tor"):
+                        bc = {0:-21, 'rt':2}
+                    elif field_col == ("magnetic","pol"):
+                        if eigs[0] == 0 and eigs[1] == 0:
+                            bc = {0:-21, 'rt':2}
+                        else:
+                            bc = {0:-20, 'rt':2}
                     elif field_col == ("temperature",""):
                         bc = {0:-21, 'rt':2}
 
