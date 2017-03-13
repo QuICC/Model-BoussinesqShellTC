@@ -117,7 +117,7 @@ namespace PrecessionDynamo {
       Physical::SphericalPrecession::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, corC, Po, 2.0);
 
       /// Compute Poincare term
-      Physical::SphericalPoincare::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mR, this->mTheta, this->mPhi, this->unknown().dom(0).phys(), this->time(), alpha, Po);
+      Physical::SphericalPoincare::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mR, this->mTheta, this->mPhi, this->time(), alpha, Po);
    }
 
    void Momentum::setRequirements()
