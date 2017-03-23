@@ -498,7 +498,7 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2(res[0], bc, -(kx**2 + ky**2)/Pr)
+                mat = geo.i2(res[0], bc, -(kx**2 + ky**2)*Pm/Pr)
                 bc[0] = min(bc[0], 0)
                 mat += geo.i2d2(res[0], bc, Pm/Pr, cscale = zscale)
 
