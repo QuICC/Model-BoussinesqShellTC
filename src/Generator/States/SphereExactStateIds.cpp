@@ -10,6 +10,8 @@
 // System includes
 //
 #include <tr1/cmath>
+//Leo: using tr1 from boost for clang
+#include <boost/math/tr1.hpp>
 
 // External includes
 //
@@ -39,10 +41,24 @@ namespace Equations {
       Array sph_harm = 2.0*re*(static_cast<MHDFloat>(m)*phi).array().cos() - 2.0*im*(static_cast<MHDFloat>(m)*phi).array().sin();
       #if defined QUICC_SHNORM_SCHMIDT
          // Schmidt quasi-normalized spherical harmonic Y_l^m
+         #ifdef __APPLE__
+         //Leo: special functions are not implemented in clang, thus one has to use boost 
+         MHDFloat leg = boost::math::tr1::sph_legendre(l, m, theta)*boost::math::sqrt(4.0*Math::PI/static_cast<MHDFloat>(2*l + 1));
+         #else
          MHDFloat leg = std::tr1::sph_legendre(l, m, theta)*std::sqrt(4.0*Math::PI/static_cast<MHDFloat>(2*l + 1));
+         #endif
+
+         
       #elif defined QUICC_SHNORM_UNITY
          // Normalized spherical harmonic Y_l^m
+         #ifdef __APPLE__
+         //Leo: using boost
+         MHDFloat leg = boost::math::tr1::sph_legendre(l, m, theta);
+         #else
          MHDFloat leg = std::tr1::sph_legendre(l, m, theta);
+         #endif
+         
+
       #endif //defined QUICC_SHNORM_SCHMIDT
       
       sph_harm *= leg;
