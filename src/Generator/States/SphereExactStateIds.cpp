@@ -10,8 +10,11 @@
 // System includes
 //
 #include <tr1/cmath>
-//Leo: using tr1 from boost for clang
+
+//Leo: using special functions from boost for clang
+#ifdef __APPLE__
 #include <boost/math/tr1.hpp>
+#endif
 
 // External includes
 //
