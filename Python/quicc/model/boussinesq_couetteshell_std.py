@@ -117,6 +117,8 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
         """Convert simulation input boundary conditions to ID"""
 
         sgn = np.sign(eq_params['rossby'])
+        # modified by Nicolò Lardelli -> use Ro=0 to compute stationary solution U_0, it s the limit case
+        sgn = 1 if sgn==0 else sgn
         ro = self.automatic_parameters(eq_params)['ro']
         ri = ro*eq_params['rratio']
         a, b = geo.linear_r2x(ro, eq_params['rratio'])

@@ -759,12 +759,20 @@ def inh_couette(mat, s, modes, coeffs):
 
     assert(coeffs.get('c', None) is not None)
     assert(coeffs.get('l', None) is not None)
+    #assert(coeffs.get('axis',None) is not None)
 
     if coeffs['l'] == 1:
         for i, m in enumerate(modes):
-            if m == 0:
-                norm = np.sqrt(3.0/(4.0*np.pi))
-                mat[s+1,i] += coeffs['c']/norm
+            if coeffs.get('axis', None) is None:
+                if m == 0:
+                    norm = np.sqrt(3.0/(4.0*np.pi))
+                    mat[s+1,i] += coeffs['c']/norm
+            elif coeffs.get('axis', None) == 'x':
+                if m==1:
+                    norm = -np.sqrt(3/(8.0*np.pi))
+                    factor = 2.
+                    mat[s+1,i] += coeffs['c']/norm/factor
 
     return mat
+
 
