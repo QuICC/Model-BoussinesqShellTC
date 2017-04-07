@@ -61,7 +61,7 @@ namespace Couette {
 
       // Check wheter a nonlinear interaction is required
 	  MHDFloat Ro = this->eqParams().nd(NonDimensional::ROSSBY);
-	  bool use_nonlinear = (Ro==0.)? false : true;
+	  bool use_nonlinear = (Ro==0.) ? false : true;
 
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, use_nonlinear, false);
 
