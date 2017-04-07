@@ -194,8 +194,8 @@ class BoussinesqCouetteShellHyperviscous(BoussinesqCouetteShellHyperviscousConfi
         l = eigs[0]
 
         # applies a constant Ekman up to 50 and then let scale from 50 onward
-        if l>=50:
-            E = E * (l/50.)**2
+        if l>=25:
+            E = E * (l/25.)**2
 
 
         ro = self.automatic_parameters(eq_params)['ro']

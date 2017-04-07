@@ -5,4 +5,5 @@ set(MHDSources
 set(MHDSrcSubDirs
    Explicit
    Hyperviscous
+   Implicit
 )
