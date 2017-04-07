@@ -59,9 +59,13 @@ namespace Couette {
          int start = 0;
       #endif //QUICC_SPATIALSCHEME_SLFL
 
-      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
+      // Check wheter a nonlinear interaction is required
+	  MHDFloat Ro = this->eqParams().nd(NonDimensional::ROSSBY);
+	  bool use_nonlinear = (Ro==0.)? false : true;
 
-      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, use_nonlinear, false);
+
+      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, use_nonlinear, false);
 
       #ifdef QUICC_SPATIALSCHEME_SLFL
          // Create cos(theta) and sin(theta) data for Coriolis term

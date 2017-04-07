@@ -388,11 +388,11 @@ namespace Explicit {
 
       // Create probe field writer
       spVector2 = IoVariable::SharedShellTorPolTracerWriter(new  IoVariable::ShellTorPolTracerWriter("magnetic_probe", SchemeType::type(), mProbes));
-      spVector2->expect(PhysicalNames::VELOCITY);
+      spVector2->expect(PhysicalNames::MAGNETIC);
       spSim->addAsciiOutputFile(spVector2);
       // Create kinetic energy spectral writer
       spVector3 = IoVariable::SharedShellTorPolEnergySpectraWriter(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_magnetic", SchemeType::type()));
-      spVector3->expect(PhysicalNames::VELOCITY);
+      spVector3->expect(PhysicalNames::MAGNETIC);
       spSim->addAsciiOutputFile(spVector3);
    }
 
