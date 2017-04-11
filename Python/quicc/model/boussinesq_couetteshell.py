@@ -61,7 +61,7 @@ class BoussinesqCouetteShellConfig:
         is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.SLOWEST_MULTI_RHS
+        index_mode = self.SLOWEST_SINGLE_RHS
 
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
@@ -113,6 +113,7 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
 
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
+
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
