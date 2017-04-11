@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_EXPLICIT_PHYSICALMODEL_HPP
-#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_EXPLICIT_PHYSICALMODEL_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_IMPLICIT_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_IMPLICIT_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -22,7 +22,7 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/SLFlScheme.hpp"
+#include "SpatialSchemes/3D/SLFmScheme.hpp"
 
 // THIS IS NOT A COMMENT BUT AN OPTION READ BY CMAKE
 // QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
@@ -134,4 +134,4 @@ namespace Implicit {
 }
 }
 
-#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_EXPLICIT_PHYSICALMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_IMPLICIT_PHYSICALMODEL_HPP
