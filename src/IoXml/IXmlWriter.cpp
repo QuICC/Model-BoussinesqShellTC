@@ -44,8 +44,12 @@ namespace IoXml {
 
       // Create xml declaration
       node = this->mXML.allocate_node(rapidxml::node_declaration);
-      node->append_attribute(this->mXML.allocate_attribute("version", "1.0"));
-      node->append_attribute(this->mXML.allocate_attribute("encoding", "utf-8"));
+      std::string sver = "version";
+      std::string svern = "1.0";
+      node->append_attribute(this->mXML.allocate_attribute(this->mXML.allocate_string(sver.c_str()), this->mXML.allocate_string(svern.c_str())));
+      std::string senc = "encoding";
+      std::string senct = "utf-8";
+      node->append_attribute(this->mXML.allocate_attribute(this->mXML.allocate_string(senc.c_str()), this->mXML.allocate_string(senct.c_str())));
       this->mXML.append_node(node);
       
       // FILEMETA node
