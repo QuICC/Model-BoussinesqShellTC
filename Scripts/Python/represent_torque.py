@@ -20,7 +20,7 @@ if __name__=="__main__":
     try:
 
         folder_name = os.path.relpath("..","../..")
-        data = pd.read_csv(filename, sep='\t', skiprows=3, names=['time', 'torque'])
+        data = pd.read_csv(filename, sep='\t', skiprows=3, names=['time', 'Torque'])
 
     except IOError as e:
         folder_name = os.path.relpath(".","..")

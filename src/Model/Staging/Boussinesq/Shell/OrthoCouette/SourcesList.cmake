@@ -4,4 +4,5 @@ set(MHDSources
 
 set(MHDSrcSubDirs
    Explicit
+   Implicit
 )
