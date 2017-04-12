@@ -737,27 +737,27 @@ def alt_ones(nr, parity):
     else:
         return -np.cumprod(-np.ones(nr))
 
-def apply_inhomogeneous(mat, modes, bc, ordering = 'SLFl', location = 't'):
+def apply_inhomogeneous(mat, modes, bc, ordering = 'SLFl', location = 't', nr = None):
     """Add inhomogeneous conditions to the matrix"""
 
-    mat = mat.tolil()
 
+    mat = mat.tolil()
     if location == 't':
         s = 0
     elif location == 'b':
         s = mat.shape[0]-nbc
 
     if bc[0] == 24:
-        mat = inh_couette(mat, s, modes, bc.get('c',None), ordering)
+        mat = inh_couette(mat, s, modes, bc.get('c',None), ordering, nr)
 
     if not spsp.isspmatrix_coo(mat):
         mat = mat.tocoo()
 
     return mat
 
-def inh_couette(mat, s, modes, coeffs, ordering = 'SLFl'):
+def inh_couette(mat, s, modes, coeffs, ordering = 'SLFl', nr= None):
     """Set inhomogeneous constrain for toroidal Couette"""
-    print(mat,s,modes,coeffs, ordering)
+
     assert(coeffs.get('c', None) is not None)
 
     if ordering=='SLFm':
@@ -768,7 +768,8 @@ def inh_couette(mat, s, modes, coeffs, ordering = 'SLFl'):
                 for i, l in enumerate(modes):
                     if l==1:
                         norm = np.sqrt(3.0/(4.0*np.pi))
-                        mat[s+1,i] += coeffs['c']/norm
+
+                        mat[nr*i+s+1,0] += coeffs['c']/norm
 
         elif coeffs.get('axis', None) == 'x':
             if coeffs['m'] == 1:
@@ -776,7 +777,7 @@ def inh_couette(mat, s, modes, coeffs, ordering = 'SLFl'):
                     if l == 1:
                         norm = -np.sqrt(3 / (8.0 * np.pi))
                         factor = 2.
-                        mat[s + 1, i] += coeffs['c'] / norm / factor
+                        mat[nr*i + s + 1, 0] += coeffs['c'] / norm / factor
 
     else: # i.e. SLFl
         assert(coeffs.get('l', None) is not None)

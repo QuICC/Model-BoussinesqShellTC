@@ -72,7 +72,6 @@ def build_block_matrix(fields, func, func_args, restriction = None):
             args = func_args + (field_row,field_col)
             row.append(func(*args, restriction = restrict[j]))
         tmp.append(row)
-
     return spsp.bmat(tmp, format='coo')
 
 def build_diag_matrix(fields, func, func_args, restriction = None):

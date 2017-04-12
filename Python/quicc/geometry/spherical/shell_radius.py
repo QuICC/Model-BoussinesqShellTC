@@ -1362,6 +1362,11 @@ def avg(nr, a, b):
 def inhomogeneous_bc(nr, l, modes, bc, ordering = 'SLFl'):
     """Create a inhomogeneous boundary operator"""
 
-    mat = spsp.lil_matrix((nr, len(modes)))
-    return radbc.apply_inhomogeneous(mat, modes, bc, ordering)
+
+    if  ordering == 'SLFm':
+        mat = spsp.lil_matrix((nr * len(modes), 1))
+        return radbc.apply_inhomogeneous(mat, modes, bc, ordering, nr=nr)
+    else:
+        mat = spsp.lil_matrix((nr, len(modes)))
+        return radbc.apply_inhomogeneous(mat, modes, bc, ordering)
 

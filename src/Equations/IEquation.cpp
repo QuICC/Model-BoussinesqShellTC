@@ -458,7 +458,8 @@ namespace Equations {
       // Add list of modes
       if(opId == ModelOperator::INHOMOGENEOUS)
       {
-         if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+         if((this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)/* ||
+        		 (this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)*/)
          {
             pTmp = PyList_New(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx));
             for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx); ++i)
