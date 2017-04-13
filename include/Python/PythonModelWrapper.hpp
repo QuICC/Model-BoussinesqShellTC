@@ -48,6 +48,11 @@ namespace QuICC {
          static void createModel(const std::string& model);
 
          /**
+          * @brief Create the Python model class, first trying model+specialization
+          */
+         static void createModel(const std::string& model, const std::string& specialization);
+
+         /**
           * @brief Set the Python function object
           */
          static void setFunction(const std::string& func);

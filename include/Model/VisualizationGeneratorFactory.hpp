@@ -64,13 +64,7 @@ namespace QuICC {
       PythonModelWrapper::import(TModel::PYMODULE);
 
       // Try to setup specialized Visualization model
-      try{
-         PythonModelWrapper::createModel(TModel::PYCLASS + "Visu");
-      } catch(const Exception& e)
-      {
-         // Try standard model
-         PythonModelWrapper::createModel(TModel::PYCLASS);
-      }
+      PythonModelWrapper::createModel(TModel::PYCLASS, "Visu");
 
       // Create list of field ID strings for boundary conditions
       std::vector<PhysicalNames::Id> fields = Model::PhysicalModelBase::fieldIds();
