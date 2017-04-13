@@ -89,6 +89,18 @@ namespace QuICC {
       #endif //QUICC_BOUNDARYMETHOD_GALERKIN
    }
 
+   void PythonModelWrapper::createModel(const std::string& model, const std::string& specialization)
+   {
+      bool hasSpecialization = PyObject_HasAttrString(PythonModelWrapper::mpModule, (model+specialization).c_str());
+      if(hasSpecialization)
+      {
+         PythonModelWrapper::createModel(model + specialization);
+      } else
+      {
+         PythonModelWrapper::createModel(model);
+      }
+   }
+
    void PythonModelWrapper::setFunction(const std::string& func)
    {
       // Cleanup
