@@ -64,7 +64,7 @@ namespace Plane {
 
 namespace QGmhdBhhLowRm {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_qg_mhd_bhh_lowrm";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_qgmhdbhhlowrm";
 
    const std::string PhysicalModel::PYCLASS = "BoussinesqQGmhdBhhLowRm";
 
