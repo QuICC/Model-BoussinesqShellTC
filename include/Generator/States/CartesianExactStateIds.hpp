@@ -56,6 +56,10 @@ namespace Equations {
          POLYSINSIN,       // Polynomial, Sine, Sine
          POLYSINCOS,       // Polynomial, Sine, Cosine
          POLYCOSSIN,       // Polynomial, Cosine, Sine
+         BXHELICOIDAL,     // Helicoidal Bx (Stellmach & Hansen, 2004)
+         BYHELICOIDAL,     // Helicoidal By (Stellmach & Hansen, 2004) 
+         NULLFIELD,
+         CONSTANTFIELD,
          // FFF states
          COSCOSCOS = 50,   // Cosine, Cosine, Cosine
          SINSINSIN,        // Sine, Sine, Sine
