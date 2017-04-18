@@ -55,6 +55,8 @@ namespace QuICC {
          FBY,
          /// Fluctuating bz
          FBZ,
+         /// Z fluctuating density current
+         FJZ,
          /// Magnetic field
          MAGNETIC,
          /// X Magnetic field
