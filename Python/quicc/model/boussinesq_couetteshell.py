@@ -58,7 +58,7 @@ class BoussinesqCouetteShellConfig:
         """Provide description of the system of equation"""
 
         # Matrix operator is real
-        is_complex = False
+        is_complex = True
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
@@ -274,12 +274,13 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
         lmax = res[1]
 
         # generate the modes
-        modes = range(m, lmax + 1)
+        modes = range(m, lmax)
+        mat = None
+        bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_col)
+
         if field_row == ("velocity","tor"):
 
 
-            mat = None
-            bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
             """
             rows = []
             for l in range(m, res[1]):
@@ -293,10 +294,18 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
                 raise RuntimeError("Equations are not setup properly!")
 
             #return spsp.vstack(rows)
+            print('toroidal:' , mat.shape)
             return mat
-        else:
-            return base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
 
+        elif field_row == ("velocity","pol"):
+
+            mat = spsp.lil_matrix((res[0] * len(modes), 1))
+            return mat
+
+        else:
+            mat = base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
+            print('poloidal:', mat.shape)
+            return mat
 
 class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
@@ -355,7 +364,7 @@ class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_mode
         """Provide description of the system of equation"""
 
         # Matrix operator is real
-        is_complex = False
+        is_complex = True
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS

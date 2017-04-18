@@ -795,6 +795,7 @@ def inh_couette(mat, s, modes, coeffs, ordering = 'SLFl', nr= None):
                         factor = 2.
                         mat[s+1,i] += coeffs['c']/norm/factor
 
+    print(mat.shape)
     return mat
 
 

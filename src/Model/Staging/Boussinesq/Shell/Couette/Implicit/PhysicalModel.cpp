@@ -222,11 +222,11 @@ namespace Implicit {
     		  0.9, 0.0, 3.141592654,
 			  0.95, 0.0, 3.141592654,
 			  1.0, 0.0, 3.141592654;
-
+/*
       // Create probe field writer
       IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spVector2);
+      spSim->addAsciiOutputFile(spVector2);*/
       // Create kinetic energy spectral writer
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
