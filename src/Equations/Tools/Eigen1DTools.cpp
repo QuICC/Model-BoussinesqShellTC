@@ -37,7 +37,7 @@ namespace Equations {
       std::vector<MHDFloat> eigs;
 
       // Get wave number rescale to box size
-      eigs.push_back(spRes->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DATND>(matIdx)));
+      eigs.push_back(spRes->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATND>(matIdx)));
 
       return eigs;
    }

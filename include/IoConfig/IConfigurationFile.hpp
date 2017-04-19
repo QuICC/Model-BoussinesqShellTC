@@ -142,12 +142,12 @@ namespace IoConfig {
          /**
           * @brief Get name of the framework XML tag
           */
-         std::string frameworkTag() const;
+         const std::string& frameworkTag() const;
 
          /**
           * @brief Get name of the framework XML tag
           */
-         std::string simulationTag() const;
+         const std::string& simulationTag() const;
 
          /**
           * @brief Framework part of configuration file
@@ -270,12 +270,12 @@ namespace IoConfig {
       return this->mSimulation.find(SimulationBlocks::BOUNDARY)->second;
    }
 
-   template <typename TBase> std::string IConfigurationFile<TBase>::frameworkTag() const
+   template <typename TBase> const std::string& IConfigurationFile<TBase>::frameworkTag() const
    {
       return IConfigurationFile<TBase>::FRAMEWORKTAG;
    }
 
-   template <typename TBase> std::string IConfigurationFile<TBase>::simulationTag() const
+   template <typename TBase> const std::string& IConfigurationFile<TBase>::simulationTag() const
    {
       return IConfigurationFile<TBase>::SIMULATIONTAG;
    }

@@ -6,7 +6,7 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(QUICC_COMPILERS "GCC" "Intel" PARENT_SCOPE)
+set(QUICC_COMPILERS "Intel" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
@@ -24,11 +24,10 @@ set(QUICC_THREADSMODELS "None" PARENT_SCOPE)
 #----------- AVAILABLE FFT VERSIONS --------------#
 ###################################################
 
-set(QUICC_FFTS "FFTW" "cuFFT" PARENT_SCOPE)
+set(QUICC_FFTS "FFTW" PARENT_SCOPE)
 set(QUICC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
-set(QUICC_LIBRARIES_CUFFT "cudart" "cufft" "cufftw" PARENT_SCOPE)
-set(QUICC_INCLUDES_CUFFT "/curc/tools/x_86_64/rh6/cuda/5.5/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_CUFFT "/curc/tools/x_86_64/rh6/cuda/5.5/lib64" PARENT_SCOPE)
+set(QUICC_INCLUDES_FFTW "$ENV{CURC_FFTW_INC}" PARENT_SCOPE)
+set(QUICC_LIBDIR_FFTW "$ENV{CURC_FFTW_LIB}" PARENT_SCOPE)
 
 ###################################################
 #-------------- AVAILABLE FFT PLANS --------------#
@@ -46,21 +45,17 @@ set(QUICC_LINALGS "Eigen" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(QUICC_SPLINALGS "UmfPack" "MUMPS"  "SparseLU" "KentLU" "MKLPardiso" PARENT_SCOPE)
+set(QUICC_SPLINALGS "UmfPack" "MUMPS"  "SparseLU" PARENT_SCOPE)
 set(QUICC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
-set(QUICC_LIBRARIES_MUMPS "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "dmumps" "zmumps" "mumps_common" "pord" "scalapack" "ptesmumps" "esmumps" "ptscotch" "scotch" "scotcherr" "scotcherrexit" "parmetis" "metis" "ifcore" PARENT_SCOPE)
-set(QUICC_LIBRARIES_KENTLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "klu" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
-set(QUICC_LIBRARIES_MKLPARDISO "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" PARENT_SCOPE)
+set(QUICC_LIBRARIES_MUMPS "mkl_scalapack_ilp64" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "mkl_blacs_intelmpi_ilp64" "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "metis" "ifcore" PARENT_SCOPE)
 set(QUICC_INCLUDES_UMFPACK_GCC "/home/phma6156/share/gcc/include" PARENT_SCOPE)
 set(QUICC_LIBDIR_UMFPACK_GCC "/home/phma6156/share/gcc/lib" PARENT_SCOPE)
-set(QUICC_INCLUDES_SUPERLU_GCC "/home/phma6156/share/gcc/SuperLU_4.3/SRC" PARENT_SCOPE)
-set(QUICC_LIBDIR_SUPERLU_GCC "/home/phma6156/share/gcc/SuperLU_4.3/lib" PARENT_SCOPE)
 set(QUICC_INCLUDES_UMFPACK_INTEL "/home/phma6156/share/intel/suitesparse/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_UMFPACK_INTEL "/home/phma6156/share/intel/suitesparse/lib" PARENT_SCOPE)
+set(QUICC_LIBDIR_UMFPACK_INTEL "/home/phma6156/share/intel/suitesparse/lib" "$ENV{CURC_MKL_LIB}" PARENT_SCOPE)
 #set(QUICC_INCLUDES_MUMPS_INTEL "/home/phma6156/share/intel/mumps_4/include" PARENT_SCOPE)
 #set(QUICC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/mumps_4/lib" "/home/phma6156/share/intel/scalapack/lib" "/home/phma6156/share/intel/scotch_5/lib" "/home/phma6156/share/intel/parmetis_3/lib" PARENT_SCOPE)
-set(QUICC_INCLUDES_MUMPS_INTEL "/home/phma6156/share/intel/mumps_5/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/mumps_5/lib" "/home/phma6156/share/intel/scalapack/lib" "/home/phma6156/share/intel/scotch_6/lib" "/home/phma6156/share/intel/parmetis_4/lib" PARENT_SCOPE)
+set(QUICC_INCLUDES_MUMPS "$ENV{CURC_PETSC_INC}" PARENT_SCOPE)
+set(QUICC_LIBDIR_MUMPS "$ENV{CURC_PETSC_LIB}" "$ENV{CURC_MKL_LIB}" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
@@ -80,6 +75,8 @@ set(QUICC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
 
 set(QUICC_LARGEIOS "HDF5" PARENT_SCOPE)
 set(QUICC_LIBRARIES_HDF5 "rt" "z" "hdf5" PARENT_SCOPE)
+set(QUICC_INCLUDES_HDF5 "$ENV{CURC_HDF5_INC}" PARENT_SCOPE)
+set(QUICC_LIBDIR_HDF5 "$ENV{CURC_HDF5_LIB}" PARENT_SCOPE)
 
 ###################################################
 #-------------- MPI IMPLEMENTATION ---------------#
@@ -114,7 +111,7 @@ set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
 
 set(QUICC_CC_SERIAL_INTEL "icpc" PARENT_SCOPE)
 
-set(QUICC_CC_MPI_INTEL "mpic++" PARENT_SCOPE)
+set(QUICC_CC_MPI_INTEL "mpicxx" PARENT_SCOPE)
 
 set(QUICC_CC_ARCH_INTEL "-O2 -xHost" PARENT_SCOPE)
 
@@ -130,10 +127,12 @@ set(QUICC_CC_LIB_MPI_INTEL ${QUICC_CC_LIB_INTEL} PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python27" PARENT_SCOPE)
+set(QUICC_PYTHONS "python27" "python34" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON27 "/curc/tools/x_86_64/rh6/anaconda/2.0.0/lib/libpython2.7.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON27 "/curc/tools/x_86_64/rh6/anaconda/2.0.0/include/python2.7" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON27 "$ENV{CURC_PYTHON_LIB}/libpython2.7.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON27 "$ENV{CURC_PYTHON_INC}/python2.7" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON34 "util" "$ENV{CURC_PYTHON_LIB}/libpython3.4m.a" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON34 "$ENV{CURC_PYTHON_INC}/python3.4m" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#

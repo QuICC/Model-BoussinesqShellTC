@@ -1,5 +1,5 @@
 /** 
- * @file Cartesian3DNusseltZWriterriter.cpp
+ * @file Cartesian3DNusseltZWriter.cpp
  * @brief Source of the implementation of the ASCII Nusselt number writer for a 3D box throught Z
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -17,7 +17,7 @@
 
 // Class include
 //
-#include "IoVariable/Cartesian3DNusseltZWriterriter.hpp"
+#include "IoVariable/Cartesian3DNusseltZWriter.hpp"
 
 // Project includes
 //
@@ -33,20 +33,20 @@ namespace QuICC {
 
 namespace IoVariable {
 
-   Cartesian3DNusseltZWriterriter::Cartesian3DNusseltZWriterriter(std::string type)
+   Cartesian3DNusseltZWriter::Cartesian3DNusseltZWriter(std::string type)
       : IVariableAsciiEWriter(NusseltTags::BASENAME, NusseltTags::EXTENSION, NusseltTags::HEADER, type, NusseltTags::VERSION, Dimensions::Space::SPECTRAL)
    {
    }
 
-   Cartesian3DNusseltZWriterriter::~Cartesian3DNusseltZWriterriter()
+   Cartesian3DNusseltZWriter::~Cartesian3DNusseltZWriter()
    {
    }
 
-   void Cartesian3DNusseltZWriterriter::init()
+   void Cartesian3DNusseltZWriter::init()
    {
-      Cartesian3DNusseltZWriterriter::scalar_iterator_range sRange = this->scalarRange();
+      Cartesian3DNusseltZWriter::scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 1);
-      Cartesian3DNusseltZWriterriter::scalar_iterator sit = sRange.first;
+      Cartesian3DNusseltZWriter::scalar_iterator sit = sRange.first;
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -79,14 +79,14 @@ namespace IoVariable {
       IVariableAsciiEWriter::init();
    }
 
-   void Cartesian3DNusseltZWriterriter::write()
+   void Cartesian3DNusseltZWriter::write()
    {
       // Create file
       this->preWrite();
 
-      Cartesian3DNusseltZWriterriter::scalar_iterator_range sRange = this->scalarRange();
+      Cartesian3DNusseltZWriter::scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 1);
-      Cartesian3DNusseltZWriterriter::scalar_iterator sit = sRange.first;
+      Cartesian3DNusseltZWriter::scalar_iterator sit = sRange.first;
 
       // Copy data
       int l;

@@ -5,7 +5,7 @@
  */
 
 /// Set the path to the simulation implementation
-#define MODELPATH PhysicalModels/QUICC_RUNSIM_MODEL.hpp
+#define MODELPATH QUICC_MODEL_PATH/QUICC_RUNSIM_PATH/PhysicalModel.hpp
 /// Define small macros allowing to convert to string
 #define MAKE_STR_X( _P ) # _P
 /// Define small macros allowing to convert to string
@@ -25,7 +25,7 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "Generator/StateGenerator.hpp"
-#include "PhysicalModels/StateGeneratorFactory.hpp"
+#include "Model/StateGeneratorFactory.hpp"
 #include MODELHEADER
 
 /**
@@ -42,7 +42,7 @@ int run()
    try
    {
       // Create state generator
-      spGen = QuICC::StateGeneratorFactory<QuICC::QUICC_RUNSIM_MODEL>::createGenerator();
+      spGen = QuICC::StateGeneratorFactory<QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel>::createGenerator();
    }
 
    // If exception is thrown, finalise (close files) and return

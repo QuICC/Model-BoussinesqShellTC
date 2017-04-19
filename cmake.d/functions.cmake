@@ -160,15 +160,20 @@ endfunction()
 #
 # Create executable
 #
-function (quicc_add_executable MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
+function (quicc_add_executable ModelPath StateRef Scheme SchemeDim MHDForm Postfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
+   # Create simple model name
+   string(REGEX REPLACE ${StateRef}/ "" ModelId ${ModelPath})
+   string(REGEX REPLACE "/" "" ModelName ${ModelId})
+   string(REGEX REPLACE "/" "::" CPPModel ${ModelId})
+
    # Create new name for executable
-   STRING(REGEX REPLACE "Model" ${MHDPostfix} ExecName ${MHDModel})
+   set(ExecName ${ModelName}${Postfix})
 
    # Create upper case scheme name
-   string(TOUPPER ${MHDScheme} UpMHDScheme)
+   string(TOUPPER ${Scheme} UpScheme)
 
    # Create list of source files
-   set(SrcsList ${MHDExecSrc} ${QUICC_SRC_DIR}/PhysicalModels/${MHDModel}.cpp ${${MHDAllSrcs}} ${${MHDModelSrcs}})
+   set(SrcsList ${MHDExecSrc} ${${MHDAllSrcs}} ${${MHDModelSrcs}})
 
    # Add executable to target list
    add_executable(${ExecName} ${SrcsList})
@@ -176,14 +181,14 @@ function (quicc_add_executable MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfi
    # Set special properties of target
    if(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpMHDScheme} -DQUICC_SPATIALDIMENSION_${MHDSchemeDim} -DQUICC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpScheme} -DQUICC_SPATIALDIMENSION_${SchemeDim} -DQUICC_MODEL_PATH=${StateRef} -DQUICC_RUNSIM_PATH=${ModelId} -DQUICC_RUNSIM_CPPMODEL=${CPPModel}")
    else(${MHDForm} STREQUAL "DEFAULT")
       set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpMHDScheme} -DQUICC_SPATIALDIMENSION_${MHDSchemeDim} -DQUICC_SPATIALSCHEME_${UpMHDScheme}_${MHDForm} -DQUICC_RUNSIM_MODEL=${MHDModel}")
+         ${ExecName} COMPILE_FLAGS "-DQUICC_SPATIALSCHEME_${UpScheme} -DQUICC_SPATIALDIMENSION_${SchemeDim} -DQUICC_SPATIALSCHEME_${UpScheme}_${MHDForm} -DQUICC_MODEL_PATH=${StateRef} -DQUICC_RUNSIM_PATH=${ModelId} -DQUICC_RUNSIM_CPPMODEL=${CPPModel}")
    endif(${MHDForm} STREQUAL "DEFAULT")
 
    # Show message
-   message(STATUS " --> Added ${ExecName} executable")
+   message(STATUS "    --> added ${ExecName}")
 endfunction ()
 
 #
@@ -197,7 +202,7 @@ function (quicc_add_test MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDE
    string(TOUPPER ${MHDScheme} UpMHDScheme)
 
    # Create list of source files
-   set(SrcsList ${MHDExecSrc} ${QUICC_SRC_DIR}/PhysicalModels/${MHDModel}.cpp ${${MHDAllSrcs}} ${${MHDModelSrcs}})
+   set(SrcsList ${MHDExecSrc} ${${MHDAllSrcs}} ${${MHDModelSrcs}})
 
    # Add executable to target list
    add_executable(${ExecName} ${SrcsList})
@@ -213,4 +218,102 @@ function (quicc_add_test MHDModel MHDScheme MHDSchemeDim MHDForm MHDPostfix MHDE
 
    # Show message
    message(STATUS " --> Added ${ExecName} test executable")
+endfunction ()
+
+#
+# Recursive crawler to generate model list
+#
+function (quicc_walk_models MHDAll MHDPath MHDDirs MHDSrcRef MHDStateRef)
+   # Loop over all the subdirectories
+   foreach(MHDDir ${MHDDirs})
+      set(MHDCurrent ${MHDAll})
+      # Set new path including subdirectory
+      set(MHDNext ${MHDPath}/${MHDDir})
+      # Unset list of subdirectories and sources
+      set(MHDSources)
+      set(MHDSrcSubDirs)
+      # Include SourcesList.cmake file
+      include(${MHDNext}/SourcesList.cmake)
+      # Loop over all sources and add full path source to list
+      foreach(MHDSource ${MHDSources})
+         list(APPEND MHDCurrent ${MHDNext}/${MHDSource})
+      endforeach(MHDSource)
+      # Check if there are additional subdirectories
+      if(DEFINED MHDSrcSubDirs)
+         quicc_walk_models("${MHDCurrent}" "${MHDNext}" "${MHDSrcSubDirs}" "${MHDSrcRef}" "${MHDStateRef}")
+      endif()
+      if(MHDSources MATCHES PhysicalModel.cpp)
+         string(REGEX REPLACE ${MHDSrcRef} "" MHDModPath ${MHDNext})
+         quicc_target_model("${MHDModPath}" "${MHDStateRef}" "${MHDCurrent}")
+      endif()
+   endforeach(MHDDir)
+endfunction ()
+
+function (quicc_find_models Path ModelDir ModelState)
+   # Unset list of subdirectories and sources
+   set(MHDCurrent)
+   set(MHDSources)
+   set(MHDSrcSubDirs)
+   # Include SourcesList.cmake file
+   set(MHDNext ${Path}/${ModelDir})
+   include(${MHDNext}/SourcesList.cmake)
+   foreach(MHDSource ${MHDSources})
+      list(APPEND MHDCurrent ${MHDNext}/${MHDSource})
+   endforeach(MHDSource)
+
+   set(MHDTmp ${ModelDir}/${ModelState})
+   quicc_walk_models("${MHDCurrent}" "${Path}" "${MHDTmp}" "${Path}" "${ModelDir}/${ModelState}")
+endfunction ()
+
+function (quicc_target_model MHDModPath MHDStateRef MHDModSrcs)
+   string(REGEX REPLACE "^/" "" MHDModPath ${MHDModPath})
+   # Set path to model header
+   set(ModelFile ${QUICC_INCLUDE_DIR}/${MHDModPath}/PhysicalModel.hpp)
+
+   # Extract the spatial scheme from model file
+   file(STRINGS ${ModelFile} Scheme REGEX "typedef .* SchemeType;")
+   STRING(REGEX REPLACE "typedef Schemes::([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
+   STRING(REGEX REPLACE " " "" Scheme ${Scheme})
+   STRING(TOUPPER ${Scheme} Scheme) 
+   set(QUICC_SPATIALSCHEME ${Scheme})
+
+   # Extract the spatial scheme dimension from model file
+   file(STRINGS ${ModelFile} SchemeDim REGEX "#include \"SpatialSchemes/.*/")
+   STRING(REGEX REPLACE "#include \"SpatialSchemes/([1-9]*D)/.*" "\\1" SchemeDim ${SchemeDim})
+   STRING(REGEX REPLACE " " "" SchemeDim ${SchemeDim})
+   set(QUICC_SPATIALDIMENSION ${SchemeDim})
+
+   # Extract the spatial scheme formulation from model file
+   file(STRINGS ${ModelFile} Formulation REGEX "// QUICC_SPATIALSCHEME_FORMULATION = .*;")
+   if(NOT ${Formulation} STREQUAL "")
+      STRING(REGEX REPLACE "// QUICC_SPATIALSCHEME_FORMULATION = ([a-z,A-Z]*);" "\\1" Formulation ${Formulation})
+      STRING(REGEX REPLACE " " "" Formulation ${Formulation})
+      set(QUICC_SPATIALSCHEME_FORMULATION ${Formulation})
+   else(NOT ${Formulation} STREQUAL "")
+      set(Formulation "DEFAULT")
+      set(QUICC_SPATIALSCHEME_FORMULATION "DEFAULT")
+   endif(NOT ${Formulation} STREQUAL "")
+
+   # Generate sources list
+   set(All_Srcs )
+   include(../cmake.d/setup/AllSrc.cmake)
+
+   # Create executable name
+   string(REGEX REPLACE ${MHDStateRef}/ "" PrettyName ${MHDModPath})
+   message(STATUS "Generating executables for ${PrettyName}")
+   # Create simulation target
+   quicc_add_executable("${MHDModPath}" "${MHDStateRef}" "${Scheme}" "${SchemeDim}" "${Formulation}" "Model" "RunSimulation.cpp"
+      MHDModSrcs All_Srcs)
+
+   # Create configuration file target
+   quicc_add_executable("${MHDModPath}" "${MHDStateRef}" "${Scheme}" "${SchemeDim}" "${Formulation}" "Config" "WriteConfig.cpp"
+      MHDModSrcs All_Srcs)
+
+   # Create state file target
+   quicc_add_executable("${MHDModPath}" "${MHDStateRef}" "${Scheme}" "${SchemeDim}" "${Formulation}" "State" "GenerateState.cpp"
+      MHDModSrcs All_Srcs)
+
+   # Create visualization file target
+   quicc_add_executable("${MHDModPath}" "${MHDStateRef}" "${Scheme}" "${SchemeDim}" "${Formulation}" "Visu" "VisualizeState.cpp"
+      MHDModSrcs All_Srcs)
 endfunction ()

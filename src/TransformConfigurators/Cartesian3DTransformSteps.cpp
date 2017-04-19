@@ -77,6 +77,19 @@ namespace TransformSteps {
             transform.back().addEdge(Integrator2DType::INTGDIFF);
             transform.back().addEdge(Integrator1DType::INTGI2, curlId, Arithmetics::SUB);
 
+         // Integrate for curl of nonlinear and mean Y (induction)
+         } else if(curlFlag == 1)
+         {
+            transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTGDIFFM);
+            transform.back().addEdge(Integrator2DType::INTGM);
+            transform.back().addEdge(Integrator1DType::INTGI2MI2D1, curlId, Arithmetics::ADD);
+
+            transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
+            transform.back().addEdge(IntegratorNDType::INTG);
+            transform.back().addEdge(Integrator2DType::INTGDIFF);
+            transform.back().addEdge(Integrator1DType::INTGI2, curlId, Arithmetics::SUB);
+
          } else
          {
             throw Exception("Requested an unknown vector forward transform");
@@ -102,25 +115,25 @@ namespace TransformSteps {
             transform.back().addEdge(Integrator2DType::INTGLAPLH);
             transform.back().addEdge(Integrator1DType::INTGI4, curlcurlId, Arithmetics::SUB);
 
-         // Integrate for second order double curl equation
+         // Integrate for double curl of nonlinear term and mean X (induction)
          } else if(curlcurlFlag == 1)
          {
             // Compute curlcurl with Dz component
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTGDIFF);
-            transform.back().addEdge(Integrator1DType::INTGI2D1, curlcurlId, Arithmetics::ADD);
+            transform.back().addEdge(Integrator1DType::INTGI2D1, curlcurlId, Arithmetics::SUB);
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTGDIFFM);
             transform.back().addEdge(Integrator2DType::INTGM);
-            transform.back().addEdge(Integrator1DType::INTGI2D1MI2, curlcurlId, Arithmetics::ADD);
+            transform.back().addEdge(Integrator1DType::INTGI2D1, curlcurlId, Arithmetics::SUB);
 
             // Compute curlcurl without Dz component
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(IntegratorNDType::INTG);
             transform.back().addEdge(Integrator2DType::INTGLAPLH);
-            transform.back().addEdge(Integrator1DType::INTGI2, curlcurlId, Arithmetics::SUB);
+            transform.back().addEdge(Integrator1DType::INTGI2, curlcurlId, Arithmetics::ADD);
 
          } else
          {

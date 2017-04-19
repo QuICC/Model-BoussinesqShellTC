@@ -523,11 +523,20 @@ namespace IoTools {
          case NonDimensional::MAGPRANDTL:
             return "magnetic_prandtl";
 
+         case NonDimensional::POINCARE:
+            return "poincare";
+
+         case NonDimensional::MODELSASSER:
+	         return "modified_elsasser";
+
          case NonDimensional::PRANDTL:
             return "prandtl";
 
          case NonDimensional::RAYLEIGH:
             return "rayleigh";
+
+         case NonDimensional::CHANDRASEKHAR:
+            return "chandrasekhar";
 
          case NonDimensional::ROBERTS:
             return "roberts";

@@ -131,6 +131,7 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
+            
             if bcId == 0:
                 if self.use_galerkin:
                     raise RuntimeError("Inhomogeneous boundary conditions cannot use Galerkin scheme!")
@@ -158,6 +159,7 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
 
         else:
             bc = no_bc()
+            
 
         return bc
 

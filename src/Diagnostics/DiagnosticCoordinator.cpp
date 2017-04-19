@@ -26,9 +26,12 @@
 #if defined QUICC_SPATIALSCHEME_TFF_TORPOL
    #include "Diagnostics/CartesianTorPolWrapper.hpp"
    #include "Diagnostics/CartesianCflWrapper.hpp"
-#elif defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL || defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
+#elif defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL
    #include "Diagnostics/SphericalTorPolWrapper.hpp"
-   #include "Diagnostics/SphericalCflWrapper.hpp"
+   #include "Diagnostics/ShellCflWrapper.hpp"
+#elif defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
+   #include "Diagnostics/SphericalTorPolWrapper.hpp"
+   #include "Diagnostics/SphereCflWrapper.hpp"
 #elif defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_TTT 
    #include "Diagnostics/StreamVerticalWrapper.hpp"
    #include "Diagnostics/CartesianCflWrapper.hpp"
@@ -39,7 +42,7 @@ namespace QuICC {
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcMaxStep(0.1), mcMinStep(1e-11), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : mcMaxStep(0.1), mcMinStep(1e-10), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
    {
    }
 
@@ -61,17 +64,27 @@ namespace Diagnostics {
       {
          SharedCartesianTorPolWrapper spVelocity = SharedCartesianTorPolWrapper(new CartesianTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
 
-         this->mspCflWrapper = SharedCartesianCflWrapper(new CartesianCflWrapper(spVelocity, mesh));
+         this->mspCflWrapper = SharedCartesianCflWrapper(new CartesianCflWrapper(spVelocity));
 
          this->mFixedStep = tstep(1);
 
-      #elif defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL || defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
-      // Create a stream function and vertical velocity wrapper
+      #elif defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL
+      // Create a toroidal/poloidal spherical shell wrapper
       } else if(vectors.count(PhysicalNames::VELOCITY))
       {
          SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
 
-         this->mspCflWrapper = SharedSphericalCflWrapper(new SphericalCflWrapper(spVelocity, mesh));
+         this->mspCflWrapper = SharedShellCflWrapper(new ShellCflWrapper(spVelocity));
+
+         this->mFixedStep = tstep(1);
+
+      #elif defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
+      // Create a full sphere wrapper
+      } else if(vectors.count(PhysicalNames::VELOCITY))
+      {
+         SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
+
+         this->mspCflWrapper = SharedSphereCflWrapper(new SphereCflWrapper(spVelocity));
 
          this->mFixedStep = tstep(1);
 
@@ -81,7 +94,7 @@ namespace Diagnostics {
       {
          SharedStreamVerticalWrapper spVelocity = SharedStreamVerticalWrapper(new StreamVerticalWrapper(scalars.find(PhysicalNames::STREAMFUNCTION)->second, scalars.find(PhysicalNames::VELOCITYZ)->second));
 
-         this->mspCflWrapper = SharedCartesianCflWrapper(new CartesianCflWrapper(spVelocity, mesh));
+         this->mspCflWrapper = SharedCartesianCflWrapper(new CartesianCflWrapper(spVelocity));
 
          this->mFixedStep = tstep(1);
 
@@ -91,6 +104,11 @@ namespace Diagnostics {
       } else
       {
          this->mFixedStep = tstep(1);
+      }
+
+      if(this->mspCflWrapper)
+      {
+         this->mspCflWrapper->init(mesh);
       }
 
       // Store configuration file start time

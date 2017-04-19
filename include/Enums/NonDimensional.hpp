@@ -39,8 +39,13 @@ namespace QuICC {
             MAGEKMAN,
             /// Magnetic Prandtl number
             MAGPRANDTL,
+			   // Nicolò Lardelli
+			   /// Modified Elsasser number
+			   MODELSASSER,
             /// Prandtl number
             PRANDTL,
+            /// Poincare number
+            POINCARE,
             /// Rayleigh number
             RAYLEIGH,
             /// Roberts number
@@ -49,6 +54,8 @@ namespace QuICC {
             ROSSBY,
             /// Taylor number
             TAYLOR,
+            /// Chandrasekhar number
+            CHANDRASEKHAR,
 
             // 
             // Geometrical numbers

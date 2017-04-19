@@ -109,10 +109,11 @@ namespace IoVariable {
             n += 2;
          }
          Array energy(n);
-
-         energy(0) = this->mXEnergy;
-         energy(1) = this->mYEnergy;
-         energy(2) = this->mZEnergy;
+         // Fixed a missing 1/2 factor in the calculation of the mean magnetic energy
+         // S. Maffei, 31 March 2017
+         energy(0) = 0.5*(this->mXEnergy);
+         energy(1) = 0.5*(this->mYEnergy);
+         energy(2) = 0.5*(this->mZEnergy);
          int i = 3;
          if(this->mHasZonalX)
          {

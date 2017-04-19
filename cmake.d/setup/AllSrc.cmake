@@ -45,7 +45,6 @@ set(MHDAllSrcDirs
    IoStats
    IoXml
    LoadSplitter
-   PhysicalModels
    PhysicalOperators
    PolynomialTransforms
    Profiler

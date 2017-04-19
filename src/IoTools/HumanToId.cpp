@@ -49,6 +49,14 @@ namespace IoTools {
       {
          return NonDimensional::MAGPRANDTL;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::POINCARE))
+      {
+         return NonDimensional::POINCARE;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::MODELSASSER))
+      {
+    	  return NonDimensional::MODELSASSER;
+
       } else if(id == IdToHuman::toTag(NonDimensional::PRANDTL))
       {
          return NonDimensional::PRANDTL;
@@ -56,6 +64,10 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(NonDimensional::RAYLEIGH))
       {
          return NonDimensional::RAYLEIGH;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::CHANDRASEKHAR))
+      {
+         return NonDimensional::CHANDRASEKHAR;
 
       } else if(id == IdToHuman::toTag(NonDimensional::ROBERTS))
       {

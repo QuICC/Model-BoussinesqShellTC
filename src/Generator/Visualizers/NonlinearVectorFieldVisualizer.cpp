@@ -76,13 +76,13 @@ namespace Equations {
          switch(compId)
          {
             case(FieldComponents::Physical::R):
-               Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).curl(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
+               Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(this->name()).dom(0).curl(), this->vector(this->name()).dom(0).phys(), 1.0);
                break;
             case(FieldComponents::Physical::THETA):
-               Physical::Cross<FieldComponents::Physical::Z,FieldComponents::Physical::R>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).curl(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
+               Physical::Cross<FieldComponents::Physical::Z,FieldComponents::Physical::R>::set(rNLComp, this->vector(this->name()).dom(0).curl(), this->vector(this->name()).dom(0).phys(), 1.0);
                break;
             case(FieldComponents::Physical::Z):
-               Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).curl(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
+               Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->vector(this->name()).dom(0).curl(), this->vector(this->name()).dom(0).phys(), 1.0);
                break;
             default:
                assert(false);
@@ -104,8 +104,7 @@ namespace Equations {
       if(this->mNonlinearType == NonlinearVectorVisualizerIds::CYLINDER_TORPOL_ADVECTION)
       {
          // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?(, needCurl)
-         this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
-         this->mRequirements.addField(this->name(), FieldRequirement(false, true, true, false, false));
+         this->mRequirements.addField(this->name(), FieldRequirement(false, true, true, false, true));
       }
    }
 

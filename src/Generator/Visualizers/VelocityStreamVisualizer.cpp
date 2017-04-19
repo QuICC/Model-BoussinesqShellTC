@@ -40,6 +40,11 @@ namespace Equations {
 
    void VelocityStreamVisualizer::setIdentity(const PhysicalNames::Id name)
    {
+      // Set the name
+      this->setName(name);
+
+      // Set the variable requirements
+      this->setRequirements();
    }
 
    void VelocityStreamVisualizer::setFields(const bool viewField, const bool viewGradient)
@@ -61,9 +66,6 @@ namespace Equations {
 
    void VelocityStreamVisualizer::setRequirements()
    {
-      // Set the name
-      this->setName(PhysicalNames::VELOCITY);
-
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
