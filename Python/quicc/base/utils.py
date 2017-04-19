@@ -96,6 +96,27 @@ def build_diag_matrix(fields, func, func_args, restriction = None):
    
     return spsp.block_diag(tmp, format='coo')
 
+def build_diag_stack(fields, func, func_args, restriction = None):
+
+    if restriction is None:
+        restrict = [None]*len(fields)
+    else:
+        try:
+            n = len(restriction[0])
+            if len(restriction) == len(fields):
+                restrict = restriction
+            else:
+                raise RuntimeError('Restriction size does not match number of fields')
+        except TypeError:
+            restrict = [restriction]*len(fields)
+
+    tmp = []
+    for j, field_row in enumerate(fields):
+        args = func_args + (field_row,field_row)
+        tmp.append(func(*args, restriction = restrict[j]))
+
+    return spsp.vstack(tmp, format='coo')
+
 def triplets(mat):
     if not spsp.isspmatrix_coo(mat):
         mat = mat.tocoo();
