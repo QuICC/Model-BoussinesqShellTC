@@ -65,6 +65,10 @@ namespace IoTools {
       {
          return NonDimensional::RAYLEIGH;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::CHANDRASEKHAR))
+      {
+         return NonDimensional::CHANDRASEKHAR;
+
       } else if(id == IdToHuman::toTag(NonDimensional::ROBERTS))
       {
          return NonDimensional::ROBERTS;

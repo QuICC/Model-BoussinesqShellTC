@@ -58,47 +58,47 @@ namespace IoXml {
          /**
           * @brief Get the name
           */
-         std::string  name() const;
+         const std::string&  name() const;
 
          /**
           * @brief Get extension
           */
-         std::string  extension() const;
+         const std::string&  extension() const;
 
          /**
           * @brief Get file meta tag
           */
-         std::string fileTag() const;
+         const std::string& fileTag() const;
 
          /**
           * @brief Get the header tag
           */
-         std::string  headerTag() const;
+         const std::string&  headerTag() const;
 
          /**
           * @brief Get the header content
           */
-         std::string  header() const;
+         const std::string&  header() const;
 
          /**
           * @brief Get the type tag
           */
-         std::string  typeTag() const;
+         const std::string&  typeTag() const;
 
          /**
           * @brief Get the type content
           */
-         std::string  type() const;
+         const std::string&  type() const;
 
          /**
           * @brief Get the version tag
           */
-         std::string  versionTag() const;
+         const std::string&  versionTag() const;
 
          /**
           * @brief Get the version content
           */
-         std::string  version() const;
+         const std::string&  version() const;
 
          /**
           * @brief Reset name

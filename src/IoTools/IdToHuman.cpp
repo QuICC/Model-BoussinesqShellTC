@@ -535,6 +535,9 @@ namespace IoTools {
          case NonDimensional::RAYLEIGH:
             return "rayleigh";
 
+         case NonDimensional::CHANDRASEKHAR:
+            return "chandrasekhar";
+
          case NonDimensional::ROBERTS:
             return "roberts";
 

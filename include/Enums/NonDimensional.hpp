@@ -54,6 +54,8 @@ namespace QuICC {
             ROSSBY,
             /// Taylor number
             TAYLOR,
+            /// Chandrasekhar number
+            CHANDRASEKHAR,
 
             // 
             // Geometrical numbers

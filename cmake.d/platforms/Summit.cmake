@@ -1,12 +1,12 @@
 ###################################################
-#----------- Desktop CMAKE SETUP FILE ------------#
+#----------- Janus CMAKE SETUP FILE ------------#
 ###################################################
 
 ###################################################
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(QUICC_COMPILERS "GCC" PARENT_SCOPE)
+set(QUICC_COMPILERS "Intel" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
@@ -26,6 +26,8 @@ set(QUICC_THREADSMODELS "None" PARENT_SCOPE)
 
 set(QUICC_FFTS "FFTW" PARENT_SCOPE)
 set(QUICC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
+set(QUICC_INCLUDES_FFTW "$ENV{CURC_FFTW_INC}" PARENT_SCOPE)
+set(QUICC_LIBDIR_FFTW "$ENV{CURC_FFTW_LIB}" PARENT_SCOPE)
 
 ###################################################
 #-------------- AVAILABLE FFT PLANS --------------#
@@ -43,35 +45,38 @@ set(QUICC_LINALGS "Eigen" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(QUICC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "MUMPS" "KentLU" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
-set(QUICC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
-set(QUICC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
-set(QUICC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
-set(QUICC_LIBRARIES_KENTLU "klu" PARENT_SCOPE)
-set(QUICC_LIBRARIES_SPARSELU "metis" PARENT_SCOPE)
-set(QUICC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
-set(QUICC_INCLUDES_MUMPS "/usr/local/share/petsc-3.7.3/arch-linux2-c-opt/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_MUMPS "/usr/local/share/petsc-3.7.3/arch-linux2-c-opt/lib" PARENT_SCOPE)
-set(QUICC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "parmetis" "ptesmumps" "ptscotch" "ptscotcherr" "ptscotchparmetis" "ptscotcherrexit" "scotch" "scotcherr" "scotcherrexit" "pord" "scalapack" "metis" "atllapack" "f77blas" "mpi" "gfortran" "mpi_mpifh" PARENT_SCOPE)
+set(QUICC_SPLINALGS "UmfPack" "MUMPS"  "SparseLU" PARENT_SCOPE)
+set(QUICC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
+set(QUICC_LIBRARIES_MUMPS "mkl_scalapack_ilp64" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "mkl_blacs_intelmpi_ilp64" "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "metis" "ifcore" PARENT_SCOPE)
+set(QUICC_INCLUDES_UMFPACK_GCC "/home/stma7353/SuiteSparse/include" PARENT_SCOPE)
+set(QUICC_LIBDIR_UMFPACK_GCC "/home/stma7353/SuiteSparse/lib" PARENT_SCOPE)
+set(QUICC_INCLUDES_UMFPACK_INTEL "/home/stma7353/SuiteSparse/include" PARENT_SCOPE)
+set(QUICC_LIBDIR_UMFPACK_INTEL "/home/stma7353/SuiteSparse/lib" "$ENV{CURC_MKL_LIB}" PARENT_SCOPE)
+#set(QUICC_INCLUDES_MUMPS_INTEL "/home/phma6156/share/intel/mumps_4/include" PARENT_SCOPE)
+#set(QUICC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/mumps_4/lib" "/home/phma6156/share/intel/scalapack/lib" "/home/phma6156/share/intel/scotch_5/lib" "/home/phma6156/share/intel/parmetis_3/lib" PARENT_SCOPE)
+set(QUICC_INCLUDES_MUMPS "$ENV{CURC_PETSC_INC}" PARENT_SCOPE)
+set(QUICC_LIBDIR_MUMPS "$ENV{CURC_PETSC_LIB}" "$ENV{CURC_MKL_LIB}" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(QUICC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "SuperLU" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
+set(QUICC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "MUMPS" "SparseLU" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(QUICC_SPTRILINALGS "SparseLU" "SuperLU" "UmfPack" "MUMPS" PARENT_SCOPE)
+set(QUICC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 
 set(QUICC_LARGEIOS "HDF5" PARENT_SCOPE)
-set(QUICC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
+set(QUICC_LIBRARIES_HDF5 "rt" "z" "hdf5" PARENT_SCOPE)
+set(QUICC_INCLUDES_HDF5 "$ENV{CURC_HDF5_INC}" PARENT_SCOPE)
+set(QUICC_LIBDIR_HDF5 "$ENV{CURC_HDF5_LIB}" PARENT_SCOPE)
 
 ###################################################
 #-------------- MPI IMPLEMENTATION ---------------#
@@ -104,17 +109,30 @@ set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
 
 set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
 
+set(QUICC_CC_SERIAL_INTEL "icpc" PARENT_SCOPE)
+
+set(QUICC_CC_MPI_INTEL "mpicxx" PARENT_SCOPE)
+
+set(QUICC_CC_ARCH_INTEL "-O2 -xHost" PARENT_SCOPE)
+
+set(QUICC_CC_INC_INTEL "" PARENT_SCOPE)
+
+set(QUICC_CC_INC_MPI_INTEL ${QUICC_CC_INC_INTEL} PARENT_SCOPE)
+
+set(QUICC_CC_LIB_INTEL "" PARENT_SCOPE)
+
+set(QUICC_CC_LIB_MPI_INTEL ${QUICC_CC_LIB_INTEL} PARENT_SCOPE)
+
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
 set(QUICC_PYTHONS "python27" "python34" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
-
-set(QUICC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4m.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON34 "/usr/include/python3.4m" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON27 "$ENV{CURC_PYTHON_LIB}/libpython2.7.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON27 "$ENV{CURC_PYTHON_INC}/python2.7" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON34 "util" "$ENV{CURC_PYTHON_LIB}/libpython3.4m.a" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON34 "$ENV{CURC_PYTHON_INC}/python3.4m" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
