@@ -131,8 +131,14 @@ namespace Couette {
       // Set solver timing
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
-      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
-      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
+	  #ifdef QUICC_SPATIALSCHEME_SLFL
+		  // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
+		  this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
+	  #else
+		  MHDFloat Ro = this->eqParams().nd(NonDimensional::ROSSBY);
+		  bool use_nonlinear = (Ro==0.) ? false : true;
+		  this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, use_nonlinear, false, use_nonlinear));
+	  #endif //QUICC_SPATIALSCHEME_SLFM
    }
 
 }
