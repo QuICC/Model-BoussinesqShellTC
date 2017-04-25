@@ -57,7 +57,7 @@ class BoussinesqOrthoCouetteShellStdConfig:
         """Provide description of the system of equation"""
 
         # Matrix operator is real
-        is_complex = False
+        is_complex = True
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
@@ -285,7 +285,7 @@ class BoussinesqOrthoCouetteShell(BoussinesqOrthoCouetteShellStdConfig, base_mod
             return base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
 
 
-class BoussinesqOrthoCouetteShellVisu(BoussinesqOrthoCouetteShellStdConfig, base_model.BaseModel):
+class BoussinesqOrthoCouetteShellVisuBusu(BoussinesqOrthoCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
