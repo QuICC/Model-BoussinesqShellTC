@@ -183,7 +183,7 @@ namespace IoVariable {
    {
       scalar_iterator sIt;
       scalar_iterator_range sRange = this->scalarRange();
-      assert(std::distance(sRange.first, sRange.second) == 2);
+      assert(std::distance(sRange.first, sRange.second) == 3);
 
       MHDFloat *pX;
       MHDFloat *pY;
@@ -193,17 +193,17 @@ namespace IoVariable {
       {
          pX = &this->mXZonalXEnergy;
          pY = &tmp;
-         pZ = &this->mZZonalXEnergy;
+         pZ = &tmp;
       } else if(flag == ZONAL_Y)
       {
          pX = &tmp;
          pY = &this->mYZonalYEnergy;
-         pZ = &this->mZZonalYEnergy;
+         pZ = &tmp;
       } else
       {
          pX = &this->mXEnergy;
          pY = &this->mYEnergy;
-         pZ = &this->mZEnergy;
+         pZ = &tmp;
       }
 
       // Initialize the energy
@@ -269,14 +269,8 @@ namespace IoVariable {
          // Compute projection transform for first dimension 
          coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
-         if(cIt->first == FieldComponents::Spectral::X)
-         {
-            // Compute |f|^2
-            rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
-         } else if(cIt->first == FieldComponents::Spectral::Y)
-         {
-            rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
-         }
+         // Compute |f|^2
+         rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
          // Compute integration transform for first dimension 
          coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
