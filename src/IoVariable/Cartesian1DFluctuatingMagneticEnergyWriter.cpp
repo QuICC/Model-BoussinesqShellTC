@@ -181,7 +181,6 @@ namespace IoVariable {
 
    void Cartesian1DFluctuatingMagneticEnergyWriter::computeEnergy(Transform::TransformCoordinatorType& coord, const Cartesian1DFluctuatingMagneticEnergyWriter::EnergyTypeId flag)
    {
-      scalar_iterator sIt;
       scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 3);
 
@@ -203,7 +202,7 @@ namespace IoVariable {
       {
          pX = &this->mXEnergy;
          pY = &this->mYEnergy;
-         pZ = &tmp;
+         pZ = &this->mZEnergy;
       }
 
       // Initialize the energy
@@ -211,24 +210,20 @@ namespace IoVariable {
       *pY = 0.0;
       *pZ = 0.0;
 
+      // Map field components to geometric components
       std::map<FieldComponents::Spectral::Id, scalar_iterator> comps;
-      sIt = sRange.first;
-      sIt++;
-      if(sRange.first->first == PhysicalNames::FBX)
+      for(scalar_iterator sIt = sRange.first; sIt != sRange.second; ++sIt)
       {
-         comps.insert(std::make_pair(FieldComponents::Spectral::X, sRange.first));
-         comps.insert(std::make_pair(FieldComponents::Spectral::Y, sIt));
-         comps.insert(std::make_pair(FieldComponents::Spectral::Z, sRange.first));
-      } else if(sRange.first->first == PhysicalNames::FBY)
-      {
-         comps.insert(std::make_pair(FieldComponents::Spectral::Y, sRange.first));
-         comps.insert(std::make_pair(FieldComponents::Spectral::X, sIt));
-         comps.insert(std::make_pair(FieldComponents::Spectral::Z, sRange.first));
-      } else if(sRange.first->first == PhysicalNames::FBZ)
-      {
-         comps.insert(std::make_pair(FieldComponents::Spectral::Y, sRange.first));
-         comps.insert(std::make_pair(FieldComponents::Spectral::X, sIt));
-         comps.insert(std::make_pair(FieldComponents::Spectral::Z, sRange.first));
+         if(sIt->first == PhysicalNames::FBX)
+         {
+            comps.insert(std::make_pair(FieldComponents::Spectral::X, sIt));
+         } else if(sIt->first == PhysicalNames::FBY)
+         {
+            comps.insert(std::make_pair(FieldComponents::Spectral::Y, sIt));
+         } else
+         {
+            comps.insert(std::make_pair(FieldComponents::Spectral::Z, sIt));
+         }
       }
 
       for(std::map<FieldComponents::Spectral::Id,scalar_iterator>::iterator cIt = comps.begin(); cIt != comps.end(); ++cIt)
