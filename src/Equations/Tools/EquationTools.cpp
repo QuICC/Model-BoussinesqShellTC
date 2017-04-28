@@ -224,6 +224,8 @@ namespace Tools {
          // All checked and equation is not coupled
          if(counter.sum() < counter.size())
          {
+            std::vector<FieldComponents::Spectral::Id> selfCoupling;
+            FieldComponents::Spectral::Id coupledComp;
             IVectorEquation::SpectralComponent_iterator compIt;
             IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
             int i = 0;
@@ -231,31 +233,65 @@ namespace Tools {
             {
                if(counter(i) == 0)
                {
-                  // Set solver index for complex equation
-                  if((*vectEqIt)->couplingInfo(*compIt).isComplex())
+                  bool selfCoupled = false;
+                  CouplingInformation::FieldId_iterator fIt;
+                  CouplingInformation::FieldId_range fRange = (*vectEqIt)->couplingInfo(*compIt).implicitRange();
+                  for(fIt = fRange.first; fIt != fRange.second; ++fIt)
                   {
-                     // Set complex solver index
-                     (*vectEqIt)->setSolverIndex(*compIt, zIdx);
+                     if(fIt->first == (*vectEqIt)->name())
+                     {
+                        selfCoupled = (std::find(selfCoupling.begin(), selfCoupling.end(), fIt->second) != selfCoupling.end());
+                     }
 
-                     // Increment complex solver index
-                     zIdx++;
-
-                     // Set solver index for real equation
-                  } else
-                  {
-                     // Set real solver index
-                     (*vectEqIt)->setSolverIndex(*compIt, dIdx);
-
-                     // Increment real solver index
-                     dIdx++;
+                     if(selfCoupled)
+                     {
+                        coupledComp = fIt->second;
+                        break;
+                     }
                   }
 
-                  // Debug statements
-                  DebuggerMacro_showValue("Identified first vector solver: ", 2, (*vectEqIt)->name());
-                  DebuggerMacro_showValue("---> component: ", 2, *compIt);
-                  DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(*compIt).solverIndex());
-                  DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(*compIt).isComplex());
+                  if(selfCoupled)
+                  {
+                     // Set the solver index
+                     (*vectEqIt)->setSolverIndex(*compIt, (*vectEqIt)->couplingInfo(coupledComp).solverIndex());
+
+                     // Debug statements
+                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                     DebuggerMacro_showValue("---> component: ", 2, *compIt);
+                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(*compIt).solverIndex());
+                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(*compIt).isComplex());
+
+                     // Set coupling flag and break out
+                     counter(i) = 1;
+                  } else
+                  {
+                     // Set solver index for complex equation
+                     if((*vectEqIt)->couplingInfo(*compIt).isComplex())
+                     {
+                        // Set complex solver index
+                        (*vectEqIt)->setSolverIndex(*compIt, zIdx);
+
+                        // Increment complex solver index
+                        zIdx++;
+
+                        // Set solver index for real equation
+                     } else
+                     {
+                        // Set real solver index
+                        (*vectEqIt)->setSolverIndex(*compIt, dIdx);
+
+                        // Increment real solver index
+                        dIdx++;
+                     }
+
+                     // Debug statements
+                     DebuggerMacro_showValue("Identified first vector solver: ", 2, (*vectEqIt)->name());
+                     DebuggerMacro_showValue("---> component: ", 2, *compIt);
+                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(*compIt).solverIndex());
+                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(*compIt).isComplex());
+                  }
                }
+               selfCoupling.push_back(*compIt);
             }
          }
 
