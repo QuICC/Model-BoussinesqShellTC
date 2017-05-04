@@ -6,7 +6,7 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(QUICC_COMPILERS "GCC" PARENT_SCOPE)
+set(QUICC_COMPILERS "CLANG" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
@@ -86,21 +86,21 @@ set(QUICC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
 #--------------- COMPILER SETTINGS ---------------#
 ###################################################
 
-set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
+set(QUICC_CC_SERIAL_CLANG "g++" PARENT_SCOPE)
 
-set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
+set(QUICC_CC_MPI_CLANG "mpic++" PARENT_SCOPE)
 
 #set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
 #Leo: test for clang 
-set(QUICC_CC_ARCH_GCC "-march=native -O2 -stdlib=libstdc++" PARENT_SCOPE)
+set(QUICC_CC_ARCH_CLANG "-march=native -O2 -stdlib=libstdc++" PARENT_SCOPE)
 
-set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
+set(QUICC_CC_INC_CLANG "" PARENT_SCOPE)
 
-set(QUICC_CC_INC_MPI_GCC ${QUICC_CC_INC_GCC} PARENT_SCOPE)
+set(QUICC_CC_INC_MPI_CLANG ${QUICC_CC_INC_CLANG} PARENT_SCOPE)
 
-set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
+set(QUICC_CC_LIB_CLANG "" PARENT_SCOPE)
 
-set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
+set(QUICC_CC_LIB_MPI_CLANG ${QUICC_CC_LIB_CLANG} PARENT_SCOPE)
 
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
