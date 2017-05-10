@@ -193,7 +193,7 @@ class BoussinesqCouetteShellHyperviscous(BoussinesqCouetteShellHyperviscousConfi
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        # applies a constant Ekman up to 50 and then let scale from 50 onward
+        # applies a constant Ekman up to 25 and then let scale from 50 onward
         if l>=25:
             E = E * (l/25.)**2
 

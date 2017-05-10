@@ -46,7 +46,7 @@ if __name__=="__main__":
         data = pd.concat(data, ignore_index=True)
         data.reindex()
         #print(data.head())
-        data.sort(['time'], inplace=True)
+        data.sort_values(['time'], inplace=True)
         pass
 
     data['time'] -= min(data['time'])

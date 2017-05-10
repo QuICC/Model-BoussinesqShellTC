@@ -74,13 +74,13 @@ if __name__=="__main__":
     ax.plot(data[:,0],y_predict)
     ax.fill_between(data[:,0], y_predict - y_std, y_predict + y_std,alpha=.25)
     """
-
+    alpha = 0.05
     data.set_index('time', inplace = True)
     # forward
-    ewm = data['Torque'].ewm(alpha=0.03, adjust=True)
+    ewm = data['Torque'].ewm(alpha=alpha, adjust=True)
     m = ewm.agg(['mean','std'])
     # backward
-    ewm_bwd= data['Torque'][::-1].ewm(alpha = 0.03,adjust =True)
+    ewm_bwd= data['Torque'][::-1].ewm(alpha = alpha,adjust =True)
     m_bwd = ewm_bwd.agg(['mean','std'])
     print(m[::-1].head())
     m = (m+m_bwd)/2.

@@ -38,7 +38,7 @@ if __name__=="__main__":
         #datafull = pd.DataFrame(datafull).sort([0])
         datafull = pd.concat(datafull, ignore_index=True)
         datafull.reindex()
-        datafull.sort([0],inplace=True)
+        datafull.sort_values([0],inplace=True)
 
         datafull = datafull.as_matrix()
     pass
