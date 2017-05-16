@@ -6,6 +6,9 @@ from quicc.geometry.spherical import shell_radius
 
 if __name__=="__main__":
 
+
+    # open files
+
     try:
         argv = sys.argv
         filename = argv[1]
@@ -42,8 +45,16 @@ if __name__=="__main__":
 
         datafull = datafull.as_matrix()
     pass
+
     pp.figure()
     pp.clf()
+
+    pp.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    pp.rcParams['font.family'] = 'ubuntu'
+    #pp.rcParams['font.size'] = 14
+    # set parameters for plotting
+    pp.ticklabel_format(style='sci', axis='y')
+
 
     data = datafull[-1,1:]
 
@@ -54,7 +65,7 @@ if __name__=="__main__":
     pp.loglog(data[2*Lmax:3*Lmax], label='L spectrum, poloidal')
     pp.plot(data[3*Lmax:-1], label='M spectrum, poloidal')
 
-    pp.title(folder_name)
+    #pp.title(folder_name)
     pp.xlabel('l/m')
     pp.ylabel('E')
     pp.legend()
