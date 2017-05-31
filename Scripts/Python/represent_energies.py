@@ -8,8 +8,14 @@ import sys
 import os
 import pandas as pd
 from matplotlib import pyplot as pp
+from matplotlib.ticker import OldScalarFormatter
+
 
 if __name__=="__main__":
+
+
+
+    # open files
 
     try:
         argv = sys.argv
@@ -46,7 +52,7 @@ if __name__=="__main__":
         data = pd.concat(data, ignore_index=True)
         data.reindex()
         #print(data.head())
-        data.sort(['time'], inplace=True)
+        data.sort_values(['time'], inplace=True)
         pass
 
     data['time'] -= min(data['time'])
@@ -57,7 +63,12 @@ if __name__=="__main__":
     #print('Final Toroidal to Total energy ratio of: '+string_ratio)
 
     ax = data.plot(x='time',y=['total', 'toroidal','poloidal'])
-    ax.set_title(folder_name+',  toroidal/total energy ratio: '+ string_ratio+'%')
+    # set parameters for plotting
+    ax.yaxis.set_major_formatter(OldScalarFormatter())
+    pp.rcParams['font.family'] = 'ubuntu'
+    #pp.rcParams['font.size'] = 12
+
+    #ax.set_title(folder_name)#+',  toroidal/total energy ratio: '+ string_ratio+'%')
     ax.set_xlabel('t')
     ax.set_ylabel('E')
 
