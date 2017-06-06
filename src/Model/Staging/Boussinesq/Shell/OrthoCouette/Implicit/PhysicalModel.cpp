@@ -212,9 +212,11 @@ namespace Implicit {
    void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create kinetic energy writer
+	   /*
       IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
+      */
 
 
 
