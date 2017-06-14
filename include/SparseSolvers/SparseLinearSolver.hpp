@@ -253,6 +253,7 @@ namespace Solver {
          if(this->mInhomogeneous.at(i).nonZeros() > 0)
          {
             Solver::internal::addCorrection(this->mRHSData.at(i), this->mInhomogeneous.at(i));
+            // TODO: multiply the previous expression times exp(i omega t)
          }
       }
    }

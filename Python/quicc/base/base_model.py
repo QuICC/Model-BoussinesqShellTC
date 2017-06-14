@@ -3,7 +3,7 @@
 from __future__ import division
 from __future__ import unicode_literals
 
-verbose_write_mtx = True
+verbose_write_mtx = False
 if verbose_write_mtx:
     import scipy.io as io
     import os
