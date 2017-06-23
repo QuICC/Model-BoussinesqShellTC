@@ -98,12 +98,8 @@ namespace IoVariable {
          /**
           * @brief Chebyshev operator to integrate in radius
           */
-         SparseMatrix mIntgOp;
+         Array mIntgOp;
 
-         /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor)
-          */
-         SparseMatrix mSphIntgOp;
    };
 
    inline bool ShellTorPolUniformVorticityWriter::isHeavy() const

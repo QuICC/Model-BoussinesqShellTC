@@ -11,7 +11,7 @@
 // System includes
 //
 #include <iomanip>
-
+#include <assert.h>
 // External includes
 //
 
@@ -45,13 +45,14 @@ namespace IoVariable {
    {
       // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
       MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
-      MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
+      MHDFloat rratio = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
+      MHDFloat ri = ro*rratio;
 
       this->mDelta = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::EKMAN))->second;
       this->mDelta = std::pow(this->mDelta,0.5)*10.;
       this->mVolume = (std::pow(ro-this->mDelta,5)-std::pow(ri+this->mDelta,5))/(5.* std::sqrt(3.));
 
-      /*
+
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("quicc.geometry.spherical.shell_radius");
@@ -62,8 +63,8 @@ namespace IoVariable {
 
       // ... compute a, b factors
       PyObject *pTmp = PyTuple_New(2);
-      PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second));
-      PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second));
+      PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(ro));
+      PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(rratio));
       PythonWrapper::setFunction("linear_r2x");
       pValue = PythonWrapper::callFunction(pTmp);
       PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
@@ -74,34 +75,56 @@ namespace IoVariable {
       PyTuple_SetItem(pArgs, 3, pValue);
 
       // Get resolution
-      int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>() + 2;
-      pValue = PyLong_FromLong(cols);
+      int nR = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      pValue = PyLong_FromLong(nR);
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Call r^2
       PythonWrapper::setFunction("r2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpR2(cols,cols);
+      SparseMatrix tmpR2(nR, nR);
       PythonWrapper::fillMatrix(tmpR2, pValue);
       Py_DECREF(pValue);
 
-      pTmp = PyTuple_GetSlice(pArgs, 0, 3);
-      // Call avg
-      PythonWrapper::setFunction("integral");
-      pValue = PythonWrapper::callFunction(pTmp);
+      // Call r^1
+      PythonWrapper::setFunction("r1");
+      pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpAvg(cols,cols);
-      PythonWrapper::fillMatrix(tmpAvg, pValue);
+      SparseMatrix tmpR1(nR, nR);
+      PythonWrapper::fillMatrix(tmpR1, pValue);
       Py_DECREF(pValue);
+
+      // Call i1
+      PythonWrapper::setFunction("i1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix and cleanup
+      SparseMatrix tmpI1(nR, nR);
+      PythonWrapper::fillMatrix(tmpI1, pValue);
+      Py_DECREF(pValue);
+
+      // prepare the points of cut offs
+      PyObject * pList;
+      pList = PyList_New(2);
+      PyList_SetItem(pList, 0, PyFloat_FromDouble(ro-this->mDelta));
+      PyList_SetItem(pList, 1, PyFloat_FromDouble(ri+this->mDelta));
+      PyTuple_SetItem(pArgs, 3, pList);
+
+      //Call proj
+      PythonWrapper::import("quicc.projection.shell");
+      PythonWrapper::setFunction("proj");
+      pValue = PythonWrapper::callFunction(pArgs);
+      SparseMatrix tmpProj(2, nR);
+      PythonWrapper::fillMatrix(tmpProj, pValue);
+      Py_DECREF(pValue);
+
+      // Finalize the Python wrapper
       PythonWrapper::finalize();
 
-      // Store integral
-      this->mIntgOp = tmpAvg.leftCols(cols-2);
-
-      // Store spherical integral (include r^2 factor)
-      this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
-      */
+      // Store integral projector
+      SparseMatrix temp = tmpProj*tmpI1*tmpR2*tmpR1;
+      this->mIntgOp  = (temp.row(0)-temp.row(1));
+      assert( this->mIntgOp.rows() == 1);
       IVariableAsciiEWriter::init();
    }
 
@@ -118,10 +141,10 @@ namespace IoVariable {
       MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
 
       // Dealias toroidal variable data
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
+      //coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
       
       // Recover dealiased BWD data
-      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+      //Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Get FWD storage
       //Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
@@ -130,7 +153,7 @@ namespace IoVariable {
       //coord.transform1D().project(rOutVarTor.rData(), rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
       // retrieve the collocation points
-      Array r_grid = coord.transform1D().meshGrid();
+      //Array r_grid = coord.transform1D().meshGrid();
 
       // Compute projection transform for first dimension 
       //coord.transform1D().integrate_full(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
@@ -139,7 +162,6 @@ namespace IoVariable {
       this->mUVx = 0.0;
       this->mUVy = 0.0;
       this->mUVz = 0.0;
-
 
       #ifdef QUICC_SPATIALSCHEME_SLFM
          double factor = 1.0;
@@ -160,8 +182,8 @@ namespace IoVariable {
             	   continue;
                }
 
-               ArrayZ Tspec = rInVarTor.slice(k).col(j);
-
+               ArrayZ Tspec = vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j);
+               /*
                Array Tvals;
                coord.transform1D().project(Tspec.data(), Tvals.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
@@ -172,12 +194,13 @@ namespace IoVariable {
                // multiply tims r^3
                Tvals = Tvals*r_grid*r_grid*r_grid;
                coord.transform1D().integrate_full(Tvals.data(), Tspec.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
-
+			   */
+               MHDComplex temp = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j));
 			   if(m==0){
-				   this->mUVz = Tspec.real().sum();
+				   this->mUVz = temp.real();
 			   } else {
-				   this->mUVx = Tspec.real().sum();
-				   this->mUVy = Tspec.imag().sum();
+				   this->mUVx = temp.real();
+				   this->mUVy = temp.imag();
 			   }
             }
          }
@@ -194,8 +217,8 @@ namespace IoVariable {
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
             	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-                ArrayZ Tspec = rInVarTor.slice(k).col(j);
-
+            	//ArrayZ Tspec = vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j);
+                /*
                 Array Tvals;
                 coord.transform1D().project( Tspec, Tvals, Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
@@ -206,14 +229,16 @@ namespace IoVariable {
                 // multiply tims r^3
                 Tvals = Tvals*r_grid*r_grid*r_grid;
                 coord.transform1D().integrate_full( Tvals, Tspec., Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
+				*/
 
-
- 				if(m==0){
- 				   this->mUVz = Tspec.real().sum();
- 			   } else {
- 				   this->mUVx = Tspec.real().sum();
- 				   this->mUVy = Tspec.imag().sum();
- 			   }
+                //MHDComplex res = this->mIntgOp.dot(Tspec);
+            	MHDComplex temp = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j));
+            	if(m==0){
+            		this->mUVz = temp.real();
+            	} else {
+            		this->mUVx = temp.real();
+            		this->mUVy = temp.imag();
+            	}
             }
          }
       #endif //QUICC_SPATIALSCHEME_SLFL
