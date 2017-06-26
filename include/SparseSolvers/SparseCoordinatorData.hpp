@@ -510,6 +510,9 @@ namespace Solver {
 
          // Apply quasi-inverse to nonlinear terms
          Equations::addSource(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+
+         // Impose boundary value
+         Equations::setBoundaryValue(*(*eqIt), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
       }
    }
 

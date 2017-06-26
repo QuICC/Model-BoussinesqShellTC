@@ -686,9 +686,6 @@ namespace IoTools {
          case ModelOperator::STENCIL:
             return "stencil";
 
-         case ModelOperator::INHOMOGENEOUS:
-            return "inhomogeneous";
-
          default:
             throw Exception("Unknown ID to string conversion requested (ModelOperator)");
       }

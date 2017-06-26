@@ -202,7 +202,7 @@ namespace Equations {
       }
    }
 
-   void IEquation::dispatchCoupling(FieldComponents::Spectral::Id compId, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const SharedResolution spRes, const bool allowExplicit)
+   void IEquation::dispatchCoupling(FieldComponents::Spectral::Id compId, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const SharedResolution spRes, const bool hasBoundaryValue, const bool allowExplicit)
    {
       // Prepare Python call arguments
       PyObject *pArgs, *pTmp, *pValue;
@@ -282,6 +282,9 @@ namespace Equations {
 
       // Set source flags: has source term?
       infoIt.first->second.setSource(hasSource);
+
+      // Set boundary value flags: has nonzero boundary value?
+      infoIt.first->second.setBoundaryValue(hasBoundaryValue);
 
       // Set index type: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
       infoIt.first->second.setIndexType(static_cast<CouplingInformation::IndexType>(indexMode));
@@ -439,40 +442,14 @@ namespace Equations {
 
    void  IEquation::dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id compId, const int matIdx, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Get first four standard arguments in a tuple of size 6 (7 for inhomogeneous boundary condition)
+      // Get first four standard arguments in a tuple of size 6
       PyObject *pArgs;
       int argStart;
-      if(opId == ModelOperator::INHOMOGENEOUS)
-      {
-         pArgs = this->dispatchBaseArguments(7, bcType, spRes, eigs);
-         argStart = 5;
-      } else
-      {
-         pArgs = this->dispatchBaseArguments(6, bcType, spRes, eigs);
-         argStart = 4;
-      }
+      pArgs = this->dispatchBaseArguments(6, bcType, spRes, eigs);
+      argStart = 4;
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue, *pList;
-
-      // Add list of modes
-      if(opId == ModelOperator::INHOMOGENEOUS)
-      {
-         if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
-         {
-            pTmp = PyList_New(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx));
-            for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx); ++i)
-            {
-               PyList_SetItem(pTmp, i, PyFloat_FromDouble(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(i,matIdx)));
-            }
-            PyTuple_SetItem(pArgs, 4, pTmp);
-
-         } else
-         {
-            Py_INCREF(Py_None);
-            PyTuple_SetItem(pArgs, 4, Py_None);
-         }
-      }
 
       // Get list of implicit fields
       CouplingInformation::FieldId_range impRange = this->couplingInfo(compId).implicitRange();
@@ -671,6 +648,14 @@ namespace Equations {
    {
       // This implementation should never get called!
       throw Exception("Activated source term without implementation!");
+
+      return Datatypes::SpectralScalarType::PointType();
+   }
+
+   Datatypes::SpectralScalarType::PointType IEquation::boundaryValue(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+   {
+      // This implementation should never get called!
+      throw Exception("Activated boundary value without implementation!");
 
       return Datatypes::SpectralScalarType::PointType();
    }

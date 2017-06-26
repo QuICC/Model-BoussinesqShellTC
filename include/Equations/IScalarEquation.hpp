@@ -119,7 +119,7 @@ namespace Equations {
          /**
           * @brief Build coupling information from Python scripts
           */
-         void defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const bool allowExplicit = true);
+         void defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const bool hasBoundaryValue = false, const bool allowExplicit = true);
 
          /**
           * @brief Set the unknown variable
@@ -181,6 +181,17 @@ namespace Equations {
     * @param start   Start index for the storage
     */
    template <typename TData> void addSource(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
+
+   /**
+    * @brief Impose boundary value
+    *
+    * @param eq      Equation to work on
+    * @param compId  Component ID
+    * @param storage Storage for the equation values
+    * @param matIdx  Index of the given data
+    * @param start   Start index for the storage
+    */
+   template <typename TData> void setBoundaryValue(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
 
    /**
     * @brief Set nonlinear spectral values to zero
@@ -788,6 +799,145 @@ namespace Equations {
 
                      // Add source value
                      Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, k));
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   template <typename TData> void setBoundaryValue(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
+      // Set boundary value if required
+      if(eq.couplingInfo(compId).hasBoundaryValue())
+      {
+         if(eq.couplingInfo(compId).isGalerkin())
+         {
+            throw std::logic_error("Galerkin expansion cannot have a nonzero boundary value!");
+         }
+
+         // matIdx is the index of the slowest varying direction with a single RHS
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
+         {
+            int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
+
+            //Safety assertion
+            assert(start >= 0);
+
+            #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
+               // Add source data
+               int l;
+               int j_;
+               int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+               #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+                  int corrDim = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+               #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+               for(int j = 0; j < cols; j++)
+               {
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  #if defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+                     j_ -= corrDim;
+                  #endif //defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM
+                  for(int i = 0; i < rows; i++)
+                  {
+                     // Compute correct position
+                     l = start + j_ + i;
+
+                     // Set boundary value
+                     Datatypes::internal::setScalar(storage, l, eq.boundaryValue(compId, i, j, matIdx));
+                  }
+               }
+            #else
+               // Copy data
+               int k = start;
+               for(int j = 0; j < cols; j++)
+               {
+                  for(int i = 0; i < rows; i++)
+                  {
+                     // Set boundary value
+                     Datatypes::internal::setScalar(storage, k, eq.boundaryValue(compId, i, j, matIdx));
+
+                     // increase storage counter
+                     k++;
+                  }
+               }
+            #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
+
+         // matIdx is the index of the slowest varying direction with multiple RHS
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+         {
+            int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
+
+            //Safety assertion
+            assert(start >= 0);
+
+            // Copy data
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Set boundary value
+                  Datatypes::internal::setScalar(storage, i + start, j, eq.boundaryValue(compId, i, j, matIdx));
+               }
+            }
+
+         // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            //Safety assertion
+            assert(start >= 0);
+
+            // Get mode indexes
+            ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+            int rows = eq.unknown().dom(0).perturbation().slice(mode(0)).rows();
+
+            // Copy data
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Set boundary value
+               Datatypes::internal::setScalar(storage, k, eq.boundaryValue(compId, i, mode(1), mode(0)));
+
+               // increase storage counter
+               k++;
+            }
+
+         // There is a single matrix
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
+         {
+            assert(matIdx == 0);
+
+            //Safety assertion
+            assert(start >= 0);
+
+            // Add source data
+            int l;
+            int k_;
+            int j_;
+            #ifdef QUICC_SPATIALDIMENSION_3D
+               int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+            #else
+               int dimK = 1;
+            #endif //QUICC_SPATIALDIMENSION_3D
+            int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            {
+               k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+               {
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                  {
+                     // Compute correct position
+                     l = start + k_ + j_ + i;
+
+                     // Set boundary value
+                     Datatypes::internal::setScalar(storage, l, eq.boundaryValue(compId, i, j, k));
                   }
                }
             }

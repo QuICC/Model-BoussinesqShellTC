@@ -159,14 +159,6 @@ namespace Solver {
          const Eigen::SparseMatrix<typename TData::Scalar>& inhomogeneous(const int idx) const;
 
          /**
-          * @brief Set inhomogeneous boundary condition
-          *
-          * @param idx  Index of the data
-          * @param opD  Inhomogeneous operator
-          */
-         void setInhomogeneous(const int idx, const DecoupledZSparse& opD);
-
-         /**
           * @brief Add inhomogeneous boundary condition to RHS data
           */
          void addInhomogeneous();
@@ -403,7 +395,7 @@ namespace Solver {
       this->mSolution.push_back(TData(rows,cols));
       this->mSolution.back().setZero();
 
-      // Add storage for solution
+      // Add storage for inhomogeneous boundary value
       this->mInhomogeneous.push_back(Eigen::SparseMatrix<typename TData::Scalar>(rows,cols));
       this->mInhomogeneous.back().setZero();
    }
@@ -429,6 +421,11 @@ namespace Solver {
       return this->mRHSData.at(idx);
    }
 
+   template <typename TOperator,typename TData> Eigen::SparseMatrix<typename TData::Scalar>& SparseLinearSolver<TOperator,TData>::rInhomogeneous(const int idx)
+   {
+      return this->mInhomogeneous.at(idx);
+   }
+
    template <typename TOperator,typename TData> const TData& SparseLinearSolver<TOperator,TData>::solution(const int idx) const
    {
       return this->mSolution.at(idx);
@@ -442,24 +439,6 @@ namespace Solver {
    template <typename TOperator,typename TData> const Eigen::SparseMatrix<typename TData::Scalar>& SparseLinearSolver<TOperator,TData>::inhomogeneous(const int idx) const
    {
       return this->mInhomogeneous.at(idx);
-   }
-
-   template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::setInhomogeneous(const int idx, const DecoupledZSparse& opD)
-   {
-      if(opD.real().nonZeros() > 0 || opD.imag().nonZeros() > 0)
-      {
-         DecoupledZSparse tmp = opD;
-         if(opD.real().nonZeros() == 0)
-         {
-            tmp.real().resize(this->mInhomogeneous.at(idx).rows(), this->mInhomogeneous.at(idx).cols());
-         }
-
-         if(opD.imag().nonZeros() == 0)
-         {
-            tmp.imag().resize(this->mInhomogeneous.at(idx).rows(), this->mInhomogeneous.at(idx).cols());
-         }
-         Solver::internal::addOperators(this->mInhomogeneous.at(idx), 1.0, tmp);
-      }
    }
 
    namespace internal {

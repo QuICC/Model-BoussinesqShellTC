@@ -100,6 +100,16 @@ namespace Equations {
          virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
          /**
+          * @brief Compute the boundary value
+          *
+          * @param compId  ID of the spectral component
+          * @param i       Fastest index
+          * @param j       Second index
+          * @param k       Slowest index
+          */
+         virtual Datatypes::SpectralScalarType::PointType boundaryValue(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
+
+         /**
           * @brief Initialise the spectral equation matrices
           */
          virtual void initSpectralMatrices() = 0;
@@ -136,7 +146,7 @@ namespace Equations {
          /**
           * \brief Implementation of the coupling definition to python scripts
           */
-         void dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const SharedResolution spRes, const bool allowExplicit = true);
+         void dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const SharedResolution spRes, const bool hasBoundaryValue = false, const bool allowExplicit = true);
 
          /**
           * @brief Implementation of base arguments common to all dispatcher
