@@ -100,7 +100,7 @@ namespace IoVariable {
 		   MHDFloat E =this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::EKMAN))->second;
 
 		   double pi = 3.14159265358979;
-		   this->mFactor = -8./3.*pi*ri*E;
+		   this->mFactor = 8./3.*pi*ri*ri*E;
 
 		   // Initialise python wrapper
 		   PythonWrapper::init();
@@ -167,7 +167,7 @@ namespace IoVariable {
 		   Py_DECREF(pValue);
 
 		   // select only the correct boundary condition
-		   this->mProj = (-diffProj*ri+2*valueProj).row(1);
+		   this->mProj = (diffProj*ri - valueProj).row(1);
 		   PythonWrapper::finalize();
 	   }
 

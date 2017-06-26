@@ -76,28 +76,32 @@ if __name__=="__main__":
         datafull = datafull.as_matrix()
     pass
 
+    pp.figure()
+    pp.clf()
+
+    pp.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    pp.rcParams['font.family'] = 'ubuntu'
+    #pp.rcParams['font.size'] = 14
+    # set parameters for plotting
+    pp.ticklabel_format(style='sci', axis='y')
+
+
+    data = datafull[-1,1:]
+
+    Lmax = data.shape[0]/4
+
+
+    #pp.title(folder_name)
+    pp.xlabel('l/m')
+    pp.ylabel('E')
+    pp.legend()
+        #pp.draw()
     try:
-        if argv[2] == "-v":
-            by = 10
-            for i in range(0,datafull.shape[0], by):
-                data = datafull[i:i+1,:]
-                pp.clf()
-                pp.ion()
-                draw(data)
-                pp.pause(0.05)
-
-        else:
-            #pp.imshow(datafull)
-            Lmax= datafull.shape[1]/4
-            pp.plot(datafull[:,0],np.log(datafull[:,3+Lmax])/np.log(10))
-            pp.plot(datafull[:,0],np.log(datafull[:,2+Lmax])/np.log(10))
-            pp.show()
-
-
+        fout = argv[2]
+        pp.savefig(fout)
     except IndexError as e:
         draw(datafull)
         pass
-
 
 
 

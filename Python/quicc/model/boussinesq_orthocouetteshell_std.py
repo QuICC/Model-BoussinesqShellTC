@@ -12,7 +12,7 @@ import quicc.base.base_model as base_model
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
 
 
-class BoussinesqCouetteShellStdConfig:
+class BoussinesqOrthoCouetteShellStdConfig:
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
@@ -65,7 +65,7 @@ class BoussinesqCouetteShellStdConfig:
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
 
-class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.BaseModel):
+class BoussinesqOrthoCouetteShellStd(BoussinesqOrthoCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
@@ -117,7 +117,7 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
         """Convert simulation input boundary conditions to ID"""
 
         sgn = np.sign(eq_params['rossby'])
-        # modified by Nicolò Lardelli -> use Ro=0 to compute stationary solution U_0, it s the limit case
+        # modified by Nicolò Lardelli -> use Ro=0 to compute stationary solution U_0
         sgn = 1 if sgn==0 else sgn
         ro = self.automatic_parameters(eq_params)['ro']
         ri = ro*eq_params['rratio']
@@ -140,7 +140,7 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {0:24, 'c':{'c':sgn*ri, 'l':l}}
+                        bc = {0:24, 'c':{'c':sgn*ri, 'l':l, 'axis':'x'}}
                     elif field_row == ("velocity","pol") and field_col == field_row:
                         bc = {0:40, 'c':{'a':a, 'b':b}}
             
@@ -266,7 +266,7 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellStdConfig, base_model.Base
             return base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
 
 
-class BoussinesqCouetteShellStdVisu(BoussinesqCouetteShellStdConfig, base_model.BaseModel):
+class BoussinesqOrthoCouetteShellStdVisu(BoussinesqOrthoCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):

@@ -53,7 +53,7 @@ if __name__=="__main__":
     # post-processing on the value, to be removed once the value calculations are correct
     ri = 0.35/(1.-0.35)
     T = np.sqrt(4*np.pi/3)*ri
-    data['value']=(data['value']+ri*T*8*np.pi/3.*1e-4)*ri
+    data['value']=(data['value']+ri*T*8*np.pi/3.*1e-5)*ri
 
 
     #e# ax = data.plot(x='time', y='value', title=folder_name)
