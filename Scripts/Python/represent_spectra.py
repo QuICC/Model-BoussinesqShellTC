@@ -4,6 +4,36 @@ import sys, os
 import pandas as pd
 from quicc.geometry.spherical import shell_radius
 
+
+def draw(datafull):
+    #pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+    pp.rcParams['font.family'] = 'ubuntu'
+    # pp.rcParams['font.size'] = 14
+    # set parameters for plotting
+    #pp.ticklabel_format(style='sci', axis='y')
+
+    data = datafull[-1, 1:]
+
+    Lmax = data.shape[0] / 4
+
+    pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
+    pp.loglog(data[Lmax:2 * Lmax], label='M spectrum, toroidal')
+    pp.loglog(data[2 * Lmax:3 * Lmax], label='L spectrum, poloidal')
+    pp.loglog(data[3 * Lmax:-1], label='M spectrum, poloidal')
+
+    # pp.title(folder_name)
+    pp.xlabel('l/m')
+    pp.ylabel('E')
+    pp.legend()
+    # pp.draw()
+    try:
+        fout = argv[2]
+        pp.savefig(fout)
+    except IndexError as e:
+        pp.show()
+
+        return
+
 if __name__=="__main__":
 
 
@@ -60,10 +90,6 @@ if __name__=="__main__":
 
     Lmax = data.shape[0]/4
 
-    pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
-    pp.loglog(data[Lmax:2*Lmax], label='M spectrum, toroidal')
-    pp.loglog(data[2*Lmax:3*Lmax], label='L spectrum, poloidal')
-    pp.plot(data[3*Lmax:-1], label='M spectrum, poloidal')
 
     #pp.title(folder_name)
     pp.xlabel('l/m')
@@ -74,7 +100,11 @@ if __name__=="__main__":
         fout = argv[2]
         pp.savefig(fout)
     except IndexError as e:
-        pp.show()
+        draw(datafull)
+        pass
+
+
+
 
 
 

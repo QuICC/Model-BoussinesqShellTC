@@ -517,6 +517,9 @@ namespace IoTools {
          case NonDimensional::EKMAN:
             return "ekman";
 
+         case NonDimensional::MAGREYNOLDS:
+        	return "magnetic_reynolds";
+
          case NonDimensional::MAGEKMAN:
             return "magnetic_ekman";
 
