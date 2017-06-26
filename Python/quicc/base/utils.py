@@ -72,7 +72,6 @@ def build_block_matrix(fields, func, func_args, restriction = None):
             args = func_args + (field_row,field_col)
             row.append(func(*args, restriction = restrict[j]))
         tmp.append(row)
-
     return spsp.bmat(tmp, format='coo')
 
 def build_diag_matrix(fields, func, func_args, restriction = None):
@@ -96,10 +95,10 @@ def build_diag_matrix(fields, func, func_args, restriction = None):
    
     return spsp.block_diag(tmp, format='coo')
 
-def build_diag_stack(fields, func, func_args, restriction = None):
+def build_block_vector(fields, func, func_args, restriction = None):
 
     if restriction is None:
-        restrict = [None]*len(fields)
+        restrict = [None] * len(fields)
     else:
         try:
             n = len(restriction[0])

@@ -19,7 +19,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Explicit/PhysicalModel.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Implicit/PhysicalModel.hpp )
 
 // Project includes
 //
@@ -51,11 +51,11 @@ namespace Shell {
 
 namespace Couette {
 
-namespace Explicit {
+namespace Implicit {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_couetteshell_std";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_couetteshell";
 
-   const std::string PhysicalModel::PYCLASS = "BoussinesqCouetteShellStd";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqCouetteShell";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
@@ -76,7 +76,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(3)
+         switch(4)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -128,6 +128,11 @@ namespace Explicit {
 
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
+               break;
+
+            case 4:
+               spVector->setStateType(Equations::ShellExactStateIds::NOISE);
+               break;
          }
 
       // Generate random spectrum
@@ -217,7 +222,7 @@ namespace Explicit {
     		  0.9, 0.0, 3.141592654,
 			  0.95, 0.0, 3.141592654,
 			  1.0, 0.0, 3.141592654;
-
+/*
       // Create probe field writer
       IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
@@ -225,7 +230,7 @@ namespace Explicit {
       // Create kinetic energy spectral writer
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spVector3);
+      spSim->addAsciiOutputFile(spVector3);*/
       
       // Create torque writer
       IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));

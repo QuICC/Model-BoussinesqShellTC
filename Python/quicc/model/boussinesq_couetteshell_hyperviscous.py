@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 
+import quicc.base.utils as utils
 import quicc.geometry.spherical.shell_radius as geo
 import quicc.base.base_model as base_model
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
@@ -193,9 +194,15 @@ class BoussinesqCouetteShellHyperviscous(BoussinesqCouetteShellHyperviscousConfi
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        # applies a constant Ekman up to 50 and then let scale from 50 onward
-        if l>=50:
-            E = E * (l/50.)**2
+        """
+        # applies a constant Ekman up to 25 and then let scale from 50 onward
+        if l>=25:
+            E = E * (l/25.)**2
+        """
+        lmax = res[1]
+        l0 = np.ceil(lmax * 0.8)
+        if l > l0:
+            E = E * 1000**((l-l0)/(lmax-l0))
 
 
         ro = self.automatic_parameters(eq_params)['ro']

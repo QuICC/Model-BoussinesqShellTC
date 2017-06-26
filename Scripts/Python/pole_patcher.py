@@ -45,7 +45,7 @@ if __name__=="__main__":
     except RuntimeError as e:
         print(e)
         sys.exit()
-            
+
     for group in list(h5_file):
         for subg in list(h5_file[group]):
 
@@ -64,11 +64,11 @@ if __name__=="__main__":
             # patch boundaries in theta direction bottom
 
             row = dataset[:,0,:]
-            row = np.ones_like(row)*np.mean(row)
+            row = np.matmul(np.diag(np.mean(row,axis=1)),np.ones_like(row))
             dataset = np.insert(dataset,0,row,axis = 1)
 
             row = dataset[:,-1,:]
-            row = np.ones_like(row)*np.mean(row)
+            row = np.matmul(np.diag(np.mean(row,axis=1)),np.ones_like(row))
             dataset = np.insert(dataset,dataset.shape[1],row,axis = 1)
 
             del h5_file[name]

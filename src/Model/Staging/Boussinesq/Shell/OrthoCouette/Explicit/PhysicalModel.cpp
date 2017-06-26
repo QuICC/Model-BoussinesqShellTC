@@ -1,7 +1,8 @@
-/** 
- * @file PhysicalModel.cpp
- * @brief Source of the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
+/*
+ * PhysicalModel.cpp
+ *
+ *  Created on: Apr 3, 2017
+ *      Author: Nicolò Lardelli
  */
 
 /// Define small macros allowing to convert to string
@@ -19,7 +20,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Explicit/PhysicalModel.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/OrthoCouette/Explicit/PhysicalModel.hpp )
 
 // Project includes
 //
@@ -49,13 +50,13 @@ namespace Boussinesq {
 
 namespace Shell {
 
-namespace Couette {
+namespace OrthoCouette {
 
 namespace Explicit {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_couetteshell_std";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_orthocouetteshell_std";
 
-   const std::string PhysicalModel::PYCLASS = "BoussinesqCouetteShellStd";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqOrthoCouetteShellStd";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
@@ -76,11 +77,11 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(3)
+         switch(4)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
-               tSH.clear(); 
+               tSH.clear();
                tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
@@ -93,7 +94,7 @@ namespace Explicit {
 
             case 1:
                spVector->setStateType(Equations::ShellExactStateIds::POLOIDAL);
-               tSH.clear(); 
+               tSH.clear();
                tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
@@ -106,7 +107,7 @@ namespace Explicit {
 
             case 2:
                spVector->setStateType(Equations::ShellExactStateIds::TORPOL);
-               tSH.clear(); 
+               tSH.clear();
                tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
@@ -115,7 +116,7 @@ namespace Explicit {
                tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
-               tSH.clear(); 
+               tSH.clear();
                tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
@@ -128,6 +129,11 @@ namespace Explicit {
 
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
+               break;
+
+            case 4:
+               spVector->setStateType(Equations::ShellExactStateIds::NOISE);
+               break;
          }
 
       // Generate random spectrum
@@ -136,7 +142,7 @@ namespace Explicit {
          // Shared pointer to random initial state equation
          Equations::SharedRandomVectorState spVector;
 
-         // Add scalar random initial state generator 
+         // Add scalar random initial state generator
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
          spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
@@ -161,15 +167,19 @@ namespace Explicit {
       spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
+      /*
       // Add zonal velocity field visualization
       spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
       spVTrivial->setFields(true, false, false);
       spVTrivial->setIdentity(PhysicalNames::ZONAL_VELOCITY);
+      */
 
+      /*
       // Add nonzonal velocity field visualization
       spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
       spVTrivial->setFields(true, false, false);
       spVTrivial->setIdentity(PhysicalNames::NONZONAL_VELOCITY);
+      */
 
       // Add vertical velocity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
@@ -184,8 +194,8 @@ namespace Explicit {
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::VELOCITY);
-      spOut->expect(PhysicalNames::ZONAL_VELOCITY);
-      spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
+      //spOut->expect(PhysicalNames::ZONAL_VELOCITY);
+      //spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
@@ -205,10 +215,12 @@ namespace Explicit {
 
    void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
+
       // Create kinetic energy writer
       IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
+
 
 
       // Create probes
@@ -218,19 +230,13 @@ namespace Explicit {
 			  0.95, 0.0, 3.141592654,
 			  1.0, 0.0, 3.141592654;
 
-      // Create probe field writer
-      IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_probe", SchemeType::type(), mProbes));
-      spVector2->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spVector2);
+
+
       // Create kinetic energy spectral writer
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector3);
-      
-      // Create torque writer
-      IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
-      spVector4->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spVector4);
+
 
    }
 
@@ -278,3 +284,6 @@ namespace Explicit {
 }
 }
 }
+
+
+
