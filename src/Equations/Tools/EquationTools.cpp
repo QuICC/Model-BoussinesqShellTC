@@ -224,7 +224,7 @@ namespace Tools {
          // All checked and equation is not coupled
          if(counter.sum() < counter.size())
          {
-            std::vector<FieldComponents::Spectral::Id> selfCoupling
+	   std::vector<FieldComponents::Spectral::Id> selfCoupling;
 	      FieldComponents::Spectral::Id coupledComp;
             IVectorEquation::SpectralComponent_iterator compIt;
             IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
