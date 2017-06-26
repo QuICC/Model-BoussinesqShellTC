@@ -10,7 +10,8 @@ import scipy.special as special
 import quicc.base.utils as utils
 
 def worland_norm(n , l):
-    """Normalization factor"""
+    """Normalization factor = 1/Norm
+    """
 
     if l == 0:
         if n == 0:

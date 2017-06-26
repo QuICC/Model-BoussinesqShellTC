@@ -3,8 +3,13 @@
 ###################################################
 
 # Get list of platforms
-file(GLOB Platforms
-   ${CMAKE_SOURCE_DIR}/cmake.d/platforms/[A-Z]*.cmake)
+IF(APPLE)
+    file(GLOB Platforms
+        ${CMAKE_SOURCE_DIR}/cmake.d/platforms/*.cmake)
+ELSE()
+    file(GLOB Platforms
+        ${CMAKE_SOURCE_DIR}/cmake.d/platforms/[A-Z]*.cmake)
+ENDIF()
 
 # Cleanup list
 foreach(Platform ${Platforms})

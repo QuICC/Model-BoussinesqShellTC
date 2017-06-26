@@ -107,13 +107,12 @@ def build_block_vector(fields, func, func_args, restriction = None):
             else:
                 raise RuntimeError('Restriction size does not match number of fields')
         except TypeError:
-            restrict = [restriction] * len(fields)
+            restrict = [restriction]*len(fields)
 
     tmp = []
-
-    for j, field_col in enumerate(fields):
-        args = func_args + (field_col,field_col)
-        tmp.append(func(*args, restriction=restrict[j]))
+    for j, field_row in enumerate(fields):
+        args = func_args + (field_row,field_row)
+        tmp.append(func(*args, restriction = restrict[j]))
 
     return spsp.vstack(tmp, format='coo')
 

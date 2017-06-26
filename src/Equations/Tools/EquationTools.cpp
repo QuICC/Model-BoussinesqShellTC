@@ -224,8 +224,8 @@ namespace Tools {
          // All checked and equation is not coupled
          if(counter.sum() < counter.size())
          {
-	   std::vector<FieldComponents::Spectral::Id> selfCoupling;
-	      FieldComponents::Spectral::Id coupledComp;
+            std::vector<FieldComponents::Spectral::Id> selfCoupling;
+            FieldComponents::Spectral::Id coupledComp;
             IVectorEquation::SpectralComponent_iterator compIt;
             IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
             int i = 0;
@@ -233,7 +233,7 @@ namespace Tools {
             {
                if(counter(i) == 0)
                {
-		 bool selfCoupled = false;
+                  bool selfCoupled = false;
                   CouplingInformation::FieldId_iterator fIt;
                   CouplingInformation::FieldId_range fRange = (*vectEqIt)->couplingInfo(*compIt).implicitRange();
                   for(fIt = fRange.first; fIt != fRange.second; ++fIt)
