@@ -1,9 +1,8 @@
 set(MHDSources
-   Momentum.cpp
+   ../Couette/Momentum.cpp
 )
 
 set(MHDSrcSubDirs
    Explicit
-   Hyperviscous
    Implicit
 )

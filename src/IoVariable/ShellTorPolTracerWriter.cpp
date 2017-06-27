@@ -429,7 +429,7 @@ namespace IoVariable{
 
 				// compute R component from poloidal part
 				ArrayZ tempR = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*YlmParts[std::make_pair(l,m)].array();
-				this->mRpart += tempR.real()*factor*l*(l+1));
+				this->mRpart += tempR.real()*factor*l*(l+1);
 
 				ArrayZ tempPol = this->mProjDrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k);
 				ArrayZ tempTor = this->mProjInvrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(j).col(k);

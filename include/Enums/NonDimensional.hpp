@@ -35,13 +35,16 @@ namespace QuICC {
             EADY = 0,
             /// Ekman number
             EKMAN,
+			// inserted by NicolòLardelli
+			// Magnetic Reynolds number
+			MAGREYNOLDS,
             /// Magnetic Ekman number
             MAGEKMAN,
             /// Magnetic Prandtl number
             MAGPRANDTL,
 			   // Nicolò Lardelli
 			   /// Modified Elsasser number
-			   MODELSASSER,
+			MODELSASSER,
             /// Prandtl number
             PRANDTL,
             /// Poincare number

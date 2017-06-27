@@ -76,13 +76,13 @@ class BaseModel:
 
     def inhomogeneous(self, res, eq_params, eigs, bcs, modes, fields, restriction = None):
         """Create the boundary operator"""
-
-        mat = utils.build_diag_stack(fields, self.inhomogeneous_block, (res,eq_params,eigs,bcs,modes), restriction = restriction)
+        mat = utils.build_block_vector(fields, self.inhomogeneous_block, (res,eq_params,eigs,bcs,modes), restriction = restriction)
         if verbose_write_mtx:
             fname = "matrix_inhomogeneous_" + make_single_name(fields, bcs)
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname  + ".mtx", mat)
+        print('total inhomogeneous rhs: ', mat.shape, mat)
         return mat
 
     def explicit_linear(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
@@ -230,5 +230,4 @@ class BaseModel:
 
     def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):
         """Create matrix block for inhomogeneous boundary operator"""
-
         return spsp.lil_matrix((1,1))
