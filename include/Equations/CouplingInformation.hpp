@@ -241,7 +241,7 @@ namespace Equations {
           *
           * @param hasBoundaryValue  Equation requires nonzero boundary value computation?
           */
-         void setHasBoundaryValue(const bool hasBoundaryValue);
+         void setBoundaryValue(const bool hasBoundaryValue);
 
          /**
           * @brief Set system sizes

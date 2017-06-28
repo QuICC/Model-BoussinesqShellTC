@@ -90,8 +90,6 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_rdiffdivr(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 23:
         cond = tau_insulating(mat.shape[1], 0, bc.get('c',None))
-    elif bc[0] == 24:
-        cond = tau_couette(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
@@ -270,16 +268,6 @@ def tau_insulating(nr, pos, coeffs = None):
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
-
-def tau_couette(nr, pos, coeffs = None):
-    """Create the toroidal Couette boundray tau line(s)"""
-
-    assert(coeffs.get('c', None) is not None)
-    #TODO: think of the ordering
-    #assert(coeffs.get('l', None) is not None)
-    assert(pos == 0)
-
-    return tau_value(nr, 0, None)
 
 def tau_value_diff(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""

@@ -89,12 +89,31 @@ namespace Solver {
           * @param idx   Index of the data
           */
          TData& rSolution(const int idx);
+
+         /**
+          * @brief Get inhomogeneous boundary condition
+          *
+          * @param idx   Index of the condition
+          */
+         const Eigen::SparseMatrix<typename TData::Scalar>& inhomogeneous(const int idx) const;
+
+         /**
+          * @brief Set inhomogeneous boundary condition
+          *
+          * @param idx   Index of the condition
+          */
+         Eigen::SparseMatrix<typename TData::Scalar>& rInhomogeneous(const int idx);
          
       protected:
          /**
           * @brief Storage for solution of linear solve
           */
          std::vector<TData>  mSolution;
+
+         /**
+          * @brief Storage for inhomogeneous boundary conditions
+          */
+         std::vector<Eigen::SparseMatrix<typename TData::Scalar> >  mInhomogeneous;
 
       private:
    };
@@ -118,6 +137,10 @@ namespace Solver {
       // Add storage for solution
       this->mSolution.push_back(TData(rows,cols));
       this->mSolution.back().setZero();
+
+      // Add storage for inhomogeneous boundary value
+      this->mInhomogeneous.push_back(Eigen::SparseMatrix<typename TData::Scalar>(rows,cols));
+      this->mInhomogeneous.back().setZero();
    }
 
    template <typename TOperator,typename TData> void SparseTrivialSolver<TOperator,TData>::initSolutions()
@@ -152,6 +175,16 @@ namespace Solver {
    {
       // WARNING: this is the same as rSolution. It's used to simplify some implementations
       return this->mSolution.at(idx);
+   }
+
+   template <typename TOperator,typename TData> const Eigen::SparseMatrix<typename TData::Scalar>& SparseTrivialSolver<TOperator,TData>::inhomogeneous(const int idx) const
+   {
+      return this->mInhomogeneous.at(idx);
+   }
+
+   template <typename TOperator,typename TData> Eigen::SparseMatrix<typename TData::Scalar>& SparseTrivialSolver<TOperator,TData>::rInhomogeneous(const int idx)
+   {
+      return this->mInhomogeneous.at(idx);
    }
 }
 }

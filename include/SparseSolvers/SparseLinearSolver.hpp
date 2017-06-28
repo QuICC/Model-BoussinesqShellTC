@@ -159,6 +159,13 @@ namespace Solver {
          const Eigen::SparseMatrix<typename TData::Scalar>& inhomogeneous(const int idx) const;
 
          /**
+          * @brief Set inhomogeneous boundary condition
+          *
+          * @param idx   Index of the condition
+          */
+         Eigen::SparseMatrix<typename TData::Scalar>& rInhomogeneous(const int idx);
+
+         /**
           * @brief Add inhomogeneous boundary condition to RHS data
           */
          void addInhomogeneous();

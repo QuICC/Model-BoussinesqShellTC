@@ -808,6 +808,9 @@ namespace Equations {
             throw std::logic_error("Galerkin expansion cannot have a nonzero boundary value!");
          }
 
+         std::vector<Eigen::Triplet<typename TData::Scalar> > triplets;
+         typename TData::Scalar tripVal;
+
          // matIdx is the index of the slowest varying direction with a single RHS
          if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
          {
@@ -837,7 +840,11 @@ namespace Equations {
                      l = start + j_ + i;
 
                      // Set boundary value
-                     Datatypes::internal::setScalar(storage, l, eq.boundaryValue(compId, i, j, matIdx));
+                     tripVal = eq.boundaryValue(compId, i, j, matIdx);
+                     if(tripVal != 0.0)
+                     {
+                        triplets.push_back(Eigen::Triplet<typename TData::Scalar>(l, 0, tripVal));
+                     }
                   }
                }
             #else
@@ -848,7 +855,11 @@ namespace Equations {
                   for(int i = 0; i < rows; i++)
                   {
                      // Set boundary value
-                     Datatypes::internal::setScalar(storage, k, eq.boundaryValue(compId, i, j, matIdx));
+                     tripVal = eq.boundaryValue(compId, i, j, matIdx);
+                     if(tripVal != 0.0)
+                     {
+                        triplets.push_back(Eigen::Triplet<typename TData::Scalar>(k, 0, tripVal));
+                     }
 
                      // increase storage counter
                      k++;
@@ -871,7 +882,11 @@ namespace Equations {
                for(int i = 0; i < rows; i++)
                {
                   // Set boundary value
-                  Datatypes::internal::setScalar(storage, i + start, j, eq.boundaryValue(compId, i, j, matIdx));
+                  tripVal = eq.boundaryValue(compId, i, j, matIdx);
+                  if(tripVal != 0.0)
+                  {
+                     triplets.push_back(Eigen::Triplet<typename TData::Scalar>(i + start, j, tripVal));
+                  }
                }
             }
 
@@ -890,7 +905,11 @@ namespace Equations {
             for(int i = 0; i < rows; i++)
             {
                // Set boundary value
-               Datatypes::internal::setScalar(storage, k, eq.boundaryValue(compId, i, mode(1), mode(0)));
+               tripVal = eq.boundaryValue(compId, i, mode(1), mode(0));
+               if(tripVal != 0.0)
+               {
+                  triplets.push_back(Eigen::Triplet<typename TData::Scalar>(k, 0, tripVal));
+               }
 
                // increase storage counter
                k++;
@@ -926,11 +945,18 @@ namespace Equations {
                      l = start + k_ + j_ + i;
 
                      // Set boundary value
-                     Datatypes::internal::setScalar(storage, l, eq.boundaryValue(compId, i, j, k));
+                     tripVal = eq.boundaryValue(compId, i, j, k);
+                     if(tripVal != 0.0)
+                     {
+                        triplets.push_back(Eigen::Triplet<typename TData::Scalar>(l, 0, tripVal));
+                     }
                   }
                }
             }
          }
+         Eigen::SparseMatrix<typename TData::Scalar>  tmpMat(storage.rows(), storage.cols());
+         tmpMat.setFromTriplets(triplets.begin(), triplets.end());
+         storage = tmpMat; 
       }
    }
 

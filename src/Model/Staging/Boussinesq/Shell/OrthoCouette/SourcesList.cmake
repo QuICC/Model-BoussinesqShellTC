@@ -1,5 +1,6 @@
 set(MHDSources
-   ../Couette/Momentum.cpp
+   Momentum.cpp
+   ../Couette/MomentumBase.cpp
 )
 
 set(MHDSrcSubDirs

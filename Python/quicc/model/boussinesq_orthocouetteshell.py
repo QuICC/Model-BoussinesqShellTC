@@ -140,7 +140,7 @@ class BoussinesqOrthoCouetteShell(BoussinesqOrthoCouetteShellStdConfig, base_mod
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {0:24, 'c':{'c':sgn*ri, 'm':m, 'axis':'x'}}
+                        bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == field_row:
                         bc = {0:40, 'c':{'a':a, 'b':b}}
             
@@ -261,28 +261,6 @@ class BoussinesqOrthoCouetteShell(BoussinesqOrthoCouetteShellStdConfig, base_mod
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
-
-    def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):
-        """Create matrix block linear operator"""
-
-        assert (eigs[0].is_integer())
-        m = int(eigs[0])
-        lmax = res[1]
-
-        # generate the modes
-        modes = range(m, lmax + 1)
-        if field_row == ("velocity","tor"):
-
-            mat = None
-            bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-            mat = geo.rad.inhomogeneous_bc(res[0], m, modes, bc, ordering = 'SLFm')
-
-            if mat is None:
-                raise RuntimeError("Equations are not setup properly!")
-
-            return mat
-        else:
-            return base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
 
 
 class BoussinesqOrthoCouetteShellVisuBusu(BoussinesqOrthoCouetteShellStdConfig, base_model.BaseModel):

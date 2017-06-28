@@ -142,7 +142,7 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
 
                 else:
                     if field_row == ("velocity","tor") and field_col == field_row:
-                        bc = {0:24, 'c':{'c':sgn*ri, 'm':m}} #initialize with -1
+                        bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == field_row:
                         bc = {0:40, 'c':{'a':a, 'b':b}}
             
@@ -265,47 +265,6 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
-
-    def inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction = None):
-        """Create matrix block linear operator"""
-
-        assert (eigs[0].is_integer())
-        m = int(eigs[0])
-        lmax = res[1]
-
-        # generate the modes
-        modes = range(m, lmax)
-        mat = None
-        bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_col)
-
-        if field_row == ("velocity","tor"):
-
-
-            """
-            rows = []
-            for l in range(m, res[1]):
-
-                # bc['c']['l'] = l
-                bc['c']['m'] = m"""
-            mat = geo.rad.inhomogeneous_bc(res[0], m, modes, bc, ordering = 'SLFm')
-                #mat = np.vstack([mat,mat2])
-
-            if mat is None:
-                raise RuntimeError("Equations are not setup properly!")
-
-            #return spsp.vstack(rows)
-            print('toroidal:' , mat.shape)
-            return mat
-
-        elif field_row == ("velocity","pol"):
-
-            mat = spsp.lil_matrix((res[0] * len(modes), 1))
-            return mat
-
-        else:
-            mat = base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
-            print('poloidal:', mat.shape)
-            return mat
 
 class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
