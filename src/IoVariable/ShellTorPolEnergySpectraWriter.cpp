@@ -51,7 +51,7 @@ namespace IoVariable {
       this->mVolume = (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
 
       // obtain Nmax
-      int Nmax = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int Nmax = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>();
       mTorRadial = Array(Nmax);
       mPolRadial = Array(Nmax);
 
@@ -195,7 +195,7 @@ namespace IoVariable {
             		factor = 2.0;
             	}
             	this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
-            	this->mTorRadial += factor*lfactor*(rOutVarTor.slice(k).col(j).real());
+            	this->mTorRadial += factor*lfactor*(rInVarTor.slice(k).col(j).real());
             }
 
          }
@@ -249,7 +249,7 @@ namespace IoVariable {
                lfactor = std::pow(l*(l+1.0),2);
 
                this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
-               this->mPolRadial += factor*lfactor*(rOutVarPolQ.slice(k).col(j).real());
+               this->mPolRadial += factor*lfactor*(rInVarPolQ.slice(k).col(j).real());
             }
          }
       #endif //defined QUICC_SPATIALSCHEME_SLFM
@@ -270,7 +270,7 @@ namespace IoVariable {
 					factor = 2.0;
 				}
 				this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
-				this->mPolRadial += factor*lfactor*(rOutVarPolQ.slice(k).col(j).real());
+				this->mPolRadial += factor*lfactor*(rInVarPolQ.slice(k).col(j).real());
 			}
 
          }
@@ -321,7 +321,7 @@ namespace IoVariable {
                lfactor = l*(l+1.0);
 
                this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
-               this->mPolRadial += factor*lfactor*(rOutVarPolS.slice(k).col(j).real());
+               this->mPolRadial += factor*lfactor*(rInVarPolS.slice(k).col(j).real());
 
             }
          }
@@ -342,7 +342,7 @@ namespace IoVariable {
 					factor = 2.0;
 				}
 				this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
-				this->mPolRadial += factor*lfactor*(rOutVarPolS.slice(k).col(j).real());
+				this->mPolRadial += factor*lfactor*(rInVarPolS.slice(k).col(j).real());
 
 			}
          }
