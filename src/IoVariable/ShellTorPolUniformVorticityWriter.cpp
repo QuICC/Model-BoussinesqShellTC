@@ -51,7 +51,7 @@ namespace IoVariable {
       this->mDelta = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::EKMAN))->second;
       this->mDelta = std::pow(this->mDelta,0.5)*10.;
       //this->mVolume = (std::pow(ro-this->mDelta,5)-std::pow(ri+this->mDelta,5))/(5.* std::sqrt(3.));
-      this->mVolume = (std::pow(ro,5)-std::pow(ri,5))/(5.* std::sqrt(3.));
+      this->mVolume = (std::pow(ro,5)-std::pow(ri,5))/(5.* std::sqrt(3./Math::PI)/2);
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -196,10 +196,10 @@ namespace IoVariable {
                coord.transform1D().integrate_full(Tvals.data(), Tspec.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 			   */
 				if(m==0){
-					this->mUVz = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());;
+					this->mUVz = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
 				} else {
-					this->mUVx = -this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());;
-					this->mUVy = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag());;
+					this->mUVx = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real())/std::sqrt(2);
+					this->mUVy = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag())/std::sqrt(2);
 				}
             }
          }
@@ -232,10 +232,10 @@ namespace IoVariable {
 
                 //MHDComplex res = this->mIntgOp.dot(Tspec);
             	if(m==0){
-            		this->mUVz = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());;
+            		this->mUVz = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
             	} else {
-            		this->mUVx = -this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());;
-            		this->mUVy = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag());;
+            		this->mUVx = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real())/std::sqrt(2);
+            		this->mUVy = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag())/std::sqrt(2);
             	}
             }
          }

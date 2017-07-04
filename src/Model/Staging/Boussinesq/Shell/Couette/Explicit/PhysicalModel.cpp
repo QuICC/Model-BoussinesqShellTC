@@ -77,7 +77,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(3)
+         switch(6)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -129,6 +129,32 @@ namespace Explicit {
 
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
+               break;
+
+            case 4:
+               spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
+               tSH.clear();
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
+               break;
+
+            case 5:
+                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
+                tSH.clear();
+                tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
+                break;
+
+            case 6:
+                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
+                tSH.clear();
+                tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(0,1)));
+                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
+                break;
+
          }
 
       // Generate random spectrum
