@@ -51,7 +51,7 @@ namespace IoVariable {
       this->mDelta = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::EKMAN))->second;
       this->mDelta = std::pow(this->mDelta,0.5)*10.;
       //this->mVolume = (std::pow(ro-this->mDelta,5)-std::pow(ri+this->mDelta,5))/(5.* std::sqrt(3.));
-      this->mVolume = (std::pow(ro,5)-std::pow(ri,5))/(5.* std::sqrt(3./Math::PI)/2);
+      this->mVolume = (std::pow(ro,5)-std::pow(ri,5))/(5.* std::sqrt(3./(4*Math::PI)));
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -140,24 +140,6 @@ namespace IoVariable {
       MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
       MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
 
-      // Dealias toroidal variable data
-      //coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
-      
-      // Recover dealiased BWD data
-      //Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-      // Get FWD storage
-      //Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
-
-      // Compute projection transform for first dimension 
-      //coord.transform1D().project(rOutVarTor.rData(), rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
-
-      // retrieve the collocation points
-      //Array r_grid = coord.transform1D().meshGrid();
-
-      // Compute projection transform for first dimension 
-      //coord.transform1D().integrate_full(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
-
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mUVx = 0.0;
       this->mUVy = 0.0;
@@ -182,24 +164,11 @@ namespace IoVariable {
             	   continue;
                }
 
-               ArrayZ Tspec = vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j);
-               /*
-               Array Tvals;
-               coord.transform1D().project(Tspec.data(), Tvals.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
-
-               // set the values to 0 if they are in the boundary layer
-               Tvals = (r_grid.array() >= (ri + this->mDelta)).select(Tvals, 0);
-               Tvals = (r_grid.array() <= (ro - this->mDelta)).select(Tvals, 0);
-
-               // multiply tims r^3
-               Tvals = Tvals*r_grid*r_grid*r_grid;
-               coord.transform1D().integrate_full(Tvals.data(), Tspec.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
-			   */
 				if(m==0){
 					this->mUVz = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
 				} else {
-					this->mUVx = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real())/std::sqrt(2);
-					this->mUVy = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag())/std::sqrt(2);
+					this->mUVx = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real())*std::sqrt(2);
+					this->mUVy = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag())*std::sqrt(2);
 				}
             }
          }
@@ -216,36 +185,16 @@ namespace IoVariable {
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
             	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-            	//ArrayZ Tspec = vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j);
-                /*
-                Array Tvals;
-                coord.transform1D().project( Tspec, Tvals, Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
-                // set the values to 0 if they are in the boundary layer
-                Tvals = (r_grid.array() >= (ri + this->mDelta)).select(Tvals, 0);
-                Tvals = (r_grid.array() <= (ro - this->mDelta)).select(Tvals, 0);
-
-                // multiply tims r^3
-                Tvals = Tvals*r_grid*r_grid*r_grid;
-                coord.transform1D().integrate_full( Tvals, Tspec., Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
-				*/
-
-                //MHDComplex res = this->mIntgOp.dot(Tspec);
             	if(m==0){
             		this->mUVz = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real());
             	} else {
-            		this->mUVx = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real())/std::sqrt(2);
-            		this->mUVy = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag())/std::sqrt(2);
+            		this->mUVx = - this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).real())*std::sqrt(2);
+            		this->mUVy = this->mIntgOp.dot(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j).imag())*std::sqrt(2);
             	}
             }
          }
       #endif //QUICC_SPATIALSCHEME_SLFL
-
-      // Free BWD storage
-      //coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
-
-      // Free FWD storage
-      //coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
 
       // Normalize the integral with int_ri^ror^4dr minus the boundaries
       this->mUVz /= this->mVolume;
