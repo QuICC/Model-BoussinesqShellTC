@@ -130,7 +130,6 @@ def make_sh_loperator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = N
     mat = spsp.block_diag(blocks, format = 'coo')
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
-
 def make_sh_qoperator(opl, opr, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create the coupled operator for the coriolis Q term"""
 

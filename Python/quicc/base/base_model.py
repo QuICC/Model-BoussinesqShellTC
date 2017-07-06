@@ -82,7 +82,6 @@ class BaseModel:
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname  + ".mtx", mat)
-        print('total inhomogeneous rhs: ', mat.shape, mat)
         return mat
 
     def explicit_linear(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):

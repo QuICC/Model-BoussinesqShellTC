@@ -76,7 +76,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(3)
+         switch(5)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -128,6 +128,19 @@ namespace Explicit {
 
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
+               break;
+
+            case 4:
+            	spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAX);
+            	break;
+
+            case 5:
+            	spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAY);
+            	break;
+
+            case 6:
+            	spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAZ);
+            	break;
          }
 
       // Generate random spectrum
