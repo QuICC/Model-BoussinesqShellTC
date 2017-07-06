@@ -58,7 +58,7 @@ namespace IoVariable {
       PythonWrapper::import("quicc.geometry.spherical.shell_radius");
 
       // Prepare arguments
-      PyObject *pArgs, *pValue;
+      PyObject *pArgs, *pValue, *pBC;
       pArgs = PyTuple_New(4);
 
       // ... compute a, b factors
@@ -70,36 +70,47 @@ namespace IoVariable {
       PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
       PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
       // ... create boundray condition (none)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 3, pValue);
+      pBC = PyDict_New();
+      PyDict_SetItem(pBC, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pBC, PyUnicode_FromString("cr"), PyLong_FromLong(2));
+      PyTuple_SetItem(pArgs, 3, pBC);
 
       // Get resolution
       int nR = this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      pValue = PyLong_FromLong(nR);
+      pValue = PyLong_FromLong(nR+2);
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Call r^2
       PythonWrapper::setFunction("r2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpR2(nR, nR);
+      SparseMatrix tmpR2(nR+2, nR);
       PythonWrapper::fillMatrix(tmpR2, pValue);
       Py_DECREF(pValue);
 
+      // change a couple of arguments
+      pValue = PyLong_FromLong(nR+3);
+      PyTuple_SetItem(pArgs, 0, pValue);
+      pBC = PyDict_New();
+      PyDict_SetItem(pBC, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pBC, PyUnicode_FromString("cr"), PyLong_FromLong(1));
+      PyTuple_SetItem(pArgs, 3, pBC);
       // Call r^1
       PythonWrapper::setFunction("r1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpR1(nR, nR);
+      SparseMatrix tmpR1(nR+3, nR+2);
       PythonWrapper::fillMatrix(tmpR1, pValue);
       Py_DECREF(pValue);
 
+      // change a couple of arguments
+      pValue = PyLong_FromLong(nR+4);
+      PyTuple_SetItem(pArgs, 0, pValue);
       // Call i1
       PythonWrapper::setFunction("i1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpI1(nR, nR);
+      SparseMatrix tmpI1(nR+4, nR+3);
       PythonWrapper::fillMatrix(tmpI1, pValue);
       Py_DECREF(pValue);
 
@@ -114,7 +125,7 @@ namespace IoVariable {
       PythonWrapper::import("quicc.projection.shell");
       PythonWrapper::setFunction("proj");
       pValue = PythonWrapper::callFunction(pArgs);
-      SparseMatrix tmpProj(2, nR);
+      SparseMatrix tmpProj(2, nR+4);
       PythonWrapper::fillMatrix(tmpProj, pValue);
       Py_DECREF(pValue);
 
@@ -122,7 +133,7 @@ namespace IoVariable {
       PythonWrapper::finalize();
 
       // Store integral projector
-      SparseMatrix temp = tmpProj*tmpI1*tmpR2*tmpR1;
+      SparseMatrix temp = tmpProj*tmpI1*tmpR1*tmpR2;
       this->mIntgOp  = (temp.row(0)-temp.row(1));
       assert( this->mIntgOp.rows() == 1);
       IVariableAsciiEWriter::init();
