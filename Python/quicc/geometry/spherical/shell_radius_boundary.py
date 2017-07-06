@@ -797,4 +797,3 @@ def inh_couette(mat, s, modes, coeffs, ordering = 'SLFl', nr= None):
 
     return mat
 
-
