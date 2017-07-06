@@ -33,6 +33,7 @@
 #include "IoVariable/ShellTorPolTracerWriter.hpp"
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
+#include "IoVariable/ShellTorPolUniformVorticityWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
@@ -224,7 +225,7 @@ namespace Explicit {
       spSim->addAsciiOutputFile(spVector);
 
 
-      // Create probes
+      // Create probesrm *--
       Matrix mProbes(4,3);
       mProbes << 0.85, 0.0, 3.141592654,
     		  0.9, 0.0, 3.141592654,
@@ -245,6 +246,9 @@ namespace Explicit {
       spVector4->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector4);
 
+      IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
+      spVector5->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector5);
    }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
