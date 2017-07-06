@@ -51,7 +51,7 @@ namespace IoVariable {
       this->mDelta = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::EKMAN))->second;
       this->mDelta = std::pow(this->mDelta,0.5)*10.;
       //this->mVolume = (std::pow(ro-this->mDelta,5)-std::pow(ri+this->mDelta,5))/(5.* std::sqrt(3.));
-      this->mVolume = (std::pow(ro,5)-std::pow(ri,5))/(5.* std::sqrt(3./(4*Math::PI)));
+      this->mVolume = (std::pow(ro-this->mDelta,5)-std::pow(ri+this->mDelta,5))/(5.* std::sqrt(3./(4*Math::PI)));
 
       // Initialise python wrapper
       PythonWrapper::init();
