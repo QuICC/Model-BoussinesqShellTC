@@ -56,6 +56,9 @@ namespace Equations {
          BENCHVELC1,       // Initial velocity perturbation state for Christensen's benchmark C1
          BENCHMAGC1,       // Initial magnetic perturbation state for Christensen's benchmark C1
          IMPMAGMATSUI,     // Imposed magnetic field from Matsui
+		 BENCHOMEGAX,	   // Inposed rotation around the X axis
+		 BENCHOMEGAY,      // Imposed rotation around the Y axis
+		 BENCHOMEGAZ,	   // Imposed rotation around the Z axis
       };
 
       /**
