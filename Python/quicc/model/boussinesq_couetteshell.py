@@ -293,8 +293,7 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
             if mat is None:
                 raise RuntimeError("Equations are not setup properly!")
 
-            #return spsp.vstack(rows)
-            print('toroidal:' , mat.shape)
+
             return mat
 
         elif field_row == ("velocity","pol"):
@@ -304,7 +303,6 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
 
         else:
             mat = base_model.BaseModel.inhomogeneous_block(self, res, eq_params, eigs, bcs, modes, field_row, field_col, restriction)
-            print('poloidal:', mat.shape)
             return mat
 
 class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_model.BaseModel):

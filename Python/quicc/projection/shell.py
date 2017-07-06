@@ -4,6 +4,9 @@ from __future__ import division
 from __future__ import unicode_literals
 import numpy as np
 from numpy.polynomial import chebyshev as cheb
+from scipy import sparse as spsp
+
+import quicc.base.utils as utils
 
 def proj_radial(nr, a, b, x):
 
@@ -47,6 +50,14 @@ def proj_radial_r(nr, a, b, x):
     temp = (cheb.chebval(xx,coeffs)/(a*xx+b)).transpose()
     return temp
 
+def proj(nr, a, b, r):
+
+    # evaluates the projection matrix matrix for the chebyshev basis
+    xx = (np.array(r)-b)/a
+    coeffs = np.eye(nr)*2
+    coeffs[0,0]=1.
+
+    return spsp.lil_matrix(cheb.chebval(xx, coeffs).transpose())
 
 
 if __name__=="__main__":
