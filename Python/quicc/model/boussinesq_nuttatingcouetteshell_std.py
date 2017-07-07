@@ -23,7 +23,7 @@ class BoussinesqNuttatingCouetteShellStdConfig:
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "omega", "rratio"]
+        return ["ekman", "rossby", "omega", "alpha", "rratio"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
