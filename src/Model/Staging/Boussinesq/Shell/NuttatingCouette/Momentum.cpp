@@ -72,11 +72,12 @@ namespace NuttatingCouette {
 
                      MHDFloat sgn = std::pow(-1.0,std::signbit(this->eqParams().nd(NonDimensional::ROSSBY)));
                      MHDFloat ri = this->eqParams().nd(NonDimensional::RO)*this->eqParams().nd(NonDimensional::RRATIO);
-                     MHDFloat norm = std::sqrt(3.0/(4.0*Math::PI));
+                     MHDFloat norm = -std::sqrt(3.0/(8.0*Math::PI));
                      MHDFloat omega = this->eqParams().nd(NonDimensional::OMEGA);
 					 MHDFloat t = this->time();
-                     MHDComplex phase = std::exp(Math::cI * omega * t);
-                     return Datatypes::SpectralScalarType::PointType(phase*sgn*ri/norm);
+                     MHDComplex phase = std::exp(-Math::cI * omega * t);
+                     MHCFloat factor = 2.0;
+                     return Datatypes::SpectralScalarType::PointType(phase*sgn*ri/norm/factor);
                   }
                }
             }
