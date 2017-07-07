@@ -33,6 +33,7 @@
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
 #include "IoVariable/ShellTorPolTracerWriter.hpp"
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
+#include "IoVariable/ShellTorPolUniformVorticityWriter.hpp"
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -233,10 +234,14 @@ namespace Explicit {
 
 
       // Create kinetic energy spectral writer
-      IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
+      IoVariable::SharedShellTorPolEnergySpectraWriter spVector2(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector2->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector2);
+
+      // Create a uniform vorticity writer
+      IoVariable::SharedShellTorPolUniformVorticityWriter spVector3(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector3);
-
 
    }
 

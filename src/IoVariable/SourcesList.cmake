@@ -9,6 +9,8 @@ set(MHDSources
    IVariableHdf5Reader.cpp
    VisualizationFileTags.cpp
    VisualizationFileWriter.cpp
+   AverageTags.cpp
+   ObservableTags.cpp
    EnergyTags.cpp
    NusseltTags.cpp
    ContinuityTags.cpp

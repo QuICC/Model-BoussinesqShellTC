@@ -41,6 +41,10 @@ namespace IoTools {
       {
          return NonDimensional::EKMAN;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::MAGREYNOLDS))
+      {
+    	  return NonDimensional::MAGREYNOLDS;
+
       } else if(id == IdToHuman::toTag(NonDimensional::MAGEKMAN))
       {
          return NonDimensional::MAGEKMAN;

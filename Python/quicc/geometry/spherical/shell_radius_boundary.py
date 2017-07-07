@@ -90,6 +90,8 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_rdiffdivr(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 23:
         cond = tau_insulating(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 24:
+        cond = tau_couette(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
@@ -268,6 +270,16 @@ def tau_insulating(nr, pos, coeffs = None):
         cond[1] = (t - cond[1])/2.0
 
     return np.array(cond)
+
+def tau_couette(nr, pos, coeffs = None):
+    """Create the toroidal Couette boundray tau line(s)"""
+
+    assert(coeffs.get('c', None) is not None)
+    #TODO: think of the ordering
+    #assert(coeffs.get('l', None) is not None)
+    assert(pos == 0)
+
+    return tau_value(nr, 0, None)
 
 def tau_value_diff(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
@@ -724,3 +736,64 @@ def alt_ones(nr, parity):
         return np.cumprod(-np.ones(nr))
     else:
         return -np.cumprod(-np.ones(nr))
+
+def apply_inhomogeneous(mat, modes, bc, ordering = 'SLFl', location = 't', nr = None):
+    """Add inhomogeneous conditions to the matrix"""
+
+
+    mat = mat.tolil()
+    if location == 't':
+        s = 0
+    elif location == 'b':
+        s = mat.shape[0]-nbc
+
+    if bc[0] == 24:
+        mat = inh_couette(mat, s, modes, bc.get('c',None), ordering, nr)
+
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo()
+
+    return mat
+
+def inh_couette(mat, s, modes, coeffs, ordering = 'SLFl', nr= None):
+    """Set inhomogeneous constrain for toroidal Couette"""
+
+    assert(coeffs.get('c', None) is not None)
+
+    if ordering=='SLFm':
+        assert(coeffs.get('m',None) is not None)
+
+        if coeffs.get('axis',None) is None:
+            if coeffs['m'] == 0:
+                for i, l in enumerate(modes):
+                    if l==1:
+                        norm = np.sqrt(3.0/(4.0*np.pi))
+
+                        mat[nr*i+s+1,0] += coeffs['c']/norm
+
+        elif coeffs.get('axis', None) == 'x':
+            if coeffs['m'] == 1:
+                for i, l in enumerate(modes):
+                    if l == 1:
+                        norm = -np.sqrt(3 / (8.0 * np.pi))
+                        factor = 2.
+                        mat[nr*i + s + 1, 0] += coeffs['c'] / norm / factor
+
+    else: # i.e. SLFl
+        assert(coeffs.get('l', None) is not None)
+        #assert(coeffs.get('axis',None) is not None)
+
+        if coeffs['l'] == 1:
+            for i, m in enumerate(modes):
+                if coeffs.get('axis', None) is None:
+                    if m == 0:
+                        norm = np.sqrt(3.0/(4.0*np.pi))
+                        mat[s+1,i] += coeffs['c']/norm
+                elif coeffs.get('axis', None) == 'x':
+                    if m==1:
+                        norm = -np.sqrt(3/(8.0*np.pi))
+                        factor = 2.
+                        mat[s+1,i] += coeffs['c']/norm/factor
+
+    return mat
+
