@@ -4,6 +4,8 @@ set(MHDSources
    Transport.cpp
    VelocityZ.cpp
    VorticityZ.cpp
+   VelocityX.cpp
+   VelocityY.cpp
    fbx.cpp
    fby.cpp
    fbz.cpp

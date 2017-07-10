@@ -35,6 +35,8 @@
 #include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityZ.hpp )
 #include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/Transport.hpp )
 #include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VorticityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityX.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityY.hpp )
 #include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/MeanHeat.hpp )
 #include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fbx.hpp )
 #include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fby.hpp )
@@ -48,6 +50,7 @@
 #include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "IoVariable/Cartesian1DMagneticEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DFluctuatingMagneticEnergyWriter.hpp"
 #include "IoStats/Cartesian1DScalarAvgWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
@@ -83,6 +86,12 @@ namespace QGmhdBhhLowRm {
       // Add vertical vorticity equation
       spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::VorticityZ>();
 
+      // Add velocity x
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::VelocityX>();
+     
+      // Add velocity y
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::VelocityY>();
+ 
       // Add mean heat computation
       spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::MeanHeat>();
 
@@ -287,6 +296,16 @@ namespace QGmhdBhhLowRm {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VORTICITYZ);
 
+      // Add VelocityX to profile visualisation
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::VELOCITYX);
+
+      // Add VelocityY to profile visualisation
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::VELOCITYY);
+
       // Add background temperature profile visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
@@ -312,6 +331,8 @@ namespace QGmhdBhhLowRm {
       spOut->expect(PhysicalNames::BX);
       spOut->expect(PhysicalNames::BY);
       spOut->expect(PhysicalNames::VORTICITYZ);
+      spOut->expect(PhysicalNames::VELOCITYX);
+      spOut->expect(PhysicalNames::VELOCITYY);
       spOut->expect(PhysicalNames::FBX);
       spOut->expect(PhysicalNames::FBY);
       spOut->expect(PhysicalNames::FBZ);
@@ -331,6 +352,8 @@ namespace QGmhdBhhLowRm {
       spIn->expect(PhysicalNames::BX);
       spIn->expect(PhysicalNames::BY);
       spIn->expect(PhysicalNames::VORTICITYZ);
+      spIn->expect(PhysicalNames::VELOCITYX);
+      spIn->expect(PhysicalNames::VELOCITYY);       
       spIn->expect(PhysicalNames::FBY);
       spIn->expect(PhysicalNames::FBX);
       spIn->expect(PhysicalNames::FBZ);
@@ -371,10 +394,27 @@ namespace QGmhdBhhLowRm {
       spMag->expect(PhysicalNames::BY);
       spSim->addAsciiOutputFile(spMag);
 
-      // Create temperature energy writer
-      //   IoVariable::SharedCartesian1DScalarEnergyWriter spMag(new IoVariable::Cartesian1DScalarEnergyWriter("magX", SchemeType::type()));
-      //   spMag->expect(PhysicalNames::BX);
-      //   spSim->addAsciiOutputFile(spMag);
+      // Create fluctuating magnetic energy writer
+      // NB: It's mangetic energy per unit volume
+      IoVariable::SharedCartesian1DFluctuatingMagneticEnergyWriter spFlMag(new IoVariable::Cartesian1DFluctuatingMagneticEnergyWriter("fluct_magnetic", SchemeType::type()));
+      spFlMag->expect(PhysicalNames::FBX);
+      spFlMag->expect(PhysicalNames::FBY);
+      spFlMag->expect(PhysicalNames::FBZ);
+      spSim->addAsciiOutputFile(spFlMag);
+
+      // Create cartesian kinetic energy writer
+      // to be compared with kinetic_energy, created by calculating velocityx and velocityy
+      // NB: It's mangetic energy per unit volume
+//      IoVariable::SharedCartesian1DFluctuatingMagneticEnergyWriter spCartK(new IoVariable::Cartesian1DFluctuatingMagneticEnergyWriter("cartesian_kinetic", SchemeType::type()));
+//      spCartK->expect(PhysicalNames::VELOCITYX);
+//      spCartK->expect(PhysicalNames::VELOCITYY);
+//      spCartK->expect(PhysicalNames::VELOCITYZ);
+//      spSim->addAsciiOutputFile(spCartK);
+
+      IoVariable::SharedCartesian1DMagneticEnergyWriter spCartK(new IoVariable::Cartesian1DMagneticEnergyWriter("cartesian_kinetic", SchemeType::type()));
+      spCartK->expect(PhysicalNames::VELOCITYX);
+      spCartK->expect(PhysicalNames::VELOCITYY);
+      spSim->addAsciiOutputFile(spCartK);
 
    }
 
@@ -404,6 +444,8 @@ namespace QGmhdBhhLowRm {
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spState->expect(PhysicalNames::VORTICITYZ);
+      spState->expect(PhysicalNames::VELOCITYX);
+      spState->expect(PhysicalNames::VELOCITYY);
       spState->expect(PhysicalNames::BY);
       spState->expect(PhysicalNames::BX);
       spState->expect(PhysicalNames::FBX);

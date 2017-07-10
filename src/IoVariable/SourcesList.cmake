@@ -26,6 +26,7 @@ elseif(QUICC_SPATIALSCHEME STREQUAL "TFT")
 elseif(QUICC_SPATIALSCHEME STREQUAL "TFF")
    list(APPEND MHDSources
       Cartesian1DMagneticEnergyWriter.cpp
+      Cartesian1DFluctuatingMagneticEnergyWriter.cpp
       Cartesian1DNusseltDZWriter.cpp
       Cartesian1DNusseltXWriter.cpp
       Cartesian1DNusseltZWriter.cpp
