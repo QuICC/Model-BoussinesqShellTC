@@ -97,6 +97,9 @@ namespace IoTools {
          case PhysicalNames::NONZONAL_VELOCITY:
             return "Non zonal velocity";
 
+         case PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY:
+        	return "Rotated geostrophic velocity";
+
          case PhysicalNames::VORTICITY:
             return "Vorticity";
 
@@ -279,6 +282,9 @@ namespace IoTools {
 
          case PhysicalNames::NONZONAL_VELOCITY:
             return "nonzonal_velocity";
+
+         case PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY:
+        	 return "rotatedgeostrophic_velocity";
 
          case PhysicalNames::VORTICITY:
             return "vorticity";

@@ -9,6 +9,7 @@ import scipy.sparse as spsp
 import quicc.base.utils as utils
 import quicc.geometry.spherical.shell_radius as geo
 import quicc.base.base_model as base_model
+import quicc.projection.shell as proj
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
 
 
@@ -263,9 +264,9 @@ class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqNuttatingCouetteShellStdC
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            if field_row in [("zonal_velocity","tor"),("nonzonal_velocity","tor")]:
+            if field_row in [("zonal_velocity","tor"),("nonzonal_velocity","tor"),("rotatedgeostrophic_velocity","tor")]:
                 fields = [("velocity","tor")]
-            elif field_row in [("zonal_velocity","pol"),("nonzonal_velocity","pol")]:
+            elif field_row in [("zonal_velocity","pol"),("nonzonal_velocity","pol"), ("rotatedgeostrophic_velocity","pol")]:
                 fields = [("velocity","pol")]
             else:
                 fields = []
@@ -380,6 +381,45 @@ class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqNuttatingCouetteShellStdC
                 mat = geo.qid(res[0], 0, bc)
             else:
                 mat = geo.zblk(res[0], bc)
+        elif field_row == ("rotatedgeostrophic_velocity", "tor") and field_col == ("velocity", "tor"):
+            if l == 1:
+                # define matrices as in the  ascii writer
+                delta = (eq_params['ekman']**.5)*10
+                ro = self.automatic_parameters(eq_params)['ro']
+                ri = ro * eq_params['rratio']
+                a, b = geo.linear_r2x(ro, eq_params['rratio'])
+                bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_row)
+                bc['cr'] = 2
+                R2 = geo.r2(res[0]+2, a, b, bc)
+                bc['cr'] = 1
+                R1 = geo.r1(res[0]+3, a, b, bc)
+                I1 = geo.i1(res[0]+4, a, b, bc)
+                Proj = proj.proj(res[0]+4, a, b, [ro-delta, ri+delta])
+                temp = Proj*I1*R1*R2
+                M = temp[0,:]-temp[1,:]
+
+                # volume
+                volume = ((ro-delta)**5-(ri+delta)**5)/(5 *(3/4/np.pi)**.5)
+                M /= volume
+                column = np.zeros((res[0],1))
+                column[0] = 1.
+                Adv = spsp.coo_matrix(column * M)
+
+                bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_row)
+                if m == 0:
+                    mat = geo.qid(res[0], 0, bc) - Adv
+                elif m == 1:
+                    mat = geo.qid(res[0], 0, bc) - 2.**.5 * Adv
+
+                else:
+                    mat = geo.qid(res[0], 0, bc)
+
+            else:
+                mat = geo.qid(res[0], 0, bc)
+
+        elif field_row == ("rotatedgeostrophic_velocity", "pol") and  field_col == ("velocity", "pol"):
+            mat = geo.qid(res[0], 0, bc)
+
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

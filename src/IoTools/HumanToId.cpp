@@ -358,8 +358,12 @@ namespace IoTools {
       {
          return PhysicalNames::NONZONAL_VELOCITY;
 
-      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
-      {
+      } else if(id == IdToHuman::toTag(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY))
+	  {
+    	 return PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY;
+
+	  } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
+	  {
          return PhysicalNames::VORTICITY;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYX))

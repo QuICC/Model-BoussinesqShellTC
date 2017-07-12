@@ -172,6 +172,11 @@ namespace Explicit {
       spVTrivial->setFields(true, false, false);
       spVTrivial->setIdentity(PhysicalNames::NONZONAL_VELOCITY);
 
+      // Add rotated geostrophic velocity field visualization
+      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
+      spVTrivial->setFields(true, false, false);
+      spVTrivial->setIdentity(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY);
+
       // Add vertical velocity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
       spVertical->setFieldType(FieldType::VECTOR);
@@ -187,6 +192,7 @@ namespace Explicit {
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::ZONAL_VELOCITY);
       spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
+      spOut->expect(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
