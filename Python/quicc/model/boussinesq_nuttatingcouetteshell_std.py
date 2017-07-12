@@ -397,7 +397,7 @@ class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqNuttatingCouetteShellStdC
                 Proj = proj.proj(res[0]+4, a, b, [ro-delta, ri+delta])
                 temp = Proj*I1*R1*R2
                 M = temp[0,:]-temp[1,:]
-
+§
                 # volume
                 volume = ((ro-delta)**5-(ri+delta)**5)/(5 *(3/4/np.pi)**.5)
                 M /= volume

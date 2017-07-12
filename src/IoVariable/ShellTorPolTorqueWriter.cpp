@@ -177,7 +177,7 @@ namespace IoVariable {
 
    void ShellTorPolTorqueWriter::compute(Transform::TransformCoordinatorType& coord)
    {
-
+	   this->mTorque = 0;
 	   if(this->mComputeFlag){
 
 		   // get iterator to field
@@ -250,26 +250,14 @@ namespace IoVariable {
 	   // Create file
 	   this->preWrite();
 
-	   // Define the comunication tag
-	   int tag = 1815;
 
 	   // message pass the torque
 	   #ifdef QUICC_MPI
 
 	   MHDFloat Torque = this->mTorque;
-	   if(this->mComputeFlag){
-		   // send if the core computed
-		   MPI_Send(&Torque, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD);
-	   }
 
-	   if(FrameworkMacro::allowsIO()){
-
-		   // recieve if the core needs to write
-		   MPI_Status status;
-		   MPI_Recv(&Torque, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
-
-		   this->mTorque = Torque;
-	   }
+	   MPI_Allreduce(MPI_IN_PLACE, &Torque, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+	   this->mTorque = Torque;
 	   #endif //QUICC_MPI
 
 
