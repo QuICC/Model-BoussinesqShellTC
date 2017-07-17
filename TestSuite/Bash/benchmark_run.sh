@@ -1,14 +1,23 @@
 #!/bin/bash
 
+if [ "$#" -lt 1 ]; then
+    echo "Requires at least 1 arguments"
+    echo "Usage:"
+    echo "benchmark_run.sh benchmark_list.dat"
+    exit 1
+fi
+
 #set -euf
-set -o pipefail
+#set -o pipefail
 #set -x
 
 # Store current directory
 current_dir=`pwd`
 build_dir="Master-Benchmarks"
 
-while IFS=" " read -r QUICC_APPROX QUICC_GEOMETRY QUICC_MODEL QUICC_MPIALGO QUICC_TIMESTEPPER QUICC_SPLINALG QUICC_FFT QUICC_THREADS QUICC_MEMORYUSAGE QUICC_PLATFORM QUICC_DIM1D QUICC_DIM2D QUICC_DIM3D QUICC_DT QUICC_TRASH
+BENCHMARKS_LIST=$1
+
+while IFS=" " read -u "${file_fd}" -r QUICC_APPROX QUICC_GEOMETRY QUICC_MODEL QUICC_MPIALGO QUICC_TIMESTEPPER QUICC_SPLINALG QUICC_FFT QUICC_THREADS QUICC_MEMORYUSAGE QUICC_PLATFORM QUICC_DIM1D QUICC_DIM2D QUICC_DIM3D QUICC_DT QUICC_TRASH
 do
    # Ignore lines starting with #
    if [ "${QUICC_APPROX:0:1}" == "#" ];
@@ -42,7 +51,7 @@ do
    done
 
    cd ${current_dir}
-done < "${1}"
+done  {file_fd}<"${BENCHMARKS_LIST}"
 
 cd ${current_dir}
 echo "Done"
