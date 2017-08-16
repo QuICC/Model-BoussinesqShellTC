@@ -248,7 +248,6 @@ class BoussinesqNuttatingCouetteShellStd(BoussinesqNuttatingCouetteShellStdConfi
 
         return mat
 
-
 class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqNuttatingCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
