@@ -1,8 +1,8 @@
 /** 
- * @file Cartesian1DFluctuatingMagneticEnergyWriter.cpp
+ * @file Cartesian1DKineticCartesianWriter.cpp
  * @brief Source of the implementation of the ASCII Cartesian 1D (double periodic) energy calculation for a vector field (streamfunction formulation)
  * @author Meredith (5/16) -- adapeted from the code by Philippe Marti \<philippe.marti@colorado.edu\>
- * @ 4/17 Stefano adapted it for the QGmhdBhhLowRm model
+ * @ 7/11 Stefano adapted it for the QGmhdBhhLowRm model
  */
 
 // Configuration includes
@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include "IoVariable/Cartesian1DFluctuatingMagneticEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DKineticCartesianWriter.hpp"
 
 // Project includes
 //
@@ -33,16 +33,16 @@ namespace QuICC {
 
 namespace IoVariable {
 
-   Cartesian1DFluctuatingMagneticEnergyWriter::Cartesian1DFluctuatingMagneticEnergyWriter(const std::string& prefix, const std::string& type, const bool hasZonalX, const bool hasZonalY)
+   Cartesian1DKineticCartesianWriter::Cartesian1DKineticCartesianWriter(const std::string& prefix, const std::string& type, const bool hasZonalX, const bool hasZonalY)
       : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mHasZonalX(hasZonalX), mHasZonalY(hasZonalY), mXEnergy(-1.0), mYEnergy(-1.0), mZEnergy(-1.0), mXZonalXEnergy(-1.0), mZZonalXEnergy(-1.0), mYZonalYEnergy(-1.0), mZZonalYEnergy(-1.0)
    {
    }
 
-   Cartesian1DFluctuatingMagneticEnergyWriter::~Cartesian1DFluctuatingMagneticEnergyWriter()
+   Cartesian1DKineticCartesianWriter::~Cartesian1DKineticCartesianWriter()
    {
    }
 
-   void Cartesian1DFluctuatingMagneticEnergyWriter::init()
+   void Cartesian1DKineticCartesianWriter::init()
    {
       // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
       this->mVolume = 2.0;
@@ -75,7 +75,7 @@ namespace IoVariable {
       IVariableAsciiEWriter::init();
    }
 
-   void Cartesian1DFluctuatingMagneticEnergyWriter::compute(Transform::TransformCoordinatorType& coord)
+   void Cartesian1DKineticCartesianWriter::compute(Transform::TransformCoordinatorType& coord)
    {
       // Compute total energy
       this->computeEnergy(coord, TOTAL);
@@ -93,7 +93,7 @@ namespace IoVariable {
       }
    }
 
-   void Cartesian1DFluctuatingMagneticEnergyWriter::write()
+   void Cartesian1DKineticCartesianWriter::write()
    {
       // Create file
       this->preWrite();
@@ -112,8 +112,8 @@ namespace IoVariable {
          Array energy(n);
          // Fixed a missing 1/2 factor in the calculation of the mean magnetic energy
          // S. Maffei, 31 March 2017
-         // Actually we might not need this fix
-         // S. Maffei 1 August 2017
+         // Actually we don't need that 1/2 pre-factor...
+         // S. Maffei, 1 August 2017
          energy(0) = (this->mXEnergy);
          energy(1) = (this->mYEnergy);
          energy(2) = (this->mZEnergy);
@@ -181,7 +181,7 @@ namespace IoVariable {
       }
    }
 
-   void Cartesian1DFluctuatingMagneticEnergyWriter::computeEnergy(Transform::TransformCoordinatorType& coord, const Cartesian1DFluctuatingMagneticEnergyWriter::EnergyTypeId flag)
+   void Cartesian1DKineticCartesianWriter::computeEnergy(Transform::TransformCoordinatorType& coord, const Cartesian1DKineticCartesianWriter::EnergyTypeId flag)
    {
       scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 3);
@@ -216,10 +216,10 @@ namespace IoVariable {
       std::map<FieldComponents::Spectral::Id, scalar_iterator> comps;
       for(scalar_iterator sIt = sRange.first; sIt != sRange.second; ++sIt)
       {
-         if(sIt->first == PhysicalNames::FBX)
+         if(sIt->first == PhysicalNames::VELOCITYX)
          {
             comps.insert(std::make_pair(FieldComponents::Spectral::X, sIt));
-         } else if(sIt->first == PhysicalNames::FBY)
+         } else if(sIt->first == PhysicalNames::VELOCITYY)
          {
             comps.insert(std::make_pair(FieldComponents::Spectral::Y, sIt));
          } else

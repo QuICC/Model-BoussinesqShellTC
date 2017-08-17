@@ -63,6 +63,12 @@ namespace QuICC {
       {
          // calculate the transforms and calculate the Skew
 
+         // Initialize the Skewness
+         // This line was missing in the original formulation, causing the Skew to explode
+         // 
+         // Maffei S., July, 2017
+         this->mSkew.setConstant(0.0);
+
          scalar_iterator_range sRange = this->scalarRange();
          assert(std::distance(sRange.first, sRange.second) == 1);
 
