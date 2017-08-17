@@ -1,5 +1,5 @@
 /** 
- * @file VelocityX.cpp
+ * @file fjz.cpp
  * @brief Source of the implementation of the vertical vorticity computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityX.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fjz.hpp )
 
 // Project includes
 //
@@ -36,32 +36,32 @@ namespace Plane {
 
 namespace QGmhdBhhLowRm {
 
-   VelocityX::VelocityX(SharedEquationParameters spEqParams)
+   fjz::fjz(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   VelocityX::~VelocityX()
+   fjz::~fjz()
    {
    }
 
-   void VelocityX::setCoupling()
+   void fjz::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
-   void VelocityX::setRequirements()
+   void fjz::setRequirements()
    {
       // Set streamfunction as equation unknown
-      this->setName(PhysicalNames::VELOCITYX);
+      this->setName(PhysicalNames::FJZ);
 
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYX, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::FJZ, FieldRequirement(true, true, false, false));
    }
 
 }

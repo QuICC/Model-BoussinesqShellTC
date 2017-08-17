@@ -67,6 +67,9 @@ namespace IoTools {
          case PhysicalNames::FBZ:
             return "Fbz";
 
+	 case PhysicalNames::FJZ:
+            return "Fjz";
+
          case PhysicalNames::MAGNETIC:
             return "Magnetic";
 
@@ -249,6 +252,9 @@ namespace IoTools {
 
          case PhysicalNames::FBZ:
             return "fbz";
+
+         case PhysicalNames::FJZ:
+            return "fjz";
 
          case PhysicalNames::MAGNETIC:
             return "magnetic";

@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocitiyY.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityY.hpp )
 
 // Project includes
 //
@@ -36,55 +36,23 @@ namespace Plane {
 
 namespace QGmhdBhhLowRm {
 
-   VelocitiyY::VelocitiyY(SharedEquationParameters spEqParams)
+   VelocityY::VelocityY(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   VelocitiyY::~VelocitiyY()
+   VelocityY::~VelocityY()
    {
    }
 
-   void VelocitiyY::setCoupling()
+   void VelocityY::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
-   void VelocitiyY::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
-   {
-      // Assert on scalar component is used
-      assert(id == FieldComponents::Physical::SCALAR);
-
-      /// 
-      /// Computation:
-      ///   \f$ VelocitiyY = -D(streamfunction)Dy \f$
-      ///
-
-      rNLComp.setData((this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::X).data().array()).matrix());
-   }
-
-   Datatypes::SpectralScalarType::PointType VelocitiyY::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
-   {
-      // Assert on scalar component is used
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iY) == 0)
-      {
-         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iZ,iY) == 0)
-         {
-            if(iX == 0)
-            {
-               return Datatypes::SpectralScalarType::PointType(-1.0);
-            }
-         }
-      }
-
-      return Datatypes::SpectralScalarType::PointType(0.0);
-   }
-
-   void VelocitiyY::setRequirements()
+   void VelocityY::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VELOCITYY);
@@ -93,10 +61,7 @@ namespace QGmhdBhhLowRm {
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYY, FieldRequirement(true, true, true, false));
-
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, false, false, true));
+      this->mRequirements.addField(PhysicalNames::VELOCITYY, FieldRequirement(true, true, false, false));
    }
 
 }

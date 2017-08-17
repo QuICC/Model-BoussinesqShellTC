@@ -257,14 +257,14 @@ namespace F3DQG {
       spSim->addStatsOutputFile(spRMS);
       
       // Create skew temperature writer
-      IoStats::SharedCartesian1DScalarSkewWriter spSkew(new IoStats::Cartesian1DScalarSkewWriter("temperature", spAvg, spRMS,  SchemeType::type()));
-      spSkew->expect(PhysicalNames::TEMPERATURE);
-      spSim->addStatsOutputFile(spSkew);
+//      IoStats::SharedCartesian1DScalarSkewWriter spSkew(new IoStats::Cartesian1DScalarSkewWriter("temperature", spAvg, spRMS,  SchemeType::type()));
+//      spSkew->expect(PhysicalNames::TEMPERATURE);
+//      spSim->addStatsOutputFile(spSkew);
       
       // Create kurt temperature writer
-      IoStats::SharedCartesian1DScalarKurtWriter spKurt(new IoStats::Cartesian1DScalarKurtWriter("temperature", spAvg, spRMS,  SchemeType::type()));
-      spKurt->expect(PhysicalNames::TEMPERATURE);
-      spSim->addStatsOutputFile(spKurt);
+//      IoStats::SharedCartesian1DScalarKurtWriter spKurt(new IoStats::Cartesian1DScalarKurtWriter("temperature", spAvg, spRMS,  SchemeType::type()));
+//      spKurt->expect(PhysicalNames::TEMPERATURE);
+//      spSim->addStatsOutputFile(spKurt);
       
    }
 

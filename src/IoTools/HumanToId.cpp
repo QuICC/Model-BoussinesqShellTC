@@ -321,6 +321,10 @@ namespace IoTools {
       {
          return PhysicalNames::FBZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::FJZ))
+      {
+         return PhysicalNames::FJZ;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::MAGNETIC))
       {
          return PhysicalNames::MAGNETIC;
