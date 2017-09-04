@@ -214,7 +214,11 @@ namespace Explicit {
       spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
       spOut->expect(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VELOCITYX);
+      spOut->expect(PhysicalNames::VELOCITYY);
       spOut->expect(PhysicalNames::VORTICITYZ);
+      spOut->expect(PhysicalNames::VORTICITYX);
+      spOut->expect(PhysicalNames::VORTICITYY);
       spVis->addHdf5OutputFile(spOut);
    }
 
