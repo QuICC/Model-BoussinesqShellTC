@@ -4,6 +4,7 @@ import sys, os
 import pandas as pd
 from quicc.geometry.spherical import shell_radius
 from base_representer import BaseRepresenter
+import xml.etree.ElementTree as ET
 
 class SpectraRepresenter(BaseRepresenter):
 
@@ -45,7 +46,9 @@ class SpectraRepresenter(BaseRepresenter):
             datafull.sort_values([0], inplace=True)
 
             datafull = datafull.as_matrix()
-            self.datafull = datafull
+        self.datafull = datafull
+        self.filename = filename
+
 
     def draw(self):
 
@@ -69,12 +72,24 @@ class SpectraRepresenter(BaseRepresenter):
 
         data = datafull[-1, 1:]
 
-        Lmax = data.shape[0] / 4
+        try:
+            dirname = os.path.dirname(self.filename)
+            print(dirname)
+            cfg_file = open(dirname + 'parameters.cfg', 'r')
+            header = cfg_file.readline()
+            root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
+            Lmax = int(root[1][0][1].text)+1
+            Mmax = int(root[1][0][2].text)+1
+        except BaseException as e:
+            Lmax = Mmax = data.shape[0] / 4
+            pass
 
-        pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
-        pp.loglog(data[Lmax:2 * Lmax], label='M spectrum, toroidal')
-        pp.loglog(data[2 * Lmax:3 * Lmax], label='L spectrum, poloidal')
-        pp.loglog(data[3 * Lmax:-1], label='M spectrum, poloidal')
+
+
+        pp.semilogy(data[0:Lmax], label='L spectrum, toroidal')
+        pp.semilogy(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
+        pp.semilogy(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
+        pp.semilogy(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
 
         # pp.title(folder_name)
         pp.xlabel('l/m')
