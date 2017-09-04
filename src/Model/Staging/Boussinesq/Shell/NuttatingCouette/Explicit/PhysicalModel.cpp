@@ -182,10 +182,30 @@ namespace Explicit {
       spVertical->setFieldType(FieldType::VECTOR);
       spVertical->setIdentity(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITY);
 
+      // Add X component of velocity
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::VECTOR);
+      spVertical->setIdentity(PhysicalNames::VELOCITYX, PhysicalNames::VELOCITY);
+
+      // Add Y component of velocity
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::VECTOR);
+      spVertical->setIdentity(PhysicalNames::VELOCITYY, PhysicalNames::VELOCITY);
+
       // Add vertical vorticity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
       spVertical->setFieldType(FieldType::CURL);
       spVertical->setIdentity(PhysicalNames::VORTICITYZ, PhysicalNames::VELOCITY);
+
+      // Add X component vorticity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::CURL);
+      spVertical->setIdentity(PhysicalNames::VORTICITYX, PhysicalNames::VELOCITY);
+
+      // Add Y component vorticity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::CURL);
+      spVertical->setIdentity(PhysicalNames::VORTICITYY, PhysicalNames::VELOCITY);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
