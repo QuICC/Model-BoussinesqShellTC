@@ -18,19 +18,14 @@ set(QUICC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
 #----------- AVAILABLE THREADS MODELS ------------#
 ###################################################
 
-set(QUICC_THREADSMODELS "None" "Pthreads" "OpenMP" PARENT_SCOPE)
+set(QUICC_THREADSMODELS "None" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE FFT VERSIONS --------------#
 ###################################################
 
-set(QUICC_FFTS "FFTW" "cuFFT" PARENT_SCOPE)
+set(QUICC_FFTS "FFTW" PARENT_SCOPE)
 set(QUICC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
-set(QUICC_LIBRARIES_FFTW_PTHREADS "fftw3_threads" "fftw3" PARENT_SCOPE)
-set(QUICC_LIBRARIES_FFTW_OPENMP "fftw3_omp" "fftw3" PARENT_SCOPE)
-set(QUICC_LIBRARIES_CUFFT "cudart" "cufft" "cufftw" PARENT_SCOPE)
-set(QUICC_INCLUDES_CUFFT "/opt/cuda/include" "/opt/cuda/sdk/common/inc/" PARENT_SCOPE)
-set(QUICC_LIBDIR_CUFFT "/opt/cuda/lib64" PARENT_SCOPE)
 
 ###################################################
 #-------------- AVAILABLE FFT PLANS --------------#
@@ -93,28 +88,18 @@ set(QUICC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
 ###################################################
 
 set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
-set(QUICC_CC_SERIAL_SCALASCA "g++" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
-set(QUICC_CC_MPI_SCALASCA "mpic++" PARENT_SCOPE)
 
 set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
-set(QUICC_CC_ARCH_SCALASCA "-march=native -O2" PARENT_SCOPE)
-
-set(QUICC_CC_OPENMP_GCC "-fopenmp" PARENT_SCOPE)
-set(QUICC_CC_OPENMP_SCALASCA "-fopenmp" PARENT_SCOPE)
 
 set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
-set(QUICC_CC_INC_SCALASCA "" PARENT_SCOPE)
 
 set(QUICC_CC_INC_MPI_GCC "" PARENT_SCOPE)
-set(QUICC_CC_INC_MPI_SCALASCA "" PARENT_SCOPE)
 
 set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
-set(QUICC_CC_LIB_SCALASCA "" PARENT_SCOPE)
 
 set(QUICC_CC_LIB_MPI_GCC "" PARENT_SCOPE)
-set(QUICC_CC_LIB_MPI_SCALASCA "" PARENT_SCOPE)
 
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
