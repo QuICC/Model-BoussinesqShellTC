@@ -43,8 +43,6 @@ namespace QuICC {
             EXPLICIT_NEXTSTEP,
             /// Galerkin stencil
             STENCIL,
-            /// Inhomogeneous boundary condition RHS operator
-            INHOMOGENEOUS,
          };
       };
 }

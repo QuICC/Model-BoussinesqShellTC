@@ -83,6 +83,8 @@ namespace QuICC {
          ZONAL_VELOCITY, 
          /// Non-zonal velocity field (m != 0)
          NONZONAL_VELOCITY, 
+		 // Subtracted velocity field without uniform vorticity
+		 ROTATEDGEOSTROPHIC_VELOCITY,
          /// Vorticity field
          VORTICITY,
          /// X vorticity field

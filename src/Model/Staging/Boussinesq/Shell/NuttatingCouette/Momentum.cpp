@@ -1,7 +1,8 @@
 /** 
  * @file Momentum.cpp
- * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq spherical Couette in a spherical shell model
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq spherical Couette around
+ * an equatorially sprecessing orthogonal axis in a spherical shell model
+ * @author Nicolò Lardelli \<nicolo.lardelli@erdw.ethz.ch\>
  */
 
 /// Define small macros allowing to convert to string
@@ -20,7 +21,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Momentum.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/NuttatingCouette/Momentum.hpp )
 
 // Project includes
 //
@@ -38,10 +39,10 @@ namespace Boussinesq {
 
 namespace Shell {
 
-namespace Couette {
+namespace NuttatingCouette {
 
    Momentum::Momentum(SharedEquationParameters spEqParams)
-      : MomentumBase(spEqParams)
+      : Couette::MomentumBase(spEqParams)
    {
    }
 
@@ -56,12 +57,12 @@ namespace Couette {
          #if defined QUICC_SPATIALSCHEME_SLFL
             if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 1)
             {
-               if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0)
+               if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 1)
                {
                   if(i == 1)
                   {
          #elif defined QUICC_SPATIALSCHEME_SLFM
-            if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
+            if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 1)
             {
                if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 1)
                {
@@ -71,8 +72,12 @@ namespace Couette {
 
                      MHDFloat sgn = std::pow(-1.0,std::signbit(this->eqParams().nd(NonDimensional::ROSSBY)));
                      MHDFloat ri = this->eqParams().nd(NonDimensional::RO)*this->eqParams().nd(NonDimensional::RRATIO);
-                     MHDFloat norm = std::sqrt(3.0/(4.0*Math::PI));
-                     return Datatypes::SpectralScalarType::PointType(sgn*ri/norm);
+                     MHDFloat norm = -std::sqrt(3.0/(8.0*Math::PI));
+                     MHDFloat omega = this->eqParams().nd(NonDimensional::OMEGA);
+					 MHDFloat t = this->time();
+                     MHDComplex phase = std::exp(-Math::cI * omega * t);
+                     MHDFloat factor = 2.0;
+                     return Datatypes::SpectralScalarType::PointType(this->eqParams().nd(NonDimensional::ALPHA)*phase*sgn*ri/norm/factor);
                   }
                }
             }

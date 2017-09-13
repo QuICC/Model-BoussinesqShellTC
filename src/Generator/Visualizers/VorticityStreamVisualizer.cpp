@@ -47,7 +47,7 @@ namespace Equations {
 
    void VorticityStreamVisualizer::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, false, false, false, false);
    }
 
    void VorticityStreamVisualizer::setRequirements()

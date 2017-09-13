@@ -125,9 +125,9 @@ namespace Equations {
       }
    }
 
-   void IVectorEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const bool allowExplicit)
+   void IVectorEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const bool hasBoundaryValue, const bool allowExplicit)
    {
-      this->dispatchCoupling(comp, eqType, iZero, hasNL, hasSource, this->unknown().dom(0).spRes(), allowExplicit);
+      this->dispatchCoupling(comp, eqType, iZero, hasNL, hasSource, this->unknown().dom(0).spRes(), hasBoundaryValue, allowExplicit);
    }
 
    void  IVectorEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const

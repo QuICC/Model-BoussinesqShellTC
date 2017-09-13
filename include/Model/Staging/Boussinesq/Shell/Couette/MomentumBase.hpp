@@ -1,11 +1,11 @@
 /**
- * @file Momentum.hpp
- * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette dynamo in a spherical shell
+ * @file MomentumBase.hpp
+ * @brief Base implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTEDYNAMO_MOMENTUM_HPP
-#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTEDYNAMO_MOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUMBASE_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUMBASE_HPP
 
 // Configuration includes
 //
@@ -31,12 +31,12 @@ namespace Boussinesq {
 
 namespace Shell {
 
-namespace CouetteDynamo {
+namespace Couette {
 
    /**
-    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette dynamo in a spherical shell
+    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette in a spherical shell
     */
-   class Momentum: public IVectorEquation
+   class MomentumBase: public IVectorEquation
    {
       public:
          /**
@@ -44,12 +44,12 @@ namespace CouetteDynamo {
           *
           * @param spEqParams  Shared equation parameters
           */
-         Momentum(SharedEquationParameters spEqParams);
+         MomentumBase(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Momentum();
+         virtual ~MomentumBase();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -58,11 +58,6 @@ namespace CouetteDynamo {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
-
-         /**
-          * @brief Set inhomogeneous boundary condition
-          */
-         Datatypes::SpectralScalarType::PointType boundaryValue(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
       protected:
          /**
@@ -99,4 +94,4 @@ namespace CouetteDynamo {
 }
 }
 
-#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTEDYNAMO_MOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUMBASE_HPP

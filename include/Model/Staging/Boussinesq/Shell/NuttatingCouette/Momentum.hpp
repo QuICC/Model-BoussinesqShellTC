@@ -1,11 +1,12 @@
 /**
  * @file Momentum.hpp
- * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette in a spherical shell
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq
+ * spherical Couette around a precessing orthogonal roation axis in a spherical shell
+ * @author Nicolò Lardelli \<nicolo.lardelli@erdw.ethz.ch\>
  */
 
-#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP
-#define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_NUTTATINGCOUETTE_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_NUTTATINGCOUETTE_MOMENTUM_HPP
 
 /// Define small macros allowing to convert to string
 #define MAKE_STR_X( _P ) # _P
@@ -35,12 +36,12 @@ namespace Boussinesq {
 
 namespace Shell {
 
-namespace Couette {
+namespace NuttatingCouette {
 
    /**
     * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette in a spherical shell
     */
-   class Momentum: public MomentumBase
+   class Momentum: public Couette::MomentumBase
    {
       public:
          /**
@@ -71,4 +72,4 @@ namespace Couette {
 }
 }
 
-#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_NUTTATINGCOUETTE_MOMENTUM_HPP

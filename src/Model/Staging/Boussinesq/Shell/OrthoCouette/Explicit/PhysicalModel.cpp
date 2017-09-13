@@ -24,7 +24,7 @@
 
 // Project includes
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Momentum.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/OrthoCouette/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
@@ -62,7 +62,7 @@ namespace Explicit {
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::Boussinesq::Shell::Couette::Momentum>();
+      spSim->addVectorEquation<Equations::Boussinesq::Shell::OrthoCouette::Momentum>();
    }
 
    void PhysicalModel::addStates(SharedStateGenerator spGen)

@@ -89,7 +89,7 @@ namespace Equations {
 
    void RandomScalarState::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, true, false, false);
    }
 
    Datatypes::SpectralScalarType::PointType RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const

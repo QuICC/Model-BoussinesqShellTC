@@ -30,7 +30,7 @@ namespace QuICC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingInformation::SLOWEST_SINGLE_RHS), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mHasBoundaryValue(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingInformation::SLOWEST_SINGLE_RHS), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -56,6 +56,11 @@ namespace Equations {
    bool CouplingInformation::hasSource() const
    {
       return this->mHasSource;
+   }
+
+   bool CouplingInformation::hasBoundaryValue() const
+   {
+      return this->mHasBoundaryValue;
    }
 
    bool CouplingInformation::isComplex() const
@@ -185,6 +190,11 @@ namespace Equations {
    void CouplingInformation::setSource(const bool hasSource)
    {
       this->mHasSource = hasSource;
+   }
+
+   void CouplingInformation::setBoundaryValue(const bool hasBoundaryValue)
+   {
+      this->mHasBoundaryValue = hasBoundaryValue;
    }
 
    void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const MatrixI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs)

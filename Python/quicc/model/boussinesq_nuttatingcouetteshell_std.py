@@ -7,13 +7,13 @@ import numpy as np
 import scipy.sparse as spsp
 
 import quicc.base.utils as utils
-import quicc.geometry.spherical.shell_radius as couette_geo
-import quicc.geometry.spherical.shell as geo
+import quicc.geometry.spherical.shell_radius as geo
 import quicc.base.base_model as base_model
+import quicc.projection.shell as proj
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
 
 
-class BoussinesqCouetteShellConfig:
+class BoussinesqNuttatingCouetteShellStdConfig:
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
@@ -24,7 +24,7 @@ class BoussinesqCouetteShellConfig:
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "rratio"]
+        return ["ekman", "rossby", "omega", "alpha", "rratio"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -58,21 +58,21 @@ class BoussinesqCouetteShellConfig:
         """Provide description of the system of equation"""
 
         # Matrix operator is real
-        is_complex = True
+        is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.SLOWEST_SINGLE_RHS
+        index_mode = self.SLOWEST_MULTI_RHS
 
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
 
-class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel):
+class BoussinesqNuttatingCouetteShellStd(BoussinesqNuttatingCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
     
-        fields = [("velocity","tor"), ("velocity","pol")]
+        fields = [field_row]
 
         return fields
 
@@ -114,18 +114,17 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
-
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
         sgn = np.sign(eq_params['rossby'])
-        # modified by Nicolo Lardelli -> use Ro=0 to compute stationary solution U_0, it s the limit case
+        # modified by Nicolò Lardelli -> use Ro=0 to compute stationary solution U_0
         sgn = 1 if sgn==0 else sgn
         ro = self.automatic_parameters(eq_params)['ro']
         ri = ro*eq_params['rratio']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
         assert(eigs[0].is_integer())
-        m = int(eigs[0])
+        l = eigs[0]
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -171,7 +170,7 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
         """Create matrix block for explicit linear term"""
 
         assert(eigs[0].is_integer())
-        m = int(eigs[0])
+        l = eigs[0]
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -197,33 +196,18 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
 
         E = eq_params['ekman']
         assert(eigs[0].is_integer())
+        l = eigs[0]
 
         ro = self.automatic_parameters(eq_params)['ro']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","tor") and field_col == field_row:
+            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0)*E)
 
-        #TODO: determing if for this scheme, eigs[0] is m or l
-        m = int(eigs[0])
-
-        if field_row == ("velocity","tor"):
-            if field_col == ("velocity","tor"):
-                mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, E, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
-                bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m, l_zero_fix = 'zero', restriction = restriction)
-
-            elif field_col == ("velocity","pol"):
-                mat = geo.i2r2coriolis(res[0], res[1], m, a, b, bc, -1., l_zero_fix = 'zero', restriction = restriction)
-
-        elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","tor"):
-                mat = geo.i4r4coriolis(res[0], res[1], m, a, b, bc, 1, l_zero_fix = 'zero', restriction = restriction)
-
-            elif field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, E, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
-                bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m, l_zero_fix = 'zero', restriction = restriction)
+        elif field_row == ("velocity","pol") and field_col == field_row:
+            mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0)*E)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -234,19 +218,18 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
         """Create matrix block of time operator"""
 
         assert(eigs[0].is_integer())
-        m = int(eigs[0])
+        l = eigs[0]
 
         ro = self.automatic_parameters(eq_params)['ro']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
-
+            mat = geo.i4r4lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -258,15 +241,14 @@ class BoussinesqCouetteShell(BoussinesqCouetteShellConfig, base_model.BaseModel)
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        m = int(eigs[0])
-        mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix='zero', restriction=restriction)
+        mat = geo.zblk(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_model.BaseModel):
+class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqNuttatingCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
@@ -281,9 +263,9 @@ class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_mode
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            if field_row in [("zonal_velocity","tor"),("nonzonal_velocity","tor")]:
+            if field_row in [("zonal_velocity","tor"),("nonzonal_velocity","tor"),("rotatedgeostrophic_velocity","tor")]:
                 fields = [("velocity","tor")]
-            elif field_row in [("zonal_velocity","pol"),("nonzonal_velocity","pol")]:
+            elif field_row in [("zonal_velocity","pol"),("nonzonal_velocity","pol"), ("rotatedgeostrophic_velocity","pol")]:
                 fields = [("velocity","pol")]
             else:
                 fields = []
@@ -323,10 +305,10 @@ class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_mode
         """Provide description of the system of equation"""
 
         # Matrix operator is real
-        is_complex = True
+        is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.SLOWEST_SINGLE_RHS
+        index_mode = self.MODE
 
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
@@ -336,10 +318,10 @@ class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_mode
         sgn = np.sign(eq_params['rossby'])
         ro = self.automatic_parameters(eq_params)['ro']
         ri = ro*eq_params['rratio']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         assert(eigs[0].is_integer())
-        m = int(eigs[0])
+        l = eigs[0]
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -373,30 +355,70 @@ class BoussinesqCouetteShellVisuVisuCULO(BoussinesqCouetteShellConfig, base_mode
         """Create matrix block for explicit linear term"""
 
         assert(eigs[0].is_integer())
-        m = int(eigs[0])
+        l = eigs[0]
+        m = eigs[1]
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("zonal_velocity","tor") and field_col == ("velocity","tor"):
             if m == 0:
-                mat = geo.rad.qid(res[0], 0, bc)
+                mat = geo.qid(res[0], 0, bc)
             else:
-                mat = geo.rad.zblk(res[0], bc)
+                mat = geo.zblk(res[0], bc)
         elif field_row == ("zonal_velocity","pol") and field_col == ("velocity","pol"):
             if m == 0:
-                mat = geo.rad.qid(res[0], 0, bc)
+                mat = geo.qid(res[0], 0, bc)
             else:
-                mat = geo.rad.zblk(res[0], bc)
+                mat = geo.zblk(res[0], bc)
         elif field_row == ("nonzonal_velocity","tor") and field_col == ("velocity","tor"):
             if m > 0:
-                mat = geo.rad.qid(res[0], 0, bc)
+                mat = geo.qid(res[0], 0, bc)
             else:
-                mat = geo.rad.zblk(res[0], bc)
+                mat = geo.zblk(res[0], bc)
         elif field_row == ("nonzonal_velocity","pol") and field_col == ("velocity","pol"):
             if m > 0:
-                mat = geo.rad.qid(res[0], 0, bc)
+                mat = geo.qid(res[0], 0, bc)
             else:
-                mat = geo.rad.zblk(res[0], bc)
+                mat = geo.zblk(res[0], bc)
+        elif field_row == ("rotatedgeostrophic_velocity", "tor") and field_col == ("velocity", "tor"):
+            if l == 1:
+                # define matrices as in the  ascii writer
+                delta = (eq_params['ekman']**.5)*10
+                ro = self.automatic_parameters(eq_params)['ro']
+                ri = ro * eq_params['rratio']
+                a, b = geo.linear_r2x(ro, eq_params['rratio'])
+                bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_row)
+                bc['cr'] = 2
+                R2 = geo.r2(res[0]+2, a, b, bc)
+                bc['cr'] = 1
+                R1 = geo.r1(res[0]+3, a, b, bc)
+                I1 = geo.i1(res[0]+4, a, b, bc)
+                Proj = proj.proj(res[0]+4, a, b, [ro-delta, ri+delta])
+                temp = Proj*I1*R1*R2
+                M = temp[0,:]-temp[1,:]
+
+                # volume
+                volume = ((ro-delta)**5-(ri+delta)**5)/(5 *(3/4/np.pi)**.5)
+                M /= volume
+                column = np.zeros((res[0],1))
+                column[0] = 1.
+                Adv = spsp.coo_matrix(column * M)
+
+                bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_row)
+                if m == 0:
+                    mat = geo.qid(res[0], 0, bc) - Adv
+                elif m == 1:
+                    mat = geo.qid(res[0], 0, bc) - 2.**.5 * Adv
+
+                else:
+                    mat = geo.qid(res[0], 0, bc)
+
+            else:
+                mat = geo.qid(res[0], 0, bc)
+
+        elif field_row == ("rotatedgeostrophic_velocity", "pol") and  field_col == ("velocity", "pol"):
+            mat = geo.qid(res[0], 0, bc)
+
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

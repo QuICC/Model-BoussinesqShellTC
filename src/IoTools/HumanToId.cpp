@@ -262,9 +262,6 @@ namespace IoTools {
       {
          return ModelOperator::STENCIL;
 
-      } else if(id == IdToHuman::toString(ModelOperator::INHOMOGENEOUS))
-      {
-         return ModelOperator::INHOMOGENEOUS;
       } else
       {
          throw Exception("Unknown string to ID conversion requested (ModelOperator)");
@@ -361,8 +358,12 @@ namespace IoTools {
       {
          return PhysicalNames::NONZONAL_VELOCITY;
 
-      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
-      {
+      } else if(id == IdToHuman::toTag(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY))
+	  {
+    	 return PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY;
+
+	  } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
+	  {
          return PhysicalNames::VORTICITY;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYX))
