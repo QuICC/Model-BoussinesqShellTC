@@ -14,7 +14,7 @@ from quicc.model.boussinesq_couetteshell_base import BoussinesqCouetteShellBase,
 
 
 
-class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase):
+class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase, BoussinesqCouetteShellBaseConfig):
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -23,7 +23,9 @@ class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase):
         is_complex = False
 
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.MODE
+        index_mode = self.SLOWEST_MULTI_RHS
+
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
@@ -31,6 +33,28 @@ class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase):
         fields = [field_row]
 
         return fields
+
+    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction=None):
+        """Create matrix block of time operator"""
+
+        assert (eigs[0].is_integer())
+        l = eigs[0]
+
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.linear_r2x(ro, eq_params['rratio'])
+
+        mat = None
+        bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_row)
+        if field_row == ("velocity", "tor"):
+            mat = geo.i2r2(res[0], a, b, bc, l * (l + 1.0))
+
+        elif field_row == ("velocity", "pol"):
+            mat = geo.i4r4lapl(res[0], l, a, b, bc, l * (l + 1.0))
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
 
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
@@ -55,10 +79,22 @@ class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase):
 
         return mat
 
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction=None):
+        """Create matrix block linear operator"""
+
+        mat = None
+        bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_col)
+        mat = geo.zblk(res[0], bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
 class BoussinesqCouetteShellStdConfig(BoussinesqCouetteShellBaseConfig):
     pass
 
-class BoussinesqCouetteShellStd( BoussinesqCouetteShellBaseConfig, BoussinesqCouetteShellExplicitBase, base_model.BaseModel):
+class BoussinesqCouetteShellStd(BoussinesqCouetteShellExplicitBase):
     pass
 
 

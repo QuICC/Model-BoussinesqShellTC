@@ -13,62 +13,7 @@ import quicc.base.base_model as base_model
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
 from quicc.model.boussinesq_couetteshell_base import BoussinesqCouetteShellBase, BoussinesqCouetteShellBaseConfig, BoussinesqCouetteShellBaseVisu
 
-
-class BoussinesqCouetteShellConfigOld:
-    """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
-
-    def periodicity(self):
-        """Get the domain periodicity"""
-
-        return [False, False, False]
-
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["ekman", "rossby", "rratio"]
-
-    def automatic_parameters(self, eq_params):
-        """Extend parameters with automatically computable values"""
-
-        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
-
-        return d
-
-    def config_fields(self):
-        """Get the list of fields that need a configuration entry"""
-
-        return ["velocity"]
-
-    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
-        """Create the galerkin stencil"""
-        
-        assert(eigs[0].is_integer())
-        l = eigs[0]
-
-        # Get boundary condition
-        mat = None
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        mat = geo.stencil(res[0], bc, make_square)
-
-        if mat is None:
-            raise RuntimeError("Equations are not setup properly!")
-
-        return mat
-
-    def equation_info(self, res, field_row):
-        """Provide description of the system of equation"""
-
-        # Matrix operator is real
-        is_complex = True
-
-        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-        index_mode = self.SLOWEST_SINGLE_RHS
-
-        return self.compile_equation_info(res, field_row, is_complex, index_mode)
-
-
-
-class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase):
+class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase, BoussinesqCouetteShellBaseConfig):
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -87,6 +32,29 @@ class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase):
         fields = [("velocity", "tor"), ("velocity", "pol")]
 
         return fields
+
+    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
+        """Create matrix block of time operator"""
+
+        assert(eigs[0].is_integer())
+        m = int(eigs[0])
+
+        ro = self.automatic_parameters(eq_params)['ro']
+        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        if field_row == ("velocity","tor"):
+            mat = geo.i2r2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+
+        elif field_row == ("velocity","pol"):
+            mat = geo.i4r4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
+
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
 
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
@@ -126,13 +94,67 @@ class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase):
 
         return mat
 
+    def boundary_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        m = int(eigs[0])
+        mat = geo.zblk(res[0], res[1], m, bc, l_zero_fix='zero', restriction=restriction)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
 class BoussinesqCouetteShellConfig(BoussinesqCouetteShellBaseConfig):
     pass
 
-class BoussinesqCouetteShell(BoussinesqCouetteShellImplicitBase, BoussinesqCouetteShellBaseConfig):
+class BoussinesqCouetteShell(BoussinesqCouetteShellImplicitBase):
     pass
 
 class BoussinesqCouetteShellVisu(BoussinesqCouetteShellBaseVisu):
+    pass
+
+class BoussinesqCouetteShellConfigOld:
+    """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
+
+    def periodicity(self):
+        """Get the domain periodicity"""
+
+        return [False, False, False]
+
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["ekman", "rossby", "rratio"]
+
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        d = {"ro": 1.0 / (1.0 - eq_params["rratio"])}
+
+        return d
+
+    def config_fields(self):
+        """Get the list of fields that need a configuration entry"""
+        return ["velocity"]
+
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+
+        assert (eigs[0].is_integer())
+        l = eigs[0]
+
+        # Get boundary condition
+        mat = None
+        bc = self.convert_bc(eq_params, eigs, bcs, field_row, field_row)
+        mat = geo.stencil(res[0], bc, make_square)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -145,8 +167,7 @@ class BoussinesqCouetteShellVisu(BoussinesqCouetteShellBaseVisu):
 
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
-
-class BoussinesqCouetteShellOld(BoussinesqCouetteShellConfig, base_model.BaseModel):
+class BoussinesqCouetteShellOld(BoussinesqCouetteShellConfigOld, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
