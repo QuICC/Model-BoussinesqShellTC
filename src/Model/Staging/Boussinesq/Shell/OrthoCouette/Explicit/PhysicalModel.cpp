@@ -55,9 +55,9 @@ namespace OrthoCouette {
 
 namespace Explicit {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_orthocouetteshell_std";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_couetteshell_std";
 
-   const std::string PhysicalModel::PYCLASS = "BoussinesqOrthoCouetteShellStd";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqCouetteShellStd";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
