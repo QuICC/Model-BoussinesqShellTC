@@ -14,7 +14,7 @@ from quicc.model.boussinesq_couetteshell_base import BoussinesqCouetteShellBase,
 
 
 
-class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase, BoussinesqCouetteShellBaseConfig):
+class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase):
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -94,7 +94,7 @@ class BoussinesqCouetteShellExplicitBase(BoussinesqCouetteShellBase, BoussinesqC
 class BoussinesqCouetteShellStdConfig(BoussinesqCouetteShellBaseConfig):
     pass
 
-class BoussinesqCouetteShellStd(BoussinesqCouetteShellExplicitBase):
+class BoussinesqCouetteShellStd(BoussinesqCouetteShellExplicitBase, BoussinesqCouetteShellBaseConfig):
     pass
 
 

@@ -11,9 +11,27 @@ import quicc.geometry.spherical.shell_radius as geo
 import quicc.base.base_model as base_model
 import quicc.projection.shell as proj
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
+from quicc.model.boussinesq_couetteshell_std import BoussinesqCouetteShellStdConfig, BoussinesqCouetteShellExplicitBase, BoussinesqCouetteShellBaseVisu
 
 
-class BoussinesqNuttatingCouetteShellStdConfig:
+class BoussinesqNuttatingCouetteShellStdConfig(BoussinesqCouetteShellStdConfig):
+    """ define the base methods that depend on the problem and not on the parallelization settings"""
+
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["ekman", "rossby", "omega", "alpha", "rratio"]
+
+
+class BoussinesqNuttatingCouetteShellStd(BoussinesqCouetteShellExplicitBase, BoussinesqNuttatingCouetteShellStdConfig):
+    pass
+
+class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqCouetteShellBaseVisu):
+    pass
+
+
+
+class BoussinesqNuttatingCouetteShellStdConfigOld:
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def periodicity(self):
@@ -66,7 +84,7 @@ class BoussinesqNuttatingCouetteShellStdConfig:
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
 
-class BoussinesqNuttatingCouetteShellStd(BoussinesqNuttatingCouetteShellStdConfig, base_model.BaseModel):
+class BoussinesqNuttatingCouetteShellStdOld(BoussinesqNuttatingCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
@@ -248,7 +266,7 @@ class BoussinesqNuttatingCouetteShellStd(BoussinesqNuttatingCouetteShellStdConfi
 
         return mat
 
-class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqNuttatingCouetteShellStdConfig, base_model.BaseModel):
+class BoussinesqNuttatingCouetteShellStdVisuOld(BoussinesqNuttatingCouetteShellStdConfig, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
