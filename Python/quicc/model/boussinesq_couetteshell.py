@@ -13,7 +13,7 @@ import quicc.base.base_model as base_model
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
 from quicc.model.boussinesq_couetteshell_base import BoussinesqCouetteShellBase, BoussinesqCouetteShellBaseConfig, BoussinesqCouetteShellBaseVisu
 
-class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase, BoussinesqCouetteShellBaseConfig):
+class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase):
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -110,10 +110,10 @@ class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase, BoussinesqC
 class BoussinesqCouetteShellConfig(BoussinesqCouetteShellBaseConfig):
     pass
 
-class BoussinesqCouetteShell(BoussinesqCouetteShellImplicitBase):
+class BoussinesqCouetteShellNew(BoussinesqCouetteShellImplicitBase, BoussinesqCouetteShellBaseConfig):
     pass
 
-class BoussinesqCouetteShellVisu(BoussinesqCouetteShellBaseVisu):
+class BoussinesqCouetteShellVisu(BoussinesqCouetteShellBaseVisu, BoussinesqCouetteShellBaseConfig):
     pass
 
 class BoussinesqCouetteShellConfigOld:
@@ -167,7 +167,7 @@ class BoussinesqCouetteShellConfigOld:
 
         return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
-class BoussinesqCouetteShellOld(BoussinesqCouetteShellConfigOld, base_model.BaseModel):
+class BoussinesqCouetteShell(BoussinesqCouetteShellConfigOld, base_model.BaseModel):
     """Class to setup the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def implicit_fields(self, field_row):
