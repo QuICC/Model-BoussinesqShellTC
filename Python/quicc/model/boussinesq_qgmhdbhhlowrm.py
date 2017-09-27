@@ -71,7 +71,7 @@ class BoussinesqQGmhdBhhLowRm(base_model.BaseModel):
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
 #            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz",""), ("emfx",""), ("emfy",""), ("pressure","")]:
-            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz","")]:
+            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz",""), ("dissTh",""), ("dissV",""), ("dissB","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -285,6 +285,15 @@ class BoussinesqQGmhdBhhLowRm(base_model.BaseModel):
                 mat = geo.zblk(res[0],bc)
             else:
                 mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+
+        elif field_row == ("dissTh","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("dissV","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("dissB","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)  
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -12,6 +12,9 @@ set(MHDSources
    fby.cpp
    fbz.cpp
    fjz.cpp
+   DissTh.cpp
+   DissB.cpp
+   DissV.cpp
    PhysicalModel.cpp
 )
 

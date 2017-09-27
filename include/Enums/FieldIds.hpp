@@ -91,6 +91,12 @@ namespace QuICC {
          VORTICITYY,
          /// Axial vorticity field
          VORTICITYZ,
+         /// Thermal dissipation
+         DISSTH,
+         /// Viscous dissipation
+         DISSV,
+         /// Ohmic dissipation
+         DISSB,
 
          /// Phi field (for example phi = D_z w)
          PHI,
@@ -159,7 +165,18 @@ namespace QuICC {
          ZONAL_KINETIC_ENERGY,
          /// Non zonal kinetic energy: u \cdot u
          NONZONAL_KINETIC_ENERGY,
-
+         /// Local kinetic energy in the x direction
+         KINETIC_ENERGY_X,
+	 /// Local kinetic energy in the y direction
+	 KINETIC_ENERGY_Y,
+         /// Local kinetic energy in the z direction
+         KINETIC_ENERGY_Z,
+         /// Local magnetic energy in the x direction
+         MAGNETIC_ENERGY_X,
+         /// Local magnetic energy in the y direction
+         MAGNETIC_ENERGY_Y,
+         /// Local magnetic energy in the z direction
+         MAGNETIC_ENERGY_Z,
 	      /// Imposed magnetic field
 	      IMPOSED_MAGNETIC,
       };

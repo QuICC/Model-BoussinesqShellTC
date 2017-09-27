@@ -112,6 +112,15 @@ namespace IoTools {
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
 
+         case PhysicalNames::DISSTH:
+	    return "DissTh";
+
+         case PhysicalNames::DISSV:
+            return "DissV";
+
+         case PhysicalNames::DISSB:
+            return "DissB";
+
          case PhysicalNames::PHI:
             return "Phi";
 
@@ -204,6 +213,24 @@ namespace IoTools {
 
          case PhysicalNames::NONZONAL_KINETIC_ENERGY:
             return "Non zonal kinetic energy";
+
+         case PhysicalNames::KINETIC_ENERGY_X:
+            return "Kinetic_Energy_X";
+
+         case PhysicalNames::KINETIC_ENERGY_Y:
+            return "Kinetic_Energy_Y";
+
+         case PhysicalNames::KINETIC_ENERGY_Z:
+            return "Kinetic_Energy_Z";
+
+         case PhysicalNames::MAGNETIC_ENERGY_X:
+            return "Magnetic_Energy_X";
+
+         case PhysicalNames::MAGNETIC_ENERGY_Y:
+            return "Magnetic_Energy_Y";
+
+         case PhysicalNames::MAGNETIC_ENERGY_Z:
+            return "Magnetic_Energy_Z";
 
          case PhysicalNames::IMPOSED_MAGNETIC:
             return "Imposed magnetic field";
@@ -298,6 +325,15 @@ namespace IoTools {
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";
 
+         case PhysicalNames::DISSTH:
+            return "dissTh";
+
+         case PhysicalNames::DISSV:
+            return "dissV";
+
+         case PhysicalNames::DISSB:
+            return "dissB";
+
          case PhysicalNames::PHI:
             return "phi";
 
@@ -390,6 +426,24 @@ namespace IoTools {
 
          case PhysicalNames::NONZONAL_KINETIC_ENERGY:
             return "nonzonal_kinetic_energy";
+
+         case PhysicalNames::KINETIC_ENERGY_X:
+            return "kinetic_energy_x";
+
+         case PhysicalNames::KINETIC_ENERGY_Y:
+            return "kinetic_energy_y";
+
+         case PhysicalNames::KINETIC_ENERGY_Z:
+            return "kinetic_energy_z";
+
+         case PhysicalNames::MAGNETIC_ENERGY_X:
+            return "magnetic_energy_x";
+
+         case PhysicalNames::MAGNETIC_ENERGY_Y:
+            return "magnetic_energy_y";
+
+         case PhysicalNames::MAGNETIC_ENERGY_Z:
+            return "magnetic_energy_z";
 
          case PhysicalNames::IMPOSED_MAGNETIC:
             return "imposed_magnetic";

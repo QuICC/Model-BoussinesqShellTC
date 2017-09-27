@@ -381,6 +381,18 @@ namespace IoTools {
       {
          return PhysicalNames::VORTICITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::DISSTH))
+      {
+         return PhysicalNames::DISSTH;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::DISSV))
+      {
+         return PhysicalNames::DISSV;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::DISSB))
+      {
+         return PhysicalNames::DISSB;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::PHI))
       {
          return PhysicalNames::PHI;
@@ -504,6 +516,30 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(PhysicalNames::NONZONAL_KINETIC_ENERGY))
       {
          return PhysicalNames::NONZONAL_KINETIC_ENERGY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::KINETIC_ENERGY_X))
+      {
+         return PhysicalNames::KINETIC_ENERGY_X;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::KINETIC_ENERGY_Y))
+      {
+         return PhysicalNames::KINETIC_ENERGY_Y;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::KINETIC_ENERGY_Z))
+      {
+         return PhysicalNames::KINETIC_ENERGY_Z;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MAGNETIC_ENERGY_X))
+      {
+         return PhysicalNames::MAGNETIC_ENERGY_X;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MAGNETIC_ENERGY_Y))
+      {
+         return PhysicalNames::MAGNETIC_ENERGY_Y;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MAGNETIC_ENERGY_Z))
+      {
+         return PhysicalNames::MAGNETIC_ENERGY_Z;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::IMPOSED_MAGNETIC))
       {
