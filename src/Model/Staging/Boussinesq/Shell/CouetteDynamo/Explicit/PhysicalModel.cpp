@@ -32,7 +32,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
-#include "IoVariable/ShellTorPolTracerWriter.hpp"
+#include "IoVariable/ShellTorPolProbeWriter.hpp"
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
@@ -368,7 +368,7 @@ namespace Explicit {
 			  1.0, 0.0, 3.141592654;
 
       // Create probe field writer
-      IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_probe", SchemeType::type(), mProbes));
+      IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector2);
       // Create kinetic energy spectral writer
@@ -387,7 +387,7 @@ namespace Explicit {
       spSim->addAsciiOutputFile(spVector);
 
       // Create probe field writer
-      spVector2 = IoVariable::SharedShellTorPolTracerWriter(new  IoVariable::ShellTorPolTracerWriter("magnetic_probe", SchemeType::type(), mProbes));
+      spVector2 = IoVariable::SharedShellTorPolProbeWriter(new  IoVariable::ShellTorPolProbeWriter("magnetic_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::MAGNETIC);
       spSim->addAsciiOutputFile(spVector2);
       // Create kinetic energy spectral writer

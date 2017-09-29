@@ -24,33 +24,33 @@ if __name__=="__main__":
     h5_file = h5py.File(filename,'r+')
 
     try:
+        # retrieve theta linspace and add two values and beginning and enw
         theta_points = np.array(h5_file['mesh']['grid_theta'])
         theta_points = np.insert(theta_points,0,np.pi)
         theta_points = np.insert(theta_points,len(theta_points),0.)
 
+        # insert new theta
         del h5_file['mesh']['grid_theta']
         h5_file.create_dataset('mesh/grid_theta',data = theta_points)
 
+        # retrieve phi linspace and add on more point
         phi_points = np.array(h5_file['mesh']['grid_phi'])
         phi_points = np.insert(phi_points,len(phi_points),2*np.pi)
 
+        # insert new phi
         del  h5_file['mesh']['grid_phi']
         h5_file.create_dataset('mesh/grid_phi',data = phi_points)
-        
-
-        
-        
-
 
     except RuntimeError as e:
+
         print(e)
         sys.exit()
 
     for group in list(h5_file):
+
         for subg in list(h5_file[group]):
 
             ref = h5_file[group][subg]
-            
             dataset = np.array(ref)
             if len(dataset.shape)!=3:
                 continue
