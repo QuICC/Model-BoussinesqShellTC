@@ -1,4 +1,3 @@
-
 ###################################################
 #----------- Pleiades CMAKE SETUP FILE ------------#
 ###################################################
@@ -103,7 +102,7 @@ set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
 set(QUICC_CC_LIB_MPI_GCC "${QUICC_CC_LIB_GCC}" PARENT_SCOPE)
 
 ###################################################
-#--------------- PYTHON LIBRARIES ----------------#
+#--------------- PYTHONPATHON LIBRARIES ----------------#
 ###################################################
 
 set(QUICC_PYTHONS "python35" PARENT_SCOPE)
@@ -118,7 +117,7 @@ set(QUICC_INCLUDES_PYTHON34 "$ENV{PYTHONPATH}/include/python3.4m" PARENT_SCOPE)
 set(QUICC_LIBDIR_PYTHON34 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
 
 set(QUICC_LIBRARIES_PYTHON35 "python3.5m" "util" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON35 "$ENV{PYTHONPATH}/include/python3.5m" "$ENV{PYTHONPATH}/lib/python3.5/site-packages/numpy/core/include/"  PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON35 "$ENV{PYTHONPATH}/include/python3.5m" "$ENV{PYTHONPATH}/lib/python3.5/site-packages/numpy/core/include"  PARENT_SCOPE)
 set(QUICC_LIBDIR_PYTHON35 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
 
 
