@@ -181,12 +181,12 @@ class BoussinesqCouetteShellBase(base_model.BaseModel):
 
 class BoussinesqCouetteShellBaseVisu(BoussinesqCouetteShellBase):
 
-    def implicit_fields(self, field_row):
+    #def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields = []
+       # fields = []
 
-        return fields
+        #return fields
 
     def explicit_fields(self, timing, field_row):
         """Get the list of fields with explicit linear dependence"""
@@ -212,14 +212,6 @@ class BoussinesqCouetteShellBaseVisu(BoussinesqCouetteShellBase):
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
-
-        sgn = np.sign(eq_params['rossby'])
-        ro = self.automatic_parameters(eq_params)['ro']
-        ri = ro * eq_params['rratio']
-        a, b = geo.linear_r2x(ro, eq_params['rratio'])
-
-        assert (eigs[0].is_integer())
-        l = eigs[0]
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -282,3 +274,15 @@ class BoussinesqCouetteShellBaseVisu(BoussinesqCouetteShellBase):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
+"""
+    def equation_info(self, res, field_row):
+
+        # Matrix operator is real
+        is_complex = True
+
+        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
+        index_mode = self.SLOWEST_MULTI_RHS
+        print(index_mode)
+
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
+"""

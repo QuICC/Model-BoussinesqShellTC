@@ -53,6 +53,6 @@ class BoussinesqCouetteShellHyperviscousStd(BoussinesqCouetteShellHyperviscousSt
     pass
 
 
-class BoussinesqCouetteShellHyperviscousStdVisu(BoussinesqCouetteShellHyperviscousStdConfig, BoussinesqCouetteShellBaseVisu):
+class BoussinesqCouetteShellHyperviscousStdVisu(BoussinesqCouetteShellBaseVisu, BoussinesqCouetteShellHyperviscousStd):
     pass
 

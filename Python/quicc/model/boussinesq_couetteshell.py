@@ -113,5 +113,5 @@ class BoussinesqCouetteShellConfig(BoussinesqCouetteShellBaseConfig):
 class BoussinesqCouetteShell(BoussinesqCouetteShellBaseConfig, BoussinesqCouetteShellImplicitBase):
     pass
 
-class BoussinesqCouetteShellVisu(BoussinesqCouetteShellBaseConfig, BoussinesqCouetteShellBaseVisu):
+class BoussinesqCouetteShellVisu(BoussinesqCouetteShellBaseVisu, BoussinesqCouetteShell):
     pass

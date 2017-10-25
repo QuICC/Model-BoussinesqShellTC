@@ -98,5 +98,5 @@ class BoussinesqCouetteShellStd(BoussinesqCouetteShellExplicitBase, BoussinesqCo
     pass
 
 
-class BoussinesqCouetteShellStdVisu(BoussinesqCouetteShellBaseVisu, BoussinesqCouetteShellBaseConfig):
+class BoussinesqCouetteShellStdVisu(BoussinesqCouetteShellBaseVisu, BoussinesqCouetteShellStd):
     pass
