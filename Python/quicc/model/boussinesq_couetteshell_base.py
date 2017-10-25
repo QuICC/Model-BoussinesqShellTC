@@ -180,13 +180,13 @@ class BoussinesqCouetteShellBase(base_model.BaseModel):
 
 
 class BoussinesqCouetteShellBaseVisu(BoussinesqCouetteShellBase):
-
-    #def implicit_fields(self, field_row):
+    
+    def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-       # fields = []
+        fields = []
 
-        #return fields
+        return fields
 
     def explicit_fields(self, timing, field_row):
         """Get the list of fields with explicit linear dependence"""

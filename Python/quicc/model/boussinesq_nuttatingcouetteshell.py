@@ -25,6 +25,7 @@ class BoussinesqNuttatingCouetteShellConfig(BoussinesqCouetteShellConfig):
 
 class BoussinesqNuttatingCouetteShell(BoussinesqNuttatingCouetteShellConfig, BoussinesqCouetteShellImplicitBase):
     pass
-
+"""
 class BoussinesqNuttatingCouetteShellVisu(BoussinesqCouetteShellBaseVisu, BoussinesqNuttatingCouetteShell):
     pass
+"""
