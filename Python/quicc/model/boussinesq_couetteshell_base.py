@@ -180,7 +180,7 @@ class BoussinesqCouetteShellBase(base_model.BaseModel):
 
 
 class BoussinesqCouetteShellBaseVisu(BoussinesqCouetteShellBase):
-    
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 

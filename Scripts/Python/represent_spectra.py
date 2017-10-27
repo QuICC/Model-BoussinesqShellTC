@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as pp
 import sys, os
 import pandas as pd
-from quicc.geometry.spherical import shell_radius
+#from quicc.geometry.spherical import shell_radius
 from base_representer import BaseRepresenter
 import xml.etree.ElementTree as ET
 
@@ -86,11 +86,19 @@ class SpectraRepresenter(BaseRepresenter):
 
 
 
+        pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
+        pp.loglog(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
+        pp.loglog(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
+        pp.loglog(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
+        pp.xlabel('l/m')
+        pp.ylabel('E')
+        pp.legend()
+
+        pp.figure()
         pp.semilogy(data[0:Lmax], label='L spectrum, toroidal')
         pp.semilogy(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
         pp.semilogy(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
         pp.semilogy(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
-
         # pp.title(folder_name)
         pp.xlabel('l/m')
         pp.ylabel('E')
