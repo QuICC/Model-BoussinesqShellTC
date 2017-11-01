@@ -102,7 +102,7 @@ set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
 set(QUICC_CC_LIB_MPI_GCC "${QUICC_CC_LIB_GCC}" PARENT_SCOPE)
 
 ###################################################
-#--------------- PYTHONPATHON LIBRARIES ----------------#
+#--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
 set(QUICC_PYTHONS "python35" PARENT_SCOPE)
