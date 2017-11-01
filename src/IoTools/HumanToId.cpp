@@ -350,6 +350,10 @@ namespace IoTools {
       {
          return PhysicalNames::VELOCITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::VELOCITYS))
+      {
+         return PhysicalNames::VELOCITYS;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::ZONAL_VELOCITY))
       {
          return PhysicalNames::ZONAL_VELOCITY;
@@ -376,7 +380,13 @@ namespace IoTools {
 
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYZ))
       {
+
          return PhysicalNames::VORTICITYZ;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYS))
+      {
+
+         return PhysicalNames::VORTICITYS;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::PHI))
       {
