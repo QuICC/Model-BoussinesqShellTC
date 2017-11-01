@@ -97,9 +97,6 @@ namespace QuICC {
       {
          // MPI gathering
 
-
-// NOTE: it looks to me that this is just doing a sum. This is fine, but somewhere there has to be a division by the number of elements
-// Maffei, July 2017
          #ifdef QUICC_MPI
             MPI_Allreduce(MPI_IN_PLACE, this->mAvg.data(), this->mAvg.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif //QUICC_MPI
@@ -113,10 +110,7 @@ namespace QuICC {
          // Check if the workflow allows IO to be performed
          if(FrameworkMacro::allowsIO())
          {
-// Philippe's version
          this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mAvg.transpose() << std::endl;
-// Let's try my version
-//	this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mAvg.transpose() / this->mAvg.size() << std::endl; 
         }
 
          // Close file
