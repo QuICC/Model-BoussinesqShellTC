@@ -19,11 +19,11 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Explicit/PhysicalModel.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/NuttatingCouette/Implicit/PhysicalModel.hpp )
 
 // Project includes
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/Momentum.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/NuttatingCouette/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
@@ -50,18 +50,18 @@ namespace Boussinesq {
 
 namespace Shell {
 
-namespace Couette {
+namespace NuttatingCouette {
 
-namespace Explicit {
+namespace Implicit {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_couetteshell_std";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_nuttatingcouetteshell";
 
-   const std::string PhysicalModel::PYCLASS = "BoussinesqCouetteShellStd";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqNuttatingCouetteShell";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::Boussinesq::Shell::Couette::Momentum>();
+      spSim->addVectorEquation<Equations::Boussinesq::Shell::NuttatingCouette::Momentum>();
    }
 
    void PhysicalModel::addStates(SharedStateGenerator spGen)
@@ -77,7 +77,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(5)
+         switch(3)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -129,19 +129,6 @@ namespace Explicit {
 
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
-               break;
-
-            case 4:
-            	spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAX);
-            	break;
-
-            case 5:
-            	spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAY);
-            	break;
-
-            case 6:
-            	spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAZ);
-            	break;
          }
 
       // Generate random spectrum
@@ -185,23 +172,53 @@ namespace Explicit {
       spVTrivial->setFields(true, false, false);
       spVTrivial->setIdentity(PhysicalNames::NONZONAL_VELOCITY);
 
+      // Add rotated geostrophic velocity field visualization
+      spVTrivial = spVis->addVectorEquation<Equations::VectorFieldTrivialVisualizer>();
+      spVTrivial->setFields(true, false, false);
+      spVTrivial->setIdentity(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY);
+
       // Add vertical velocity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
       spVertical->setFieldType(FieldType::VECTOR);
       spVertical->setIdentity(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITY);
+
+      // Add X component of velocity
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::VECTOR);
+      spVertical->setIdentity(PhysicalNames::VELOCITYX, PhysicalNames::VELOCITY);
+
+      // Add Y component of velocity
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::VECTOR);
+      spVertical->setIdentity(PhysicalNames::VELOCITYY, PhysicalNames::VELOCITY);
 
       // Add vertical vorticity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
       spVertical->setFieldType(FieldType::CURL);
       spVertical->setIdentity(PhysicalNames::VORTICITYZ, PhysicalNames::VELOCITY);
 
+      // Add X component vorticity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::CURL);
+      spVertical->setIdentity(PhysicalNames::VORTICITYX, PhysicalNames::VELOCITY);
+
+      // Add Y component vorticity visualization
+      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
+      spVertical->setFieldType(FieldType::CURL);
+      spVertical->setIdentity(PhysicalNames::VORTICITYY, PhysicalNames::VELOCITY);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::ZONAL_VELOCITY);
       spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
+      spOut->expect(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VELOCITYX);
+      spOut->expect(PhysicalNames::VELOCITYY);
       spOut->expect(PhysicalNames::VORTICITYZ);
+      spOut->expect(PhysicalNames::VORTICITYX);
+      spOut->expect(PhysicalNames::VORTICITYY);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -219,6 +236,7 @@ namespace Explicit {
 
    void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
+
       // Create kinetic energy writer
       IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
       spVector->expect(PhysicalNames::VELOCITY);
@@ -238,6 +256,7 @@ namespace Explicit {
 			  0.0, 0.5, Math::PI*4./3.,
 			  0.0, -0.5, Math::PI*5./3.;
 
+
       // Create probe field writer
       IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
@@ -246,15 +265,18 @@ namespace Explicit {
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector3);
-      
+
       // Create torque writer
       IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
       spVector4->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector4);
 
+
       IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
       spVector5->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector5);
+
+
    }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)

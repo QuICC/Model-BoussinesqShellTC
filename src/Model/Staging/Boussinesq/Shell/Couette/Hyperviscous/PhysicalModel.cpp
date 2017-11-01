@@ -30,7 +30,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "IoVariable/ShellTorPolEnergyWriter.hpp"
-#include "IoVariable/ShellTorPolTracerWriter.hpp"
+#include "IoVariable/ShellTorPolProbeWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
@@ -209,14 +209,20 @@ namespace Hyperviscous {
       spSim->addAsciiOutputFile(spVector);
 
       // Create probes
-      Matrix mProbes(4,3);
-      mProbes << 0.85, 0.0, 3.141592654,
-    		  0.9, 0.0, 3.141592654,
-			  0.95, 0.0, 3.141592654,
-			  1.0, 0.0, 3.141592654;
+      Matrix mProbes(6,3);
+
+      // the r coordinate is in x\in[-1,1] space
+      // the theta coordinate is the cos of colatitude
+      // the phi coordinate is azimuthal in radiants
+      mProbes << 0.0, 0.5, 0.0,
+    		  0.0, -0.5, Math::PI/3.,
+			  0.0, 0.5, Math::PI*2./3.,
+			  0.0, -0.5, Math::PI,
+			  0.0, 0.5, Math::PI*4./3.,
+			  0.0, -0.5, Math::PI*5./3.;
 
       // Create probe field writer
-      IoVariable::SharedShellTorPolTracerWriter spVector2(new  IoVariable::ShellTorPolTracerWriter("velocity_probe", SchemeType::type(), mProbes));
+      IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector2);
 

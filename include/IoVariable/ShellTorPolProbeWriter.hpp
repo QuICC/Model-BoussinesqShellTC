@@ -1,11 +1,11 @@
 /**
- * @file ShellTorPolTracerWriter.hpp
- * @brief Implementation of the ASCII tracer writer for Toroidal-Poloidal decomposed fields in a spherical shell
+ * @file ShellTorPolProbeWriter.hpp
+ * @brief Implementation of the ASCII probe writer for Toroidal-Poloidal decomposed fields in a spherical shell
  * @author Nicolò Lardelli \<nicolo.lardelli@erdw.ethz.ch\>
  */
 
-#ifndef SHELLTORPOLTRACERWRITER_HPP
-#define SHELLTORPOLTRACERWRITER_HPP
+#ifndef SHELLTORPOLPROBEWRITER_HPP
+#define SHELLTORPOLPROBEWRITER_HPP
 
 // Configuration includes
 //
@@ -35,22 +35,22 @@ namespace IoVariable{
 	/*
 	 * @brief Implementation of the ASCII tracer writer for Toroidal-Poloidal decomposed fields in a spherical shell
 	 */
-	class ShellTorPolTracerWriter : public IVariableAsciiEWriter
+	class ShellTorPolProbeWriter : public IVariableAsciiEWriter
 	{
 	public:
 
 		/*
-		 * @brief Constructor of ShellTorPolTracerWriter
+		 * @brief Constructor of ShellTorPolProbeWriter
 		 *
 		 * @param prefix Prefix to use for the file name
 		 * @param type Type of the file (typically scheme name)
 		 */
-		ShellTorPolTracerWriter(const std::string& prefix, const std::string& type, const Matrix& Points);
+		ShellTorPolProbeWriter(const std::string& prefix, const std::string& type, const Matrix& Points);
 
 		/*
 		 * @brief Destructor
 		 */
-		~ShellTorPolTracerWriter();
+		~ShellTorPolProbeWriter();
 
 		/*
 		 * @brief Initialize the operator, transform and file
@@ -134,12 +134,12 @@ namespace IoVariable{
 
 
 
-	inline bool ShellTorPolTracerWriter::isHeavy() const
+	inline bool ShellTorPolProbeWriter::isHeavy() const
 	{
 		return true;
 	}
 
-	typedef SharedPtrMacro<ShellTorPolTracerWriter> SharedShellTorPolTracerWriter;
+	typedef SharedPtrMacro<ShellTorPolProbeWriter> SharedShellTorPolProbeWriter;
 
 
 

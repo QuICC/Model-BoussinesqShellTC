@@ -1,12 +1,11 @@
-/*
- * PhysicalModel.hpp
- *
- *  Created on: Apr 3, 2017
- *      Author: Nicolò Lardelli
+/** 
+ * @file PhysicalModel.hpp
+ * @brief Implementation of the Boussinesq spherical Couette in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_ORTHOCOUETTE_IMPLICIT_PHYSICALMODEL_HPP_
-#define QUICC_MODEL_BOUSSINESQ_SHELL_ORTHOCOUETTE_IMPLICIT_PHYSICALMODEL_HPP_
+#ifndef QUICC_MODEL_BOUSSINESQ_SHELL_NUTTATINGCOUETTE_IMPLICIT_PHYSICALMODEL_HPP
+#define QUICC_MODEL_BOUSSINESQ_SHELL_NUTTATINGCOUETTE_IMPLICIT_PHYSICALMODEL_HPP
 
 // Configuration includes
 //
@@ -25,6 +24,7 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/3D/SLFmScheme.hpp"
 
+
 // THIS IS NOT A COMMENT BUT AN OPTION READ BY CMAKE
 // QUICC_SPATIALSCHEME_FORMULATION = TORPOL;
 
@@ -36,7 +36,7 @@ namespace Boussinesq {
 
 namespace Shell {
 
-namespace OrthoCouette {
+namespace NuttatingCouette {
 
 namespace Implicit {
 
@@ -100,9 +100,9 @@ namespace Implicit {
           */
          static void addHdf5OutputFiles(SharedSimulation spSim);
 
-         /**
+         /** 
           * @brief Add the required statistics output files
-          *
+          * 
           * @param spSim   Shared simulation object
           */
          static void addStatsOutputFiles(SharedSimulation spSim);
@@ -135,14 +135,14 @@ namespace Implicit {
 }
 }
 
-// 
+//
 // Block compilation of unusable parallelisation algorithms
 //
 #ifdef QUICC_MPIALGO_SINGLE1D
-#error "The SINGLE1D parallelisation is not supported!" 
+#error "The SINGLE1D parallelisation is not supported!"
 #endif //QUICC_MPIALGO_SINGLE1D
 #if defined QUICC_MPIALGO_TUBULAR && !(defined QUICC_SPLINALG_MUMPS && defined QUICC_MPISPSOLVE)
-#error "The TUBULAR parallelisation is not supported!" 
+#error "The TUBULAR parallelisation is not supported!"
 #endif //defined QUICC_MPIALGO_TUBULAR && !defined QUICC_SPLINALG_MUMPS && !defined QUICC_MPISPSOLVE
 
-#endif // QUICC_MODEL_BOUSSINESQ_SHELL_ORTHOCOUETTE_IMPLICIT_PHYSICALMODEL_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_EXPLICIT_PHYSICALMODEL_HPP

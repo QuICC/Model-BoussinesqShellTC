@@ -11,10 +11,10 @@ import quicc.geometry.spherical.shell_radius as geo
 import quicc.base.base_model as base_model
 import quicc.projection.shell as proj
 from quicc.geometry.spherical.shell_radius_boundary import no_bc
-from quicc.model.boussinesq_couetteshell_std import BoussinesqCouetteShellStdConfig, BoussinesqCouetteShellExplicitBase, BoussinesqCouetteShellBaseVisu
+from quicc.model.boussinesq_couetteshell import BoussinesqCouetteShellConfig, BoussinesqCouetteShellImplicitBase, BoussinesqCouetteShellBaseVisu
 
 
-class BoussinesqNuttatingCouetteShellStdConfig(BoussinesqCouetteShellStdConfig):
+class BoussinesqNuttatingCouetteShellConfig(BoussinesqCouetteShellConfig):
     """ define the base methods that depend on the problem and not on the parallelization settings"""
 
     def nondimensional_parameters(self):
@@ -23,9 +23,9 @@ class BoussinesqNuttatingCouetteShellStdConfig(BoussinesqCouetteShellStdConfig):
         return ["ekman", "rossby", "omega", "alpha", "rratio"]
 
 
-class BoussinesqNuttatingCouetteShellStd(BoussinesqNuttatingCouetteShellStdConfig, BoussinesqCouetteShellExplicitBase):
+class BoussinesqNuttatingCouetteShell(BoussinesqNuttatingCouetteShellConfig, BoussinesqCouetteShellImplicitBase):
     pass
-
-class BoussinesqNuttatingCouetteShellStdVisu(BoussinesqCouetteShellBaseVisu, BoussinesqNuttatingCouetteShellStd):
+"""
+class BoussinesqNuttatingCouetteShellVisu(BoussinesqCouetteShellBaseVisu, BoussinesqNuttatingCouetteShell):
     pass
-
+"""
