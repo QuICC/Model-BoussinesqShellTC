@@ -235,7 +235,7 @@ namespace Timestep {
          /**
           * @brief Build the scheme operators
           */
-         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size);
+         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size);
 
          /**
           * @brief Finished timestep?
@@ -779,7 +779,7 @@ namespace Timestep {
       }
    }
 
-   template <typename TOperator,typename TData> void SparseImExRK3RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size)
+   template <typename TOperator,typename TData> void SparseImExRK3RTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size)
    {
       // Update timestep
       this->mDt = dt;
@@ -801,9 +801,6 @@ namespace Timestep {
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), -TimeSchemeSelector::aIm(i,i)*this->mDt, opA);
          Solver::internal::addOperators(this->rLHSMatrix(TimeSchemeSelector::aIm(i,i), idx), 1.0, opC);
       }
-
-      // Set inhomogeneous boundary value
-      this->setInhomogeneous(idx, opD);
    }
 
    namespace internal

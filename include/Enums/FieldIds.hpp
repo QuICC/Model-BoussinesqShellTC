@@ -79,10 +79,14 @@ namespace QuICC {
          VELOCITYY,
          /// Z velocity field
          VELOCITYZ,
+         /// S velocity field
+         VELOCITYS,
          /// Zonal velocity field (m = 0)
          ZONAL_VELOCITY, 
          /// Non-zonal velocity field (m != 0)
          NONZONAL_VELOCITY, 
+		 // Subtracted velocity field without uniform vorticity
+		 ROTATEDGEOSTROPHIC_VELOCITY,
          /// Vorticity field
          VORTICITY,
          /// X vorticity field
@@ -91,6 +95,8 @@ namespace QuICC {
          VORTICITYY,
          /// Axial vorticity field
          VORTICITYZ,
+         /// Equatorial vorticity field
+         VORTICITYS,
          /// Thermal dissipation
          DISSTH,
          /// Viscous dissipation

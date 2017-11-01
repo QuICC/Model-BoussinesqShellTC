@@ -130,8 +130,8 @@ set(QUICC_PYTHONS "python27" "python34" PARENT_SCOPE)
 set(QUICC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
 set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON34 "/usr/include/python3.4" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4m.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON34 "/usr/include/python3.4m" "/usr/lib64/python3.4/site-packages/numpy/core/include/" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#

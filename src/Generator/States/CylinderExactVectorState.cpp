@@ -76,19 +76,19 @@ namespace Equations {
       if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
       {
          bool hasSource = (this->mSpecTypeId.count(FieldComponents::Spectral::ONE) > 0);
-         this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false);
+         this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false, false);
       }
 
       if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
       {
          bool hasSource = (this->mSpecTypeId.count(FieldComponents::Spectral::TWO) > 0);
-         this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false);
+         this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false, false);
       }
 
       if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
       {
          bool hasSource = (this->mSpecTypeId.count(FieldComponents::Spectral::THREE) > 0);
-         this->defineCoupling(FieldComponents::Spectral::THREE, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false);
+         this->defineCoupling(FieldComponents::Spectral::THREE, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false, false);
       }
    }
 

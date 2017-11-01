@@ -262,9 +262,6 @@ namespace IoTools {
       {
          return ModelOperator::STENCIL;
 
-      } else if(id == IdToHuman::toString(ModelOperator::INHOMOGENEOUS))
-      {
-         return ModelOperator::INHOMOGENEOUS;
       } else
       {
          throw Exception("Unknown string to ID conversion requested (ModelOperator)");
@@ -357,6 +354,10 @@ namespace IoTools {
       {
          return PhysicalNames::VELOCITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::VELOCITYS))
+      {
+         return PhysicalNames::VELOCITYS;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::ZONAL_VELOCITY))
       {
          return PhysicalNames::ZONAL_VELOCITY;
@@ -365,8 +366,12 @@ namespace IoTools {
       {
          return PhysicalNames::NONZONAL_VELOCITY;
 
-      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
-      {
+      } else if(id == IdToHuman::toTag(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY))
+	  {
+    	 return PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY;
+
+	  } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
+	  {
          return PhysicalNames::VORTICITY;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYX))
@@ -380,6 +385,10 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYZ))
       {
          return PhysicalNames::VORTICITYZ;
+         
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYS))
+      {
+         return PhysicalNames::VORTICITYS;
 
       } else if(id == IdToHuman::toTag(PhysicalNames::DISSTH))
       {

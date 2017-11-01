@@ -94,11 +94,17 @@ namespace IoTools {
          case PhysicalNames::VELOCITYZ:
             return "VelocityZ";
 
+          case PhysicalNames::VELOCITYS:
+            return "VelocityS";
+
          case PhysicalNames::ZONAL_VELOCITY:
             return "Zonal velocity";
 
          case PhysicalNames::NONZONAL_VELOCITY:
             return "Non zonal velocity";
+
+         case PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY:
+        	return "Rotated geostrophic velocity";
 
          case PhysicalNames::VORTICITY:
             return "Vorticity";
@@ -111,9 +117,12 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
+            
+         case PhysicalNames::VORTICITYS:
+            return "VorticityS";
 
          case PhysicalNames::DISSTH:
-	    return "DissTh";
+	        return "DissTh";
 
          case PhysicalNames::DISSV:
             return "DissV";
@@ -307,11 +316,17 @@ namespace IoTools {
          case PhysicalNames::VELOCITYZ:
             return "velocityz";
 
+          case PhysicalNames::VELOCITYS:
+            return "velocitys";
+
          case PhysicalNames::ZONAL_VELOCITY:
             return "zonal_velocity";
 
          case PhysicalNames::NONZONAL_VELOCITY:
             return "nonzonal_velocity";
+
+         case PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY:
+        	 return "rotatedgeostrophic_velocity";
 
          case PhysicalNames::VORTICITY:
             return "vorticity";
@@ -324,6 +339,9 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";
+            
+         case PhysicalNames::VORTICITYS:
+            return "vorticitys";
 
          case PhysicalNames::DISSTH:
             return "dissTh";
@@ -748,9 +766,6 @@ namespace IoTools {
 
          case ModelOperator::STENCIL:
             return "stencil";
-
-         case ModelOperator::INHOMOGENEOUS:
-            return "inhomogeneous";
 
          default:
             throw Exception("Unknown ID to string conversion requested (ModelOperator)");

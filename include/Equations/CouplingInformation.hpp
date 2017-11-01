@@ -103,6 +103,11 @@ namespace Equations {
          bool hasSource() const;
 
          /**
+          * @brief Has a boundary value?
+          */
+         bool hasBoundaryValue() const;
+
+         /**
           * @brief Is the system complex?
           */
          bool isComplex() const;
@@ -232,6 +237,13 @@ namespace Equations {
          void setSource(const bool hasSource);
 
          /**
+          * @brief Set boundary value flag
+          *
+          * @param hasBoundaryValue  Equation requires nonzero boundary value computation?
+          */
+         void setBoundaryValue(const bool hasBoundaryValue);
+
+         /**
           * @brief Set system sizes
           *
           * @param nSystems         Number of systems
@@ -307,6 +319,11 @@ namespace Equations {
           * @brief Storage for the source flag
           */
          bool mHasSource;
+
+         /**
+          * @brief Storage for the boundary value flag
+          */
+         bool mHasBoundaryValue;
 
          /**
           * @brief Storage for the complex flag

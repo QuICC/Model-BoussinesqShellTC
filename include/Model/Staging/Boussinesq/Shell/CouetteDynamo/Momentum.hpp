@@ -59,6 +59,11 @@ namespace CouetteDynamo {
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
 
+         /**
+          * @brief Set inhomogeneous boundary condition
+          */
+         Datatypes::SpectralScalarType::PointType boundaryValue(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
+
       protected:
          /**
           * @brief Set variable requirements

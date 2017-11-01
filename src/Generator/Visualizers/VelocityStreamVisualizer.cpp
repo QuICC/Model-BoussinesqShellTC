@@ -60,7 +60,7 @@ namespace Equations {
       SpectralComponent_iterator specIt;
       for(specIt = specRange.first; specIt != specRange.second; ++specIt)
       {
-         this->defineCoupling(*specIt, CouplingInformation::WRAPPER, 0, false, false, false);
+         this->defineCoupling(*specIt, CouplingInformation::WRAPPER, 0, false, false, false, false);
       }
    }
 

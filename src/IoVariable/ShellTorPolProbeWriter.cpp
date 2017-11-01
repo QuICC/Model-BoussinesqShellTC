@@ -1,5 +1,5 @@
 /*
- * ShellTorPolTracerWriter.cpp
+ * ShellTorPolProbeWriter.cpp
  *
  *  Created on: Nov 23, 2016
  *      Author: Nicolò Lardelli
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include"IoVariable/ShellTorPolTracerWriter.hpp"
+#include"IoVariable/ShellTorPolProbeWriter.hpp"
 
 // Project includes
 //
@@ -34,7 +34,7 @@ namespace IoVariable{
 	/*
 	 * @brief Constructor
 	 */
-	ShellTorPolTracerWriter::ShellTorPolTracerWriter(const std::string& prefix, const std::string& type, const Matrix& Points)
+	ShellTorPolProbeWriter::ShellTorPolProbeWriter(const std::string& prefix, const std::string& type, const Matrix& Points)
 		:IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix+EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mRpart(Points.rows()), mThetapart(Points.rows()), mPhipart(Points.rows()), mPoints(Points)
 	{
 
@@ -44,14 +44,14 @@ namespace IoVariable{
 	 * @brief Destructor
 	 */
 
-	ShellTorPolTracerWriter::~ShellTorPolTracerWriter(){}
+	ShellTorPolProbeWriter::~ShellTorPolProbeWriter(){}
 
 
 	/*
 	 * @brief Subroutine init: generates the projections matrices
 	 */
 
-	void ShellTorPolTracerWriter::init(){
+	void ShellTorPolProbeWriter::init(){
 
 		// Retrieve size of the outer and inner shell
 		MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
@@ -400,7 +400,7 @@ namespace IoVariable{
 	 * @brief carry out the evaluation of the TorPol field in the 3 directions
 	 */
 
-	void ShellTorPolTracerWriter::compute(Transform::TransformCoordinatorType& coord){
+	void ShellTorPolProbeWriter::compute(Transform::TransformCoordinatorType& coord){
 
 		// get iterator to field
 		vector_iterator vIt;
@@ -413,7 +413,7 @@ namespace IoVariable{
 		this->mRpart.setZero();
 		this->mThetapart.setZero();
 		this->mPhipart.setZero();
-
+		Dimensions::Simulation::SIM3D;
 		// loop over all (l,m) groups
 		#ifdef  QUICC_SPATIALSCHEME_SLFM
 		for( int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k){
@@ -421,18 +421,18 @@ namespace IoVariable{
 			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
 
 			double factor = (m==0) ? 1.0 : 2.0;
-
 			for(int j=0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j){
 
 				// j index is the l order
 				int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
 				// compute R component from poloidal part
-				ArrayZ tempR = (this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k)).array()*YlmParts[std::make_pair(l,m)].array();
+				ArrayZ tempR = this->mProjMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(k).col(j);
+				tempR = tempR.array()*YlmParts[std::make_pair(l,m)].array();
 				this->mRpart += tempR.real()*factor*l*(l+1);
 
-				ArrayZ tempPol = this->mProjDrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(j).col(k);
-				ArrayZ tempTor = this->mProjInvrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(j).col(k);
+				ArrayZ tempPol = this->mProjDrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL).slice(k).col(j);
+				ArrayZ tempTor = this->mProjInvrMat * vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).slice(k).col(j);
 
 				Array temp1 = (tempPol.array()*dYlmdthParts[std::make_pair(l,m)].array() + tempTor.array()*YlmIsinParts[std::make_pair(l,m)].array()).real();
 				this->mThetapart += temp1*factor;
@@ -477,7 +477,7 @@ namespace IoVariable{
 
 	}
 
-	void ShellTorPolTracerWriter::write(){
+	void ShellTorPolProbeWriter::write(){
 
 		// Create file
 		this->preWrite();

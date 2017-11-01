@@ -59,7 +59,7 @@ namespace CouetteDynamo {
          int start = 0;
       #endif //QUICC_SPATIALSCHEME_SLFL
 
-      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false, true);
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false);
 
@@ -115,6 +115,43 @@ namespace CouetteDynamo {
          ///
          Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), 2.0);
       #endif //QUICC_SPATIALSCHEME_SLFL
+   }
+
+   Datatypes::SpectralScalarType::PointType Momentum::boundaryValue(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+   {  
+      if(compId == FieldComponents::Spectral::TOR)
+      {
+         #if defined QUICC_SPATIALSCHEME_SLFL
+            if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 1)
+            {
+               if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0)
+               {
+                  if(i == 1)
+                  {
+         #elif defined QUICC_SPATIALSCHEME_SLFM
+            if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
+            {
+               if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 1)
+               {
+                  if(i == 1)
+                  {
+         #endif //defined QUICC_SPATIALSCHEME_SLFL
+
+                     MHDFloat sgn = std::pow(-1.0,std::signbit(this->eqParams().nd(NonDimensional::ROSSBY)));
+                     MHDFloat ri = this->eqParams().nd(NonDimensional::RO)*this->eqParams().nd(NonDimensional::RRATIO);
+                     MHDFloat norm = std::sqrt(3.0/(4.0*Math::PI));
+                     return Datatypes::SpectralScalarType::PointType(sgn*ri/norm);
+                  }
+               }
+            }
+
+         return Datatypes::SpectralScalarType::PointType(0.0);
+      } else
+      {
+         throw std::logic_error("Poloidal component should not set inhomogeneous boundary condition");
+
+         return Datatypes::SpectralScalarType::PointType(0.0);
+      }
    }
 
    void Momentum::setRequirements()

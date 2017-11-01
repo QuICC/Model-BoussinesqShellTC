@@ -134,9 +134,8 @@ namespace Timestep {
           * @param opA  A operator
           * @param opB  B operator
           * @param opC  Boundary operator
-          * @param opD  Inhomogeneous boundary operator
           */
-         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size);
+         void buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size);
 
          /**
           * @brief Error of computation
@@ -449,7 +448,7 @@ namespace Timestep {
       this->mTMatrix.push_back(TOperator());
    }
 
-   template <typename TOperator,typename TData> void SparseOldImExTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const DecoupledZSparse& opD, const MHDFloat dt, const int size)
+   template <typename TOperator,typename TData> void SparseOldImExTimestepper<TOperator,TData>::buildOperators(const int idx, const DecoupledZSparse& opA, const DecoupledZSparse& opB, const DecoupledZSparse& opC, const MHDFloat dt, const int size)
    {
       // Update timestep
       this->mDt = dt;
@@ -482,9 +481,6 @@ namespace Timestep {
             Solver::internal::addOperators(this->rOldRHSMatrix(TimeSchemeSelector::rhsT(0,i), idx, j), -TimeSchemeSelector::rhsT(j+1,i)/this->mDt, opB);
          }
       }
-
-      // Set inhomogeneous boundary value
-      this->setInhomogeneous(idx, opD);
    }
 
    template <typename TOperator,typename TData> void SparseOldImExTimestepper<TOperator,TData>::initMatrices(const MHDFloat lhsId, const MHDFloat rhsId, const int n)

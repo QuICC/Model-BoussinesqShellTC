@@ -7,6 +7,10 @@
 #ifndef QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP
 #define QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_MOMENTUM_HPP
 
+/// Define small macros allowing to convert to string
+#define MAKE_STR_X( _P ) # _P
+#define MAKE_STR( _P ) MAKE_STR_X( _P )
+
 // Configuration includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
@@ -21,7 +25,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IVectorEquation.hpp"
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Shell/Couette/MomentumBase.hpp )
 
 namespace QuICC {
 
@@ -36,7 +40,7 @@ namespace Couette {
    /**
     * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq spherical Couette in a spherical shell
     */
-   class Momentum: public IVectorEquation
+   class Momentum: public MomentumBase
    {
       public:
          /**
@@ -52,38 +56,11 @@ namespace Couette {
          virtual ~Momentum();
 
          /**
-          * @brief Compute the nonlinear interaction term
-          *
-          * @param rNLComp Nonlinear term component
-          * @param id      ID of the component (allows for a more general implementation)
+          * @brief Set inhomogeneous boundary condition
           */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
+         Datatypes::SpectralScalarType::PointType boundaryValue(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
       protected:
-         /**
-          * @brief Set variable requirements
-          */
-         virtual void setRequirements();
-
-         /**
-          * @brief Set the equation coupling information
-          */
-         virtual void setCoupling();
-
-         /**
-          * @brief Set the nonlinear integration components
-          */
-         virtual void setNLComponents();
-
-         /**
-          * @brief Storage for the cos(theta) grid values (if required)
-          */
-         Array mCosTheta;
-
-         /**
-          * @brief Storage for the sin(theta) grid values (if required)
-          */
-         Array mSinTheta;
 
       private:
    };

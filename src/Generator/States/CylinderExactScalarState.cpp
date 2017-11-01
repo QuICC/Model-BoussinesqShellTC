@@ -70,7 +70,7 @@ namespace Equations {
    {
       bool hasNL = (this->mTypeId != CylinderExactStateIds::NOTUSED);
       bool hasSource =  (this->mSpecTypeId != CylinderExactStateIds::NOTUSED);
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, hasNL, hasSource, false, false);
    }
 
    void CylinderExactScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
