@@ -111,7 +111,7 @@ namespace QuICC {
          if(FrameworkMacro::allowsIO())
          {
          this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mAvg.transpose() << std::endl;
-         }
+        }
 
          // Close file
          this->postWrite();

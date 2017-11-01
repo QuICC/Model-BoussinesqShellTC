@@ -71,7 +71,7 @@ class BoussinesqQGmhdBhhLowRm(base_model.BaseModel):
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
 #            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz",""), ("emfx",""), ("emfy",""), ("pressure","")]:
-            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz","")]:
+            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("fbx",""), ("fby",""), ("fbz",""), ("dissTh",""), ("dissV",""), ("dissB","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -80,6 +80,12 @@ class BoussinesqQGmhdBhhLowRm(base_model.BaseModel):
         elif timing == self.EXPLICIT_NEXTSTEP:
             if field_row == ("vorticityz",""):
                 fields = [("streamfunction","")]
+            elif field_row == ("velocityx",""):
+                fields = [("streamfunction","")]
+            elif field_row == ("velocityy",""):
+                fields = [("streamfunction","")]
+            elif field_row == ("fjz",""):
+                fields = [("fbx",""), ("fby","")] # this line works fine
             else:
                 fields = []
 
@@ -280,6 +286,15 @@ class BoussinesqQGmhdBhhLowRm(base_model.BaseModel):
             else:
                 mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
 
+        elif field_row == ("dissTh","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("dissV","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("dissB","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)  
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
@@ -296,6 +311,18 @@ class BoussinesqQGmhdBhhLowRm(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
             mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
+
+        if field_row == ("fjz","") and field_col == ("fbx",""):
+            mat = geo.qid(res[0],0, bc, -1j*ky)
+
+        if field_row == ("fjz","") and field_col == ("fby",""):
+            mat = geo.qid(res[0],0, bc, 1j*kx) #so....now it magically works?
+
+        elif field_row == ("velocityx","") and field_col == ("streamfunction",""):
+            mat = geo.qid(res[0],0, bc, -ky*1j)
+
+        elif field_row == ("velocityy","") and field_col == ("streamfunction",""):
+            mat = geo.qid(res[0],0, bc, kx*1j)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

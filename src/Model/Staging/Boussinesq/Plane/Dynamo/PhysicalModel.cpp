@@ -77,6 +77,7 @@ namespace Dynamo {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spScalar;
          Equations::SharedCartesianExactVectorState spVector;
+//         Equations::SharedCartesianExactVectorState spExact;
 
          // Add vector exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
@@ -94,12 +95,18 @@ namespace Dynamo {
          spScalar->setStateType(Equations::CartesianExactStateIds::PLANFORMSQUARES);
          spScalar->setModeOptions(1e0, 10.0, 1e0, 10.0);
 
+         // Add imposed magnetic field
+//         spExact = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
+//         spExact->setIdentity(PhysicalNames::IMPOSED_MAGNETIC);
+//         spExact->setStateType(Equations::CartesianExactStateIds::TORPOLCNST);
+
       // Generate random spectrum
       } else
       {
          // Shared pointer to random initial state equation
          Equations::SharedRandomScalarState spScalar;
          Equations::SharedRandomVectorState spVector;
+//         Equations::SharedCartesianExactVectorState spExact;
 
          // Add scalar random initial state generator 
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
@@ -113,6 +120,11 @@ namespace Dynamo {
          spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-10, 1e-10, 1e4, 1e4, 1e4);
          spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-10, 1e-10, 1e4, 1e4, 1e4);
 
+         // Add imposed magnetic field
+//         spExact = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
+//         spExact->setIdentity(PhysicalNames::IMPOSED_MAGNETIC);
+//         spExact->setStateType(Equations::CartesianExactStateIds::TORPOLCNST);
+
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
@@ -124,6 +136,7 @@ namespace Dynamo {
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::MAGNETIC);
       spOut->expect(PhysicalNames::TEMPERATURE);
+//      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -159,6 +172,12 @@ namespace Dynamo {
       spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::MAGNETIC);
 
+      // Add imposed magnetic field visualization
+//      spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+//      spVector->setFields(true, false, false);
+//      spVector->setIdentity(PhysicalNames::IMPOSED_MAGNETIC);
+
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
@@ -166,6 +185,7 @@ namespace Dynamo {
       spOut->expect(PhysicalNames::FLUCT_TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::MAGNETIC);
+//      spOut->expect(PhysicalNames::IMPOSED_MAGNETIC);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -178,7 +198,7 @@ namespace Dynamo {
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITY);
       spIn->expect(PhysicalNames::MAGNETIC);
-
+//      spIn->expect(PhysicalNames::IMPOSED_MAGNETIC);
       // Set simulation state
       spVis->setInitialState(spIn);
    }
