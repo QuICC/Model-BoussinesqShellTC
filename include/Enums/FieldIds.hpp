@@ -79,6 +79,8 @@ namespace QuICC {
          VELOCITYY,
          /// Z velocity field
          VELOCITYZ,
+         /// S velocity field
+         VELOCITYS,
          /// Zonal velocity field (m = 0)
          ZONAL_VELOCITY, 
          /// Non-zonal velocity field (m != 0)
@@ -93,6 +95,8 @@ namespace QuICC {
          VORTICITYY,
          /// Axial vorticity field
          VORTICITYZ,
+         /// Equatorial vorticity field
+         VORTICITYS,
 
          /// Phi field (for example phi = D_z w)
          PHI,

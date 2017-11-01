@@ -91,6 +91,9 @@ namespace IoTools {
          case PhysicalNames::VELOCITYZ:
             return "VelocityZ";
 
+          case PhysicalNames::VELOCITYS:
+            return "VelocityS";
+
          case PhysicalNames::ZONAL_VELOCITY:
             return "Zonal velocity";
 
@@ -111,6 +114,9 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
+
+         case PhysicalNames::VORTICITYS:
+            return "VorticityS";
 
          case PhysicalNames::PHI:
             return "Phi";
@@ -277,6 +283,9 @@ namespace IoTools {
          case PhysicalNames::VELOCITYZ:
             return "velocityz";
 
+          case PhysicalNames::VELOCITYS:
+            return "velocitys";
+
          case PhysicalNames::ZONAL_VELOCITY:
             return "zonal_velocity";
 
@@ -297,6 +306,9 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";
+
+         case PhysicalNames::VORTICITYS:
+            return "vorticitys";
 
          case PhysicalNames::PHI:
             return "phi";
