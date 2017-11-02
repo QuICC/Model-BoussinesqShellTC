@@ -40,6 +40,7 @@
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
+#include "Generator/Visualizers/SphericalRadialCylindricalFieldVisualizer.hpp"
 #include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
@@ -182,30 +183,20 @@ namespace Explicit {
       spVertical->setFieldType(FieldType::VECTOR);
       spVertical->setIdentity(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITY);
 
-      // Add X component of velocity
-      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
-      spVertical->setFieldType(FieldType::VECTOR);
-      spVertical->setIdentity(PhysicalNames::VELOCITYX, PhysicalNames::VELOCITY);
-
-      // Add Y component of velocity
-      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
-      spVertical->setFieldType(FieldType::VECTOR);
-      spVertical->setIdentity(PhysicalNames::VELOCITYY, PhysicalNames::VELOCITY);
+      // Add cylindrical radius velocity visualization
+      spCylindrical = spVis->addScalarEquation<Equations::SphericalRadialCylindricalFieldVisualizer>();
+      spCylindrical->setFieldType(FieldType::VECTOR);
+      spCylindrical->setIdentity(PhysicalNames::VELOCITYS, PhysicalNames::VELOCITY);
 
       // Add vertical vorticity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
       spVertical->setFieldType(FieldType::CURL);
       spVertical->setIdentity(PhysicalNames::VORTICITYZ, PhysicalNames::VELOCITY);
 
-      // Add X component vorticity visualization
-      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
-      spVertical->setFieldType(FieldType::CURL);
-      spVertical->setIdentity(PhysicalNames::VORTICITYX, PhysicalNames::VELOCITY);
-
-      // Add Y component vorticity visualization
-      spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
-      spVertical->setFieldType(FieldType::CURL);
-      spVertical->setIdentity(PhysicalNames::VORTICITYY, PhysicalNames::VELOCITY);
+      // Add horizontal vorticity visualization
+      spCylindrical = spVis->addScalarEquation<Equations::SphericalRadialCylindricalFieldVisualizer>();
+      spCylindrical->setFieldType(FieldType::CURL);
+      spCylindrical->setIdentity(PhysicalNames::VORTICITYS, PhysicalNames::VELOCITY);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -214,11 +205,9 @@ namespace Explicit {
       spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
       spOut->expect(PhysicalNames::ROTATEDGEOSTROPHIC_VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
-      spOut->expect(PhysicalNames::VELOCITYX);
-      spOut->expect(PhysicalNames::VELOCITYY);
+      spOut->expect(PhysicalNames::VELOCITYS);
       spOut->expect(PhysicalNames::VORTICITYZ);
-      spOut->expect(PhysicalNames::VORTICITYX);
-      spOut->expect(PhysicalNames::VORTICITYY);
+      spOut->expect(PhysicalNames::VORTICITYS);
       spVis->addHdf5OutputFile(spOut);
    }
 
