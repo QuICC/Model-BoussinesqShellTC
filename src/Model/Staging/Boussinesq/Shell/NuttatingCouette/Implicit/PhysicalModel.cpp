@@ -157,6 +157,7 @@ namespace Implicit {
       Equations::SharedVectorFieldVisualizer spVector;
       Equations::SharedVectorFieldTrivialVisualizer spVTrivial;
       Equations::SharedSphericalVerticalFieldVisualizer spVertical;
+      Equations::SharedSphericalRadialCylindricalFieldVisualizer spCylindrical;
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
