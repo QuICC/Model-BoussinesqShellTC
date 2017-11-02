@@ -12,6 +12,8 @@ set(MHDSources
    EnergyTags.cpp
    NusseltTags.cpp
    ContinuityTags.cpp
+   AverageTags.cpp
+   ObservableTags.cpp
 )
 
 if(QUICC_SPATIALSCHEME STREQUAL "TTT")
