@@ -18,6 +18,7 @@ from quicc.linear_stability.solver_slepc import Print
 from mpi4py import MPI
 from petsc4py import PETSc
 
+PETSc.ScalarType = np.complex64
 
 class MarginalCurve:
     """The marginal curve"""
@@ -643,6 +644,8 @@ def default_options():
 
 def compute(gevp_opts, marginal_opts):
     """Compute eigen solutions requested by options"""
+
+    print(PETSc.ScalarType)
 
     # Make options consistent
     marginal_opts['minimum'] = marginal_opts['minimum'] and marginal_opts['curve']

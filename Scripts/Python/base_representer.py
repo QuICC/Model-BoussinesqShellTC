@@ -8,12 +8,17 @@ import sys
 import os
 import pandas as pd
 from matplotlib import pyplot as pp
+import xml.etree.ElementTree as ET
 
 
 class BaseRepresenter:
 
     def __init__(self):
         self.data = None
+
+        # use an incrementing indices so that draw can be used for different plots
+        self.idx_draw = 2
+
         pass
 
     # define the name columns static variable
@@ -29,7 +34,7 @@ class BaseRepresenter:
         try:
             argv = sys.argv
             # print argv
-            filename = argv[1]
+            self.filename = argv[1]
         except RuntimeError as e:
             print(e)
             print('Supposed usage: python represent_energies.py filename')
@@ -38,7 +43,7 @@ class BaseRepresenter:
         try:
 
             folder_name = os.path.relpath(".", "..")
-            data = pd.read_csv(filename, sep='\t', skiprows=3, names=self.name_columns)
+            data = pd.read_csv(self.filename, sep='\t', skiprows=3, names=self.name_columns)
 
         except IOError as e:
             folder_name = os.path.relpath(".", "..")
@@ -47,24 +52,37 @@ class BaseRepresenter:
                 if (os.path.isdir(folder)):
                     # print(folder)
                     try:
-                        datatemp = pd.read_csv(folder + '/' + filename, sep='\t', skiprows=3,
+                        datatemp = pd.read_csv(folder + '/' + self.filename, sep='\t', skiprows=3,
                                                names=self.name_columns)
+                        print(folder, data)
                         data.append(datatemp)
                     except IOError as e:
                         #print(e)
                         pass
-
+            print(data)
             data = pd.concat(data, ignore_index=True)
+
             data.reindex()
             # print(data.head())
-            data.sort_values(['time'], inplace=True)
+            data.sort_values([r'$t$'], inplace=True)
 
         self.data = data
 
     def draw(self):
 
         try:
-            fout = sys.argv[2]
+            fout = sys.argv[self.idx_draw]
             pp.savefig(fout)
+            self.idx_draw+=1
         except IndexError as e:
             pp.show()
+
+    def search_in_parameter(self, param):
+
+        dirname = os.path.dirname(self.filename)
+        print(dirname)
+        cfg_file = open(dirname + '/parameters.cfg', 'r')
+        header = cfg_file.readline()
+        root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
+        leaf = root.find('*/*/'+param)
+        return leaf.text

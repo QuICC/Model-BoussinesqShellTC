@@ -10,7 +10,7 @@ from matplotlib import pyplot as pp
 
 class EnergyRepresenter(BaseRepresenter):
 
-    _name_columns = ['time', 'total', 'toroidal', 'poloidal']
+    _name_columns = [r'$t$', 'total', 'toroidal', 'poloidal']
 
     def __init__(self):
         BaseRepresenter.__init__(self)
@@ -18,14 +18,14 @@ class EnergyRepresenter(BaseRepresenter):
 
     def draw(self):
         data = self.data
-        data['time'] -= min(data['time'])
+        data[r'$t$'] -= min(data[r'$t$'])
         data = data[data['total'] < 1e2]
 
         idx = max(data.index)
         string_ratio = str("%.2f" % (data['toroidal'][idx] / data['total'][idx] * 100))
         # print('Final Toroidal to Total energy ratio of: '+string_ratio)
 
-        ax = data.plot(x='time', y=['total', 'toroidal', 'poloidal'])
+        ax = data.plot(x=r'$t$', y=['total', 'toroidal', 'poloidal'])
         # set parameters for plotting
         ax.yaxis.set_major_formatter(OldScalarFormatter())
         pp.rcParams['font.family'] = 'ubuntu'

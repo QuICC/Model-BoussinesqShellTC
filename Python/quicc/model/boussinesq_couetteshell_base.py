@@ -43,7 +43,12 @@ class BoussinesqCouetteShellBase(base_model.BaseModel):
 
         return d
 
+    def stability_fields(self):
+        """Get the list of fields needed for linear stability calculations"""
 
+        fields =  [("velocity","tor"), ("velocity","pol")]
+
+        return fields
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
