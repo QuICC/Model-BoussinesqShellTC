@@ -309,8 +309,12 @@ class BoussinesqQGmhdBhhLowRm(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+#        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+#            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
+
+        # this line in place of the previous one would remove the barotropic component 
         if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
-            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
+            mat = geo.qid(res[0],0,bc,-(kx**2+ky**2))  - spsp.eye(res[0],1)*geo.avg(res[0])*geo.qid(res[0],0,bc,-(kx**2+ky**2)) 
 
         if field_row == ("fjz","") and field_col == ("fbx",""):
             mat = geo.qid(res[0],0, bc, -1j*ky)
