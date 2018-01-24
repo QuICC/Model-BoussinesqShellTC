@@ -9,7 +9,7 @@ import os
 import pandas as pd
 from matplotlib import pyplot as pp
 import xml.etree.ElementTree as ET
-
+import matplotlib
 
 class BaseRepresenter:
 
@@ -18,6 +18,9 @@ class BaseRepresenter:
 
         # use an incrementing indices so that draw can be used for different plots
         self.idx_draw = 2
+
+        matplotlib.rcParams.update({'font.size': 18})
+
 
         pass
 
@@ -46,18 +49,22 @@ class BaseRepresenter:
             data = pd.read_csv(self.filename, sep='\t', skiprows=3, names=self.name_columns)
 
         except IOError as e:
-            folder_name = os.path.relpath(".", "..")
+            folderpath = os.path.dirname(self.filename)
             data = []
-            for folder in os.listdir('.'):
-                if (os.path.isdir(folder)):
-                    # print(folder)
+            for folder in os.listdir(folderpath):
+                if (os.path.isdir(folderpath+'/'+folder)):
                     try:
-                        datatemp = pd.read_csv(folder + '/' + self.filename, sep='\t', skiprows=3,
+                        datatemp = pd.read_csv(folderpath+'/'+folder + '/' + os.path.basename(self.filename), sep='\t', skiprows=3,
                                                names=self.name_columns)
+                        print('here')
                         print(folder, data)
                         data.append(datatemp)
+                        print(datatemp)
+                        print(data)
                     except IOError as e:
-                        #print(e)
+
+                        print(folder + '/' + os.path.basename(self.filename))
+                        print(e)
                         pass
             print(data)
             data = pd.concat(data, ignore_index=True)
@@ -69,6 +76,8 @@ class BaseRepresenter:
         self.data = data
 
     def draw(self):
+
+        pp.tight_layout()
 
         try:
             fout = sys.argv[self.idx_draw]

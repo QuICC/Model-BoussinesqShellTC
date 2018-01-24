@@ -177,7 +177,7 @@ namespace IoVariable {
       this->postWrite();
 
       // Abort if kinetic energy is NaN
-      if(std::isnan(this->mEnergy))
+      if(isnan(this->mEnergy))
       {
          FrameworkMacro::abort(99);
 

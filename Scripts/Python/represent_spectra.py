@@ -17,7 +17,7 @@ class SpectraRepresenter(BaseRepresenter):
 
         try:
             argv = sys.argv
-            filename = argv[1]
+            self.filename = argv[1]
         except RuntimeError as e:
             print(e)
             print('Supposed usage: python represent_spectra.py filename')
@@ -26,17 +26,20 @@ class SpectraRepresenter(BaseRepresenter):
         try:
             # folder_name = os.path.relpath("..","../..")
             folder_name = os.path.relpath(".", "..")
-            datafull = np.loadtxt(filename, skiprows=3)
+            folderpath = os.path.dirname(self.filename)
+            datafull = np.loadtxt(self.filename, skiprows=3)
         except IOError as e:
 
             folder_name = os.path.relpath(".", "..")
             datafull = []
-            for folder in os.listdir('.'):
-                if (os.path.isdir(folder)):
-                    # print(folder)
+            for folder in os.listdir(folderpath):
+                if (os.path.isdir(folderpath+'/'+folder)):
+                    print(folder)
                     try:
-                        datatemp = pd.DataFrame(np.loadtxt(folder + '/' + filename, skiprows=3))
+                        print(folderpath+'/'+folder + '/' + os.path.basename(self.filename))
+                        datatemp = pd.DataFrame(np.loadtxt(folderpath+'/'+folder + '/' + os.path.basename(self.filename), skiprows=3))
                         datafull.append(datatemp)
+                        print(datatemp)
                     except IOError as e:
                         # print(e)
                         pass
@@ -47,8 +50,6 @@ class SpectraRepresenter(BaseRepresenter):
 
             datafull = datafull.as_matrix()
         self.datafull = datafull
-        self.filename = filename
-
 
     def draw(self):
 
@@ -72,10 +73,10 @@ class SpectraRepresenter(BaseRepresenter):
 
         data = datafull[-1, 1:]
 
+
         try:
             dirname = os.path.dirname(self.filename)
-            print(dirname)
-            cfg_file = open(dirname + 'parameters.cfg', 'r')
+            cfg_file = open(dirname + '/parameters.cfg', 'r')
             header = cfg_file.readline()
             root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
             Lmax = int(root[1][0][1].text)+1
@@ -86,23 +87,23 @@ class SpectraRepresenter(BaseRepresenter):
 
 
 
-        pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
-        pp.loglog(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
-        pp.loglog(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
-        pp.loglog(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
-        pp.xlabel('l/m')
-        pp.ylabel('E')
-        pp.legend()
+        pp.loglog(np.cumsum(np.ones_like(data[:Lmax])), data[:Lmax], label='L spectrum, toroidal')
+        pp.loglog(np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax])), data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
+        pp.loglog(np.cumsum(np.ones_like(data[Mmax + Lmax:Mmax+ 2 * Lmax])), data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
+        pp.loglog(np.cumsum(np.ones_like(data[Mmax+ 2 * Lmax:])), data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
 
+
+        """
         pp.figure()
         pp.semilogy(data[0:Lmax], label='L spectrum, toroidal')
         pp.semilogy(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
         pp.semilogy(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
         pp.semilogy(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
         # pp.title(folder_name)
-        pp.xlabel('l/m')
-        pp.ylabel('E')
-        pp.legend()
+        """
+        pp.xlabel(r'$l+1 \quad m+1$')
+        pp.ylabel(r'$E_{kin}$')
+        pp.legend(prop={'size': 14})
 
         BaseRepresenter.draw(self)
 

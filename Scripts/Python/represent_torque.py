@@ -7,30 +7,30 @@ from base_representer import BaseRepresenter
 
 class TorqueRepresenter(BaseRepresenter):
 
-    _name_columns = ['time', 'value']
+    _name_columns = [r'$t$', 'value']
     def __init__(self):
         BaseRepresenter.__init__(self)
         pass
 
     def draw(self):
         data = self.data
-        data['time'] -= min(data['time'])
+        data[r'$t$'] -= min(data[r'$t$'])
         data = data[abs(data['value']) < 1.0]
 
         # post-processing on the value, to be removed once the value calculations are correct
-        ri = 0.35 / (1. - 0.35)
-        T = np.sqrt(4 * np.pi / 3) * ri
-        data['value'] = (data['value'] + ri * T * 8 * np.pi / 3. * 1e-5) * ri
+        #ri = 0.35 / (1. - 0.35)
+        #T = np.sqrt(4 * np.pi / 3) * ri
+        #data['value'] = (data['value'] + ri * T * 8 * np.pi / 3. * 1e-5) * ri
 
         # e# ax = data.plot(x='time', y='value', title=folder_name)
-        ax = data.plot(x='time', y='value', alpha=0.25)
+        ax = data.plot(x=r'$t$', y='value', alpha=0.25)
 
         # set parameters for plotting
 
         # pp.rcParams['font.size'] = 14
 
         alpha = 0.05
-        data.set_index('time', inplace=True)
+        data.set_index(r'$t$', inplace=True)
         # forward
         ewm = data['value'].ewm(alpha=alpha, adjust=True)
         m = ewm.agg(['mean', 'std'])
@@ -44,9 +44,9 @@ class TorqueRepresenter(BaseRepresenter):
 
         ax.yaxis.set_major_formatter(OldScalarFormatter())
         pp.rcParams['font.family'] = 'ubuntu'
-        ax.set_ylabel('G')
+        ax.set_ylabel(r'$G$')
         # ax.set_title(folder_name)
-        ax.set_xlabel('t')
+        #ax.set_xlabel('t')
 
         BaseRepresenter.draw(self)
 

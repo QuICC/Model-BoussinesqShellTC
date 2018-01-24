@@ -11,6 +11,7 @@
 // System includes
 //
 #include <iomanip>
+#include <cmath>
 
 // External includes
 //
@@ -399,7 +400,7 @@ namespace IoVariable {
       this->postWrite();
 
       // Abort if kinetic energy is NaN
-      if(std::isnan(this->mTorEnergy.norm()) || std::isnan(this->mPolEnergy.norm()))
+      if(isnan(this->mTorEnergy.norm()) || isnan(this->mPolEnergy.norm()))
       {
          FrameworkMacro::abort(99);
 

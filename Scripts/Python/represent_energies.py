@@ -33,7 +33,7 @@ class EnergyRepresenter(BaseRepresenter):
 
         # ax.set_title(folder_name)#+',  toroidal/total energy ratio: '+ string_ratio+'%')
         ax.set_xlabel('t')
-        ax.set_ylabel('E')
+        ax.set_ylabel(r'$E_{kin}$')
 
         BaseRepresenter.draw(self)
 

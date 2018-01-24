@@ -1,5 +1,5 @@
-# -*- coding:utf-8 -*-
-# Nicolò Lardelli 24th November 2016
+# -*- coding: utf-8 -*-
+# Nicolo Lardelli 24th November 2016
 
 from __future__ import division
 from __future__ import unicode_literals
