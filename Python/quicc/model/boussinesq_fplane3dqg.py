@@ -57,7 +57,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature","")]:
+            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("dissTh",""), ("dissV","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -65,6 +65,9 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
             if field_row == ("vorticityz",""):
+                fields = [("streamfunction","")]
+                fields = [("streamfunction","")]
+            elif field_row == ("velocityy",""):
                 fields = [("streamfunction","")]
             else:
                 fields = []
@@ -203,6 +206,12 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
+        elif field_row == ("dissTh","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("dissV","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
@@ -217,8 +226,18 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
-            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
+#        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+#            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
+#       to set to zero the barotropic component use this instead:
+#
+if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+            mat = geo.qid(res[0],0,bc,-(kx**2+ky**2))  - spsp.eye(res[0],1)*geo.avg(res[0])*geo.qid(res[0],0,bc,-(kx**2+ky**2)) 
+
+        elif field_row == ("velocityx","") and field_col == ("streamfunction",""):
+            mat = geo.qid(res[0],0, bc, -ky*1j)
+
+        elif field_row == ("velocityy","") and field_col == ("streamfunction",""):
+            mat = geo.qid(res[0],0, bc, kx*1j)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
