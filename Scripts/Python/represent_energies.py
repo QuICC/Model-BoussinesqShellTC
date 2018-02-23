@@ -10,7 +10,7 @@ from matplotlib import pyplot as pp
 
 class EnergyRepresenter(BaseRepresenter):
 
-    _name_columns = [r'$t$', 'total', 'toroidal', 'poloidal']
+    _name_columns = [r'$t$', r'$E_{tot}$', r'$E_{tor}$', r'$E_{pol}$', r'$E^c_{sym}$', r'$E^c_{asym}$', r'$E^{eq}_{sym}$', r'$E^{eq}_{asym}$']
 
     def __init__(self):
         BaseRepresenter.__init__(self)
@@ -19,15 +19,15 @@ class EnergyRepresenter(BaseRepresenter):
     def draw(self):
         data = self.data
         data[r'$t$'] -= min(data[r'$t$'])
-        data = data[data['total'] < 1e2]
+        data = data[data[r'$E_{tot}$'] < 1e2]
 
         idx = max(data.index)
-        string_ratio = str("%.2f" % (data['toroidal'][idx] / data['total'][idx] * 100))
+        string_ratio = str("%.2f" % (data[r'$E_{tor}$'][idx] / data[r'$E_{tot}$'][idx] * 100))
         # print('Final Toroidal to Total energy ratio of: '+string_ratio)
 
-        ax = data.plot(x=r'$t$', y=['total', 'toroidal', 'poloidal'])
+        ax = data.plot(x=r'$t$', y=[r'$E_{tot}$', r'$E_{tor}$', r'$E_{pol}$', r'$E^c_{sym}$', r'$E^c_{asym}$', r'$E^{eq}_{sym}$', r'$E^{eq}_{asym}$'], logy = True)
         # set parameters for plotting
-        ax.yaxis.set_major_formatter(OldScalarFormatter())
+        #ax.yaxis.set_major_formatter(OldScalarFormatter())
         pp.rcParams['font.family'] = 'ubuntu'
         # pp.rcParams['font.size'] = 12
 

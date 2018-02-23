@@ -5,6 +5,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
+from numpy.polynomial import legendre as leg
 
 
 def plm(l, m, x):
@@ -30,20 +31,23 @@ def pmm(maxl, m, x):
     mat = np.zeros((len(x), 1))
 
     # orthogonality as Schäffer 2013
-    mat[:,0] = 1.0/np.sqrt(4.0*np.pi)
+    mat[:,0] = 1.0/np.sqrt(4*np.pi)
     sx = np.sqrt(1.0 - x**2)
     for i in range(1, m+1):
         mat[:,0] = -np.sqrt((2.0*i + 1.0)/(2.0*i))*sx*mat[:,0]
 
     return mat
 
-def lplm(l, m, x):
+def lplm(maxl, l, m, x = None):
 
     # return an orthonormal assoc legendre function
     # wapper for plm
-    x = np.array(x)
+    if x is None:
+        xx, ww = leg.leggauss(maxl)
+    else:
+        xx = np.array(x)
 
-    y = plm(l, m, x)
+    y = plm(l, m, xx)
     return y
 
 """
@@ -127,28 +131,37 @@ def deipm(l, m, phi):
 
 """
 
-def dplm(l, m, x):
+def dplm(maxl, l, m, x = None):
 
     # returns the derivative associated legendre function
     # implementation Hollerbach style, stable on the poles
     # fully normalized
-    x = np.array(x)
-    y = -1./2*(((l+m)*(l-m+1))**0.5*plm(l,m-1,x)-((l-m)*(l+m+1))**.5*plm(l, m+1, x))
+    #m= m-1
+    if x is None:
+        xx, ww = leg.leggauss(maxl)
+    else:
+        xx = np.array(x)
+
+    y = -1./2*(((l+m)*(l-m+1))**0.5*plm(l,m-1,xx)-((l-m)*(l+m+1))**.5*plm(l, m+1, xx))
 
     return y
 
 
-def lplm_sin(l, m, x):
+def lplm_sin(maxl, l, m, x = None):
 
     # return associated legendre function /sin_theta
     # implemented with the recurrence relation for P_l^m(x)/(1-x**2)**.5 when possible (aka m!=0)
     # fully normalized
 
-    x = np.array(x)
-    if m!=0:
-        y = -1/2/m*(((l-m)*(l-m-1))**.5 * plm(l-1, m+1, x) + ((l+m)*(l+m-1))**.5 *plm(l-1, m-1, x))*((2*l+1)/(2*l-1))**.5
+    if x is None:
+        xx, ww = leg.leggauss(maxl)
     else:
-        y = plm(l, m, x)/(1-x**2)**.5
+        xx = np.array(x)
+
+    if m!=0:
+        y = -1/2/m*(((l-m)*(l-m-1))**.5 * plm(l-1, m+1, xx) + ((l+m)*(l+m-1))**.5 *plm(l-1, m-1, xx))*((2*l+1)/(2*l-1))**.5
+    else:
+        y = plm(l, m, xx)/(1-xx**2)**.5
 
     return y
 

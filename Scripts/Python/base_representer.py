@@ -32,16 +32,20 @@ class BaseRepresenter:
             raise NotImplementedError('Name Columns not implemented in the base class')
         return self._name_columns
 
-    def open(self):
+    def open(self, filename = None):
 
-        try:
-            argv = sys.argv
-            # print argv
-            self.filename = argv[1]
-        except RuntimeError as e:
-            print(e)
-            print('Supposed usage: python represent_energies.py filename')
-            sys.exit()
+        if filename == None:
+            try:
+                argv = sys.argv
+                # print argv
+                self.filename = argv[1]
+            except RuntimeError as e:
+                print(e)
+                print('Supposed usage: python represent_energies.py filename')
+                sys.exit()
+
+        else:
+            self.filename = filename
 
         try:
 
@@ -95,3 +99,7 @@ class BaseRepresenter:
         root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
         leaf = root.find('*/*/'+param)
         return leaf.text
+
+    def get_data(self):
+
+        return self.data
