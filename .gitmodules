@@ -1,3 +1,0 @@
-[submodule "External/eigen3"]
-	path = External/eigen3
-	url = ../SubmoduleEigen3.git
