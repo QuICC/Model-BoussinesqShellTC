@@ -208,16 +208,16 @@ namespace Equations {
       MHDFloat tmp;
       this->makeRandom(tmp, i, j, k, minVal, maxVal);
 
-      val.real() = tmp;
+      val.real(tmp);
 
       #if defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM || defined QUICC_SPATIALSCHEME_AFT || defined QUICC_SPATIALSCHEME_CFT || defined QUICC_SPATIALSCHEME_WFT
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             this->makeRandom(tmp, i, j, k, minVal, maxVal);
-            val.imag() = tmp;
+            val.imag(tmp);
          } else
          {
-            val.imag() = 0.0;
+            val.imag(0.0);
          }
       #elif defined QUICC_SPATIALSCHEME_TFF
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0 && this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
@@ -236,32 +236,32 @@ namespace Equations {
             }
 
             this->makeRandom(tmp, i, j, k, minVal, maxVal, seed);
-            val.real() = tmp;
+            val.real(tmp);
             this->makeRandom(tmp, i, j, k, minVal, maxVal, seed+3);
             if(k2D < n2D/2)
             {
-               val.imag() = tmp;
+               val.imag(tmp);
             } else
             {
-               val.imag() = -tmp;
+               val.imag(-tmp);
             }
 
          } else if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             this->makeRandom(tmp, i, j, k, minVal, maxVal);
-            val.imag() = tmp;
+            val.imag(tmp);
          } else
          {
-            val.imag() = 0.0;
+            val.imag(0.0);
          }
       #elif defined QUICC_SPATIALSCHEME_SLFL || defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k) != 0)
          {
             this->makeRandom(tmp, i, j, k, minVal, maxVal);
-            val.imag() = tmp;
+            val.imag(tmp);
          } else
          {
-            val.imag() = 0.0;
+            val.imag(0.0);
          }
       #endif //defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_SLFM || defined QUICC_SPATIALSCHEME_BLFM || defined QUICC_SPATIALSCHEME_WLFM || defined QUICC_SPATIALSCHEME_AFT || defined QUICC_SPATIALSCHEME_CFT || defined QUICC_SPATIALSCHEME_WFT
    }
