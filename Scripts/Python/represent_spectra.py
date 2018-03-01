@@ -13,19 +13,23 @@ class SpectraRepresenter(BaseRepresenter):
         BaseRepresenter.__init__(self)
         pass
 
-    def open(self):
+    def open(self, filename=None):
+
+        if filename==None:
+            try:
+                argv = sys.argv
+                self.filename = argv[1]
+            except RuntimeError as e:
+                print(e)
+                print('Supposed usage: python represent_spectra.py filename')
+                sys.exit()
+        else:
+            self.filename=filename
+
 
         try:
-            argv = sys.argv
-            self.filename = argv[1]
-        except RuntimeError as e:
-            print(e)
-            print('Supposed usage: python represent_spectra.py filename')
-            sys.exit()
-
-        try:
-            # folder_name = os.path.relpath("..","../..")
-            folder_name = os.path.relpath(".", "..")
+            #folder_name = os.path.relpath("..","../..")
+            #folder_name = os.path.relpath(".", "..")
             folderpath = os.path.dirname(self.filename)
             datafull = np.loadtxt(self.filename, skiprows=3)
         except IOError as e:
@@ -51,7 +55,7 @@ class SpectraRepresenter(BaseRepresenter):
             datafull = datafull.as_matrix()
         self.datafull = datafull
 
-    def draw(self):
+    def draw(self,type='both'):
 
         pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
         pp.rcParams['font.family'] = 'ubuntu'
@@ -59,20 +63,20 @@ class SpectraRepresenter(BaseRepresenter):
         # set parameters for plotting
         pp.ticklabel_format(style='sci', axis='y')
 
-        print(type(self.datafull))
+        #print(type(self.datafull))
 
 
-        self.draw_snapshot(self.datafull)
+        self.draw_snapshot(self.datafull,type=type)
 
-    def draw_snapshot(self, datafull):
+    def draw_snapshot(self, datafull, **kwargs):
         #pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
         pp.rcParams['font.family'] = 'ubuntu'
         # pp.rcParams['font.size'] = 14
         # set parameters for plotting
         #pp.ticklabel_format(style='sci', axis='y')
 
-        data = datafull[-1, 1:]
-
+        #data = datafull[-1, 1:]
+        data = datafull[ 1:]
 
         try:
 
@@ -89,11 +93,13 @@ class SpectraRepresenter(BaseRepresenter):
             pass
 
 
-
-        pp.loglog(np.cumsum(np.ones_like(data[:Lmax])), data[:Lmax], label='L spectrum, toroidal')
-        pp.loglog(np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax])), data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
-        pp.loglog(np.cumsum(np.ones_like(data[Mmax + Lmax:Mmax+ 2 * Lmax])), data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
-        pp.loglog(np.cumsum(np.ones_like(data[Mmax+ 2 * Lmax:])), data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
+        if kwargs['type']!='l':
+            pp.loglog(np.cumsum(np.ones_like(data[:Lmax])), data[:Lmax], label='L spectrum, toroidal')
+            pp.loglog(np.cumsum(np.ones_like(data[Mmax + Lmax:Mmax + 2 * Lmax])), data[Mmax + Lmax:Mmax + 2 * Lmax],
+                      label='L spectrum, poloidal')
+        elif kwargs['type']!='m':
+            pp.loglog(np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax])), data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
+            pp.loglog(np.cumsum(np.ones_like(data[Mmax+ 2 * Lmax:])), data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
 
 
         """

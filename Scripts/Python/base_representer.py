@@ -4,8 +4,7 @@ Created on Tue Jun 27 10:20 2017
 
 @author: Nicolò Lardelli @D-ERDW ETH Zürich
 """
-import sys
-import os
+import sys, os, re
 import pandas as pd
 from matplotlib import pyplot as pp
 import xml.etree.ElementTree as ET
@@ -83,8 +82,15 @@ class BaseRepresenter:
 
         pp.tight_layout()
 
+        # check  for the python pattern at the beginning of the file
+        if re.match('python.*', sys.argv[0]):
+            pass
+        else:
+            self.idx_draw = 10000
+
         try:
             fout = sys.argv[self.idx_draw]
+            print(fout)
             pp.savefig(fout)
             self.idx_draw+=1
         except IndexError as e:

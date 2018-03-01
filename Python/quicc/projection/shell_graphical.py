@@ -66,14 +66,14 @@ class ShellPlotter:
         # define title dictionary
         self.title_dict = {'simple': r'$\bm{u}_', 'curl': r'$\left(\bm{\nabla}\times\bm{u}\right)_'}
 
-
-    def plot(self, section_type, m = 'all', type = 'simple'):
+    """
+    def plot(self, section_type, mSelect = 'all', type = 'simple'):
 
         # prepare the modes
-        if m == 'all':
+        if mSelect == 'all':
             modes = np.arange(self.nM)
         else:
-            modes = np.array(m)
+            modes = np.array(mSelect)
 
         # store the field type
         self.vector_field_type = type
@@ -86,6 +86,7 @@ class ShellPlotter:
             self.plot_boundaries(modes = modes)
         else:
             raise RuntimeError('Unkown section type '+ section_type)
+    """
 
     def loop_over(self, *args, **kwargs ):
 
@@ -117,14 +118,14 @@ class ShellPlotter:
         else:
             raise RuntimeError('Unknown  file type ' + self.file_type)
 
-    def plot(self,m='all', **kwargs):
+    def plot(self,mSelect='all', **kwargs):
 
 
         # prepare the modes
-        if m == 'all':
+        if mSelect == 'all':
             modes = np.arange(self.nM)
         else:
-            modes = np.array(m)
+            modes = np.array(mSelect)
 
         kwargs['modes']=modes
         # produce the grid for plotting
@@ -151,8 +152,8 @@ class ShellPlotter:
             xmax = xmin + np.sin(theta_crit)*h
             ymax = ymin + np.cos(theta_crit)*h
 
-            xx = np.linspace(xmin, xmax, 4*self.nN )
-            yy = np.linspace(ymin, ymax, 4*self.nN )
+            xx = np.linspace(xmin, xmax, 8*self.nN )
+            yy = np.linspace(ymin, ymax, 8*self.nN )
 
             rr = (xx**2+yy**2)**.5
             ttheta = np.arctan2(xx,yy)
@@ -220,6 +221,7 @@ class ShellPlotter:
         self.Tn_r2_eval = shell.proj_radial_r2(self.nN, self.a, self.b, xx_bulk) # evaluate 1/r**2 Tn
         self.d2Tndr2_eval = shell.proj_lapl(self.nN, self.a, self.b, xx_bulk) # evaluate 1/r**2dr r**2 dr
 
+        # decision block on how to handle the subplots
         if kwargs['mode']=='boundaries':
 
             # prepare the subplot
@@ -227,15 +229,19 @@ class ShellPlotter:
             ax1 = ax[:,0]
             ax2 = ax[:,1]
             ax3 = ax[:,2]
+        elif kwargs['mode']=='line':
+            # prepare the subplot
+            fig, (ax1, ax2, ax3) = pp.subplots(1, 3, sharey=False, sharex=True, figsize=(10, 4))
         else:
             # prepare the subplot
             fig, (ax1, ax2, ax3) = pp.subplots(1, 3, sharey=True, sharex=True, figsize=(10, 4))
 
         if kwargs['mode'] == 'line':
-            x_arg = rr
+            x_arg = [rr]
         else:
-            x_arg = (XX, YY)
+            x_arg = [XX, YY]
 
+        rarg = None
         if kwargs['type']=='simple' or kwargs['type']=='curl':
 
             prefix = self.title_dict[kwargs['type']]
@@ -250,15 +256,17 @@ class ShellPlotter:
 
 
             # plot r field component
-            self.plot_field(fig, ax1, x_arg, U_r, colormap='dual', title=prefix+'{r}$', **kwargs)
+            self.plot_field(fig, ax1, *x_arg, U_r, colormap='dual', title=prefix+'{r}$', **kwargs)
             if kwargs['mode']!='boundaries' and kwargs['mode']!='line':
                 ax1.set_aspect('equal')
 
             # plot theta field component
-            self.plot_field(fig, ax2, x_arg, U_theta, colormap='dual', title=prefix+'{\Theta}$', **kwargs)
+            self.plot_field(fig, ax2, *x_arg, U_theta, colormap='dual', title=prefix+'{\Theta}$', **kwargs)
 
             # plot phi field component
-            self.plot_field(fig, ax3, x_arg, U_phi, colormap='dual', title=prefix+'{\phi}$', **kwargs)
+            self.plot_field(fig, ax3, *x_arg, U_phi, colormap='dual', title=prefix+'{\phi}$', **kwargs)
+
+            rarg = (*x_arg, np.real(U_r), np.real(U_theta), np.real(U_phi))
 
         else:
 
@@ -297,14 +305,18 @@ class ShellPlotter:
             Helicity = U_r * Omega_r + U_theta * Omega_theta + U_phi * Omega_phi
 
             # plot Energy
-            self.plot_field(fig, ax1, x_arg, Energy, colormap = 'log', title=r'$\frac{1}{2}\left|\bm{u}\right|^2$', **kwargs)
+            self.plot_field(fig, ax1, *x_arg, Energy, colormap = 'log', title=r'$\frac{1}{2}\left|\bm{u}\right|^2$', **kwargs)
             if kwargs['mode']!='boundaries' and kwargs['mode']!='line':
                 ax1.set_aspect('equal')
             # plot Enstrophy
-            self.plot_field(fig, ax2, x_arg, Enstrophy, colormap='log', title=r'$\frac{1}{2}\left|\bm{\nabla}\times\bm{u}\right|^2$', **kwargs)
+            self.plot_field(fig, ax2, *x_arg, Enstrophy, colormap='log', title=r'$\frac{1}{2}\left|\bm{\nabla}\times\bm{u}\right|^2$', **kwargs)
 
             # plot Helicity
-            self.plot_field(fig, ax3, x_arg, Helicity, colormap='dual', title=r'$\bm{u}\cdot\bm{\nabla}\times\bm{u}$', **kwargs)
+            self.plot_field(fig, ax3, *x_arg, Helicity, colormap='dual', title=r'$\bm{u}\cdot\bm{\nabla}\times\bm{u}$', **kwargs)
+
+            rarg = (*x_arg, Energy, Enstrophy, Helicity)
+
+        return rarg
 
     """
     def plot_equatorial(self, **kwargs):
@@ -463,6 +475,7 @@ class ShellPlotter:
 
     """
     def plot_field(self, fig, ax, *args, **kwargs):
+
         if kwargs['mode']=='line':
             rr = args[0]
             ff = args[1]
@@ -538,7 +551,7 @@ class ShellPlotter:
 
         factor = 2.0
 
-        if kwargs['mode']=='meridional':
+        if kwargs['mode']=='meridional' or kwargs['mode']=='boundaries':
 
             # prepare arrays
             eimp = np.exp(1j * m * self.phi_0)*factor
