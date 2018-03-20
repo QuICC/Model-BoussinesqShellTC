@@ -1,5 +1,8 @@
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as pp
+import sys, os.path, time
+import xml.etree.ElementTree as ET
 
 from matplotlib.ticker import OldScalarFormatter
 
@@ -11,6 +14,68 @@ class TorqueRepresenter(BaseRepresenter):
     def __init__(self):
         BaseRepresenter.__init__(self)
         pass
+
+    def open(self, filename=None):
+
+        if filename == None:
+            try:
+                argv = sys.argv
+                # print argv
+                self.filename = argv[1]
+            except RuntimeError as e:
+                print(e)
+                print('Supposed usage: python represent_energies.py filename')
+                sys.exit()
+
+        else:
+            self.filename = filename
+
+        try:
+
+            folder_name = os.path.relpath(".", "..")
+            data = pd.read_csv(self.filename, sep='\t', skiprows=3, names=self.name_columns)
+
+        except IOError as e:
+            folderpath = os.path.dirname(self.filename)
+            data = []
+            for folder in os.listdir(folderpath):
+                if (os.path.isdir(folderpath + '/' + folder)):
+                    try:
+                        local_filename = folderpath + '/' + folder + '/' + os.path.basename(self.filename)
+                        datatemp = pd.read_csv(local_filename, sep='\t', skiprows=3, names=self.name_columns)
+                        print(time.ctime(os.path.getmtime(local_filename)))
+                        last_modified_time = pd.Timestamp(time.ctime(os.path.getmtime(local_filename)))
+                        #print(folder, data)
+
+                        # if older than 2017-06-19 correct the value
+                        if last_modified_time < pd.Timestamp('2017-06-19'):
+
+                            # find Ekman number
+                            local_param_file = folderpath + '/' + folder + '/parameters.cfg'
+                            cfg_file = open(local_param_file, 'r')
+                            header = cfg_file.readline()
+                            root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
+                            Ek = float(root[2][0][0].text)
+                            print('Parameter file found', Ek)
+
+                            ri = 0.35 / (1. - 0.35)
+                            T = np.sqrt(4 * np.pi / 3) * ri
+                            datatemp['value'] = (datatemp['value'] + ri * T * 8 * np.pi / 3. * Ek) * ri
+
+                        data.append(datatemp)
+
+                    except IOError as e:
+
+                        #print(folder + '/' + os.path.basename(self.filename))
+                        #print(e)
+                        pass
+            data = pd.concat(data, ignore_index=True)
+
+            data.reindex()
+            # print(data.head())
+            data.sort_values([r'$t$'], inplace=True)
+
+        self.data = data
 
     def draw(self):
         data = self.data

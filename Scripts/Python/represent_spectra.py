@@ -64,8 +64,7 @@ class SpectraRepresenter(BaseRepresenter):
         pp.ticklabel_format(style='sci', axis='y')
 
         #print(type(self.datafull))
-
-
+        print(type)
         self.draw_snapshot(self.datafull,type=type)
 
     def draw_snapshot(self, datafull, **kwargs):
@@ -75,8 +74,8 @@ class SpectraRepresenter(BaseRepresenter):
         # set parameters for plotting
         #pp.ticklabel_format(style='sci', axis='y')
 
-        #data = datafull[-1, 1:]
-        data = datafull[ 1:]
+        data = datafull[-1, 1:]
+        #data = datafull[ 1:]
 
         try:
 
@@ -87,7 +86,7 @@ class SpectraRepresenter(BaseRepresenter):
             root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
             Lmax = int(root[1][0][1].text)+1
             Mmax = int(root[1][0][2].text)+1
-            print('Parameter file found')
+            print('Parameter file found', Lmax, Mmax)
         except BaseException as e:
             Lmax = Mmax = data.shape[0] / 4
             pass
@@ -97,10 +96,12 @@ class SpectraRepresenter(BaseRepresenter):
             pp.loglog(np.cumsum(np.ones_like(data[:Lmax])), data[:Lmax], label='L spectrum, toroidal')
             pp.loglog(np.cumsum(np.ones_like(data[Mmax + Lmax:Mmax + 2 * Lmax])), data[Mmax + Lmax:Mmax + 2 * Lmax],
                       label='L spectrum, poloidal')
-        elif kwargs['type']!='m':
+
+        if kwargs['type']!='m':
             pp.loglog(np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax])), data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
             pp.loglog(np.cumsum(np.ones_like(data[Mmax+ 2 * Lmax:])), data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
-
+            
+        pp.ylim(ymin=1e-20)
 
         """
         pp.figure()

@@ -10,12 +10,12 @@ import numpy as np
 from numpy.polynomial import chebyshev as cheb
 from numpy.polynomial import legendre as leg
 from matplotlib import pyplot as pp
-from matplotlib import rc, rcParams
+from matplotlib import rc
 from matplotlib.colors import LogNorm, Normalize
 
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-rc('text', usetex=True)
-pp.rc('text.latex', preamble=r'\usepackage{bm}')
+#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+#rc('text', usetex=True)
+#rc('text.latex', preamble=r'\usepackage{bm}')
 
 def rank_1_matrix(a, b):
     # Input:
@@ -134,6 +134,8 @@ class ShellPlotter:
 
         # produce grid for bulk of the flow only
         delta = self.E ** .5
+        if self.E >1e-4:
+            delta = 0.01
 
         # first if decision block over the radial grid
         if kwargs['mode']=='boundaries':
@@ -145,25 +147,54 @@ class ShellPlotter:
         elif  kwargs['mode']=='line':
 
             eta = self.rratio
-            ymin = eta/(1-eta)
-            xmin = 0.
-            theta_crit = np.arccos(np.abs(self.fN)/2)
-            h = ((1+eta)/(1-eta))**.5
-            xmax = xmin + np.sin(theta_crit)*h
-            ymax = ymin + np.cos(theta_crit)*h
 
-            xx = np.linspace(xmin, xmax, 8*self.nN )
-            yy = np.linspace(ymin, ymax, 8*self.nN )
+            # if the cut argument is standard, perform
+            # a flat cut at z = 1/2(r_i+r_o)
+            if kwargs.get('cut','orthogonal') == 'standard':
+
+                ymin = (eta + 1.) / (1. - eta) / 2.
+                xmin = 0.
+                theta_crit = np.arccos(np.abs(self.fN) / 2)
+                h = ((1./(1.-eta))**2-ymin**2 )**.5
+                xmax = xmin + h
+                ymax = ymin
+
+                # modify the self.phi_0 variable to 90 degrees
+                self.phi_0 = np.pi/2
+
+
+
+            else:
+                ymin = eta / (1 - eta)
+                xmin = 0.
+                theta_crit = np.arccos(np.abs(self.fN) / 2)
+                h = ((1 + eta) / (1 - eta)) ** .5
+                xmax = xmin + np.cos(theta_crit) * h
+                ymax = ymin + np.sin(theta_crit) * h
+
+
+
+
+            xx = np.linspace(xmin, xmax, 15*self.nN)
+            yy = np.linspace(ymin, ymax, 15*self.nN)
 
             rr = (xx**2+yy**2)**.5
-            ttheta = np.arctan2(xx,yy)
+            cottheta = np.arctan2(yy,xx)
+
+            xx2 = xx-xmin
+            yy2 = yy-ymin
+
+            xe = (xx2**2 + yy2**2)**.5
 
             # select the interior of the flow
             idx = (rr >= self.ri + 10 * delta) & (rr <= self.ro - 10 * delta)
             rr = rr[idx]
+            xe = xe[idx]
+            cottheta = cottheta[idx]
+            ttheta = np.pi/2-cottheta
 
             xx_bulk = (rr - self.b) / self.a
-            ttheta = ttheta[idx]
+
         else:
 
             #delta = 0.
@@ -237,7 +268,7 @@ class ShellPlotter:
             fig, (ax1, ax2, ax3) = pp.subplots(1, 3, sharey=True, sharex=True, figsize=(10, 4))
 
         if kwargs['mode'] == 'line':
-            x_arg = [rr]
+            x_arg = [xe]
         else:
             x_arg = [XX, YY]
 
@@ -253,6 +284,14 @@ class ShellPlotter:
 
             # compute (either velocity or vorticity
             self.loop_over(U_r, U_theta, U_phi, **kwargs)
+
+            if kwargs.get('cut','orthogonal') == 'standard':
+
+                U_s = np.sin(ttheta) *  U_r + np.cos(ttheta)* U_theta
+                U_z = np.cos(ttheta) * U_r - np.sin(ttheta) * U_theta
+
+                U_r = U_s
+                U_theta = U_z
 
 
             # plot r field component
