@@ -38,14 +38,14 @@ class SpectraRepresenter(BaseRepresenter):
             datafull = []
             for folder in os.listdir(folderpath):
                 if (os.path.isdir(folderpath+'/'+folder)):
-                    print(folder)
+                    #print(folder)
                     try:
-                        print(folderpath+'/'+folder + '/' + os.path.basename(self.filename))
+                        #print(folderpath+'/'+folder + '/' + os.path.basename(self.filename))
                         datatemp = pd.DataFrame(np.loadtxt(folderpath+'/'+folder + '/' + os.path.basename(self.filename), skiprows=3))
                         datafull.append(datatemp)
-                        print(datatemp)
+                        #print(datatemp)
                     except IOError as e:
-                        # print(e)
+                        #print(e)
                         pass
 
             datafull = pd.concat(datafull, ignore_index=True)
@@ -93,15 +93,24 @@ class SpectraRepresenter(BaseRepresenter):
 
 
         if kwargs['type']!='l':
-            pp.loglog(np.cumsum(np.ones_like(data[:Lmax])), data[:Lmax], label='L spectrum, toroidal')
-            pp.loglog(np.cumsum(np.ones_like(data[Mmax + Lmax:Mmax + 2 * Lmax])), data[Mmax + Lmax:Mmax + 2 * Lmax],
+            pp.loglog(data[:Lmax], label='L spectrum, toroidal')
+            pp.loglog(data[Mmax + Lmax:Mmax + 2 * Lmax],
                       label='L spectrum, poloidal')
 
         if kwargs['type']!='m':
             pp.loglog(np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax])), data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
             pp.loglog(np.cumsum(np.ones_like(data[Mmax+ 2 * Lmax:])), data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
-            
-        pp.ylim(ymin=1e-20)
+        """
+        index_vector = np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax]))
+        pp.loglog(index_vector, index_vector**(-5./3)*3e-4,'--', label=r'$k^{-\frac{5}{3}}$')
+
+        index_vector = index_vector[index_vector > 10.]
+        pp.loglog(index_vector, index_vector**(-3.)*3e-2,'--', label=r'$k^{-3}$')
+
+        index_vector = index_vector[index_vector > 40.]
+        pp.loglog(index_vector, index_vector**(-5)*3e2, '--', label=r'$k^{-5}$')
+        """
+        #pp.ylim(ymin=1e-20)
 
         """
         pp.figure()
@@ -111,7 +120,7 @@ class SpectraRepresenter(BaseRepresenter):
         pp.semilogy(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
         # pp.title(folder_name)
         """
-        pp.xlabel(r'$l+1 \quad m+1$')
+        pp.xlabel(r'$l\quad m+1$')
         pp.ylabel(r'$E_{kin}$')
         pp.legend(prop={'size': 14})
 

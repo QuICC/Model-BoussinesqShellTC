@@ -59,15 +59,15 @@ class BaseRepresenter:
                     try:
                         datatemp = pd.read_csv(folderpath+'/'+folder + '/' + os.path.basename(self.filename), sep='\t', skiprows=3,
                                                names=self.name_columns)
-                        print('here')
-                        print(folder, data)
+                        #print('here')
+                        #print(folder, data)
                         data.append(datatemp)
-                        print(datatemp)
-                        print(data)
+                        #print(datatemp)
+                        #print(data)
                     except IOError as e:
 
                         print(folder + '/' + os.path.basename(self.filename))
-                        print(e)
+                        #print(e)
                         pass
             print(data)
             data = pd.concat(data, ignore_index=True)

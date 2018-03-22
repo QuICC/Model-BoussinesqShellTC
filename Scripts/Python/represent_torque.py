@@ -43,7 +43,7 @@ class TorqueRepresenter(BaseRepresenter):
                     try:
                         local_filename = folderpath + '/' + folder + '/' + os.path.basename(self.filename)
                         datatemp = pd.read_csv(local_filename, sep='\t', skiprows=3, names=self.name_columns)
-                        print(time.ctime(os.path.getmtime(local_filename)))
+#print(time.ctime(os.path.getmtime(local_filename)))
                         last_modified_time = pd.Timestamp(time.ctime(os.path.getmtime(local_filename)))
                         #print(folder, data)
 
@@ -52,11 +52,12 @@ class TorqueRepresenter(BaseRepresenter):
 
                             # find Ekman number
                             local_param_file = folderpath + '/' + folder + '/parameters.cfg'
+                            print(local_param_file)
                             cfg_file = open(local_param_file, 'r')
                             header = cfg_file.readline()
                             root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
                             Ek = float(root[2][0][0].text)
-                            print('Parameter file found', Ek)
+                            #print('Parameter file found', Ek)
 
                             ri = 0.35 / (1. - 0.35)
                             T = np.sqrt(4 * np.pi / 3) * ri
