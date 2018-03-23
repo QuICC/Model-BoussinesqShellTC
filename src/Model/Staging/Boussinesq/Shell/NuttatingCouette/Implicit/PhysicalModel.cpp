@@ -240,11 +240,11 @@ namespace Implicit {
       // the theta coordinate is the cos of colatitude
       // the phi coordinate is azimuthal in radiants
       mProbes << 0.0, 0.5, 0.0,
-    		  0.0, -0.5, Math::PI/3.,
-			  0.0, 0.5, Math::PI*2./3.,
-			  0.0, -0.5, Math::PI,
-			  0.0, 0.5, Math::PI*4./3.,
-			  0.0, -0.5, Math::PI*5./3.;
+              0.0, -0.5, Math::PI/3.,
+              0.0, 0.5, Math::PI*2./3.,
+              0.0, -0.5, Math::PI,
+              0.0, 0.5, Math::PI*4./3.,
+              0.0, -0.5, Math::PI*5./3.;
 
 
       // Create probe field writer
