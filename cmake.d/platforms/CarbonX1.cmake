@@ -93,7 +93,7 @@ set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
-set(QUICC_CC_ARCH_GCC "-march=native -lm -O2 -Wall -D _GLIBCXX_USE_C99_MATH" PARENT_SCOPE)
+set(QUICC_CC_ARCH_GCC "-O2 -w" PARENT_SCOPE)
 
 set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
 
@@ -107,7 +107,7 @@ set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python27" "python35" PARENT_SCOPE)
+set(QUICC_PYTHONS "python27" "python35" "python36" PARENT_SCOPE)
 
 set(QUICC_LIBRARIES_PYTHON27 "/usr/lib/x86_64-linux-gnu/libpython2.7.so" PARENT_SCOPE)
 set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" "/usr/lib/python2.7/dist-packages/numpy/core/include" PARENT_SCOPE)
@@ -115,6 +115,9 @@ set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" "/usr/lib/python2.7/dist-pa
 
 set(QUICC_LIBRARIES_PYTHON35 "/usr/lib/x86_64-linux-gnu/libpython3.5m.so" PARENT_SCOPE)
 set(QUICC_INCLUDES_PYTHON35 "/usr/include/python3.5m" "/usr/lib/python3/dist-packages/numpy/core/include" PARENT_SCOPE)
+
+set(QUICC_LIBRARIES_PYTHON36 "/usr/lib/x86_64-linux-gnu/libpython3.6m.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON36 "/usr/include/python3.6m" "/usr/lib/python3/dist-packages/numpy/core/include" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#

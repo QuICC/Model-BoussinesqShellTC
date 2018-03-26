@@ -140,8 +140,8 @@ namespace Implicit {
 #ifdef QUICC_MPIALGO_SINGLE1D
 #error "The SINGLE1D parallelisation is not supported!" 
 #endif //QUICC_MPIALGO_SINGLE1D
-#if defined QUICC_MPIALGO_TUBULAR && !(defined QUICC_SPLINALG_MUMPS && defined QUICC_MPISPSOLVE)
-#error "The TUBULAR parallelisation is not supported!" 
+#if defined QUICC_MPIALGO_TUBULAR && !defined QUICC_SPLINALG_MUMPS && !defined QUICC_MPISPSOLVE
+#error "The TUBULAR parallelisation is not supported!"
 #endif //defined QUICC_MPIALGO_TUBULAR && !defined QUICC_SPLINALG_MUMPS && !defined QUICC_MPISPSOLVE
 
 #endif // QUICC_MODEL_BOUSSINESQ_SHELL_COUETTE_IMPLICIT_PHYSICALMODEL_HPP
