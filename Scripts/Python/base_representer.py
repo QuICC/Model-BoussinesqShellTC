@@ -83,12 +83,12 @@ class BaseRepresenter:
         pp.tight_layout()
 
         # check  for the python pattern at the beginning of the file
-        """
+
         if re.match('python.*', sys.argv[0]):
             pass
         else:
             self.idx_draw = 10000
-        """
+
 
         try:
             fout = sys.argv[self.idx_draw]

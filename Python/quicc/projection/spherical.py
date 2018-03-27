@@ -26,22 +26,87 @@ class OnlyOne:
         return getattr(self.instance, name)
 """
 
+class SingletonPlm(object):
+
+    __dict = None
+
+    instance = None
+    def __init__(self, key):
+        if not SingletonPlm.instance:
+            SingletonPlm.instance = key
+            SingletonPlm.__dict = dict()
+        else:
+            SingletonPlm.instance = key
+            SingletonPlm.__dict = dict()
+
+    def get_dict(self, key):
+
+        if (SingletonPlm.instance == key).all():
+            return SingletonPlm.__dict
+
+        else:
+            SingletonPlm.instance = key
+            SingletonPlm.__dict = dict()
+            return SingletonPlm.__dict
+
+
+
+
+
+SingletonPlm(0)
+"""
 def plm(l, m, x):
 
-    """Compute the normalized associated legendre polynomial projection matrix"""
-    if l<m or m<0 or l<0:
-        return np.zeros_like(x)
-    maxl = l
-    mat = np.zeros((len(x), maxl - m + 1))
-    mat[:,0] = pmm(maxl, m, x)[:,0]
-    if maxl == m:
+    if (l,m) in SingletonPlm.get_dict(SingletonPlm,x):
+        return SingletonPlm.get_dict(SingletonPlm,x)[(l,m)]
+    else:
+        #Compute the normalized associated legendre polynomial projection matrix
+        if l<m or m<0 or l<0:
+            return np.zeros_like(x)
+        maxl = l
+        #print(x)
+        
+
+        if (m,m) not in SingletonPlm.get_dict(SingletonPlm,x):
+            SingletonPlm.get_dict(SingletonPlm, x)[(m, m)] = pmm(maxl, m, x)[:,0]
+
+        if (m + 1, m) not in SingletonPlm.get_dict(SingletonPlm,x):
+            SingletonPlm.get_dict(SingletonPlm, x)[(m + 1, m)] = np.sqrt(2.0 * m + 3.0) * x * SingletonPlm.get_dict(SingletonPlm,x)[(m,m)]
+
+
+
+
+        for i, l in enumerate(range(m+2, maxl + 1)):
+            #mat[:,i+2] = np.sqrt((2.0*l + 1)/(l - m))*np.sqrt((2.0*l - 1.0)/(l + m))*x*mat[:,i+1] - np.sqrt((2.0*l + 1)/(2.0*l - 3.0))*np.sqrt((l + m - 1.0)/(l + m))*np.sqrt((l - m - 1.0)/(l - m))*mat[:,i]
+            if (l,m) not in SingletonPlm.get_dict(SingletonPlm,x):
+                temp = np.sqrt((2.0 * l + 1) / (l - m)) * np.sqrt((2.0 * l - 1.0) / (l + m)) * x *  SingletonPlm.get_dict(SingletonPlm,x)[(l-1,m)] - np.sqrt(
+                    (2.0 * l + 1) / (2.0 * l - 3.0)) * np.sqrt((l + m - 1.0) / (l + m)) * np.sqrt(
+                    (l - m - 1.0) / (l - m)) *  SingletonPlm.get_dict(SingletonPlm,x)[(l-2,m)]
+                SingletonPlm.get_dict(SingletonPlm,x)[(l,m)] = temp
+                #print('('+str(l)+','+str(m)+')')
+        return SingletonPlm.get_dict(SingletonPlm,x)[(maxl,m)]
+
+"""
+def plm(l, m, x):
+
+
+        #Compute the normalized associated legendre polynomial projection matrix
+        if l<m or m<0 or l<0:
+            return np.zeros_like(x)
+        maxl = l
+        mat = np.zeros((len(x), maxl - m + 1))
+        mat[:,0] = pmm(maxl, m, x)[:,0]
+        if maxl == m:
+            return mat[:,-1]
+
+        mat[:,1] = np.sqrt(2.0*m + 3.0)*x*mat[:,0]
+
+        for i, l in enumerate(range(m+2, maxl + 1)):
+            mat[:,i+2] = np.sqrt((2.0*l + 1)/(l - m))*np.sqrt((2.0*l - 1.0)/(l + m))*x*mat[:,i+1] - np.sqrt((2.0*l + 1)/(2.0*l - 3.0))*np.sqrt((l + m - 1.0)/(l + m))*np.sqrt((l - m - 1.0)/(l - m))*mat[:,i]
+
+        #SingletonPlm.get_dict(SingletonPlm,x)[(l,m)]=mat[:,-1]
         return mat[:,-1]
 
-    mat[:,1] = np.sqrt(2.0*m + 3.0)*x*mat[:,0]
-    for i, l in enumerate(range(m+2, maxl + 1)):
-        mat[:,i+2] = np.sqrt((2.0*l + 1)/(l - m))*np.sqrt((2.0*l - 1.0)/(l + m))*x*mat[:,i+1] - np.sqrt((2.0*l + 1)/(2.0*l - 3.0))*np.sqrt((l + m - 1.0)/(l + m))*np.sqrt((l - m - 1.0)/(l - m))*mat[:,i]
-
-    return mat[:,-1]
 
 def pmm(maxl, m, x):
     """Compute the normalized associated legendre polynomial of order and degree m"""

@@ -13,9 +13,9 @@ from matplotlib import pyplot as pp
 from matplotlib import rc
 from matplotlib.colors import LogNorm, Normalize
 
-#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-#rc('text', usetex=True)
-#rc('text.latex', preamble=r'\usepackage{bm}')
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+rc('text', usetex=True)
+rc('text.latex', preamble=r'\usepackage{bm}')
 
 def rank_1_matrix(a, b):
     # Input:
@@ -263,14 +263,21 @@ class ShellPlotter:
         elif kwargs['mode']=='line':
             # prepare the subplot
             fig, (ax1, ax2, ax3) = pp.subplots(1, 3, sharey=False, sharex=True, figsize=(10, 4))
-        else:
+        elif kwargs['mode']=='equatorial':
             # prepare the subplot
             fig, (ax1, ax2, ax3) = pp.subplots(1, 3, sharey=True, sharex=True, figsize=(10, 4))
+        else:
+            fig, (ax1, ax2, ax3) = pp.subplots(1, 3, sharey=True, sharex=True, figsize=(10, 8))
 
         if kwargs['mode'] == 'line':
             x_arg = [xe]
         else:
             x_arg = [XX, YY]
+
+        if kwargs['mode'] != 'boundaries' and kwargs['mode'] != 'line':
+            ax1.set_aspect('equal')
+            ax2.set_aspect('equal')
+            ax3.set_aspect('equal')
 
         rarg = None
         if kwargs['type']=='simple' or kwargs['type']=='curl':
@@ -296,8 +303,7 @@ class ShellPlotter:
 
             # plot r field component
             self.plot_field(fig, ax1, *x_arg, U_r, colormap='dual', title=prefix+'{r}$', **kwargs)
-            if kwargs['mode']!='boundaries' and kwargs['mode']!='line':
-                ax1.set_aspect('equal')
+
 
             # plot theta field component
             self.plot_field(fig, ax2, *x_arg, U_theta, colormap='dual', title=prefix+'{\Theta}$', **kwargs)
@@ -357,162 +363,7 @@ class ShellPlotter:
 
         return rarg
 
-    """
-    def plot_equatorial(self, **kwargs):
 
-        # produce the grid for plotting
-        xx_r, ww = cheb.chebgauss(4 * self.nN)
-        rr = self.a * xx_r + self.b
-
-        # produce grid for bulk of the flow only
-        # delta = self.E ** .5
-        delta = 0.
-        rr = rr[(rr >= self.ri + 10 * delta) & (rr <= self.ro - 10 * delta)]
-        xx_bulk = (rr - self.b) / self.a
-
-        # generate the grid for the
-        pphi = np.linspace(0, 2*np.pi, 2 * self.nL+1) + self.phi_0
-        RR, PP = np.meshgrid(rr, pphi)
-        XX = np.cos(PP) * RR
-        YY = np.sin(PP) * RR
-
-        # produce the mapping for chebyshev polynomials
-        self.Tn_eval = shell.proj_radial(self.nN, self.a, self.b, xx_bulk)  # evaluate chebyshev simple
-        self.dTndr_eval = shell.proj_dradial_dr(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r d/dr(r Tn)
-        self.Tn_r_eval = shell.proj_radial_r(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r Tn
-
-        # produce the mapping for the tri-curl part
-        self.Tn_r2_eval = shell.proj_radial_r2(self.nN, self.a, self.b, xx_bulk) # evaluate 1/r**2 Tn
-        self.d2Tndr2_eval = shell.proj_lapl(self.nN, self.a, self.b, xx_bulk) # evaluate 1/r**2dr r**2 dr
-
-        # initialize the fields
-        U_phi = np.zeros_like(XX, dtype=complex)
-        U_r = np.zeros_like(XX, dtype=complex)
-        U_theta = np.zeros_like(XX, dtype=complex)
-
-        # loop over
-        self.loop_over(U_r, U_theta, U_phi, pphi = pphi, **kwargs)
-
-        if kwargs['mode']=='boundaries':
-
-            # prepare the subplot
-            fig, ax = pp.subplots(2, 3, sharey=False, sharex=True, figsize=(10, 2))
-            ax1 = ax[:,0]
-            ax2 = ax[:,1]
-            ax3 = ax[:,2]
-        else:
-            # prepare the subplot
-            fig, (ax1, ax2, ax3) = pp.subplots(1, 3, sharey=True, sharex=True, figsize=(10, 4))
-
-        prefix = self.title_dict[self.vector_field_type]
-
-        # plot Ur
-        im1 = ax1.contourf(XX, YY, np.real(U_r), 100, cmap = pp.get_cmap('coolwarm'), vmin=np.nanmin(np.real(U_r)),
-                           vmax=np.nanmax(np.real(U_r)))
-        ax1.set_aspect('equal')
-        ax1.set_title(prefix+'{r}$')
-        pp.colorbar(im1, ax = ax1, orientation = 'horizontal', ticks=[np.nanmin(np.real(U_r)), np.nanmax(np.real(U_r))]
-                    , shrink=0.8)
-
-        # plot Utheta
-        im2 = ax2.contourf(XX, YY, np.real(U_theta), 100, cmap = pp.get_cmap('coolwarm'), vmin=np.nanmin(np.real(U_theta)),
-                           vmax=np.nanmax(np.real(U_theta)))
-        ax2.set_title(prefix+'{\theta}$')
-        pp.colorbar(im2, ax = ax2, orientation = 'horizontal',
-                    ticks=[np.nanmin(np.real(U_theta)), np.nanmax(np.real(U_theta))], shrink=0.8)
-
-        # plot Uphi
-        im3 = ax3.contourf(XX, YY, np.real(U_phi), 100, cmap = pp.get_cmap('coolwarm'), vmin=np.nanmin(np.real(U_phi)),
-                           vmax=np.nanmax(np.real(U_phi)))
-        ax3.set_title(prefix+'{\phi}$')
-        pp.colorbar(im3, ax = ax3, orientation = 'horizontal',
-                    ticks=[np.nanmin(np.real(U_phi)), np.nanmax(np.real(U_phi))], shrink=0.8)
-        print(np.nanmin(np.real(U_phi)), np.nanmax(np.real(U_phi)))
-    """
-    """
-
-    def plot_boundaries(self, **kwargs):
-
-        # produce the grid for plotting
-        xx_r, ww = cheb.chebgauss(2 * self.nN)
-        rr = self.a * xx_r + self.b
-
-        xx_th, ww = leg.leggauss(2 * self.nL)
-        ttheta = np.arccos(xx_th)
-
-        # produce grid for the boundary
-        delta = self.E ** .5
-        rr = rr[(rr < self.ri + 10 * delta) | (rr > self.ro - 10 * delta)]
-        xx_bulk = (rr - self.b) / self.a
-        ttheta = np.concatenate(([np.pi], ttheta, [0]))
-        self.xx_th = np.cos(ttheta)
-
-        RR, TT = np.meshgrid(rr, ttheta)
-
-        # produce the mapping for chebyshev polynomials
-        self.Tn_eval = shell.proj_radial(self.nN, self.a, self.b, xx_bulk)  # evaluate chebyshev simple
-        self.dTndr_eval = shell.proj_dradial_dr(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r d/dr(r Tn)
-        self.Tn_r_eval = shell.proj_radial_r(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r Tn
-
-        # produce the mapping for the tri-curl part
-        self.Tn_r2_eval = shell.proj_radial_r2(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r**2 Tn
-        self.d2Tndr2_eval = shell.proj_lapl(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r**2dr r**2 dr
-
-        # initialize the fields
-        U_phi = np.zeros_like(RR, dtype=complex)
-        U_r = np.zeros_like(RR, dtype=complex)
-        U_theta = np.zeros_like(RR, dtype=complex)
-
-        # compute U_r, U_theta, U_phi
-        self.loop_over(U_r, U_theta, U_phi, **kwargs)
-
-        # prepare the subplot
-        fig, ax = pp.subplots(2,3, sharey=False, sharex=True, figsize = (10,2))
-        # find the separation between inner and outer boundary
-        idx_boundary = int(TT.shape[1]/2)
-
-        fig.subplots_adjust(hspace=0)
-
-        # define dictionary to plot
-        prefix = self.title_dict[self.vector_field_type]
-        # plot Ur
-
-        im00 = ax[0, 0].contourf(TT[:, 0:idx_boundary], RR[:, 0:idx_boundary], np.real(U_r[:, 0:idx_boundary]), 100,
-                                 cmap = pp.get_cmap('coolwarm'), vmin=min, vmax=max)
-        ax[0, 0].set_aspect(15.0)
-        im10 = ax[1, 0].contourf(TT[:, idx_boundary + 1:], RR[:, idx_boundary + 1:], np.real(U_r[:, idx_boundary + 1:]),
-                                 100, cmap=pp.get_cmap('coolwarm'), vmin=min, vmax=max)
-        ax[1, 0].set_aspect(15.0)
-        ax[0, 0].set_title(prefix+r'{r}$')
-        cb1 = fig.colorbar(im10, orientation='horizontal', ax=[ax[0, 0], ax[1, 0]], ticks=[min, max], shrink=0.8)
-
-        # plot Utheta
-        min = np.nanmin(np.real(U_theta))
-        max = np.nanmax(np.real(U_theta))
-        im01 = ax[0,1].contourf(TT[:, 0:idx_boundary], RR[:, 0:idx_boundary], np.real(U_theta[:, 0:idx_boundary]), 100,
-                                cmap=pp.get_cmap('coolwarm'), vmin=min, vmax=max)
-        ax[0, 1].set_aspect(15.0)
-        im11 = ax[1,1].contourf(TT[:, idx_boundary + 1:], RR[:, idx_boundary + 1:],
-                                np.real(U_theta[:, idx_boundary + 1:]), 100, cmap=pp.get_cmap('coolwarm'),
-                                vmin=min, vmax=max)
-        ax[1, 1].set_aspect(15.0)
-        ax[0,1].set_title(prefix+r'{\theta}$')
-        #print(np.real(U_theta).nanmin(), np.real(U_theta).nanmax())
-        cb2 = fig.colorbar(im11, orientation='horizontal', ax = [ax[0, 1], ax[1, 1]], ticks = [min, max], shrink=0.8)
-
-        # plot Uphi
-        min = np.nanmin(np.real(U_phi))
-        max = np.nanmax(np.real(U_phi))
-        im02 = ax[0,2].contourf(TT[:, 0:idx_boundary], RR[:, 0:idx_boundary], np.real(U_phi[:, 0:idx_boundary]), 100,
-                               cmap=pp.get_cmap('coolwarm'), vmin=min, vmax=max)
-        ax[0, 2].set_aspect(15.0)
-        im12 = ax[1,2].contourf(TT[:, idx_boundary + 1:], RR[:, idx_boundary + 1:], np.real(U_phi[:, idx_boundary + 1:]),
-                               100, cmap=pp.get_cmap('coolwarm'), vmin=min, vmax=max)
-        ax[1, 2].set_aspect(15.0)
-        ax[0, 2].set_title(prefix+r'{\phi}$')
-        cb3 = fig.colorbar(im12, orientation='horizontal', ax = [ax[0, 2], ax[1, 2]], ticks =[min, max], shrink=0.8)
-
-    """
     def plot_field(self, fig, ax, *args, **kwargs):
 
         if kwargs['mode']=='line':

@@ -26,8 +26,8 @@ class EnergyRepresenter(BaseRepresenter):
         # print('Final Toroidal to Total energy ratio of: '+string_ratio)
 
         #ax = data.plot(x=r'$t$', y=[r'$E_{tot}$', r'$E_{tor}$', r'$E_{pol}$', r'$E^c_{sym}$', r'$E^c_{asym}$', r'$E^{eq}_{sym}$', r'$E^{eq}_{asym}$'], logy = True)
-        ax = data.plot(x=r'$t$',
-                       y=[r'$E_{tot}$', r'$E_{tor}$', r'$E_{pol}$'], logy=True)
+        ax = data.plot(x=r'$t$', y=[r'$E_{tot}$', r'$E_{tor}$', r'$E_{pol}$', r'$E^c_{sym}$', r'$E^c_{asym}$'], logy = True)
+        #ax = data.plot(x=r'$t$', y=[r'$E_{tot}$', r'$E_{tor}$', r'$E_{pol}$'], logy=True)
         # set parameters for plotting
         #ax.yaxis.set_major_formatter(OldScalarFormatter())
         pp.rcParams['font.family'] = 'ubuntu'
