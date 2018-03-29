@@ -243,6 +243,7 @@ class ShellPlotter:
             YY = np.cos(TT) * RR
             XX = np.sin(TT) * RR
 
+        print(self.a, self.b)
         # produce the mapping for chebyshev polynomials
         self.Tn_eval = shell.proj_radial(self.nN, self.a, self.b, xx_bulk)  # evaluate chebyshev simple
         self.dTndr_eval = shell.proj_dradial_dr(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r d/dr(r Tn)
@@ -397,16 +398,16 @@ class ShellPlotter:
             im = ax[1].contourf(XX[:, idx_boundary + 1:], YY[:, idx_boundary + 1:], ZZ[:, idx_boundary + 1:], 100, cmap=map, norm = norm)
             ax[1].set_aspect(15.0)
             ax[0].set_title(kwargs['title'])
-            #cb1 = fig.colorbar(im10, orientation='horizontal', ax=[ax[0], ax[1]], ticks=[min, max], shrink=0.8)
+            cb1 = fig.colorbar(im, orientation='horizontal', ax=[ax[0], ax[1]], ticks=[min, max], shrink=0.8)
         elif kwargs['mode']=='line':
             ax.plot(rr, ff )
         else:
             im = ax.contourf(XX, YY, ZZ, 100, cmap=map, norm = norm)
             ax.set_title(kwargs['title'])
             if kwargs.get('colormap', 'dual') == 'log':
-                fig.colorbar(im, orientation='horizontal', ax=ax, shrink=1.0)
+                fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8)
             else:
-                fig.colorbar(im, orientation='horizontal', ax=ax, shrink=1.0)
+                fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8)
 
 
 
@@ -439,8 +440,13 @@ class ShellPlotter:
             raise RuntimeError('Unknown vector field type '+self.vector_field_type)
             pass
 
-        factor = 2.0
-
+        """
+        if m==0:
+            factor=1.
+        else:
+            factor=2.
+        """
+        factor=1.
         if kwargs['mode']=='meridional' or kwargs['mode']=='boundaries':
 
             # prepare arrays
@@ -460,6 +466,25 @@ class ShellPlotter:
             Field_theta += rank_1_matrix(Ylm_sin, rad_part_tor) * eimp
             Field_phi -= rank_1_matrix(dYlm, rad_part_tor) * eimp
 
+            if m!=0:
+                m=-m
+                # prepare arrays
+                eimp = np.exp(1j * m * self.phi_0) * factor
+
+                # initialize the theta tranforms
+                #Ylm = spherical.lplm(self.nL, l, m, self.xx_th)
+                #dYlm = spherical.dplm(self.nL, l, m, self.xx_th)
+                Ylm_sin = -1*Ylm_sin
+
+                # update the fields poloidal parts
+                Field_r += rank_1_matrix(Ylm, np.conj(rad_part_ur)) * eimp
+                Field_theta += rank_1_matrix(dYlm, np.conj(rad_part_pol)) * eimp
+                Field_phi += rank_1_matrix(Ylm_sin, np.conj(rad_part_pol)) * eimp
+
+                # update the fields toroidal parts
+                Field_theta += rank_1_matrix(Ylm_sin, np.conj(rad_part_tor)) * eimp
+                Field_phi -= rank_1_matrix(dYlm, np.conj(rad_part_tor)) * eimp
+
         elif kwargs['mode']=='line':
 
             # prepare arrays
@@ -478,6 +503,26 @@ class ShellPlotter:
             # update the fields toroidal parts
             Field_theta += Ylm_sin* rad_part_tor * eimp
             Field_phi -= dYlm* rad_part_tor * eimp
+
+            if m != 0:
+
+                # prepare arrays
+                eimp = np.exp(1j * -1* m * self.phi_0) * factor
+
+                # initialize the theta tranforms
+                #Ylm = spherical.lplm(self.nL, l, m, self.xx_th)
+                #dYlm = spherical.dplm(self.nL, l, m, self.xx_th)
+                Ylm_sin = Ylm_sin*-1
+
+                # update the fields poloidal parts
+                Field_r += Ylm * np.conj(rad_part_ur) * eimp
+                Field_theta += dYlm * np.conj(rad_part_pol) * eimp
+                Field_phi += Ylm_sin * np.conj(rad_part_pol) * eimp
+
+                # update the fields toroidal parts
+                Field_theta += Ylm_sin * np.conj(rad_part_tor) * eimp
+                Field_phi -= dYlm * np.conj(rad_part_tor) * eimp
+
         else:
 
             # prepare arrays
@@ -496,3 +541,23 @@ class ShellPlotter:
             # update the fields toroidal parts
             Field_theta += rank_1_matrix(eimp, rad_part_tor) * Ylm_sin
             Field_phi -= rank_1_matrix(eimp, rad_part_tor) * dYlm
+
+            if m!=0:
+                m=-1*m
+                # prepare arrays
+                eimp = np.exp(1j * m * kwargs['pphi']) * factor
+
+                # initialize the theta tranforms
+                #Ylm = spherical.lplm(self.nL, l, m, np.array([0.]))
+                #dYlm = spherical.dplm(self.nL, l, m, np.array([0.]))
+                #Ylm_sin = spherical.lplm_sin(self.nL, l, m, np.array([0.])) * m * 1j
+                Ylm_sin = -1*Ylm_sin
+
+                # update the fields poloidal parts
+                Field_r += rank_1_matrix(eimp, np.conj(rad_part_ur)) * Ylm
+                Field_theta += rank_1_matrix(eimp, np.conj(rad_part_pol)) * dYlm
+                Field_phi += rank_1_matrix(eimp, np.conj(rad_part_pol)) * Ylm_sin
+
+                # update the fields toroidal parts
+                Field_theta += rank_1_matrix(eimp, np.conj(rad_part_tor)) * Ylm_sin
+                Field_phi -= rank_1_matrix(eimp, np.conj(rad_part_tor)) * dYlm
