@@ -240,7 +240,7 @@ namespace Explicit {
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
 
-
+      /*
       // Create probes
       Matrix mProbes(6,3);
 
@@ -258,6 +258,8 @@ namespace Explicit {
       IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector2);
+      */
+
       // Create kinetic energy spectral writer
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
@@ -267,10 +269,12 @@ namespace Explicit {
       IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
       spVector4->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector4);
-
+      
+      /*
       IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
       spVector5->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector5);
+      */
    }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
