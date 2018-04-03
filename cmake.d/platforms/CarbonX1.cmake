@@ -89,7 +89,7 @@ set(QUICC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
 #--------------- COMPILER SETTINGS ---------------#
 ###################################################
 
-set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
+set(QUICC_CC_SERIAL_GCC "g++-5" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
