@@ -230,24 +230,27 @@ namespace Explicit {
 		IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
 		spVector->expect(PhysicalNames::VELOCITY);
 		spSim->addAsciiOutputFile(spVector);
+       /*
+        // Create probes
+        Matrix mProbes(6,3);
 
-		  // Create probes
-		  Matrix mProbes(6,3);
-
-		  // the r coordinate is in x\in[-1,1] space
-		  // the theta coordinate is the cos of colatitude
-		  // the phi coordinate is azimuthal in radiants
-		  mProbes << 0.0, 0.5, 0.0,
-				  0.0, -0.5, Math::PI/3.,
-				  0.0, 0.5, Math::PI*2./3.,
-				  0.0, -0.5, Math::PI,
-				  0.0, 0.5, Math::PI*4./3.,
-				  0.0, -0.5, Math::PI*5./3.;
+        // the r coordinate is in x\in[-1,1] space
+        // the theta coordinate is the cos of colatitude
+        // the phi coordinate is azimuthal in radiants
+        mProbes << 0.0, 0.5, 0.0,
+              0.0, -0.5, Math::PI/3.,
+              0.0, 0.5, Math::PI*2./3.,
+              0.0, -0.5, Math::PI,
+              0.0, 0.5, Math::PI*4./3.,
+              0.0, -0.5, Math::PI*5./3.;
 
 		// Create probe field writer
 		IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
 		spVector2->expect(PhysicalNames::VELOCITY);
 		spSim->addAsciiOutputFile(spVector2);
+        */
+
+
 		// Create kinetic energy spectral writer
 		IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
 		spVector3->expect(PhysicalNames::VELOCITY);

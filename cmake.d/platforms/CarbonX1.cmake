@@ -89,11 +89,11 @@ set(QUICC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
 #--------------- COMPILER SETTINGS ---------------#
 ###################################################
 
-set(QUICC_CC_SERIAL_GCC "g++-5" PARENT_SCOPE)
+set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
-set(QUICC_CC_ARCH_GCC "-O2 -w" PARENT_SCOPE)
+set(QUICC_CC_ARCH_GCC "-O2 -w -std=c++11 -fext-numeric-literals" PARENT_SCOPE)
 
 set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
 

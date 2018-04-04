@@ -134,6 +134,7 @@ namespace IoVariable {
 
       // Store integral projector
       SparseMatrix temp = tmpProj*tmpI1*tmpR1*tmpR2;
+      this->mIntgOp  = (temp.row(0)-temp.row(1));
       IVariableAsciiEWriter::init();
    }
 
