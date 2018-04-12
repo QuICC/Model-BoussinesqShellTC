@@ -133,18 +133,18 @@ class BoussinesqCouetteShellBase(base_model.BaseModel):
 
             # Set LHS galerkin restriction
             if self.use_galerkin:
-                raise RuntimeError("Inhomogeneous boundary conditions cannot used Galerkin scheme!")
+                raise RuntimeError("Inhomogeneous boundary conditions cannot use Galerkin scheme!")
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
             if self.use_galerkin:
-                raise RuntimeError("Inhomogeneous boundary conditions cannot used Galerkin scheme!")
+                raise RuntimeError("Inhomogeneous boundary conditions cannot use Galerkin scheme!")
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
-                raise RuntimeError("Inhomogeneous boundary conditions cannot used Galerkin scheme!")
+                raise RuntimeError("Inhomogeneous boundary conditions cannot use Galerkin scheme!")
 
         else:
             bc = no_bc()
