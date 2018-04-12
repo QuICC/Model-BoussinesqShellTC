@@ -39,8 +39,8 @@ class BaseRepresenter:
                 # print argv
                 self.filename = argv[1]
             except RuntimeError as e:
-                print(e)
-                print('Supposed usage: python represent_energies.py filename')
+                #print(e)
+                #print('Supposed usage: python represent_energies.py filename')
                 sys.exit()
 
         else:
@@ -66,10 +66,10 @@ class BaseRepresenter:
                         #print(data)
                     except IOError as e:
 
-                        print(folder + '/' + os.path.basename(self.filename))
+                        #print(folder + '/' + os.path.basename(self.filename))
                         #print(e)
                         pass
-            print(data)
+
             data = pd.concat(data, ignore_index=True)
 
             data.reindex()
@@ -92,7 +92,7 @@ class BaseRepresenter:
 
         try:
             fout = sys.argv[self.idx_draw]
-            print(fout)
+            #print(fout)
             pp.savefig(fout)
             self.idx_draw+=1
         except IndexError as e:
@@ -101,7 +101,7 @@ class BaseRepresenter:
     def search_in_parameter(self, param):
 
         dirname = os.path.dirname(self.filename)
-        print(dirname)
+        #print(dirname)
         cfg_file = open(dirname + '/parameters.cfg', 'r')
         header = cfg_file.readline()
         root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')

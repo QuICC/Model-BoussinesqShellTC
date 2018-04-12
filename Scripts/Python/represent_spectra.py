@@ -125,6 +125,7 @@ class SpectraRepresenter(BaseRepresenter):
         pp.legend(prop={'size': 14})
 
         BaseRepresenter.draw(self)
+        return pp.gca()
 
 if __name__=="__main__":
     reader = SpectraRepresenter()

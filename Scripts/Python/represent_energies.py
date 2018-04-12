@@ -39,7 +39,7 @@ class EnergyRepresenter(BaseRepresenter):
 
         BaseRepresenter.draw(self)
 
-    pass
+        return ax
 
 
 if __name__=="__main__":

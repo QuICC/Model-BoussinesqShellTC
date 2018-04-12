@@ -66,28 +66,6 @@ class ShellPlotter:
         # define title dictionary
         self.title_dict = {'simple': r'$\bm{u}_', 'curl': r'$\left(\bm{\nabla}\times\bm{u}\right)_'}
 
-    """
-    def plot(self, section_type, mSelect = 'all', type = 'simple'):
-
-        # prepare the modes
-        if mSelect == 'all':
-            modes = np.arange(self.nM)
-        else:
-            modes = np.array(mSelect)
-
-        # store the field type
-        self.vector_field_type = type
-
-        if section_type == 'meridional':
-            self.plot_meridional(modes = modes)
-        elif section_type == "equatorial":
-            self.plot_equatorial(modes = modes)
-        elif section_type == "boundaries":
-            self.plot_boundaries(modes = modes)
-        else:
-            raise RuntimeError('Unkown section type '+ section_type)
-    """
-
     def loop_over(self, *args, **kwargs ):
 
         # loop_over takes care of the looping of the various modes and distinguishes between SLFm and SLFl
@@ -364,7 +342,6 @@ class ShellPlotter:
 
         return rarg
 
-
     def plot_field(self, fig, ax, *args, **kwargs):
 
         if kwargs['mode']=='line':
@@ -408,8 +385,6 @@ class ShellPlotter:
                 fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8)
             else:
                 fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8)
-
-
 
     def evaluate_mode(self, l, m, idx, *args, **kwargs):
 
@@ -561,3 +536,8 @@ class ShellPlotter:
                 # update the fields toroidal parts
                 Field_theta += rank_1_matrix(eimp, np.conj(rad_part_tor)) * Ylm_sin
                 Field_phi -= rank_1_matrix(eimp, np.conj(rad_part_tor)) * dYlm
+
+
+    def prepare_rotation(self):
+
+        
