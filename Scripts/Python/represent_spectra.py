@@ -75,7 +75,7 @@ class SpectraRepresenter(BaseRepresenter):
         try:
             dirname = os.path.dirname(self.filename)
             print(dirname)
-            cfg_file = open(dirname + 'parameters.cfg', 'r')
+            cfg_file = open(dirname + '/parameters.cfg', 'r')
             header = cfg_file.readline()
             root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
             Lmax = int(root[1][0][1].text)+1
