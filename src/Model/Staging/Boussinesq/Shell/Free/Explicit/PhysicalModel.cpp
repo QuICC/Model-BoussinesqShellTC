@@ -77,7 +77,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(5)
+         switch(4)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);

@@ -92,18 +92,26 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_insulating(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 24:
         cond = tau_couette(mat.shape[1], 0, bc.get('c',None))
-    elif bc[0] == 30:
-        cond1 = tau_value(mat.shape[1], -1, bc.get('cc',None))
-        cond2 = tau_value_diff(mat.shape[1], 1, bc.get('c',None))
+    elif bc[0] == 25:
+        cond1 = tau_diff(mat.shape[1], -1, bc.get('c',None))
+        cond2 = tau_value(mat.shape[1], 1, bc.get('cc', None))
         cond = np.vstack([cond1, cond2])
-    elif bc[0] == 31:
-        cond1 = tau_value(mat.shape[1], 1, bc.get('cc',None))
-        cond2 = tau_value_diff(mat.shape[1], -1, bc.get('c',None))
+    elif bc[0] == 26:
+        cond1 = tau_value(mat.shape[1], -1, bc.get('cc',None))
+        cond2 = tau_diff(mat.shape[1], 1, bc.get('c',None))
         cond = np.vstack([cond1, cond2])
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
+    elif bc[0] == 42:
+        cond1 = tau_value_diff2(mat.shape[1], -1, bc.get('c', None))
+        cond2 = tau_value_diff(mat.shape[1], 1, bc.get('c', None))
+        cond = np.vstack([cond1, cond2])
+    elif bc[0] == 43:
+        cond1 = tau_value_diff2(mat.shape[1], 1, bc.get('c', None))
+        cond2 = tau_value_diff(mat.shape[1], -1, bc.get('c', None))
+        cond = np.vstack([cond1, cond2])
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)

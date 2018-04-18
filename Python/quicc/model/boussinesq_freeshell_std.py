@@ -42,9 +42,9 @@ class BoussinesqFreeShellExplicitBase(BoussinesqCouetteShellExplicitBase):
 
                 else:
                     if field_row == ("velocity", "tor") and field_col == field_row:
-                        bc = {0: 11}
+                        bc = {0: 26, 'c': {'a': a, 'b': b}}
                     elif field_row == ("velocity", "pol") and field_col == field_row:
-                        bc = {0: 31, 'c': {'a': a, 'b': b}}
+                        bc = {0: 43, 'c': {'a': a, 'b': b}}
             # outer boundary
             elif bcId == 1:
                 if self.use_galerkin:
@@ -52,9 +52,9 @@ class BoussinesqFreeShellExplicitBase(BoussinesqCouetteShellExplicitBase):
 
                 else:
                     if field_row == ("velocity", "tor") and field_col == field_row:
-                        bc = {0: 10}
+                        bc = {0: 25, 'c': {'a': a, 'b': b}}
                     elif field_row == ("velocity", "pol") and field_col == field_row:
-                        bc = {0: 30, 'c': {'a': a, 'b': b}}
+                        bc = {0: 42, 'c': {'a': a, 'b': b}}
 
 
             # Set LHS galerkin restriction
