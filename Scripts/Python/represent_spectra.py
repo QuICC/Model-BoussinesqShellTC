@@ -80,7 +80,7 @@ class SpectraRepresenter(BaseRepresenter):
         try:
 
             dirname = os.path.dirname(self.filename)
-            print(dirname)
+            print(dirname+ '/parameters.cfg')
             cfg_file = open(dirname + '/parameters.cfg', 'r')
             header = cfg_file.readline()
             root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
