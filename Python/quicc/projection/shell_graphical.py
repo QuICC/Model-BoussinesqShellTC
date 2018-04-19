@@ -537,7 +537,7 @@ class ShellPlotter:
                 Field_theta += rank_1_matrix(eimp, np.conj(rad_part_tor)) * Ylm_sin
                 Field_phi -= rank_1_matrix(eimp, np.conj(rad_part_tor)) * dYlm
 
-
+"""
     def prepare_rotation(self):
 
-        
+"""
