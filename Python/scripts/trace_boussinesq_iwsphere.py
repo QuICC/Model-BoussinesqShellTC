@@ -42,7 +42,7 @@ res = [48, 48, 0]
 #res = [512, 512, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
-m = 0 #
+m = 1 #
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
 eq_params = {'ekman':E, 'rayleigh':0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel}

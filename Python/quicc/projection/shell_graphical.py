@@ -39,8 +39,11 @@ class ShellPlotter:
         self.file_type = self.fopen.attrs['type']
 
         # retrieve parameters for visualization
-        self.ro = self.fopen['/physical/ro'].value
         self.rratio = self.fopen['/physical/rratio'].value
+        try:
+            self.ro = self.fopen['/physical/ro'].value
+        except KeyError as e:
+            self.ro = 1/(1-self.rratio)
         self.E = self.fopen['/physical/ekman'].value
 
         # retrieve the runtime and the frequency
