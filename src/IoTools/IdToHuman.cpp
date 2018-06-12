@@ -607,6 +607,9 @@ namespace IoTools {
          case NonDimensional::POINCARE:
             return "poincare";
 
+         case NonDimensional::ELSASSER:
+             return "elsasser";
+
          case NonDimensional::MODELSASSER:
 	         return "modified_elsasser";
 
