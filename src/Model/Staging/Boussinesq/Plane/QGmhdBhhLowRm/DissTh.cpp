@@ -53,7 +53,7 @@ namespace QGmhdBhhLowRm {
    void DissTh::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
    void DissTh::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

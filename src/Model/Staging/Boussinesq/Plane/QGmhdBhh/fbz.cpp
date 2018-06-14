@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fbz.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/fbz.hpp )
 
 // Project includes
 //
@@ -35,7 +35,7 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
 
    fbz::fbz(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
@@ -50,7 +50,7 @@ namespace QGmhdBhhLowRm {
 
    void fbz::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void fbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

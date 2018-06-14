@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/DissV.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/F3DQG/DissV.hpp )
 
 // Project includes
 //
@@ -36,7 +36,7 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace F3DQG {
 
    DissV::DissV(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)

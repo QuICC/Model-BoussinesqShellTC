@@ -1,5 +1,5 @@
 /** 
- * @file fbz.cpp
+ * @file MeanHeat.cpp
  * @brief Source of the implementation of the mean heat computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fbz.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/MeanHeat.hpp )
 
 // Project includes
 //
@@ -35,39 +35,40 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
 
-   fbz::fbz(SharedEquationParameters spEqParams)
+   MeanHeat::MeanHeat(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   fbz::~fbz()
+   MeanHeat::~MeanHeat()
    {
    }
 
-   void fbz::setCoupling()
+   void MeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true);
    }
 
-   void fbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void MeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
 
       // Get paramters
-      MHDFloat MPr = this->eqParams().nd(NonDimensional::MAGPRANDTL);
+      MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
 
       /// 
       /// Computation:
+      ///   \f$ Pr w \theta\f$
       ///
-      rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array())).matrix());
+      rNLComp.setData((Pr*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
-   Datatypes::SpectralScalarType::PointType fbz::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType MeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -86,25 +87,22 @@ namespace QGmhdBhhLowRm {
       return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
-   void fbz::setRequirements()
+   void MeanHeat::setRequirements()
    {
       // Set streamfunction as equation unknown
-      this->setName(PhysicalNames::FBZ);
+      this->setName(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
-      // Add fbz requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, false));
+      // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::DZ_MEANTEMPERATURE, FieldRequirement(true, true, true, false));
 
-      // Add BX requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));
-
-      // Add BY requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
+      // Add temperature requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, true, false));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, false, true, false));
    }
 
 }

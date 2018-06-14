@@ -1,6 +1,6 @@
 /** 
- * @file DissV.cpp
- * @brief Source of the implementation of the local viscous dissipation computation in the F-plane 3DQG model
+ * @file DissB.cpp
+ * @brief Source of the implementation of the local ohmic dissipation computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/DissV.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/DissB.hpp )
 
 // Project includes
 //
@@ -36,26 +36,26 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
 
-   DissV::DissV(SharedEquationParameters spEqParams)
+   DissB::DissB(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   DissV::~DissV()
+   DissB::~DissB()
    {
    }
 
-   void DissV::setCoupling()
+   void DissB::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
-   void DissV::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void DissB::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -63,13 +63,15 @@ namespace QGmhdBhhLowRm {
 
       /// 
       /// Computation:
-      ///   \f$ VORTICITYZ^2 + (\nabla VELOCITYZ)^2  \f$
+      ///   \f$ FJZ^2 + (\nabla FBZ)^2  \f$
       ///
+      
       /// A +1 is added to solve for the -1 level in the background always present in the field. Not sure where this comes from, but probably is a m=0 problem. Or a scaling transformation gone wrong. 
+      rNLComp.setData((1+pow(this->scalar(PhysicalNames::FJZ).dom(0).phys().data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array(),2)).matrix());
 
-        rNLComp.setData((1+pow(this->scalar(PhysicalNames::VORTICITYZ).dom(0).phys().data().array(),2) + pow(this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array(),2) + pow(this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array(),2)).matrix());}
+}
 
-   Datatypes::SpectralScalarType::PointType DissV::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType DissB::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -88,23 +90,23 @@ namespace QGmhdBhhLowRm {
       return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
-   void DissV::setRequirements()
+   void DissB::setRequirements()
    {
       // Set fluctuating bx field as equation unknown
-      this->setName(PhysicalNames::DISSV);
+      this->setName(PhysicalNames::DISSB);
 
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
-      // Add DissV requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::DISSV, FieldRequirement(true, true, true, false, false, false));
+      // Add DissB requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::DISSB, FieldRequirement(true, true, true, false, false, false));
 
-      // Add VORTICITYZ requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, true, false, false, false));
+      // Add FJZ requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::FJZ, FieldRequirement(true, true, true, false, false, false));
 
 
-      // Add VELOCITYZ requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true, false, false));
+      // Add FBZ requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
+      this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, true, false, false));
 
    }
 }

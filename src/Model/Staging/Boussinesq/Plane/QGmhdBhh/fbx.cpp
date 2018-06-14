@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fbx.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/fbx.hpp )
 
 // Project includes
 //
@@ -36,7 +36,7 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
 
    fbx::fbx(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
@@ -52,7 +52,7 @@ namespace QGmhdBhhLowRm {
    void fbx::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void fbx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

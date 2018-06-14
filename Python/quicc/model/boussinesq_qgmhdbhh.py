@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq F-Plane 3DQG model"""
+"""Module provides the functions to generate the Boussinesq F-Plane QG model with horizontal imposed magnetic field and low Rm"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -12,8 +12,8 @@ import quicc.base.base_model as base_model
 from quicc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
-class BoussinesqFPlane3DQG(base_model.BaseModel):
-    """Class to setup the Boussinesq F-Plane 3DQG model"""
+class BoussinesqQGmhdBhh(base_model.BaseModel):
+    """Class to setup the Boussinesq F-Plane QG MHD Bhh model"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -23,12 +23,13 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "scale1d"]
+        return ["prandtl", "magnetic_prandtl", "chandrasekhar", "rayleigh", "scale1d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["streamfunction", "velocityz", "temperature"]
+#        return ["streamfunction", "velocityz", "temperature", "bx", "by"] # Do I need this?
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -43,6 +44,15 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         if field_row in [("streamfunction",""), ("velocityz",""), ("temperature","")]:
             fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
+        elif field_row in [("fbx","")]:
+            fields =  [("fbx","")]
+
+        elif field_row in [("fby","")]:
+            fields =  [("fby","")]
+
+        elif field_row in [("fbz","")]:
+            fields =  [("fbz","")]
+
         else:
             fields = [field_row]
 
@@ -54,10 +64,16 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
             fields = []
+#            if field_row in [("bx","")]: 
+#                fields = [("emfy","")]
+#            elif field_row in [("by","")]: 
+#                fields = [("emfx","")]
+#            else:
+#                fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
-            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("dissTh",""), ("dissV","")]:
+            if field_row in [("temperature",""), ("streamfunction",""), ("velocityz",""), ("dz_meantemperature",""), ("dissTh",""), ("dissV",""), ("dissB","")]:
                 fields = [field_row]
             else:
                 fields = []
@@ -70,12 +86,14 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 fields = [("streamfunction","")]
             elif field_row == ("velocityy",""):
                 fields = [("streamfunction","")]
+            elif field_row == ("fjz",""):
+                fields = [("fbx",""), ("fby","")] # this line works fine
             else:
                 fields = []
 
         return fields
 
-    def block_size(self, res, eigs, bcs, field_row):
+    def block_size(self, res, eig, bcs, field_row):
         """Create block size information"""
 
         tau_n = res[0]
@@ -127,8 +145,6 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
-                    elif field_col == ("streamfunction",""):
-                        bc = {0:-21, 'rt':0}
                     elif field_col == ("velocityz",""):
                         bc = {0:-20, 'rt':0}
 
@@ -138,6 +154,14 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                             bc = {0:11}
                         elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                             bc = {0:10}
+                        elif field_row == ("temperature","") and field_col == field_row:
+                            bc = {0:991}
+                        elif field_row == ("fbx","") and field_col == ("fbx",""):
+                            bc = {0:21}
+                        elif field_row == ("fby","") and field_col == ("fby",""):
+                            bc = {0:21}
+                        elif field_row == ("fbz","") and field_col == ("fbz",""):
+                            bc = {0:20}
                     else:
                         bc = no_bc()
 
@@ -150,11 +174,11 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     if bcs["bcType"] == self.SOLVER_HAS_BC:
                         if field_row == ("temperature","") and field_col == field_row:
                             bc = {0:20}
-            
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityz","") or field_row == ("streamfunction",""):
-                    bc['rt'] = 2
+                    bc['rt'] = 1
                 elif field_row == ("temperature",""):
                     bc['rt'] = 2
 
@@ -163,37 +187,59 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             if self.use_galerkin:
                 if field_col == ("temperature",""):
                     bc = {0:-20, 'rt':0}
-                elif field_col == ("streamfunction",""):
-                    bc = {0:-21, 'rt':0}
-                elif field_col == ("velocityz",""):
-                    bc = {0:-20, 'rt':0}
-        
+            elif field_col == ("velocityz",""):
+                bc = {0:-20, 'rt':0}
+
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
-                if field_row == ("velocityz",""):
-                    bc['rt'] = 2
-                elif field_row == ("streamfunction",""):
-                    bc['rt'] = 2
-                elif field_row == ("temperature",""):
-                    bc['rt'] = 2
+                   if field_row == ("velocityz",""):
+                       bc['rt'] = 2
+                   elif field_row == ("temperature",""):
+                       bc['rt'] = 2
 
         else:
             bc = no_bc()
 
         return bc
 
+#    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+#        """Create matrix block for explicit linear term"""
+
+#        tau = eq_params['tau']
+#        zscale = eq_params['scale1d']
+
+#        mat = None
+#        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+
+#        if field_row == ("bx","") and field_col == ("emfy",""):
+#            mat = geo.i2d1(res[0], bc, 1.0*tau, cscale = zscale)
+
+#        elif field_row == ("by","") and field_col == ("emfx",""):
+#            mat = geo.i2d1(res[0], bc, -1.0*tau, cscale = zscale)
+
+#        if mat is None:
+#            raise RuntimeError("Equations are not setup properly!")
+
+#        return mat
+
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
 
+        zscale = eq_params['scale1d']
+
+        kx = eigs[0]
+        ky = eigs[1]
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+
         if field_row == ("temperature","") and field_col == field_row:
             if bcs["temperature"] == 1 and not self.use_galerkin:
                 mat = geo.sid(res[0], 2, bc)
             else:
-                mat = geo.sid(res[0], 0, bc)
+                mat = geo.sid(res[0], 1, bc)
 
         elif field_row == ("streamfunction","") and field_col == field_row:
             mat = geo.i1(res[0], bc)
@@ -203,15 +249,55 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         elif field_row == ("dz_meantemperature","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
-                mat = (geo.qid(res[0],0, bc) - spsp.eye(res[0], 1)*geo.avg(res[0]))
+                mat = (spsp.eye(res[0]) - spsp.eye(res[0], 1)*geo.avg(res[0]))
             else:
                 mat = geo.zblk(res[0], bc)
+
+#        elif field_row == ("emfx","") and field_col == field_row:
+#            if eigs[0] == 0 and eigs[1] == 0:
+#                mat = geo.qid(res[0], 0, bc)
+#            else:
+#                mat = geo.zblk(res[0], bc)
+
+#        elif field_row == ("emfy","") and field_col == field_row:
+#            if eigs[0] == 0 and eigs[1] == 0:
+#                mat = geo.qid(res[0], 0, bc)
+#            else:
+#                mat = geo.zblk(res[0], bc)
+
+#        elif field_row == ("pressure","") and field_col == field_row:
+#            if eigs[0] == 0 and eigs[1] == 0:
+#                mat = geo.qid(res[0], 0, bc)
+#            else:
+#                mat = geo.zblk(res[0], bc)
+
+
+        elif field_row == ("fbx","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -1)
+
+        elif field_row == ("fby","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -1)
+
+        elif field_row == ("fbz","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -1)
 
         elif field_row == ("dissTh","") and field_col == field_row:
                 mat = geo.qid(res[0], 0, bc, 1)
 
         elif field_row == ("dissV","") and field_col == field_row:
                 mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("dissB","") and field_col == field_row:
+                mat = geo.qid(res[0], 0, bc, 1)  
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -229,10 +315,15 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
             mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
-#       to set to zero the barotropic component use this instead:
-
+#       subtract barotropic component
 #        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
 #            mat = geo.qid(res[0],0,bc,-(kx**2+ky**2))  - spsp.eye(res[0],1)*geo.avg(res[0])*geo.qid(res[0],0,bc,-(kx**2+ky**2)) 
+
+        elif field_row == ("fjz","") and field_col == ("fbx",""):
+            mat = geo.qid(res[0],0, bc, -ky*1j)
+
+        elif field_row == ("fjz","") and field_col == ("fby",""):
+            mat = geo.qid(res[0],0, bc, kx*1j) 
 
         elif field_row == ("velocityx","") and field_col == ("streamfunction",""):
             mat = geo.qid(res[0],0, bc, -ky*1j)
@@ -249,6 +340,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         Pr = eq_params['prandtl']
+        MPr = eq_params['magnetic_prandtl']
         Ra = eq_params['rayleigh']
         zscale = eq_params['scale1d']
         kx = eigs[0]
@@ -265,6 +357,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], bc)
+
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
@@ -288,7 +381,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     if bcs["temperature"] == 1 and not self.use_galerkin:
                         mat = geo.sid(res[0],2, bc)
                     else:
-                        mat = geo.sid(res[0],0, bc)
+                        mat = geo.sid(res[0],1, bc)
                 else:
                     mat = geo.zblk(res[0], bc)
 
@@ -296,7 +389,33 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 if bcs["temperature"] == 1 and not self.use_galerkin:
                     mat = geo.sid(res[0],2, bc, -(1.0/Pr)*(kx**2 + ky**2))
                 else:
-                    mat = geo.sid(res[0],0, bc, -(1.0/Pr)*(kx**2 + ky**2))
+                    mat = geo.sid(res[0],1, bc, -(1.0/Pr)*(kx**2 + ky**2))
+
+#        elif field_row == ("bx",""):
+#            if field_col == ("bx",""):
+#                mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
+
+#        elif field_row == ("by",""):
+#            if field_col == ("by",""):
+#                mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
+
+        elif field_row == ("fbx","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -(kx**2+ky**2)/MPr)
+
+        elif field_row == ("fby","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -(kx**2+ky**2)/MPr)
+
+        elif field_row == ("fbz","") and field_col == field_row:
+            if eigs[0] == 0 and eigs[1] == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -(kx**2+ky**2)/MPr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -321,7 +440,16 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             if bcs["temperature"] == 1 and not self.use_galerkin:
                 mat = geo.sid(res[0],2, bc)
             else:
-                mat = geo.sid(res[0],0, bc)
+                mat = geo.sid(res[0],1, bc)
+
+        elif field_row == ("fbx",""):
+            mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("fby",""):
+            mat = geo.qid(res[0], 0, bc, 1)
+
+        elif field_row == ("fby",""):
+            mat = geo.qid(res[0], 0, bc, 1)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -333,7 +461,11 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        mat = geo.zblk(res[0], bc)
+
+        if field_row == ("temperature","") and field_col == field_row:
+            mat = geo.zblk(res[0], bc, location = 'b')
+        else:
+            mat = geo.zblk(res[0], bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

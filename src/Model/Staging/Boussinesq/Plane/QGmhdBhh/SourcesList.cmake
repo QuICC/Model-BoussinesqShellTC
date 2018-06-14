@@ -1,14 +1,21 @@
 set(MHDSources
    MeanHeat.cpp
-   PhysicalModel.cpp
    Streamfunction.cpp
    Transport.cpp
    VelocityX.cpp
    VelocityY.cpp
    VelocityZ.cpp
    VorticityZ.cpp
-   DissV.cpp
+   VelocityX.cpp
+   VelocityY.cpp
+   fbx.cpp
+   fby.cpp
+   fbz.cpp
+   fjz.cpp
    DissTh.cpp
+   DissB.cpp
+   DissV.cpp
+   PhysicalModel.cpp
 )
 
 set(MHDSrcSubDirs
