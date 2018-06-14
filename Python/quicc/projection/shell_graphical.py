@@ -224,7 +224,6 @@ class ShellPlotter:
             YY = np.cos(TT) * RR
             XX = np.sin(TT) * RR
 
-        print(self.a, self.b)
         # produce the mapping for chebyshev polynomials
         self.Tn_eval = shell.proj_radial(self.nN, self.a, self.b, xx_bulk)  # evaluate chebyshev simple
         self.dTndr_eval = shell.proj_dradial_dr(self.nN, self.a, self.b, xx_bulk)  # evaluate 1/r d/dr(r Tn)
@@ -382,7 +381,7 @@ class ShellPlotter:
         elif kwargs['mode']=='line':
             ax.plot(rr, ff )
         else:
-            im = ax.contourf(XX, YY, ZZ, 100, cmap=map, norm = norm)
+            im = ax.contour(XX, YY, ZZ, 20, cmap=map, norm = norm)
             ax.set_title(kwargs['title'])
             if kwargs.get('colormap', 'dual') == 'log':
                 fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8)
@@ -413,18 +412,21 @@ class ShellPlotter:
             rad_part_ur = l * (l + 1) * np.matmul(self.Tn_r_eval, modeT)
             rad_part_pol = np.matmul(self.dTndr_eval, modeT)
             rad_part_tor = -( np.matmul(self.d2Tndr2_eval, modeP)+ l * (l+1) *np.matmul(self.Tn_r2_eval, modeP) )
+            #rad_part_tor = -(np.matmul(self.d2Tndr2_eval, modeP))
+
 
         else:
             raise RuntimeError('Unknown vector field type '+self.vector_field_type)
             pass
 
-        """
+
         if m==0:
             factor=1.
         else:
             factor=2.
         """
         factor=1.
+        """
         if kwargs['mode']=='meridional' or kwargs['mode']=='boundaries':
 
             # prepare arrays

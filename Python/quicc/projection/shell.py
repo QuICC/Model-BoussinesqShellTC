@@ -75,8 +75,8 @@ def proj_lapl(nr, a, b, x=None):
 
     c1 = cheb.chebder(coeffs,1)
     c2 = cheb.chebder(coeffs,2)
-    return (2*cheb.chebval(xx, c1) /a /(a * xx + b) + cheb.chebval(xx, c2) /a**2).transpose()
-
+    #return (2*cheb.chebval(xx, c1) /a /(a * xx + b) + cheb.chebval(xx, c2) /a**2).transpose()
+    return ( cheb.chebval(xx, c2) / a ** 2).transpose()
 
 def proj_radial_r2(nr, a, b, x = None):
     # evaluate the radial basis functions of degree <nr over r
