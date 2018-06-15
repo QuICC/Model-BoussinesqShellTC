@@ -20,6 +20,7 @@ def proj_radial(nr, a, b, x = None):
 
     # use chebyshev polynomials normalized for FCT
     coeffs = np.eye(nr)*2
+    #coeffs = np.eye(nr)
     coeffs[0,0]=1.
 
     return (cheb.chebval(xx,coeffs)).transpose()
@@ -36,6 +37,7 @@ def proj_dradial_dr(nr, a, b, x = None):
 
      # use chebyshev polynomials normalized for FCT
      coeffs = np.eye(nr) * 2
+     #coeffs = np.eye(nr)
      coeffs[0, 0] = 1.
      c = cheb.chebder(coeffs)
      return  (cheb.chebval(xx,c)/a + cheb.chebval(xx,coeffs)/(a*xx+b) ).transpose()
@@ -53,6 +55,7 @@ def proj_radial_r(nr, a, b, x = None):
 
     # use chebyshev polynomials normalized for FCT
     coeffs = np.eye(nr)*2
+    #coeffs = np.eye(nr)
     coeffs[0,0]=1.
 
     temp = (cheb.chebval(xx,coeffs)/(a*xx+b)).transpose()
@@ -71,12 +74,13 @@ def proj_lapl(nr, a, b, x=None):
 
     # use chebyshev polynomials normalized for FCT
     coeffs = np.eye(nr) * 2
+    #coeffs = np.eye(nr)
     coeffs[0, 0] = 1.
 
     c1 = cheb.chebder(coeffs,1)
     c2 = cheb.chebder(coeffs,2)
-    #return (2*cheb.chebval(xx, c1) /a /(a * xx + b) + cheb.chebval(xx, c2) /a**2).transpose()
-    return ( cheb.chebval(xx, c2) / a ** 2).transpose()
+    return (2*cheb.chebval(xx, c1) /a /(a * xx + b) + cheb.chebval(xx, c2) /a**2).transpose()
+    #return ( cheb.chebval(xx, c2) / a ** 2).transpose()
 
 def proj_radial_r2(nr, a, b, x = None):
     # evaluate the radial basis functions of degree <nr over r
@@ -89,6 +93,8 @@ def proj_radial_r2(nr, a, b, x = None):
 
     # use chebyshev polynomials normalized for FCT
     coeffs = np.eye(nr)*2
+
+    #coeffs = np.eye(nr)
     coeffs[0,0]=1.
 
     temp = (cheb.chebval(xx,coeffs)/(a*xx+b)**2).transpose()
@@ -99,6 +105,8 @@ def proj(nr, a, b, r):
     # evaluates the projection matrix matrix for the chebyshev basis
     xx = (np.array(r)-b)/a
     coeffs = np.eye(nr)*2
+
+    #coeffs = np.eye(nr)
     coeffs[0,0]=1.
 
     return spsp.lil_matrix(cheb.chebval(xx, coeffs).transpose())

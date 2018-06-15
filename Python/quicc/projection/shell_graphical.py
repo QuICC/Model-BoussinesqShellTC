@@ -411,7 +411,7 @@ class ShellPlotter:
             # procedure for the vorticity field
             rad_part_ur = l * (l + 1) * np.matmul(self.Tn_r_eval, modeT)
             rad_part_pol = np.matmul(self.dTndr_eval, modeT)
-            rad_part_tor = -( np.matmul(self.d2Tndr2_eval, modeP)+ l * (l+1) *np.matmul(self.Tn_r2_eval, modeP) )
+            rad_part_tor = -( np.matmul(self.d2Tndr2_eval, modeP) - l*(l+1)*np.matmul(self.Tn_r2_eval, modeP) )
             #rad_part_tor = -(np.matmul(self.d2Tndr2_eval, modeP))
 
 
@@ -419,14 +419,14 @@ class ShellPlotter:
             raise RuntimeError('Unknown vector field type '+self.vector_field_type)
             pass
 
-
+        """
         if m==0:
             factor=1.
         else:
             factor=2.
         """
         factor=1.
-        """
+
         if kwargs['mode']=='meridional' or kwargs['mode']=='boundaries':
 
             # prepare arrays
