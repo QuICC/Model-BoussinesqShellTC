@@ -322,7 +322,7 @@ class ShellPlotter:
             Omega_theta = np.real(Omega_theta)
             Omega_phi = np.real(Omega_phi)
 
-            Energy = U_r**2 + U_theta**2 + U_phi**2
+            Energy = U_r*U_r + U_theta*U_theta + U_phi*U_phi
             Energy *= 0.5
 
             Enstrophy = Omega_r**2 +  Omega_theta**2 + Omega_phi**2
@@ -419,13 +419,14 @@ class ShellPlotter:
             raise RuntimeError('Unknown vector field type '+self.vector_field_type)
             pass
 
-        """
+
         if m==0:
-            factor=1.
+            factor=.5
         else:
-            factor=2.
+            factor=1.
         """
         factor=1.
+        """
 
         if kwargs['mode']=='meridional' or kwargs['mode']=='boundaries':
 
