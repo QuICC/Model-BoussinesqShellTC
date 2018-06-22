@@ -26,7 +26,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoVariable/DissipationTags.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Python/PythonWrapper.hpp"
 
@@ -35,7 +35,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellTorPolDissipationWriter::ShellTorPolDissipationWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(-1.0), mPolEnergy(-1.0)
+      : IVariableAsciiEWriter(prefix + DissipationTags::BASENAME, DissipationTags::EXTENSION, prefix + DissipationTags::HEADER, type, DissipationTags::VERSION, Dimensions::Space::SPECTRAL), mTorDiss(-1.0), mPolDiss(-1.0)
    {
    }
 
@@ -112,32 +112,33 @@ namespace IoVariable {
       assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::TOR);
       assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
+       // Compute integral over Chebyshev expansion and sum harmonics
+       this->mTorDiss = 0.0;
+       this->mPolDiss = 0.0;
+       /*
+       this->mCentroAntysymDiss = 0.0;
+       this->mCentroSymDiss = 0.0;
+       this->mEquaAntysymDiss = 0.0;
+       this->mEquaSymDiss = 0.0;*/
+
       // Dealias poloidal variable data
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
+      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
       
       // Recover dealiased BWD data
-      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Get FWD storage
-      Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+      Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarPolRadLapl = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+       Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarPolRadLapl2 = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project(rOutVarTor.rData(), rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
+      coord.transform1D().project(rOutVarPolRadLapl.rData(), rInVarPol.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::RADLAPL);
 
       // Compute |f|^2
-      rOutVarTor.rData() = rOutVarTor.rData().array()*rOutVarTor.rData().conjugate().array();
+      rOutVarPolRadLapl2.rData() = rOutVarPolRadLapl.rData().array()*rOutVarPolRadLapl.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate_full(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
-
-      // Compute integral over Chebyshev expansion and sum harmonics
-      this->mTorEnergy = 0.0;
-      this->mPolEnergy = 0.0;
-      /*
-      this->mCentroAntysymEnergy = 0.0;
-      this->mCentroSymEnergy = 0.0;
-      this->mEquaAntysymEnergy = 0.0;
-      this->mEquaSymEnergy = 0.0;*/
+      coord.transform1D().integrate_full(rInVarPol.rData(), rOutVarPolRadLapl2.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
       MHDFloat lfactor = 0.0;
 
@@ -147,7 +148,7 @@ namespace IoVariable {
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // m = 0, no factor of two
-				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             if( m == 0)
             {
                factor = 1.0;
@@ -161,8 +162,9 @@ namespace IoVariable {
                int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l*(l+1.0);
 
-					MHDFloat ModeDiss = factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
-               this->mTorDiss += ModeDiss;
+                MHDFloat ModeDiss = factor*lfactor*(this->mSphIntgOp*rInVarPol.slice(k).col(j).real()).sum();
+               this->mPolDiss += ModeDiss;
+               /*
 
 					// assign the centro symmetry energies
 					if( (l % 2) == 1 )
@@ -181,6 +183,7 @@ namespace IoVariable {
 
 						this->mEquaAntysymDiss += ModeDiss;
 					}
+					*/
             }
          }
       #endif //defined QUICC_SPATIALSCHEME_SLFM
@@ -196,10 +199,11 @@ namespace IoVariable {
             // m = 0, no factor of two
             if( firstM == 0)
             {
-               MHDFloat ModeDiss = lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(0).real())(0);
-               this->mTorDiss += ModeDiss;
+               MHDFloat ModeDiss = lfactor*(this->mSphIntgOp*rInVarPol.slice(k).col(0).real())(0);
+               this->mPolDiss += ModeDiss;
                start = 1;
                firstM = 1;
+               /*
 
                if ( (l % 2) == 1){
 
@@ -210,10 +214,12 @@ namespace IoVariable {
                   this->mCentroAntysymDiss += ModeDiss;
                   this->mEquaAntysymDiss += ModeDiss;
                }
+               */
             }
 
-            Matrix MatrixModes = 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).rightCols(rInVarTor.slice(k).cols()-start).real());
-            this->mTorDiss += MatrixModes.sum();
+            Matrix MatrixModes = 2.0*lfactor*(this->mSphIntgOp*rInVarPol.slice(k).rightCols(rInVarPol.slice(k).cols()-start).real());
+            this->mPolDiss += MatrixModes.sum();
+            /*
             if ( (l % 2) == 1){
 
 					this->mCentroSymDiss += MatrixModes.sum();
@@ -233,22 +239,287 @@ namespace IoVariable {
                   this->mEquaAntysymDiss += temp;
 				   }
 				}
+				*/
 
 
          }
       #endif //QUICC_SPATIALSCHEME_SLFL
 
       // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPol);
 
       // Free FWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
+       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPolRadLapl2);
+
+
+       // Dealias poloidal variable data
+       coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+
+       // Recover dealiased BWD data
+       rInVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+       // Get FWD storage
+       Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+
+       // Compute projection transform for first dimension
+       coord.transform1D().project(rOutVarPol.rData(), rInVarPol.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
+
+       // Compute |f|^2
+       rOutVarPol.rData() = rOutVarPolRadLapl.rData().array()*rOutVarPol.rData().conjugate().array();
+       //
+       //rOutVarPol.rData() = rOutVarPolRadLapl.rData().array()*rOutVarPol.rData().conjugate().array() + rOutVarPolRadLapl.rData().conjugate().array()*rOutVarPol.rData().array();
+
+       // Compute projection transform for first dimension
+       coord.transform1D().integrate_full(rInVarPol.rData(), rOutVarPol.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
+
+       lfactor = 0.0;
+
+#ifdef QUICC_SPATIALSCHEME_SLFM
+       double factor = 1.0;
+         // Loop over harmonic order m
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            // m = 0, no factor of two
+				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            if( m == 0)
+            {
+               factor = 1.0;
+            } else
+            {
+               factor = 2.0;
+            }
+
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = std::pow(l*(l+1.0),2);
+
+                MHDFloat ModeDiss = -2.*factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real()).sum();
+               this->mPolDiss += ModeDiss;
+               /*
+
+					// assign the centro symmetry energies
+					if( (l % 2) == 1 )
+					{
+						this->mCentroSymDiss += ModeDiss;
+					} else {
+
+						this->mCentroAntysymDiss += ModeDiss;
+					}
+
+					// assign the equatorial symmetry energies
+					if( ((l+m) % 2) == 1 )
+					{
+						this->mEquaSymDiss += ModeDiss;
+					} else {
+
+						this->mEquaAntysymDiss += ModeDiss;
+					}
+					*/
+            }
+         }
+#endif //defined QUICC_SPATIALSCHEME_SLFM
+#ifdef QUICC_SPATIALSCHEME_SLFL
+       // Loop over harmonic degree l
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            lfactor = std::pow(l*(l+1.0),2);
+            int start = 0;
+
+            int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
+            // m = 0, no factor of two
+            if( firstM == 0)
+            {
+               MHDFloat ModeDiss = -2.0*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(0).real())(0);
+               this->mPolDiss += ModeDiss;
+               start = 1;
+               firstM = 1;
+
+               /*
+               if ( (l % 2) == 1){
+
+                  this->mCentroSymDiss += ModeDiss;
+                  this->mEquaSymDiss += ModeDiss;
+               } else {
+
+                  this->mCentroAntysymDiss += ModeDiss;
+                  this->mEquaAntysymDiss += ModeDiss;
+               }
+               */
+            }
+
+            Matrix MatrixModes = -2.0*2.0*lfactor*(this->mIntgOp*rInVarPol.slice(k).rightCols(rInVarPol.slice(k).cols()-start).real());
+            this->mPolDiss += MatrixModes.sum();
+            /*
+            if ( (l % 2) == 1){
+
+					this->mCentroSymDiss += MatrixModes.sum();
+				} else {
+
+					this->mCentroAntysymDiss += MatrixModes.sum();
+				}
+
+				for(int mm = 0; mm < MatrixModes.cols(); ++mm){
+
+				   MHDFloat temp = MatrixModes.col(mm).sum();
+
+				   if( ((l+mm+firstM) % 2) == 1)
+				   {
+                  this->mEquaSymDiss += temp;
+				   } else {
+                  this->mEquaAntysymDiss += temp;
+				   }
+				}
+				*/
+
+
+         }
+#endif //QUICC_SPATIALSCHEME_SLFL
+
+       // Free BWD storage
+       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPol);
+
+       // Free FWD storage
+       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPolRadLapl);
+       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPol);
+
+
+       // Dealias poloidal variable data
+       coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+
+       // Recover dealiased BWD data
+       rInVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+       // Get FWD storage
+       rOutVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+
+       // Compute projection transform for first dimension
+       coord.transform1D().project(rOutVarPol.rData(), rInVarPol.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::DIVR);
+
+       // Compute |f|^2
+       rOutVarPol.rData() = rOutVarPol.rData().array()*rOutVarPol.rData().conjugate().array();
+
+       // Compute projection transform for first dimension
+       coord.transform1D().integrate_full(rInVarPol.rData(), rOutVarPol.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
+
+       lfactor = 0.0;
+
+#ifdef QUICC_SPATIALSCHEME_SLFM
+       double factor = 1.0;
+         // Loop over harmonic order m
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            // m = 0, no factor of two
+				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            if( m == 0)
+            {
+               factor = 1.0;
+            } else
+            {
+               factor = 2.0;
+            }
+
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = std::pow(l*(l+1.0),3);
+
+                MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+               this->mPolDiss += ModeDiss;
+               /*
+
+					// assign the centro symmetry energies
+					if( (l % 2) == 1 )
+					{
+						this->mCentroSymDiss += ModeDiss;
+					} else {
+
+						this->mCentroAntysymDiss += ModeDiss;
+					}
+
+					// assign the equatorial symmetry energies
+					if( ((l+m) % 2) == 1 )
+					{
+						this->mEquaSymDiss += ModeDiss;
+					} else {
+
+						this->mEquaAntysymDiss += ModeDiss;
+					}
+					*/
+            }
+         }
+#endif //defined QUICC_SPATIALSCHEME_SLFM
+#ifdef QUICC_SPATIALSCHEME_SLFL
+       // Loop over harmonic degree l
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            lfactor = std::pow(l*(l+1.0),3);
+            int start = 0;
+
+            int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
+            // m = 0, no factor of two
+            if( firstM == 0)
+            {
+               MHDFloat ModeDiss = lfactor*(this->mIntgOp*rInVarPol.slice(k).col(0).real())(0);
+               this->mPolDiss += ModeDiss;
+               start = 1;
+               firstM = 1;
+
+               /*
+
+               if ( (l % 2) == 1){
+
+                  this->mCentroSymDiss += ModeDiss;
+                  this->mEquaSymDiss += ModeDiss;
+               } else {
+
+                  this->mCentroAntysymDiss += ModeDiss;
+                  this->mEquaAntysymDiss += ModeDiss;
+               }
+               */
+            }
+
+            Matrix MatrixModes = 2.0*lfactor*(this->mIntgOp*rInVarPol.slice(k).rightCols(rInVarPol.slice(k).cols()-start).real());
+            this->mPolDiss += MatrixModes.sum();
+            /*
+            if ( (l % 2) == 1){
+
+					this->mCentroSymDiss += MatrixModes.sum();
+				} else {
+
+					this->mCentroAntysymDiss += MatrixModes.sum();
+				}
+
+				for(int mm = 0; mm < MatrixModes.cols(); ++mm){
+
+				   MHDFloat temp = MatrixModes.col(mm).sum();
+
+				   if( ((l+mm+firstM) % 2) == 1)
+				   {
+                  this->mEquaSymDiss += temp;
+				   } else {
+                  this->mEquaAntysymDiss += temp;
+				   }
+				}
+				*/
+
+
+         }
+#endif //QUICC_SPATIALSCHEME_SLFL
+
+       // Free BWD storage
+       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPol);
+
+       // Free FWD storage
+       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPol);
 
       // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
       this->mPolDiss /= 2*this->mVolume;
 
       // Dealias toroidal variable data for Q component
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::Tor));
+      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
 
       // Recover dealiased BWD data
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTorQ = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -543,8 +814,8 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTorDiss + this->mPolDiss << "\t" << this->mTorDiss << "\t" << this->mPolDiss <<
-							"\t" << this->mCentroSymDiss <<  "\t" <<  this->mCentroAntysymDiss << "\t" << this->mEquaSymDiss << "\t" << this->mEquaAntysymDiss << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTorDiss + this->mPolDiss << "\t" << this->mTorDiss << "\t" << this->mPolDiss << std::endl;
+							//"\t" << this->mCentroSymDiss <<  "\t" <<  this->mCentroAntysymDiss << "\t" << this->mEquaSymDiss << "\t" << this->mEquaAntysymDiss << std::endl;
       }
 
       // Close file

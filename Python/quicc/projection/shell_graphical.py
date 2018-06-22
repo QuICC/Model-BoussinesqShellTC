@@ -419,14 +419,14 @@ class ShellPlotter:
             raise RuntimeError('Unknown vector field type '+self.vector_field_type)
             pass
 
-
+        """
         if m==0:
             factor=.5
         else:
             factor=1.
         """
         factor=1.
-        """
+
 
         if kwargs['mode']=='meridional' or kwargs['mode']=='boundaries':
 

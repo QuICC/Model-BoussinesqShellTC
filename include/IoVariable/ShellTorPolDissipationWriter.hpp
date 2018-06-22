@@ -116,15 +116,15 @@ namespace IoVariable {
          SparseMatrix mSphIntgOp;
    };
 
-   inline bool ShellTorPolEnergyWriter::isHeavy() const
+   inline bool ShellTorPolDissipationWriter::isHeavy() const
    {
       return true;
    }
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef SharedPtrMacro<ShellTorPolEnergyWriter> SharedShellTorPolEnergyWriter;
+   typedef SharedPtrMacro<ShellTorPolDissipationWriter> SharedShellTorPolDissipationWriter;
 
 }
 }
 
-#endif // SHELLTORPOLENERGYWRITER_HPP
+#endif // SHELLTORPOLDISSIPATIONWRITER_HPP

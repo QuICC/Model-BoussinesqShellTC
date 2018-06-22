@@ -14,6 +14,7 @@ set(MHDSources
    ContinuityTags.cpp
    AverageTags.cpp
    ObservableTags.cpp
+   DissipationTags.cpp
 )
 
 if(QUICC_SPATIALSCHEME STREQUAL "TTT")
@@ -53,6 +54,7 @@ elseif(QUICC_SPATIALSCHEME STREQUAL "SLFL" OR QUICC_SPATIALSCHEME STREQUAL "SLFM
       ShellScalarEnergyWriter.cpp
       ShellTorPolEnergyWriter.cpp
       ShellTorPolEnergySpectraWriter.cpp
+      ShellTorPolDissipationWriter.cpp
       )
 elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL" OR QUICC_SPATIALSCHEME STREQUAL "BLFM" OR QUICC_SPATIALSCHEME STREQUAL "WLFL" OR QUICC_SPATIALSCHEME STREQUAL "WLFM")
    list(APPEND MHDSources
