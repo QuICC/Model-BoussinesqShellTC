@@ -36,7 +36,9 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellTorPolEnergySpectraWriter::ShellTorPolEnergySpectraWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(), mPolEnergy(), mTorRadial(), mPolRadial()
+      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type,
+                              EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(), mPolEnergy(),
+        mTorRadial(), mPolRadial()
    {
    }
 
@@ -155,7 +157,7 @@ namespace IoVariable {
 
       MHDFloat lfactor = 0.0;
       #ifdef QUICC_SPATIALSCHEME_SLFM
-         double factor = 1.0;
+         MHDFloat factor = 1.0;
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {

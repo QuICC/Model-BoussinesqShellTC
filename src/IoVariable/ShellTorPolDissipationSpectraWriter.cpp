@@ -1,5 +1,5 @@
-/** 
- * @file ShellTorPolDissipationWriter.cpp
+/**
+ * @file ShellTorPolDissipationSpectraWriter.cpp
  * @brief Source of the implementation of the ASCII spherical harmonics dissipation calculation for vectorial field in a spherical shell
  * @author Nicolò Lardelli \<nicolo.lardelli@erdw.ethz.edu\>
  */
@@ -19,7 +19,7 @@
 
 // Class include
 //
-#include "IoVariable/ShellTorPolDissipationWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationSpectraWriter.hpp"
 
 // Project includes
 //
@@ -34,20 +34,35 @@ namespace QuICC {
 
    namespace IoVariable {
 
-      ShellTorPolDissipationWriter::ShellTorPolDissipationWriter(const std::string &prefix, const std::string &type)
+      ShellTorPolDissipationSpectraWriter::ShellTorPolDissipationSpectraWriter(const std::string &prefix,
+                                                                               const std::string &type)
               : IVariableAsciiEWriter(prefix + DissipationTags::BASENAME, DissipationTags::EXTENSION,
                                       prefix + DissipationTags::HEADER, type, DissipationTags::VERSION,
-                                      Dimensions::Space::SPECTRAL), mTorDiss(-1.0), mPolDiss(-1.0) {
+                                      Dimensions::Space::SPECTRAL), mTorDiss(), mPolDiss(),
+                mTorRadial(), mPolRadial() {
       }
 
-      ShellTorPolDissipationWriter::~ShellTorPolDissipationWriter() {
+      ShellTorPolDissipationSpectraWriter::~ShellTorPolDissipationSpectraWriter() {
       }
 
-      void ShellTorPolDissipationWriter::init() {
+      void ShellTorPolDissipationSpectraWriter::init() {
          // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
          MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
          MHDFloat ri = ro * this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
          this->mVolume = (4.0 / 3.0) * Math::PI * (std::pow(ro, 3) - std::pow(ri, 3));
+
+         // obtain Nmax
+         int Nmax = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>();
+         mTorRadial = Array(Nmax);
+         mPolRadial = Array(Nmax);
+
+         // obtain Lmax and Mmax
+         int Lmax = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::SPECTRAL);
+         int Mmax = this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::SPECTRAL);
+
+         // resize the mTorEnergy and mPolEnergy matrices
+         mTorEnergy = Matrix(Lmax, Mmax);
+         mPolEnergy = Matrix(Lmax, Mmax);
 
          // Initialise python wrapper
          PythonWrapper::init();
@@ -104,7 +119,7 @@ namespace QuICC {
          IVariableAsciiEWriter::init();
       }
 
-      void ShellTorPolDissipationWriter::compute(Transform::TransformCoordinatorType &coord) {
+      void ShellTorPolDissipationSpectraWriter::compute(Transform::TransformCoordinatorType &coord) {
          // get iterator to field
          vector_iterator vIt;
          vector_iterator_range vRange = this->vectorRange();
@@ -113,12 +128,11 @@ namespace QuICC {
          assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
          // Compute integral over Chebyshev expansion and sum harmonics
-         this->mTorDiss = 0.0;
-         this->mPolDiss = 0.0;
-         this->mCentroAntysymDiss = 0.0;
-         this->mCentroSymDiss = 0.0;
-         this->mEquaAntysymDiss = 0.0;
-         this->mEquaSymDiss = 0.0;
+         this->mTorDiss.setZero();
+         this->mPolDiss.setZero();
+
+         this->mTorDiss.setZero();
+         this->mPolDiss.setZero();
 
          // Dealias poloidal variable data
          coord.communicator().dealiasSpectral(
@@ -146,7 +160,7 @@ namespace QuICC {
          MHDFloat lfactor = 0.0;
 
 #ifdef QUICC_SPATIALSCHEME_SLFM
-         double factor = 1.0;
+         MHDFloat factor = 1.0;
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -165,85 +179,36 @@ namespace QuICC {
                int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l*(l+1.0);
 
-                MHDFloat ModeDiss = factor*lfactor*(this->mSphIntgOp*rInVarPol.slice(k).col(j).real()).sum();
-               this->mPolDiss += ModeDiss;
-
-
-                    // assign the centro symmetry energies
-                    if( (l % 2) == 0 )
-                    {
-                        this->mCentroSymDiss += ModeDiss;
-                    } else {
-
-                        this->mCentroAntysymDiss += ModeDiss;
-                    }
-
-                    // assign the equatorial symmetry energies
-                    if( ((l+m) % 2) == 0 )
-                    {
-                        this->mEquaSymDiss += ModeDiss;
-                    } else {
-
-                        this->mEquaAntysymDiss += ModeDiss;
-                    }
+               MHDFloat ModeDiss = factor*lfactor*(this->mSphIntgOp*rInVarPol.slice(k).col(j).real()).sum();
+               this->mPolDiss(l,m) += ModeDiss;
 
             }
          }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
          // Loop over harmonic degree l
+         MHDFactor factor=1.;
+         // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             lfactor = l*(l+1.0);
-            int start = 0;
 
-            int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
-            // m = 0, no factor of two
-            if( firstM == 0)
-            {
-               MHDFloat ModeDiss = lfactor*(this->mSphIntgOp*rInVarPol.slice(k).col(0).real())(0);
-               this->mPolDiss += ModeDiss;
-               start = 1;
-               firstM = 1;
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
+            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+            	if(m==0){
+            		factor = 1.0;
+            	} else {
+            		factor = 2.0;
+            	}
 
-               if ( (l % 2) == 0){
+               MHDFloat ModeDiss = factor*lfactor*(this->mSphIntgOp*rInVarPol.slice(k).col(j).real())(0);
+               this->mPolDiss(l,m) += ModeDiss;
 
-                  this->mCentroSymDiss += ModeDiss;
-                  this->mEquaSymDiss += ModeDiss;
-               } else {
-
-                  this->mCentroAntysymDiss += ModeDiss;
-                  this->mEquaAntysymDiss += ModeDiss;
                }
 
             }
-
-            Matrix MatrixModes = 2.0*lfactor*(this->mSphIntgOp*rInVarPol.slice(k).rightCols(rInVarPol.slice(k).cols()-start).real());
-            this->mPolDiss += MatrixModes.sum();
-
-            if ( (l % 2) == 0){
-
-                    this->mCentroSymDiss += MatrixModes.sum();
-                } else {
-
-                    this->mCentroAntysymDiss += MatrixModes.sum();
-                }
-
-                for(int mm = 0; mm < MatrixModes.cols(); ++mm){
-
-                   MHDFloat temp = MatrixModes.col(mm).sum();
-
-                   if( ((l+mm+firstM) % 2) == 0)
-                   {
-                  this->mEquaSymDiss += temp;
-                   } else {
-                  this->mEquaAntysymDiss += temp;
-                   }
-                }
-
-
 
          }
 #endif //QUICC_SPATIALSCHEME_SLFL
@@ -282,11 +247,11 @@ namespace QuICC {
 
 #ifdef QUICC_SPATIALSCHEME_SLFM
          double factor = 1.0;
-           // Loop over harmonic order m
-           for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+        // Loop over harmonic order m
+        for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
            {
               // m = 0, no factor of two
-                  int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
               if( m == 0)
               {
                  factor = 1.0;
@@ -297,88 +262,37 @@ namespace QuICC {
 
               for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
               {
+
                  int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                  lfactor = std::pow(l*(l+1.0),2);
 
-                  MHDFloat ModeDiss = -2.*factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real()).sum();
-                 this->mPolDiss += ModeDiss;
+                 ModeDiss = -2.*factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real()).sum();
+                 this->mPolDiss(l,m) += ModeDiss;
 
-
-                      // assign the centro symmetry energies
-                      if( (l % 2) == 0 )
-                      {
-                          this->mCentroSymDiss += ModeDiss;
-                      } else {
-
-                          this->mCentroAntysymDiss += ModeDiss;
-                      }
-
-                      // assign the equatorial symmetry energies
-                      if( ((l+m) % 2) == 0 )
-                      {
-                          this->mEquaSymDiss += ModeDiss;
-                      } else {
-
-                          this->mEquaAntysymDiss += ModeDiss;
-                      }
 
               }
            }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
+         MHDFactor factor=1.;
          // Loop over harmonic degree l
-           for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-           {
-              int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-              lfactor = std::pow(l*(l+1.0),2);
-              int start = 0;
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            lfactor = std::pow(l*(l+1.0),2);
 
-              int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
-              // m = 0, no factor of two
-              if( firstM == 0)
-              {
-                 MHDFloat ModeDiss = -2.0*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(0).real())(0);
-                 this->mPolDiss += ModeDiss;
-                 start = 1;
-                 firstM = 1;
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
-
-                 if ( (l % 2) == 0){
-
-                    this->mCentroSymDiss += ModeDiss;
-                    this->mEquaSymDiss += ModeDiss;
-                 } else {
-
-                    this->mCentroAntysymDiss += ModeDiss;
-                    this->mEquaAntysymDiss += ModeDiss;
-                 }
+            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+            	if(m==0){
+            		factor = 1.0;
+            	} else {
+            		factor = 2.0;
+            	}
+               MHDFloat ModeDiss = -2.0*factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real())(0);
+              this->mPolDiss(l,m) += ModeDiss;
 
               }
-
-              Matrix MatrixModes = -2.0*2.0*lfactor*(this->mIntgOp*rInVarPol.slice(k).rightCols(rInVarPol.slice(k).cols()-start).real());
-              this->mPolDiss += MatrixModes.sum();
-
-              if ( (l % 2) == 0){
-
-                      this->mCentroSymDiss += MatrixModes.sum();
-                  } else {
-
-                      this->mCentroAntysymDiss += MatrixModes.sum();
-                  }
-
-                  for(int mm = 0; mm < MatrixModes.cols(); ++mm){
-
-                     MHDFloat temp = MatrixModes.col(mm).sum();
-
-                     if( ((l+mm+firstM) % 2) == 0)
-                     {
-                    this->mEquaSymDiss += temp;
-                     } else {
-                    this->mEquaAntysymDiss += temp;
-                     }
-                  }
-
-
 
            }
 #endif //QUICC_SPATIALSCHEME_SLFL
@@ -412,7 +326,6 @@ namespace QuICC {
          coord.transform1D().integrate_full(rInVarPol.rData(), rOutVarPol.data(),
                                             Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
-         lfactor = 0.0;
 
 #ifdef QUICC_SPATIALSCHEME_SLFM
          double factor = 1.0;
@@ -420,8 +333,8 @@ namespace QuICC {
            for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
            {
               // m = 0, no factor of two
-                  int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-              if( m == 0)
+            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+           if( m == 0)
               {
                  factor = 1.0;
               } else
@@ -435,82 +348,30 @@ namespace QuICC {
                  lfactor = std::pow(l*(l+1.0),3);
 
                   MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
-                 this->mPolDiss += ModeDiss;
-
-
-                      // assign the centro symmetry energies
-                      if( (l % 2) == 0 )
-                      {
-                          this->mCentroSymDiss += ModeDiss;
-                      } else {
-
-                          this->mCentroAntysymDiss += ModeDiss;
-                      }
-
-                      // assign the equatorial symmetry energies
-                      if( ((l+m) % 2) == 0 )
-                      {
-                          this->mEquaSymDiss += ModeDiss;
-                      } else {
-
-                          this->mEquaAntysymDiss += ModeDiss;
-                      }
+                 this->mPolDiss(l,m) += ModeDiss;
 
               }
            }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
          // Loop over harmonic degree l
-           for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-           {
-              int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-              lfactor = std::pow(l*(l+1.0),3);
-              int start = 0;
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            lfactor = std::pow(l*(l+1.0),3);
 
-              int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
-              // m = 0, no factor of two
-              if( firstM == 0)
-              {
-                 MHDFloat ModeDiss = lfactor*(this->mIntgOp*rInVarPol.slice(k).col(0).real())(0);
-                 this->mPolDiss += ModeDiss;
-                 start = 1;
-                 firstM = 1;
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
+            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+            	if(m==0){
+            		factor = 1.0;
+            	} else {
+            		factor = 2.0;
+            	}
 
+                 MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real())(0);
+                 this->mPolDiss(l,m) += ModeDiss;
 
-                 if ( (l % 2) == 0){
-
-                    this->mCentroSymDiss += ModeDiss;
-                    this->mEquaSymDiss += ModeDiss;
-                 } else {
-
-                    this->mCentroAntysymDiss += ModeDiss;
-                    this->mEquaAntysymDiss += ModeDiss;
-                 }
-
-              }
-
-              Matrix MatrixModes = 2.0*lfactor*(this->mIntgOp*rInVarPol.slice(k).rightCols(rInVarPol.slice(k).cols()-start).real());
-              this->mPolDiss += MatrixModes.sum();
-
-              if ( (l % 2) == 0){
-
-                      this->mCentroSymDiss += MatrixModes.sum();
-                  } else {
-
-                      this->mCentroAntysymDiss += MatrixModes.sum();
-                  }
-
-                  for(int mm = 0; mm < MatrixModes.cols(); ++mm){
-
-                     MHDFloat temp = MatrixModes.col(mm).sum();
-
-                     if( ((l+mm+firstM) % 2) == 0)
-                     {
-                    this->mEquaSymDiss += temp;
-                     } else {
-                    this->mEquaAntysymDiss += temp;
-                     }
                   }
 
 
@@ -554,7 +415,7 @@ namespace QuICC {
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // m = 0, no factor of two
-                int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             if( m == 0)
             {
                factor = 1.0;
@@ -569,83 +430,32 @@ namespace QuICC {
                lfactor = std::pow(l*(l+1.0),2);
 
                MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTorQ.slice(k).col(j).real()).sum();
-               this->mTorDiss += ModeDiss;
-
-
-               // assign the centro symmetry energies
-               if( (l % 2) == 1 )
-               {
-
-                 this->mCentroSymDiss += ModeDiss;
-               } else {
-
-                 this->mCentroAntysymDiss += ModeDiss;
-               }
-
-               // assign the equatorial symmetry energies
-               if( ((l+m) % 2) == 1 )
-               {
-                 this->mEquaSymDiss += ModeDiss;
-               } else {
-
-                 this->mEquaAntysymDiss += ModeDiss;
-               }
+               this->mTorDiss(l,m) += ModeDiss;
 
             }
          }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
-         lfactor = 0.0;
+         MHDFactor factor=1.;
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             lfactor = std::pow(l*(l+1.0),2);
-            int start = 0;
-            // m = 0, no factor of two
 
-            int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
-            if( firstM == 0)
-            {
-               MHDFloat ModeDiss = lfactor*(this->mIntgOp*rInVarTorQ.slice(k).col(0).real())(0);
-               this->mTorDiss += ModeDiss;
-               start = 1;
-               firstM = 1;
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
-               if ( (l % 2) == 1)
-               {
-                   this->mCentroSymDiss += ModeDiss;
-                   this->mEquaSymDiss += ModeDiss;
-               } else {
+            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+            	if(m==0){
+            		factor = 1.0;
+            	} else {
+            		factor = 2.0;
+            	}
 
-                    this->mCentroAntysymDiss += ModeDiss;
-                    this->mEquaAntysymDiss += ModeDiss;
-               }
+               MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTorQ.slice(k).col(j).real())(0);
+               this->mTorDiss(l,m) += ModeDiss;
+
             }
-            Matrix MatrixModes = 2.0*lfactor*(this->mIntgOp*rInVarTorQ.slice(k).rightCols(rInVarTorQ.slice(k).cols()-start).real());
-            this->mTorDiss += MatrixModes.sum();
-
-            if ( (l % 2) == 1 )
-            {
-                this->mCentroSymDiss += MatrixModes.sum();
-            } else {
-                this->mCentroAntysymDiss += MatrixModes.sum();
-            }
-
-            for(int mm = 0; mm < MatrixModes.cols(); ++mm){
-
-               MHDFloat temp = MatrixModes.col(mm).sum();
-
-               if( ((l+mm+firstM) % 2) == 1){
-
-              this->mEquaSymDiss += temp;
-               } else {
-
-              this->mEquaAntysymDiss += temp;
-               }
-            }
-
-
 
          }
 #endif //QUICC_SPATIALSCHEME_SLFL
@@ -683,7 +493,7 @@ namespace QuICC {
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // m = 0, no factor of two
-                int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             if(m == 0)
             {
                factor = 1.0;
@@ -698,88 +508,32 @@ namespace QuICC {
                lfactor = l*(l+1.0);
 
                MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTorS.slice(k).col(j).real()).sum();
-               this->mTorDiss += ModeDiss;
-
-               // assign the centro symmetry energies
-               if( (l % 2) == 1 )
-               {
-                   this->mCentroSymDiss += ModeDiss;
-               } else {
-
-                   this->mCentroAntysymDiss += ModeDiss;
-               }
-
-
-               // assign the equatorial symmetry energies
-               if( ((l+m) % 2) == 1 )
-               {
-
-               this->mEquaSymDiss += ModeDiss;
-               } else {
-
-               this->mEquaAntysymDiss += ModeDiss;
-               }
-
+               this->mTorDiss(l,m) += ModeDiss;
 
             }
          }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
-         lfactor = 0.0;
+         MHDFloat factor=1.;
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             lfactor = l*(l+1.0);
-            int start = 0;
-            // m = 0, no factor of two
-            int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
-            if(firstM == 0)
-            {
-               MHDFloat ModeDiss =  lfactor*(this->mIntgOp*rInVarTorS.slice(k).col(0).real())(0);
-               this->mTorDiss += ModeDiss;
-               start = 1;
-               firstM = 1;
 
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
+            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-               if ( (l % 2) == 1 ){
+            	if(m==0){
+            		factor = 1.0;
+            	} else {
+            		factor = 2.0;
+            	}
 
-                  this->mCentroSymDiss += ModeDiss;
-                  this->mEquaSymDiss += ModeDiss;
-               } else {
-
-                  this->mCentroAntysymDiss += ModeDiss;
-                  this->mEquaAntysymDiss += ModeDiss;
-               }
+               MHDFloat ModeDiss =  factor*lfactor*(this->mIntgOp*rInVarTorS.slice(k).col(j).real())(0);
+               this->mTorDiss(j,m) += ModeDiss;
 
             }
-
-
-
-            Matrix MatrixModes = 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).rightCols(rInVarPolS.slice(k).cols()-start).real());
-            this->mPolDiss += MatrixModes.sum();
-
-                if ( (l % 2) == 1 ){
-
-                    this->mCentroSymDiss += MatrixModes.sum();
-                } else {
-
-                    this->mCentroAntysymDiss += MatrixModes.sum();
-                }
-
-                for(int mm = 0; mm < MatrixModes.cols(); ++mm){
-
-                   MHDFloat temp = MatrixModes.col(mm).sum();
-
-                   if( ((l+mm+firstM) % 2) == 1 ){
-
-                  this->mEquaSymDiss += temp;
-                   } else {
-
-                  this->mEquaAntysymDiss += temp;
-                   }
-                }
-
          }
 #endif //QUICC_SPATIALSCHEME_SLFL
 
@@ -792,45 +546,42 @@ namespace QuICC {
          // Normalize by the volume
          this->mTorDiss /= 2 * this->mVolume;
 
-         // Normalize the remainder of the energies by volume
-         this->mEquaSymDiss /= 2 * this->mVolume;
-         this->mEquaAntysymDiss /= 2 * this->mVolume;
-         this->mCentroSymDiss /= 2 * this->mVolume;
-         this->mCentroAntysymDiss /= 2 * this->mVolume;
-
       }
 
-      void ShellTorPolDissipationWriter::write() {
+      void ShellTorPolDissipationSpectraWriter::write() {
          // Create file
          this->preWrite();
 
-         // Get the "global" Kinetic Diss from MPI code
-#ifdef QUICC_MPI
-         Array Diss(6);
+         // prepare the vector by either summing on the 1st or 2nd axis
 
-         Diss(0) = this->mTorDiss;
-         Diss(1) = this->mPolDiss;
-         Diss(2) = this->mCentroSymDiss;
-         Diss(3) = this->mCentroAntysymDiss;
-         Diss(4) = this->mEquaSymDiss;
-         Diss(5) = this->mCentroAntysymDiss;
+         Array LTorSpectrum = this->mTorEnergy.rowwise().sum();
+         Array MTorSpectrum = this->mTorEnergy.colwise().sum();
+         Array LPolSpectrum = this->mPolEnergy.rowwise().sum();
+         Array MPolSpectrum = this->mPolEnergy.colwise().sum();
+
+         // Get the "global" Kinetic energy from MPI code
+         #ifdef QUICC_MPI
+         //Array energy(2);
+         MPI_Allreduce(MPI_IN_PLACE, LTorSpectrum.data(), LTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum.data(), MTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum.data(), LPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum.data(), MPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         //MPI_Allreduce(MPI_IN_PLACE, mTorRadial.data(), mTorRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         //MPI_Allreduce(MPI_IN_PLACE, mPolRadial.data(), mPolRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
 
-         MPI_Allreduce(MPI_IN_PLACE, Diss.data(), 6, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-         this->mTorDiss = Diss(0);
-         this->mPolDiss = Diss(1);
-           this->mCentroSymDiss = Diss(2);
-         this->mCentroAntysymDiss = Diss(3);
-         this->mEquaSymDiss = Diss(4);
-         this->mEquaAntysymDiss = Diss(5);
-#endif //QUICC_MPI
+         #endif //QUICC_MPI
 
          // Check if the workflow allows IO to be performed
-         if (FrameworkMacro::allowsIO()) {
-            this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTorDiss + this->mPolDiss << "\t"
-                        << this->mTorDiss << "\t" << this->mPolDiss << std::endl;
-            //"\t" << this->mCentroSymDiss <<  "\t" <<  this->mCentroAntysymDiss << "\t" << this->mEquaSymDiss << "\t" << this->mEquaAntysymDiss << std::endl;
+         if(FrameworkMacro::allowsIO())
+         {
+            //this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTorEnergy + this->mPolEnergy << "\t" << this->mTorEnergy << "\t" << this->mPolEnergy << std::endl;
+            this->mFile << std::setprecision(14) << this->mTime << "\t" << LTorSpectrum.transpose() << '\t';
+            this->mFile << std::setprecision(14) << '\t' << MTorSpectrum.transpose() << '\t';
+            this->mFile << std::setprecision(14) << '\t' << LPolSpectrum.transpose() << '\t';
+            this->mFile << std::setprecision(14) << '\t' << MPolSpectrum.transpose() << std::endl;
+            //this->mFile << std::setprecision(14) << '\t' << mTorRadial.transpose() << '\t';
+            //this->mFile << std::setprecision(14) << '\t' << mPolRadial.transpose() << std::endl;
          }
 
          // Close file

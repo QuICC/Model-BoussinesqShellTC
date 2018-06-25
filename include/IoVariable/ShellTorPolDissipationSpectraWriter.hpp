@@ -1,11 +1,12 @@
-/** 
- * @file ShellTorPolEnergyWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical shell
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
+/**
+ * @file ShellTorPolDissipationSpectraWriter.hpp
+ * @brief Implementation of the ASCII spherical harmonics dissipation calculation for a Toroidal/Poloidal field in a spherical shell
+ * @author Nicolò Lardelli \<nicolo.lardelli@erdw.ethz.ch\>
  */
+#ifndef QUICC_SHELLTORPOLDISSIPATIONSPECTRAWRITER_HPP
+#define QUICC_SHELLTORPOLDISSIPATIONSPECTRAWRITER_HPP
 
-#ifndef SHELLTORPOLDISSIPATIONWRITER_HPP
-#define SHELLTORPOLDISSIPATIONWRITER_HPP
+
 
 // Configuration includes
 //
@@ -31,7 +32,7 @@ namespace QuICC {
       /**
        * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical shell
        */
-      class ShellTorPolDissipationWriter : public IVariableAsciiEWriter {
+      class ShellTorPolDissipationSpectraWriter : public IVariableAsciiEWriter {
       public:
           /**
            * @brief Constructor
@@ -39,12 +40,12 @@ namespace QuICC {
            * @param prefix Prefix to use for file name
            * @param type Type of the file (typically scheme name)
            */
-          ShellTorPolDissipationWriter(const std::string &prefix, const std::string &type);
+          ShellTorPolDissipationSpectraWriter(const std::string &prefix, const std::string &type);
 
           /**
            * @brief Destructor
            */
-          virtual ~ShellTorPolDissipationWriter();
+          virtual ~ShellTorPolDissipationSpectraWriter();
 
           /**
            * @brief Initialise the operator, transform and file
@@ -75,35 +76,20 @@ namespace QuICC {
           MHDFloat mVolume;
 
           /**
-           * @brief Storage for the Toroidal energy
-           */
-          MHDFloat mTorDiss;
+          * @brief Storage for the Toroidal energy
+          */
+          Matrix mTorEnergy;
 
           /**
            * @brief Storage for the Poloidal energy
            */
-          MHDFloat mPolDiss;
+          Matrix mPolEnergy;
 
-          /**
-           * @brief Storage for the centro-symmentric energy
+          /*
+           * @brief Storage for the radial spectral decomposition, unused
            */
-          MHDFloat mCentroSymDiss;
-
-          /**
-           * @brief Storage for the centro-antisymmetric energy
-           */
-          MHDFloat mCentroAntysymDiss;
-
-          /**
-          * @brief Storage for the equatorial-symmentric energy
-          */
-          MHDFloat mEquaSymDiss;
-
-          /**
-          * @brief Storage for the equatorial-antisymmetric energy
-          */
-          MHDFloat mEquaAntysymDiss;
-
+          Array mTorRadial;
+          Array mPolRadial;
           /**
              * @brief Chebyshev operator to integrate in radius
              */
@@ -115,14 +101,14 @@ namespace QuICC {
           SparseMatrix mSphIntgOp;
       };
 
-      inline bool ShellTorPolDissipationWriter::isHeavy() const {
+      inline bool ShellTorPolDissipationSpectraWriter::isHeavy() const {
          return true;
       }
 
       /// Typedef for a shared pointer of a HDF5 state file writer
-      typedef SharedPtrMacro <ShellTorPolDissipationWriter> SharedShellTorPolDissipationWriter;
+      typedef SharedPtrMacro <ShellTorPolDissipationSpectraWriter> SharedShellTorPolDissipationSpectraWriter;
 
    }
 }
 
-#endif // SHELLTORPOLDISSIPATIONWRITER_HPP
+#endif //QUICC_SHELLTORPOLDISSIPATIONSPECTRAWRITER_HPP
