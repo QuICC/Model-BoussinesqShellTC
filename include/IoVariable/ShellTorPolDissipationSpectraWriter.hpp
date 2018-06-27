@@ -78,12 +78,12 @@ namespace QuICC {
           /**
           * @brief Storage for the Toroidal energy
           */
-          Matrix mTorEnergy;
+          Matrix mTorDiss;
 
           /**
            * @brief Storage for the Poloidal energy
            */
-          Matrix mPolEnergy;
+          Matrix mPolDiss;
 
           /*
            * @brief Storage for the radial spectral decomposition, unused

@@ -33,6 +33,8 @@
 #include "IoVariable/ShellTorPolProbeWriter.hpp"
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
 #include "IoVariable/ShellTorPolUniformVorticityWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationSpectraWriter.hpp"
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -255,17 +257,25 @@ namespace Implicit {
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector3);
-       
+
+      /*
       // Create torque writer
       IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
       spVector4->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector4);
-      /*
+      */
 
       IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
       spVector5->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector5);
-      */
+
+      IoVariable::SharedShellTorPolDissipationWriter spVector6(new IoVariable::ShellTorPolDissipationWriter("kinetic", SchemeType::type()));
+      spVector6->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector6);
+
+      IoVariable::SharedShellTorPolDissipationSpectraWriter spVector7(new IoVariable::ShellTorPolDissipationSpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector7->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector7);
 
    }
 

@@ -139,9 +139,9 @@ namespace IoVariable {
 		this->mEquaSymEnergy = 0.0;
 
       MHDFloat lfactor = 0.0;
+      MHDFloat factor = 0.0;
 
       #ifdef QUICC_SPATIALSCHEME_SLFM
-         double factor = 1.0;
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -195,7 +195,7 @@ namespace IoVariable {
             // m = 0, no factor of two
             if( firstM == 0)
             {
-               MHDFloat ModeEnergy = lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(0).real())(0);
+               MHDFloat ModeEnergy = lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(0).real()).sum();
                this->mTorEnergy += ModeEnergy;
                start = 1;
                firstM = 1;
@@ -203,11 +203,11 @@ namespace IoVariable {
                if ( (l % 2) == 1){
 
                   this->mCentroSymEnergy += ModeEnergy;
-                  this->mEquaSymEnergy += ModeEnergy;
+                  //this->mEquaSymEnergy += ModeEnergy;
                } else {
 
                   this->mCentroAntysymEnergy += ModeEnergy;
-                  this->mEquaAntysymEnergy += ModeEnergy;
+                  //this->mEquaAntysymEnergy += ModeEnergy;
                }
             }
 
@@ -221,18 +221,23 @@ namespace IoVariable {
 					this->mCentroAntysymEnergy += MatrixModes.sum();
 				}
 
-				for(int mm = 0; mm < MatrixModes.cols(); ++mm){
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
 
-				   MHDFloat temp = MatrixModes.col(mm).sum();
 
-				   if( ((l+mm+firstM) % 2) == 1)
+               MHDFloat temp = factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+               if( ((l+m) % 2) == 1)
 				   {
                   this->mEquaSymEnergy += temp;
 				   } else {
                   this->mEquaAntysymEnergy += temp;
 				   }
-				}
-
+            }
 
          }
       #endif //QUICC_SPATIALSCHEME_SLFL
@@ -321,7 +326,7 @@ namespace IoVariable {
             int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
             if( firstM == 0)
             {
-               MHDFloat ModeEnergy = lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(0).real())(0);
+               MHDFloat ModeEnergy = lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(0).real()).sum();
                this->mPolEnergy += ModeEnergy;
                start = 1;
                firstM = 1;
@@ -329,11 +334,9 @@ namespace IoVariable {
 					if ( (l % 2) == 0){
 
                   this->mCentroSymEnergy += ModeEnergy;
-                  this->mEquaSymEnergy += ModeEnergy;
                } else {
 
                   this->mCentroAntysymEnergy += ModeEnergy;
-                  this->mEquaAntysymEnergy += ModeEnergy;
                }
             }
             Matrix MatrixModes = 2.0*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).rightCols(rInVarPolQ.slice(k).cols()-start).real());
@@ -347,18 +350,23 @@ namespace IoVariable {
 					this->mCentroAntysymEnergy += MatrixModes.sum();
 				}
 
-				for(int mm = 0; mm < MatrixModes.cols(); ++mm){
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
 
-				   MHDFloat temp = MatrixModes.col(mm).sum();
 
-				   if( ((l+mm+firstM) % 2) == 0){
-
+               MHDFloat temp = factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+               if( ((l+m) % 2) == 1)
+				   {
                   this->mEquaSymEnergy += temp;
 				   } else {
-
                   this->mEquaAntysymEnergy += temp;
 				   }
-				}
+            }
 
 
          }
@@ -444,18 +452,18 @@ namespace IoVariable {
             int firstM = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k);
             if(firstM == 0)
             {
-               MHDFloat ModeEnergy =  lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(0).real())(0);
+               MHDFloat ModeEnergy =  lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(0).real()).sum();
                this->mPolEnergy += ModeEnergy;
                start = 1;
                firstM = 1;
 					if ( (l % 2) == 0){
 
                   this->mCentroSymEnergy += ModeEnergy;
-                  this->mEquaSymEnergy += ModeEnergy;
+                  //this->mEquaSymEnergy += ModeEnergy;
                } else {
 
                   this->mCentroAntysymEnergy += ModeEnergy;
-                  this->mEquaAntysymEnergy += ModeEnergy;
+                  //this->mEquaAntysymEnergy += ModeEnergy;
                }
             }
 
@@ -470,18 +478,25 @@ namespace IoVariable {
 					this->mCentroAntysymEnergy += MatrixModes.sum();
 				}
 
-				for(int mm = 0; mm < MatrixModes.cols(); ++mm){
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
 
-				   MHDFloat temp = MatrixModes.col(mm).sum();
 
-				   if( ((l+mm+firstM) % 2) == 0){
-
+               MHDFloat temp = factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+               if( ((l+m) % 2) == 1)
+				   {
                   this->mEquaSymEnergy += temp;
-				   } else {
 
+				   } else {
                   this->mEquaAntysymEnergy += temp;
 				   }
-				}
+
+            }
          }
       #endif //QUICC_SPATIALSCHEME_SLFL
 

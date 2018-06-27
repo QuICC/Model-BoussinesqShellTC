@@ -57,12 +57,12 @@ namespace QuICC {
          mPolRadial = Array(Nmax);
 
          // obtain Lmax and Mmax
-         int Lmax = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::SPECTRAL);
-         int Mmax = this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::SPECTRAL);
+         int Lmax = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
+         int Mmax = this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
          // resize the mTorEnergy and mPolEnergy matrices
-         mTorEnergy = Matrix(Lmax, Mmax);
-         mPolEnergy = Matrix(Lmax, Mmax);
+         mTorDiss = Matrix(Lmax, Mmax);
+         mPolDiss = Matrix(Lmax, Mmax);
 
          // Initialise python wrapper
          PythonWrapper::init();
@@ -131,9 +131,6 @@ namespace QuICC {
          this->mTorDiss.setZero();
          this->mPolDiss.setZero();
 
-         this->mTorDiss.setZero();
-         this->mPolDiss.setZero();
-
          // Dealias poloidal variable data
          coord.communicator().dealiasSpectral(
                  vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
@@ -158,9 +155,8 @@ namespace QuICC {
                                             Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
          MHDFloat lfactor = 0.0;
-
+         MHDFloat factor = 1.;
 #ifdef QUICC_SPATIALSCHEME_SLFM
-         MHDFloat factor = 1.0;
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -187,8 +183,6 @@ namespace QuICC {
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
          // Loop over harmonic degree l
-         MHDFactor factor=1.;
-         // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
@@ -196,17 +190,15 @@ namespace QuICC {
 
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
-            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-            	if(m==0){
-            		factor = 1.0;
-            	} else {
-            		factor = 2.0;
-            	}
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
 
                MHDFloat ModeDiss = factor*lfactor*(this->mSphIntgOp*rInVarPol.slice(k).col(j).real())(0);
                this->mPolDiss(l,m) += ModeDiss;
-
-               }
 
             }
 
@@ -246,35 +238,33 @@ namespace QuICC {
          lfactor = 0.0;
 
 #ifdef QUICC_SPATIALSCHEME_SLFM
-         double factor = 1.0;
-        // Loop over harmonic order m
-        for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-           {
-              // m = 0, no factor of two
-            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-              if( m == 0)
-              {
-                 factor = 1.0;
-              } else
-              {
-                 factor = 2.0;
-              }
+         // Loop over harmonic order m
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+            {
+               // m = 0, no factor of two
+             int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+               if( m == 0)
+               {
+                  factor = 1.0;
+               } else
+               {
+                  factor = 2.0;
+               }
 
-              for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
-              {
+               for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+               {
 
-                 int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-                 lfactor = std::pow(l*(l+1.0),2);
+                  int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+                  lfactor = std::pow(l*(l+1.0),2);
 
-                 ModeDiss = -2.*factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real()).sum();
-                 this->mPolDiss(l,m) += ModeDiss;
+                  MHDFloat ModeDiss = -2.*factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real()).sum();
+                  this->mPolDiss(l,m) += ModeDiss;
 
 
-              }
-           }
+               }
+            }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
-         MHDFactor factor=1.;
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -283,18 +273,18 @@ namespace QuICC {
 
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
-            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-            	if(m==0){
-            		factor = 1.0;
-            	} else {
-            		factor = 2.0;
-            	}
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
                MHDFloat ModeDiss = -2.0*factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real())(0);
               this->mPolDiss(l,m) += ModeDiss;
 
-              }
-
            }
+
+        }
 #endif //QUICC_SPATIALSCHEME_SLFL
 
          // Free BWD storage
@@ -328,30 +318,29 @@ namespace QuICC {
 
 
 #ifdef QUICC_SPATIALSCHEME_SLFM
-         double factor = 1.0;
-           // Loop over harmonic order m
-           for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-           {
-              // m = 0, no factor of two
-            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-           if( m == 0)
-              {
-                 factor = 1.0;
-              } else
-              {
-                 factor = 2.0;
-              }
+         // Loop over harmonic order m
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            // m = 0, no factor of two
+          int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         if( m == 0)
+            {
+               factor = 1.0;
+            } else
+            {
+               factor = 2.0;
+            }
 
-              for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
-              {
-                 int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-                 lfactor = std::pow(l*(l+1.0),3);
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int l= this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = std::pow(l*(l+1.0),3);
 
-                  MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
-                 this->mPolDiss(l,m) += ModeDiss;
+                MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real()).sum();
+               this->mPolDiss(l,m) += ModeDiss;
 
-              }
-           }
+            }
+         }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
          // Loop over harmonic degree l
@@ -362,12 +351,12 @@ namespace QuICC {
 
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
-            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-            	if(m==0){
-            		factor = 1.0;
-            	} else {
-            		factor = 2.0;
-            	}
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
 
                  MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarPol.slice(k).col(j).real())(0);
                  this->mPolDiss(l,m) += ModeDiss;
@@ -436,7 +425,6 @@ namespace QuICC {
          }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
-         MHDFactor factor=1.;
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -445,14 +433,14 @@ namespace QuICC {
 
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
 
-            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-            	if(m==0){
-            		factor = 1.0;
-            	} else {
-            		factor = 2.0;
-            	}
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
 
-               MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTorQ.slice(k).col(j).real())(0);
+               MHDFloat ModeDiss = factor*lfactor*(this->mIntgOp*rInVarTorQ.slice(k).col(j).real()).sum();
                this->mTorDiss(l,m) += ModeDiss;
 
             }
@@ -514,7 +502,6 @@ namespace QuICC {
          }
 #endif //defined QUICC_SPATIALSCHEME_SLFM
 #ifdef QUICC_SPATIALSCHEME_SLFL
-         MHDFloat factor=1.;
          // Loop over harmonic degree l
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -522,15 +509,15 @@ namespace QuICC {
             lfactor = l*(l+1.0);
 
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
-            	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
 
-            	if(m==0){
-            		factor = 1.0;
-            	} else {
-            		factor = 2.0;
-            	}
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
 
-               MHDFloat ModeDiss =  factor*lfactor*(this->mIntgOp*rInVarTorS.slice(k).col(j).real())(0);
+               MHDFloat ModeDiss =  factor*lfactor*(this->mIntgOp*rInVarTorS.slice(k).col(j).real()).sum();
                this->mTorDiss(j,m) += ModeDiss;
 
             }
@@ -554,10 +541,10 @@ namespace QuICC {
 
          // prepare the vector by either summing on the 1st or 2nd axis
 
-         Array LTorSpectrum = this->mTorEnergy.rowwise().sum();
-         Array MTorSpectrum = this->mTorEnergy.colwise().sum();
-         Array LPolSpectrum = this->mPolEnergy.rowwise().sum();
-         Array MPolSpectrum = this->mPolEnergy.colwise().sum();
+         Array LTorSpectrum = this->mTorDiss.rowwise().sum();
+         Array MTorSpectrum = this->mTorDiss.colwise().sum();
+         Array LPolSpectrum = this->mPolDiss.rowwise().sum();
+         Array MPolSpectrum = this->mPolDiss.colwise().sum();
 
          // Get the "global" Kinetic energy from MPI code
          #ifdef QUICC_MPI
@@ -573,8 +560,7 @@ namespace QuICC {
          #endif //QUICC_MPI
 
          // Check if the workflow allows IO to be performed
-         if(FrameworkMacro::allowsIO())
-         {
+         if (FrameworkMacro::allowsIO()) {
             //this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTorEnergy + this->mPolEnergy << "\t" << this->mTorEnergy << "\t" << this->mPolEnergy << std::endl;
             this->mFile << std::setprecision(14) << this->mTime << "\t" << LTorSpectrum.transpose() << '\t';
             this->mFile << std::setprecision(14) << '\t' << MTorSpectrum.transpose() << '\t';
@@ -586,13 +572,14 @@ namespace QuICC {
 
          // Close file
          this->postWrite();
-
+         /*
          // Abort if kinetic Diss is NaN
-         if (isnan(this->mTorDiss) || isnan(this->mPolDiss)) {
+         if (isnan(this->mTorDiss.norm()) || isnan(this->mPolDiss.norm())) {
             FrameworkMacro::abort(99);
 
             throw Exception("Toroidal/Poloidal Diss is NaN!");
          }
+          */
       }
 
    }

@@ -35,6 +35,7 @@
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "IoVariable/ShellTorPolUniformVorticityWriter.hpp"
 #include "IoVariable/ShellTorPolDissipationWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationSpectraWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
@@ -281,6 +282,10 @@ namespace Explicit {
       IoVariable::SharedShellTorPolDissipationWriter spVector6(new IoVariable::ShellTorPolDissipationWriter("kinetic", SchemeType::type()));
       spVector6->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector6);
+
+      IoVariable::SharedShellTorPolDissipationSpectraWriter spVector7(new IoVariable::ShellTorPolDissipationSpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector7->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector7);
 
    }
 
