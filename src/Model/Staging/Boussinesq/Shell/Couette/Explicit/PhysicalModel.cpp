@@ -242,7 +242,7 @@ namespace Explicit {
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
 
-
+      /*
       // Create probes
       Matrix mProbes(6,3);
 
@@ -260,7 +260,7 @@ namespace Explicit {
       IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector2);
-
+      */
 
       // Create kinetic energy spectral writer
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
