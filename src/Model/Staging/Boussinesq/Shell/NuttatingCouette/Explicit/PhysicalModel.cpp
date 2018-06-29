@@ -261,10 +261,20 @@ namespace Explicit {
 		spVector4->expect(PhysicalNames::VELOCITY);
 		spSim->addAsciiOutputFile(spVector4);
 
+      // Create average vorticity writer
+      IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
+      spVector5->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector5);
 
-		IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
-		spVector5->expect(PhysicalNames::VELOCITY);
-		spSim->addAsciiOutputFile(spVector5);
+      // Create  kinetic dissipation writer
+      IoVariable::SharedShellTorPolDissipationWriter spVector6(new IoVariable::ShellTorPolDissipationWriter("kinetic", SchemeType::type()));
+      spVector6->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector6);
+
+      // Create kinetic dissipation spectral writer
+      IoVariable::SharedShellTorPolDissipationSpectraWriter spVector7(new IoVariable::ShellTorPolDissipationSpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector7->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector7);
 
    }
 

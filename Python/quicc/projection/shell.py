@@ -47,7 +47,7 @@ def proj_dradial_dr(nr, a, b, x = None):
 def proj_radial_r(nr, a, b, x = None):
     # evaluate the radial basis functions of degree <nr over r
     # this projection operator includes the 1/r part and corresponds
-    # to the a projection from spectral to physical for the toroidal field (T-part of a qst decomposition)
+# to the a projection from spectral to physical for the toroidal field (T-part of a qst decomposition)
     if x is None:
         xx,ww = cheb.chebgauss(nr)
     else:
