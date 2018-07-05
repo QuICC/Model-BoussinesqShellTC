@@ -34,6 +34,8 @@
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "IoVariable/ShellTorPolUniformVorticityWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationSpectraWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
