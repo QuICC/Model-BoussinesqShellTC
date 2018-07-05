@@ -373,7 +373,7 @@ namespace Solver {
    template <template <class,class> class TSolver,typename TSolverIt> std::pair<bool,MHDFloat> solveSolvers(SparseCoordinatorData<TSolver>& coord)
    {
       // Create iterator to current solver
-      TSolverIt solIt;g
+      TSolverIt solIt;
       coord.setIterator(solIt);
       TSolverIt endIt;
       coord.setEndIterator(endIt);
