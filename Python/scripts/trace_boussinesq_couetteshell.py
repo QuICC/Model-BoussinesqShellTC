@@ -42,7 +42,7 @@ E = 1e-4; mc = 1; Ro=0.
 res = [119, 239, 1]
 
 # Create parameters (rescaling to proper nondimensionalisation)
-m = 0 #
+m = 1 #
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
 eq_params = {'ekman':E, 'rossby':Ro, 'ro':ro, 'rratio':rratio, 'rayleigh':0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel}
@@ -61,7 +61,7 @@ marginal_options = MarginalCurve.default_options()
 marginal_options['evp_tol'] = 1e-10
 #marginal_options['ellipse_radius'] = 1e5 
 marginal_options['geometry'] = 'shell'
-marginal_options['target'] = 0.6547j
+marginal_options['target'] = -1.0j
 marginal_options['curve'] = False
 marginal_options['minimum'] = False
 marginal_options['plot_curve'] = True
@@ -70,7 +70,7 @@ marginal_options['solve_nev'] = 15
 marginal_options['point_k'] = m
 marginal_options['plot_spy'] = False
 marginal_options['show_spectra'] = True
-marginal_options['show_physical'] = False
+marginal_options['show_physical'] = True
 marginal_options['save_hdf5'] = True
 marginal_options['viz_mode'] = 1
 marginal_options['curve_points'] = np.arange(max(0, m-2), m+3, 1)
