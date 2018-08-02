@@ -255,7 +255,13 @@ namespace Transform {
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR)->second, pValue);
       Py_DECREF(pValue);
       // Rescale first row to create SPD matrix (due to c_0 in Chebyshev expansion)
-      this->mSolveOp.find(ProjectorType::DIVR)->second.row(0) *= 0.5;
+      for(int j = 0; j < this->mSolveOp.find(ProjectorType::DIVR)->second.cols(); ++j)
+      {
+         if(this->mSolveOp.find(ProjectorType::DIVR)->second.coeff(0,j) != 0.0)
+         {
+            this->mSolveOp.find(ProjectorType::DIVR)->second.coeffRef(0,j) *= 0.5;
+         }
+      }
 
       // Call r2 for solver
       PythonWrapper::setFunction("r2");
@@ -264,7 +270,13 @@ namespace Transform {
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR2)->second, pValue);
       Py_DECREF(pValue);
       // Rescale first row to create SPD matrix (due to c_0 in Chebyshev expansion)
-      this->mSolveOp.find(ProjectorType::DIVR2)->second.row(0) *= 0.5;
+      for(int j = 0; j < this->mSolveOp.find(ProjectorType::DIVR2)->second.cols(); ++j)
+      {
+         if(this->mSolveOp.find(ProjectorType::DIVR2)->second.coeff(0,j) != 0.0)
+         {
+            this->mSolveOp.find(ProjectorType::DIVR2)->second.coeffRef(0,j) *= 0.5;
+         }
+      }
 
       // Call i1 for solver
       // Change resolution
