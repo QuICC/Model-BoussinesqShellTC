@@ -1,11 +1,11 @@
 /**
- * @file Kinetic_Energy_X.hpp
+ * @file DissTh.hpp
  * @brief Implementation of the local thermal dissipation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_KINETIC_ENERGY_X_HPP
-#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_KINETIC_ENERGY_X_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_DISSTH_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_DISSTH_HPP
 
 // Configuration includes
 //
@@ -31,12 +31,12 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace F3DQG {
 
    /**
     * @brief Implementation of the local thermal dissipation computation for the Boussinesq F-plane 3DQG model
     */
-   class Kinetic_Energy_X: public IScalarEquation
+   class DissTh: public IScalarEquation
    {
       public:
          /**
@@ -44,12 +44,12 @@ namespace QGmhdBhhLowRm {
           *
           * @param spEqParams Shared equation parameters
           */
-         Kinetic_Energy_X(SharedEquationParameters spEqParams);
+         DissTh(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Kinetic_Energy_X();
+         virtual ~DissTh();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -89,4 +89,4 @@ namespace QGmhdBhhLowRm {
 }
 }
 
-#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_KINETIC_ENERGY_X_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_F3DQG_DISSTH_HPP

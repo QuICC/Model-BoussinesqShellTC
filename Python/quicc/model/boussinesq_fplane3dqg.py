@@ -66,6 +66,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         elif timing == self.EXPLICIT_NEXTSTEP:
             if field_row == ("vorticityz",""):
                 fields = [("streamfunction","")]
+            elif field_row == ("velocityx",""):
                 fields = [("streamfunction","")]
             elif field_row == ("velocityy",""):
                 fields = [("streamfunction","")]
@@ -226,12 +227,12 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-#        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
-#            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
+        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
 #       to set to zero the barotropic component use this instead:
-#
-if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
-            mat = geo.qid(res[0],0,bc,-(kx**2+ky**2))  - spsp.eye(res[0],1)*geo.avg(res[0])*geo.qid(res[0],0,bc,-(kx**2+ky**2)) 
+
+#        if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+#            mat = geo.qid(res[0],0,bc,-(kx**2+ky**2))  - spsp.eye(res[0],1)*geo.avg(res[0])*geo.qid(res[0],0,bc,-(kx**2+ky**2)) 
 
         elif field_row == ("velocityx","") and field_col == ("streamfunction",""):
             mat = geo.qid(res[0],0, bc, -ky*1j)
