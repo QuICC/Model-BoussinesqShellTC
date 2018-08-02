@@ -1,12 +1,8 @@
 /** 
- * @file fbz.cpp
+ * @file BoussinesqDynamo3DQGfbz.cpp
  * @brief Source of the implementation of the mean heat computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-
-/// Define small macros allowing to convert to string
-#define MAKE_STR_X( _P ) # _P
-#define MAKE_STR( _P ) MAKE_STR_X( _P )
 
 // Configuration includes
 //
@@ -18,7 +14,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fbz.hpp )
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqDynamo3DQGfbz.hpp"
 
 // Project includes
 //
@@ -31,29 +27,23 @@ namespace QuICC {
 
 namespace Equations {
 
-namespace Boussinesq {
-
-namespace Plane {
-
-namespace QGmhdBhhLowRm {
-
-   fbz::fbz(SharedEquationParameters spEqParams)
+   BoussinesqDynamo3DQGfbz::BoussinesqDynamo3DQGfbz(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   fbz::~fbz()
+   BoussinesqDynamo3DQGfbz::~BoussinesqDynamo3DQGfbz()
    {
    }
 
-   void fbz::setCoupling()
+   void BoussinesqDynamo3DQGfbz::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
-   void fbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqDynamo3DQGfbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -67,7 +57,7 @@ namespace QGmhdBhhLowRm {
       rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array())).matrix());
    }
 
-   Datatypes::SpectralScalarType::PointType fbz::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType BoussinesqDynamo3DQGfbz::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -86,7 +76,7 @@ namespace QGmhdBhhLowRm {
       return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
-   void fbz::setRequirements()
+   void BoussinesqDynamo3DQGfbz::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::FBZ);
@@ -107,8 +97,5 @@ namespace QGmhdBhhLowRm {
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
    }
 
-}
-}
-}
 }
 }

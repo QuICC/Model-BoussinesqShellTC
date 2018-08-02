@@ -113,12 +113,12 @@ namespace QuICC {
          this->postWrite();
 
          // Abort if kinetic energy is NaN
-         if(std::isnan(this->mKurt.sum()))
-         {
-            FrameworkMacro::abort(99);
+//         if(std::isnan(this->mKurt.sum()))
+//         {
+//            FrameworkMacro::abort(99);
 
-            throw Exception("Kurtosis is NaN!");
-         }
+//            throw Exception("Kurtosis is NaN!");
+//         }
       }
 
    }

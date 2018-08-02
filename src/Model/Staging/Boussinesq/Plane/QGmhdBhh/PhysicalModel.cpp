@@ -28,24 +28,24 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/PhysicalModel.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/PhysicalModel.hpp )
 
 // Project includes
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/Streamfunction.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityX.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityY.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VelocityZ.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/Transport.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/VorticityZ.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/MeanHeat.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fbx.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fby.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fbz.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fjz.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/DissTh.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/DissB.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/DissV.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/Streamfunction.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/VelocityX.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/VelocityY.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/VelocityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/VorticityZ.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/MeanHeat.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/fbx.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/fby.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/fbz.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/fjz.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/DissTh.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/DissB.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/DissV.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
@@ -74,55 +74,55 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_qgmhdbhhlowrm";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_qgmhdbhh";
 
-   const std::string PhysicalModel::PYCLASS = "BoussinesqQGmhdBhhLowRm";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqQGmhdBhh";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add upright streamfunction equation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::Streamfunction>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::Streamfunction>();
 
       // Add upright vertical velocity equation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::VelocityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::VelocityZ>();
 
       // Add upright transport equation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::Transport>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::Transport>();
 
       // Add velocity x
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::VelocityX>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::VelocityX>();
 
       // Add velocity y
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::VelocityY>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::VelocityY>();
 
       // Add vertical vorticity equation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::VorticityZ>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::VorticityZ>();
 
       // Add mean heat computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::MeanHeat>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::MeanHeat>();
 
       // Add fbx computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::fbx>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::fbx>();
 
       // Add fby computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::fby>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::fby>();
 
       // Add fbz heat computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::fbz>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::fbz>();
 
       // Add fjz computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::fjz>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::fjz>();
 
       // Add DissTh computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::DissTh>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::DissTh>();
 
       // Add DissB computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::DissB>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::DissB>();
 
       // Add DissV computation
-      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhhLowRm::DissV>();
+      spSim->addScalarEquation<Equations::Boussinesq::Plane::QGmhdBhh::DissV>();
       
    }
 
@@ -588,9 +588,9 @@ namespace QGmhdBhhLowRm {
       spSim->addStatsOutputFile(spAvgVx);
 
       // Create RMS velocityx  writer
-      IoStats::SharedCartesian1DScalarRMSWriter spRMSVx(new IoStats::Cartesian1DScalarRMSWriter("velocityx", spAvgVx,  SchemeType::type()));
-      spRMSVx->expect(PhysicalNames::VELOCITYX);
-      spSim->addStatsOutputFile(spRMSVx);
+//      IoStats::SharedCartesian1DScalarRMSWriter spRMSVx(new IoStats::Cartesian1DScalarRMSWriter("velocityx", spAvgVx,  SchemeType::type()));
+//      spRMSVx->expect(PhysicalNames::VELOCITYX);
+//      spSim->addStatsOutputFile(spRMSVx);
 
       // Create skew velocityx  writer       
 //      IoStats::SharedCartesian1DScalarSkewWriter spSkewVx(new IoStats::Cartesian1DScalarSkewWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));

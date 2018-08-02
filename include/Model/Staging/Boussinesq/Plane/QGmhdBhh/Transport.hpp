@@ -1,12 +1,11 @@
 /**
- * @file DissB.hpp
- * @brief Implementation of the ohmic dissipation equation for the Boussinesq F-plane QG model with horizontal helicoidal magnetic field applied
+ * @file Transport.hpp
+ * @brief Implementation of the transport equation for the Boussinesq F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @modified by Stefano Maffei \<maffei.ste@gmail.com\>
  */
 
-#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
-#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_TRANSPORT_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -32,25 +31,26 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
+
    /**
-    * @brief Implementation of the ohmic dissipation equation for the Boussinesq F-plane QG model
+    * @brief Implementation of the transport equation for the Boussinesq F-plane 3DQG model
     */
-   class DissB: public IScalarEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams Shared equation parameters
+          * @param spEqParams    Shared equation parameters
           */
-         DissB(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~DissB();
-         
+         virtual ~Transport();
+
          /**
           * @brief Compute the nonlinear interaction term
           *
@@ -58,7 +58,7 @@ namespace QGmhdBhhLowRm {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
-         
+
       protected:
          /**
           * @brief Set variable requirements
@@ -78,4 +78,5 @@ namespace QGmhdBhhLowRm {
 }
 }
 }
-#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
+
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_TRANSPORT_HPP

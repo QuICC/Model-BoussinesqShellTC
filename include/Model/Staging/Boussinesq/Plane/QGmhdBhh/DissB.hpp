@@ -5,8 +5,8 @@
  * @modified by Stefano Maffei \<maffei.ste@gmail.com\>
  */
 
-#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
-#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_DISSB_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_DISSB_HPP
 
 // Configuration includes
 //
@@ -32,7 +32,7 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
    /**
     * @brief Implementation of the ohmic dissipation equation for the Boussinesq F-plane QG model
     */
@@ -78,4 +78,4 @@ namespace QGmhdBhhLowRm {
 }
 }
 }
-#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_DISSB_HPP

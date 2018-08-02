@@ -1,12 +1,12 @@
 /**
- * @file DissB.hpp
- * @brief Implementation of the ohmic dissipation equation for the Boussinesq F-plane QG model with horizontal helicoidal magnetic field applied
+ * @file BoussinesqQGmhdBhhVelocityZ.hpp
+ * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane QG model with horizontal helicoidal magnetic field applied
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @modified by Stefano Maffei \<maffei.ste@gmail.com\>
  */
 
-#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
-#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
+#ifndef QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_VELOCITYZ_HPP
+#define QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_VELOCITYZ_HPP
 
 // Configuration includes
 //
@@ -32,11 +32,12 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
+
    /**
-    * @brief Implementation of the ohmic dissipation equation for the Boussinesq F-plane QG model
+    * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane QG model
     */
-   class DissB: public IScalarEquation
+   class VelocityZ: public IScalarEquation
    {
       public:
          /**
@@ -44,12 +45,12 @@ namespace QGmhdBhhLowRm {
           *
           * @param spEqParams Shared equation parameters
           */
-         DissB(SharedEquationParameters spEqParams);
+         VelocityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~DissB();
+         virtual ~VelocityZ();
          
          /**
           * @brief Compute the nonlinear interaction term
@@ -78,4 +79,4 @@ namespace QGmhdBhhLowRm {
 }
 }
 }
-#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHHLOWRM_DISSB_HPP
+#endif // QUICC_EQUATIONS_BOUSSINESQ_PLANE_QGMHDBHH_VELOCITYZ_HPP

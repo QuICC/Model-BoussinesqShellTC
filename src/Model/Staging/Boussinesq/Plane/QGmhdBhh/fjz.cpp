@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhhLowRm/fjz.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Plane/QGmhdBhh/fjz.hpp )
 
 // Project includes
 //
@@ -34,7 +34,7 @@ namespace Boussinesq {
 
 namespace Plane {
 
-namespace QGmhdBhhLowRm {
+namespace QGmhdBhh {
 
    fjz::fjz(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
@@ -61,7 +61,7 @@ namespace QGmhdBhhLowRm {
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FJZ, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::FJZ, FieldRequirement(true, true, false, false));
    }
 
 }
