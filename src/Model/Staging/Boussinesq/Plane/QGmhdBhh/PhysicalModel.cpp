@@ -177,6 +177,24 @@ namespace QGmhdBhh {
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
+          // Add FBX initial state generation equation
+          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+          spExact->setIdentity(PhysicalNames::FBX);
+          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
+          // Add FBY initial state generation equation
+          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+          spExact->setIdentity(PhysicalNames::FBY);
+          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
+          // Add FBZ initial state generation equation
+          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+          spExact->setIdentity(PhysicalNames::FBZ);
+          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+          spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
          // Add BY initial state generation equation
 //         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
 //         spExact->setIdentity(PhysicalNames::EMFY);
@@ -263,6 +281,20 @@ namespace QGmhdBhh {
          spExact->setStateType(Equations::CartesianExactStateIds::BYHELICOIDAL);
 //         spExact->setStateType(Equations::CartesianExactStateIds::NULLFIELD);
 
+          // Add FBX initial state generation equation
+          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+          spRand->setIdentity(PhysicalNames::FBX);
+          spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
+
+          // Add FBY initial state generation equation
+          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+          spRand->setIdentity(PhysicalNames::FBY);
+          spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
+
+          // Add FBZ initial state generation equation
+          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+          spRand->setIdentity(PhysicalNames::FBZ);
+          spRand->setSpectrum(-1e-2, 1e-2, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -271,6 +303,9 @@ namespace QGmhdBhh {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::FBX);
+      spOut->expect(PhysicalNames::FBY);
+      spOut->expect(PhysicalNames::FBZ);
       spOut->expect(PhysicalNames::BX);
       spOut->expect(PhysicalNames::BY);
       spGen->addHdf5OutputFile(spOut);
@@ -588,19 +623,19 @@ namespace QGmhdBhh {
       spSim->addStatsOutputFile(spAvgVx);
 
       // Create RMS velocityx  writer
-//      IoStats::SharedCartesian1DScalarRMSWriter spRMSVx(new IoStats::Cartesian1DScalarRMSWriter("velocityx", spAvgVx,  SchemeType::type()));
-//      spRMSVx->expect(PhysicalNames::VELOCITYX);
-//      spSim->addStatsOutputFile(spRMSVx);
+      IoStats::SharedCartesian1DScalarRMSWriter spRMSVx(new IoStats::Cartesian1DScalarRMSWriter("velocityx", spAvgVx,  SchemeType::type()));
+      spRMSVx->expect(PhysicalNames::VELOCITYX);
+      spSim->addStatsOutputFile(spRMSVx);
 
       // Create skew velocityx  writer       
-//      IoStats::SharedCartesian1DScalarSkewWriter spSkewVx(new IoStats::Cartesian1DScalarSkewWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
-//      spSkewVx->expect(PhysicalNames::VELOCITYX);
-//      spSim->addStatsOutputFile(spSkewVx);
+      IoStats::SharedCartesian1DScalarSkewWriter spSkewVx(new IoStats::Cartesian1DScalarSkewWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
+      spSkewVx->expect(PhysicalNames::VELOCITYX);
+      spSim->addStatsOutputFile(spSkewVx);
 
       // Create kurt velocityx  writer
-//      IoStats::SharedCartesian1DScalarKurtWriter spKurtVx(new IoStats::Cartesian1DScalarKurtWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
-//      spKurtVx->expect(PhysicalNames::VELOCITYX);
-//      spSim->addStatsOutputFile(spKurtVx);
+      IoStats::SharedCartesian1DScalarKurtWriter spKurtVx(new IoStats::Cartesian1DScalarKurtWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
+      spKurtVx->expect(PhysicalNames::VELOCITYX);
+      spSim->addStatsOutputFile(spKurtVx);
 
       // velocityy
 
@@ -610,19 +645,19 @@ namespace QGmhdBhh {
       spSim->addStatsOutputFile(spAvgVy);
 
       // Create RMS velocityy  writer
-//      IoStats::SharedCartesian1DScalarRMSWriter spRMSVy(new IoStats::Cartesian1DScalarRMSWriter("velocityy", spAvgVy,  SchemeType::type()));
-//      spRMSVy->expect(PhysicalNames::VELOCITYY);
-//      spSim->addStatsOutputFile(spRMSVy);
+      IoStats::SharedCartesian1DScalarRMSWriter spRMSVy(new IoStats::Cartesian1DScalarRMSWriter("velocityy", spAvgVy,  SchemeType::type()));
+      spRMSVy->expect(PhysicalNames::VELOCITYY);
+      spSim->addStatsOutputFile(spRMSVy);
 
      // Create skew velocityy  writer       
-//     IoStats::SharedCartesian1DScalarSkewWriter spSkewVy(new IoStats::Cartesian1DScalarSkewWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
-//      spSkewVy->expect(PhysicalNames::VELOCITYY);
-//      spSim->addStatsOutputFile(spSkewVy);
+     IoStats::SharedCartesian1DScalarSkewWriter spSkewVy(new IoStats::Cartesian1DScalarSkewWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
+      spSkewVy->expect(PhysicalNames::VELOCITYY);
+      spSim->addStatsOutputFile(spSkewVy);
 
       // Create kurt velocityy  writer
-//      IoStats::SharedCartesian1DScalarKurtWriter spKurtVy(new IoStats::Cartesian1DScalarKurtWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
-//      spKurtVy->expect(PhysicalNames::VELOCITYY);
-//      spSim->addStatsOutputFile(spKurtVy);
+      IoStats::SharedCartesian1DScalarKurtWriter spKurtVy(new IoStats::Cartesian1DScalarKurtWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
+      spKurtVy->expect(PhysicalNames::VELOCITYY);
+      spSim->addStatsOutputFile(spKurtVy);
 
       // fjz
 

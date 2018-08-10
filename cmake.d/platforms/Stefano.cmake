@@ -91,9 +91,9 @@ set(QUICC_CC_SERIAL_CLANG "g++-5" PARENT_SCOPE)
 set(QUICC_CC_MPI_CLANG "mpic++" PARENT_SCOPE)
 
 # for debug
-#set(QUICC_CC_ARCH_GCC "-march=native -O0 -g -stdlib=libstdc++ --std=c++11" PARENT_SCOPE)
+set(QUICC_CC_ARCH_GCC "-march=native -O0 -g -stdlib=libstdc++ --std=c++11" PARENT_SCOPE)
 # for fast, optimised runs
-set(QUICC_CC_ARCH_GCC "-march=native -O2 -stdlib=libstdc++ --std=c++11" PARENT_SCOPE)
+#set(QUICC_CC_ARCH_GCC "-march=native -O2 -stdlib=libstdc++ --std=c++11" PARENT_SCOPE)
 
 set(QUICC_CC_INC_CLANG "" PARENT_SCOPE)
 

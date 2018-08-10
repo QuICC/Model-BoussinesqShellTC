@@ -61,7 +61,7 @@ namespace QGmhdBhh {
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYY, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITYY, FieldRequirement(true, true, true, false));
    }
 
 }

@@ -50,7 +50,7 @@ namespace QGmhdBhh {
 
    void fbz::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void fbz::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -63,8 +63,18 @@ namespace QGmhdBhh {
 
       /// 
       /// Computation:
+      ///   \f$ MPr(Bx dx w + By dy w) \f$
       ///
       rNLComp.setData((-MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array())).matrix());
+
+      ///   \f$ MPr(bx dx w + by dy w) \f$
+      ///
+      rNLComp.setData((-MPr*(this->scalar(PhysicalNames::FBX).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array()+this->scalar(PhysicalNames::FBY).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array())).matrix());
+
+      /// \f$ MPr(dy\Psi dx bz - dx\Psi dy bz) \f$
+      ///
+      rNLComp.setData(-MPr*(this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::X).data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()).matrix());
+
    }
 
    Datatypes::SpectralScalarType::PointType fbz::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -95,7 +105,7 @@ namespace QGmhdBhh {
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Add fbz requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, true));
 
       // Add BX requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));
@@ -103,8 +113,18 @@ namespace QGmhdBhh {
       // Add BY requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
+      // Add FBX requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, true));
+
+      // Add FBY requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, true, true, true));
+
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
+
+      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true, false, true));
+
    }
 
 }

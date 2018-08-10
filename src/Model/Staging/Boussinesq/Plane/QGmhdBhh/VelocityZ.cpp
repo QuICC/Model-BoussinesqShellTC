@@ -68,8 +68,10 @@ namespace QGmhdBhh {
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
       ///
       Physical::StreamAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
-      /// nonlinear Lorentz term 
+      /// nonlinear Lorentz term \left(B_\perp)\cdot \nabla b_z
       rNLComp.addData((Q/MPR)*(-this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()).matrix());
+      /// nonlinear Lorentz term \left(b_\perp)\cdot \nabla b_z
+      rNLComp.addData((Q/MPR)*(-this->scalar(PhysicalNames::FBX).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::FBY).dom(0).phys().data().array()*this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()).matrix());
    }
 
    void VelocityZ::setRequirements()
@@ -91,6 +93,12 @@ namespace QGmhdBhh {
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
+
+      // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, false));
+
+      // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, true, true, false));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::FBZ, FieldRequirement(true, true, true, true));

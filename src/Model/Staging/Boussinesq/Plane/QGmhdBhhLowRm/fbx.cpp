@@ -66,8 +66,7 @@ namespace QGmhdBhhLowRm {
       /// 
       /// Computation:
       ///   \f$ MPr(Bx dxy\Psi + By dyy\Psi) \f$
-      ///
-      
+
       rNLComp.setData(MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array()).matrix());
    }
 
@@ -101,6 +100,9 @@ namespace QGmhdBhhLowRm {
       // Add fBX requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, false));
 
+      // Add fBX requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, true, true, false));
+
       // Add BX requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));
 
@@ -108,7 +110,7 @@ namespace QGmhdBhhLowRm {
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false, false, true));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, false, false, true));
 
 //      // Restrict components of 2nd order gradient (only example, actually not used)
 //      // Make upper triangular matrix

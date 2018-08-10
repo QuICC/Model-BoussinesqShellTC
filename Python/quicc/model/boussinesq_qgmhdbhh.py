@@ -34,7 +34,7 @@ class BoussinesqQGmhdBhh(base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
+        fields =  [("streamfunction",""), ("velocityz",""), ("temperature",""), ("fbx",""), ("fby",""), ("fbz","")]
 
         return fields
 
@@ -44,11 +44,20 @@ class BoussinesqQGmhdBhh(base_model.BaseModel):
         if field_row in [("streamfunction",""), ("velocityz",""), ("temperature","")]:
             fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
-#        elif field_row in [("bx","")]:
-#            fields =  [("bx","")]
+        elif field_row in [("fbx","")]:
+            fields =  [("fbx","")]
 
-#        elif field_row in [("by","")]:
-#            fields =  [("by","")]
+        elif field_row in [("fby","")]:
+            fields =  [("fby","")]
+
+        elif field_row in [("fbz","")]:
+            fields =  [("fbz","")]
+
+        elif field_row in [("bx","")]:
+            fields =  [("bx","")]
+
+        elif field_row in [("by","")]:
+            fields =  [("by","")]
 
         else:
             fields = [field_row]
@@ -249,6 +258,7 @@ class BoussinesqQGmhdBhh(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
+#       For the dynamod model
 #        elif field_row == ("emfx","") and field_col == field_row:
 #            if eigs[0] == 0 and eigs[1] == 0:
 #                mat = geo.qid(res[0], 0, bc)
@@ -268,23 +278,42 @@ class BoussinesqQGmhdBhh(base_model.BaseModel):
 #                mat = geo.zblk(res[0], bc)
 
 
+#       For the low Pm model
+#        elif field_row == ("fbx","") and field_col == field_row:
+#            if eigs[0] == 0 and eigs[1] == 0:
+#                mat = geo.zblk(res[0],bc)
+#            else:
+#                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+
+#        elif field_row == ("fby","") and field_col == field_row:
+#            if eigs[0] == 0 and eigs[1] == 0:
+#                mat = geo.zblk(res[0],bc)
+#            else:
+#                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+
+#        elif field_row == ("fbz","") and field_col == field_row:
+#            if eigs[0] == 0 and eigs[1] == 0:
+#                mat = geo.zblk(res[0],bc)
+#            else:
+#                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+
         elif field_row == ("fbx","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
                 mat = geo.zblk(res[0],bc)
             else:
-                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+                mat = geo.qid(res[0], 0, bc, 1)
 
         elif field_row == ("fby","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
                 mat = geo.zblk(res[0],bc)
             else:
-                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+                mat = geo.qid(res[0], 0, bc, 1)
 
         elif field_row == ("fbz","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
                 mat = geo.zblk(res[0],bc)
             else:
-                mat = geo.qid(res[0], 0, bc, -1/(kx**2 + ky**2))
+                mat = geo.qid(res[0], 0, bc, 1)
 
         elif field_row == ("dissTh","") and field_col == field_row:
                 mat = geo.qid(res[0], 0, bc, 1)
@@ -387,6 +416,24 @@ class BoussinesqQGmhdBhh(base_model.BaseModel):
                 else:
                     mat = geo.sid(res[0],1, bc, -(1.0/Pr)*(kx**2 + ky**2))
 
+        elif field_row == ("fbx","") and field_col == field_row:
+            if kx == 0 and ky == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -(kx**2 + ky**2))
+
+        elif field_row == ("fby","") and field_col == field_row:
+            if kx == 0 and ky == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -(kx**2 + ky**2))
+
+        elif field_row == ("fbz","") and field_col == field_row:
+            if kx == 0 and ky == 0:
+                mat = geo.zblk(res[0],bc)
+            else:
+                mat = geo.qid(res[0], 0, bc, -(kx**2 + ky**2))
+
 #        elif field_row == ("bx",""):
 #            if field_col == ("bx",""):
 #                mat = geo.i2d2(res[0], bc, tau/MPr, cscale = zscale)
@@ -405,6 +452,8 @@ class BoussinesqQGmhdBhh(base_model.BaseModel):
 
         kx = eigs[0]
         ky = eigs[1]
+        MPr = eq_params['magnetic_prandtl']
+
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -419,6 +468,15 @@ class BoussinesqQGmhdBhh(base_model.BaseModel):
                 mat = geo.sid(res[0],2, bc)
             else:
                 mat = geo.sid(res[0],1, bc)
+
+        elif field_row == ("fbx",""):
+            mat = geo.qid(res[0], 0, bc, MPr)
+
+        elif field_row == ("fby",""):
+            mat = geo.qid(res[0], 0, bc, MPr)
+
+        elif field_row == ("fbz",""):
+            mat = geo.qid(res[0], 0, bc, MPr)
 
 #        elif field_row == ("bx",""):
 #            mat = geo.i2(res[0], bc)

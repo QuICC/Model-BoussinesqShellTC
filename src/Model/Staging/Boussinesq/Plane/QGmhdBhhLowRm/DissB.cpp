@@ -64,6 +64,8 @@ namespace QGmhdBhhLowRm {
       /// 
       /// Computation:
       ///   \f$ FJZ^2 + (\nabla FBZ)^2  \f$
+      ///  or
+      ///   \f$ (\partial_x b_z)^2 + (\partial_y b_z)^2  + (\partial_y bx - \partial_x by)^2  \f$
       ///
       
       rNLComp.setData((pow(this->scalar(PhysicalNames::FJZ).dom(0).phys().data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array(),2)).matrix());

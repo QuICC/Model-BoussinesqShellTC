@@ -22,3 +22,7 @@ QuICC.wiki/
 ######################
 cmake-build-debug/
 .idea/
+
+# Python bytecode #
+###################
+*.pyc

@@ -52,7 +52,7 @@ namespace QGmhdBhh {
    void fbx::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void fbx::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -69,6 +69,17 @@ namespace QGmhdBhh {
       ///
       
       rNLComp.setData(MPr*(this->scalar(PhysicalNames::BX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()+this->scalar(PhysicalNames::BY).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array()).matrix());
+
+      /// \f$ MPr(bx dxy\Psi + by dyy\Psi) \f$
+      ///
+
+      rNLComp.setData(MPr*(this->scalar(PhysicalNames::FBX).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::X,FieldComponents::Physical::Y).data().array()+this->scalar(PhysicalNames::FBY).dom(0).phys().data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad2().comp(FieldComponents::Physical::Y,FieldComponents::Physical::Y).data().array()).matrix());
+
+      /// \f$ MPr(dy\Psi dx bx - dx\Psi dy bx) \f$
+      ///
+
+      rNLComp.setData(-MPr*(this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()*this->scalar(PhysicalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::X).data().array() - this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::X).data().array()*this->scalar(PhysicalNames::FBX).dom(0).grad().comp(FieldComponents::Physical::Y).data().array()).matrix());
+
    }
 
    Datatypes::SpectralScalarType::PointType fbx::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -99,7 +110,10 @@ namespace QGmhdBhh {
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Add fBX requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::FBX, FieldRequirement(true, true, true, true));
+
+      // Add fBY requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::FBY, FieldRequirement(true, true, true, true));
 
       // Add BX requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::BX, FieldRequirement(true, true, true, false));
@@ -108,7 +122,7 @@ namespace QGmhdBhh {
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false, false, true));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true, false, true));
 
 //      // Restrict components of 2nd order gradient (only example, actually not used)
 //      // Make upper triangular matrix
