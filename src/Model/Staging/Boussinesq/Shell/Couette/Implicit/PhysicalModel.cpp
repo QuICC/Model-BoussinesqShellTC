@@ -80,7 +80,7 @@ namespace Implicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(3)
+         switch(2)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -135,7 +135,15 @@ namespace Implicit {
                break;
 
             case 4:
-               spVector->setStateType(Equations::ShellExactStateIds::NOISE);
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAX);
+               break;
+
+            case 5:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAY);
+               break;
+
+            case 6:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAZ);
                break;
          }
 
