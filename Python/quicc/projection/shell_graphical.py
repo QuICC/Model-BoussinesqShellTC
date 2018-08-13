@@ -403,8 +403,11 @@ class ShellPlotter:
         Field_phi = args[2]
 
         # retrieve the scalar fields
-        modeP = self.fopen['velocity/velocity_pol'].value[idx, :, 0] + self.fopen['velocity/velocity_pol'].value[idx, :, 1] * 1j
         modeT = self.fopen['velocity/velocity_tor'].value[idx, :, 0] + self.fopen['velocity/velocity_tor'].value[idx, :, 1] * 1j
+        try:
+            modeP = self.fopen['velocity/velocity_pol'].value[idx, :, 0] + self.fopen['velocity/velocity_pol'].value[idx, :, 1] * 1j
+        except:
+            modeP = np.zeros_like(modeT)
 
         # initialize radial parts
         # the radial parts can be interchanged if we evaluate the vorticity field or the velocity field
