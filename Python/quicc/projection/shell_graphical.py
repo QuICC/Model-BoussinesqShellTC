@@ -11,7 +11,7 @@ from numpy.polynomial import chebyshev as cheb
 from numpy.polynomial import legendre as leg
 from matplotlib import pyplot as pp
 from matplotlib import rc
-from matplotlib.colors import LogNorm, Normalize
+from matplotlib.colors import LogNorm, Normalize, LinearSegmentedColormap
 
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
@@ -114,8 +114,8 @@ class ShellPlotter:
         rr = self.a * xx_r + self.b
 
         # produce grid for bulk of the flow only
-        #delta = self.E ** .5
-        delta=0.
+        delta = self.E ** .5
+        #delta=0.
         if self.E >1e-4:
             delta = 0.01
 
@@ -364,12 +364,12 @@ class ShellPlotter:
 
         if kwargs.get('colormap','dual') == 'log':
             map = pp.get_cmap('hot')
-            #norm = LogNorm(min, max)
             norm = Normalize(min, max, clip=True)
 
         else:
             map = pp.get_cmap('coolwarm')
-            norm = Normalize(min, max, clip=True)
+            #norm = Normalize(min, max, clip=True)
+            norm = MidpointNormalize(min, max, 0, clip=True)
 
         if kwargs['mode']=='boundaries':
             idx_boundary = idx_boundary = int(XX.shape[1]/2)
@@ -379,17 +379,20 @@ class ShellPlotter:
             im = ax[1].contourf(XX[:, idx_boundary + 1:], YY[:, idx_boundary + 1:], ZZ[:, idx_boundary + 1:], 50, cmap=map, norm = norm)
             ax[1].set_aspect(15.0)
             ax[0].set_title(kwargs['title'])
-            cb1 = fig.colorbar(im, orientation='horizontal', ax=[ax[0], ax[1]], ticks=[min, max], shrink=0.8)
+            cb1 = fig.colorbar(im, orientation='horizontal', ax=[ax[0], ax[1]], ticks=[min, max], shrink=0.8, format='%.2E')
+            #cb1 = fig.colorbar(im, orientation='horizontal', ax=[ax[0], ax[1]], shrink=0.8)
         elif kwargs['mode']=='line':
             ax.plot(rr, ff )
         else:
-            im = ax.contour(XX, YY, ZZ, 50, cmap=map, norm = norm)
+            im = ax.contourf(XX, YY, ZZ, 50, cmap=map, norm = norm)
             ax.set_title(kwargs['title'])
             if kwargs.get('colormap', 'dual') == 'log':
-                #fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8)
+                fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8, format='%.2E')
+                #fig.colorbar(im, orientation='horizontal', ax=ax, shrink=0.8)
                 pass
             else:
-                #fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8)
+                fig.colorbar(im, orientation='horizontal', ax=ax, ticks=[min, max], shrink=0.8, format='%.2E')
+                #fig.colorbar(im, orientation='horizontal', ax=ax, shrink=0.8)
                 pass
 
 
@@ -548,6 +551,17 @@ class ShellPlotter:
                 # update the fields toroidal parts
                 Field_theta += rank_1_matrix(eimp, np.conj(rad_part_tor)) * Ylm_sin *factor
                 Field_phi -= rank_1_matrix(eimp, np.conj(rad_part_tor)) * dYlm *factor
+
+class MidpointNormalize(Normalize):
+    def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+        self.midpoint = midpoint
+        Normalize.__init__(self, vmin, vmax, clip)
+
+    def __call__(self, value, clip=None):
+        # I'm ignoring masked values and all kinds of edge cases to make a
+        # simple example...
+        x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
+        return np.ma.masked_array(np.interp(value, x, y))
 
 """
     def prepare_rotation(self):
