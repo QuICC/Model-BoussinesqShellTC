@@ -340,6 +340,7 @@ namespace Transform {
          }
 
          //
+
          // Energy operators
          //
          op.resize(legGrid.size(), energySize+1);
