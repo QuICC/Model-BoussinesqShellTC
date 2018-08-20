@@ -43,14 +43,26 @@ namespace QuICC {
 
    void SerialTimer::start()
    {
-      // Get the starting timespec
+//      // Get the starting timespec
       clock_gettime(CLOCK_REALTIME, &this->mStart);
+// Stefano: added on July 2018. Needed for Mac version earlier than 10.12 
+//      #ifdef __APPLE__
+//      mach_absolute_time();
+//      #else
+//      clock_gettime(CLOCK_REALTIME, &this->mStart);
+//      #endif
    }
 
    void SerialTimer::stop()
    {
       // Get the stopping timespec
       clock_gettime(CLOCK_REALTIME, &this->mStop);
+// Stefano: added on July 2018. Needed for Mac version earlier than 10.12
+//      #ifdef __APPLE__
+//      mach_absolute_time();
+//      #else
+//      clock_gettime(CLOCK_REALTIME, &this->mStop);
+//      #endif
    }
 
    MHDFloat SerialTimer::time() const

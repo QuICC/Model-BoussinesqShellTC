@@ -8,7 +8,7 @@
 #define VERSION_HPP
 
 #define QUICC_VERSION_MAJOR 0
-#define QUICC_VERSION_MINOR 5
+#define QUICC_VERSION_MINOR 6
 #define QUICC_VERSION_PATCH 0
 
 // System includes

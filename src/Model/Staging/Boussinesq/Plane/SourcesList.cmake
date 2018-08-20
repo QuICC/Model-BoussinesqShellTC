@@ -12,4 +12,5 @@ set(MHDSrcSubDirs
    RRBC
    TiltedF3DQG
    QGmhdBhhLowRm 
+   QGmhdBhh
 )

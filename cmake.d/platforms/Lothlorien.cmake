@@ -108,13 +108,13 @@ set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python27" "python35" PARENT_SCOPE)
+set(QUICC_PYTHONS "python27" "python36" PARENT_SCOPE)
 
 set(QUICC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
 set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON35 "/usr/lib64/libpython3.5m.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON35 "/usr/include/python3.5m" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON36 "/usr/lib64/libpython3.6m.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON36 "/usr/include/python3.6m" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
