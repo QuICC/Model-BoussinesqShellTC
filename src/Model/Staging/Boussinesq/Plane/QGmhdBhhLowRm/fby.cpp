@@ -52,7 +52,7 @@ namespace QGmhdBhhLowRm {
    void fby::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false);
    }
 
    void fby::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -107,7 +107,7 @@ namespace QGmhdBhhLowRm {
       this->mRequirements.addField(PhysicalNames::BY, FieldRequirement(true, true, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff? need curl? need diff2?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false, false, true));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, false, false, true));
 
 //      // Restrict components of 2nd order gradient
 //      // Make upper triangular matrix
