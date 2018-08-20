@@ -1,4 +1,5 @@
-# Nicolò Lardelli 24th November 2016
+# -*- coding: utf-8 -*-
+# Nicolo Lardelli 24th November 2016
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -8,46 +9,95 @@ from scipy import sparse as spsp
 
 import quicc.base.utils as utils
 
-def proj_radial(nr, a, b, x):
+def proj_radial(nr, a, b, x = None):
 
     # evaluate the radial basis functions of degree <nr
-    # this projection operator includes the 1/r**2 part and corresponds
     # to the projection of the poloidal field in r direction (Q-part of a qst decomposition
-    xx = np.array(x)
+    if x is None:
+        xx,ww = cheb.chebgauss(nr)
+    else:
+        xx = np.array(x)
 
     # use chebyshev polynomials normalized for FCT
     coeffs = np.eye(nr)*2
+    #coeffs = np.eye(nr)
     coeffs[0,0]=1.
 
-    return (cheb.chebval(xx,coeffs)/(a*xx+b)**2).transpose()
+    return (cheb.chebval(xx,coeffs)).transpose()
 
-def proj_dradial_dr(nr,a,b,x):
+def proj_dradial_dr(nr, a, b, x = None):
 
      # evaluate the first derivative of radial basis function of degree <nr
-     # this projection operator corresponds to 1/r d/dr projecting from spectral to physical
+     # this projection operator corresponds to 1/r d/dr r projecting from spectral to physical
      # used for the theta and phi contribution of the poloidal field (S-part of a qst decomposition)
-     xx = np.array(x)
+     if x is None:
+         xx, ww = cheb.chebgauss(nr)
+     else:
+         xx = np.array(x)
 
      # use chebyshev polynomials normalized for FCT
      coeffs = np.eye(nr) * 2
+     #coeffs = np.eye(nr)
      coeffs[0, 0] = 1.
      c = cheb.chebder(coeffs)
-     return  (cheb.chebval(xx,c)/a /(a*xx+b)).transpose()
+     return  (cheb.chebval(xx,c)/a + cheb.chebval(xx,coeffs)/(a*xx+b) ).transpose()
 
 
 
-def proj_radial_r(nr, a, b, x):
-
+def proj_radial_r(nr, a, b, x = None):
     # evaluate the radial basis functions of degree <nr over r
     # this projection operator includes the 1/r part and corresponds
-    # to the a projection from spectral to physical for the toroidal field (T-part of a qst decomposition)
-    xx = np.array(x)
+# to the a projection from spectral to physical for the toroidal field (T-part of a qst decomposition)
+    if x is None:
+        xx,ww = cheb.chebgauss(nr)
+    else:
+        xx = np.array(x)
 
     # use chebyshev polynomials normalized for FCT
     coeffs = np.eye(nr)*2
+    #coeffs = np.eye(nr)
     coeffs[0,0]=1.
 
     temp = (cheb.chebval(xx,coeffs)/(a*xx+b)).transpose()
+    return temp
+
+
+def proj_lapl(nr, a, b, x=None):
+
+    # evaluate the second derivative of radial basis in radial direction function of degree <nr
+    # this projection operator corresponds to 1/r**2 d/dr r**2d/dr projecting from spectral to physical
+    # used for the theta and phi contribution of the poloidal field (S-part of a qst decomposition)
+    if x is None:
+        xx, ww = cheb.chebgauss(nr)
+    else:
+        xx = np.array(x)
+
+    # use chebyshev polynomials normalized for FCT
+    coeffs = np.eye(nr) * 2
+    #coeffs = np.eye(nr)
+    coeffs[0, 0] = 1.
+
+    c1 = cheb.chebder(coeffs,1)
+    c2 = cheb.chebder(coeffs,2)
+    return (2*cheb.chebval(xx, c1) /a /(a * xx + b) + cheb.chebval(xx, c2) /a**2).transpose()
+    #return ( cheb.chebval(xx, c2) / a ** 2).transpose()
+
+def proj_radial_r2(nr, a, b, x = None):
+    # evaluate the radial basis functions of degree <nr over r
+    # this projection operator includes the 1/r**2 part and corresponds
+    # to the a projection from spectral to physical for the toroidal field (T-part of a qst decomposition)
+    if x is None:
+        xx,ww = cheb.chebgauss(nr)
+    else:
+        xx = np.array(x)
+
+    # use chebyshev polynomials normalized for FCT
+    coeffs = np.eye(nr)*2
+
+    #coeffs = np.eye(nr)
+    coeffs[0,0]=1.
+
+    temp = (cheb.chebval(xx,coeffs)/(a*xx+b)**2).transpose()
     return temp
 
 def proj(nr, a, b, r):
@@ -55,6 +105,8 @@ def proj(nr, a, b, r):
     # evaluates the projection matrix matrix for the chebyshev basis
     xx = (np.array(r)-b)/a
     coeffs = np.eye(nr)*2
+
+    #coeffs = np.eye(nr)
     coeffs[0,0]=1.
 
     return spsp.lil_matrix(cheb.chebval(xx, coeffs).transpose())

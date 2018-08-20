@@ -75,19 +75,19 @@ class BoussinesqCouetteShellImplicitBase(BoussinesqCouetteShellBase):
             if field_col == ("velocity","tor"):
                 mat = geo.i2r2lapl(res[0], res[1], m, a, b, bc, E, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + 2*geo.i2r2(res[0], res[1], m, a, b, bc, 1j*m, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2r2coriolis(res[0], res[1], m, a, b, bc, -1., l_zero_fix = 'zero', restriction = restriction)
+                mat = 2*geo.i2r2coriolis(res[0], res[1], m, a, b, bc, -1., l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4r4coriolis(res[0], res[1], m, a, b, bc, 1, l_zero_fix = 'zero', restriction = restriction)
+                mat = 2*geo.i4r4coriolis(res[0], res[1], m, a, b, bc, 1, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
                 mat = geo.i4r4lapl2(res[0], res[1], m, a, b, bc, E, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m, l_zero_fix = 'zero', restriction = restriction)
+                mat = mat + 2*geo.i4r4lapl(res[0], res[1], m, a, b, bc, 1j*m, l_zero_fix = 'zero', restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

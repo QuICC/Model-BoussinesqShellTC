@@ -33,6 +33,8 @@
 #include "IoVariable/ShellTorPolProbeWriter.hpp"
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
 #include "IoVariable/ShellTorPolUniformVorticityWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationSpectraWriter.hpp"
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -78,7 +80,7 @@ namespace Implicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(4)
+         switch(2)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -133,7 +135,15 @@ namespace Implicit {
                break;
 
             case 4:
-               spVector->setStateType(Equations::ShellExactStateIds::NOISE);
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAX);
+               break;
+
+            case 5:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAY);
+               break;
+
+            case 6:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHOMEGAZ);
                break;
          }
 
@@ -225,46 +235,56 @@ namespace Implicit {
 
    void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-	      // Create kinetic energy writer
-	      IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
-	      spVector->expect(PhysicalNames::VELOCITY);
-	      spSim->addAsciiOutputFile(spVector);
+
+      // Create kinetic energy writer
+      IoVariable::SharedShellTorPolEnergyWriter spVector(new IoVariable::ShellTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector);
+
+   /*
+      // Create probes
+      Matrix mProbes(6,3);
+
+      // the r coordinate is in x\in[-1,1] space
+      // the theta coordinate is the cos of colatitude
+      // the phi coordinate is azimuthal in radiants
+      mProbes << 0.0, 0.5, 0.0,
+              0.0, -0.5, Math::PI/3.,
+              0.0, 0.5, Math::PI*2./3.,
+              0.0, -0.5, Math::PI,
+              0.0, 0.5, Math::PI*4./3.,
+              0.0, -0.5, Math::PI*5./3.;
 
 
-	      // Create probes
-	      Matrix mProbes(6,3);
+      // Create probe field writer
+      IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
+      spVector2->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector2);
+      */
+      // Create kinetic energy spectral writer
+      IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector3->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector3);
 
-	      // the r coordinate is in x\in[-1,1] space
-	      // the theta coordinate is the cos of colatitude
-	      // the phi coordinate is azimuthal in radiants
-	      mProbes << 0.0, 0.5, 0.0,
-	    		  0.0, -0.5, Math::PI/3.,
-				  0.0, 0.5, Math::PI*2./3.,
-				  0.0, -0.5, Math::PI,
-				  0.0, 0.5, Math::PI*4./3.,
-				  0.0, -0.5, Math::PI*5./3.;
+      // Create torque writer
+      IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
+      spVector4->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector4);
 
-	      // Create probe field writer
-	      IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
-	      spVector2->expect(PhysicalNames::VELOCITY);
-	      spSim->addAsciiOutputFile(spVector2);
+      // Create average vorticity writer
+      IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
+      spVector5->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector5);
 
+      // Create  kinetic dissipation writer
+      IoVariable::SharedShellTorPolDissipationWriter spVector6(new IoVariable::ShellTorPolDissipationWriter("kinetic", SchemeType::type()));
+      spVector6->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector6);
 
-	      // Create kinetic energy spectral writer
-	      IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
-	      spVector3->expect(PhysicalNames::VELOCITY);
-	      spSim->addAsciiOutputFile(spVector3);
-
-	      // Create torque writer
-	      IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
-	      spVector4->expect(PhysicalNames::VELOCITY);
-	      spSim->addAsciiOutputFile(spVector4);
-
-
-	      IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
-	      spVector5->expect(PhysicalNames::VELOCITY);
-	      spSim->addAsciiOutputFile(spVector5);
-
+      // Create kinetic dissipation spectral writer
+      IoVariable::SharedShellTorPolDissipationSpectraWriter spVector7(new IoVariable::ShellTorPolDissipationSpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector7->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector7);
 
    }
 

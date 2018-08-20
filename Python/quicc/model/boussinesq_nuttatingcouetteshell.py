@@ -20,7 +20,7 @@ class BoussinesqNuttatingCouetteShellConfig(BoussinesqCouetteShellConfig):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "omega", "alpha", "rratio"]
+        return ["ekman", "rossby", "omega", "rratio"]
 
 
 class BoussinesqNuttatingCouetteShell(BoussinesqNuttatingCouetteShellConfig, BoussinesqCouetteShellImplicitBase):

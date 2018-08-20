@@ -23,7 +23,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "rossby", "modified_elsasser", "magnetic_reynolds", "rratio"]
+        return ["ekman", "rossby", "elsasser", "magnetic_reynolds", "rratio"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -229,7 +229,7 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        Ro = eq_params['rossby']
+        Ro = abs(eq_params['rossby'])
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -239,16 +239,16 @@ class BoussinesqDynamoCouetteShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
+            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0)*Ro)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i4r4lapl(res[0], l, a, b, bc, l*(l+1.0)*Ro)
 
         elif field_row == ("magnetic","tor"):
-            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0)/abs(Ro))
+            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0)*Ro)
 
         elif field_row == ("magnetic","pol"):
-            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0)/abs(Ro))
+            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0)*Ro)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
