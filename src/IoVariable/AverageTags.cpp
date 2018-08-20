@@ -1,5 +1,4 @@
 /**
- *
  * @file AverageTags.cpp
  * @brief Source of the definitions and names used by the average writers
  * @author Nicolò Lardelli \<nicolo.lardelli@erdw.ethz.ch\>

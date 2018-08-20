@@ -874,7 +874,7 @@ namespace QuICC {
          this->postWrite();
 
          // Abort if kinetic Diss is NaN
-         if (isnan(this->mTorDiss) || isnan(this->mPolDiss)) {
+         if (std::isnan(this->mTorDiss) || std::isnan(this->mPolDiss)) {
             FrameworkMacro::abort(99);
 
             throw Exception("Toroidal/Poloidal Diss is NaN!");

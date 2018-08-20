@@ -645,8 +645,6 @@ def default_options():
 def compute(gevp_opts, marginal_opts):
     """Compute eigen solutions requested by options"""
 
-    print(PETSc.ScalarType)
-
     # Make options consistent
     marginal_opts['minimum'] = marginal_opts['minimum'] and marginal_opts['curve']
     marginal_opts['plot_point'] = marginal_opts['plot_point'] and (marginal_opts['point'] or marginal_opts['minimum'])

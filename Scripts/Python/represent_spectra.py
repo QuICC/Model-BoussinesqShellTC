@@ -55,28 +55,6 @@ class SpectraRepresenter(BaseRepresenter):
             datafull = datafull.as_matrix()
         self.datafull = datafull
 
-    def draw(self,type='both'):
-
-        pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
-        pp.rcParams['font.family'] = 'ubuntu'
-        # pp.rcParams['font.size'] = 14
-        # set parameters for plotting
-        pp.ticklabel_format(style='sci', axis='y')
-
-        #print(type(self.datafull))
-        print(type)
-        self.draw_snapshot(self.datafull,type=type)
-
-    def draw_snapshot(self, datafull, **kwargs):
-        #pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
-        pp.rcParams['font.family'] = 'ubuntu'
-        # pp.rcParams['font.size'] = 14
-        # set parameters for plotting
-        #pp.ticklabel_format(style='sci', axis='y')
-
-        data = datafull[-1, 1:]
-        #data = datafull[ 1:]
-
         try:
 
             dirname = os.path.dirname(self.filename)
@@ -84,24 +62,64 @@ class SpectraRepresenter(BaseRepresenter):
             cfg_file = open(dirname + '/parameters.cfg', 'r')
             header = cfg_file.readline()
             root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
-            Lmax = int(root[1][0][1].text)+1
-            Mmax = int(root[1][0][2].text)+1
-            print('Parameter file found', Lmax, Mmax)
+            self.Lmax = int(root[1][0][1].text)+1
+            self.Mmax = int(root[1][0][2].text)+1
+            print('Parameter file found', self.Lmax, self.Mmax)
         except BaseException as e:
-            Lmax = Mmax = data.shape[0] / 4
+            self.Lmax = self.Mmax = data.shape[0] / 4
             pass
+
+    def draw(self,type='both'):
+        pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+        pp.rcParams['font.family'] = 'ubuntu'
+        # pp.rcParams['font.size'] = 14
+        # set parameters for plotting
+        pp.ticklabel_format(style='sci', axis='y')
+        try:
+            if sys.argv[2]:
+                print('Representing the spectrum over time')
+                # remove chunks of data
+                t = self.datafull[:,0]
+                t = t- np.min(t)
+                data = self.datafull[:,1:]
+                torL = data[:,:self.Lmax]
+                polL = data[:,self.Mmax + self.Lmax:self.Mmax + 2 * self.Lmax]
+                torM = data[:,self.Lmax:self.Lmax + self.Mmax]
+                polM = data[:,self.Mmax+ 2 * self.Lmax:]
+                l = np.arange(self.Lmax)
+                m = np.arange(self.Mmax)
+                fig, (ax) = pp.subplots(2,2)
+                ax[0,0].contourf(t, l, np.log(torL.T), 100)
+                ax[0,1].contourf(t, l, np.log(polL.T), 100)
+                ax[1,0].contourf(t, m, np.log(torM.T), 100)
+                ax[1,1].contourf(t, m, np.log(polM.T), 100)
+                pp.show()
+
+            else:
+                raise ValueError(sys.argv[2], 'doesn\'t specify a correct flag')
+
+        except Exception as e:
+            print(e)
+
+
+            self.draw_snapshot(self.datafull,type=type)
+
+    def draw_snapshot(self, datafull, **kwargs):
+
+        data = datafull[-1, 1:]
+        #data = datafull[ 1:]
 
 
         if kwargs['type']!='l':
-            pp.loglog(data[:Lmax], label='L spectrum, toroidal')
-            pp.loglog(data[Mmax + Lmax:Mmax + 2 * Lmax],
+            pp.loglog(data[:self.Lmax], label='L spectrum, toroidal')
+            pp.loglog(data[self.Mmax + self.Lmax:self.Mmax + 2 * self.Lmax],
                       label='L spectrum, poloidal')
 
         if kwargs['type']!='m':
-            pp.loglog(np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax])), data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
-            pp.loglog(np.cumsum(np.ones_like(data[Mmax+ 2 * Lmax:])), data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
+            pp.loglog(np.cumsum(np.ones_like(data[self.Lmax:self.Lmax + self.Mmax])), data[self.Lmax:self.Lmax + self.Mmax], label='M spectrum, toroidal')
+            pp.loglog(np.cumsum(np.ones_like(data[self.Mmax+ 2 * self.Lmax:])), data[self.Mmax+ 2 * self.Lmax:], label='M spectrum, poloidal')
         """
-        index_vector = np.cumsum(np.ones_like(data[Lmax:Lmax + Mmax]))
+        index_vector = np.cumsum(np.ones_like(data[self.Lmax:self.Lmax + self.Mmax]))
         pp.loglog(index_vector, index_vector**(-5./3)*3e-4,'--', label=r'$k^{-\frac{5}{3}}$')
 
         index_vector = index_vector[index_vector > 10.]
@@ -114,10 +132,10 @@ class SpectraRepresenter(BaseRepresenter):
 
         """
         pp.figure()
-        pp.semilogy(data[0:Lmax], label='L spectrum, toroidal')
-        pp.semilogy(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
-        pp.semilogy(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
-        pp.semilogy(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
+        pp.semilogy(data[0:self.Lmax], label='L spectrum, toroidal')
+        pp.semilogy(data[self.Lmax:self.Lmax + self.Mmax], label='M spectrum, toroidal')
+        pp.semilogy(data[self.Mmax + self.Lmax:self.Mmax+ 2 * self.Lmax], label='L spectrum, poloidal')
+        pp.semilogy(data[self.Mmax+ 2 * self.Lmax:], label='M spectrum, poloidal')
         # pp.title(folder_name)
         """
         pp.xlabel(r'$l\quad m+1$')

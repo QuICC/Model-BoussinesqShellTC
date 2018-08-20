@@ -280,7 +280,7 @@ namespace Equations {
 
       if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComonent(FieldComponents::Spectral::TWO, 0);
+         this->addNLComponent(FieldComponents::Spectral::TWO, 0);
       }
 
       if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)

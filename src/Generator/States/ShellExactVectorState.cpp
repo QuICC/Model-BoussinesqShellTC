@@ -78,7 +78,7 @@ namespace Equations {
    {
       ShellExactStateIds::Id typeId = this->mTypeId;
 
-       // Initialize to zero
+      // Initialize to zero
       rNLComp.rData().setConstant(0);
 
       if(typeId == ShellExactStateIds::CONSTANT)
