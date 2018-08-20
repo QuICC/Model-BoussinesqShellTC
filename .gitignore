@@ -1,3 +1,5 @@
+# Vim swap files #
+##################
 *.swp
 
 # OS generated files #
