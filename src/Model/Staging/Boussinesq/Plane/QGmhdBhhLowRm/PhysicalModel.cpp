@@ -579,8 +579,6 @@ namespace QGmhdBhhLowRm {
       spKurtP->expect(PhysicalNames::STREAMFUNCTION);
       spSim->addStatsOutputFile(spKurtP);
 
-//      if(false)
-//      {
 
       // velocityx
 
@@ -590,19 +588,19 @@ namespace QGmhdBhhLowRm {
       spSim->addStatsOutputFile(spAvgVx);
 
       // Create RMS velocityx  writer
-//      IoStats::SharedCartesian1DScalarRMSWriter spRMSVx(new IoStats::Cartesian1DScalarRMSWriter("velocityx", spAvgVx,  SchemeType::type()));
-//      spRMSVx->expect(PhysicalNames::VELOCITYX);
-//      spSim->addStatsOutputFile(spRMSVx);
+      IoStats::SharedCartesian1DScalarRMSWriter spRMSVx(new IoStats::Cartesian1DScalarRMSWriter("velocityx", spAvgVx,  SchemeType::type()));
+      spRMSVx->expect(PhysicalNames::VELOCITYX);
+      spSim->addStatsOutputFile(spRMSVx);
 
       // Create skew velocityx  writer       
-//      IoStats::SharedCartesian1DScalarSkewWriter spSkewVx(new IoStats::Cartesian1DScalarSkewWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
-//      spSkewVx->expect(PhysicalNames::VELOCITYX);
-//      spSim->addStatsOutputFile(spSkewVx);
+      IoStats::SharedCartesian1DScalarSkewWriter spSkewVx(new IoStats::Cartesian1DScalarSkewWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
+      spSkewVx->expect(PhysicalNames::VELOCITYX);
+      spSim->addStatsOutputFile(spSkewVx);
 
       // Create kurt velocityx  writer
-//      IoStats::SharedCartesian1DScalarKurtWriter spKurtVx(new IoStats::Cartesian1DScalarKurtWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
-//      spKurtVx->expect(PhysicalNames::VELOCITYX);
-//      spSim->addStatsOutputFile(spKurtVx);
+      IoStats::SharedCartesian1DScalarKurtWriter spKurtVx(new IoStats::Cartesian1DScalarKurtWriter("velocityx", spAvgVx, spRMSVx,  SchemeType::type()));
+      spKurtVx->expect(PhysicalNames::VELOCITYX);
+      spSim->addStatsOutputFile(spKurtVx);
 
       // velocityy
 
@@ -612,19 +610,19 @@ namespace QGmhdBhhLowRm {
       spSim->addStatsOutputFile(spAvgVy);
 
       // Create RMS velocityy  writer
-//      IoStats::SharedCartesian1DScalarRMSWriter spRMSVy(new IoStats::Cartesian1DScalarRMSWriter("velocityy", spAvgVy,  SchemeType::type()));
-//      spRMSVy->expect(PhysicalNames::VELOCITYY);
-//      spSim->addStatsOutputFile(spRMSVy);
+      IoStats::SharedCartesian1DScalarRMSWriter spRMSVy(new IoStats::Cartesian1DScalarRMSWriter("velocityy", spAvgVy,  SchemeType::type()));
+      spRMSVy->expect(PhysicalNames::VELOCITYY);
+      spSim->addStatsOutputFile(spRMSVy);
 
      // Create skew velocityy  writer       
-//     IoStats::SharedCartesian1DScalarSkewWriter spSkewVy(new IoStats::Cartesian1DScalarSkewWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
-//      spSkewVy->expect(PhysicalNames::VELOCITYY);
-//      spSim->addStatsOutputFile(spSkewVy);
+     IoStats::SharedCartesian1DScalarSkewWriter spSkewVy(new IoStats::Cartesian1DScalarSkewWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
+      spSkewVy->expect(PhysicalNames::VELOCITYY);
+      spSim->addStatsOutputFile(spSkewVy);
 
       // Create kurt velocityy  writer
-//      IoStats::SharedCartesian1DScalarKurtWriter spKurtVy(new IoStats::Cartesian1DScalarKurtWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
-//      spKurtVy->expect(PhysicalNames::VELOCITYY);
-//      spSim->addStatsOutputFile(spKurtVy);
+      IoStats::SharedCartesian1DScalarKurtWriter spKurtVy(new IoStats::Cartesian1DScalarKurtWriter("velocityy", spAvgVy, spRMSVy,  SchemeType::type()));
+      spKurtVy->expect(PhysicalNames::VELOCITYY);
+      spSim->addStatsOutputFile(spKurtVy);
 
       // fjz
 
@@ -634,21 +632,20 @@ namespace QGmhdBhhLowRm {
       spSim->addStatsOutputFile(spAvgFJZ);
 
       // Create RMS vertical current writer
-//      IoStats::SharedCartesian1DScalarRMSWriter spRMSFJZ(new IoStats::Cartesian1DScalarRMSWriter("fjz", spAvgFJZ,  SchemeType::type()));
-//      spRMSFJZ->expect(PhysicalNames::FJZ);
-//      spSim->addStatsOutputFile(spRMSFJZ);
+      IoStats::SharedCartesian1DScalarRMSWriter spRMSFJZ(new IoStats::Cartesian1DScalarRMSWriter("fjz", spAvgFJZ,  SchemeType::type()));
+      spRMSFJZ->expect(PhysicalNames::FJZ);
+      spSim->addStatsOutputFile(spRMSFJZ);
 
      // Create skew vertical current writer
-//       IoStats::SharedCartesian1DScalarSkewWriter spSkewFJZ(new IoStats::Cartesian1DScalarSkewWriter("fjz", spAvgFJZ, spRMSFJZ,  SchemeType::type()));
-//      spSkewFJZ->expect(PhysicalNames::FJZ);
-//      spSim->addStatsOutputFile(spSkewFJZ);
+       IoStats::SharedCartesian1DScalarSkewWriter spSkewFJZ(new IoStats::Cartesian1DScalarSkewWriter("fjz", spAvgFJZ, spRMSFJZ,  SchemeType::type()));
+      spSkewFJZ->expect(PhysicalNames::FJZ);
+      spSim->addStatsOutputFile(spSkewFJZ);
 
       // Create kurt vertical current writer
-//      IoStats::SharedCartesian1DScalarKurtWriter spKurtFJZ(new IoStats::Cartesian1DScalarKurtWriter("fjz", spAvgFJZ, spRMSFJZ,  SchemeType::type()));
-//      spKurtFJZ->expect(PhysicalNames::FJZ);
-//      spSim->addStatsOutputFile(spKurtFJZ);
+      IoStats::SharedCartesian1DScalarKurtWriter spKurtFJZ(new IoStats::Cartesian1DScalarKurtWriter("fjz", spAvgFJZ, spRMSFJZ,  SchemeType::type()));
+      spKurtFJZ->expect(PhysicalNames::FJZ);
+      spSim->addStatsOutputFile(spKurtFJZ);
 
-//      } // end if(false)
 
       // fbz
 

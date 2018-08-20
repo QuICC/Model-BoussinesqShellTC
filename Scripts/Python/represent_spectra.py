@@ -109,7 +109,6 @@ class SpectraRepresenter(BaseRepresenter):
         data = datafull[-1, 1:]
         #data = datafull[ 1:]
 
-
         if kwargs['type']!='l':
             pp.loglog(data[:self.Lmax], label='L spectrum, toroidal')
             pp.loglog(data[self.Mmax + self.Lmax:self.Mmax + 2 * self.Lmax],

@@ -91,7 +91,7 @@ set(QUICC_CC_SERIAL_CLANG "g++" PARENT_SCOPE)
 set(QUICC_CC_MPI_CLANG "mpic++" PARENT_SCOPE)
 
 #set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
-#Leo: test for clang 
+#Leo: test for clang. put -O0 when debugging 
 set(QUICC_CC_ARCH_CLANG "-march=native -O2 -stdlib=libstdc++" PARENT_SCOPE)
 
 set(QUICC_CC_INC_CLANG "" PARENT_SCOPE)
@@ -109,7 +109,8 @@ set(QUICC_CC_LIB_MPI_CLANG ${QUICC_CC_LIB_CLANG} PARENT_SCOPE)
 set(QUICC_PYTHONS "python27" PARENT_SCOPE)
 
 #set(QUICC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
-set(QUICC_LIBRARIES_PYTHON27 "/usr/local/opt/python/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib" PARENT_SCOPE)
+#set(QUICC_LIBRARIES_PYTHON27 "/usr/local/opt/python/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON27 "/usr/lib/libpython2.7.so" PARENT_SCOPE)
 set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
 ###################################################

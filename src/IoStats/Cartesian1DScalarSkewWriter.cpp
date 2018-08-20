@@ -45,7 +45,7 @@ namespace QuICC {
       {
 
          IStatisticsAsciiEWriter::init();
-
+         //print out the z values in the file (from 1 to 0)
          if(FrameworkMacro::allowsIO())
          {
             this->mFile << "# " << std::setprecision(14) << (1.0 + this->mMesh.at(0).transpose().reverse().array())/2.0 <<std::endl;
@@ -112,12 +112,12 @@ namespace QuICC {
          this->postWrite();
 
          // Abort if kinetic energy is NaN
-         if(std::isnan(this->mSkew.sum()))
-         {
-            FrameworkMacro::abort(99);
+//         if(std::isnan(this->mSkew.sum()))
+//         {
+//            FrameworkMacro::abort(99);
 
-            throw Exception("Skew is NaN!");
-         }
+//            throw Exception("Skew is NaN!");
+//         }
       }
 
    }

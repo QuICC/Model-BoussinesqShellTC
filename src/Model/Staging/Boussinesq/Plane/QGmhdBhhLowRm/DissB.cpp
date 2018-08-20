@@ -52,7 +52,7 @@ namespace QGmhdBhhLowRm {
    void DissB::setCoupling()
    {	
       // 1: want index to start at 1 because of inverse laplacian, T, T?
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
    void DissB::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -64,30 +64,12 @@ namespace QGmhdBhhLowRm {
       /// 
       /// Computation:
       ///   \f$ FJZ^2 + (\nabla FBZ)^2  \f$
+      ///  or
+      ///   \f$ (\partial_x b_z)^2 + (\partial_y b_z)^2  + (\partial_y bx - \partial_x by)^2  \f$
       ///
       
-      /// A +1 is added to solve for the -1 level in the background always present in the field. Not sure where this comes from, but probably is a m=0 problem. Or a scaling transformation gone wrong. 
-      rNLComp.setData((1+pow(this->scalar(PhysicalNames::FJZ).dom(0).phys().data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array(),2)).matrix());
+      rNLComp.setData((pow(this->scalar(PhysicalNames::FJZ).dom(0).phys().data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::X).data().array(),2) + pow(this->scalar(PhysicalNames::FBZ).dom(0).grad().comp(FieldComponents::Physical::Y).data().array(),2)).matrix());
 
-}
-
-   Datatypes::SpectralScalarType::PointType DissB::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
-   {
-      // Assert on scalar component is used
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iY) == 0)
-      {
-         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iZ,iY) == 0)
-         {
-            if(iX == 0)
-            {
-               return Datatypes::SpectralScalarType::PointType(-1.0);
-            }
-         }
-      } 
-
-      return Datatypes::SpectralScalarType::PointType(0.0);
    }
 
    void DissB::setRequirements()

@@ -6,7 +6,7 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(QUICC_COMPILERS "GCC" "Scalasca" PARENT_SCOPE)
+set(QUICC_COMPILERS "GCC" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
@@ -98,40 +98,32 @@ set(QUICC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
 ###################################################
 
 set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
-set(QUICC_CC_SERIAL_SCALASCA "g++" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
-set(QUICC_CC_MPI_SCALASCA "mpic++" PARENT_SCOPE)
 
 set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
-set(QUICC_CC_ARCH_SCALASCA "-march=native -O2" PARENT_SCOPE)
 
 set(QUICC_CC_OPENMP_GCC "-fopenmp" PARENT_SCOPE)
-set(QUICC_CC_OPENMP_SCALASCA "-fopenmp" PARENT_SCOPE)
 
 set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
-set(QUICC_CC_INC_SCALASCA "" PARENT_SCOPE)
 
 set(QUICC_CC_INC_MPI_GCC "" PARENT_SCOPE)
-set(QUICC_CC_INC_MPI_SCALASCA "" PARENT_SCOPE)
 
 set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
-set(QUICC_CC_LIB_SCALASCA "" PARENT_SCOPE)
 
 set(QUICC_CC_LIB_MPI_GCC "" PARENT_SCOPE)
-set(QUICC_CC_LIB_MPI_SCALASCA "" PARENT_SCOPE)
 
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python27" "python34" PARENT_SCOPE)
+set(QUICC_PYTHONS "python27" "python36" PARENT_SCOPE)
 
 set(QUICC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
 set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON34 "/usr/lib64/libpython3.4m.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON34 "/usr/include/python3.4m" "/usr/lib64/python3.4/site-packages/numpy/core/include/" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON36 "/usr/lib64/libpython3.6m.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON36 "/usr/include/python3.6m" "/usr/lib64/python3.6/site-packages/numpy/core/include/" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
