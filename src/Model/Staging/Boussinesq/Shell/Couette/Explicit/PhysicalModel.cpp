@@ -34,12 +34,15 @@
 #include "IoVariable/ShellTorPolEnergySpectraWriter.hpp"
 #include "IoVariable/ShellTorPolTorqueWriter.hpp"
 #include "IoVariable/ShellTorPolUniformVorticityWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationWriter.hpp"
+#include "IoVariable/ShellTorPolDissipationSpectraWriter.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
 #include "Generator/States/ShellExactVectorState.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldTrivialVisualizer.hpp"
 #include "Generator/Visualizers/SphericalVerticalFieldVisualizer.hpp"
+#include "Generator/Visualizers/SphericalRadialCylindricalFieldVisualizer.hpp"
 #include "Model/PhysicalModelBase.hpp"
 
 namespace QuICC {
@@ -77,7 +80,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(5)
+         switch(4)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -169,6 +172,7 @@ namespace Explicit {
       Equations::SharedVectorFieldVisualizer spVector;
       Equations::SharedVectorFieldTrivialVisualizer spVTrivial;
       Equations::SharedSphericalVerticalFieldVisualizer spVertical;
+      Equations::SharedSphericalRadialCylindricalFieldVisualizer spCylindrical;
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
@@ -190,10 +194,22 @@ namespace Explicit {
       spVertical->setFieldType(FieldType::VECTOR);
       spVertical->setIdentity(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITY);
 
+
+      // Add cylindrical radius velocity visualization
+      spCylindrical = spVis->addScalarEquation<Equations::SphericalRadialCylindricalFieldVisualizer>();
+      spCylindrical->setFieldType(FieldType::VECTOR);
+      spCylindrical->setIdentity(PhysicalNames::VELOCITYS, PhysicalNames::VELOCITY);
+
       // Add vertical vorticity visualization
       spVertical = spVis->addScalarEquation<Equations::SphericalVerticalFieldVisualizer>();
       spVertical->setFieldType(FieldType::CURL);
       spVertical->setIdentity(PhysicalNames::VORTICITYZ, PhysicalNames::VELOCITY);
+
+      // Add horizontal vorticity visualization
+      spCylindrical = spVis->addScalarEquation<Equations::SphericalRadialCylindricalFieldVisualizer>();
+      spCylindrical->setFieldType(FieldType::CURL);
+      spCylindrical->setIdentity(PhysicalNames::VORTICITYS, PhysicalNames::VELOCITY);
+
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -201,7 +217,9 @@ namespace Explicit {
       spOut->expect(PhysicalNames::ZONAL_VELOCITY);
       spOut->expect(PhysicalNames::NONZONAL_VELOCITY);
       spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VELOCITYS);
       spOut->expect(PhysicalNames::VORTICITYZ);
+      spOut->expect(PhysicalNames::VORTICITYS);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -224,7 +242,7 @@ namespace Explicit {
       spVector->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector);
 
-
+      /*
       // Create probes
       Matrix mProbes(6,3);
 
@@ -242,19 +260,33 @@ namespace Explicit {
       IoVariable::SharedShellTorPolProbeWriter spVector2(new  IoVariable::ShellTorPolProbeWriter("velocity_probe", SchemeType::type(), mProbes));
       spVector2->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector2);
+      */
+
       // Create kinetic energy spectral writer
       IoVariable::SharedShellTorPolEnergySpectraWriter spVector3(new IoVariable::ShellTorPolEnergySpectraWriter("spectrum_kinetic", SchemeType::type()));
       spVector3->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector3);
-      
+
       // Create torque writer
       IoVariable::SharedShellTorPolTorqueWriter spVector4(new IoVariable::ShellTorPolTorqueWriter("torque", SchemeType::type()));
       spVector4->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector4);
 
+      // Create average vorticity writer
       IoVariable::SharedShellTorPolUniformVorticityWriter spVector5(new IoVariable::ShellTorPolUniformVorticityWriter("vorticity", SchemeType::type()));
       spVector5->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spVector5);
+
+      // Create  kinetic dissipation writer
+      IoVariable::SharedShellTorPolDissipationWriter spVector6(new IoVariable::ShellTorPolDissipationWriter("kinetic", SchemeType::type()));
+      spVector6->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector6);
+
+      // Create kinetic dissipation spectral writer
+      IoVariable::SharedShellTorPolDissipationSpectraWriter spVector7(new IoVariable::ShellTorPolDissipationSpectraWriter("spectrum_kinetic", SchemeType::type()));
+      spVector7->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector7);
+
    }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)

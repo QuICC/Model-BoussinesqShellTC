@@ -75,7 +75,6 @@ namespace IoVariable{
 		PythonWrapperNumpy::setFunction("linear_r2x");
 		pValue = PythonWrapperNumpy::callFunction(pTmp);
 
-
 		// store arguments and prepare for the proj_radial function call
 		PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue,0));
 		PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue,1));

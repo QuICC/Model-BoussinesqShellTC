@@ -77,7 +77,7 @@ namespace NuttatingCouette {
 					 MHDFloat t = this->time();
                      MHDComplex phase = std::exp(-Math::cI * omega * t);
                      MHDFloat factor = 2.0;
-                     return Datatypes::SpectralScalarType::PointType(this->eqParams().nd(NonDimensional::ALPHA)*phase*sgn*ri/norm/factor);
+                     return Datatypes::SpectralScalarType::PointType(phase*sgn*ri/norm/factor);
                   }
                }
             }
