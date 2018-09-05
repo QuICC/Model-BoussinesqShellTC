@@ -18,6 +18,7 @@ from quicc.linear_stability.solver_slepc import Print
 from mpi4py import MPI
 from petsc4py import PETSc
 
+PETSc.ScalarType = np.complex64
 
 class MarginalCurve:
     """The marginal curve"""

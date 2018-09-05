@@ -13,32 +13,39 @@ class SpectraRepresenter(BaseRepresenter):
         BaseRepresenter.__init__(self)
         pass
 
-    def open(self):
+    def open(self, filename=None):
+
+        if filename==None:
+            try:
+                argv = sys.argv
+                self.filename = argv[1]
+            except RuntimeError as e:
+                print(e)
+                print('Supposed usage: python represent_spectra.py filename')
+                sys.exit()
+        else:
+            self.filename=filename
+
 
         try:
-            argv = sys.argv
-            filename = argv[1]
-        except RuntimeError as e:
-            print(e)
-            print('Supposed usage: python represent_spectra.py filename')
-            sys.exit()
-
-        try:
-            # folder_name = os.path.relpath("..","../..")
-            folder_name = os.path.relpath(".", "..")
-            datafull = np.loadtxt(filename, skiprows=3)
+            #folder_name = os.path.relpath("..","../..")
+            #folder_name = os.path.relpath(".", "..")
+            folderpath = os.path.dirname(self.filename)
+            datafull = np.loadtxt(self.filename, skiprows=3)
         except IOError as e:
 
             folder_name = os.path.relpath(".", "..")
             datafull = []
-            for folder in os.listdir('.'):
-                if (os.path.isdir(folder)):
-                    # print(folder)
+            for folder in os.listdir(folderpath):
+                if (os.path.isdir(folderpath+'/'+folder)):
+                    #print(folder)
                     try:
-                        datatemp = pd.DataFrame(np.loadtxt(folder + '/' + filename, skiprows=3))
+                        #print(folderpath+'/'+folder + '/' + os.path.basename(self.filename))
+                        datatemp = pd.DataFrame(np.loadtxt(folderpath+'/'+folder + '/' + os.path.basename(self.filename), skiprows=3))
                         datafull.append(datatemp)
+                        #print(datatemp)
                     except IOError as e:
-                        # print(e)
+                        #print(e)
                         pass
 
             datafull = pd.concat(datafull, ignore_index=True)
@@ -47,64 +54,95 @@ class SpectraRepresenter(BaseRepresenter):
 
             datafull = datafull.as_matrix()
         self.datafull = datafull
-        self.filename = filename
 
+        try:
 
-    def draw(self):
+            dirname = os.path.dirname(self.filename)
+            print(dirname+ '/parameters.cfg')
+            cfg_file = open(dirname + '/parameters.cfg', 'r')
+            header = cfg_file.readline()
+            root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
+            self.Lmax = int(root[1][0][1].text)+1
+            self.Mmax = int(root[1][0][2].text)+1
+            print('Parameter file found', self.Lmax, self.Mmax)
+        except BaseException as e:
+            self.Lmax = self.Mmax = data.shape[0] / 4
+            pass
 
+    def draw(self,type='both'):
         pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
         pp.rcParams['font.family'] = 'ubuntu'
         # pp.rcParams['font.size'] = 14
         # set parameters for plotting
         pp.ticklabel_format(style='sci', axis='y')
+        try:
+            if sys.argv[2]:
+                print('Representing the spectrum over time')
+                # remove chunks of data
+                t = self.datafull[:,0]
+                t = t- np.min(t)
+                data = self.datafull[:,1:]
+                torL = data[:,:self.Lmax]
+                polL = data[:,self.Mmax + self.Lmax:self.Mmax + 2 * self.Lmax]
+                torM = data[:,self.Lmax:self.Lmax + self.Mmax]
+                polM = data[:,self.Mmax+ 2 * self.Lmax:]
+                l = np.arange(self.Lmax)
+                m = np.arange(self.Mmax)
+                fig, (ax) = pp.subplots(2,2)
+                ax[0,0].contourf(t, l, np.log(torL.T), 100)
+                ax[0,1].contourf(t, l, np.log(polL.T), 100)
+                ax[1,0].contourf(t, m, np.log(torM.T), 100)
+                ax[1,1].contourf(t, m, np.log(polM.T), 100)
+                pp.show()
 
-        print(type(self.datafull))
+            else:
+                raise ValueError(sys.argv[2], 'doesn\'t specify a correct flag')
+
+        except Exception as e:
+            print(e)
 
 
-        self.draw_snapshot(self.datafull)
+            self.draw_snapshot(self.datafull,type=type)
 
-    def draw_snapshot(self, datafull):
-        #pp.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
-        pp.rcParams['font.family'] = 'ubuntu'
-        # pp.rcParams['font.size'] = 14
-        # set parameters for plotting
-        #pp.ticklabel_format(style='sci', axis='y')
+    def draw_snapshot(self, datafull, **kwargs):
 
         data = datafull[-1, 1:]
+        #data = datafull[ 1:]
 
-        try:
-            dirname = os.path.dirname(self.filename)
-            print(dirname)
-            cfg_file = open(dirname + 'parameters.cfg', 'r')
-            header = cfg_file.readline()
-            root = ET.fromstring(header + '<root>' + cfg_file.read() + '</root>')
-            Lmax = int(root[1][0][1].text)+1
-            Mmax = int(root[1][0][2].text)+1
-        except BaseException as e:
-            Lmax = Mmax = data.shape[0] / 4
-            pass
+        if kwargs['type']!='l':
+            pp.loglog(data[:self.Lmax], label='L spectrum, toroidal')
+            pp.loglog(data[self.Mmax + self.Lmax:self.Mmax + 2 * self.Lmax],
+                      label='L spectrum, poloidal')
 
+        if kwargs['type']!='m':
+            pp.loglog(np.cumsum(np.ones_like(data[self.Lmax:self.Lmax + self.Mmax])), data[self.Lmax:self.Lmax + self.Mmax], label='M spectrum, toroidal')
+            pp.loglog(np.cumsum(np.ones_like(data[self.Mmax+ 2 * self.Lmax:])), data[self.Mmax+ 2 * self.Lmax:], label='M spectrum, poloidal')
+        """
+        index_vector = np.cumsum(np.ones_like(data[self.Lmax:self.Lmax + self.Mmax]))
+        pp.loglog(index_vector, index_vector**(-5./3)*3e-4,'--', label=r'$k^{-\frac{5}{3}}$')
 
+        index_vector = index_vector[index_vector > 10.]
+        pp.loglog(index_vector, index_vector**(-3.)*3e-2,'--', label=r'$k^{-3}$')
 
-        pp.loglog(data[0:Lmax], label='L spectrum, toroidal')
-        pp.loglog(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
-        pp.loglog(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
-        pp.loglog(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
-        pp.xlabel('l/m')
-        pp.ylabel('E')
-        pp.legend()
+        index_vector = index_vector[index_vector > 40.]
+        pp.loglog(index_vector, index_vector**(-5)*3e2, '--', label=r'$k^{-5}$')
+        """
+        #pp.ylim(ymin=1e-20)
 
+        """
         pp.figure()
-        pp.semilogy(data[0:Lmax], label='L spectrum, toroidal')
-        pp.semilogy(data[Lmax:Lmax + Mmax], label='M spectrum, toroidal')
-        pp.semilogy(data[Mmax + Lmax:Mmax+ 2 * Lmax], label='L spectrum, poloidal')
-        pp.semilogy(data[Mmax+ 2 * Lmax:], label='M spectrum, poloidal')
+        pp.semilogy(data[0:self.Lmax], label='L spectrum, toroidal')
+        pp.semilogy(data[self.Lmax:self.Lmax + self.Mmax], label='M spectrum, toroidal')
+        pp.semilogy(data[self.Mmax + self.Lmax:self.Mmax+ 2 * self.Lmax], label='L spectrum, poloidal')
+        pp.semilogy(data[self.Mmax+ 2 * self.Lmax:], label='M spectrum, poloidal')
         # pp.title(folder_name)
-        pp.xlabel('l/m')
-        pp.ylabel('E')
-        pp.legend()
+        """
+        pp.xlabel(r'$l\quad m+1$')
+        pp.ylabel(r'$E_{kin}$')
+        pp.legend(prop={'size': 14})
 
         BaseRepresenter.draw(self)
+        return pp.gca()
 
 if __name__=="__main__":
     reader = SpectraRepresenter()

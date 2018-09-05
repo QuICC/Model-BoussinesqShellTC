@@ -57,6 +57,10 @@ namespace IoTools {
       {
          return NonDimensional::POINCARE;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::ELSASSER))
+      {
+         return NonDimensional::ELSASSER;
+
       } else if(id == IdToHuman::toTag(NonDimensional::MODELSASSER))
       {
     	  return NonDimensional::MODELSASSER;

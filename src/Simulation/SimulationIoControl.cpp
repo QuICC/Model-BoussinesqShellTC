@@ -16,6 +16,7 @@
 
 // Project includes
 //
+#include "Base/Version.hpp"
 
 namespace QuICC {
 
@@ -43,6 +44,16 @@ namespace QuICC {
 
       // Print parameters file parameters
       this->mspCfgFile->printInfo();
+
+      // Print version information
+      IoTools::Formatter::printNewline(std::cout);
+      IoTools::Formatter::printLine(std::cout, '=');
+      IoTools::Formatter::printCentered(std::cout, "QuICC", '*');
+      IoTools::Formatter::printLine(std::cout, '-');
+      IoTools::Formatter::printCentered(std::cout, "Version: " + Version::version(), ' ');
+      IoTools::Formatter::printLine(std::cout, '=');
+      IoTools::Formatter::printNewline(std::cout);
+
    }
 
    void SimulationIoControl::cleanup()

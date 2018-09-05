@@ -11,6 +11,7 @@
 // System includes
 //
 #include <iomanip>
+#include <cmath>
 
 // External includes
 //
@@ -35,7 +36,9 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellTorPolEnergySpectraWriter::ShellTorPolEnergySpectraWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(), mPolEnergy(), mTorRadial(), mPolRadial()
+      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type,
+                              EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(), mPolEnergy(),
+        mTorRadial(), mPolRadial()
    {
    }
 
@@ -154,7 +157,7 @@ namespace IoVariable {
 
       MHDFloat lfactor = 0.0;
       #ifdef QUICC_SPATIALSCHEME_SLFM
-         double factor = 1.0;
+         MHDFloat factor = 1.0;
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
@@ -335,16 +338,16 @@ namespace IoVariable {
             lfactor = l*(l+1.0);
 
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
-				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-				if(m==0){
-					factor = 1.0;
-				} else {
-					factor = 2.0;
-				}
-				this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
-				this->mPolRadial += factor*lfactor*(rInVarPolS.slice(k).col(j).real());
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
+               this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+               this->mPolRadial += factor*lfactor*(rInVarPolS.slice(k).col(j).real());
 
-			}
+            }
          }
       #endif //QUICC_SPATIALSCHEME_SLFL
 

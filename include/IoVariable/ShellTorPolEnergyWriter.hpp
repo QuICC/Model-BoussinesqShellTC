@@ -85,6 +85,26 @@ namespace IoVariable {
           */
          MHDFloat mPolEnergy;
 
+		   /**
+		    * @brief Storage for the centro-symmentric energy
+		    */
+		   MHDFloat mCentroSymEnergy;
+
+		   /**
+		    * @brief Storage for the centro-antisymmetric energy
+		    */
+		   MHDFloat mCentroAntysymEnergy;
+
+		   /**
+		   * @brief Storage for the equatorial-symmentric energy
+		   */
+		   MHDFloat mEquaSymEnergy;
+
+		   /**
+		   * @brief Storage for the equatorial-antisymmetric energy
+		   */
+	   	MHDFloat mEquaAntysymEnergy;
+
          /**
           * @brief Chebyshev operator to integrate in radius
           */

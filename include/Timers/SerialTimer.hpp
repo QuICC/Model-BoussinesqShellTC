@@ -13,7 +13,12 @@
 
 // External includes
 //
-
+//#include <time.h>
+// Stefano: added in July 2018 for Mac (versions earlier than 10.12)
+//#if defined(__APPLE__)
+//#include <mach/mach.h>
+//#include <mach/mach_time.h>
+//#endif
 // Project includes
 //
 #include "Timers/ITimer.hpp"
