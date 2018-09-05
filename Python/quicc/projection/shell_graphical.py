@@ -149,7 +149,7 @@ class ShellPlotter:
             else:
                 ymin = eta / (1 - eta)
                 xmin = 0.
-                theta_crit = np.arccos(np.abs(self.fN) / 2)
+                theta_crit = np.pi/2. - np.arccos(np.abs(self.fN) / 2)
                 h = ((1 + eta) / (1 - eta)) ** .5
                 xmax = xmin + np.cos(theta_crit) * h
                 ymax = ymin + np.sin(theta_crit) * h
@@ -157,8 +157,8 @@ class ShellPlotter:
 
 
 
-            xx = np.linspace(xmin, xmax, 15*self.nN)
-            yy = np.linspace(ymin, ymax, 15*self.nN)
+            xx = np.linspace(xmin, xmax, 8*self.nN)
+            yy = np.linspace(ymin, ymax, 8*self.nN)
 
             rr = (xx**2+yy**2)**.5
             cottheta = np.arctan2(yy,xx)
@@ -169,7 +169,7 @@ class ShellPlotter:
             xe = (xx2**2 + yy2**2)**.5
 
             # select the interior of the flow
-            idx = (rr >= self.ri + 10 * delta) & (rr <= self.ro - 10 * delta)
+            idx = (rr >= self.ri + 2.5 * delta) & (rr <= self.ro - 2.5 * delta)
             rr = rr[idx]
             xe = xe[idx]
             cottheta = cottheta[idx]
