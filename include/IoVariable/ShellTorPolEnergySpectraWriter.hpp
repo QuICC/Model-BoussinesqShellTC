@@ -85,6 +85,17 @@ namespace IoVariable {
           */
          Matrix mPolEnergy;
 
+          /**
+            * @brief Storage for the Toroidal energy
+            */
+          Matrix mTorEnergyAsym;
+
+          /**
+           * @brief Storage for the Poloidal energy
+           */
+          Matrix mPolEnergyAsym;
+
+
          /*
           * @brief Storage for the radial spectral decomposition, unused
           */

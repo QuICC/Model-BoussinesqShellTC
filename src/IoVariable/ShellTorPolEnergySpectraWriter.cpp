@@ -38,7 +38,7 @@ namespace IoVariable {
    ShellTorPolEnergySpectraWriter::ShellTorPolEnergySpectraWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type,
                               EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(), mPolEnergy(),
-        mTorRadial(), mPolRadial()
+        mTorEnergyAsym(), mPolEnergyAsym(), mTorRadial(), mPolRadial()
    {
    }
 
@@ -65,6 +65,8 @@ namespace IoVariable {
       // resize the mTorEnergy and mPolEnergy matrices
       mTorEnergy = Matrix(Lmax, Mmax);
       mPolEnergy = Matrix(Lmax, Mmax);
+      mTorEnergyAsym = Matrix(Lmax, Mmax);
+      mPolEnergyAsym = Matrix(Lmax, Mmax);
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -151,6 +153,8 @@ namespace IoVariable {
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mTorEnergy.setZero();
       this->mPolEnergy.setZero();
+      this->mTorEnergyAsym.setZero();
+      this->mPolEnergyAsym.setZero();
 
       this->mTorRadial.setZero();
       this->mPolRadial.setZero();
@@ -179,6 +183,11 @@ namespace IoVariable {
 
                this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
                this->mTorRadial += factor*lfactor*(rOutVarTor.slice(k).col(j).real());
+               if( (l%2) == 0)
+               {
+                  this->mTorEnergyAsym(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+
+               }
             }
          }
       #endif //defined QUICC_SPATIALSCHEME_SLFM
@@ -199,6 +208,10 @@ namespace IoVariable {
             	}
             	this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
             	this->mTorRadial += factor*lfactor*(rInVarTor.slice(k).col(j).real());
+            	if( (l%2)==0 ){
+                  this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+
+            	}
             }
 
          }
@@ -253,6 +266,11 @@ namespace IoVariable {
 
                this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
                this->mPolRadial += factor*lfactor*(rInVarPolQ.slice(k).col(j).real());
+
+               if( (l%2) == 1)
+               {
+                  this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+               }
             }
          }
       #endif //defined QUICC_SPATIALSCHEME_SLFM
@@ -274,6 +292,11 @@ namespace IoVariable {
 				}
 				this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
 				this->mPolRadial += factor*lfactor*(rInVarPolQ.slice(k).col(j).real());
+
+				if( (l%2) == 1)
+            {
+               this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+            }
 			}
 
          }
@@ -326,6 +349,11 @@ namespace IoVariable {
                this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
                this->mPolRadial += factor*lfactor*(rInVarPolS.slice(k).col(j).real());
 
+               if( (l%2) == 1)
+               {
+                  this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+               }
+
             }
          }
       #endif //defined QUICC_SPATIALSCHEME_SLFM
@@ -346,6 +374,11 @@ namespace IoVariable {
                }
                this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
                this->mPolRadial += factor*lfactor*(rInVarPolS.slice(k).col(j).real());
+
+               if( (l%2) == 1)
+               {
+                  this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+               }
 
             }
          }
@@ -372,6 +405,10 @@ namespace IoVariable {
       Array MTorSpectrum = this->mTorEnergy.colwise().sum();
       Array LPolSpectrum = this->mPolEnergy.rowwise().sum();
       Array MPolSpectrum = this->mPolEnergy.colwise().sum();
+      Array LTorSpecAsym = this->mTorEnergyAsym.rowwise().sum();
+      Array MTorSpecAsym = this->mTorEnergyAsym.colwise().sum();
+      Array LPolSpecAsym = this->mPolEnergyAsym.rowwise().sum();
+      Array MPolSpecAsym = this->mPolEnergyAsym.colwise().sum();
 
       // Get the "global" Kinetic energy from MPI code
       #ifdef QUICC_MPI
@@ -380,6 +417,10 @@ namespace IoVariable {
          MPI_Allreduce(MPI_IN_PLACE, MTorSpectrum.data(), MTorSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, LPolSpectrum.data(), LPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, MPolSpectrum.data(), MPolSpectrum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, LTorSpecAsym.data(), LTorSpecAsym.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, MTorSpecAsym.data(), MTorSpecAsym.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, LPolSpecAsym.data(), LPolSpecAsym.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, MPolSpecAsym.data(), MPolSpecAsym.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          //MPI_Allreduce(MPI_IN_PLACE, mTorRadial.data(), mTorRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          //MPI_Allreduce(MPI_IN_PLACE, mPolRadial.data(), mPolRadial.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
@@ -390,10 +431,15 @@ namespace IoVariable {
       if(FrameworkMacro::allowsIO())
       {
          //this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mTorEnergy + this->mPolEnergy << "\t" << this->mTorEnergy << "\t" << this->mPolEnergy << std::endl;
-    	 this->mFile << std::setprecision(14) << this->mTime << "\t" << LTorSpectrum.transpose() << '\t';
-    	 this->mFile << std::setprecision(14) << '\t' << MTorSpectrum.transpose() << '\t';
-    	 this->mFile << std::setprecision(14) << '\t' << LPolSpectrum.transpose() << '\t';
-    	 this->mFile << std::setprecision(14) << '\t' << MPolSpectrum.transpose() << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << '\t' << LTorSpectrum.transpose() << '\t';
+         this->mFile << std::setprecision(14) << '\t' << MTorSpectrum.transpose() << '\t';
+         this->mFile << std::setprecision(14) << '\t' << LPolSpectrum.transpose() << '\t';
+         this->mFile << std::setprecision(14) << '\t' << MPolSpectrum.transpose() << '\t';
+         this->mFile << std::setprecision(14) << '\t' << LTorSpecAsym.transpose() << '\t';
+         this->mFile << std::setprecision(14) << '\t' << MTorSpecAsym.transpose() << '\t';
+         this->mFile << std::setprecision(14) << '\t' << LPolSpecAsym.transpose() << '\t';
+         this->mFile << std::setprecision(14) << '\t' << MPolSpecAsym.transpose() << '\t';
+         this->mFile << std::setprecision(14) << std::endl;
     	 //this->mFile << std::setprecision(14) << '\t' << mTorRadial.transpose() << '\t';
     	 //this->mFile << std::setprecision(14) << '\t' << mPolRadial.transpose() << std::endl;
       }
