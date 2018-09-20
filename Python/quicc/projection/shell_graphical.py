@@ -119,6 +119,9 @@ class ShellPlotter:
         if self.E >1e-4:
             delta = 0.01
 
+        if kwargs.get('noBoundary', False)==True:
+            delta=0.0
+
         # first if decision block over the radial grid
         if kwargs['mode']=='boundaries':
 
@@ -132,7 +135,8 @@ class ShellPlotter:
 
             # if the cut argument is standard, perform
             # a flat cut at z = 1/2(r_i+r_o)
-            if kwargs.get('cut','orthogonal') == 'standard':
+            cut = kwargs.get('cut','orthogonal')
+            if cut == 'standard':
 
                 ymin = (eta + 1.) / (1. - eta) / 2.
                 xmin = 0.
@@ -144,7 +148,12 @@ class ShellPlotter:
                 # modify the self.phi_0 variable to 90 degrees
                 self.phi_0 = np.pi/2
 
-
+            elif cut =='45degree':
+                v = (1+eta)/(1-eta)/np.sqrt(2)
+                ymin = v
+                xmin = 0
+                ymax = 0
+                xmax = v
 
             else:
                 ymin = eta / (1 - eta)
@@ -169,7 +178,7 @@ class ShellPlotter:
             xe = (xx2**2 + yy2**2)**.5
 
             # select the interior of the flow
-            idx = (rr >= self.ri + 2.5 * delta) & (rr <= self.ro - 2.5 * delta)
+            idx = (rr >= self.ri + 5 * delta) & (rr <= self.ro - 5 * delta)
             rr = rr[idx]
             xe = xe[idx]
             cottheta = cottheta[idx]
@@ -253,6 +262,8 @@ class ShellPlotter:
 
         if kwargs['mode'] == 'line':
             x_arg = [xe]
+            if kwargs.get('geometry', False)==True:
+                x_arg = [xe, xx, yy]
         else:
             x_arg = [XX, YY]
 
@@ -282,6 +293,13 @@ class ShellPlotter:
                 U_r = U_s
                 U_theta = U_z
 
+            if kwargs.get('coordinates','spherical') == 'cylindrical':
+
+                U_s = np.sin(TT) *  U_r + np.cos(TT)* U_theta
+                U_z = np.cos(TT) * U_r - np.sin(TT) * U_theta
+
+                U_r = U_s
+                U_theta = U_z
 
             # plot r field component
             self.plot_field(fig, ax1, *x_arg, U_r, colormap='dual', title=prefix+'{r}$', **kwargs)
