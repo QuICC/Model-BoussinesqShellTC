@@ -149,13 +149,3 @@ if __name__=="__main__":
     print(reader.name_columns)
     reader.open()
     reader.draw()
-
-
-
-
-
-
-
-
-
-
