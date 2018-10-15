@@ -109,11 +109,11 @@ set(QUICC_PYTHONS "python27" "python36" PARENT_SCOPE)
 
 
 set(QUICC_LIBRARIES_PYTHON27 "python2.7" "util" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON27 "$ENV{PYTHONPATH}/include/python2.7" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON27 "$ENV{PYTHONPATH}/include/python2.7" "$ENV{PYTHONPATH}/lib/python2.7/site-packages/numpy/core/include" PARENT_SCOPE)
 set(QUICC_LIBDIR_PYTHON27 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
 
 set(QUICC_LIBRARIES_PYTHON36 "python3.6m" "util" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON36 "$ENV{PYTHONPATH}/include/python3.6m" "$ENV{PYTHONPATH}/lib/python3.6/site-packages/numpy/core/include"  PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON36 "$ENV{PYTHONPATH}/include/python3.6m" "$ENV{PYTHONPATH}/lib/python3.6/site-packages/numpy/core/include" PARENT_SCOPE)
 set(QUICC_LIBDIR_PYTHON36 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
 
 ###################################################
