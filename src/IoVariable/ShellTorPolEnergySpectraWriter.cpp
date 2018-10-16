@@ -209,7 +209,7 @@ namespace IoVariable {
             	this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
             	this->mTorRadial += factor*lfactor*(rInVarTor.slice(k).col(j).real());
             	if( (l%2)==0 ){
-                  this->mTorEnergy(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+                  this->mTorEnergyAsym(l,m) += factor*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
 
             	}
             }
@@ -269,7 +269,7 @@ namespace IoVariable {
 
                if( (l%2) == 1)
                {
-                  this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+                  this->mPolEnergyAsym(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
                }
             }
          }
@@ -295,7 +295,7 @@ namespace IoVariable {
 
 				if( (l%2) == 1)
             {
-               this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+               this->mPolEnergyAsym(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
             }
 			}
 
@@ -351,7 +351,7 @@ namespace IoVariable {
 
                if( (l%2) == 1)
                {
-                  this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+                  this->mPolEnergyAsym(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
                }
 
             }
@@ -377,7 +377,7 @@ namespace IoVariable {
 
                if( (l%2) == 1)
                {
-                  this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
+                  this->mPolEnergyAsym(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(j).real()).sum();
                }
 
             }
