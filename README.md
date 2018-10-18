@@ -17,7 +17,7 @@
 0. Upload your SSH key to your gitlab profile
 1. Clone repository
    ```
-   git clone git@gitlab.base13.ch:QuICC/QuICC.git
+   git clone git@github.com:QuICC/QuICC.git
    ```
 2. Clone submodules
    ```
