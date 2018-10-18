@@ -104,19 +104,44 @@ class SpectraRepresenter(BaseRepresenter):
 
             self.draw_snapshot(self.datafull,type=type)
 
-    def draw_snapshot(self, datafull, **kwargs):
-
-        data = datafull[-1, 1:]
-        #data = datafull[ 1:]
-
-        if kwargs['type']!='l':
+    def draw(self, data, **kwargs):
+        # define the routine for plotting datasets
+        if kwargs['type'] != 'l':
             pp.loglog(data[:self.Lmax], label='L spectrum, toroidal')
             pp.loglog(data[self.Mmax + self.Lmax:self.Mmax + 2 * self.Lmax],
                       label='L spectrum, poloidal')
 
-        if kwargs['type']!='m':
-            pp.loglog(np.cumsum(np.ones_like(data[self.Lmax:self.Lmax + self.Mmax])), data[self.Lmax:self.Lmax + self.Mmax], label='M spectrum, toroidal')
-            pp.loglog(np.cumsum(np.ones_like(data[self.Mmax+ 2 * self.Lmax:])), data[self.Mmax+ 2 * self.Lmax:], label='M spectrum, poloidal')
+        if kwargs['type'] != 'm':
+            pp.loglog(np.cumsum(np.ones_like(data[self.Lmax:self.Lmax + self.Mmax])),
+                      data[self.Lmax:self.Lmax + self.Mmax], label='M spectrum, toroidal')
+            pp.loglog(np.cumsum(np.ones_like(data[self.Mmax + 2 * self.Lmax:2 * self.Mmax + 2 * self.Lmax])),
+                      data[self.Mmax + 2 * self.Lmax:2 * self.Mmax + 2 * self.Lmax], label='M spectrum, poloidal')
+
+        pp.xlabel(r'$l\quad m+1$')
+        pp.ylabel(r'$E_{kin}$')
+        pp.legend(prop={'size': 14})
+
+        BaseRepresenter.draw(self)
+
+
+    def draw_snapshot(self, datafull, **kwargs):
+
+        # select the last  record of data to be plotted
+        data = datafull[-1, 1:]
+        #data = datafull[ 1:]
+
+        # check the length of the data vector
+        expected_vec_size = (self.Lmax + self.Mmax)*2
+        if len(data) == expected_vec_size :
+            self.draw(data, kwargs)
+
+        elif len(data) == 2*expected_vec_size:
+            self.draw(data[:expected_vec_size], kwargs)
+            pp.figure()
+            self.draw(data[expected_vec_size:], kwargs)
+
+
+
         """
         index_vector = np.cumsum(np.ones_like(data[self.Lmax:self.Lmax + self.Mmax]))
         pp.loglog(index_vector, index_vector**(-5./3)*3e-4,'--', label=r'$k^{-\frac{5}{3}}$')
@@ -137,11 +162,7 @@ class SpectraRepresenter(BaseRepresenter):
         pp.semilogy(data[self.Mmax+ 2 * self.Lmax:], label='M spectrum, poloidal')
         # pp.title(folder_name)
         """
-        pp.xlabel(r'$l\quad m+1$')
-        pp.ylabel(r'$E_{kin}$')
-        pp.legend(prop={'size': 14})
 
-        BaseRepresenter.draw(self)
         return pp.gca()
 
 if __name__=="__main__":
