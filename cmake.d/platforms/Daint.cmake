@@ -91,7 +91,7 @@ set(QUICC_CC_SERIAL_GCC "CC" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "CC" PARENT_SCOPE)
 
-set(QUICC_CC_ARCH_GCC "-O2" PARENT_SCOPE)
+set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
 
 set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
 
@@ -105,21 +105,11 @@ set(QUICC_CC_LIB_MPI_GCC "${QUICC_CC_LIB_GCC}" PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python35" PARENT_SCOPE)
+set(QUICC_PYTHONS "python36" PARENT_SCOPE)
 
-
-set(QUICC_LIBRARIES_PYTHON27 "python2.7" "util" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON27 "$ENV{PYTHONPATH}/include/python2.7" PARENT_SCOPE)
-set(QUICC_LIBDIR_PYTHON27 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
-
-set(QUICC_LIBRARIES_PYTHON34 "python3.4m" "util" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON34 "$ENV{PYTHONPATH}/include/python3.4m" PARENT_SCOPE)
-set(QUICC_LIBDIR_PYTHON34 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
-
-set(QUICC_LIBRARIES_PYTHON35 "python3.5m" "util" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON35 "$ENV{PYTHONPATH}/include/python3.5m" "$ENV{PYTHONPATH}/lib/python3.5/site-packages/numpy/core/include"  PARENT_SCOPE)
-set(QUICC_LIBDIR_PYTHON35 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
-
+set(QUICC_LIBRARIES_PYTHON36 "python3.6m" "util" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON36 "$ENV{PYTHONPATH}/include/python3.6m" "$ENV{PYTHONPATH}/lib/python3.6/site-packages/numpy/core/include" PARENT_SCOPE)
+set(QUICC_LIBDIR_PYTHON36 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
