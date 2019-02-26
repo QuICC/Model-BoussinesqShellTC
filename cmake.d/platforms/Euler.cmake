@@ -56,10 +56,10 @@ set(QUICC_SPLINALGS "SparseLU" "MUMPS" "UmfPack" PARENT_SCOPE)
 ###################################################
 
 set(QUICC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "MUMPS" "UmfPack" PARENT_SCOPE)
-set(QUICC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "metis" "openblas" "goto2" "mpi" "gfortran" "mpi_mpifh" "cmumps" "smumps" "pord" "scalapack" "parmetis" PARENT_SCOPE)
+set(QUICC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "openblas" "goto2" "mpi" "mpi_f90" "mpi_f77" "gfortran" "cmumps" "smumps" "pord" "scalapack" "metis" "parmetis" PARENT_SCOPE)
 #set(QUICC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "parmetis" "ptesmumps" "ptscotch" "ptscotcherr" "ptscotchparmetis" "ptscotcherrexit" "scotch" "scotcherr" "scotcherrexit" "pord" "scalapack" "metis" "atllapack" "f77blas" "mpi" "gfortran" "mpi_mpifh" PARENT_SCOPE)
-set(QUICC_INCLUDES_MUMPS "/cluster/apps/mumps/5.0.1/x86_64/gcc_4.8.2/openmpi_1.6.5/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_MUMPS "/cluster/apps/mumps/5.0.1/x86_64/gcc_4.8.2/openmpi_1.6.5/lib" "/cluster/apps/openmpi/1.6.5/x86_64/gcc_4.8.2/lib" PARENT_SCOPE)
+set(QUICC_INCLUDES_MUMPS "$ENV{MODULE_mumps_ROOT_DIR}/include" PARENT_SCOPE)
+set(QUICC_LIBDIR_MUMPS "$ENV{MODULE_mumps_ROOT_DIR}/lib" "$ENV{MODULE_open_mpi_ROOT_DIR}/lib" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
