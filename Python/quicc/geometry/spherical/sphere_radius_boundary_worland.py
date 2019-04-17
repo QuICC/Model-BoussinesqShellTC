@@ -317,6 +317,9 @@ def stencil_rdiffdivr(nr, l, coeffs = None):
     def d_1(n):
         num = -wb.worland_norm_row(n,l,-1)*2.0*n*(3.0 - 3.0*l - 8.0*n + 4.0*l*n + 4.0*n**2)
         den = (-1.0 + 2.0*n)*(-1.0 + l + 4.0*l*n + 4.0*n**2)
+        if l == 1:
+            num[0] = 1.0
+            den[0] = 1.0
         return num/den
 
     # Generate diagonal
@@ -332,9 +335,7 @@ def stencil_rdiffdivr(nr, l, coeffs = None):
 def stencil_insulating(nr, l, coeffs = None):
     """Create stencil matrix for a insulating boundary"""
 
-    assert(coeffs.get('l', None) is not None)
-
-    l = coeffs['l']
+    assert(coeffs is None)
 
     ns = np.arange(0,nr)
     offsets = [-1, 0]
@@ -399,9 +400,7 @@ def stencil_value_diff(nr, l, coeffs = None):
 def stencil_value_diff2(nr, l, coeffs = None):
     """Create stencil matrix for a zero boundary value and zero 2nd derivative"""
 
-    assert(coeffs.get('l', None) is not None)
-
-    l = coeffs['l']
+    assert(coeffs is None)
 
     ns = np.arange(0,nr)
     offsets = [-2, -1, 0]
