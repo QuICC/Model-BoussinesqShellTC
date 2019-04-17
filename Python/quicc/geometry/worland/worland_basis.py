@@ -219,6 +219,19 @@ def worland_divrdiffr(nr, l):
 
     return val
 
+def worland_insulating_sph(nr, l):
+    """Compute the insulating magnetic condition for a sphere at endpoint for Worland polynomials"""
+
+    val = np.zeros(nr)
+    if nr > 0:
+        val[1:] = 2.0*(l+np.arange(1,nr))*worland_value(nr-1, l+1, 1, False)
+        val += (2.0*l+1.0)*worland_value(nr, l, 0, False)
+
+    # Normalize
+    worland_normalize(val, l)
+
+    return val
+
 def worland_laplh_cyl(nr, m):
     """Compute the horizontal laplacian in a cylinder at endpoint for Worland polynomials"""
 

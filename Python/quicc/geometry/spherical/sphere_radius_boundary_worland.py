@@ -165,7 +165,7 @@ def tau_insulating(nr, l, coeffs = None):
     l = coeffs['l']
 
     cond = []
-    cond.append(c*wb.worland_divrdiffr(nr,l))
+    cond.append(c*wb.worland_insulating_sph(nr,l))
 
     return np.array(cond)
 
@@ -291,8 +291,8 @@ def stencil_diff(nr, l, coeffs = None):
 
     # Generate subdiagonal
     def d_1(n):
-        num = -wb.worland_norm_row(n,l,-1)*2.0*m*(4.0*(-1.0 + m)**2 + l*(-3.0 + 4.0*m))
-        den = (-1.0 + 2.0*m)*(l + 4.0*l*m + 4.0*m**2)
+        num = -wb.worland_norm_row(n,l,-1)*2.0*n*(4.0*(-1.0 + n)**2 + l*(-3.0 + 4.0*n))
+        den = (-1.0 + 2.0*n)*(l + 4.0*l*n + 4.0*n**2)
         return num/den
 
     # Generate diagonal
@@ -317,6 +317,9 @@ def stencil_rdiffdivr(nr, l, coeffs = None):
     def d_1(n):
         num = -wb.worland_norm_row(n,l,-1)*2.0*n*(3.0 - 3.0*l - 8.0*n + 4.0*l*n + 4.0*n**2)
         den = (-1.0 + 2.0*n)*(-1.0 + l + 4.0*l*n + 4.0*n**2)
+        if l == 1:
+            num[0] = 1.0
+            den[0] = 1.0
         return num/den
 
     # Generate diagonal
@@ -332,24 +335,16 @@ def stencil_rdiffdivr(nr, l, coeffs = None):
 def stencil_insulating(nr, l, coeffs = None):
     """Create stencil matrix for a insulating boundary"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
-    assert(coeffs.get('l', None) is not None)
+    assert(coeffs is None)
 
-    l = coeffs['l']
-
-    ns = np.arange(parity,2*nr,2)
+    ns = np.arange(0,nr)
     offsets = [-1, 0]
 
     # Generate subdiagonal
     def d_1(n):
-        val = -(l + n**2 - 4.0*n + 5.0)/(l + n**2 + 1.0)
-        for i,j in enumerate(n):
-            if j == 2:
-                val[i] = -(l + 1.0)/(l + 5.0)
-                break
-            if j > 2:
-                break
-        return wb.worland_norm_row(n,l,-1)*val
+        num = -wb.worland_norm_row(n,l,-1)*2.0*n*(4.0*(-1.0 + n)**2 + l*(-2.0 + 4.0*n) + 1.0)
+        den = (-1.0 + 2.0*n)*(2.0*l + 1.0 + 4.0*l*n + 4.0*n**2)
+        return num/den
 
     # Generate diagonal
     def d0(n):
@@ -405,37 +400,22 @@ def stencil_value_diff(nr, l, coeffs = None):
 def stencil_value_diff2(nr, l, coeffs = None):
     """Create stencil matrix for a zero boundary value and zero 2nd derivative"""
 
-    raise NotImplementedError("Boundary condition not yet implemented!")
     assert(coeffs is None)
 
-    ns = np.arange(parity,2*nr,2)
+    ns = np.arange(0,nr)
     offsets = [-2, -1, 0]
 
-    # Generate second subdiagonal
+    # Generate 2n subdiagonal
     def d_2(n):
-        val_num = (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)
-        val_den = (n - 1.0)*(2.0*n**2 - 4.0*n + 3.0)
-        val = val_num/val_den
-        for i,j in enumerate(n):
-            if j == 4:
-                val[i] = 1.0/38.0
-                break
-            if j > 4:
-                break
-        return wb.worland_norm_row(n,l,-2)*val
+        num = wb.worland_norm_row(n,l,-2)*4.0*(-1.0 + n)*n*(-3.0 + l + 2.0*n)*(19.0 + 8.0*(-3.0 + n)*n + 2.0*l*(-5.0 + 4.0*n))
+        den = (-1.0 + l + 2.0*n)*(3.0+4.0*(-2.0 + n)*n)*(3.0 + 8.0*(-1.0 + n)*n+l*(-2.0 + 8.0*n))
+        return num/den
 
     # Generate subdiagonal
     def d_1(n):
-        val_num = -2.0*n*(2.0*n**2 + 7.0)
-        val_den = (n + 1.0)*(2.0*n**2 + 4.0*n + 3.0)
-        val = val_num/val_den
-        for i,j in enumerate(n):
-            if j == 2:
-                val[i] = -10.0/19.0
-                break
-            if j > 2:
-                break
-        return wb.worland_norm_row(n,l,-1)*val
+        num = -wb.worland_norm_row(n,l,-1)*4*n*(l + 2.0*n)*(7.0 + 8.0*n**2 + l*(2.0 + 8.0*n))
+        den = (-1.0 + 2.0*n)*(1.0 + l + 2.0*n)*(3.0 + 8.0*n*(1.0 + n) + l*(6.0 + 8.0*n))
+        return num/den
 
     # Generate diagonal
     def d0(n):

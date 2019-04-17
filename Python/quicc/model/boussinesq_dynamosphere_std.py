@@ -133,7 +133,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-10, 'rt':0}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-13, 'rt':0, 'c':{'l':l}}
+                        bc = {0:-13, 'rt':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-10, 'rt':0}
 
@@ -145,7 +145,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
                     elif field_row == ("magnetic","tor") and field_col == field_row:
                         bc = {0:10}
                     elif field_row == ("magnetic","pol") and field_col == field_row:
-                        bc = {0:13, 'c':{'l':l}}
+                        bc = {0:13}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:10}
 
@@ -187,7 +187,7 @@ class BoussinesqDynamoSphereStd(base_model.BaseModel):
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-10, 'rt':1}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-13, 'c':{'l':l}, 'rt':1}
+                        bc = {0:-13, 'rt':1}
                     elif field_col == ("temperature",""):
                         bc = {0:-10, 'rt':1}
 

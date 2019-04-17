@@ -359,6 +359,5 @@ def stencil(nr, l, bc, make_square):
 
     if not make_square:
         bc['rb'] = bc['rt']
-    bc['rt'] = 0
 
     return radbc.constrain(mat, l, bc)
