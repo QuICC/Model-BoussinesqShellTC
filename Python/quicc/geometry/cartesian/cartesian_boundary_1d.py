@@ -206,7 +206,7 @@ def tau_insulating(nx, pos, bc):
     ns = np.arange(0,nx)
     if pos >= 0:
         # D + a P 
-        cnst = k_perp*c*tau_c()
+        cnst = k_perp*c
         cond.append(cnst*np.ones(nx))
         cond[-1][0] /= tau_c()
         cond[-1] += c*ns**2
@@ -214,7 +214,7 @@ def tau_insulating(nx, pos, bc):
 
     if pos <= 0:
         # D - a P 
-        cnst = -k_perp*c*tau_c()
+        cnst = -k_perp*c
         cond.append(cnst*alt_ones(nx, 1))
         cond[-1][0] /= tau_c()
         cond[-1] += c*ns**2*alt_ones(nx, 0)
