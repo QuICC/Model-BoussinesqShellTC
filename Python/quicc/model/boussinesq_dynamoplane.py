@@ -156,7 +156,8 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                         else:
                             kx = eigs[0]
                             ky = eigs[1]
-                            bc = {0:-24, 'k_perp':(kx**2 + ky**2)**0.5, 'rt':0}
+                            zscale = eq_params['scale1d']
+                            bc = {0:-24, 'k_perp':(kx**2 + ky**2)**0.5, 'cscale':zscale, 'rt':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
@@ -176,7 +177,8 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                         else:
                             kx = eigs[0]
                             ky = eigs[1]
-                            bc = {0:24, 'k_perp':(kx**2 + ky**2)**0.5}
+                            zscale = eq_params['scale1d']
+                            bc = {0:24, 'k_perp':(kx**2 + ky**2)**0.5, 'cscale':zscale}
                     elif field_row == ("temperature","") and field_col == field_row:
                         bc = {0:20}
 
@@ -296,7 +298,8 @@ class BoussinesqDynamoPlane(BoussinesqDynamoPlaneConfig, base_model.BaseModel):
                         else:
                             kx = eigs[0]
                             ky = eigs[1]
-                            bc = {0:-24, 'k_perp':(kx**2 + ky**2)**0.5, 'rt':2}
+                            zscale = eq_params['scale1d']
+                            bc = {0:-24, 'k_perp':(kx**2 + ky**2)**0.5, 'cscale':zscale, 'rt':2}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':2}
 

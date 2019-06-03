@@ -199,6 +199,7 @@ def tau_insulating(nx, pos, bc):
     """Create the tau line(s) for a insulating boundary"""
 
     k_perp = bc['k_perp']
+    cscale = bc['cscale']
     it = coeff_iterator(bc.get('c',None), pos)
 
     cond = []
@@ -206,18 +207,20 @@ def tau_insulating(nx, pos, bc):
     ns = np.arange(0,nx)
     if pos >= 0:
         # D + a P 
-        cnst = k_perp*c*tau_c()
-        cond.append(cnst*np.ones(nx))
+        c_P = k_perp*c
+        cond.append(c_P*np.ones(nx))
         cond[-1][0] /= tau_c()
-        cond[-1] += c*ns**2
+        c_D = c*cscale
+        cond[-1] += c_D*ns**2
         c = next(it)*tau_c()
 
     if pos <= 0:
         # D - a P 
-        cnst = -k_perp*c*tau_c()
-        cond.append(cnst*alt_ones(nx, 1))
+        c_P = -k_perp*c
+        cond.append(c_P*alt_ones(nx, 1))
         cond[-1][0] /= tau_c()
-        cond[-1] += c*ns**2*alt_ones(nx, 0)
+        c_D = c*cscale
+        cond[-1] += c_D*ns**2*alt_ones(nx, 0)
 
     if bc.get('use_parity', True) and pos == 0:
         t = cond[0].copy()
