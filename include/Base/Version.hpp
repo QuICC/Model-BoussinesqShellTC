@@ -9,7 +9,7 @@
 
 #define QUICC_VERSION_MAJOR 0
 #define QUICC_VERSION_MINOR 8
-#define QUICC_VERSION_PATCH 1
+#define QUICC_VERSION_PATCH 2
 
 // System includes
 //
