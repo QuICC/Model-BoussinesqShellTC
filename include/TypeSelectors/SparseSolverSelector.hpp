@@ -59,7 +59,7 @@
          {
             //typedef Eigen::SparseLU<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > Type;
             //typedef Eigen::SparseLU<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
-            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<int> > Type;
             //typedef Eigen::SparseLU<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > Type;
          };
       }
@@ -100,7 +100,7 @@
          {
             //typedef Eigen::SparseQR<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > Type;
             //typedef Eigen::SparseQR<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
-            typedef Eigen::SparseQR<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SparseQR<TMatrix, Eigen::COLAMDOrdering<int> > Type;
             //typedef Eigen::SparseQR<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > Type;
          };
       }
@@ -230,7 +230,7 @@
           */
          template <typename TMatrix> struct SparseSpdSelector
          {
-            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<int> > Type;
          };
       }
    }
@@ -323,7 +323,7 @@
           */
          template <typename TMatrix> struct SparseTriSelector
          {
-            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<int> > Type;
          };
       }
    }
