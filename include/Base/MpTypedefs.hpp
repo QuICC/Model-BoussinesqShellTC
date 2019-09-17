@@ -16,8 +16,17 @@
 
 // External includes
 //
+#if defined QUICC_MPBACKEND_BOOST
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#elif defined QUICC_MPBACKEND_GMP
+#include <boost/multiprecision/gmp.hpp>
+#elif defined QUICC_MPBACKEND_MPFR
+#include <boost/multiprecision/mpfr.hpp>
+#elif defined QUICC_MPBACKEND_QUAD
+#include <boost/multiprecision/float128.hpp>
+#endif // defined QUICC_MPBACKEND_BOOST
+#include <boost/multiprecision/eigen.hpp>
 #include <Eigen/Core>
-#include <Eigen/MPRealSupport>
 
 // Project includes
 //
@@ -29,7 +38,15 @@ namespace QuICC {
     */
    //@{
    /// Typedef for multiple precision floating point type value
-   typedef mpfr::mpreal MHDMpFloat;
+#if defined QUICC_MPBACKEND_BOOST
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<QUICC_MULTPRECISION_DIGITS> > MHDMpFloat;
+#elif defined QUICC_MPBACKEND_GMP
+   typedef boost::multiprecision::number<boost::multiprecision::gmp_float<QUICC_MULTPRECISION_DIGITS> > MHDMpFloat;
+#elif defined QUICC_MPBACKEND_MPFR
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<QUICC_MULTPRECISION_DIGITS> > MHDMpFloat;
+#elif defined QUICC_MPBACKEND_QUAD
+   typedef boost::multiprecision::float128 MHDMpFloat;
+#endif // defined QUICC_MPBACKEND_BOOST
    //@}
 
    /**
