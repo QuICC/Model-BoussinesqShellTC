@@ -44,9 +44,9 @@ endfunction(quicc_check_choice)
 #
 function (quicc_provide_choice choiceList choiceName chosen out)
    # Create selection entry
-   quicc_create_choice(${choice} ${choiceList} ${choiceName} ${chosen})
+   quicc_create_choice(${choiceList} ${choiceName} ${chosen})
    # Validate selection
-   quicc_check_choice(${choice} ${choiceList} ${choiceName} ${chosen} ${out})
+   quicc_check_choice(${choiceList} ${choiceName} ${chosen} ${out})
    set(${out} ${${out}} PARENT_SCOPE)
 endfunction(quicc_provide_choice)
 
