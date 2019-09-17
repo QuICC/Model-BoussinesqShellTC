@@ -161,8 +161,10 @@ def tau_rdiffdivr(nr, l, coeffs = None):
 def tau_insulating(nr, l, coeffs = None):
     """Create the insulating boundray tau line(s)"""
 
-    c = coeffs.get('c', 1.0)
-    l = coeffs['l']
+    if coeffs is None:
+        c = 1.0
+    else:
+        c = coeffs
 
     cond = []
     cond.append(c*wb.worland_insulating_sph(nr,l))
