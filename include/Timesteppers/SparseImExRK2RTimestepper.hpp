@@ -612,34 +612,36 @@ namespace Timestep {
                size_t nnz = this->mRHSMatrix.at(i).nonZeros();
 
                // Update LHS and RHS matrices
-               size_t lhsJ = 0;
                for (size_t k=0; k< static_cast<size_t>(this->mRHSMatrix.at(i).outerSize()); ++k)
                {
-                  typename TOperator::InnerIterator lhsIt(this->rLHSMatrix(TimeSchemeSelector::aIm(step,step), i),lhsJ);
+                  typename TOperator::InnerIterator lhsIt(this->rLHSMatrix(TimeSchemeSelector::aIm(step,step), i),k);
                   for(typename TOperator::InnerIterator timeIt(this->mRHSMatrix.at(i),k); timeIt; ++timeIt)
                   {
                      // Only keep going if nonzero elements are left
                      if(nnz > 0)
                      {
-                        // Update LHS matrix
-                        if(timeIt.col() == lhsIt.col())
-                        {
-                           if(timeIt.row() == lhsIt.row())
-                           {
-                              // Update values
-                              lhsIt.valueRef() += TimeSchemeSelector::aIm(step,step)*(oldDt - this->mDt)*timeIt.value();
+                        assert(lhsIt.col() == timeIt.col());
+                        assert(lhsIt.row() <= timeIt.row());
 
-                              // Update LHS iterators and counters
-                              ++lhsIt;
-                              if(!lhsIt)
-                              {
-                                 lhsJ++;
-                              }
-                           }
+                        // LHS matrix might have additional nonzero entries
+                        while(lhsIt.row() < timeIt.row() && lhsIt)
+                        {
+                           ++lhsIt;
                         }
 
-                        // Update nonzero counter
-                        nnz--;
+                        // Update LHS matrix
+                        if(timeIt.row() == lhsIt.row())
+                        {
+                           // Update values
+                           lhsIt.valueRef() += TimeSchemeSelector::aIm(step,step)*(oldDt - this->mDt)*timeIt.value();
+
+                           // Update nonzero counter
+                           nnz--;
+                        }
+
+                        // Update LHS iterators and counters
+                        ++lhsIt;
+
                      } else
                      {
                         break;
@@ -647,8 +649,11 @@ namespace Timestep {
                   }
                }
 
-               // Safety assert to make sure all values have been updated
-               assert(nnz == 0);
+               // Abort if some nonzero entries where not updated
+               if(nnz != 0)
+               {
+                  throw std::logic_error("Update of timestepping matrices failed");
+               }
             }
          }
       }
