@@ -69,7 +69,7 @@ endif(mpiTest)
 #
 
 if(mpiTest)
-   set(QUICC_GROUPERS_SERIAL "Equation" "Auto")
+   set(QUICC_GROUPERS_SERIAL "Equation")
    set(QUICC_GROUPERS_SINGLE1D "Equation" "Auto" "Single1D")
    set(QUICC_GROUPERS_SINGLE2D "Equation" "Auto" "Single2D")
    set(QUICC_GROUPERS_TUBULAR "Equation" "Auto" "Single1D" "Single2D" "Transform")

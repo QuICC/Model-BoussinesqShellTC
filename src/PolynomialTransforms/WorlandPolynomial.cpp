@@ -1102,7 +1102,7 @@ namespace Polynomial {
       cs(2) = (a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b));
       cs(3) = precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(n*(n + a)*(n + b)));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1115,7 +1115,7 @@ namespace Polynomial {
       cs(1) = (a - b);
       cs(2) = precision::sqrt((a + b + MHD_MP(3.0))/(MHD_MP(4.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1126,7 +1126,7 @@ namespace Polynomial {
 
       cs(0) = precision::sqrt(MHD_MP(2.0))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b + MHD_MP(2.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1143,7 +1143,7 @@ namespace Polynomial {
       cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b - MHD_MP(1.0)));
       cs(3) = precision::sqrt((n + MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/((n + a)*(n + b)));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1157,7 +1157,7 @@ namespace Polynomial {
 
       cs(2) = precision::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/(MHD_MP(2.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b)));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1168,7 +1168,7 @@ namespace Polynomial {
 
       cs(0) = MHD_MP(2.0)*precision::sqrt(MHD_MP(2.0)*(a+b))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b + MHD_MP(2.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1185,7 +1185,7 @@ namespace Polynomial {
       cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*precision::sqrt(MHD_MP(2.0)*n + a + b - MHD_MP(1.0));
       cs(3) = precision::sqrt((n + MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(n*n*(n + a)*(n + b)*(n + a + b - MHD_MP(2.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1198,7 +1198,7 @@ namespace Polynomial {
       cs(1) = (a - b);
       cs(2) = (precision::sqrt(MHD_MP(3.0))/MHD_MP(2.0))*precision::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b - MHD_MP(1.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1209,7 +1209,7 @@ namespace Polynomial {
 
       cs(0) = MHD_MP(8.0)*precision::sqrt((a + b)*(a + b - MHD_MP(1.0)))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b + MHD_MP(2.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1226,7 +1226,7 @@ namespace Polynomial {
       cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))));
       cs(3) = precision::sqrt((n + MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n*n*(n + a)*(n + b)*(n + a + b - MHD_MP(3.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1239,7 +1239,7 @@ namespace Polynomial {
       cs(1) = (a - b);
       cs(2) = precision::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b - MHD_MP(2.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1250,7 +1250,7 @@ namespace Polynomial {
 
       cs(0) = MHD_MP(16.0)*precision::sqrt(MHD_MP(3.0)*(a + b)*(a + b - MHD_MP(1.0))*(a + b - MHD_MP(2.0)))*precision::exp(MHD_MP(0.5)*(precisiontr1::lgamma(a + b + MHD_MP(2.0)) - precisiontr1::lgamma(a + MHD_MP(1.0)) - precisiontr1::lgamma(b + MHD_MP(1.0))));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1267,7 +1267,7 @@ namespace Polynomial {
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0);
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1280,7 +1280,7 @@ namespace Polynomial {
       cs(1) = (a - b);
       cs(2) = MHD_MP(0.5);
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1291,7 +1291,7 @@ namespace Polynomial {
 
       cs(0) = MHD_MP(1.0);
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1308,7 +1308,7 @@ namespace Polynomial {
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(1.0));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
       
       return cs;
    }
@@ -1321,7 +1321,7 @@ namespace Polynomial {
       cs(1) = (a - b);
       cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1332,7 +1332,7 @@ namespace Polynomial {
 
       cs(0) = MHD_MP(2.0)*(a + b);
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1349,7 +1349,7 @@ namespace Polynomial {
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(2.0));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
       
       return cs;
    }
@@ -1362,7 +1362,7 @@ namespace Polynomial {
       cs(1) = (a - b);
       cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(1.0)));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1373,7 +1373,7 @@ namespace Polynomial {
 
       cs(0) = MHD_MP(4.0)*(a + b)*(a + b - MHD_MP(1.0));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1390,7 +1390,7 @@ namespace Polynomial {
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(3.0));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
       
       return cs;
    }
@@ -1403,7 +1403,7 @@ namespace Polynomial {
       cs(1) = (a - b);
       cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(2.0)));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }
@@ -1414,7 +1414,7 @@ namespace Polynomial {
 
       cs(0) = MHD_MP(8.0)*(a + b)*(a + b - MHD_MP(1.0))*(a + b - MHD_MP(2.0));
 
-      assert(!std::isnan(cs.sum()));
+      assert(!precision::isnan(cs.sum()));
 
       return cs;
    }

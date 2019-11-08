@@ -79,7 +79,7 @@ quicc_link_external(QUICC_SPSPDLINALG)
 quicc_link_external(QUICC_LARGEIO)
 
 # Multiple precision libraries and includes
-quicc_link_external(QUICC_MPLIB)
+quicc_link_external(QUICC_MPBACKEND)
 
 # Multiple precision libraries and includes
 quicc_link_external(QUICC_PYTHON)

@@ -24,7 +24,7 @@
    #include "Base/MpTypedefs.hpp"
    
    /// Define a small macro to replace float constants to strings in the case of MP computations
-   #define MHD_MP(c) #c
+   #define MHD_MP(c) MHDMpFloat(#c)
 #else
    #include <tr1/cmath>
    /// For normal computations the macro does nothing
@@ -131,9 +131,6 @@ namespace QuICC {
 
    inline void Precision::init()
    {
-      #ifdef QUICC_MULTPRECISION
-         mpfr::mpreal::set_default_prec(256);
-      #endif // QUICC_MULTPRECISION
    }
 
    inline SharedArray Precision::cast(internal::SharedArray spIArr)
@@ -144,7 +141,7 @@ namespace QuICC {
          // Loop over whole array
          for(int i=0; i < spIArr->size(); i++)
          {
-            (*spArr)(i) = (*spIArr)(i).toDouble();
+            (*spArr)(i) = (*spIArr)(i).convert_to<double>();
          }
 
          return spArr;
@@ -163,7 +160,7 @@ namespace QuICC {
          {
             for(int i=0; i < spIMat->rows(); i++)
             {
-               (*spMat)(i,j) = (*spIMat)(i,j).toDouble();
+               (*spMat)(i,j) = (*spIMat)(i,j).convert_to<double>();
             }
          }
 
@@ -181,7 +178,7 @@ namespace QuICC {
          // Loop over whole array
          for(int i=0; i < rIArr.size(); i++)
          {
-            arr(i) = rIArr(i).toDouble();
+            arr(i) = rIArr(i).convert_to<double>();
          }
 
          return arr;
@@ -200,7 +197,7 @@ namespace QuICC {
          {
             for(int i=0; i < rIMat.rows(); i++)
             {
-               mat(i,j) = rIMat(i,j).toDouble();
+               mat(i,j) = rIMat(i,j).convert_to<double>();
             }
          }
 
@@ -212,8 +209,8 @@ namespace QuICC {
 
 #ifdef QUICC_MULTPRECISION
    /// Create a namespace alias for the internal precision stuff pointing to mpfr namespace
-   namespace  precision = mpfr;
-   namespace  precisiontr1 = mpfr;
+   namespace  precision = boost::multiprecision;
+   namespace  precisiontr1 = boost::multiprecision;
 #else
    /// Create a namespace alias for the internal precision stuff pointing to std namespace
    namespace  precision = std;

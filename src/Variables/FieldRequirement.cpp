@@ -277,7 +277,7 @@ namespace QuICC {
       this->mNeedGradient2 = this->mNeedGradient2 || req.needPhysicalGradient2(); 
 
       // Do OR operation of physical components requirement
-      this->mPhysicalComps = this->mPhysicalComps + req.physicalComps();
+      this->mPhysicalComps = this->mPhysicalComps || req.physicalComps();
 
       // Do OR operation of physical gradient components requirement
       if(req.needPhysicalGradient())
@@ -285,14 +285,14 @@ namespace QuICC {
          std::vector<FieldComponents::Spectral::Id>::const_iterator it;
          for(it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
          {
-            this->mGradientComps.find(*it)->second = this->mGradientComps.find(*it)->second + req.gradientComps(*it);
+            this->mGradientComps.find(*it)->second = this->mGradientComps.find(*it)->second || req.gradientComps(*it);
          }
       }
 
       // Do OR operation of physical curl components requirement
       if(req.needPhysicalCurl())
       {
-         this->mCurlComps = this->mCurlComps + req.curlComps();
+         this->mCurlComps = this->mCurlComps || req.curlComps();
       }
 
       // Do OR operation of physical 2nd order gradient components requirement
@@ -301,7 +301,7 @@ namespace QuICC {
          std::vector<FieldComponents::Spectral::Id>::const_iterator it;
          for(it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
          {
-            this->mGradient2Comps.find(*it)->second = this->mGradient2Comps.find(*it)->second + req.gradient2Comps(*it);
+            this->mGradient2Comps.find(*it)->second = this->mGradient2Comps.find(*it)->second || req.gradient2Comps(*it);
          }
       }
    }

@@ -79,8 +79,13 @@ set(QUICC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
 #-------------- MULTIPLE PRECISION ---------------#
 ###################################################
 
-set(QUICC_MPLIBS "mpfr" PARENT_SCOPE)
+set(QUICC_MPBACKENDS "boost" "gmp" "mpfr" "quad" PARENT_SCOPE)
+set(QUICC_INCLUDES_BOOST "/usr/include" PARENT_SCOPE)
+set(QUICC_INCLUDES_GMP "/usr/include" PARENT_SCOPE)
+set(QUICC_LIBRARIES_GMP "gmp" PARENT_SCOPE)
+set(QUICC_INCLUDES_MPFR "/usr/include" PARENT_SCOPE)
 set(QUICC_LIBRARIES_MPFR "mpfr" PARENT_SCOPE)
+set(QUICC_LIBRARIES_QUAD "quadmath" PARENT_SCOPE)
 
 ###################################################
 #--------------- COMPILER SETTINGS ---------------#

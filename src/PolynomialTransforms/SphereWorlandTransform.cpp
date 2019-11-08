@@ -95,14 +95,14 @@ namespace Transform {
       WorlandChebyshevRule::computeQuadrature(this->mGrid, this->mWeights, igrid, iweights, this->mspSetup->fwdSize());
 
       // Create grids for energy calculations
-      Array legGrid(std::ceil(4.0*this->mspSetup->fwdSize()/3.) + 1);
+      Array legGrid(std::lround(std::ceil(4.0*this->mspSetup->fwdSize()/3.) + 1));
       Array legWeights(legGrid.size());
       internal::Array ilegGrid, ilegWeights;
       LegendreRule::computeQuadrature(legGrid, legWeights, ilegGrid, ilegWeights, legGrid.size());
       legGrid.array() = ((legGrid.array() + 1.0)/2.0);
       ilegGrid.array() = ((ilegGrid.array() + 1.0)/2.0);
 
-      Array nrgGrid(std::ceil(4.0*this->mspSetup->fwdSize()/3.) + 1);
+      Array nrgGrid(std::lround(std::ceil(4.0*this->mspSetup->fwdSize()/3.) + 1));
       Array nrgWeights(nrgGrid.size());
       internal::Array inrgGrid, inrgWeights;
       WorlandChebyshevRule::computeQuadrature(nrgGrid, nrgWeights, inrgGrid, inrgWeights, std::ceil(4.0*this->mspSetup->fwdSize()/3.) + 1);
