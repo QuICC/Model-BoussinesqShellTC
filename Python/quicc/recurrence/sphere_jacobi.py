@@ -9,8 +9,10 @@ import quicc.recurrence.symbolic_jacobi as mod
 
 l = sympy.Symbol('l')
 n = sympy.Symbol('n')
-w_alpha = -sympy.Rational(1,2)
-#w_alpha = 0
+w_alpha_legendre = 0
+w_alpha_chebyshev = -sympy.Rational(1,2)
+
+w_alpha = w_alpha_chebyshev
 w_beta = l - sympy.Rational(1,2)
 
 symbolic = mod.SymbolicJacobi(a = w_alpha, b = w_beta)
