@@ -90,7 +90,7 @@ class GEVPSolver:
 
         PC = KSP.getPC()
         PC.setType('lu')
-        PC.setFactorSolverPackage('mumps')
+        PC.setFactorSolverType('mumps')
 
         PC.setFromOptions()
         KSP.setFromOptions()

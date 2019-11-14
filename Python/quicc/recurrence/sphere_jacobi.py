@@ -9,14 +9,19 @@ import quicc.recurrence.symbolic_jacobi as mod
 
 l = sympy.Symbol('l')
 n = sympy.Symbol('n')
+w_alpha = -sympy.Rational(1,2)
+#w_alpha = 0
+w_beta = l - sympy.Rational(1,2)
 
-symbolic = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l - sympy.Rational(1,2))
+symbolic = mod.SymbolicJacobi(a = w_alpha, b = w_beta)
 
 def chooseParameters(alpha, beta):
     """Choose the Jacobi polynomial to use"""
 
-    global symbolic
-    symbolic = mod.SymbolicJacobi(a = alpha, b = beta)
+    global symbolic, w_alpha, w_beta
+    w_alpha = alpha
+    w_beta = beta
+    symbolic = mod.SymbolicJacobi(a = w_alpha, b = w_beta)
 
 def x1():
     """Sphere x operator"""
@@ -165,6 +170,33 @@ def i4lapl2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i1qm():
+    """Sphere i1qm (i1r1 coriolis Q(l-1)) operator"""
+
+    # Compute starting terms
+    r = symbolic.spectral_increase({0:-4}, True)
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i1qp():
+    """Sphere i2qp (i1r1 coriolis Q(l+1)) operator"""
+
+    partA = symbolic.spectral_integral_decrease({0:(2*l+1)}, True)
+    partB = symbolic.spectral_decrease({0:2}, True)
+
+    r = partA
+    for k,v in partB.items():
+        r[k] = r[k] + v
+        r[k] = r[k].simplify().factor()
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i2qm():
     """Sphere i2qm (i1r1i1r1 coriolis Q(l-1)) operator"""
 
@@ -185,7 +217,7 @@ def i2qm():
 def i2qp():
     """Sphere i2qp (i1r1i1r1 coriolis Q(l+1)) operator"""
 
-    above = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l + sympy.Rational(1,2))
+    above = mod.SymbolicJacobi(a = w_alpha, b = w_beta + 1)
 
     # Setup terms in recurrence
     terms = [
@@ -232,7 +264,7 @@ def i4qm():
 def i4qp():
     """Sphere i4qp (i1r1i1r1i1r1i1r1 coriolis Q(l+1)) operator"""
 
-    above = mod.SymbolicJacobi(a = -sympy.Rational(1,2), b = l + sympy.Rational(1,2))
+    above = mod.SymbolicJacobi(a = w_alpha, b = w_beta + 1)
 
     # Setup terms in recurrence
     terms = [
