@@ -207,7 +207,7 @@ def worland_rdiffdivr(nr, l):
     return val
 
 def worland_divrdiffr(nr, l):
-    """Compute the insulating magnetic condition at endpoint for Worland polynomials"""
+    """Compute the 1/r D r condition at endpoint for Worland polynomials"""
 
     val = np.zeros(nr)
     if nr > 0:
@@ -283,18 +283,18 @@ def i1_diags(nr, l):
 
     # Generate 1st subdiagonal
     def d_1(n):
-        val = wb.worland_norm_row(n,l,-1)*2.0*(l + n - 1.0)/((l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
+        val = worland_norm_row(n,l,-1)*2.0*(l + n - 1.0)/((l + 2.0*n - 2.0)*(l + 2.0*n - 1.0))
         if l == 0:
-            val[0] = wb.worland_norm_row(n[0:1],l,-1)*2.0/(l + 1.0)
+            val[0] = worland_norm_row(n[0:1],l,-1)*2.0/(l + 1.0)
         return val
 
     # Generate main diagonal
     def d0(n):
-        return -wb.worland_norm_row(n,l,0)*2.0*l/((l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
+        return -worland_norm_row(n,l,0)*2.0*l/((l + 2.0*n - 1.0)*(l + 2.0*n + 1.0))
 
     # Generate 1st superdiagonal
     def d1(n):
-        return -wb.worland_norm_row(n,l,1)*(2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)/(2.0*(l + n)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
+        return -worland_norm_row(n,l,1)*(2.0*n + 1.0)*(2.0*l + 2.0*n + 1.0)/(2.0*(l + n)*(l + 2.0*n + 1.0)*(l + 2.0*n + 2.0))
 
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)

@@ -32,7 +32,7 @@ def sh_coeff(coeff):
     else:
         def fct(x):
             return 1.0
-    
+
     return fct
 
 def fix_l_zero(nr, m, mat, bc, fix):
@@ -127,9 +127,14 @@ def zblk(nr, maxnl, m, bc, l_zero_fix = False, restriction = None):
 
     return make_sh_loperator(rad.zblk, nr, maxnl, m, bc, 0.0, with_sh_coeff = None, l_zero_fix = l_zero_fix, restriction = restriction)
 
+def i1(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i1 radial operator kronecker with an identity"""
+
+    return make_sh_loperator(rad.i1, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+
 def i2(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2 radial operator kronecker with an identity"""
-    
+
     return make_sh_loperator(rad.i2, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def i2lapl(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
@@ -151,6 +156,11 @@ def i4lapl2(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = Fa
     """Create a i4lapl2 radial operator kronecker with an identity"""
 
     return make_sh_loperator(rad.i4lapl2, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+
+def i1coriolis(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i1 radial operator kronecker with coriolis Q term"""
+
+    return make_sh_qoperator(rad.i1qm, rad.i1qp, nr, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def i2coriolis(nr, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2 radial operator kronecker with coriolis Q term"""
@@ -175,7 +185,7 @@ def qid(nr, maxnl, m, qr, bc, coeff = 1.0):
 
 def stencil(nr, maxnl, m, bc, make_square):
     """Create a galerkin stencil matrix"""
-    
+
     bcr = convert_bc(bc)
 
     bcr = sphbc.ldependent_bc(bcr, m)

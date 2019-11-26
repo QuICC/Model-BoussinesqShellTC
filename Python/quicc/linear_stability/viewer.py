@@ -234,7 +234,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         prof_fast = dict()
         print("slice_ratio: " + str(slice_ratio))
         for k,f in sol_slice.items():
-            prof_fast[k] = f[np.floor(f.shape[0]/slice_ratio),:]
+            prof_fast[k] = f[int(np.floor(f.shape[0]/slice_ratio)),:]
 
         pfid = "fast"
         if fid is not None:
@@ -257,7 +257,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid_slow = transf.grid_slow(*res_2d)
         prof_slow = dict()
         for k,f in sol_slice.items():
-            prof_slow[k] = f[:,np.floor(f.shape[1]/slice_ratio)]
+            prof_slow[k] = f[:,int(np.floor(f.shape[1]/slice_ratio))]
 
         pfid = "slow"
         if fid is not None:
@@ -293,7 +293,7 @@ def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         grid = transf.grid_2d(*slice_res)
         print("slice_ratio: " + str(slice_ratio))
         for k,f in sol_volume.items():
-            sol_slice[k] = f[:,:,np.floor(f.shape[2]/slice_ratio)].T
+            sol_slice[k] = f[:,:,int(np.floor(f.shape[2]/slice_ratio))].T
         sfid = "slow"
         if fid is not None:
             sfid = sfid + "_" + fid
@@ -304,7 +304,7 @@ def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         slice_res = res_1d + res_3d
         grid = transf.grid_2d(*slice_res)
         for k,f in sol_volume.items():
-            sol_slice[k] = f[:,np.floor(f.shape[1]/slice_ratio),:].T 
+            sol_slice[k] = f[:,int(np.floor(f.shape[1]/slice_ratio)),:].T 
         sfid = "medium"
         if fid is not None:
             sfid = sfid + "_" + fid
@@ -315,7 +315,7 @@ def viewPhysical3D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         slice_res = res_2d + res_3d
         grid = transf.grid_2d(*slice_res)
         for k,f in sol_volume.items():
-            sol_slice[k] = f[np.floor(f.shape[0]/slice_ratio),:,:].T
+            sol_slice[k] = f[int(np.floor(f.shape[0]/slice_ratio)),:,:].T
         sfid = "fast"
         if fid is not None:
             sfid = sfid + "_" + fid

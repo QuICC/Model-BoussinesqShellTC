@@ -52,14 +52,14 @@ class SymbolicJacobi(base.SymbolicBase):
 
             def cA(i):
                 """A coefficient: x J_n =  A_n J_{n-1} - B_n J_{n} + C_n J_{n+1}"""
-                
+
                 num = 2*(n + i + a)*(n + i + b)
                 den = (2*n + 2*i + a + b + 1)*(2*n + 2*i + a + b)
                 return num/den
 
             def cB(i):
                 """B coefficient: x J_n =  A_n J_{n-1} - B_n J_{n} + C_n J_{n+1}"""
-               
+
                 num = (a**2 - b**2)
                 den = (2*n + 2*i + a + b + 2)*(2*n + 2*i + a + b)
                 return num/den
@@ -100,14 +100,14 @@ class SymbolicJacobi(base.SymbolicBase):
 
         def cA(i):
             """A coefficient: J_n^{b-1} =  A_n J_{n-1}^b + B_n J_{n}^b"""
-            
+
             num = (n + i + a)
             den = (2*n + 2*i + a + b)
             return num/den
 
         def cB(i):
-            """B coefficient: J_n^{b+1} =  A_n J_{n-1}^b + B_n J_{n}^b"""
-           
+            """B coefficient: J_n^{b-1} =  A_n J_{n-1}^b + B_n J_{n}^b"""
+
             num = (n + i + a + b)
             den = (2*n + 2*i + a + b)
             return num/den
@@ -141,14 +141,14 @@ class SymbolicJacobi(base.SymbolicBase):
 
         def cA(i):
             """A coefficient: (x+1) J_n^{b+1} =  A_n J_{n}^b + B_n J_{n+1}^b"""
-            
+
             num = 2*(n + i + b + 1)
             den = (2*n + 2*i + a + b + 2)
             return num/den
 
         def cB(i):
             """B coefficient: (x+1) J_n^{b+1} =  A_n J_{n}^b + B_n J_{n+1}^b"""
-           
+
             num = 2*(n + i + 1)
             den = (2*n + 2*i + a + b + 2)
             return num/den
@@ -189,14 +189,14 @@ class SymbolicJacobi(base.SymbolicBase):
 
             def cA(i):
                 """A coefficient: \int J_n =  A_n J_{n-1} + B_n J_{n} + C_n J_{n+1}"""
-                
+
                 num = -2*(n + i + a)*(n + i + b)
                 den = (n + i + a + b)*(2*n + 2*i + a + b)*(2*n + 2*i + a + b + 1)
                 return num/den
 
             def cB(i):
                 """B coefficient: \int J_n =  A_n J_{n-1} + B_n J_{n} + C_n J_{n+1}"""
-               
+
                 num = 2*(a - b)
                 den = (2*n + 2*i + a + b + 2)*(2*n + 2*i + a + b)
                 return num/den
@@ -225,4 +225,45 @@ class SymbolicJacobi(base.SymbolicBase):
                     recurrence[i] = recurrence[i].simplify().factor()
                 else:
                     recurrence[i] = recurrence[i].factor()
+        return recurrence
+
+    def spectral_integral_decrease(self, f, asrow):
+        """Recurrence relation for the indefinite integral of a Jacobi expansion with decrease of beta parameter"""
+
+        prev = dict(f)
+        recurrence = dict()
+        a = self.a
+        b = self.b
+
+        def cA(i):
+            """A coefficient: \int J_n^{b+1} =  A_n J_{n}^{b} + B_n J_{n+1}^{b}"""
+
+            num = -2*(n + i + b + 1)
+            den = (n + i + a + b + 1)*(2*n + 2*i + a + b + 2)
+            return num/den
+
+        def cB(i):
+            """B coefficient: \int J_n^{b+1} =  A_n J_{n}^{b} + B_n J_{n+1}^{b}"""
+
+            num = 2
+            den = (2*n + 2*i + a + b + 2)
+            return num/den
+
+        for i in prev.keys():
+            recurrence[i] = recurrence.get(i,0) + cA(i)*prev[i]
+            recurrence[i+1] = recurrence.get(i+1,0) + cB(i)*prev[i]
+
+        # Convert to row recurrence relation
+        if asrow:
+            old = dict(recurrence)
+            recurrence = dict()
+            for i in old.keys():
+                recurrence[-i] = old[i].subs(n, n-i)
+
+        for i in recurrence.keys():
+            if self.useSimplify:
+                recurrence[i] = recurrence[i].simplify().factor()
+            else:
+                recurrence[i] = recurrence[i].factor()
+
         return recurrence

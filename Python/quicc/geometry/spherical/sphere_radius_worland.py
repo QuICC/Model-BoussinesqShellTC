@@ -63,9 +63,54 @@ def r2(nr, l, bc, coeff = 1.0, zr = 0):
 def i1(nr, l, bc, coeff = 1.0):
     """Create operator for 1st integral r^l P_n^{-1/2,l-1/2}(2r^2-1)."""
 
-    diags,offsets = wb.i1_diags(nr, l)
+    diags,offsets = wb.i1_diags(nr+1, l)
 
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
+    return radbc.constrain(mat, l, bc)
+
+def i1qm(nr, l, bc, coeff = 1.0):
+    """Create operator for 1st integral of Q r^{l-1} P_n^{-1/2,l-3/2}(2r^2 -1)."""
+
+    ns = np.arange(0, nr+1)
+    offsets = np.arange(0,2)
+    nzrow = 0
+
+    # Generate main diagonal
+    def d0(n):
+        return -wb.worland_norm_row(n,l,0,-1)*4.0*(l + n - 1.0)/(l + 2.0*n - 1.0)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -wb.worland_norm_row(n,l,1,-1)*2.0*(2.0*n + 1.0)/(l + 2.0*n + 1.0)
+
+    ds = [d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
+    return radbc.constrain(mat, l, bc)
+
+def i1qp(nr, l, bc, coeff = 1.0):
+    """Create operator for 1st integral of Q r^{l+1} P_n^{-1/2,l+1/2}(2r^2 -1)."""
+
+    ns = np.arange(0, nr+1)
+    offsets = np.arange(-1,1)
+    nzrow = 0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return wb.worland_norm_row(n,l,-1,1)*2.0*(2.0*l + 2.0*n + 1.0)/(l + 2.0*n - 1.0)
+
+    # Generate main diagonal
+    def d0(n):
+        return wb.worland_norm_row(n,l,0,1)*(2.0*n - 1.0)*(2.0*l + 2.0*n + 1.0)/((l + n)*(l + 2.0*n + 1.0))
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, has_wrap = False)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = radbc.restrict_eye(mat.shape[0], 'rt', 1)*mat*radbc.restrict_eye(mat.shape[1], 'cr', 1)
     return radbc.constrain(mat, l, bc)
 
 def i2(nr, l, bc, coeff = 1.0):
