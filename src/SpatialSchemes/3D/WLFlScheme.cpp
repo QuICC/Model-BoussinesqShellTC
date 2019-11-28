@@ -76,7 +76,9 @@ namespace Schemes {
          mult(i) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
+      int padSize = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D) - specSize;
+
+      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult, padSize));
    }
 
    Transform::SharedPolySetup WLFlScheme::spSetup2D(SharedResolution spRes) const
@@ -112,7 +114,9 @@ namespace Schemes {
          mult(i) = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
+      int padSize = this->dim(Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D) - specSize;
+
+      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult, padSize));
    }
 
    Transform::SharedFftSetup WLFlScheme::spSetup3D(SharedResolution spRes) const
@@ -158,7 +162,7 @@ namespace Schemes {
       //
 
       // Get dealiased Worland transform size
-      int nR = Transform::PolynomialTools::dealias(this->mI+this->mL/2+4);
+      int nR = Transform::PolynomialTools::dealias(this->mI+this->mL/2+8);
 
       // Get dealiased associated Legendre transform size
       int nTh = Transform::PolynomialTools::dealias(this->mL+1);
@@ -176,7 +180,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->setDimension(this->mI+1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      this->setDimension(this->mI+8, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
       this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);

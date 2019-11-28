@@ -23,8 +23,8 @@ namespace QuICC {
 
 namespace Transform {
 
-   PolySetup::PolySetup(const int size, const int howmany, const int specSize, const std::vector<ArrayI>& fast, const ArrayI& slow, const ArrayI& mult)
-      : TransformSetup(size, howmany, specSize), mFast(fast), mSlow(slow), mMult(mult)
+   PolySetup::PolySetup(const int size, const int howmany, const int specSize, const std::vector<ArrayI>& fast, const ArrayI& slow, const ArrayI& mult, const int padSize)
+      : TransformSetup(size, howmany, specSize), mFast(fast), mSlow(slow), mMult(mult), mPadSize(padSize)
    {
    }
 
@@ -45,6 +45,11 @@ namespace Transform {
    const ArrayI& PolySetup::mult() const
    {
       return this->mMult;
+   }
+
+   int PolySetup::padSize() const
+   {
+      return this->mPadSize;
    }
 
 }

@@ -94,7 +94,9 @@ namespace Schemes {
          mult(i) = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
+      int padSize = this->dim(Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D) - specSize;
+
+      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult, padSize));
    }
 
    Transform::SharedFftSetup SLFlScheme::spSetup3D(SharedResolution spRes) const
