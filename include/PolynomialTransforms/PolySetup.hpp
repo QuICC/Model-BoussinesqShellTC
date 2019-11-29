@@ -41,8 +41,9 @@ namespace Transform {
           * @param fast       List of fast varying indexes
           * @param slow       List of slow varying indexes
           * @param mult       List of second dimension multipliers
+          * @param padSize    Padding size
           */
-         PolySetup(const int size, const int howmany, const int specSize, const std::vector<ArrayI>& fast, const ArrayI& slow, const ArrayI& mult);
+         PolySetup(const int size, const int howmany, const int specSize, const std::vector<ArrayI>& fast, const ArrayI& slow, const ArrayI& mult, const int padSize);
 
          /**
           * @brief Empty destructor
@@ -63,6 +64,11 @@ namespace Transform {
           * @brief Get the multipliers
           */
          const ArrayI&  mult() const;
+
+         /**
+          * @brief Get padding size
+          */
+         int padSize() const;
          
       protected:
 
@@ -81,6 +87,11 @@ namespace Transform {
           * @brief Storage for the multipliers
           */
          ArrayI mMult;
+
+         /**
+          * @brief Padding size
+          */
+         int mPadSize;
    };
 
    /// Typedef for an smart reference counting pointer for a PolySetup

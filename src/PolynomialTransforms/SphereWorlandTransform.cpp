@@ -406,7 +406,6 @@ namespace Transform {
       {
          throw Exception("Requested an unknown integrator");
       }
-
    }
 
    void SphereWorlandTransform::integrate_energy(Array& spectrum, const MatrixZ& specVal, SphereWorlandTransform::ProjectorType::Id projector, SphereWorlandTransform::IntegratorType::Id integrator)
@@ -468,8 +467,8 @@ namespace Transform {
       for(size_t i = 0; i < ops.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
-         int specRows = ops.at(i).rows();
-         rPhysVal.block(0, start, physRows, cols) = ops.at(i).transpose()*specVal.block(0,start, specRows, cols);
+         int specRows = ops.at(i).rows() - this->mspSetup->padSize();
+         rPhysVal.block(0, start, physRows, cols) = ops.at(i).topRows(specRows).transpose()*specVal.block(0,start, specRows, cols);
          start += cols;
       }
    }
@@ -481,8 +480,8 @@ namespace Transform {
       for(size_t i = 0; i < projOps.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
-         int specRows = projOps.at(i).rows();
-         MatrixZ tmp = projOps.at(i).transpose()*specVal.block(0,start, specRows, cols);
+         int specRows = projOps.at(i).rows() - this->mspSetup->padSize();
+         MatrixZ tmp = projOps.at(i).topRows(specRows).transpose()*specVal.block(0,start, specRows, cols);
          tmp.array() = tmp.array()*tmp.conjugate().array();
          spectrum.segment(start, cols).transpose() = intgOps.at(i).transpose()*tmp.real();
          start += cols;
