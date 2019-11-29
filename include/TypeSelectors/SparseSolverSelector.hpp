@@ -57,10 +57,10 @@
           */
          template <typename TMatrix> struct SparseSelector
          {
-            //typedef Eigen::SparseLU<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > Type;
-            //typedef Eigen::SparseLU<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseLU<TMatrix, Eigen::NaturalOrdering<int> > Type;
+            //typedef Eigen::SparseLU<TMatrix, Eigen::AMDOrdering<int> > Type;
             typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<int> > Type;
-            //typedef Eigen::SparseLU<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseLU<TMatrix, Eigen::MetisOrdering<int> > Type;
          };
       }
    }
@@ -98,10 +98,10 @@
           */
          template<typename TMatrix> struct SparseSelector
          {
-            //typedef Eigen::SparseQR<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > Type;
-            //typedef Eigen::SparseQR<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseQR<TMatrix, Eigen::NaturalOrdering<int> > Type;
+            //typedef Eigen::SparseQR<TMatrix, Eigen::AMDOrdering<int> > Type;
             typedef Eigen::SparseQR<TMatrix, Eigen::COLAMDOrdering<int> > Type;
-            //typedef Eigen::SparseQR<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseQR<TMatrix, Eigen::MetisOrdering<int> > Type;
          };
       }
    }
@@ -267,7 +267,7 @@
           */
          template <typename TMatrix> struct SparseSpdSelector
          {
-            typedef Eigen::SimplicialLLT<TMatrix, Eigen::Lower, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SimplicialLLT<TMatrix, Eigen::Lower, Eigen::AMDOrdering<int> > Type;
          };
       }
    }
@@ -286,7 +286,7 @@
           */
          template <typename TMatrix> struct SparseSpdSelector
          {
-            typedef Eigen::SimplicialLDLT<TMatrix, Eigen::Lower, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SimplicialLDLT<TMatrix, Eigen::Lower, Eigen::AMDOrdering<int> > Type;
          };
       }
    }
