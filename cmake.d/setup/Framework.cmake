@@ -23,6 +23,9 @@ message(STATUS "***********************************************")
 #
 set(QUICC_MEMORYUSAGES "High" "Limited")
 
+if(QUICC_MEMORYUSAGE STREQUAL "")
+  set(QUICC_MEMORYUSAGE "High")
+endif(QUICC_MEMORYUSAGE STREQUAL "")
 quicc_provide_choice(QUICC_MEMORYUSAGES "Memory usage" QUICC_MEMORYUSAGE memoryTest)
 
 if(memoryTest)
@@ -70,12 +73,15 @@ endif(mpiTest)
 
 if(mpiTest)
    set(QUICC_GROUPERS_SERIAL "Equation")
-   set(QUICC_GROUPERS_SINGLE1D "Equation" "Auto" "Single1D")
-   set(QUICC_GROUPERS_SINGLE2D "Equation" "Auto" "Single2D")
-   set(QUICC_GROUPERS_TUBULAR "Equation" "Auto" "Single1D" "Single2D" "Transform")
+   set(QUICC_GROUPERS_SINGLE1D "Single1D" "Equation" "Auto")
+   set(QUICC_GROUPERS_SINGLE2D "Single2D" "Equation" "Auto")
+   set(QUICC_GROUPERS_TUBULAR "Transform" "Equation" "Auto" "Single1D" "Single2D")
    set(QUICC_GROUPERS_COUPLED2D "Equation" "Auto" "Single1D")
    string(TOUPPER "QUICC_GROUPERS_${QUICC_MPIALGO}" upGrouper)
 
+   if(QUICC_TRANSGROUPER STREQUAL "")
+      list(GET ${upGrouper} 0 QUICC_TRANSGROUPER)
+   endif(QUICC_TRANSGROUPER STREQUAL "")
    quicc_provide_choice(${upGrouper} "Transform grouping" QUICC_TRANSGROUPER groupTest)
 
    if(groupTest)
@@ -146,6 +152,9 @@ endif(QUICC_MPI)
 #
 set(QUICC_BOUNDARYMETHODS "Galerkin" "Tau")
 
+if(QUICC_BOUNDARYMETHOD STREQUAL "")
+  set(QUICC_BOUNDARYMETHOD "Tau")
+endif(QUICC_BOUNDARYMETHOD STREQUAL "")
 quicc_provide_choice(QUICC_BOUNDARYMETHODS "Boundary method" QUICC_BOUNDARYMETHOD boundaryTest)
 
 if(boundaryTest)
@@ -163,6 +172,9 @@ endif(boundaryTest)
 #
 set(QUICC_TIMESTEPPERS "ImExRKCB2" "ImExRKCB3a" "ImExRKCB3b" "ImExRKCB3c" "ImExRKCB3d" "ImExRKCB3e" "ImExRKCB3f" "ImExRKCB4" "ImExRK3" "ImExSBDF2")
 
+if(QUICC_TIMESTEPPER STREQUAL "")
+   set(QUICC_TIMESTEPPER "ImExRKCB2")
+endif(QUICC_TIMESTEPPER STREQUAL "")
 quicc_provide_choice(QUICC_TIMESTEPPERS "Time integrator" QUICC_TIMESTEPPER timeTest)
 
 if(timeTest)
