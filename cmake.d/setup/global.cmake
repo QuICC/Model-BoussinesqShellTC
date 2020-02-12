@@ -9,6 +9,9 @@ quicc_provide_choice(QUICC_COMPILERS "Compiler" QUICC_COMPILER compilerTest)
 #----------------- SMART POINTER -----------------#
 ###################################################
 
+if(QUICC_SMARTPTR STREQUAL "")
+   list(GET QUICC_SMARTPTRS 0 QUICC_SMARTPTR)
+endif(QUICC_SMARTPTR STREQUAL "")
 quicc_provide_choice(QUICC_SMARTPTRS "Shared pointer" QUICC_SMARTPTR sharedptrTest)
 
 if(sharedptrTest)
@@ -41,7 +44,10 @@ endif(fftTest)
 ###################################################
 #------------- FFT PLAN COMPUTATION --------------#
 ###################################################
-
+# Default FFT plan is medium
+if(QUICC_FFTPLAN STREQUAL "")
+  list(GET QUICC_FFTPLANS 0 QUICC_FFTPLAN)
+endif(QUICC_FFTPLAN STREQUAL "")
 quicc_provide_choice(QUICC_FFTPLANS "FFT plan" QUICC_FFTPLAN fftplanTest)
 
 if(fftplanTest)
@@ -64,6 +70,9 @@ endif(linalgTest)
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################
 
+if(QUICC_SPLINALG STREQUAL "")
+  list(GET QUICC_SPLINALGS 0 QUICC_SPLINALG)
+endif(QUICC_SPLINALG STREQUAL "")
 quicc_provide_choice(QUICC_SPLINALGS "Sparse linear algebra" QUICC_SPLINALG splinalgTest)
 
 if(splinalgTest)
@@ -227,7 +236,7 @@ endif(QUICC_MULTPRECISION)
 ###################################################
 
 # Disable by default as it doesn't work for all cases
-option(QUICC_OPTIMIZE_TREE "Optimize transform tree?" OFF)
+option(QUICC_OPTIMIZE_TREE "Optimize transform tree?" ON)
 mark_as_advanced(FORCE QUICC_OPTIMIZE_TREE)
 if(QUICC_OPTIMIZE_TREE)
    add_definitions("-DQUICC_OPTIMIZE_TREE")

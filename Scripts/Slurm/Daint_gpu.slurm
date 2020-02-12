@@ -12,7 +12,7 @@
 
 module load daint-gpu
 module switch PrgEnv-cray PrgEnv-gnu
-module load fftw
+module load cray-fftw
 module load cray-hdf5-parallel
 module load cray-python
 module load cray-tpsl
