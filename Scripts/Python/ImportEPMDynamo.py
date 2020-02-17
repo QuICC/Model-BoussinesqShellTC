@@ -102,11 +102,17 @@ def rescale(d, n, l, m):
 
     return out
 
+def remove_background(d):
+    print("### Removing thermal background state ###")
+    d[0,0] -= 1.110720734539592
+    d[0,1] -= -0.7853981633974483
+    return d
+
 
 # Create temperature field
 group = quicc_file.create_group('temperature')
 epm_data = epm_file['Codensity']['Codensity'][:]
-group.create_dataset('temperature', data = rescale(epm_data, spec1D, spec2D, spec3D))
+group.create_dataset('temperature', data = remove_background(rescale(epm_data, spec1D, spec2D, spec3D)))
 
 # Create velocity field
 group = quicc_file.create_group('velocity')
