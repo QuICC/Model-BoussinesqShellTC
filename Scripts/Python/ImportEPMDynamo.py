@@ -27,7 +27,7 @@ epm_file = h5py.File(input_file, 'r')
 spec1D = epm_file['Truncation']['N'][()]
 spec2D = epm_file['Truncation']['L'][()]
 spec3D = epm_file['Truncation']['M'][()]
-trans1D = 3*(spec1D+1 + spec2D//2 + 1)//2
+trans1D = 3*(spec1D+1 + spec2D//2 + 8)//2
 trans2D = 3*(spec2D+1)//2
 trans3D =  3*(spec3D+1)
 phys1D = 3*(spec1D+1 + spec2D//2 + 1)//2
@@ -73,20 +73,20 @@ group.create_dataset('rayleigh', (), 'f8', data = physRa)
 # Create truncation group
 group = quicc_file.create_group('truncation')
 subgroup = group.create_group('physical')
-subgroup.create_dataset('dim1D', (), 'i8', data = phys1D)
-subgroup.create_dataset('dim2D', (), 'i8', data = phys2D)
-subgroup.create_dataset('dim3D', (), 'i8', data = phys3D)
+subgroup.create_dataset('dim1D', (), 'i4', data = phys1D)
+subgroup.create_dataset('dim2D', (), 'i4', data = phys2D)
+subgroup.create_dataset('dim3D', (), 'i4', data = phys3D)
 subgroup = group.create_group('transform')
-subgroup.create_dataset('dim1D', (), 'i8', data = trans1D)
-subgroup.create_dataset('dim2D', (), 'i8', data = trans2D)
-subgroup.create_dataset('dim3D', (), 'i8', data = trans3D)
+subgroup.create_dataset('dim1D', (), 'i4', data = trans1D)
+subgroup.create_dataset('dim2D', (), 'i4', data = trans2D)
+subgroup.create_dataset('dim3D', (), 'i4', data = trans3D)
 subgroup = group.create_group('spectral')
-subgroup.create_dataset('dim1D', (), 'i8', data = phys1D)
-subgroup.create_dataset('dim2D', (), 'i8', data = phys2D)
-subgroup.create_dataset('dim3D', (), 'i8', data = phys3D)
+subgroup.create_dataset('dim1D', (), 'i4', data = spec1D)
+subgroup.create_dataset('dim2D', (), 'i4', data = spec2D)
+subgroup.create_dataset('dim3D', (), 'i4', data = spec3D)
 
-def rescale(d, n, l, m):
-    out = np.zeros(d.shape[0:2],dtype=np.complex128)
+def rescale(d, l, m):
+    out = np.zeros(d.shape)
     lm = -1
     for k in range(0, l+1):
         norm0 = np.sqrt(4.0*np.pi/(2.0*k + 1.0))
@@ -97,36 +97,39 @@ def rescale(d, n, l, m):
                 norm = norm0
             else:
                 norm = normm
-            for i in range(0, n+1):
-                out[lm, i] = norm*d[lm,i,0] + norm*d[lm,i,1]*1j
-
+            out[lm,:,:] = norm*d[lm,:,:]
     return out
 
 def remove_background(d):
     print("### Removing thermal background state ###")
-    d[0,0] -= 1.110720734539592
-    d[0,1] -= -0.7853981633974483
+    d[0,0,0] -= 1.110720734539592
+    d[0,1,0] -= -0.7853981633974483
     return d
 
 
 # Create temperature field
 group = quicc_file.create_group('temperature')
 epm_data = epm_file['Codensity']['Codensity'][:]
-group.create_dataset('temperature', data = remove_background(rescale(epm_data, spec1D, spec2D, spec3D)))
+ds = group.create_dataset('temperature', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+ds[:] = remove_background(rescale(epm_data, spec2D, spec3D))
 
 # Create velocity field
 group = quicc_file.create_group('velocity')
 epm_data = epm_file['Velocity']['VelocityTor'][:]
-group.create_dataset('velocity_tor', data = rescale(epm_data, spec1D, spec2D, spec3D))
+ds = group.create_dataset('velocity_tor', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+ds[:] = rescale(epm_data, spec2D, spec3D)
 epm_data = epm_file['Velocity']['VelocityPol'][:]
-group.create_dataset('velocity_pol', data = rescale(epm_data, spec1D, spec2D, spec3D))
+ds = group.create_dataset('velocity_pol', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+ds[:] = rescale(epm_data, spec2D, spec3D)
 
 # Create magnetic field
 group = quicc_file.create_group('magnetic')
 epm_data = epm_file['Magnetic']['MagneticTor'][:]
-group.create_dataset('magnetic_tor', data = rescale(epm_data, spec1D, spec2D, spec3D))
+ds = group.create_dataset('magnetic_tor', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+ds[:] = rescale(epm_data, spec2D, spec3D)
 epm_data = epm_file['Magnetic']['MagneticPol'][:]
-group.create_dataset('magnetic_pol', data = rescale(epm_data, spec1D, spec2D, spec3D))
+ds = group.create_dataset('magnetic_pol', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+ds[:] = rescale(epm_data, spec2D, spec3D)
 
 # Finished
 epm_file.close()
