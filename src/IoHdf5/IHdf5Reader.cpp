@@ -95,6 +95,7 @@ namespace IoHdf5 {
       size = H5Tget_size(ftype);
       // Create string type
       type = H5Tcopy (H5T_C_S1);
+      H5Tset_strpad(type, H5Tget_strpad(ftype));
       // Set string length
       H5Tset_size(type, size);
       // Alloate memory
@@ -123,6 +124,7 @@ namespace IoHdf5 {
       size = H5Tget_size(ftype);
       // Create string type
       type = H5Tcopy (H5T_C_S1);
+      H5Tset_strpad(type, H5Tget_strpad(ftype));
       // Set string length
       H5Tset_size(type, size);
       // Alloate memory
@@ -151,6 +153,7 @@ namespace IoHdf5 {
       size = H5Tget_size(ftype);
       // Create string type
       type = H5Tcopy (H5T_C_S1);
+      H5Tset_strpad(type, H5Tget_strpad(ftype));
       // Set string length
       H5Tset_size(type, size);
       // Alloate memory
