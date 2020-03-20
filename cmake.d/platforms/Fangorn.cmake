@@ -12,7 +12,7 @@ set(QUICC_COMPILERS "GCC" PARENT_SCOPE)
 #----------- AVAILABLE SMART POINTERS ------------#
 ###################################################
 
-set(QUICC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
+set(QUICC_SMARTPTRS "TR1" "cxx0x" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE C++ VERSIONS --------------#
@@ -107,7 +107,7 @@ set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
-set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
+set(QUICC_CC_ARCH_GCC "-march=native -O2 -std=c++11" PARENT_SCOPE)
 
 set(QUICC_CC_CPP14_GCC "-std=c++14" PARENT_SCOPE)
 
@@ -123,10 +123,7 @@ set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python27" "python36" PARENT_SCOPE)
-
-set(QUICC_LIBRARIES_PYTHON27 "/usr/lib64/libpython2.7.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON27 "/usr/include/python2.7" PARENT_SCOPE)
+set(QUICC_PYTHONS "python36" PARENT_SCOPE)
 
 set(QUICC_LIBRARIES_PYTHON36 "/usr/lib64/libpython3.6m.so" PARENT_SCOPE)
 set(QUICC_INCLUDES_PYTHON36 "/usr/include/python3.6m" "/usr/lib64/python3.6/site-packages/numpy/core/include/" PARENT_SCOPE)
