@@ -516,12 +516,18 @@ def sphH5CSRGrid(e_dset, e_func, g_fast, g_mid, g_slow):
         e_dset[k,:,:] = e_func(g_slow[k])
 
 def sphH5CSThetaGrid(e_dset, e_func, g_fast, g_mid, g_slow):
+    tmp = np.zeros((e_dset.shape[1],e_dset.shape[2]))
     for j in range(0,g_mid.size):
-        e_dset[:,j,:] = e_func(g_mid[j])
+        tmp[j,:] = e_func(g_mid[j])
+    for k in range(0,e_dset.shape[0]):
+       e_dset[k,:,:] = tmp
 
 def sphH5CSPhiGrid(e_dset, e_func, g_fast, g_mid, g_slow):
+    tmp = np.zeros((e_dset.shape[1],e_dset.shape[2]))
     for i in range(0,g_fast.size):
-       e_dset[:,:,i] = e_func(g_fast[i])
+       tmp[:,i] = e_func(g_fast[i])
+    for k in range(0,e_dset.shape[0]):
+       e_dset[k,:,:] = tmp
 
 def genericGName(gFast, gMid, gSlow = None):
     if gSlow is not None:
