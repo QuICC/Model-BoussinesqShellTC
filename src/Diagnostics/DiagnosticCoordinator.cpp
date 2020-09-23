@@ -80,6 +80,15 @@ namespace Diagnostics {
 
       #elif defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
       // Create a full sphere wrapper
+      } else if(vectors.count(PhysicalNames::VELOCITY) && vectors.count(PhysicalNames::MAGNETIC))
+      {
+         SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
+         SharedSphericalTorPolWrapper spMagnetic = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::MAGNETIC)->second));
+
+         this->mspCflWrapper = SharedSphereCflWrapper(new SphereCflWrapper(spVelocity, spMagnetic));
+
+         this->mFixedStep = tstep(1);
+      // Create a full sphere wrapper
       } else if(vectors.count(PhysicalNames::VELOCITY))
       {
          SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));

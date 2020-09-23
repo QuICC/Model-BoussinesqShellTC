@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "Diagnostics/IVelocityWrapper.hpp"
+#include "Diagnostics/IVectorWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 namespace QuICC {
@@ -29,7 +29,7 @@ namespace Diagnostics {
    /**
     * @brief Streamfunction and vertical velocity wrapper into velocity field
     */
-   class StreamVerticalWrapper: public IVelocityWrapper
+   class StreamVerticalWrapper: public IVectorWrapper
    {
       public:
          /**

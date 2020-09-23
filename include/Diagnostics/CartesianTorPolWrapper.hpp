@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "Diagnostics/IVelocityWrapper.hpp"
+#include "Diagnostics/IVectorWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
 namespace QuICC {
@@ -29,7 +29,7 @@ namespace Diagnostics {
    /**
     * @brief Cartesian Toroidal/Poloidal decomposition wrapper into velocity field 
     */
-   class CartesianTorPolWrapper: public IVelocityWrapper
+   class CartesianTorPolWrapper: public IVectorWrapper
    {
       public:
          /**

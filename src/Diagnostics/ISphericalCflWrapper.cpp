@@ -24,8 +24,13 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVelocityWrapper spVelocity)
-      : ICflWrapper(spVelocity), mcCourant(0.65)
+   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity)
+      : ICflWrapper(spVelocity), mcCourant(0.8)
+   {
+   }
+
+   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic)
+      : ICflWrapper(spVelocity, spMagnetic), mcCourant(0.8)
    {
    }
 
@@ -91,16 +96,48 @@ namespace Diagnostics {
       // Compute most stringent CFL condition
       MHDFloat cfl = 1.0;
 
-      int nR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
-      for(int i = 0; i < nR; ++i)
+      if(this->mspVelocity && this->mspMagnetic)
       {
-         int iR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
+         MHDFloat Pm = 1.0;
+         MHDFloat E = 1e-5;
 
-         // Radial CFL
-         cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(0)(iR)/this->mspVelocity->one().slice(i).array().abs().maxCoeff());
-   
-         // Horizontal CFL
-         cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(1)(iR)/(this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt().maxCoeff());
+         MHDFloat alfvenFactor = Pm/E;
+         MHDFloat alfvenDamping;
+         MHDFloat maxVel;
+         MHDFloat dr;
+         Matrix p;
+         int nR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int i = 0; i < nR; ++i)
+         {
+            int iR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
+
+            // Radial CFL
+            dr = this->mMeshSpacings.at(0)(iR);
+            alfvenDamping = std::pow((Pm + 1.0)/(2.0*dr),2);
+            p = this->mspMagnetic->one().slice(i).array().pow(2)*alfvenFactor;
+            maxVel = (p.array()/(p.array() + alfvenDamping).array().sqrt() + this->mspVelocity->one().slice(i).array().abs()).maxCoeff();
+            cfl = std::min(cfl, this->mcCourant*dr/maxVel);
+
+            // Horizontal CFL
+            dr = this->mMeshSpacings.at(1)(iR);
+            alfvenDamping = std::pow((Pm + 1.0)/(2.0*dr),2);
+            p = (this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2))*alfvenFactor;
+            maxVel = (p.array()/(p.array() + alfvenDamping).array().sqrt() + (this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
+            cfl = std::min(cfl, this->mcCourant*dr/maxVel);
+         }
+      } else
+      {
+         int nR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int i = 0; i < nR; ++i)
+         {
+            int iR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
+
+            // Radial CFL
+            cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(0)(iR)/this->mspVelocity->one().slice(i).array().abs().maxCoeff());
+
+            // Horizontal CFL
+            cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(1)(iR)/(this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt().maxCoeff());
+         }
       }
 
       return cfl;

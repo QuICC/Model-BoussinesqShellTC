@@ -2,7 +2,7 @@
 set(MHDSources
    DiagnosticCoordinator.cpp
    ICflWrapper.cpp
-   IVelocityWrapper.cpp
+   IVectorWrapper.cpp
 )
 
 if(QUICC_SPATIALSCHEME STREQUAL "TTT" OR QUICC_SPATIALSCHEME STREQUAL "TFT" OR QUICC_SPATIALSCHEME STREQUAL "TFF" OR QUICC_SPATIALSCHEME STREQUAL "FFF")

@@ -24,8 +24,13 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   SphereCflWrapper::SphereCflWrapper(const SharedIVelocityWrapper spVelocity)
+   SphereCflWrapper::SphereCflWrapper(const SharedIVectorWrapper spVelocity)
       : ISphericalCflWrapper(spVelocity)
+   {
+   }
+
+   SphereCflWrapper::SphereCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic)
+      : ISphericalCflWrapper(spMagnetic)
    {
    }
 

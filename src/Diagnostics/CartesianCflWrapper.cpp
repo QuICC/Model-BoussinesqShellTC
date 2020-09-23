@@ -24,7 +24,7 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   CartesianCflWrapper::CartesianCflWrapper(const SharedIVelocityWrapper spVelocity)
+   CartesianCflWrapper::CartesianCflWrapper(const SharedIVectorWrapper spVelocity)
       : ICflWrapper(spVelocity), mcCourant(0.65)
    {
    }
