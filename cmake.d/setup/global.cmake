@@ -23,6 +23,9 @@ endif(sharedptrTest)
 #------------ THREADS PARALLELISATION ------------#
 ###################################################
 
+if(QUICC_THREADS STREQUAL "")
+   list(GET QUICC_THREADSMODELS 0 QUICC_THREADS)
+endif(QUICC_THREADS STREQUAL "")
 quicc_provide_choice(QUICC_THREADSMODELS "Threads paralellization" QUICC_THREADS threadsTest)
 
 if(threadsTest)
@@ -34,6 +37,9 @@ endif(threadsTest)
 #------------- FFT IMPLEMENTATION ----------------#
 ###################################################
 
+if(QUICC_FFT STREQUAL "")
+   list(GET QUICC_FFTS 0 QUICC_FFT)
+endif(QUICC_FFT STREQUAL "")
 quicc_provide_choice(QUICC_FFTS "FFT implementation" QUICC_FFT fftTest)
 
 if(fftTest)
@@ -59,6 +65,9 @@ endif(fftplanTest)
 #--------- LINEAR ALGEBRA IMPLEMENTATION ---------#
 ###################################################
 
+if(QUICC_LINALG STREQUAL "")
+   list(GET QUICC_LINALGS 0 QUICC_LINALG)
+endif(QUICC_LINALG STREQUAL "")
 quicc_provide_choice(QUICC_LINALGS "Linear algebra" QUICC_LINALG linalgTest)
 
 if(linalgTest)
@@ -121,6 +130,9 @@ endif(sptrilinalgTest)
 #------------------ LARGE IO FORMAT --------------#
 ###################################################
 
+if(QUICC_LARGEIOS STREQUAL "")
+   list(GET QUICC_LARGEIOS 0 QUICC_LARGEIO)
+endif(QUICC_LARGEIOS STREQUAL "")
 quicc_provide_choice(QUICC_LARGEIOS "Large IO format" QUICC_LARGEIO largeioTest)
 
 if(largeioTest)
