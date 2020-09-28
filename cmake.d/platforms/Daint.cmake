@@ -110,11 +110,11 @@ set(QUICC_CC_LIB_MPI_GCC "${QUICC_CC_LIB_GCC}" PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python36" PARENT_SCOPE)
+set(QUICC_PYTHONS "python38" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON36 "python3.6m" "util" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON36 "$ENV{PYTHONPATH}/include/python3.6m" "$ENV{PYTHONPATH}/lib/python3.6/site-packages/numpy/core/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_PYTHON36 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON38 "python3.8" "util" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON38 "$ENV{PYTHONPATH}/include/python3.8" "$ENV{PYTHONPATH}/lib/python3.8/site-packages/numpy/core/include" PARENT_SCOPE)
+set(QUICC_LIBDIR_PYTHON38 "$ENV{PYTHONPATH}/lib" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
