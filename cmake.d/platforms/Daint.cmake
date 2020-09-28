@@ -6,7 +6,7 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(QUICC_COMPILERS "GCC" PARENT_SCOPE)
+set(QUICC_COMPILERS "GCC" "Cray" PARENT_SCOPE)
 #set(QUICC_DISABLE_RDYNAMIC ON PARENT_SCOPE)
 set(QUICC_ENABLE_DYNAMIC ON PARENT_SCOPE)
 
@@ -92,6 +92,7 @@ set(QUICC_LIBRARIES_QUAD "quadmath" PARENT_SCOPE)
 #--------------- COMPILER SETTINGS ---------------#
 ###################################################
 
+# GNU
 set(QUICC_CC_SERIAL_GCC "CC" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "CC" PARENT_SCOPE)
@@ -105,6 +106,21 @@ set(QUICC_CC_INC_MPI_GCC ${QUICC_CC_INC_GCC} PARENT_SCOPE)
 set(QUICC_CC_LIB_GCC "" PARENT_SCOPE)
 
 set(QUICC_CC_LIB_MPI_GCC "${QUICC_CC_LIB_GCC}" PARENT_SCOPE)
+
+# Cray
+set(QUICC_CC_SERIAL_CRAY "CC" PARENT_SCOPE)
+
+set(QUICC_CC_MPI_CRAY "CC" PARENT_SCOPE)
+
+set(QUICC_CC_ARCH_CRAY "" PARENT_SCOPE)
+
+set(QUICC_CC_INC_CRAY "" PARENT_SCOPE)
+
+set(QUICC_CC_INC_MPI_CRAY ${QUICC_CC_INC_CRAY} PARENT_SCOPE)
+
+set(QUICC_CC_LIB_CRAY "" PARENT_SCOPE)
+
+set(QUICC_CC_LIB_MPI_CRAY "${QUICC_CC_LIB_CRAY}" PARENT_SCOPE)
 
 ###################################################
 #--------------- PYTHON LIBRARIES ----------------#
