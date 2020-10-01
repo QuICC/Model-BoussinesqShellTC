@@ -24,13 +24,23 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity)
-      : ICflWrapper(spVelocity), mcCourant(0.65)
+   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const std::map<NonDimensional::Id,MHDFloat>& params)
+      : ICflWrapper(spVelocity),
+        mcCourant(0.65),
+        mcInertial(params.find(NonDimensional::CFL_INERTIAL)->second),
+        mcTorsional(params.find(NonDimensional::CFL_TORSIONAL)->second),
+        mcAlfvenScale(0),
+        mcAlfvenDamping(0)
    {
    }
 
-   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic)
-      : ICflWrapper(spVelocity, spMagnetic), mcCourant(0.65)
+   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<NonDimensional::Id,MHDFloat>& params)
+      : ICflWrapper(spVelocity, spMagnetic),
+        mcCourant(0.65),
+        mcInertial(params.find(NonDimensional::CFL_INERTIAL)->second),
+        mcTorsional(params.find(NonDimensional::CFL_TORSIONAL)->second),
+        mcAlfvenScale(params.find(NonDimensional::CFL_ALFVEN_SCALE)->second),
+        mcAlfvenDamping(params.find(NonDimensional::CFL_ALFVEN_DAMPING)->second)
    {
    }
 
@@ -96,6 +106,11 @@ namespace Diagnostics {
       // Compute most stringent CFL condition
       MHDFloat cfl = 1.0;
 
+      // Inertial wave CFL
+      cfl = std::min(cfl, this->mcCourant*this->mcInertial);
+      // Torsional wave CFL
+      cfl = std::min(cfl, this->mcCourant*this->mcTorsional);
+
       MHDFloat effVel; // Effective velocity
       MHDFloat dr;
 
@@ -103,11 +118,7 @@ namespace Diagnostics {
 
       if(this->mspVelocity && this->mspMagnetic)
       {
-         MHDFloat Pm = 1.0;
-         MHDFloat E = 1e-5;
-
-         MHDFloat alfvenFactor = Pm/E;
-         MHDFloat alfvenDamping;
+         MHDFloat aD;
          Matrix p;
          for(int i = 0; i < nR; ++i)
          {
@@ -115,16 +126,16 @@ namespace Diagnostics {
 
             // Radial CFL
             dr = this->mMeshSpacings.at(0)(iR);
-            alfvenDamping = std::pow((Pm + 1.0)/(2.0*dr),2);
-            p = this->mspMagnetic->one().slice(i).array().pow(2)*alfvenFactor;
-            effVel = (p.array()/(p.array() + alfvenDamping).array().sqrt() + this->mspVelocity->one().slice(i).array().abs()).maxCoeff();
+            aD = std::pow(this->mcAlfvenDamping/dr,2);
+            p = this->mspMagnetic->one().slice(i).array().pow(2)*this->mcAlfvenScale;
+            effVel = (p.array()/(p.array() + aD).array().sqrt() + this->mspVelocity->one().slice(i).array().abs()).maxCoeff();
             cfl = std::min(cfl, this->mcCourant*dr/effVel);
 
             // Horizontal CFL
             dr = this->mMeshSpacings.at(1)(iR);
-            alfvenDamping = std::pow((Pm + 1.0)/(2.0*dr),2);
-            p = (this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2))*alfvenFactor;
-            effVel = (p.array()/(p.array() + alfvenDamping).array().sqrt() + (this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
+            aD = std::pow(this->mcAlfvenDamping/dr,2);
+            p = (this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2))*this->mcAlfvenScale;
+            effVel = (p.array()/(p.array() + aD).array().sqrt() + (this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
             cfl = std::min(cfl, this->mcCourant*dr/effVel);
          }
       } else

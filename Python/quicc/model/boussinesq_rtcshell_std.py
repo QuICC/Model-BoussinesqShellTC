@@ -28,8 +28,13 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
 
+        E = eq_params['taylor']**(-0.5)
         # Unit gap width
-        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
+        d = {
+                "ro":1.0/(1.0 - eq_params["rratio"])
+                "cfl_inertial":0.1*E,
+                "cfl_torsional":1.0
+            }
         # Unit radius
         #d = {"ro":1.0}
 
@@ -42,7 +47,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
-    
+
         fields = [field_row]
 
         return fields
@@ -95,7 +100,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
-        
+
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -163,7 +168,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
                         bc = {0:22, 'c':{'a':a, 'b':b}}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
                         bc = {0:41, 'c':{'a':a, 'b':b}}
-            
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
@@ -190,7 +195,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
                         bc = {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-41, 'rt':4, 'c':{'a':a, 'b':b}}
-        
+
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
@@ -332,7 +337,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         T = eq_params['taylor']**0.5
 
         # Easy switch from nondimensionalistion by R_o (Dormy) and (R_o - R_i) (Christensen)
-        # Parameters match as:  Dormy   Christensen 
+        # Parameters match as:  Dormy   Christensen
         #                       Ra      Ra/(R_o*R_i*Ta^0.5)
         #                       Ta      Ta*(1-R_i/R_o)^4
         if ro == 1.0:

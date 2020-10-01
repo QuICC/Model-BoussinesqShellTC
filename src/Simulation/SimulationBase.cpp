@@ -145,7 +145,7 @@ namespace QuICC {
       stage.start("initializing diagnostics");
 
       // Initialise the diagnostics
-      this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables, tstep);
+      this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables, tstep, this->mspEqParams->map());
 
       // Cleanup IO control
       this->mSimIoCtrl.cleanup();

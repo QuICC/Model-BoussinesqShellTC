@@ -25,6 +25,17 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         return ["ekman", "prandtl", "rayleigh"]
 
+    def automatic_parameters(self, eq_params):
+        """Extend parameters with automatically computable values"""
+
+        E = eq_params['ekman']
+        d = {
+                "cfl_inertial":0.1*E,
+                "cfl_torsional":1.0
+            }
+
+        return d
+
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
@@ -90,7 +101,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
-        
+
         assert(eigs[0].is_integer())
 
         m = int(eigs[0])
@@ -170,7 +181,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                             bc = {0:12}
                     elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:21}
-            
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
@@ -197,7 +208,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                         bc = {0:-12, 'rt':1}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':2}
-        
+
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()

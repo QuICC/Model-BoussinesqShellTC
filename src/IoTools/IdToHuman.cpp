@@ -740,6 +740,20 @@ namespace IoTools {
          case NonDimensional::RESCALED:
             return "rescaled";
 
+         //
+         // CFL flags
+         case NonDimensional::CFL_INERTIAL:
+            return "cfl_inertial";
+
+         case NonDimensional::CFL_TORSIONAL:
+            return "cfl_torsional";
+
+         case NonDimensional::CFL_ALFVEN_SCALE:
+            return "cfl_alfven_scale";
+
+         case NonDimensional::CFL_ALFVEN_DAMPING:
+            return "cfl_alfven_damping";
+
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
       }

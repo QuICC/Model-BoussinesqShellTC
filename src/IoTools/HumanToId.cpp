@@ -230,6 +230,24 @@ namespace IoTools {
       {
          return NonDimensional::RESCALED;
 
+      //
+      // CFL flags
+      } else if(id == IdToHuman::toTag(NonDimensional::CFL_INERTIAL))
+      {
+         return NonDimensional::CFL_INERTIAL;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::CFL_TORSIONAL))
+      {
+         return NonDimensional::CFL_TORSIONAL;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::CFL_ALFVEN_SCALE))
+      {
+         return NonDimensional::CFL_ALFVEN_SCALE;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::CFL_ALFVEN_DAMPING))
+      {
+         return NonDimensional::CFL_ALFVEN_DAMPING;
+
       } else
       {
          throw Exception("Unknown string to ID conversion requested (Nondimensional)");

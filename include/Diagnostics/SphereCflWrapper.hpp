@@ -36,7 +36,7 @@ namespace Diagnostics {
           *
           * @param Velocity wrapper
           */
-         SphereCflWrapper(const SharedIVectorWrapper spVelocity);
+         SphereCflWrapper(const SharedIVectorWrapper spVelocity, const std::map<NonDimensional::Id,MHDFloat>& params);
 
          /**
           * @brief Constructor
@@ -44,7 +44,7 @@ namespace Diagnostics {
           * @param Velocity wrapper
           * @param Magnetic wrapper
           */
-         SphereCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic);
+         SphereCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<NonDimensional::Id,MHDFloat>& params);
 
          /**
           * @brief Constructor
