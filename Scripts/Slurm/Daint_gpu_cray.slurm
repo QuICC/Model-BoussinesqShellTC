@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#
+#SBATCH --job-name="DynShell"
+#SBATCH --partition=normal
+#SBATCH --time=00:15:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=12
+#SBATCH --ntasks-per-core=1
+#SBATCH --constraint=gpu
+#SBATCH --output=slurm_out.%j
+#SBATCH --error=slurm_err.%j
+
+module load daint-gpu
+#module switch PrgEnv-gnu PrgEnv-cray
+module load cray-fftw
+module load cray-hdf5-parallel
+module load cray-python
+module load cray-tpsl
+module load CMake
+
+srun -n $SLURM_NTASKS --ntasks-per-node $SLURM_NTASKS_PER_NODE ./BoussinesqDynamoShellStdModel
