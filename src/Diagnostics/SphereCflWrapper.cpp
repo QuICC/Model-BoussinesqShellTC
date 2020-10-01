@@ -30,7 +30,7 @@ namespace Diagnostics {
    }
 
    SphereCflWrapper::SphereCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic)
-      : ISphericalCflWrapper(spMagnetic)
+      : ISphericalCflWrapper(spVelocity, spMagnetic)
    {
    }
 
