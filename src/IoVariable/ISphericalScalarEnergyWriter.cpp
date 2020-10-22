@@ -60,7 +60,7 @@ namespace IoVariable {
    void ISphericalScalarEnergyWriter::write()
    {
       // Normalize by the volume
-      this->mEnergy /= 2.0*this->mVolume;
+      this->mEnergy /= this->mVolume;
 
       // Create file
       this->preWrite();
@@ -73,7 +73,7 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mEnergy.sum() << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mEnergy.sum();
          if(this->mShowParity)
          {
             this->mFile << std::setprecision(14) << "\t" << this->mEnergy(0) << "\t" << this->mEnergy(1);

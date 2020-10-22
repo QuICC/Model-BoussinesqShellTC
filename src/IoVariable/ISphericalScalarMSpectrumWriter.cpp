@@ -59,7 +59,7 @@ namespace IoVariable {
    void ISphericalScalarMSpectrumWriter::write()
    {
       // Normalize by the volume
-      this->mEnergy /= 2.0*this->mVolume;
+      this->mEnergy /= this->mVolume;
 
       // Create file
       this->preWrite();
@@ -73,6 +73,7 @@ namespace IoVariable {
       if(FrameworkMacro::allowsIO())
       {
          this->mFile << "#Time: "<< std::setprecision(14) << this->mTime << std::endl;
+         this->mFile << "#Energy: "<< std::setprecision(14) << this->mEnergy.sum() << std::endl;
 
          // Total
          for(int i = 0; i < this->mEnergy.size(); i++)

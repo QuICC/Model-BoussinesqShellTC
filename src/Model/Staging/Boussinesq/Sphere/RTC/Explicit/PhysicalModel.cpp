@@ -31,7 +31,11 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "IoVariable/SphereScalarEnergyWriter.hpp"
+#include "IoVariable/SphereScalarLSpectrumWriter.hpp"
+#include "IoVariable/SphereScalarMSpectrumWriter.hpp"
 #include "IoVariable/SphereTorPolEnergyWriter.hpp"
+#include "IoVariable/SphereTorPolLSpectrumWriter.hpp"
+#include "IoVariable/SphereTorPolMSpectrumWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/SphereExactStateIds.hpp"
@@ -207,14 +211,38 @@ namespace Explicit {
    void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create temperature energy writer
-      IoVariable::SharedSphereScalarEnergyWriter spScalar(new IoVariable::SphereScalarEnergyWriter("temperature", SchemeType::type()));
-      spScalar->expect(PhysicalNames::TEMPERATURE);
-      spSim->addAsciiOutputFile(spScalar);
+      IoVariable::SharedSphereScalarEnergyWriter spTemp(new IoVariable::SphereScalarEnergyWriter("temperature", SchemeType::type()));
+      spTemp->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spTemp);
+
+#if 0
+      // Create temperature L energy spectrum writer
+      IoVariable::SharedSphereScalarLSpectrumWriter spTempL(new IoVariable::SphereScalarLSpectrumWriter("temperature", SchemeType::type()));
+      spTempL->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spTempL);
+
+      // Create temperature M energy spectrum writer
+      IoVariable::SharedSphereScalarMSpectrumWriter spTempM(new IoVariable::SphereScalarMSpectrumWriter("temperature", SchemeType::type()));
+      spTempM->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spTempM);
+#endif
 
       // Create kinetic energy writer
-      IoVariable::SharedSphereTorPolEnergyWriter spVector(new IoVariable::SphereTorPolEnergyWriter("kinetic", SchemeType::type()));
-      spVector->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spVector);
+      IoVariable::SharedSphereTorPolEnergyWriter spKinetic(new IoVariable::SphereTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spKinetic->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spKinetic);
+
+#if 0
+      // Create kinetic L energy Spectrum writer
+      IoVariable::SharedSphereTorPolLSpectrumWriter spKineticL(new IoVariable::SphereTorPolLSpectrumWriter("kinetic", SchemeType::type()));
+      spKineticL->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spKineticL);
+
+      // Create kinetic M energy spectrum writer
+      IoVariable::SharedSphereTorPolMSpectrumWriter spKineticM(new IoVariable::SphereTorPolMSpectrumWriter("kinetic", SchemeType::type()));
+      spKineticM->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spKineticM);
+#endif
    }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)

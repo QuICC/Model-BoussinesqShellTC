@@ -94,6 +94,7 @@ namespace IoVariable {
       if(FrameworkMacro::allowsIO())
       {
          this->mFile << "#Time: "<< std::setprecision(14) << this->mTime << std::endl;
+         this->mFile << "#Energy: "<< std::setprecision(14) << this->mTorEnergy.sum() + this->mPolEnergy.sum() << "\t" << this->mTorEnergy.sum() << "\t" << this->mPolEnergy.sum() << std::endl;
 
          // Total
          for(int i = 0; i < this->mTorEnergy.size(); i++)
