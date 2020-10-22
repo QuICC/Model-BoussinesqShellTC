@@ -135,7 +135,7 @@ namespace QuICC {
       this->finalizeWriters();
    }
 
-   void SimulationIoControl::addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile)
+   void SimulationIoControl::addAsciiOutputFile(IoVariable::SharedIVariableAsciiWriter spOutFile)
    {
       this->mAsciiWriters.push_back(spOutFile);
    }

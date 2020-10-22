@@ -17,7 +17,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "IoAscii/IAsciiEWriter.hpp"
+#include "IoAscii/IAsciiWriter.hpp"
 
 namespace QuICC {
 
@@ -26,7 +26,7 @@ namespace IoAscii {
    /**
     * @brief Implementation of a CFL writer
     */
-   class CflWriter: public IoAscii::IAsciiEWriter
+   class CflWriter: public IoAscii::IAsciiWriter
    {
       public:
          /**

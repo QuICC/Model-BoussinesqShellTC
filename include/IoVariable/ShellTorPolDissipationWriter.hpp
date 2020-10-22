@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace QuICC {
       /**
        * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical shell
        */
-      class ShellTorPolDissipationWriter : public IVariableAsciiEWriter {
+      class ShellTorPolDissipationWriter : public IVariableAsciiWriter {
       public:
           /**
            * @brief Constructor

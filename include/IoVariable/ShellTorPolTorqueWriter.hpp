@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace QuICC {
@@ -32,7 +32,7 @@ namespace IoVariable {
     * @brief Implementation of the ASCII spherical harmonics inner sphere torque calculation
     * for a Toroidal/Poloidal field in a spherical shell
     */
-   class ShellTorPolTorqueWriter: public IVariableAsciiEWriter
+   class ShellTorPolTorqueWriter: public IVariableAsciiWriter
    {
       public:
          /**

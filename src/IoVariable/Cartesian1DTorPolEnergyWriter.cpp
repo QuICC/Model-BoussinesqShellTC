@@ -33,7 +33,7 @@ namespace QuICC {
 namespace IoVariable {
 
    Cartesian1DTorPolEnergyWriter::Cartesian1DTorPolEnergyWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mXEnergy(-1.0), mYEnergy(-1.0), mTorEnergy(-1.0), mPolEnergy(-1.0)
+      : IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mXEnergy(-1.0), mYEnergy(-1.0), mTorEnergy(-1.0), mPolEnergy(-1.0)
    {
    }
 
@@ -71,7 +71,7 @@ namespace IoVariable {
       Py_DECREF(pValue);
       PythonWrapper::finalize();
 
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void Cartesian1DTorPolEnergyWriter::compute(Transform::TransformCoordinatorType& coord)

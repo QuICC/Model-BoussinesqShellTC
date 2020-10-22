@@ -19,7 +19,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoAscii/IAsciiEWriter.hpp"
+#include "IoAscii/IAsciiWriter.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
 
@@ -30,7 +30,7 @@ namespace IoStats {
    /**
     * @brief Implementation of a generic variable to ASCII file writer
     */
-   class IStatisticsAsciiEWriter: public IoAscii::IAsciiEWriter
+   class IStatisticsAsciiEWriter: public IoAscii::IAsciiWriter
    {
       public:
          /**

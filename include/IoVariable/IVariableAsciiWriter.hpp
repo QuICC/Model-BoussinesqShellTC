@@ -1,11 +1,11 @@
 /** 
- * @file IVariableAsciiEWriter.hpp
+ * @file IVariableAsciiWriter.hpp
  * @brief Implementation of a generic variable to ASCII file writer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef IVARIABLEASCIIEWRITER_HPP
-#define IVARIABLEASCIIEWRITER_HPP
+#ifndef IVARIABLEASCIIWRITER_HPP
+#define IVARIABLEASCIIWRITER_HPP
 
 // System includes
 //
@@ -19,7 +19,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoAscii/IAsciiEWriter.hpp"
+#include "IoAscii/IAsciiWriter.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
 
@@ -30,7 +30,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of a generic variable to ASCII file writer
     */
-   class IVariableAsciiEWriter: public IoAscii::IAsciiEWriter
+   class IVariableAsciiWriter: public IoAscii::IAsciiWriter
    {
       public:
          /**
@@ -42,13 +42,14 @@ namespace IoVariable {
           * @param type       Type string of file
           * @param version    Version string of file
           * @param id         ID of the dimension space
+          * @param mode       Write mode of file
           */
-         IVariableAsciiEWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id);
+         IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND);
 
          /**
           * @brief Destructor
           */
-         virtual ~IVariableAsciiEWriter();
+         virtual ~IVariableAsciiWriter();
 
          /**
           * @brief Add name of expected variable to be added
@@ -125,6 +126,11 @@ namespace IoVariable {
          typedef std::pair<vector_iterator, vector_iterator>  vector_iterator_range;
 
          /**
+          * @brief Get resolution
+          */
+         const Resolution& res() const;
+
+         /**
           * @brief Get iterator range to scalars
           */
          scalar_iterator_range   scalarRange();
@@ -184,9 +190,9 @@ namespace IoVariable {
    };
 
    /// Typedef for a smart reference counting pointer of a Variable HDF5 numbering writer
-   typedef SharedPtrMacro<IVariableAsciiEWriter>   SharedIVariableAsciiEWriter;
+   typedef SharedPtrMacro<IVariableAsciiWriter>   SharedIVariableAsciiWriter;
 
-   inline bool IVariableAsciiEWriter::isHeavy() const
+   inline bool IVariableAsciiWriter::isHeavy() const
    {
       return false;
    }
@@ -194,4 +200,4 @@ namespace IoVariable {
 }
 }
 
-#endif // IVARIABLEASCIIEWRITER_HPP
+#endif // IVARIABLEASCIIWRITER_HPP

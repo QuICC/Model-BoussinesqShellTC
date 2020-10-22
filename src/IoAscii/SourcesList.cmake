@@ -2,9 +2,6 @@ set(MHDSources
    AsciiFile.cpp
    IAsciiReader.cpp
    IAsciiWriter.cpp
-   IAsciiEWriter.cpp
-   IAsciiNWriter.cpp
-   IAsciiRWriter.cpp
    DirectAsciiWriter.cpp
    StdOutPipe.cpp
    CflTags.cpp

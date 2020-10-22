@@ -33,7 +33,7 @@ namespace QuICC {
 namespace IoVariable {
 
    CylinderTorPolEnergyWriter::CylinderTorPolEnergyWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(-1.0), mPolEnergy(-1.0)
+      : IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mTorEnergy(-1.0), mPolEnergy(-1.0)
    {
    }
 
@@ -108,7 +108,7 @@ namespace IoVariable {
       // Finalize wrapper
       PythonWrapper::finalize();
 
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void CylinderTorPolEnergyWriter::compute(Transform::TransformCoordinatorType& coord)

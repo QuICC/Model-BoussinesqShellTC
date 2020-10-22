@@ -32,7 +32,7 @@ namespace QuICC {
 namespace IoVariable {
 
    Cartesian1DNusseltZWriter::Cartesian1DNusseltZWriter(std::string type)
-      : IVariableAsciiEWriter(NusseltTags::BASENAME, NusseltTags::EXTENSION, NusseltTags::HEADER, type, NusseltTags::VERSION, Dimensions::Space::SPECTRAL)
+      : IVariableAsciiWriter(NusseltTags::BASENAME, NusseltTags::EXTENSION, NusseltTags::HEADER, type, NusseltTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND)
    {
    }
 

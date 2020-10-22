@@ -170,7 +170,7 @@ namespace QuICC {
           *
           * @param spOutFile Shared ASCII output file
           */
-         void addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile);
+         void addAsciiOutputFile(IoVariable::SharedIVariableAsciiWriter spOutFile);
 
          /**
           * @brief Add HDF5 output file to solver

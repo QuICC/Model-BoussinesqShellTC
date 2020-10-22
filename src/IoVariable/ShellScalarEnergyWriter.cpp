@@ -33,7 +33,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellScalarEnergyWriter::ShellScalarEnergyWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mEnergy(-1.0)
+      : IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mEnergy(-1.0)
    {
    }
 
@@ -94,7 +94,7 @@ namespace IoVariable {
 
       this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
 
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void ShellScalarEnergyWriter::compute(Transform::TransformCoordinatorType& coord)

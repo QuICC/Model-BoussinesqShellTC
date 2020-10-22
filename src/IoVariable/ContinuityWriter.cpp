@@ -32,7 +32,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ContinuityWriter::ContinuityWriter(std::string type)
-      : IVariableAsciiEWriter(ContinuityTags::BASENAME, ContinuityTags::EXTENSION, ContinuityTags::HEADER, type, ContinuityTags::VERSION, Dimensions::Space::SPECTRAL)
+      : IVariableAsciiWriter(ContinuityTags::BASENAME, ContinuityTags::EXTENSION, ContinuityTags::HEADER, type, ContinuityTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND)
    {
    }
 

@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of the ASCII energy calculation for a scalar field in a cylinder (Worland expansion)
     */
-   class CylinderScalarEnergyWriter: public IVariableAsciiEWriter
+   class CylinderScalarEnergyWriter: public IVariableAsciiWriter
    {
       public:
          /**

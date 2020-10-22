@@ -34,7 +34,7 @@ namespace QuICC {
 namespace IoVariable {
 
    Cartesian3DNusseltZWriter::Cartesian3DNusseltZWriter(std::string type)
-      : IVariableAsciiEWriter(NusseltTags::BASENAME, NusseltTags::EXTENSION, NusseltTags::HEADER, type, NusseltTags::VERSION, Dimensions::Space::SPECTRAL)
+      : IVariableAsciiWriter(NusseltTags::BASENAME, NusseltTags::EXTENSION, NusseltTags::HEADER, type, NusseltTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND)
    {
    }
 
@@ -76,7 +76,7 @@ namespace IoVariable {
       Py_DECREF(pValue);
       PythonWrapper::finalize();
 
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void Cartesian3DNusseltZWriter::write()

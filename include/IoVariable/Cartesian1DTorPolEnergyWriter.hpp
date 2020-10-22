@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of the ASCII Cartesian 1D (double periodic)energy calculation for a vector field (toroidal/poloidal formulation)
     */
-   class Cartesian1DTorPolEnergyWriter: public IVariableAsciiEWriter
+   class Cartesian1DTorPolEnergyWriter: public IVariableAsciiWriter
    {
       public:
          /**

@@ -16,7 +16,7 @@
 // Project includes
 //
 #include "IoAscii/StdOutPipe.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "IoVariable/IVariableHdf5NWriter.hpp"
 #include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
@@ -30,7 +30,7 @@ namespace QuICC {
    {
       public:
          /// Typedef for an iterator over all the ASCII writers
-         typedef std::vector<IoVariable::SharedIVariableAsciiEWriter>::iterator ascii_iterator;
+         typedef std::vector<IoVariable::SharedIVariableAsciiWriter>::iterator ascii_iterator;
 
          /// Typedef for an iterator over all the HDF5 writers
          typedef std::vector<IoVariable::SharedIVariableHdf5NWriter>::iterator hdf5_iterator;
@@ -83,7 +83,7 @@ namespace QuICC {
           *
           * @param spOutFile Shared ASCII writer
           */
-         void addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile);
+         void addAsciiOutputFile(IoVariable::SharedIVariableAsciiWriter spOutFile);
 
          /**
           * @brief Add a HDF5 output file
@@ -247,7 +247,7 @@ namespace QuICC {
          /**
           * @brief Vector of ASCII output files
           */
-         std::vector<IoVariable::SharedIVariableAsciiEWriter> mAsciiWriters;
+         std::vector<IoVariable::SharedIVariableAsciiWriter> mAsciiWriters;
 
          /**
           * @brief Vector of HDF5 output files
