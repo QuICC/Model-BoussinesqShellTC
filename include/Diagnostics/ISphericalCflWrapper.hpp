@@ -85,16 +85,6 @@ namespace Diagnostics {
          const MHDFloat mcCourant;
 
          /**
-          * @brief Inertial wave CFL
-          */
-         const MHDFloat mcInertial;
-
-         /**
-          * @brief Torsional wave CFL
-          */
-         const MHDFloat mcTorsional;
-
-         /**
           * @brief Alfven wave scale
           */
          const MHDFloat mcAlfvenScale;
@@ -103,6 +93,11 @@ namespace Diagnostics {
           * @brief Alfven wave damping
           */
          const MHDFloat mcAlfvenDamping;
+
+         /**
+          * @brief CFL conditions
+          */
+         Array mGlobalCfl;
 
          /**
           * @brief Spacing between grid points
