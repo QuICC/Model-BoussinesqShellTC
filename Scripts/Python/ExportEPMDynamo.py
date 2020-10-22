@@ -21,24 +21,65 @@ for opt, arg in opts:
     elif opt in ("-o"):
         output_file = arg
 
+out_params = ['E', 'q', 'Ra', 'Ro']
+
+quicc_epm_params = dict({
+    'ekman':'E',
+    'prandtl':'Pr',
+    'magnetic_prandtl':'Pm',
+    'rayleigh':'Ra',
+    'magnetic_ekman':'Ro',
+    'roberts':'q',
+    })
+
+epm_quicc_params = dict({
+    'E':'ekman',
+    'Pr':'prandtl',
+    'Pm':'magnetic_prandtl',
+    'Ra':'rayleigh',
+    'q':'roberts',
+    'Ro':'magnetic_ekman'
+    })
+
 # load QuICC state
 quicc_file = h5py.File(input_file, 'r')
 # Get truncation
-spec1D = quicc_file['truncation']['spectral']['dim1D'][()]
-spec2D = quicc_file['truncation']['spectral']['dim2D'][()]
-spec3D = quicc_file['truncation']['spectral']['dim3D'][()]
+epm_trunc = dict({
+    'N':quicc_file['truncation']['spectral']['dim1D'][()],
+    'L':quicc_file['truncation']['spectral']['dim2D'][()],
+    'M':quicc_file['truncation']['spectral']['dim3D'][()],
+    'Mp':1
+    })
 # Get physical parameters
-physE = quicc_file['physical']['ekman'][()]
-physRa = quicc_file['physical']['rayleigh'][()]
-physPr = quicc_file['physical']['prandtl'][()]
-physPm = quicc_file['physical']['magnetic_prandtl'][()]
-physQ = physPm/physPr
-physRo = physE/physPm
+quicc_params = dict()
+for k in quicc_epm_params:
+    if k in quicc_file['physical']:
+        quicc_params[k] = quicc_file['physical'][k][()]
+
+epm_params = dict()
+if 'E' in out_params:
+    epm_params['E'] = quicc_params['ekman']
+
+if 'q' in out_params:
+    if 'magnetic_prandtl' in quicc_params:
+        epm_params['q'] = quicc_params['magnetic_prandtl']/quicc_params['prandlt']
+    else:
+        epm_params['q'] = quicc_params['prandtl']
+
+if 'Ra' in out_params:
+    epm_params['Ra'] = quicc_params['rayleigh']
+
+if 'Ro' in out_params:
+    if 'magnetic_prandtl' in quicc_params:
+        epm_params['Ro'] = quicc_params['ekman']/quicc_params['magnetic_prandtl']
+    else:
+        epm_params['Ro'] = quicc_params['ekman']
+
 print('QuICC physical parameters:')
-print('\t'+'E = ' + str(physE))
-print('\t'+'Q = ' + str(physQ))
-print('\t'+'Ra = ' + str(physRa))
-print('\t'+'Ro = ' + str(physRo))
+print(epm_params)
+for k, v in epm_params.items():
+    print('\t'+ k + ' = ' + str(v))
+
 # Get run parameters
 runT = quicc_file['run']['time'][()]
 runDt = quicc_file['run']['timestep'][()]
@@ -55,17 +96,13 @@ group.create_dataset('Step', (), 'f8', data = runDt)
 
 # Create physical group
 group = epm_file.create_group('PhysicalParameters')
-group.create_dataset('E', (), 'f8', data = physE)
-group.create_dataset('q', (), 'f8', data = physQ)
-group.create_dataset('Ra', (), 'f8', data = physRa)
-group.create_dataset('Ro', (), 'f8', data = physRo)
+for k, v in epm_params.items():
+    group.create_dataset(k, (), 'f8', data = v)
 
 # Create truncation group
 group = epm_file.create_group('Truncation')
-group.create_dataset('N', (), 'i4', data = spec1D)
-group.create_dataset('L', (), 'i4', data = spec2D)
-group.create_dataset('M', (), 'i4', data = spec3D)
-group.create_dataset('Mp', (), 'i4', data = 1)
+for k, v in epm_trunc.items():
+    group.create_dataset(k, (), 'i4', data = v)
 
 def rescale(d, l, m):
     out = np.zeros(d.shape)
@@ -84,34 +121,48 @@ def rescale(d, l, m):
 
 def add_background(d):
     print("### Adding thermal background state ###")
-    d[0,0,0] += 1.110720734539592
-    d[0,1,0] += -0.7853981633974483
+    # Background state is: T = 1/2 (1 - r^2)
+    # In normalized spherical harmonic space: T = 1/2 (1 - r^2) (2 sqrt(pi))
+    # n = 0, W_0^0 = 1.0, norm: pi/2
+    # n = 1 W_1^0 = r^2 - 1/2, norm: pi/16
+    # t0 = 1.110720734539592
+    # t1 = -0.7853981633974483
+    import scipy.integrate as integrate
+    t0 = integrate.quad(lambda r:0.5*np.sqrt(1.0-r**2),0,1,epsabs=-1,epsrel=50*np.finfo(float).eps)[0]
+    t0 = t0*8.0**0.5
+    t1 = integrate.quad(lambda r:0.5*np.sqrt(1.0-r**2)*(r**2 - 1.0/2.0),0,1,epsabs=-1,epsrel=70*np.finfo(float).eps)[0]
+    t1 = t1*8.0
+    d[0,0,0] += t0
+    d[0,1,0] += t1
     return d
 
 
 # Create temperature field
-group = epm_file.create_group('Codensity')
-quicc_data = quicc_file['temperature']['temperature'][:]
-ds = group.create_dataset('Codensity', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(add_background(quicc_data), spec2D, spec3D)
+if 'temperature' in quicc_file:
+    group = epm_file.create_group('Codensity')
+    quicc_data = quicc_file['temperature']['temperature'][:]
+    ds = group.create_dataset('Codensity', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(add_background(quicc_data), epm_trunc['L'], epm_trunc['M'])
 
 ## Create velocity field
-group = epm_file.create_group('Velocity')
-quicc_data = quicc_file['velocity']['velocity_tor'][:]
-ds = group.create_dataset('VelocityTor', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(quicc_data, spec2D, spec3D)
-quicc_data = quicc_file['velocity']['velocity_pol'][:]
-ds = group.create_dataset('VelocityPol', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(quicc_data, spec2D, spec3D)
+if 'velocity' in quicc_file:
+    group = epm_file.create_group('Velocity')
+    quicc_data = quicc_file['velocity']['velocity_tor'][:]
+    ds = group.create_dataset('VelocityTor', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(quicc_data, epm_trunc['L'], epm_trunc['M'])
+    quicc_data = quicc_file['velocity']['velocity_pol'][:]
+    ds = group.create_dataset('VelocityPol', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(quicc_data, epm_trunc['L'], epm_trunc['M'])
 
 ## Create magnetic field
-group = epm_file.create_group('Magnetic')
-quicc_data = quicc_file['magnetic']['magnetic_tor'][:]
-ds = group.create_dataset('MagneticTor', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(quicc_data, spec2D, spec3D)
-quicc_data = quicc_file['magnetic']['magnetic_pol'][:]
-ds = group.create_dataset('MagneticPol', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(quicc_data, spec2D, spec3D)
+if 'magnetic' in quicc_file:
+    group = epm_file.create_group('Magnetic')
+    quicc_data = quicc_file['magnetic']['magnetic_tor'][:]
+    ds = group.create_dataset('MagneticTor', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(quicc_data, epm_trunc['L'], epm_trunc['M'])
+    quicc_data = quicc_file['magnetic']['magnetic_pol'][:]
+    ds = group.create_dataset('MagneticPol', shape=quicc_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(quicc_data, epm_trunc['L'], epm_trunc['M'])
 
 # Finished
 epm_file.close()

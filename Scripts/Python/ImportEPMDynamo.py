@@ -21,6 +21,10 @@ for opt, arg in opts:
     elif opt in ("-o"):
         output_file = arg
 
+# Missing data flags
+mdv = -4242.4242
+mda = np.array(mdv)
+
 # load EPMDynamo state
 epm_file = h5py.File(input_file, 'r')
 # Get truncation
@@ -34,10 +38,10 @@ phys1D = 3*(spec1D+1 + spec2D//2 + 1)//2
 phys2D = 3*(spec2D+1)//2
 phys3D =  3*(spec3D+1)
 # Get physical parameters
-physE = epm_file['PhysicalParameters']['E'][()]
-physRa = epm_file['PhysicalParameters']['Ra'][()]
-physRo = epm_file['PhysicalParameters']['Ro'][()]
-physQ = epm_file['PhysicalParameters']['q'][()]
+physE = epm_file['PhysicalParameters'].get('E',default=mda)[()]
+physRa = epm_file['PhysicalParameters'].get('Ra',default=mda)[()]
+physRo = epm_file['PhysicalParameters'].get('Ro',default=mda)[()]
+physQ = epm_file['PhysicalParameters'].get('q',default=mda)[()]
 physPm = physE/physRo
 physPr = physPm/physQ
 print('QuICC physical parameters:')
@@ -108,28 +112,31 @@ def remove_background(d):
 
 
 # Create temperature field
-group = quicc_file.create_group('temperature')
-epm_data = epm_file['Codensity']['Codensity'][:]
-ds = group.create_dataset('temperature', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = remove_background(rescale(epm_data, spec2D, spec3D))
+if 'Codensity' in epm_file:
+    group = quicc_file.create_group('temperature')
+    epm_data = epm_file['Codensity']['Codensity'][:]
+    ds = group.create_dataset('temperature', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = remove_background(rescale(epm_data, spec2D, spec3D))
 
 # Create velocity field
-group = quicc_file.create_group('velocity')
-epm_data = epm_file['Velocity']['VelocityTor'][:]
-ds = group.create_dataset('velocity_tor', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(epm_data, spec2D, spec3D)
-epm_data = epm_file['Velocity']['VelocityPol'][:]
-ds = group.create_dataset('velocity_pol', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(epm_data, spec2D, spec3D)
+if 'Velocity' in epm_file:
+    group = quicc_file.create_group('velocity')
+    epm_data = epm_file['Velocity']['VelocityTor'][:]
+    ds = group.create_dataset('velocity_tor', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(epm_data, spec2D, spec3D)
+    epm_data = epm_file['Velocity']['VelocityPol'][:]
+    ds = group.create_dataset('velocity_pol', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(epm_data, spec2D, spec3D)
 
 # Create magnetic field
-group = quicc_file.create_group('magnetic')
-epm_data = epm_file['Magnetic']['MagneticTor'][:]
-ds = group.create_dataset('magnetic_tor', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(epm_data, spec2D, spec3D)
-epm_data = epm_file['Magnetic']['MagneticPol'][:]
-ds = group.create_dataset('magnetic_pol', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
-ds[:] = rescale(epm_data, spec2D, spec3D)
+if 'Magnetic' in epm_file:
+    group = quicc_file.create_group('magnetic')
+    epm_data = epm_file['Magnetic']['MagneticTor'][:]
+    ds = group.create_dataset('magnetic_tor', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(epm_data, spec2D, spec3D)
+    epm_data = epm_file['Magnetic']['MagneticPol'][:]
+    ds = group.create_dataset('magnetic_pol', shape=epm_data.shape[0:2], dtype = ('<f8', (2,)))
+    ds[:] = rescale(epm_data, spec2D, spec3D)
 
 # Finished
 epm_file.close()
