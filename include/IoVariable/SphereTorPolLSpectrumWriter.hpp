@@ -54,7 +54,7 @@ namespace IoVariable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<SphereTorPolLSpectrumWriter> SharedSphereTorPolLSpectrumWriter;
+   typedef SharedPtrMacro<SphereTorPolLSpectrumWriter> SharedSphereTorPolLSpectrumWriter;
 
 }
 }

@@ -1,11 +1,11 @@
 /** 
- * @file ISphericalScalarEnergyWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a sphere
+ * @file ISphericalScalarLSpectrumWriter.hpp
+ * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a scalar field in a spherical geometry
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYWRITER_HPP
-#define QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARLSPECTRUMWRITER_HPP
+#define QUICC_IO_VARIABLE_ISPHERICALSCALARLSPECTRUMWRITER_HPP
 
 // Configuration includes
 //
@@ -19,9 +19,6 @@
 
 // Project includes
 //
-#include "Base/Typedefs.hpp"
-#include "Enums/FieldIds.hpp"
-#include "Resolutions/Resolution.hpp"
 #include "IoVariable/ISphericalScalarEnergyBaseWriter.hpp"
 
 namespace QuICC {
@@ -29,9 +26,9 @@ namespace QuICC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a sphere
+    * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a scalar field in a sphere
     */
-   class ISphericalScalarEnergyWriter: public ISphericalScalarEnergyBaseWriter
+   class ISphericalScalarLSpectrumWriter: public ISphericalScalarEnergyBaseWriter
    {
       public:
          /**
@@ -40,12 +37,17 @@ namespace IoVariable {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         ISphericalScalarEnergyWriter(const std::string& prefix, const std::string& type);
+         ISphericalScalarLSpectrumWriter(const std::string& prefix, const std::string& type);
 
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalScalarEnergyWriter();
+         virtual ~ISphericalScalarLSpectrumWriter();
+
+         /**
+          * @brief Initialise the operator, transform and file
+          */
+         virtual void init();
 
          /**
           * @brief Write State to file
@@ -74,4 +76,4 @@ namespace IoVariable {
 }
 }
 
-#endif // QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYWRITER_HPP
+#endif // QUICC_IO_VARIABLE_ISPHERICALSCALARLSPECTRUMWRITER_HPP

@@ -18,8 +18,6 @@
 
 // Project includes
 //
-#include "Enums/FieldIds.hpp"
-#include "Resolutions/Resolution.hpp"
 #include "IoVariable/ISphericalTorPolEnergyBaseWriter.hpp"
 
 namespace QuICC {
@@ -41,14 +39,14 @@ namespace IoVariable {
          ISphericalTorPolMSpectrumWriter(const std::string& prefix, const std::string& type);
 
          /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
-
-         /**
           * @brief Destructor
           */
          virtual ~ISphericalTorPolMSpectrumWriter();
+
+         /**
+          * @brief Initialise the operator, transform and file
+          */
+         virtual void init();
 
          /**
           * @brief Write State to file

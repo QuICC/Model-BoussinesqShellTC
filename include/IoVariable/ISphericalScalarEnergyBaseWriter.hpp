@@ -1,23 +1,25 @@
 /** 
- * @file ISphericalTorPolEnergyBaseWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical geometry
+ * @file ISphericalScalarEnergyBaseWriter.hpp
+ * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWBASERITER_HPP
-#define QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWBASERITER_HPP
+#ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYBASEWRITER_HPP
+#define QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYBASEWRITER_HPP
 
 // Configuration includes
 //
 
 // System includes
 //
+#include <memory>
 
 // External includes
 //
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "IoVariable/IVariableAsciiWriter.hpp"
@@ -27,9 +29,9 @@ namespace QuICC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical shell
+    * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a sphere
     */
-   class ISphericalTorPolEnergyBaseWriter: public IVariableAsciiWriter
+   class ISphericalScalarEnergyBaseWriter: public IVariableAsciiWriter
    {
       public:
          /**
@@ -43,12 +45,12 @@ namespace IoVariable {
           * @param id         ID of the dimension space
           * @param mode       Write mode of file
           */
-         ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const WriteMode mode = EXTEND);
+         ISphericalScalarEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const WriteMode mode = EXTEND);
 
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalTorPolEnergyBaseWriter();
+         virtual ~ISphericalScalarEnergyBaseWriter();
 
          /**
           * @brief Activate output of parity splitting in energy output
@@ -63,7 +65,7 @@ namespace IoVariable {
          /**
           * @brief Requires heavy calculation?
           */
-         virtual bool isHeavy() const;
+         virtual bool isHeavy() const; 
          
       protected:
          /**
@@ -71,7 +73,7 @@ namespace IoVariable {
           */
          bool mHasMOrdering;
 
-         /**
+         /*
           * @brief Spherical volume to normalize energy to energy density
           */
          MHDFloat mVolume;
@@ -88,22 +90,12 @@ namespace IoVariable {
          virtual void initializeEnergy() = 0;
 
          /**
-          * @brief Store energy from Q component
+          * @brief Store energy
           */
-         virtual void storeQEnergy(const int l, const int m, const MHDFloat energy) = 0;
-
-         /**
-          * @brief Store energy from S component
-          */
-         virtual void storeSEnergy(const int l, const int m, const MHDFloat energy) = 0;
-
-         /**
-          * @brief Store energy from T component
-          */
-         virtual void storeTEnergy(const int l, const int m, const MHDFloat energy) = 0;
+         virtual void storeEnergy(const int l, const int m, const MHDFloat energy) = 0;
    };
 
-   inline bool ISphericalTorPolEnergyBaseWriter::isHeavy() const
+   inline bool ISphericalScalarEnergyBaseWriter::isHeavy() const
    {
       return true;
    }
@@ -111,4 +103,4 @@ namespace IoVariable {
 }
 }
 
-#endif // QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYBASEWRITER_HPP
+#endif // QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYBASEWRITER_HPP

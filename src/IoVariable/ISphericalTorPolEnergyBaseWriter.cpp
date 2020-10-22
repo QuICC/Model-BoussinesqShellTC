@@ -28,7 +28,7 @@ namespace QuICC {
 
 namespace IoVariable {
 
-   ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
+   ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const ISphericalTorPolEnergyBaseWriter::WriteMode mode)
       : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
    {
    }

@@ -1,5 +1,5 @@
 /**
- * @file ISphericalScalarEnergyWriter.cpp
+ * @file ISphericalScalarLSpectrumWriter.cpp
  * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -18,46 +18,45 @@
 
 // Class include
 //
-#include "IoVariable/ISphericalScalarEnergyWriter.hpp"
+#include "IoVariable/ISphericalScalarLSpectrumWriter.hpp"
 
 // Project includes
 //
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
-#include "ScalarFields/FieldTools.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoVariable/SpectrumTags.hpp"
 
 namespace QuICC {
 
 namespace IoVariable {
 
-   ISphericalScalarEnergyWriter::ISphericalScalarEnergyWriter(const std::string& prefix, const std::string& type)
-      : ISphericalScalarEnergyBaseWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, ISphericalScalarEnergyBaseWriter::EXTEND), mEnergy(2)
-   {
-      this->mEnergy.setConstant(-1);
-   }
-
-   ISphericalScalarEnergyWriter::~ISphericalScalarEnergyWriter()
+   ISphericalScalarLSpectrumWriter::ISphericalScalarLSpectrumWriter(const std::string& prefix, const std::string& type)
+      : ISphericalScalarEnergyBaseWriter(prefix + SpectrumTags::LBASENAME, SpectrumTags::EXTENSION, prefix + SpectrumTags::HEADER, type, SpectrumTags::VERSION, Dimensions::Space::SPECTRAL, OVERWRITE), mEnergy(0)
    {
    }
 
-   void ISphericalScalarEnergyWriter::initializeEnergy()
+   ISphericalScalarLSpectrumWriter::~ISphericalScalarLSpectrumWriter()
+   {
+   }
+
+   void ISphericalScalarLSpectrumWriter::init()
+   {
+      this->mEnergy = Array::Zero(this->res().sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::SPECTRAL));
+
+      ISphericalScalarEnergyBaseWriter::init();
+   }
+
+   void ISphericalScalarLSpectrumWriter::initializeEnergy()
    {
       this->mEnergy.setZero();
    }
 
-   void ISphericalScalarEnergyWriter::storeEnergy(const int l, const int m, const MHDFloat energy)
+   void ISphericalScalarLSpectrumWriter::storeEnergy(const int l, const int m, const MHDFloat energy)
    {
-      if((l - m)%2 == 0)
-      {
-         this->mEnergy(0) += energy;
-      } else
-      {
-         this->mEnergy(1) += energy;
-      }
+      this->mEnergy(l) += energy;
    }
 
-   void ISphericalScalarEnergyWriter::write()
+   void ISphericalScalarLSpectrumWriter::write()
    {
       // Normalize by the volume
       this->mEnergy /= 2.0*this->mVolume;
@@ -73,10 +72,12 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(14) << this->mTime << "\t" << this->mEnergy.sum() << std::endl;
-         if(this->mShowParity)
+         this->mFile << "#Time: "<< std::setprecision(14) << this->mTime << std::endl;
+
+         // Total
+         for(int i = 0; i < this->mEnergy.size(); i++)
          {
-            this->mFile << std::setprecision(14) << "\t" << this->mEnergy(0) << "\t" << this->mEnergy(1);
+            this->mFile << i << "\t" << std::setprecision(14) << this->mEnergy(i) << std::endl;
          }
          
          // End line

@@ -43,6 +43,8 @@ namespace IoVariable {
       // Resize storage for spectra
       this->mTorEnergy = Array::Zero(this->res().sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::SPECTRAL));
       this->mPolEnergy = Array::Zero(this->res().sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::SPECTRAL));
+
+      ISphericalTorPolEnergyBaseWriter::init();
    }
 
    void ISphericalTorPolMSpectrumWriter::initializeEnergy()
@@ -68,6 +70,10 @@ namespace IoVariable {
 
    void ISphericalTorPolMSpectrumWriter::write()
    {
+      // Normalize by the volume
+      this->mTorEnergy /= 2.0*this->mVolume;
+      this->mPolEnergy /= 2.0*this->mVolume;
+
       // Create file
       this->preWrite();
 

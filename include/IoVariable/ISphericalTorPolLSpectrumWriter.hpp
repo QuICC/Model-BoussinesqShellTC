@@ -19,8 +19,6 @@
 
 // Project includes
 //
-#include "Enums/FieldIds.hpp"
-#include "Resolutions/Resolution.hpp"
 #include "IoVariable/ISphericalTorPolEnergyBaseWriter.hpp"
 
 namespace QuICC {

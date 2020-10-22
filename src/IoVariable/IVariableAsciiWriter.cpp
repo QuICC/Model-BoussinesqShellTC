@@ -25,7 +25,7 @@ namespace QuICC {
 
 namespace IoVariable {
 
-   IVariableAsciiWriter::IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
+   IVariableAsciiWriter::IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const WriteMode mode)
       : IAsciiWriter(name, ext, header, type, version, mode), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
    {
    }

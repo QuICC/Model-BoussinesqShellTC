@@ -44,7 +44,7 @@ namespace IoVariable {
           * @param id         ID of the dimension space
           * @param mode       Write mode of file
           */
-         IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND);
+         IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const WriteMode mode = EXTEND);
 
          /**
           * @brief Destructor

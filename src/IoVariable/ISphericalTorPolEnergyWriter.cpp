@@ -31,7 +31,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ISphericalTorPolEnergyWriter::ISphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type)
-      : ISphericalTorPolEnergyBaseWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(2), mPolEnergy(2)
+      : ISphericalTorPolEnergyBaseWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mTorEnergy(2), mPolEnergy(2)
    {
       this->mTorEnergy.setConstant(-1);
       this->mPolEnergy.setConstant(-1);
