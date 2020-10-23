@@ -30,6 +30,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "IoVariable/SphereNusseltWriter.hpp"
 #include "IoVariable/SphereScalarEnergyWriter.hpp"
 #include "IoVariable/SphereScalarLSpectrumWriter.hpp"
 #include "IoVariable/SphereScalarMSpectrumWriter.hpp"
@@ -212,6 +213,12 @@ namespace Explicit {
       IoVariable::SharedSphereScalarMSpectrumWriter spTempM(new IoVariable::SphereScalarMSpectrumWriter("temperature", SchemeType::type()));
       spTempM->expect(PhysicalNames::TEMPERATURE);
       spSim->addAsciiOutputFile(spTempM);
+
+
+      // Create Nusselt number writer
+      IoVariable::SharedSphereNusseltWriter spNusselt(new IoVariable::SphereNusseltWriter("", SchemeType::type()));
+      spNusselt->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spNusselt);
 
 
       // Create kinetic energy writer

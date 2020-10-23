@@ -69,6 +69,7 @@ elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL" OR QUICC_SPATIALSCHEME STREQUAL "BLFM
       ISphericalTorPolEnergyWriter.cpp
       ISphericalTorPolLSpectrumWriter.cpp
       ISphericalTorPolMSpectrumWriter.cpp
+      SphereNusseltWriter.cpp
       SphereScalarEnergyWriter.cpp
       SphereScalarLSpectrumWriter.cpp
       SphereScalarMSpectrumWriter.cpp
