@@ -24,7 +24,7 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   ShellCflWrapper::ShellCflWrapper(const SharedIVelocityWrapper spVelocity)
+   ShellCflWrapper::ShellCflWrapper(const SharedIVectorWrapper spVelocity)
       : ISphericalCflWrapper(spVelocity)
    {
    }

@@ -35,7 +35,7 @@ namespace IoVariable{
 	 * @brief Constructor
 	 */
 	ShellTorPolProbeWriter::ShellTorPolProbeWriter(const std::string& prefix, const std::string& type, const Matrix& Points)
-		:IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix+EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mRpart(Points.rows()), mThetapart(Points.rows()), mPhipart(Points.rows()), mPoints(Points)
+		: IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix+EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mRpart(Points.rows()), mThetapart(Points.rows()), mPhipart(Points.rows()), mPoints(Points)
 	{
 
 	}
@@ -392,7 +392,7 @@ namespace IoVariable{
 		#endif //QUICC_SPATIALSCHEME_SLFL
 
 		// call init for the base class
-		IVariableAsciiEWriter::init();
+		IVariableAsciiWriter::init();
 	}
 
 	/*

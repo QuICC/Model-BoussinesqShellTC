@@ -22,7 +22,7 @@
 
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include<utility>
 #include<map>
@@ -35,7 +35,7 @@ namespace IoVariable{
 	/*
 	 * @brief Implementation of the ASCII tracer writer for Toroidal-Poloidal decomposed fields in a spherical shell
 	 */
-	class ShellTorPolProbeWriter : public IVariableAsciiEWriter
+	class ShellTorPolProbeWriter : public IVariableAsciiWriter
 	{
 	public:
 

@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "IoStats/IStatisticsAsciiEWriter.hpp"
 #include "TypeSelectors/TransformCommSelector.hpp"
 
@@ -28,7 +28,7 @@ namespace QuICC {
    {
       public:
          /// Typedef for an iterator over all the ASCII writers
-         typedef std::vector<IoVariable::SharedIVariableAsciiEWriter>::iterator ascii_iterator;
+         typedef std::vector<IoVariable::SharedIVariableAsciiWriter>::iterator ascii_iterator;
 
          /// Typedef for an iterator over all the ASCII writers
          typedef std::vector<IoStats::SharedIStatisticsAsciiEWriter>::iterator stats_iterator;

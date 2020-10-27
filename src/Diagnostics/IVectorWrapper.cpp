@@ -1,5 +1,5 @@
 /** 
- * @file IVelocityWrapper.cpp
+ * @file IVectorWrapper.cpp
  * @brief Source of the interface to velocity wrapper
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "Diagnostics/IVelocityWrapper.hpp"
+#include "Diagnostics/IVectorWrapper.hpp"
 
 // Project includes
 //
@@ -21,11 +21,11 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   IVelocityWrapper::IVelocityWrapper()
+   IVectorWrapper::IVectorWrapper()
    {
    }
 
-   IVelocityWrapper::~IVelocityWrapper()
+   IVectorWrapper::~IVectorWrapper()
    {
    }
 

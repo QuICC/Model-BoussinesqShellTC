@@ -1,11 +1,10 @@
 /**
- * @file IVelocityWrapper.hpp
- * @brief Interface to the velocity wrappers used by the diagnostics 
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @file IVectorWrapper.hpp
+ * @brief Interface to the vector wrappers used by the diagnostics 
  */
 
-#ifndef IVELOCITYWRAPPER_HPP
-#define IVELOCITYWRAPPER_HPP
+#ifndef IVECTORWRAPPER_HPP
+#define IVECTORWRAPPER_HPP
 
 // Configuration includes
 //
@@ -27,33 +26,33 @@ namespace QuICC {
 namespace Diagnostics {
 
    /**
-    * @brief Interface to the velocity wrappers used by the diagnostics
+    * @brief Interface to the vector field wrappers used by the diagnostics
     */
-   class IVelocityWrapper
+   class IVectorWrapper
    {
       public:
          /**
           * @brief Constructor
           */
-         IVelocityWrapper();
+         IVectorWrapper();
 
          /**
           * @brief Constructor
           */
-         ~IVelocityWrapper();
+         ~IVectorWrapper();
 
          /**
-          * @brief Get first velocity field component
+          * @brief Get first vector field component
           */
          virtual const Datatypes::PhysicalScalarType& one() const = 0;
 
          /**
-          * @brief Get second velocity field component
+          * @brief Get second vector field component
           */
          virtual const Datatypes::PhysicalScalarType& two() const = 0;
 
          /**
-          * @brief Get third velocity field component
+          * @brief Get third vector field component
           */
          virtual const Datatypes::PhysicalScalarType& three() const = 0;
 
@@ -67,9 +66,9 @@ namespace Diagnostics {
       private:
    };
 
-   /// Typedef for a shared IVelocityWrapper
-   typedef SharedPtrMacro<IVelocityWrapper> SharedIVelocityWrapper;
+   /// Typedef for a shared IVectorWrapper
+   typedef SharedPtrMacro<IVectorWrapper> SharedIVectorWrapper;
 }
 }
 
-#endif // IVELOCITYWRAPPER_HPP
+#endif // IVECTORWRAPPER_HPP

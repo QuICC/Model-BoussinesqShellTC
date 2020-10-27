@@ -10,6 +10,8 @@
 
 // System includes
 //
+#include <sstream>
+#include <iomanip>
 
 // External includes
 //
@@ -26,13 +28,47 @@ namespace QuICC {
 
 namespace IoAscii {
 
-   IAsciiWriter::IAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : AsciiFile(name, ext, header, type, version)
+   const int IAsciiWriter::msIDWidth = 4;
+
+   IAsciiWriter::IAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const IAsciiWriter::WriteMode mode)
+      : AsciiFile(name, ext, header, type, version), mCounter(0), mBaseName(name), mMode(mode)
    {
    }
 
    IAsciiWriter::~IAsciiWriter()
    {
+   }
+
+   void IAsciiWriter::init()
+   {
+      if(this->mMode == IAsciiWriter::EXTEND)
+      {
+         this->create();
+      }
+   }
+
+   void IAsciiWriter::finalize()
+   {
+      if(this->mMode == IAsciiWriter::EXTEND)
+      {
+         this->end();
+      }
+   }
+
+   void IAsciiWriter::preWrite()
+   {
+      if(this->mMode == IAsciiWriter::OVERWRITE || this->mMode == IAsciiWriter::NUMBER)
+      {
+         this->create();
+      }
+   }
+
+   void IAsciiWriter::postWrite()
+   {
+      if(this->mMode == IAsciiWriter::OVERWRITE || this->mMode == IAsciiWriter::NUMBER)
+      {
+         this->end();
+      }
    }
 
    void IAsciiWriter::open()
@@ -75,6 +111,54 @@ namespace IoAscii {
    void IAsciiWriter::closeDebug()
    {
       this->mFile.close();
+   }
+
+   void IAsciiWriter::create()
+   {
+      // Check if the workflow allows IO to be performed
+      if(FrameworkMacro::allowsIO())
+      {
+         if(this->mMode == IAsciiWriter::NUMBER)
+         {
+            this->updateName();
+         }
+
+         // Create file
+         this->open();
+
+         // Add header information
+         this->mFile << this->header() << std::endl;
+         this->mFile << this->type() << std::endl;
+         this->mFile << this->version() << std::endl;
+      }
+   }
+
+   void IAsciiWriter::end()
+   {
+      // Check if the workflow allows IO to be performed
+      if(FrameworkMacro::allowsIO())
+      {
+         // Close the file
+         this->close();
+
+         if(this->mMode == IAsciiWriter::NUMBER)
+         {
+            // Increment the file counter
+            ++this->mCounter;
+         }
+      }
+   }
+
+   void IAsciiWriter::updateName()
+   {
+      // Create stringstream
+      std::ostringstream   oss;
+
+      // Create zerofilled string out of counter value
+      oss << std::setfill('0') << std::setw(msIDWidth) << this->mCounter;
+
+      // Reset filename including counter zerofilled value
+      this->resetName(this->mBaseName + oss.str());
    }
 
 }

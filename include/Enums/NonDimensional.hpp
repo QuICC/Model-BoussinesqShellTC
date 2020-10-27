@@ -143,6 +143,17 @@ namespace QuICC {
             FAST_MEAN,
             /// Flag to use rescaled equation
             RESCALED,
+
+            //
+            // CFL flags
+            /// CFL from inertial waves
+            CFL_INERTIAL,
+            /// CFL from torsional waves
+            CFL_TORSIONAL,
+            /// CFL Alfven wave scale
+            CFL_ALFVEN_SCALE,
+            /// CFL Alfven wave damping
+            CFL_ALFVEN_DAMPING,
          };
       };
 }

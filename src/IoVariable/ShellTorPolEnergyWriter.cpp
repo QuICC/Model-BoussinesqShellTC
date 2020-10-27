@@ -35,7 +35,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellTorPolEnergyWriter::ShellTorPolEnergyWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(-1.0), mPolEnergy(-1.0)
+      : IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mTorEnergy(-1.0), mPolEnergy(-1.0)
    {
    }
 
@@ -100,7 +100,7 @@ namespace IoVariable {
       // Store spherical integral (include r^2 factor)
       this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
 
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void ShellTorPolEnergyWriter::compute(Transform::TransformCoordinatorType& coord)

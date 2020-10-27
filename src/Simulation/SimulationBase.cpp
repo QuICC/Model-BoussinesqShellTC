@@ -145,7 +145,7 @@ namespace QuICC {
       stage.start("initializing diagnostics");
 
       // Initialise the diagnostics
-      this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables, tstep);
+      this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables, tstep, this->mspEqParams->map());
 
       // Cleanup IO control
       this->mSimIoCtrl.cleanup();
@@ -254,6 +254,9 @@ namespace QuICC {
 
       // Print storage profiling infos (if required)
       StorageProfilerMacro_printInfo();
+
+      // Finalize IO controller
+      this->mSimIoCtrl.finalize();
    }
 
    void SimulationBase::setInitialState(IoVariable::SharedStateFileReader spInitFile)
@@ -304,7 +307,7 @@ namespace QuICC {
    {
    }
 
-   void SimulationBase::addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile)
+   void SimulationBase::addAsciiOutputFile(IoVariable::SharedIVariableAsciiWriter spOutFile)
    {
       this->mSimIoCtrl.addAsciiOutputFile(spOutFile);
    }

@@ -37,7 +37,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellTorPolTorqueWriter::ShellTorPolTorqueWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorque(1.2345),mProj(),mFactor(0.)
+      : IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mTorque(1.2345),mProj(),mFactor(0.)
    {
 
    }
@@ -172,7 +172,7 @@ namespace IoVariable {
 	   }
 
 	   // call init in the base class
-	   IVariableAsciiEWriter::init();
+	   IVariableAsciiWriter::init();
    }
 
    void ShellTorPolTorqueWriter::compute(Transform::TransformCoordinatorType& coord)

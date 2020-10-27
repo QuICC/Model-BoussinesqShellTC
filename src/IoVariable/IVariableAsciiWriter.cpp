@@ -1,5 +1,5 @@
 /** 
- * @file IVariableAsciiEWriter.cpp 
+ * @file IVariableAsciiWriter.cpp 
  * @brief Source of the implementation of the generic variable to ASCII file writer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -16,7 +16,7 @@
 
 // Class include
 //
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 
 // Project includes
 //
@@ -25,44 +25,49 @@ namespace QuICC {
 
 namespace IoVariable {
 
-   IVariableAsciiEWriter::IVariableAsciiEWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id)
-      : IAsciiEWriter(name, ext, header, type, version), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
+   IVariableAsciiWriter::IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const WriteMode mode)
+      : IAsciiWriter(name, ext, header, type, version, mode), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
    {
    }
 
-   IVariableAsciiEWriter::~IVariableAsciiEWriter()
+   IVariableAsciiWriter::~IVariableAsciiWriter()
    {
    }
 
-   Dimensions::Space::Id IVariableAsciiEWriter::space() const
+   Dimensions::Space::Id IVariableAsciiWriter::space() const
    {
       return this->mSpaceId;
    }
 
-   void IVariableAsciiEWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters)
+   void IVariableAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters)
    {
       this->mPhysical = parameters;
    }
 
-   void IVariableAsciiEWriter::setSimTime(const MHDFloat time, const MHDFloat timestep)
+   const Resolution& IVariableAsciiWriter::res() const
+   {
+      return *this->mspRes;
+   }
+
+   void IVariableAsciiWriter::setSimTime(const MHDFloat time, const MHDFloat timestep)
    {
       this->mTime = time;
 
       this->mTimestep = timestep;
    }
 
-   void IVariableAsciiEWriter::setResolution(SharedResolution spRes)
+   void IVariableAsciiWriter::setResolution(SharedResolution spRes)
    {
       // Store resolution object
       this->mspRes = spRes;
    }
 
-   void IVariableAsciiEWriter::expect(const PhysicalNames::Id id)
+   void IVariableAsciiWriter::expect(const PhysicalNames::Id id)
    {
       this->mExpected.insert(id);
    }
 
-   bool IVariableAsciiEWriter::isFull() const
+   bool IVariableAsciiWriter::isFull() const
    {
       bool status = true;
 
@@ -75,7 +80,7 @@ namespace IoVariable {
       return status;
    }
 
-   void IVariableAsciiEWriter::addScalar(const std::pair<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalar)
+   void IVariableAsciiWriter::addScalar(const std::pair<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalar)
    {
       // Only add the variable if it is listed as expected
       if(this->mExpected.count(scalar.first))
@@ -90,7 +95,7 @@ namespace IoVariable {
       }
    }
  
-   void IVariableAsciiEWriter::addVector(const std::pair<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vector)
+   void IVariableAsciiWriter::addVector(const std::pair<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vector)
    {
       // Only add the variable if it is listed as expected
       if(this->mExpected.count(vector.first))
@@ -105,17 +110,17 @@ namespace IoVariable {
       }
    }
 
-   IVariableAsciiEWriter::scalar_iterator_range  IVariableAsciiEWriter::scalarRange()
+   IVariableAsciiWriter::scalar_iterator_range  IVariableAsciiWriter::scalarRange()
    {
       return std::make_pair(this->mScalars.begin(), this->mScalars.end());
    }
 
-   IVariableAsciiEWriter::vector_iterator_range  IVariableAsciiEWriter::vectorRange()
+   IVariableAsciiWriter::vector_iterator_range  IVariableAsciiWriter::vectorRange()
    {
       return std::make_pair(this->mVectors.begin(), this->mVectors.end());
    }
 
-   void IVariableAsciiEWriter::compute(Transform::TransformCoordinatorType& coord)
+   void IVariableAsciiWriter::compute(Transform::TransformCoordinatorType& coord)
    {
    }
 

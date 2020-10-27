@@ -1,6 +1,6 @@
 /** 
  * @file ShellTorPolEnergySpectraWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical shell
+ * @brief Implementation of the ASCII spherical harmonics energy spectra calculation for a Toroidal/Poloidal field in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace QuICC {
@@ -29,9 +29,9 @@ namespace QuICC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical shell
+    * @brief Implementation of the ASCII spherical harmonics energy spectra calculation for a Toroidal/Poloidal field in a spherical shell
     */
-   class ShellTorPolEnergySpectraWriter: public IVariableAsciiEWriter
+   class ShellTorPolEnergySpectraWriter: public IVariableAsciiWriter
    {
       public:
          /**
@@ -95,22 +95,21 @@ namespace IoVariable {
            */
           Matrix mPolEnergyAsym;
 
+          /*
+           * @brief Storage for the radial spectral decomposition, unused
+           */
+          Array mTorRadial;
+          Array mPolRadial;
 
-         /*
-          * @brief Storage for the radial spectral decomposition, unused
-          */
-         Array mTorRadial;
-         Array mPolRadial;
+          /**
+           * @brief Chebyshev operator to integrate in radius
+           */
+          SparseMatrix mIntgOp;
 
-         /**
-          * @brief Chebyshev operator to integrate in radius
-          */
-         SparseMatrix mIntgOp;
-
-         /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor)
-          */
-         SparseMatrix mSphIntgOp;
+          /**
+           * @brief Chebyshev operator for spherical integral in radius (include r^2 factor)
+           */
+          SparseMatrix mSphIntgOp;
    };
 
    inline bool ShellTorPolEnergySpectraWriter::isHeavy() const

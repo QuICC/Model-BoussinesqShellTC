@@ -94,14 +94,14 @@ namespace Timestep {
          newCflDt = -cfl;
      
       // Check if CFL requires a lower timestep
-      } else if(cfl < this->mDt)
+      } else if(cfl < this->mDt*(2.0-this->mcUpWindow))
       {
          // Set new timestep
-         newCflDt = cfl/this->mcUpWindow;
+         newCflDt = cfl;
 
       } else
       {
-         newCflDt = cfl;
+         newCflDt = this->mDt;
       }
       
       // Gather error across processes

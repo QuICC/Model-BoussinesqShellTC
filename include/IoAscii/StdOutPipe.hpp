@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "IoAscii/IAsciiEWriter.hpp"
+#include "IoAscii/IAsciiWriter.hpp"
 
 namespace QuICC {
 
@@ -28,7 +28,7 @@ namespace IoAscii {
    /**
     * @brief Implementation of the standard output pipe into an ASCII file
     */
-   class StdOutPipe: public IAsciiEWriter
+   class StdOutPipe: public IAsciiWriter
    {
       public:
          /**
@@ -41,7 +41,7 @@ namespace IoAscii {
          /**
          * @brief Destructor
          */
-         ~StdOutPipe();
+         virtual ~StdOutPipe();
 
          /**
           * @brief Init the file

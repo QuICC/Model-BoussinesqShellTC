@@ -33,7 +33,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellTorPolUniformVorticityWriter::ShellTorPolUniformVorticityWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + AverageTags::BASENAME, AverageTags::EXTENSION, prefix + AverageTags::HEADER, type, AverageTags::VERSION, Dimensions::Space::SPECTRAL)
+      : IVariableAsciiWriter(prefix + AverageTags::BASENAME, AverageTags::EXTENSION, prefix + AverageTags::HEADER, type, AverageTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND)
    {
    }
 
@@ -135,7 +135,7 @@ namespace IoVariable {
       // Store integral projector
       SparseMatrix temp = tmpProj*tmpI1*tmpR1*tmpR2;
       this->mIntgOp  = (temp.row(0)-temp.row(1));
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void ShellTorPolUniformVorticityWriter::compute(Transform::TransformCoordinatorType& coord)

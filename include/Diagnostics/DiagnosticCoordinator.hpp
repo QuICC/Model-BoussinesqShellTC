@@ -21,6 +21,7 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
+#include "Enums/NonDimensional.hpp"
 #include "Diagnostics/ICflWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
@@ -52,7 +53,7 @@ namespace Diagnostics {
           * @param vectors Map of shared vector variables
           * @param tstep   Timestep information
           */
-         void init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors, const Array& tstep); 
+         void init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors, const Array& tstep, const std::map<NonDimensional::Id,MHDFloat>& params);
 
          /**
           * @brief Compute the initial CFL condition

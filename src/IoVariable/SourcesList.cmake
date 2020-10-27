@@ -3,7 +3,7 @@ set(MHDSources
    StateFileTags.cpp
    StateFileWriter.cpp
    StateFileReader.cpp
-   IVariableAsciiEWriter.cpp
+   IVariableAsciiWriter.cpp
    VariableHdf5Tags.cpp
    IVariableHdf5NWriter.cpp
    IVariableHdf5Reader.cpp
@@ -16,6 +16,7 @@ set(MHDSources
    AverageTags.cpp
    ObservableTags.cpp
    DissipationTags.cpp
+   SpectrumTags.cpp
 )
 
 if(QUICC_SPATIALSCHEME STREQUAL "TTT")
@@ -60,7 +61,20 @@ elseif(QUICC_SPATIALSCHEME STREQUAL "SLFL" OR QUICC_SPATIALSCHEME STREQUAL "SLFM
       )
 elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL" OR QUICC_SPATIALSCHEME STREQUAL "BLFM" OR QUICC_SPATIALSCHEME STREQUAL "WLFL" OR QUICC_SPATIALSCHEME STREQUAL "WLFM")
    list(APPEND MHDSources
+      ISphericalScalarEnergyBaseWriter.cpp
+      ISphericalScalarEnergyWriter.cpp
+      ISphericalScalarLSpectrumWriter.cpp
+      ISphericalScalarMSpectrumWriter.cpp
+      ISphericalTorPolEnergyBaseWriter.cpp
+      ISphericalTorPolEnergyWriter.cpp
+      ISphericalTorPolLSpectrumWriter.cpp
+      ISphericalTorPolMSpectrumWriter.cpp
+      SphereNusseltWriter.cpp
       SphereScalarEnergyWriter.cpp
+      SphereScalarLSpectrumWriter.cpp
+      SphereScalarMSpectrumWriter.cpp
       SphereTorPolEnergyWriter.cpp
+      SphereTorPolLSpectrumWriter.cpp
+      SphereTorPolMSpectrumWriter.cpp
       )
 endif(QUICC_SPATIALSCHEME STREQUAL "TTT")

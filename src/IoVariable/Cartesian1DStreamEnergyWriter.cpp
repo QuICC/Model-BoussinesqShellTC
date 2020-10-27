@@ -33,7 +33,7 @@ namespace QuICC {
 namespace IoVariable {
 
    Cartesian1DStreamEnergyWriter::Cartesian1DStreamEnergyWriter(const std::string& prefix, const std::string& type, const bool hasZonalX, const bool hasZonalY)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mHasZonalX(hasZonalX), mHasZonalY(hasZonalY), mXEnergy(-1.0), mYEnergy(-1.0), mZEnergy(-1.0), mXZonalXEnergy(-1.0), mZZonalXEnergy(-1.0), mYZonalYEnergy(-1.0), mZZonalYEnergy(-1.0)
+      : IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mHasZonalX(hasZonalX), mHasZonalY(hasZonalY), mXEnergy(-1.0), mYEnergy(-1.0), mZEnergy(-1.0), mXZonalXEnergy(-1.0), mZZonalXEnergy(-1.0), mYZonalYEnergy(-1.0), mZZonalYEnergy(-1.0)
    {
    }
 
@@ -71,7 +71,7 @@ namespace IoVariable {
       Py_DECREF(pValue);
       PythonWrapper::finalize();
 
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void Cartesian1DStreamEnergyWriter::compute(Transform::TransformCoordinatorType& coord)

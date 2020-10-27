@@ -18,8 +18,9 @@
 
 // Project includes
 //
+#include "Enums/NonDimensional.hpp"
 #include "Diagnostics/ICflWrapper.hpp"
-#include "Diagnostics/IVelocityWrapper.hpp"
+#include "Diagnostics/IVectorWrapper.hpp"
 
 namespace QuICC {
 
@@ -35,9 +36,15 @@ namespace Diagnostics {
           * @brief Constructor
           *
           * @param Velocity wrapper
-          * @param Vector of physical space grid
           */
-         ISphericalCflWrapper(const SharedIVelocityWrapper spVelocity);
+         ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const std::map<NonDimensional::Id,MHDFloat>& params);
+
+         /**
+          * @brief Constructor
+          *
+          * @param Velocity wrapper
+          */
+         ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<NonDimensional::Id,MHDFloat>& params);
 
          /**
           * @brief Constructor
@@ -76,6 +83,21 @@ namespace Diagnostics {
           * @brief Courant constant used for the CFL computation
           */
          const MHDFloat mcCourant;
+
+         /**
+          * @brief Alfven wave scale
+          */
+         const MHDFloat mcAlfvenScale;
+
+         /**
+          * @brief Alfven wave damping
+          */
+         const MHDFloat mcAlfvenDamping;
+
+         /**
+          * @brief CFL conditions
+          */
+         Array mGlobalCfl;
 
          /**
           * @brief Spacing between grid points

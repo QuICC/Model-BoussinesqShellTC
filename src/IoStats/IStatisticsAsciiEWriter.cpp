@@ -26,7 +26,7 @@ namespace QuICC {
 namespace IoStats {
 
    IStatisticsAsciiEWriter::IStatisticsAsciiEWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id)
-      : IAsciiEWriter(name, ext, header, type, version), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
+      : IAsciiWriter(name, ext, header, type, version, IAsciiWriter::EXTEND), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
    {
    }
 

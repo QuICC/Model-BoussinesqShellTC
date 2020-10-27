@@ -33,7 +33,7 @@ namespace IoAscii {
    const std::string StdOutPipe::EXTENSION = "";
 
    StdOutPipe::StdOutPipe(std::string name)
-      : IAsciiEWriter(name + StdOutPipe::BASENAME, StdOutPipe::EXTENSION, StdOutPipe::HEADER, StdOutPipe::TYPE, StdOutPipe::VERSION)
+      : IAsciiWriter(name + StdOutPipe::BASENAME, StdOutPipe::EXTENSION, StdOutPipe::HEADER, StdOutPipe::TYPE, StdOutPipe::VERSION, IAsciiWriter::EXTEND)
    {
    }
 
@@ -44,7 +44,7 @@ namespace IoAscii {
    void StdOutPipe::init()
    {
       // Initialise parent
-      IAsciiEWriter::init();
+      IAsciiWriter::init();
 
       // Backup std::cout buffer
       this->mpCoutBuffer = std::cout.rdbuf();
@@ -65,7 +65,7 @@ namespace IoAscii {
       std::cout.rdbuf(this->mpCoutBuffer);
 
       // Finalise the parent
-      IAsciiEWriter::finalize();
+      IAsciiWriter::finalize();
    }
 }
 }

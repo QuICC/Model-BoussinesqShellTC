@@ -36,9 +36,9 @@ namespace QuICC {
 
       ShellTorPolDissipationSpectraWriter::ShellTorPolDissipationSpectraWriter(const std::string &prefix,
                                                                                const std::string &type)
-              : IVariableAsciiEWriter(prefix + DissipationTags::BASENAME, DissipationTags::EXTENSION,
+              : IVariableAsciiWriter(prefix + DissipationTags::BASENAME, DissipationTags::EXTENSION,
                                       prefix + DissipationTags::HEADER, type, DissipationTags::VERSION,
-                                      Dimensions::Space::SPECTRAL), mTorDiss(), mPolDiss(),
+                                      Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mTorDiss(), mPolDiss(),
                 mTorRadial(), mPolRadial() {
       }
 
@@ -116,7 +116,7 @@ namespace QuICC {
          // Store spherical integral (include r^2 factor)
          this->mSphIntgOp = tmpAvg * tmpR2.leftCols(cols - 2);
 
-         IVariableAsciiEWriter::init();
+         IVariableAsciiWriter::init();
       }
 
       void ShellTorPolDissipationSpectraWriter::compute(Transform::TransformCoordinatorType &coord) {

@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Diagnostics/ISphericalCflWrapper.hpp"
-#include "Diagnostics/IVelocityWrapper.hpp"
+#include "Diagnostics/IVectorWrapper.hpp"
 
 namespace QuICC {
 
@@ -37,7 +37,7 @@ namespace Diagnostics {
           * @param Velocity wrapper
           * @param Vector of physical space grid
           */
-         ShellCflWrapper(const SharedIVelocityWrapper spVelocity);
+         ShellCflWrapper(const SharedIVectorWrapper spVelocity);
 
          /**
           * @brief Constructor

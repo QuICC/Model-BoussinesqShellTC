@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Diagnostics/ICflWrapper.hpp"
-#include "Diagnostics/IVelocityWrapper.hpp"
+#include "Diagnostics/IVectorWrapper.hpp"
 
 namespace QuICC {
 
@@ -36,7 +36,7 @@ namespace Diagnostics {
           *
           * @param Velocity wrapper
           */
-         CartesianCflWrapper(const SharedIVelocityWrapper spVelocity);
+         CartesianCflWrapper(const SharedIVectorWrapper spVelocity);
 
          /**
           * @brief Constructor

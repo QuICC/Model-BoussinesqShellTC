@@ -24,9 +24,54 @@ namespace QuICC {
 
 namespace Diagnostics {
 
-   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVelocityWrapper spVelocity)
-      : ICflWrapper(spVelocity), mcCourant(0.65)
+   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const std::map<NonDimensional::Id,MHDFloat>& params)
+      : ICflWrapper(spVelocity),
+        mcCourant(0.65),
+        mcAlfvenScale(0),
+        mcAlfvenDamping(0),
+        mGlobalCfl(2)
    {
+      // Inertial wave CFL
+      if(params.count(NonDimensional::CFL_INERTIAL) > 0)
+      {
+         this->mGlobalCfl(0) = params.find(NonDimensional::CFL_INERTIAL)->second;
+      } else
+      {
+         this->mGlobalCfl(0) = 424242.0;
+      }
+      // Torsional wave CFL
+      if(params.count(NonDimensional::CFL_TORSIONAL) > 0)
+      {
+         this->mGlobalCfl(1) = params.find(NonDimensional::CFL_TORSIONAL)->second;
+      } else
+      {
+         this->mGlobalCfl(1) = 424242.0;
+      }
+   }
+
+   ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<NonDimensional::Id,MHDFloat>& params)
+      : ICflWrapper(spVelocity, spMagnetic),
+        mcCourant(0.65),
+        mcAlfvenScale(params.find(NonDimensional::CFL_ALFVEN_SCALE)->second),
+        mcAlfvenDamping(params.find(NonDimensional::CFL_ALFVEN_DAMPING)->second),
+        mGlobalCfl(2)
+   {
+      // Inertial wave CFL
+      if(params.count(NonDimensional::CFL_INERTIAL) > 0)
+      {
+         this->mGlobalCfl(0) = params.find(NonDimensional::CFL_INERTIAL)->second;
+      } else
+      {
+         this->mGlobalCfl(0) = 424242.0;
+      }
+      // Torsional wave CFL
+      if(params.count(NonDimensional::CFL_TORSIONAL) > 0)
+      {
+         this->mGlobalCfl(1) = params.find(NonDimensional::CFL_TORSIONAL)->second;
+      } else
+      {
+         this->mGlobalCfl(1) = 424242.0;
+      }
    }
 
    ISphericalCflWrapper::~ISphericalCflWrapper()
@@ -88,22 +133,56 @@ namespace Diagnostics {
 
    MHDFloat ISphericalCflWrapper::cfl() const
    {
-      // Compute most stringent CFL condition
-      MHDFloat cfl = 1.0;
+      MHDFloat effVel; // Effective velocity
+      MHDFloat dr;
+
+      Array cfl(this->mGlobalCfl.size()+2);
+      int iCfl = this->mGlobalCfl.size();
+      cfl.segment(0,iCfl) = this->mGlobalCfl;
 
       int nR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
-      for(int i = 0; i < nR; ++i)
-      {
-         int iR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
 
-         // Radial CFL
-         cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(0)(iR)/this->mspVelocity->one().slice(i).array().abs().maxCoeff());
-   
-         // Horizontal CFL
-         cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(1)(iR)/(this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt().maxCoeff());
+      if(this->mspVelocity && this->mspMagnetic)
+      {
+         MHDFloat aD;
+         Matrix p;
+         for(int i = 0; i < nR; ++i)
+         {
+            int iR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
+
+            // Radial CFL
+            dr = this->mMeshSpacings.at(0)(iR);
+            aD = std::pow(this->mcAlfvenDamping/dr,2);
+            p = this->mspMagnetic->one().slice(i).array().pow(2)*this->mcAlfvenScale;
+            effVel = (p.array()/(p.array() + aD).array().sqrt() + this->mspVelocity->one().slice(i).array().abs()).maxCoeff();
+            cfl(iCfl) = dr/effVel;
+
+            // Horizontal CFL
+            dr = this->mMeshSpacings.at(1)(iR);
+            aD = std::pow(this->mcAlfvenDamping/dr,2);
+            p = (this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2))*this->mcAlfvenScale;
+            effVel = (p.array()/(p.array() + aD).array().sqrt() + (this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
+            cfl(iCfl+1) = dr/effVel;
+         }
+      } else
+      {
+         for(int i = 0; i < nR; ++i)
+         {
+            int iR = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
+
+            // Radial CFL
+            dr = this->mMeshSpacings.at(0)(iR);
+            effVel = this->mspVelocity->one().slice(i).array().abs().maxCoeff();
+            cfl(iCfl) = dr/effVel;
+
+            // Horizontal CFL
+            dr = this->mMeshSpacings.at(1)(iR);
+            effVel = (this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt().maxCoeff();
+            cfl(iCfl+1) = dr/effVel;
+         }
       }
 
-      return cfl;
+      return this->mcCourant*cfl.minCoeff();
    }
 
 }

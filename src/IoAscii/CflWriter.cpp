@@ -28,7 +28,7 @@ namespace QuICC {
 namespace IoAscii {
 
    CflWriter::CflWriter()
-      : IAsciiEWriter(CflTags::NAME, CflTags::EXTENSION, CflTags::HEADER, CflTags::TYPE, CflTags::VERSION), mTime(-1.0), mTimestep(-1.0), mSteps(0.0), mChanged(false)
+      : IAsciiWriter(CflTags::NAME, CflTags::EXTENSION, CflTags::HEADER, CflTags::TYPE, CflTags::VERSION, IAsciiWriter::EXTEND), mTime(-1.0), mTimestep(-1.0), mSteps(0.0), mChanged(false)
    {
    }
 

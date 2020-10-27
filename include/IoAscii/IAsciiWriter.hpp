@@ -1,7 +1,6 @@
 /**
  * @file IAsciiWriter.hpp
  * @brief General interface to an ASCII writer 
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
 #ifndef IASCIIWRITER_HPP
@@ -33,6 +32,15 @@ namespace IoAscii {
    {
       public:
          /**
+          * @brief Possible write modes
+          */
+         enum WriteMode {
+            EXTEND, // New values are appended
+            OVERWRITE, // File is overwritten
+            NUMBER, // New file is created with incremented number
+         };
+
+         /**
          * @brief Constructor
          *
          * @param name     Filename
@@ -40,8 +48,9 @@ namespace IoAscii {
          * @param header   Header string of file
          * @param type     Type string of file
          * @param version  Version string of file 
+         * @param mode     Write mode of file
          */
-         IAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version);
+         IAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const WriteMode mode = EXTEND);
 
          /**
          * @brief Destructor
@@ -51,7 +60,7 @@ namespace IoAscii {
          /**
           * @brief Initialise the file
           */
-         virtual void init() = 0;
+         virtual void init();
 
          /**
           * @brief Write the content
@@ -61,9 +70,19 @@ namespace IoAscii {
          /**
           * @brief Finalise the file
           */
-         virtual void finalize() = 0;
+         virtual void finalize();
          
       protected:
+         /**
+          * @brief Operation to perform just before writing data
+          */
+         void preWrite();
+
+         /**
+          * @brief Operation to perform just after writing data
+          */
+         void postWrite();
+
          /**
           * @brief Handle to the file
           */
@@ -89,7 +108,41 @@ namespace IoAscii {
           */
          void closeDebug();
 
+         /**
+          * @brief Create the file
+          */
+         void create();
+
+         /**
+          * @brief end the file
+          */
+         void end();
+
+         /**
+          * @brief Update the file name with counter value
+          */
+         void updateName();
+
       private:
+         /**
+          * @brief Zero Fill width
+          */
+         static const int msIDWidth;
+
+         /**
+          * @brief File counter
+          */
+         int mCounter;
+
+         /**
+          * @brief Base name of the file
+          */
+         const std::string    mBaseName;
+
+         /**
+          * @brief Write mode of file
+          */
+         const WriteMode mMode;
    };
 
    /// Typedef for a shared pointer of a IAsciiWriter

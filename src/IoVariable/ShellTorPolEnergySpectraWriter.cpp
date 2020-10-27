@@ -36,9 +36,7 @@ namespace QuICC {
 namespace IoVariable {
 
    ShellTorPolEnergySpectraWriter::ShellTorPolEnergySpectraWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiEWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type,
-                              EnergyTags::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(), mPolEnergy(),
-        mTorEnergyAsym(), mPolEnergyAsym(), mTorRadial(), mPolRadial()
+      : IVariableAsciiWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, IVariableAsciiWriter::EXTEND), mTorEnergy(), mPolEnergy(), mTorEnergyAsym(), mPolEnergyAsym(), mTorRadial(), mPolRadial()
    {
    }
 
@@ -120,7 +118,7 @@ namespace IoVariable {
       // Store spherical integral (include r^2 factor)
       this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
 
-      IVariableAsciiEWriter::init();
+      IVariableAsciiWriter::init();
    }
 
    void ShellTorPolEnergySpectraWriter::compute(Transform::TransformCoordinatorType& coord)
@@ -165,8 +163,8 @@ namespace IoVariable {
          // Loop over harmonic order m
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
-        	// determine current m
-        	int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            // determine current m
+            int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             // m = 0, no factor of two
             if( m == 0)
             {
@@ -250,7 +248,7 @@ namespace IoVariable {
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // m = 0, no factor of two
-			int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+			   int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             if( m == 0)
             {
                factor = 1.0;
@@ -283,22 +281,22 @@ namespace IoVariable {
             int l = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             lfactor = std::pow(l*(l+1.0),2);
 
-            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++){
-				int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-				if(m==0){
-					factor = 1.0;
-				} else {
-					factor = 2.0;
-				}
-				this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
-				this->mPolRadial += factor*lfactor*(rInVarPolQ.slice(k).col(j).real());
-
-				if( (l%2) == 1)
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               this->mPolEnergyAsym(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
-            }
-			}
+               int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               if(m==0){
+                  factor = 1.0;
+               } else {
+                  factor = 2.0;
+               }
+               this->mPolEnergy(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+               this->mPolRadial += factor*lfactor*(rInVarPolQ.slice(k).col(j).real());
 
+               if( (l%2) == 1)
+               {
+                  this->mPolEnergyAsym(l,m) += factor*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(j).real()).sum();
+               }
+            }
          }
       #endif //QUICC_SPATIALSCHEME_SLFL
 

@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of the ASCII Nusselt number writer through the Z boundary extracted from temperature field
     */
-   class Cartesian1DNusseltDZWriter: public IVariableAsciiEWriter
+   class Cartesian1DNusseltDZWriter: public IVariableAsciiWriter
    {
       public:
          /**

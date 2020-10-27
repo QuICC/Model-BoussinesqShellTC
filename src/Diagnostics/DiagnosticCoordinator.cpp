@@ -50,7 +50,7 @@ namespace Diagnostics {
    {
    }
 
-   void DiagnosticCoordinator::init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors, const Array& tstep)
+   void DiagnosticCoordinator::init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors, const Array& tstep, const std::map<NonDimensional::Id,MHDFloat>& params)
    {
       // Check for constant timestep setup
       if(tstep(1) > 0)
@@ -80,11 +80,20 @@ namespace Diagnostics {
 
       #elif defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
       // Create a full sphere wrapper
+      } else if(vectors.count(PhysicalNames::VELOCITY) && vectors.count(PhysicalNames::MAGNETIC))
+      {
+         SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
+         SharedSphericalTorPolWrapper spMagnetic = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::MAGNETIC)->second));
+
+         this->mspCflWrapper = SharedSphereCflWrapper(new SphereCflWrapper(spVelocity, spMagnetic, params));
+
+         this->mFixedStep = tstep(1);
+      // Create a full sphere wrapper
       } else if(vectors.count(PhysicalNames::VELOCITY))
       {
          SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
 
-         this->mspCflWrapper = SharedSphereCflWrapper(new SphereCflWrapper(spVelocity));
+         this->mspCflWrapper = SharedSphereCflWrapper(new SphereCflWrapper(spVelocity, params));
 
          this->mFixedStep = tstep(1);
 
