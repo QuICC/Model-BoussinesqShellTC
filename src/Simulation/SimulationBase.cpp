@@ -254,6 +254,9 @@ namespace QuICC {
 
       // Print storage profiling infos (if required)
       StorageProfilerMacro_printInfo();
+
+      // Finalize IO controller
+      this->mSimIoCtrl.finalize();
    }
 
    void SimulationBase::setInitialState(IoVariable::SharedStateFileReader spInitFile)
