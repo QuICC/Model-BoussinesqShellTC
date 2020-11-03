@@ -69,12 +69,21 @@ namespace Diagnostics {
          this->mFixedStep = tstep(1);
 
       #elif defined QUICC_SPATIALSCHEME_SLFL_TORPOL || defined QUICC_SPATIALSCHEME_SLFM_TORPOL
+      } else if(vectors.count(PhysicalNames::VELOCITY) && vectors.count(PhysicalNames::MAGNETIC))
+      {
+         SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
+         SharedSphericalTorPolWrapper spMagnetic = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::MAGNETIC)->second));
+
+         this->mspCflWrapper = SharedShellCflWrapper(new ShellCflWrapper(spVelocity, spMagnetic, params));
+
+         this->mFixedStep = tstep(1);
+
       // Create a toroidal/poloidal spherical shell wrapper
       } else if(vectors.count(PhysicalNames::VELOCITY))
       {
          SharedSphericalTorPolWrapper spVelocity = SharedSphericalTorPolWrapper(new SphericalTorPolWrapper(vectors.find(PhysicalNames::VELOCITY)->second));
 
-         this->mspCflWrapper = SharedShellCflWrapper(new ShellCflWrapper(spVelocity));
+         this->mspCflWrapper = SharedShellCflWrapper(new ShellCflWrapper(spVelocity, params));
 
          this->mFixedStep = tstep(1);
 
