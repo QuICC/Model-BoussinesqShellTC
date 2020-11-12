@@ -90,16 +90,33 @@ namespace IoVariable {
          this->mPolEnergy = energy.segment(this->mTorEnergy.size(),this->mPolEnergy.size());
       #endif //QUICC_MPI
 
+      int ioPrec = 14;
+      int ioIW = 5;
+      int ioW = ioPrec+5;
+
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << "# time: "<< std::setprecision(14) << this->mTime << std::endl;
-         this->mFile << "#Energy: "<< std::setprecision(14) << this->mTorEnergy.sum() + this->mPolEnergy.sum() << "\t" << this->mTorEnergy.sum() << "\t" << this->mPolEnergy.sum() << std::endl;
+         this->mFile << "# time: " << std::setprecision(ioPrec);
+         this->mFile << std::setw(ioW) << this->mTime << std::endl;
+
+         this->mFile << "# energy: " << std::setprecision(ioPrec);
+         this->mFile << std::setw(ioW) << this->mTorEnergy.sum() + this->mPolEnergy.sum() << "\t";
+         this->mFile << std::setw(ioW) << this->mTorEnergy.sum() << "\t";
+         this->mFile << std::setw(ioW) << this->mPolEnergy.sum() << std::endl;
+
+         this->mFile << std::left << std::setw(ioIW) << "# m" << "\t";
+         this->mFile << std::setw(ioW) << "total" << "\t";
+         this->mFile << std::setw(ioW) << "toroidal" << "\t";
+         this->mFile << std::setw(ioW) << "poloidal" << std::endl;
 
          // Total
          for(int i = 0; i < this->mTorEnergy.size(); i++)
          {
-            this->mFile << i << "\t" << std::setprecision(14) << this->mTorEnergy(i) + this->mPolEnergy(i) << "\t" << this->mTorEnergy(i) << "\t" << this->mPolEnergy(i) << std::endl;
+            this->mFile << std::left << std::setw(ioIW) << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::setw(ioW) << this->mTorEnergy(i) + this->mPolEnergy(i) << "\t";
+            this->mFile << std::setw(ioW) << this->mTorEnergy(i) << "\t";
+            this->mFile << std::setw(ioW) << this->mPolEnergy(i) << std::endl;
          }
       }
 

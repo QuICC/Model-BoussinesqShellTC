@@ -71,6 +71,21 @@ namespace IoAscii {
           * @brief Finalise the file
           */
          virtual void finalize();
+
+         /**
+          * @brief Set output mode to OVERWRITE the file
+          */
+         void overwriteOutput();
+
+         /**
+          * @brief Set output mode to create new numbered file
+          */
+         void numberOutput();
+
+         /**
+          * @brief Set output to extend data in file
+          */
+         void extendOutput();
          
       protected:
          /**
@@ -130,6 +145,11 @@ namespace IoAscii {
          static const int msIDWidth;
 
          /**
+          * @brief Is file initialized?
+          */
+         bool mIsInitialized;
+
+         /**
           * @brief File counter
           */
          int mCounter;
@@ -142,7 +162,7 @@ namespace IoAscii {
          /**
           * @brief Write mode of file
           */
-         const WriteMode mMode;
+         WriteMode mMode;
    };
 
    /// Typedef for a shared pointer of a IAsciiWriter
