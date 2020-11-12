@@ -31,7 +31,7 @@ namespace IoAscii {
    const int IAsciiWriter::msIDWidth = 4;
 
    IAsciiWriter::IAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const IAsciiWriter::WriteMode mode)
-      : AsciiFile(name, ext, header, type, version), mCounter(0), mBaseName(name), mMode(mode)
+      : AsciiFile(name, ext, header, type, version), mCounter(0), mBaseName(name), mMode(mode), mIsInitialized(false)
    {
    }
 
@@ -39,8 +39,43 @@ namespace IoAscii {
    {
    }
 
+   void IAsciiWriter::overwriteOutput()
+   {
+      if(this->mIsInitialized)
+      {
+         throw Exception("Cannot change output mode of " + this->filename() + " after initialization!");
+      } else
+      {
+         this->mMode = IAsciiWriter::OVERWRITE;
+      }
+   }
+
+   void IAsciiWriter::numberOutput()
+   {
+      if(this->mIsInitialized)
+      {
+         throw Exception("Cannot change output mode of " + this->filename() + " after initialization!");
+      } else
+      {
+         this->mMode = IAsciiWriter::NUMBER;
+      }
+   }
+
+   void IAsciiWriter::extendOutput()
+   {
+      if(this->mIsInitialized)
+      {
+         throw Exception("Cannot change output mode of " + this->filename() + " after initialization!");
+      } else
+      {
+         this->mMode = IAsciiWriter::EXTEND;
+      }
+   }
+
    void IAsciiWriter::init()
    {
+      this->mIsInitialized = true;
+
       if(this->mMode == IAsciiWriter::EXTEND)
       {
          this->create();

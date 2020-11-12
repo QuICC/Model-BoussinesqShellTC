@@ -274,11 +274,13 @@ namespace Explicit {
       // Create temperature L energy spectrum writer
       IoVariable::SharedSphereScalarLSpectrumWriter spTempL(new IoVariable::SphereScalarLSpectrumWriter("temperature", SchemeType::type()));
       spTempL->expect(PhysicalNames::TEMPERATURE);
+      //spTempL->numberOutput();
       spSim->addAsciiOutputFile(spTempL);
 
       // Create temperature M energy spectrum writer
       IoVariable::SharedSphereScalarMSpectrumWriter spTempM(new IoVariable::SphereScalarMSpectrumWriter("temperature", SchemeType::type()));
       spTempM->expect(PhysicalNames::TEMPERATURE);
+      //spTempM->numberOutput();
       spSim->addAsciiOutputFile(spTempM);
 #endif
 
@@ -291,11 +293,13 @@ namespace Explicit {
       // Create kinetic L energy Spectrum writer
       IoVariable::SharedSphereTorPolLSpectrumWriter spKineticL(new IoVariable::SphereTorPolLSpectrumWriter("kinetic", SchemeType::type()));
       spKineticL->expect(PhysicalNames::VELOCITY);
+      //spKineticL->numberOutput();
       spSim->addAsciiOutputFile(spKineticL);
 
       // Create kinetic M energy spectrum writer
       IoVariable::SharedSphereTorPolMSpectrumWriter spKineticM(new IoVariable::SphereTorPolMSpectrumWriter("kinetic", SchemeType::type()));
       spKineticM->expect(PhysicalNames::VELOCITY);
+      //spKineticM->numberOutput();
       spSim->addAsciiOutputFile(spKineticM);
 #endif
 

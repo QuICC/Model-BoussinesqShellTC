@@ -69,16 +69,27 @@ namespace IoVariable {
          MPI_Allreduce(MPI_IN_PLACE, this->mEnergy.data(), this->mEnergy.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       #endif //QUICC_MPI
 
+      int ioPrec = 14;
+      int ioIW = 5;
+      int ioW = ioPrec+5;
+
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << "#Time: "<< std::setprecision(14) << this->mTime << std::endl;
-         this->mFile << "#Energy: "<< std::setprecision(14) << this->mEnergy.sum() << std::endl;
+         this->mFile << "# time: " << std::setprecision(ioPrec);
+         this->mFile << std::setw(ioW) << this->mTime << std::endl;
+
+         this->mFile << "# energy: " << std::setprecision(ioPrec);
+         this->mFile << std::setw(ioW) << this->mEnergy.sum() << std::endl;
+
+         this->mFile << std::left << std::setw(ioIW) << "# m" << "\t";
+         this->mFile << std::setw(ioW) << "total" << std::endl;
 
          // Total
          for(int i = 0; i < this->mEnergy.size(); i++)
          {
-            this->mFile << i << "\t" << std::setprecision(14) << this->mEnergy(i) << std::endl;
+            this->mFile << std::left << std::setw(ioIW) << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::setw(ioW) << this->mEnergy(i) << std::endl;
          }
          
          // End line
