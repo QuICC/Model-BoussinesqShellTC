@@ -1,0 +1,4 @@
+Copy or link the compilation database compilation_commands.json into here to use your own database with YouCompleteMe
+
+The database can be generated in a build directory using Clang++ as compiler with
+#$> cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
