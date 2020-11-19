@@ -25,16 +25,6 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
         return ["prandtl", "rayleigh"]
 
-    def automatic_parameters(self, eq_params):
-        """Extend parameters with automatically computable values"""
-
-        d = {
-                "cfl_inertial":1.0,
-                "cfl_torsional":1.0
-            }
-
-        return d
-
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 

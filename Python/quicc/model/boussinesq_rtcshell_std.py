@@ -33,7 +33,6 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         d = {
                 "ro":1.0/(1.0 - eq_params["rratio"])
                 "cfl_inertial":0.1*E,
-                "cfl_torsional":1.0
             }
         # Unit radius
         #d = {"ro":1.0}
