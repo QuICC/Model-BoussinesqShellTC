@@ -31,8 +31,11 @@ namespace QuICC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMinCnst(2), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>(), mcMinCnst(2), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-11), mcMaxDt(1e-1), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(2,1), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
    {
+      this->mDt(0,0) = this->mcMinDt;
+      this->mDt(1,0) = -100.0;
+
       // Initialize timestepper
       TimeSchemeSelector::init();
 
@@ -59,49 +62,55 @@ namespace Timestep {
 
    MHDFloat TimestepCoordinator::timestep() const
    {
-      return this->mDt;
+      return this->mDt(0,0);
    }
 
    void TimestepCoordinator::update()
    {
-      this->mTime = this->mRefTime + this->mDt;
+      this->mTime = this->mRefTime + this->timestep();
       this->mRefTime = this->mTime;
    }
 
-   void TimestepCoordinator::adaptTimestep(const MHDFloat cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void TimestepCoordinator::adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Store old timestep
-      this->mOldDt = this->mDt;
+      this->mOldDt = this->timestep();
+
+      // Update CFL information
+      this->mDt.block(0, 1, this->mDt.rows(), cfl.cols()-1) = cfl.rightCols(cfl.cols()-1);
+
+      // New compute CFL
+      MHDFloat compCfl = cfl(0,0);
 
       // Check if CFL allows for a larger timestep
       MHDFloat newCflDt = 0.0;
-      if(cfl > this->mcUpWindow*this->mDt)
+      if(compCfl > this->mcUpWindow*this->timestep())
       {
          if(this->mCnstSteps >= this->mcMinCnst)
          {
             // Set new timestep
-            newCflDt = std::min(cfl, this->mcMaxJump*this->mDt);
+            newCflDt = std::min(compCfl, this->mcMaxJump*this->timestep());
          } else
          {
             // Reuse same timestep
-            newCflDt = this->mDt;
+            newCflDt = this->timestep();
          }
       
       // Check if CFL is below minimal timestep or downard jump is large
-      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
+      } else if(compCfl < this->mcMinDt || compCfl < this->timestep()/this->mcMaxJump)
       {
          // Signal simulation abort
-         newCflDt = -cfl;
+         newCflDt = -compCfl;
      
       // Check if CFL requires a lower timestep
-      } else if(cfl < this->mDt*(2.0-this->mcUpWindow))
+      } else if(compCfl < this->timestep()*(2.0-this->mcUpWindow))
       {
          // Set new timestep
-         newCflDt = cfl;
+         newCflDt = compCfl;
 
       } else
       {
-         newCflDt = this->mDt;
+         newCflDt = this->timestep();
       }
       
       // Gather error across processes
@@ -123,46 +132,67 @@ namespace Timestep {
       // Error is too large, reduce timestep
       } else if(this->mError > this->mMaxError)
       {
-         newErrorDt = this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
+         newErrorDt = this->timestep()*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER)/this->mcUpWindow;
 
       // Error is small, increase timestep
       } else if(this->mError < this->mMaxError/(this->mcMaxJump*0.9) && this->mCnstSteps >= this->mcMinCnst)
       {
-         newErrorDt = std::min(this->mDt*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER), this->mDt*this->mcMaxJump);
+         newErrorDt = std::min(this->timestep()*std::pow(this->mMaxError/this->mError,1./TimeSchemeSelector::ORDER), this->timestep()*this->mcMaxJump);
 
       // Timestep should not be increased
       } else
       {
-         newErrorDt = this->mDt;
+         newErrorDt = this->timestep();
+      }
+
+      // Update error details
+      if(this->mMaxError > 0.0)
+      {
+         this->mDt(0, this->mDt.cols()-1) = newErrorDt;
+         this->mDt(1, this->mDt.cols()-1) = this->mError;
       }
 
       // CFL condition requested abort!
       if(newCflDt < 0.0)
       {
-         this->mDt = newCflDt;
+         this->mDt(0,0) = newCflDt;
+         this->mDt(1,0) = cfl(1,0);
 
       // Get minimum between both conditions
       } else if(newCflDt > 0.0 && newErrorDt > 0.0)
       {
-         this->mDt = std::min(newCflDt, newErrorDt);
+         if(newCflDt < newErrorDt)
+         {
+            this->mDt(0,0) = newCflDt;
+            this->mDt(1,0) = cfl(1,0);
+         } else
+         {
+            this->mDt(0,0) = newErrorDt;
+            this->mDt(1,0) = -200.0;
+         }
 
       // Use CFL condition
       } else if(newCflDt > 0.0)
       {
-         this->mDt = newCflDt;
+         if(this->timestep() != newCflDt)
+         {
+            this->mDt(0,0) = newCflDt;
+            this->mDt(1,0) = cfl(1,0);
+         }
 
       // Use error condition
       } else if(newErrorDt > 0.0)
       {
-         this->mDt = newErrorDt;
+         this->mDt(0,0) = newErrorDt;
+         this->mDt(1,0) = -200.0;
       }
 
       //
       // Update the timestep matrices if necessary
       //
-      if(this->mDt != this->mOldDt && this->mDt > 0.0)
+      if(this->timestep() != this->mOldDt && this->timestep() > 0.0)
       {
-         DebuggerMacro_showValue("Updating timestep and matrices with new Dt = ", 0, this->mDt);
+         DebuggerMacro_showValue("Updating timestep and matrices with new Dt = ", 0, this->timestep());
 
          DebuggerMacro_start("Update matrices", 0);
          // Update the time dependence in matrices
@@ -184,10 +214,10 @@ namespace Timestep {
       }
 
       // Update CFL writer
-      this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps, this->mError);
+      this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps);
       this->mspIo->write();
 
-      if(this->mDt != this->mOldDt && this->mDt > 0.0)
+      if(this->timestep() != this->mOldDt && this->timestep() > 0.0)
       {
          this->mCnstSteps = 0.0;
       }
@@ -214,10 +244,10 @@ namespace Timestep {
       this->clearSolvers();
 
       // Update current time
-      this->mTime = this->mRefTime + this->stepFraction()*this->mDt;
+      this->mTime = this->mRefTime + this->stepFraction()*this->timestep();
    }
 
-   void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void TimestepCoordinator::init(const MHDFloat time, const Matrix& cfl, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Set initial time
       this->mTime = time;
@@ -231,9 +261,21 @@ namespace Timestep {
       }
 
       // Set initial timestep
-      this->mOldDt = dt;
-      this->mDt = dt;
-      DebuggerMacro_showValue("Creating timestepper with initial timestep Dt = ", 0, this->mDt);
+      this->mOldDt = cfl(0,0);
+
+      // Update CFL details
+      if(this->mMaxError > 0.0)
+      {
+         this->mDt.resize(cfl.rows(), cfl.cols()+1);
+         this->mDt.leftCols(cfl.cols()) = cfl;
+         this->mDt.rightCols(1)(0) = 0.0;
+         this->mDt.rightCols(1)(1) = -200.0;
+      } else
+      {
+         this->mDt = cfl;
+      }
+
+      DebuggerMacro_showValue("Creating timestepper with initial timestep Dt = ", 0, this->timestep());
 
       // Initialise solver
       Solver::SparseLinearCoordinatorBase<TimeSchemeTypeSelector>::init(scalEq, vectEq);
@@ -242,20 +284,20 @@ namespace Timestep {
    void TimestepCoordinator::updateMatrices()
    {
       // Loop over all complex operator, complex field timesteppers
-      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::ComplexSolver_iterator>(*this, this->mDt);
+      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::ComplexSolver_iterator>(*this, this->timestep());
 
       // Loop over all real operator, complex field timesteppers
-      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::RealSolver_iterator>(*this, this->mDt);
+      Solver::updateTimeMatrixSolvers<TimeSchemeTypeSelector, Solver::SparseCoordinatorBase<TimeSchemeTypeSelector>::RealSolver_iterator>(*this, this->timestep());
    }
 
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->mDt, idx);
+      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->timestep(), idx);
    }
 
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->mDt, idx);
+      buildTimestepMatrixWrapper(spSolver, spEq, comp, this->timestep(), idx);
    }
 
    void TimestepCoordinator::printInfo(std::ostream& stream)

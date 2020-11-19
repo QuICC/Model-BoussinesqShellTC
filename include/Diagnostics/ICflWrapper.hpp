@@ -59,12 +59,12 @@ namespace Diagnostics {
          /**
           * @brief Get initial CFL constraint
           */
-         virtual MHDFloat initialCfl() const = 0;
+         virtual Matrix initialCfl() const = 0;
 
          /**
           * @brief Get CFL constraint
           */
-         virtual MHDFloat cfl() const = 0;
+         virtual Matrix cfl() const = 0;
 
       protected:
          /**
@@ -76,6 +76,11 @@ namespace Diagnostics {
           * @brief Shared magnetic wrapper
           */
          SharedIVectorWrapper mspMagnetic;
+
+         /**
+          * @brief Update minimum CFL in matrix
+          */
+         void updateCflMatrix(Matrix& cfl) const;
 
       private:
    };

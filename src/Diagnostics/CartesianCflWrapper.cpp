@@ -1,4 +1,4 @@
-/** 
+/**
  * @file CartesianCflWrapper.cpp
  * @brief Source of the CFL constraint wrapper in a Cartesian geometry
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
@@ -71,22 +71,47 @@ namespace Diagnostics {
       }
    }
 
-   MHDFloat CartesianCflWrapper::initialCfl() const
+   Matrix CartesianCflWrapper::initialCfl() const
    {
-      MHDFloat cfl = this->cfl();
+      Matrix cfl = this->cfl();
 
-      // Assume a velocity of 100 to avoid problems with "zero" starting values 
-      cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/100.);
-      cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/100.);
-      cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/100.);
+      const Array& dx1 = this->mMeshSpacings.at(0);
+      const Array& dx2 = this->mMeshSpacings.at(1);
+      const Array& dx3 = this->mMeshSpacings.at(2);
+
+      // Assume a velocity of 100 to avoid problems with "zero" starting values
+      MHDFloat newCfl;
+      int idx;
+      newCfl = this->mcCourant*dx1.minCoeff()/100.;
+      if(newCfl < cfl(0,1))
+      {
+         cfl(0,1) = newCfl;
+      }
+      newCfl = this->mcCourant*dx2.minCoeff()/100.;
+      if(newCfl < cfl(0,2))
+      {
+         cfl(0,2) = newCfl;
+      }
+      newCfl = this->mcCourant*dx3.minCoeff()/100.;
+      if(newCfl < cfl(0,3))
+      {
+         cfl(0,3) = newCfl;
+      }
+
+      this->updateCflMatrix(cfl);
 
       return cfl;
    }
 
-   MHDFloat CartesianCflWrapper::cfl() const
+   Matrix CartesianCflWrapper::cfl() const
    {
       // Compute most stringent CFL condition
-      MHDFloat cfl = 1.0;
+      MHDFloat newCfl;
+      Matrix cfl = Matrix::Constant(1,4, std::numeric_limits<MHDFloat>::max());
+
+      const Array& dx1 = this->mMeshSpacings.at(0);
+      const Array& dx2 = this->mMeshSpacings.at(1);
+      const Array& dx3 = this->mMeshSpacings.at(2);
 
       int nK = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
 
@@ -94,7 +119,11 @@ namespace Diagnostics {
       for(int k = 0; k < nK; ++k)
       {
          int k_ = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
-         cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(0)(k_)/this->mspVelocity->one().slice(k).array().abs().maxCoeff());
+         newCfl = dx1(k_)/this->mspVelocity->one().slice(k).array().abs().maxCoeff();
+         if(newCfl < cfl(0,1))
+         {
+            cfl(0,1) = newCfl;
+         }
       }
 
       // CFL from second component
@@ -104,7 +133,11 @@ namespace Diagnostics {
          for(int j = 0; j < nJ; ++j)
          {
             int j_ = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(j,k);
-            cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(1)(j_)/this->mspVelocity->two().profile(j,k).array().abs().maxCoeff());
+            newCfl = dx2(j_)/this->mspVelocity->two().profile(j,k).array().abs().maxCoeff();
+            if(newCfl < cfl(0,2))
+            {
+               cfl(0,2) = newCfl;
+            }
          }
       }
 
@@ -117,10 +150,17 @@ namespace Diagnostics {
             int nI = this->mspVelocity->spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>(k);
             for(int i = 0; i < nI; ++i)
             {
-               cfl = std::min(cfl, this->mcCourant*this->mMeshSpacings.at(2)(i)/std::abs(this->mspVelocity->three().point(i,j,k)));
+               newCfl = dx3(i)/std::abs(this->mspVelocity->three().point(i,j,k));
+               if(newCfl < cfl(0,3))
+               {
+                  cfl(0,3) = newCfl;
+               }
             }
          }
       }
+
+      cfl.row(0).tail(cfl.cols()-1).array().array() *= this->mcCourant;
+      this->updateCflMatrix(cfl);
 
       return cfl;
    }

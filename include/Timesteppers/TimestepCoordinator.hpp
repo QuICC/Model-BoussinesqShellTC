@@ -64,12 +64,12 @@ namespace Timestep {
           * @brief Initialise timestepper
           *
           * @param time    Initial time value
-          * @param dt      Initial timestep value
+          * @param cfl     Initial CFL timestep
           * @param error   Max error allowed during timestep
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const MHDFloat time, const MHDFloat dt, const MHDFloat mxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void init(const MHDFloat time, const Matrix& cfl, const MHDFloat mxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Tune adaptive timestepper 
@@ -81,11 +81,11 @@ namespace Timestep {
          /**
           * @brief Adapt the timestep used
           *
-          * @param cfl     CFL condition
+          * @param cfl     CFL conditions
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void adaptTimestep(const MHDFloat cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Update control status
@@ -186,7 +186,7 @@ namespace Timestep {
          /**
           * @brief Timestep length
           */
-         MHDFloat mDt;
+         Matrix mDt;
 
          /**
           * @brief Current time
