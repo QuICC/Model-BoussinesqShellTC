@@ -833,14 +833,14 @@ namespace Parallel {
          packs = this->mForwardPacks(k);
 
          // Initialise receive forward with empty requests
-         this->mRecvFRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
+         this->mRecvFRequests.insert(std::make_pair(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             this->mRecvFRequests.at(packs).push_back(MPI_REQUEST_NULL);
          }
 
          // Initialise send backward with empty requests
-         this->mSendBRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
+         this->mSendBRequests.insert(std::make_pair(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             this->mSendBRequests.at(packs).push_back(MPI_REQUEST_NULL);
@@ -912,14 +912,14 @@ namespace Parallel {
          packs = this->mBackwardPacks(k);
 
          // Initialise receive backward with empty requests
-         this->mRecvBRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
+         this->mRecvBRequests.insert(std::make_pair(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             this->mRecvBRequests.at(packs).push_back(MPI_REQUEST_NULL);
          }
 
          // Initialise send forward with empty requests
-         this->mSendFRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
+         this->mSendFRequests.insert(std::make_pair(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             this->mSendFRequests.at(packs).push_back(MPI_REQUEST_NULL);
