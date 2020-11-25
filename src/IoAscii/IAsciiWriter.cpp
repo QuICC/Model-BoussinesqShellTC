@@ -31,7 +31,7 @@ namespace IoAscii {
    const int IAsciiWriter::msIDWidth = 4;
 
    IAsciiWriter::IAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const IAsciiWriter::WriteMode mode)
-      : AsciiFile(name, ext, header, type, version), mCounter(0), mBaseName(name), mMode(mode), mIsInitialized(false)
+      : AsciiFile(name, ext, header, type, version), mIsInitialized(false), mCounter(0), mBaseName(name), mMode(mode)
    {
    }
 
