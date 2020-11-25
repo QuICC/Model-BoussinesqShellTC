@@ -231,7 +231,7 @@ namespace Diagnostics {
          }
       }
 
-      cfl.row(0).tail(cfl.cols()-1) *= this->mcCourant;
+      cfl.row(0).tail(cfl.cols()-1).array() *= this->mcCourant;
       this->updateCflMatrix(cfl);
 
       return cfl;
