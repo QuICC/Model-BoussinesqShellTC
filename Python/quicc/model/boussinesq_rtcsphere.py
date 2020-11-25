@@ -30,8 +30,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         E = eq_params['ekman']
         d = {
-                "cfl_inertial":0.1*E,
-                "cfl_torsional":1.0
+                "cfl_inertial":0.1*E
             }
 
         return d

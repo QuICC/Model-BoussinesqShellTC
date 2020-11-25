@@ -31,9 +31,8 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         E = eq_params['taylor']**(-0.5)
         # Unit gap width
         d = {
-                "ro":1.0/(1.0 - eq_params["rratio"])
-                "cfl_inertial":0.1*E,
-                "cfl_torsional":1.0
+                "ro":1.0/(1.0 - eq_params["rratio"]),
+                "cfl_inertial":0.1*E
             }
         # Unit radius
         #d = {"ro":1.0}

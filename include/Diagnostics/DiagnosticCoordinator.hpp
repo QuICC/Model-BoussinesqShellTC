@@ -68,7 +68,7 @@ namespace Diagnostics {
          /**
           * @brief Get CFL condition
           */
-         MHDFloat cfl() const;
+         const Matrix& cfl() const;
 
          /**
           * @brief Get max error goal
@@ -99,6 +99,21 @@ namespace Diagnostics {
 
       private:
          /**
+          * @brief Special CFL location value for max step condition
+          */
+         const MHDFloat MAXSTEP_LOCATION;
+
+         /**
+          * @brief Special CFL location value for min step condition
+          */
+         const MHDFloat MINSTEP_LOCATION;
+
+         /**
+          * @brief Special CFL location value for fixed step condition
+          */
+         const MHDFloat FIXEDSTEP_LOCATION;
+
+         /**
           * @brief Maximum timestep
           */
          const MHDFloat mcMaxStep;
@@ -121,7 +136,7 @@ namespace Diagnostics {
          /**
           * @brief Current CFL condition
           */
-         MHDFloat mCfl;
+         Matrix mCfl;
 
          /**
           * @brief Start simulation time
@@ -138,6 +153,11 @@ namespace Diagnostics {
           */
          SharedICflWrapper  mspCflWrapper;
    };
+
+#ifdef QUICC_MPI
+   void mpi_cfl_min(void* a, void* b, int* len, MPI_Datatype* type);
+#endif //QUICC_MPI
+
 }
 }
 

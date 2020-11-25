@@ -1,8 +1,12 @@
-/** 
+/**
  * @file DiagnosticCoordinator.cpp
  * @brief Source of the diagnostic coordinator
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
+
+// Configuration includes
+//
+#include "Framework/FrameworkMacro.h"
 
 // Debug includes
 //
@@ -32,18 +36,19 @@
 #elif defined QUICC_SPATIALSCHEME_BLFL_TORPOL || defined QUICC_SPATIALSCHEME_BLFM_TORPOL || defined QUICC_SPATIALSCHEME_WLFL_TORPOL || defined QUICC_SPATIALSCHEME_WLFM_TORPOL
    #include "Diagnostics/SphericalTorPolWrapper.hpp"
    #include "Diagnostics/SphereCflWrapper.hpp"
-#elif defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_TTT 
+#elif defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_TTT
    #include "Diagnostics/StreamVerticalWrapper.hpp"
    #include "Diagnostics/CartesianCflWrapper.hpp"
-#endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL 
+#endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL
 
 namespace QuICC {
 
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcMaxStep(0.1), mcMinStep(1e-10), mFixedStep(-1), mMaxError(-1.0), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : MAXSTEP_LOCATION(-101), MINSTEP_LOCATION(-102), FIXEDSTEP_LOCATION(-100), mcMaxStep(0.1), mcMinStep(1e-10), mFixedStep(-1), mMaxError(-1.0), mCfl(2,1), mStartTime(0.0), mStartTimestep(0.0)
    {
+      this->mCfl.setZero();
    }
 
    DiagnosticCoordinator::~DiagnosticCoordinator()
@@ -106,7 +111,7 @@ namespace Diagnostics {
 
          this->mFixedStep = tstep(1);
 
-      #elif defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_TTT 
+      #elif defined QUICC_SPATIALSCHEME_FFF || defined QUICC_SPATIALSCHEME_TFF || defined QUICC_SPATIALSCHEME_TFT || defined QUICC_SPATIALSCHEME_TTT
       // Create a stream function and vertical velocity wrapper
       } else if(scalars.count(PhysicalNames::STREAMFUNCTION) && scalars.count(PhysicalNames::VELOCITYZ))
       {
@@ -116,7 +121,7 @@ namespace Diagnostics {
 
          this->mFixedStep = tstep(1);
 
-      #endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL 
+      #endif //defined QUICC_SPATIALSCHEME_TFF_TORPOL
 
       // Required wrapper is not implemented
       } else
@@ -147,11 +152,13 @@ namespace Diagnostics {
       // Used fixed timestep
       if(this->mFixedStep > 0 && this->mMaxError > 0)
       {
-         this->mCfl = this->mcMinStep;
+         this->mCfl(0,0) = this->mcMinStep;
+         this->mCfl(1,0) = MINSTEP_LOCATION;
 
       } else if(this->mFixedStep > 0)
       {
-         this->mCfl = this->mFixedStep;
+         this->mCfl(0,0) = this->mFixedStep;
+         this->mCfl(1,0) = FIXEDSTEP_LOCATION;
 
       // Compute initial CFL condition
       } else if(this->mspCflWrapper)
@@ -159,7 +166,11 @@ namespace Diagnostics {
          // Compute CFL for initial state
          this->mCfl = this->mspCflWrapper->initialCfl();
 
-         this->mCfl = std::min(this->mcMinStep, this->mCfl);
+         if(this->mcMinStep < this->mCfl(0,0))
+         {
+            this->mCfl(0,0) = this->mcMinStep;
+            this->mCfl(1,0) = MINSTEP_LOCATION;
+         }
       }
    }
 
@@ -168,7 +179,8 @@ namespace Diagnostics {
       // Used fixed timestep
       if(this->mFixedStep > 0)
       {
-         this->mCfl = this->mFixedStep;
+         this->mCfl(0,0) = this->mFixedStep;
+         this->mCfl(1,0) = FIXEDSTEP_LOCATION;
 
       // Compute CFL condition
       } else if(this->mspCflWrapper)
@@ -179,28 +191,41 @@ namespace Diagnostics {
          this->mCfl = this->mspCflWrapper->cfl();
 
          // Check for maximum timestep
-         this->mCfl = std::min(this->mcMaxStep, this->mCfl);
+         if(this->mcMaxStep < this->mCfl(0,0))
+         {
+            this->mCfl(0,0) = this->mcMaxStep;
+            this->mCfl(1,0) = MAXSTEP_LOCATION;
+         }
 
-         this->mCfl = std::min(-this->mFixedStep, this->mCfl);
+         if(-this->mFixedStep < this->mCfl(0,0))
+         {
+            this->mCfl(0,0) = -this->mFixedStep;
+            this->mCfl(1,0) = FIXEDSTEP_LOCATION;
+         }
       }
    }
 
    void DiagnosticCoordinator::synchronize()
    {
-      //
       // Start of MPI block
-      //
       #ifdef QUICC_MPI
 
       if(this->mFixedStep <= 0 && this->mspCflWrapper)
       {
+         // Create MPI operation
+         MPI_Op op;
+         MPI_Op_create(mpi_cfl_min, true, &op);
+
+         // Create MPI datatype
+         MPI_Datatype ctype;
+         MPI_Type_contiguous(2, Parallel::MpiTypes::type<MHDFloat>(), &ctype);
+         MPI_Type_commit(&ctype);
+
          // Reduce CFL on all CPUs to the global minimum
-         MPI_Allreduce(MPI_IN_PLACE, &this->mCfl, 1, Parallel::MpiTypes::type<MHDFloat>(), MPI_MIN, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, this->mCfl.data(), this->mCfl.cols(), ctype, op, MPI_COMM_WORLD);
       }
 
-      //
       // End of MPI block
-      //
       #endif // QUICC_MPI
    }
 
@@ -209,7 +234,7 @@ namespace Diagnostics {
       return this->mMaxError;
    }
 
-   MHDFloat DiagnosticCoordinator::cfl() const
+   const Matrix& DiagnosticCoordinator::cfl() const
    {
       return this->mCfl;
    }
@@ -238,6 +263,31 @@ namespace Diagnostics {
          this->mStartTimestep = timestep;
       }
    }
+
+   #ifdef QUICC_MPI
+   void mpi_cfl_min(void* a, void* b, int* len, MPI_Datatype* type)
+   {
+      MHDFloat* in = static_cast<MHDFloat*>(a);
+      MHDFloat* inout = static_cast<MHDFloat*>(b);
+
+      int cols = *len;
+      int rows;
+      MPI_Type_size(*type, &rows);
+      rows /= sizeof(MHDFloat);
+
+      for (int i = 0; i < cols; i++)
+      {
+         if(in[i*rows] < inout[i*rows])
+         {
+            inout[i*rows] = in[i*rows];
+            for(int j = 1; j < rows; j++)
+            {
+               inout[i*rows+j] = in[i*rows+j];
+            }
+         }
+      }
+   }
+   #endif //QUICC_MPI
 
 }
 }

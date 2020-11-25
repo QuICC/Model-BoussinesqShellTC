@@ -31,8 +31,6 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         # Unit gap width
         d = {
                 "ro":1.0/(1.0 - eq_params["rratio"])
-                "cfl_inertial":1.0,
-                "cfl_torsional":1.0
             }
 
         return d

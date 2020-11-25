@@ -59,12 +59,12 @@ namespace Diagnostics {
          /**
           * @brief Get initial CFL constraint
           */
-         virtual MHDFloat initialCfl() const;
+         virtual Matrix initialCfl() const;
 
          /**
           * @brief Get CFL constraint
           */
-         virtual MHDFloat cfl() const;
+         virtual Matrix cfl() const;
 
       protected:
 

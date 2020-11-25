@@ -38,5 +38,16 @@ namespace Diagnostics {
    {
    }
 
+   void ICflWrapper::updateCflMatrix(Matrix& cfl) const
+   {
+      int idx;
+      cfl(0,0) = cfl.row(0).tail(cfl.cols()-1).minCoeff(&idx);
+
+      if(cfl.rows() > 1)
+      {
+         cfl.col(0).tail(cfl.rows()-1) = cfl.col(idx+1).tail(cfl.rows()-1);
+      }
+   }
+
 }
 }

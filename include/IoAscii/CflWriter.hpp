@@ -43,11 +43,14 @@ namespace IoAscii {
           * @brief Set the simulation time parameters
           *
           * @param time       Reached simulation time
-          * @param timestep   Last timestep size
+          * @param cfl        CFL timesteps
           * @param steps      Number of steps with previous timestep
-          * @param error      Timestep error
           */
-         void setSimTime(const MHDFloat time, const MHDFloat timestep, const MHDFloat steps, const MHDFloat error);
+         void setSimTime(const MHDFloat time, const Matrix& cfl, const MHDFloat steps);
+
+         /**
+          * @brief Make header
+          */
 
          /**
           * @brief Write State to file
@@ -80,7 +83,46 @@ namespace IoAscii {
           */
          bool mChanged;
 
+         /**
+          * @brief Timestep details
+          */
+         Matrix mDt;
+
       private:
+         /**
+          * @brief Write fancy header
+          */
+         virtual void fancyHeader();
+
+         /**
+          * @brief High precision output
+          */
+         const int mcIoHigh;
+
+         /**
+          * @brief Low precision output
+          */
+         const int mcIoLow;
+
+         /**
+          * @brief Width of exponent
+          */
+         const int mcIoExpW;
+
+         /**
+          * @brief Width of fixed
+          */
+         const int mcIoFixW;
+
+         /**
+          * @brief Width of integer
+          */
+         const int mcIoIntW;
+
+         /**
+          * @brief Need fancy header?
+          */
+         bool mNeedFancy;
    };
 
    /// Typedef for a smart reference counting pointer of a CflWriter writer
