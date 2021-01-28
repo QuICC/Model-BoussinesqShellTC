@@ -1,7 +1,6 @@
 /** 
  * @file Momentum.cpp
  * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq thermal convection in a spherical shell model
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
 // Configuration includes
@@ -19,10 +18,12 @@
 
 // Project includes
 //
-#include "QuICC/Base/Typedefs.hpp"
-#include "QuICC/Base/MathConstants.hpp"
-#include "QuICC/Enums/NonDimensional.hpp"
-#include "QuICC/PhysicalOperators/Cross.hpp"
+#include "QuICC/Typedefs.hpp"
+#include "QuICC/Math/Constants.hpp"
+#include "QuICC/PhysicalNames/Velocity.hpp"
+#include "QuICC/SpatialScheme/3D/SLFl.hpp"
+#include "QuICC/SpatialScheme/3D/SLFm.hpp"
+#include "QuICC/Model/Boussinesq/Shell/TC/MomentumKernel.hpp"
 
 namespace QuICC {
 
@@ -34,8 +35,8 @@ namespace Shell {
 
 namespace TC {
 
-   Momentum::Momentum(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams)
+   Momentum::Momentum(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme)
+      : IVectorEquation(spEqParams,spScheme)
    {
       // Set the variable requirements
       this->setRequirements();
@@ -47,11 +48,17 @@ namespace TC {
 
    void Momentum::setCoupling()
    {
-      #ifdef QUICC_SPATIALSCHEME_SLFL
-         int start = 1;
-      #else //if QUICC_SPATIALSCHEME_SLFM
-         int start = 0;
-      #endif //QUICC_SPATIALSCHEME_SLFL
+      int start;
+      if(this->ss().id() == SpatialScheme::SLFl::sId)
+      {
+         start = 1;
+      } else if(this->ss().id() == SpatialScheme::SLFm::sId)
+      {
+         start = 0;
+      } else
+      {
+         throw std::logic_error("Unknown spatial scheme was used to setup equations!");
+      }
 
       this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false);
 
@@ -65,38 +72,34 @@ namespace TC {
       this->addNLComponent(FieldComponents::Spectral::POL, 0);
    }
 
-   void Momentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void Momentum::initNLKernel(const bool force)
    {
-      ///
-      /// Compute \f$\vec u\wedge\left(\nabla\wedge\vec u\right)\f$
-      ///
-      switch(id)
-      {
-         case(FieldComponents::Physical::R):
-            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            break;
-         case(FieldComponents::Physical::THETA):
-            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            break;
-         case(FieldComponents::Physical::PHI):
-            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            break;
-         default:
-            assert(false);
-            break;
-      }
+      // Initialize the physical kernel
+      auto spNLKernel = std::make_shared<Physical::Kernel::MomentumKernel>();
+      spNLKernel->setVelocity(this->name(), this->spUnknown());
+      spNLKernel->init(1.0);
+      this->mspNLKernel = spNLKernel;
    }
 
    void Momentum::setRequirements()
    {
       // Set velocity as equation unknown
-      this->setName(PhysicalNames::VELOCITY);
+      this->setName(PhysicalNames::Velocity::id());
 
       // Set solver timing
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
-      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
-      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
+      // Forward transform generates nonlinear RHS
+      this->setForwardPathsType(FWD_IS_NONLINEAR);
+
+      // Get reference to spatial scheme
+      const auto& ss = this->ss();
+
+      // Add velocity to requirements: is scalar?
+      auto& velReq = this->mRequirements.addField(PhysicalNames::Velocity::id(), FieldRequirement(false, ss.spectral(), ss.physical()));
+      velReq.enableSpectral();
+      velReq.enablePhysical();
+      velReq.enableCurl();
    }
 
 }
