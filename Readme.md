@@ -6,8 +6,8 @@ The model equations are
 
 with the parameters defined as
 
-[Nondimensional parameters](https://latex.codecogs.com/svg.latex?%5Cinline%20%5Cbegin%7Balign*%7D%20Pr%20%26%20%3D%20%5Cfrac%7B%5Cnu%7D%7B%5Ckappa%7D%5C%5C%20Ra%20%26%20%3D%20%5Cfrac%7Bg%20%5Calpha%20%5Cbeta%20r_o%5E4%7D%7B%5Cnu%5Ckappa%7D%20%5Cend%7Balign*%7D)
+![Nondimensional parameters](https://latex.codecogs.com/svg.latex?%5Cinline%20%5Cbegin%7Balign*%7D%20Pr%20%26%20%3D%20%5Cfrac%7B%5Cnu%7D%7B%5Ckappa%7D%5C%5C%20Ra%20%26%20%3D%20%5Cfrac%7Bg%20%5Calpha%20%5Cbeta%20r_o%5E4%7D%7B%5Cnu%5Ckappa%7D%20%5Cend%7Balign*%7D)
 
 The system is solved using a Toroidal/Poloidal decomposition of the velocity <a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;\mathbf{u}" target="_blank"><img src="https://latex.codecogs.com/svg.latex?\inline&space;\mathbf{u}" title="\mathbf{u}" /></a>:
 
-[Toroidal/Poloidal decomposition](https://latex.codecogs.com/svg.latex?%5Cinline%20%5Cmathbf%7Bu%7D%3D%5Cmathbf%7B%5Cnabla%7D%5Ctimes%20T%20%5Cmathbf%7Br%7D%20&plus;%20%5Cmathbf%7B%5Cnabla%7D%5Ctimes%5Cmathbf%7B%5Cnabla%7D%5Ctimes%20P%20%5Cmathbf%7Br%7D)
+![Toroidal/Poloidal decomposition](https://latex.codecogs.com/svg.latex?%5Cinline%20%5Cmathbf%7Bu%7D%3D%5Cmathbf%7B%5Cnabla%7D%5Ctimes%20T%20%5Cmathbf%7Br%7D%20&plus;%20%5Cmathbf%7B%5Cnabla%7D%5Ctimes%5Cmathbf%7B%5Cnabla%7D%5Ctimes%20P%20%5Cmathbf%7Br%7D)
