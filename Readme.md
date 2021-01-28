@@ -1,4 +1,4 @@
-# Boussinesq thermal convection in a spherical shell
+# Boussinesq thermal convection(TC) in a spherical shell
 
 The model equations are
 
