@@ -208,11 +208,12 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
         l = eigs[0]
 
         Ra = eq_params['rayleigh']
+        Pr = eq_params['prandtl']
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4(res[0], l, bc, Ra*l*(l+1.0))
+            mat = geo.i4(res[0], l, bc, Ra/Pr*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             mat = geo.i2(res[0], l, bc, -l*(l+1.0))
@@ -258,7 +259,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
             elif field_col == ("temperature",""):
                 if self.linearize:
-                    mat = geo.i4(res[0], l, bc, -Ra*l*(l+1.0))
+                    mat = geo.i4(res[0], l, bc, -Ra/Pr*l*(l+1.0))
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","pol"):
