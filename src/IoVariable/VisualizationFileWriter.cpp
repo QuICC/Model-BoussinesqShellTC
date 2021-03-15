@@ -140,7 +140,7 @@ namespace IoVariable {
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
+      std::vector<std::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
 
       // Write the scalar field
       this->writeRegularField(group, name, fieldInfo);
@@ -155,7 +155,7 @@ namespace IoVariable {
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
+      std::vector<std::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
 
       std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>::const_iterator it;
       for(it = vector.begin(); it != vector.end(); ++it)
@@ -177,7 +177,7 @@ namespace IoVariable {
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
+      std::vector<std::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
 
       std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,Datatypes::PhysicalScalarType>::const_iterator it;
       for(it = tensor.begin(); it != tensor.end(); ++it)

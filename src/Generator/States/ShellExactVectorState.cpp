@@ -131,9 +131,9 @@ namespace Equations {
 
                   for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
                   {
-                     int l = std::tr1::get<0>(*it);
-                     int m = std::tr1::get<1>(*it);
-                     MHDFloat amplitude = std::abs(std::tr1::get<2>(*it));
+                     int l = std::get<0>(*it);
+                     int m = std::get<1>(*it);
+                     MHDFloat amplitude = std::abs(std::get<2>(*it));
 
                      if(l == 0 and m == 0)
                      {
@@ -187,9 +187,9 @@ namespace Equations {
                   theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
                   for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
                   {
-                     int l = std::tr1::get<0>(*it);
-                     int m = std::tr1::get<1>(*it);
-                     MHDFloat amplitude = std::abs(std::tr1::get<2>(*it));
+                     int l = std::get<0>(*it);
+                     int m = std::get<1>(*it);
+                     MHDFloat amplitude = std::abs(std::get<2>(*it));
 
                      if(l == 0 and m == 0)
                      {

@@ -15,7 +15,7 @@
 
 // System includes
 //
-#include <tr1/functional>
+#include <functional>
 
 // External includes
 //
@@ -35,22 +35,22 @@ namespace Polynomial {
    {
       public:
          /// Typedef for the function signature of an n independent constant normalizer 
-         typedef std::tr1::function<internal::Array()> NormalizerC;
+         typedef std::function<internal::Array()> NormalizerC;
 
          /// Typedef for the function signature of an n dependent constant normalizer 
-         typedef std::tr1::function<internal::Array(const internal::MHDFloat)> NormalizerNC;
+         typedef std::function<internal::Array(const internal::MHDFloat)> NormalizerNC;
 
          /// Typedef for the function signature of an n independent one parameter normalizer 
-         typedef std::tr1::function<internal::Array(const internal::MHDFloat)> NormalizerA;
+         typedef std::function<internal::Array(const internal::MHDFloat)> NormalizerA;
 
          /// Typedef for the function signature of an n dependent one parameter normalizer 
-         typedef std::tr1::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerNA;
+         typedef std::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerNA;
 
          /// Typedef for the function signature of an n independent two parameter normalizer 
-         typedef std::tr1::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerAB;
+         typedef std::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerAB;
 
          /// Typedef for the function signature of an n dependent two parameter normalizer 
-         typedef std::tr1::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat, const internal::MHDFloat)> NormalizerNAB;
+         typedef std::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat, const internal::MHDFloat)> NormalizerNAB;
 
          /**
           * @brief Compute three term recurrence for $P_n(x)$ normalizer

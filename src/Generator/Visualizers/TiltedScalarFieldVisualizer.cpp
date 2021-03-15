@@ -70,7 +70,7 @@ namespace Equations {
 
       // Initialize FFT
       Transform::Fft::FftSelector   transform;
-      Transform::Fft::FftSelector::SharedSetupType spSetup = std::tr1::static_pointer_cast<Transform::Fft::FftSelector::SetupType>(this->unknown().dom(0).spRes()->spTransformSetup(Dimensions::Transform::TRA3D));
+      Transform::Fft::FftSelector::SharedSetupType spSetup = std::static_pointer_cast<Transform::Fft::FftSelector::SetupType>(this->unknown().dom(0).spRes()->spTransformSetup(Dimensions::Transform::TRA3D));
       transform.init(spSetup);
 
       // Compute forward transform

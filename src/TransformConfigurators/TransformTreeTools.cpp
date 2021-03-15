@@ -16,7 +16,7 @@
 #include <set>
 #include <vector>
 #include <map>
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -99,7 +99,7 @@ namespace Transform {
    {
       // Typedefs to simplify notation
       typedef std::map<int, int> OpMap;
-      typedef std::multimap<int, std::tr1::tuple<std::vector<int>, FieldType::Id, Arithmetics::Id> > OpMulti;
+      typedef std::multimap<int, std::tuple<std::vector<int>, FieldType::Id, Arithmetics::Id> > OpMulti;
 
       bool endRecursion = false;
 
@@ -125,7 +125,7 @@ namespace Transform {
             // Check for end of recursion
             if(dim == branchIt->nEdges()-1)
             {
-               multi.insert(std::make_pair(branchIt->edge(dim).opId(), std::tr1::make_tuple(branchIt->edge(dim).outId(), branchIt->fieldId(), branchIt->edge(dim).arithId())));
+               multi.insert(std::make_pair(branchIt->edge(dim).opId(), std::make_tuple(branchIt->edge(dim).outId(), branchIt->fieldId(), branchIt->edge(dim).arithId())));
                endRecursion = true;
             }
          }
@@ -142,7 +142,7 @@ namespace Transform {
             {
                TransformTreeEdge &rNext = rPrev.addEdge(opIt->first, opIt->second);
 
-               rNext.setEnd(std::tr1::get<0>(multiIt->second), std::tr1::get<1>(multiIt->second), std::tr1::get<2>(multiIt->second));
+               rNext.setEnd(std::get<0>(multiIt->second), std::get<1>(multiIt->second), std::get<2>(multiIt->second));
             }
          }
 
@@ -306,9 +306,9 @@ namespace Transform {
             std::pair<SetOutIds::iterator,bool> outIt = outIds.insert(outKey);
 
             // Add to map or increase count
-            OptKey optKey = std::tr1::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
-            std::pair<MapOptIds::iterator,bool> optIt = optIds.insert(std::make_pair(optKey, std::tr1::make_tuple(0,counter,outIt.second)));
-            std::tr1::get<0>(optIt.first->second) += 1;
+            OptKey optKey = std::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
+            std::pair<MapOptIds::iterator,bool> optIt = optIds.insert(std::make_pair(optKey, std::make_tuple(0,counter,outIt.second)));
+            std::get<0>(optIt.first->second) += 1;
 
             // Increment counter used as index
             counter++;
@@ -339,13 +339,13 @@ namespace Transform {
 
          // Get edge iterator and make key
          TransformTreeEdge::EdgeType_iterator edgeIt = edge.rEdgeRange().first;
-         OptKey optKey = std::tr1::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
+         OptKey optKey = std::make_tuple(edgeIt->opId<int>(), edgeIt->fieldId(), edgeIt->outIds());
 
          // Setup first element of combined field
-         if(std::tr1::get<0>(optIds.find(optKey)->second) > 1)
+         if(std::get<0>(optIds.find(optKey)->second) > 1)
          {
             // Make counter negative to identify them later on
-            std::tr1::get<0>(optIds.find(optKey)->second) = -std::tr1::get<0>(optIds.find(optKey)->second) + 1;
+            std::get<0>(optIds.find(optKey)->second) = -std::get<0>(optIds.find(optKey)->second) + 1;
 
             // Convert to set
             Arithmetics::Id arithId;
@@ -360,12 +360,12 @@ namespace Transform {
                arithId = edgeIt->arithId();
             }
 
-            edge.setCombinedInfo(arithId, -1, std::tr1::get<1>(optIds.find(optKey)->second));
+            edge.setCombinedInfo(arithId, -1, std::get<1>(optIds.find(optKey)->second));
             edge.setArithId(Arithmetics::NONE);
             edgeIt = edge.delEdge(edgeIt);
 
             // Setup other elements in combination   
-         } else if(std::tr1::get<0>(optIds.find(optKey)->second) < 0)
+         } else if(std::get<0>(optIds.find(optKey)->second) < 0)
          {
             if(!hasSingleLeaf)
             {
@@ -381,16 +381,16 @@ namespace Transform {
 
             int holdId;
             // Setup intermediate elements
-            if(std::tr1::get<0>(optIds.find(optKey)->second) < -1)
+            if(std::get<0>(optIds.find(optKey)->second) < -1)
             {
-               holdId = std::tr1::get<1>(optIds.find(optKey)->second);
+               holdId = std::get<1>(optIds.find(optKey)->second);
                edgeIt = edge.delEdge(edgeIt);
 
                // Setup last element
             } else
             {
                holdId = -1;
-               if(std::tr1::get<2>(optIds.find(optKey)->second))
+               if(std::get<2>(optIds.find(optKey)->second))
                {
                   edgeIt->setArithId(Arithmetics::SET);
                } else
@@ -398,8 +398,8 @@ namespace Transform {
                   edgeIt->setArithId(Arithmetics::ADD);
                }
             }
-            edge.setCombinedInfo(arithId, std::tr1::get<1>(optIds.find(optKey)->second), holdId);
-            std::tr1::get<0>(optIds.find(optKey)->second) += 1;
+            edge.setCombinedInfo(arithId, std::get<1>(optIds.find(optKey)->second), holdId);
+            std::get<0>(optIds.find(optKey)->second) += 1;
          }
       }
    }
