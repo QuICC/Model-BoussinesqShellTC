@@ -142,7 +142,7 @@ namespace QuICC {
       Transform2DCoordinator<T1D,T2D, TCommunicator>::initTransforms(spRes, integratorTree, projectorTree);
 
       // Initialise the transforms
-      this->initTransform(std::tr1::static_pointer_cast<typename T3D::SetupType>(spRes->spTransformSetup(Dimensions::Transform::TRA3D)));
+      this->initTransform(std::static_pointer_cast<typename T3D::SetupType>(spRes->spTransformSetup(Dimensions::Transform::TRA3D)));
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransform(typename T3D::SharedSetupType spSetup3D)

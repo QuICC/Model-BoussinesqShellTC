@@ -46,8 +46,8 @@ namespace Transform {
       private:
          typedef std::pair<FieldType::Id,std::vector<int> >  OutKey;
          typedef std::set<OutKey> SetOutIds;
-         typedef std::tr1::tuple<int,FieldType::Id,std::vector<int> > OptKey;
-         typedef std::map<OptKey,std::tr1::tuple<int,int,bool> > MapOptIds;
+         typedef std::tuple<int,FieldType::Id,std::vector<int> > OptKey;
+         typedef std::map<OptKey,std::tuple<int,int,bool> > MapOptIds;
 
          /**
           * @brief Recursive grows of the tree

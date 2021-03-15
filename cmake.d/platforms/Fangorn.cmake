@@ -12,7 +12,7 @@ set(QUICC_COMPILERS "GCC" PARENT_SCOPE)
 #----------- AVAILABLE SMART POINTERS ------------#
 ###################################################
 
-set(QUICC_SMARTPTRS "TR1" "cxx0x" PARENT_SCOPE)
+set(QUICC_SMARTPTRS "std" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE C++ VERSIONS --------------#
@@ -123,10 +123,10 @@ set(QUICC_CC_LIB_MPI_GCC ${QUICC_CC_LIB_GCC} PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python37" PARENT_SCOPE)
+set(QUICC_PYTHONS "python38" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON37 "/usr/lib64/libpython3.7m.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON37 "/usr/include/python3.7m" "/usr/lib64/python3.7/site-packages/numpy/core/include/" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON38 "/usr/lib64/libpython3.8.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON38 "/usr/include/python3.8" "/usr/lib64/python3.8/site-packages/numpy/core/include/" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#

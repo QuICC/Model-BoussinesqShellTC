@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <set>
 #include <map>
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -598,7 +598,7 @@ namespace Parallel {
       } else if(spRes->cpu(0)->nDim() == 3)
       {
          // Simplify syntax
-         typedef std::tr1::tuple<int,int,int>   Coordinate;
+         typedef std::tuple<int,int,int>   Coordinate;
 
          // Extract communication structure from resolution object
          std::set<Coordinate> bwdMap;
@@ -703,9 +703,9 @@ namespace Parallel {
                   int i =0;
                   for(std::set<Coordinate>::iterator it = fwdMap.begin(); it != fwdMap.end(); ++it)
                   {
-                     matRemote(0,i) = std::tr1::get<0>(*it);
-                     matRemote(1,i) = std::tr1::get<1>(*it);
-                     matRemote(2,i) = std::tr1::get<2>(*it);
+                     matRemote(0,i) = std::get<0>(*it);
+                     matRemote(1,i) = std::get<1>(*it);
+                     matRemote(2,i) = std::get<2>(*it);
                      i++;
                   }
 
@@ -736,7 +736,7 @@ namespace Parallel {
                   // Compare received data to stored indexes
                   for(int i = 0; i < toMatch; i++)
                   {
-                     point = std::tr1::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
+                     point = std::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
 
                      mapPos = bwdMap.find(point);
 

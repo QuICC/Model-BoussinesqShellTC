@@ -20,30 +20,16 @@
    #define SharedPtrMacro boost::shared_ptr
 #endif //QUICC_SMARTPTR_BOOST
 
-// TR1 Version
-#ifdef QUICC_SMARTPTR_TR1
-   // Include the right header
-   #include <tr1/memory>
-
-   /**
-    * @def SharedPtrMacro
-    * Macro allowing to use different implementations of the shared_ptr smart pointer.
-    * Sets up the TR1 version.
-    */
-   #define SharedPtrMacro std::tr1::shared_ptr
-#endif //QUICC_SMARTPTR_TR1
-
-// C++0x Version
-#ifdef QUICC_SMARTPTR_CXX0X
+// std (at least C++11) Version
+#ifdef QUICC_SMARTPTR_STD
    // Include the right header
    #include <memory>
 
    /**
     * @def SharedPtrMacro
     * Macro allowing to use different implementations of the shared_ptr smart pointer.
-    * Sets up the C++0x version.
     */
    #define SharedPtrMacro std::shared_ptr
-#endif //QUICC_SMARTPTR_CXX0X
+#endif //QUICC_SMARTPTR_STD
 
 #endif // SHAREDPTRMACRO_H

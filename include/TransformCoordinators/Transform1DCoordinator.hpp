@@ -180,7 +180,7 @@ namespace QuICC {
    template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree)
    {
       // Initialise the transforms
-      this->initTransform(std::tr1::static_pointer_cast<typename T1D::SetupType>(spRes->spTransformSetup(Dimensions::Transform::TRA1D)));
+      this->initTransform(std::static_pointer_cast<typename T1D::SetupType>(spRes->spTransformSetup(Dimensions::Transform::TRA1D)));
 
       // Store the projector tree
       this->mIntegratorTree = integratorTree;

@@ -12,7 +12,7 @@
 
 // System includes
 //
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //

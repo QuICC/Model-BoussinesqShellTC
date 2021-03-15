@@ -14,7 +14,7 @@
 // System includes
 //
 #include <vector>
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -37,7 +37,7 @@ namespace Equations {
    {
       public:
          /// Typedef to simplify notations for harmonic mode
-         typedef std::tr1::tuple<int, int, MHDComplex> HarmonicModeType;
+         typedef std::tuple<int, int, MHDComplex> HarmonicModeType;
 
          /**
           * @brief Simple constructor

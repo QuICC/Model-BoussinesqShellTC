@@ -181,6 +181,11 @@ namespace Solver {
          virtual bool finished();
          
       protected:
+         /// Typedef for shared solver
+         typedef SharedPtrMacro<typename SparseSelector<TOperator>::Type> SharedSolverType;
+         /// Typedef for vector of shared solvers
+         typedef std::vector<SharedSolverType,Eigen::aligned_allocator<SharedSolverType> > VectorSharedSolverType;
+
          /**
           * @brief Initialise the solver matrices storage
           *
@@ -216,7 +221,7 @@ namespace Solver {
          /**
           * @brief Create sparse solvers
           */
-         std::map<MHDFloat,std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > > >  mSolver;
+         std::map<MHDFloat,VectorSharedSolverType>  mSolver;
 
       private:
    };
@@ -265,7 +270,7 @@ namespace Solver {
       }
 
       // Solve other modes
-      typename std::map<MHDFloat, std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > > >::iterator sIt = this->mSolver.find(this->mId);
+      typename std::map<MHDFloat,VectorSharedSolverType>::iterator sIt = this->mSolver.find(this->mId);
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
@@ -302,19 +307,20 @@ namespace Solver {
       // Loop over matrices
       for(typename std::map<MHDFloat,std::vector<TOperator> >::iterator it = this->mLHSMatrix.begin(); it != this->mLHSMatrix.end(); ++it)
       {
-         this->mSolver.insert(std::make_pair(it->first, std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > >()));
+         this->mSolver.insert(std::make_pair(it->first,VectorSharedSolverType()));
 
-         typename std::map<MHDFloat, std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > > >::iterator sIt = this->mSolver.find(it->first);
+         typename std::map<MHDFloat,VectorSharedSolverType>::iterator sIt = this->mSolver.find(it->first);
          sIt->second.reserve(it->second.size());
 
          for(size_t i = 0; i < it->second.size(); ++i)
          {
+            Eigen::aligned_allocator<typename SparseSelector<TOperator>::Type> alloc;
             #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
                FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
 
-               SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type(FrameworkMacro::getSubComm(FrameworkMacro::SPECTRAL, i)));
+               SharedPtrMacro<typename SparseSelector<TOperator>::Type>  solver = std::allocate_shared< typename SparseSelector<TOperator>::Type >(alloc, MpiFramework::getSubComm(MpiFramework::SPECTRAL, i));
             #else
-               SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
+               SharedPtrMacro<typename SparseSelector<TOperator>::Type>  solver = std::allocate_shared< typename SparseSelector<TOperator>::Type>(alloc);
             #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
             sIt->second.push_back(solver);
@@ -338,7 +344,7 @@ namespace Solver {
                   FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
                #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
-               typename std::map<MHDFloat, std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > > >::iterator sIt = this->mSolver.find(it->first);
+               typename std::map<MHDFloat,VectorSharedSolverType>::iterator sIt = this->mSolver.find(it->first);
                // Safety assert to make sur matrix is compressed
                assert(it->second.at(i).isCompressed());
 

@@ -143,17 +143,17 @@ namespace Datatypes {
 
    template <typename TScalar> inline bool ScalarPhysicalVariable<TScalar>::hasPhys() const
    {
-      return this->mspPhys;
+      return static_cast<bool>(this->mspPhys);
    }
 
    template <typename TScalar> inline bool ScalarPhysicalVariable<TScalar>::hasGrad() const
    {
-      return this->mspGrad;
+      return static_cast<bool>(this->mspGrad);
    }
 
    template <typename TScalar> inline bool ScalarPhysicalVariable<TScalar>::hasGrad2() const
    {
-      return this->mspGrad2;
+      return static_cast<bool>(this->mspGrad2);
    }
 
    template <typename TScalar> inline const TScalar&  ScalarPhysicalVariable<TScalar>::phys() const

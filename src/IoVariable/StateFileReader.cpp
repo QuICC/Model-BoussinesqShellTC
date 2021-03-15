@@ -115,7 +115,7 @@ namespace IoVariable {
       if(group >= 0)
       {
          // Storage for the field information
-         std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rScalar);
+         std::vector<std::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rScalar);
 
          // Check for data regularity
          if(this->mIsRegular)
@@ -146,7 +146,7 @@ namespace IoVariable {
       if(group >= 0)
       {
          // Storage for the field information
-         std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo;
+         std::vector<std::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo;
 
          // Check for data regularity
          std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>::iterator it;
@@ -195,7 +195,7 @@ namespace IoVariable {
       if(group >= 0)
       {
          // Storage for the field information
-         std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rComp);
+         std::vector<std::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rComp);
 
          // Check for data regularity
          if(this->mIsRegular)

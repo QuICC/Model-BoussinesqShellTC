@@ -12,7 +12,7 @@
 
 // System includes
 //
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -28,9 +28,9 @@ namespace QuICC {
     */
    //@{
    // No eigen dimension
-   typedef std::tr1::tuple<SparseMatrix,SparseMatrix,SparseMatrix> KronNoEigenRProduct;
+   typedef std::tuple<SparseMatrix,SparseMatrix,SparseMatrix> KronNoEigenRProduct;
    // Single eigen dimension
-   typedef std::tr1::tuple<SparseMatrix,SparseMatrix> KronEigen1DRProduct;
+   typedef std::tuple<SparseMatrix,SparseMatrix> KronEigen1DRProduct;
    // Two eigen dimension
    typedef SparseMatrix KronEigen2DRProduct;
    // Three eigen dimension
@@ -56,9 +56,9 @@ namespace QuICC {
     */
    //@{
    // No eigen dimension
-   typedef std::tr1::tuple<DecoupledZSparse,DecoupledZSparse,DecoupledZSparse> KronNoEigenZProduct;
+   typedef std::tuple<DecoupledZSparse,DecoupledZSparse,DecoupledZSparse> KronNoEigenZProduct;
    // Single eigen dimension
-   typedef std::tr1::tuple<DecoupledZSparse,DecoupledZSparse> KronEigen1DZProduct;
+   typedef std::tuple<DecoupledZSparse,DecoupledZSparse> KronEigen1DZProduct;
    // Two eigen dimension
    typedef DecoupledZSparse KronEigen2DZProduct;
    // Three eigen dimension

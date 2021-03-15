@@ -81,7 +81,7 @@ namespace IoVariable {
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
+      std::vector<std::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
 
       // Check for data regularity
       if(this->mIsRegular)
@@ -104,7 +104,7 @@ namespace IoVariable {
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo;
+      std::vector<std::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo;
 
       // Check for data regularity
       std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>::const_iterator it;

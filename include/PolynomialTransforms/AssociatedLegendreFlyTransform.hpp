@@ -19,7 +19,7 @@
 //
 #include <set>
 #include <map>
-#include <tr1/functional>
+#include <functional>
 
 // External includes
 //
@@ -79,7 +79,7 @@ namespace Transform {
          typedef AssociatedLegendreIds::Integrators IntegratorType;
 
          /// Typedef for the function signature of an operator builder
-         typedef std::tr1::function<void(AssociatedLegendreFlyTransform*, const int, const int, const int, const bool)> OperatorBuilder;
+         typedef std::function<void(AssociatedLegendreFlyTransform*, const int, const int, const int, const bool)> OperatorBuilder;
 
          /**
           * @brief Generate a physical grid
