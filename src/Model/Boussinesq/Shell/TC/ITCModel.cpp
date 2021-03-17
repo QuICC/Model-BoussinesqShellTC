@@ -59,25 +59,13 @@ namespace TC {
       return VectorFormulation::TORPOL;
    }
 
-   void ITCModel::registerNames()
-   {
-      // Physical names
-      PhysicalNames::Velocity::id();
-      PhysicalNames::Temperature::id();
-      // NonDimensional names
-      NonDimensional::Prandtl::id();
-      NonDimensional::Rayleigh::id();
-      NonDimensional::RRatio::id();
-      NonDimensional::Heating::id();
-   }
-
    void ITCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addEquation<Equations::Boussinesq::Shell::TC::Transport>();
+      spSim->addEquation<Equations::Boussinesq::Shell::TC::Transport>(this->spBackend());
                                                            
       // Add Navier-Stokes equation                        
-      spSim->addEquation<Equations::Boussinesq::Shell::TC::Momentum>();
+      spSim->addEquation<Equations::Boussinesq::Shell::TC::Momentum>(this->spBackend());
    }
 
    void ITCModel::addStates(SharedStateGenerator spGen)
