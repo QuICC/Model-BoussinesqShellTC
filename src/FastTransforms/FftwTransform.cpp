@@ -20,6 +20,7 @@
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
+#include "FastTransforms/Validator/FftwTests.hpp"
 
 namespace QuICC {
 
@@ -65,6 +66,9 @@ namespace Transform {
 
       // Register the FFTW object
       FftwLibrary::registerFft();
+
+      // Run validation tests
+      Validator::FftwTests::validateR2C();
    }
 
    void FftwTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
