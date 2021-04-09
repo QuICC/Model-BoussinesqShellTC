@@ -74,7 +74,7 @@ namespace Explicit {
    void PhysicalModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedSphereExactScalarState spScalar;
@@ -231,13 +231,13 @@ namespace Explicit {
       // Create kinetic L energy spectrum writer
       IoVariable::SharedSphereTorPolLSpectrumWriter spKineticL(new IoVariable::SphereTorPolLSpectrumWriter("kinetic", SchemeType::type()));
       spKineticL->expect(PhysicalNames::VELOCITY);
-      spKineticL->numberOutput();
+      //spKineticL->numberOutput();
       spSim->addAsciiOutputFile(spKineticL);
 
       // Create kinetic M energy spectrum writer
       IoVariable::SharedSphereTorPolMSpectrumWriter spKineticM(new IoVariable::SphereTorPolMSpectrumWriter("kinetic", SchemeType::type()));
       spKineticM->expect(PhysicalNames::VELOCITY);
-      spKineticM->numberOutput();
+      //spKineticM->numberOutput();
       spSim->addAsciiOutputFile(spKineticM);
    }
 
