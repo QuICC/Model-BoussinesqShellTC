@@ -1,0 +1,27 @@
+#########################
+# Serial
+env2lmod
+module load gcc
+module load cmake
+module load fftw
+module load hdf5
+module load python
+module load suite-sparse
+module load mumps
+#########################
+
+#########################
+# MPI
+env2lmod
+module load gcc
+module load cmake
+module load openmpi
+module load fftw
+module load hdf5
+module load python
+module load suite-sparse
+module load mumps
+#########################
+
+# Example command for 24 cores, 2h walltime
+bsub -n 24 -W 2:00 -J "RTCBench" 'mpirun ./BoussinesqSphereRTCExplicitModel'
