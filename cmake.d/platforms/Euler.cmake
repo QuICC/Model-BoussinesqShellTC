@@ -43,27 +43,21 @@ set(QUICC_LINALGS "Eigen" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(QUICC_SPLINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
-# MUMPS
-#set(QUICC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "openblas" "goto2" "mpi" "mpi_f90" "mpi_f77" "gfortran" "cmumps" "smumps" "pord" "scalapack" "metis" "parmetis" PARENT_SCOPE)
-#set(QUICC_INCLUDES_MUMPS "$ENV{MUMPS_ROOT}/include" PARENT_SCOPE)
-#set(QUICC_LIBDIR_MUMPS "$ENV{MUMPS_ROOT}/lib" "$ENV{MODULE_open_mpi_ROOT_DIR}/lib" PARENT_SCOPE)
+set(QUICC_SPLINALGS "SparseLU" "UmfPack" PARENT_SCOPE)
 # UmfPack
-#set(QUICC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
-#set(QUICC_INCLUDES_UMFPACK "$ENV{SUITE_SPARSE_ROOT}/include" PARENT_SCOPE)
-#set(QUICC_LIBDIR_UMFPACK "$ENV{SUITE_SPARSE_ROOT}/lib" PARENT_SCOPE)
+set(QUICC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE SPD LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(QUICC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "SparseLU" "MUMPS" PARENT_SCOPE)
+set(QUICC_SPSPDLINALGS "SimplicialLDLT" "SimplicialLLT" "UmfPack" "SparseLU" PARENT_SCOPE)
 
 ###################################################
 #- AVAILABLE SPARSE TRI LINEAR ALGEBRA LIBRARIES -#
 ###################################################
 
-set(QUICC_SPTRILINALGS "SparseLU" "UmfPack" "MUMPS" PARENT_SCOPE)
+set(QUICC_SPTRILINALGS "SparseLU" "UmfPack" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
