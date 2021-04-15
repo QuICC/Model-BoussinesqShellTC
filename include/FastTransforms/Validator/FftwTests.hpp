@@ -1,5 +1,5 @@
 /**
- * @file Fftw.hpp
+ * @file FftwTests.hpp
  * @brief Validation tests for FFTW library
  */
 
