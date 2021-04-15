@@ -27,6 +27,7 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 #include "Python/PythonWrapper.hpp"
+#include "FastTransforms/Validator/FftwTests.hpp"
 
 namespace QuICC {
 
@@ -131,6 +132,10 @@ namespace Transform {
       } else
       {
       }
+
+      // Run validation tests
+      Validator::FftwTests::validateR2R10();
+      Validator::FftwTests::validateR2R01();
 
       // Initialise temporary storage
       this->mTmpIn.setZero(fwdSize, howmany);

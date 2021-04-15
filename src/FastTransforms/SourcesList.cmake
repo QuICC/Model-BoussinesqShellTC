@@ -1,3 +1,7 @@
+set(MHDSrcSubDirs
+   Validator
+)
+
 set(MHDSources
    FftSetup.cpp
 )
