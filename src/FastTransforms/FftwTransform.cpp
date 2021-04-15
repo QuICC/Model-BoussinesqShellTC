@@ -101,9 +101,6 @@ namespace Transform {
          // Run validation tests
          Validator::FftwTests::validateR2C();
          Validator::FftwTests::validateC2R();
-         Validator::FftwTests::validateR2R01();
-         Validator::FftwTests::validateR2R10();
-         Validator::FftwTests::validateR2R11();
 
          // create temporary storage for plan computation
          Matrix    tmpReal(fwdSize, howmany);
