@@ -85,7 +85,7 @@ namespace IoVariable {
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-               lfactor = l_*(l_+1.0);
+               lfactor = std::pow(l_*(l_+1.0),2);
 
                this->storeT1Enstrophy(l_, m_, factor*lfactor*spectrum(idx));
                idx += 1;
@@ -97,7 +97,7 @@ namespace IoVariable {
          for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            lfactor = l_*(l_+1.0);
+            lfactor = std::(l_*(l_+1.0),2);
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
@@ -155,7 +155,7 @@ rType::ENERGY_INTG);
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-               lfactor = sqrt(l_*(l_+1.0));
+               lfactor = l_*(l_+1.0);
 
                this->storeT2Enstrophy(l_, m_, factor*lfactor*spectrum(idx));
                idx += 1;
@@ -167,7 +167,7 @@ rType::ENERGY_INTG);
          for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            lfactor = sqrt(l_*(l_+1.0));
+            lfactor = l_*(l_+1.0);
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
@@ -196,7 +196,7 @@ rType::ENERGY_INTG);
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPolQ = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute poloidal enstrophy integral for first dimension 
-      coord.transform1D().integrate_energy(spectrum, rInVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::ENERGY_PROJ, Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGY_R2);
+      coord.transform1D().integrate_energy(spectrum, rInVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::ENERGY_SLAPL, Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGY_R2);
 
       // Compute poloidal component of the enstrophy
       idx = 0;
@@ -218,7 +218,7 @@ rType::ENERGY_INTG);
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-               lfactor = std::pow(sqrt(l_*(l_+1.0)),2);
+               lfactor = l_*(l_+1.0);
 
                this->storePEnstrophy(l_, m_, factor*lfactor*spectrum(idx));
                idx += 1;
@@ -230,7 +230,7 @@ rType::ENERGY_INTG);
          for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            lfactor = std::pow(sqrt(l_*(l_+1.0)),2);
+            lfactor = l_*(l_+1.0);
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
