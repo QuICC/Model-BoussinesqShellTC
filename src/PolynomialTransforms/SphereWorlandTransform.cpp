@@ -123,7 +123,9 @@ namespace Transform {
       this->mProjOp.insert(std::make_pair(ProjectorType::ENERGY_PROJ,std::vector<Matrix>()));
       this->mProjOp.find(ProjectorType::ENERGY_PROJ)->second.reserve(this->mspSetup->slow().size());
       this->mProjOp.insert(std::make_pair(ProjectorType::ENERGY_DIFFR,std::vector<Matrix>()));
-      this->mProjOp.find(ProjectorType::ENERGY_DIFFR)->second.reserve(this->mspSetup->slow().size());
+      this->mProjOp.find(ProjectorType::ENERGY_DIFFR)->second.reserve(this->mspSetup->slow().size()); 
+      this->mProjOp.insert(std::make_pair(ProjectorType::ENERGY_SLAPL,std::vector<Matrix>()));
+      this->mProjOp.find(ProjectorType::ENERGY_SLAPL)->second.reserve(this->mspSetup->slow().size());
 
       // Reserve storage for the weighted projectors 
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTG,std::vector<Matrix>()));
@@ -361,6 +363,12 @@ namespace Transform {
          Polynomial::WorlandPolynomial::drWnl(op, itmp, l, inrgGrid);
          projIt->second.at(iL) = op.transpose();
 
+         // Projector: SLAPL
+         projIt = this->mProjOp.find(ProjectorType::ENERGY_SLAPL);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), nrgGrid.size()));
+         Polynomial::WorlandPolynomial::slaplWnl(op, itmp, l, inrgGrid);
+         projIt->second.at(iL) = op.transpose();
+
          // Energy integrator's size
          op.resize(nrgGrid.size(), energySize);
 
@@ -415,7 +423,7 @@ namespace Transform {
       spectrum.resize(this->mspSetup->howmany());
 
       // Compute energy integration
-      if((projector == SphereWorlandTransform::ProjectorType::ENERGY_PROJ || projector == SphereWorlandTransform::ProjectorType::ENERGY_DIFFR) && (integrator == SphereWorlandTransform::IntegratorType::ENERGY_INTG || integrator == SphereWorlandTransform::IntegratorType::ENERGY_R2))
+      if((projector == SphereWorlandTransform::ProjectorType::ENERGY_PROJ || projector == SphereWorlandTransform::ProjectorType::ENERGY_DIFFR || projector == SphereWorlandTransform::ProjectorType::ENERGY_SLAPL) && (integrator == SphereWorlandTransform::IntegratorType::ENERGY_INTG || integrator == SphereWorlandTransform::IntegratorType::ENERGY_R2))
       {
          this->setEnergyIntegrator(spectrum, specVal, this->mProjOp.find(projector)->second, this->mIntgOp.find(integrator)->second);
 

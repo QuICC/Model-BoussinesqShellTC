@@ -239,7 +239,12 @@ namespace Explicit {
       spKineticM->expect(PhysicalNames::VELOCITY);
       //spKineticM->numberOutput();
       spSim->addAsciiOutputFile(spKineticM);
-   }
+  
+      // Create enstrophy writer
+      IoVariable::SharedSphereTorPolEnstrophyWriter spKinetic(new IoVariable::SphereTorPolEnstrophyWriter("kinetic", SchemeType::type()));
+      spKinetic->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spKinetic);
+}
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
