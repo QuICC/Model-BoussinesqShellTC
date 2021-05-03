@@ -22,7 +22,7 @@
 //
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoVariable/EnstrophyTags.hpp"
 
 namespace QuICC {
 

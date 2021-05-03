@@ -24,14 +24,14 @@
 //
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
-#include "IoVariable/EnergyTags.hpp"
+#include "IoVariable/EnstrophyTags.hpp"
 
 namespace QuICC {
 
 namespace IoVariable {
 
    ISphericalTorPolEnstrophyWriter::ISphericalTorPolEnstrophyWriter(const std::string& prefix, const std::string& type)
-      : ISphericalTorPolEnstrophyBaseWriter(prefix + EnergyTags::BASENAME, EnergyTags::EXTENSION, prefix + EnergyTags::HEADER, type, EnergyTags::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mTorEnergy(2), mPolEnergy(2)
+      : ISphericalTorPolEnstrophyBaseWriter(prefix + EnstrophyTags::BASENAME, EnstrophyTags::EXTENSION, prefix + EnstrophyTags::HEADER, type, EnstrophyTags::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mTorEnergy(2), mPolEnergy(2)
    {
       this->mTorEnergy.setConstant(-1);
       this->mPolEnergy.setConstant(-1);

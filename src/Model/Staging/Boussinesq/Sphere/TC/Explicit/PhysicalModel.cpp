@@ -37,6 +37,7 @@
 #include "IoVariable/SphereTorPolEnergyWriter.hpp"
 #include "IoVariable/SphereTorPolLSpectrumWriter.hpp"
 #include "IoVariable/SphereTorPolMSpectrumWriter.hpp"
+#include "IoVariable/SphereTorPolEnstrophyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/SphereExactStateIds.hpp"
@@ -45,6 +46,7 @@
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Model/PhysicalModelBase.hpp"
+
 
 namespace QuICC {
 
@@ -241,9 +243,9 @@ namespace Explicit {
       spSim->addAsciiOutputFile(spKineticM);
   
       // Create enstrophy writer
-      IoVariable::SharedSphereTorPolEnstrophyWriter spKinetic(new IoVariable::SphereTorPolEnstrophyWriter("kinetic", SchemeType::type()));
-      spKinetic->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spKinetic);
+      IoVariable::SharedSphereTorPolEnstrophyWriter spEnstrophy(new IoVariable::SphereTorPolEnstrophyWriter("kinetic", SchemeType::type()));
+      spEnstrophy->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spEnstrophy);
 }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
