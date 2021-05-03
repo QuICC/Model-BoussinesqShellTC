@@ -1,11 +1,11 @@
 /** 
  * @file ISphericalTorPolEnstrophyBaseWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical geometry
+ * @brief Implementation of the ASCII spherical harmonics enstrophy calculation for a Toroidal/Poloidal field in a spherical geometry
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWBASERITER_HPP
-#define QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWBASERITER_HPP
+#ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENSTROPHYBASEWRITER_HPP
+#define QUICC_IO_VARIABLE_ISPHERICALTORPOLENSTROPHYBASEWRITER_HPP
 
 // Configuration includes
 //
@@ -111,4 +111,4 @@ namespace IoVariable {
 }
 }
 
-#endif // QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYBASEWRITER_HPP
+#endif // QUICC_IO_VARIABLE_ISPHERICALTORPOLENSTROPHYBASEWRITER_HPP

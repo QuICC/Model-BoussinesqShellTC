@@ -17,6 +17,7 @@ set(MHDSources
    ObservableTags.cpp
    DissipationTags.cpp
    SpectrumTags.cpp
+   EnstrophyTags.cpp
 )
 
 if(QUICC_SPATIALSCHEME STREQUAL "TTT")

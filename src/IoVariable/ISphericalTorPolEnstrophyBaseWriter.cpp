@@ -97,7 +97,7 @@ namespace IoVariable {
          for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            lfactor = std::(l_*(l_+1.0),2);
+            lfactor = std::pow(l_*(l_+1.0),2);
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
@@ -120,23 +120,15 @@ namespace IoVariable {
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
 
       // Dealias toroidal variable data
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spee
-ctral::TOR));
+      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
 
       // Recover dealiased BWD data
-      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().stoo
-rage<Dimensions::Transform::TRA1D>().recoverBwd();
+      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor2 = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute second part of toroidal enstrophy integral for first dimension
-      coord.transform1D().integrate_energy(spectrum, rInVarTor.data(), Transform::TransformCoordinatorType:::
-Transform1DType::ProjectorType::ENERGY_DIFFR, Transform::TransformCoordinatorType::Transform1DType::Integratoo
-rType::ENERGY_INTG);
+      coord.transform1D().integrate_energy(spectrum, rInVarTor2.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::ENERGY_DIFFR, Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGY_INTG);
 
-      this->initializeEnergy();
-
-      MHDFloat lfactor = 0.0;
-      MHDFloat factor = 1.0;
-      int idx = 0;
+      idx = 0;
       if(this->mHasMOrdering)
       {
          // Loop over harmonic order m
@@ -187,7 +179,7 @@ rType::ENERGY_INTG);
 	}
 
       // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor2);
 
       // Dealias poloidal variable data 
       coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));

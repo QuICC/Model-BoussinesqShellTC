@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPHERETORPOLENERGYWRITER_HPP
-#define SPHERETORPOLENERGYWRITER_HPP
+#ifndef SPHERETORPOLENSTROPHYWRITER_HPP
+#define SPHERETORPOLENSTROPHYWRITER_HPP
 
 // Configuration includes
 //
@@ -26,7 +26,7 @@ namespace QuICC {
 namespace IoVariable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a sphere
+    * @brief Implementation of the ASCII spherical harmonics enstrophy calculation for a Toroidal/Poloidal field in a sphere
     */
    class SphereTorPolEnstrophyWriter: public ISphericalTorPolEnstrophyWriter
    {
@@ -60,4 +60,4 @@ namespace IoVariable {
 }
 }
 
-#endif // SPHERETORPOLENERGYWRITER_HPP
+#endif // SPHERETORPOLENSTROPHYWRITER_HPP
