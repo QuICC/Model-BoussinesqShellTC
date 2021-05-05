@@ -102,7 +102,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::SphereExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(2)
+         switch(3)
          {
             case 0:
                // Toroidal
@@ -135,6 +135,11 @@ namespace Explicit {
                ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+	   
+	    case 3:
+	       //Exact
+	       spVector->setStateType(Equations::SphereExactStateIds::VALIDATION_ENSTROPHY);
+	       break;	      	
          }
 
       // Generate random spectrum

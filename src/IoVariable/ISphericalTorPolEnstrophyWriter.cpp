@@ -83,8 +83,8 @@ namespace IoVariable {
    void ISphericalTorPolEnstrophyWriter::write()
    {
       // Normalize by the volume
-      this->mTorEnergy /= 2.0*this->mVolume;
-      this->mPolEnergy /= 2.0*this->mVolume;
+      this->mTorEnergy /= this->mVolume;
+      this->mPolEnergy /= this->mVolume;
 
       // Create file
       this->preWrite();

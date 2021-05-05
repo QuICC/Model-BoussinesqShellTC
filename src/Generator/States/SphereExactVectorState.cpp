@@ -173,7 +173,70 @@ namespace Equations {
                }
             }
          }
+      } else if(typeId == SphereExactStateIds::VALIDATION_ENSTROPHY)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
 
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         Array funcPh = Array::Ones(nPh);
+         Array funcPhC1 = (phGrid).array().cos();
+         Array funcPhS1 = (phGrid).array().sin();
+         MHDFloat funcR = 1.0;
+         MHDFloat amplitude = 1.0;
+         MHDFloat funcTh = 1.0;
+
+         MHDFloat r;
+         MHDFloat theta;
+         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+            for(int iTh = 0; iTh < nTh; ++iTh)
+            {
+               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
+
+               if(compId == FieldComponents::Physical::R)
+               {
+                  amplitude = 0.0;
+                  rNLComp.addProfile(amplitude*funcPh,iTh,iR);
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  amplitude = -10.0/(7.0*std::sqrt(3.0));
+                  funcTh = std::cos(theta);
+
+                  funcR = 3.0*std::pow(r,2)*(-147.0 + 343.0*std::pow(r,2) - 217.0*std::pow(r,4) + 29.0*std::pow(r,6));
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhC1,iTh,iR);
+
+                  funcR = 14.0*std::pow(r,2)*(-9.0 - 125.0*std::pow(r,2) + 39.0*std::pow(r,4) + 27.0*std::pow(r,6));
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhS1,iTh,iR);
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  amplitude = -5.0/5544.;
+
+                  funcR = 7.0*r*(43700.0 - 58113.0*std::pow(r,2) - 15345.0*std::pow(r,4) + 1881.0*std::pow(r,6) + 20790.0*std::pow(r,8));
+                  funcTh = std::sin(theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
+
+                  funcR = 7.0*1485*std::pow(r,3)*(-9.0 + 115.0*std::pow(r,2) - 167.0*std::pow(r,4) + 70.0*std::pow(r,6));
+                  funcTh = std::sin(3.0*theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
+
+                  funcR = 528*std::sqrt(3)*std::pow(r,2)*14*(-9.0 - 125.0*std::pow(r,2) + 39.0*std::pow(r,4) + 27.0*std::pow(r,6));
+                  funcTh = std::cos(2.0*theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhC1,iTh,iR);
+
+                  funcR = 528*std::sqrt(3)*std::pow(r,2)*3*(147.0 - 343.0*std::pow(r,2) + 217.0*std::pow(r,4) - 29.0*std::pow(r,6));
+                  funcTh = std::cos(2.0*theta);
+                  rNLComp.addProfile(amplitude*funcR*funcTh*funcPhS1,iTh,iR);
+               }
+            }
+         }
       } else if(typeId == SphereExactStateIds::BENCHMAGC2)
       {
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
