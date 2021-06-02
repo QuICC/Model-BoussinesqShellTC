@@ -138,7 +138,7 @@ namespace Explicit {
 	   
 	    case 3:
 	       //Exact
-	       spVector->setStateType(Equations::SphereExactStateIds::VALIDATION_ENSTROPHY);
+	       spVector->setStateType(Equations::SphereExactStateIds::VALIDATION_ENSTROPHY2);
 	       break;	      	
          }
 
