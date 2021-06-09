@@ -37,6 +37,7 @@
 #include "IoVariable/SphereTorPolEnergyWriter.hpp"
 #include "IoVariable/SphereTorPolLSpectrumWriter.hpp"
 #include "IoVariable/SphereTorPolMSpectrumWriter.hpp"
+#include "IoVariable/SphereTorPolEnstrophyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/SphereExactStateIds.hpp"
@@ -45,6 +46,7 @@
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Model/PhysicalModelBase.hpp"
+
 
 namespace QuICC {
 
@@ -100,7 +102,7 @@ namespace Explicit {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::SphereExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(2)
+         switch(3)
          {
             case 0:
                // Toroidal
@@ -133,6 +135,11 @@ namespace Explicit {
                ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+	   
+	    case 3:
+	       //Exact
+	       spVector->setStateType(Equations::SphereExactStateIds::VALIDATION_ENSTROPHY2);
+	       break;	      	
          }
 
       // Generate random spectrum
@@ -239,7 +246,12 @@ namespace Explicit {
       spKineticM->expect(PhysicalNames::VELOCITY);
       //spKineticM->numberOutput();
       spSim->addAsciiOutputFile(spKineticM);
-   }
+  
+      // Create enstrophy writer
+      IoVariable::SharedSphereTorPolEnstrophyWriter spEnstrophy(new IoVariable::SphereTorPolEnstrophyWriter("kinetic", SchemeType::type()));
+      spEnstrophy->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spEnstrophy);
+}
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
    {

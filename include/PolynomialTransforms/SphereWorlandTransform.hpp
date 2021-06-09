@@ -54,7 +54,7 @@ namespace Transform {
           *    - ENERGY_PROJ:
           *    - ENERGY_DIFFR:
           */
-         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL, ENERGY_PROJ, ENERGY_DIFFR};
+         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL, ENERGY_PROJ, ENERGY_DIFFR, ENERGY_SLAPL};
       };
 
       /**

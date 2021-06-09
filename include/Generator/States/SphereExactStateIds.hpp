@@ -50,6 +50,8 @@ namespace Equations {
          BENCHTEMPC1 = 50, // Initial temperature perturbation state for full sphere benchmark C1
          BENCHVELC1,       // Initial velocity perturbation state for full sphere benchmark C1
          BENCHVELC2,       // Initial velocity perturbation state for full sphere benchmark C2
+	 VALIDATION_ENSTROPHY1,	// State designed to validate the enstrophy writer
+	 VALIDATION_ENSTROPHY2, // State designed to validate the enstrophy writer
          BENCHMAGC2,       // Initial magnetic perturbation state for full sphere benchmark C2
       };
 
