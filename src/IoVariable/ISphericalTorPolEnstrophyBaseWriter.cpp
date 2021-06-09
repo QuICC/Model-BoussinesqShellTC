@@ -62,7 +62,7 @@ namespace IoVariable {
       // Compute first part of toroidal enstrophy integral for first dimension
       coord.transform1D().integrate_energy(spectrum, rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::ENERGY_PROJ, Transform::TransformCoordinatorType::Transform1DType::IntegratorType::ENERGY_INTG);
 
-      this->initializeEnergy();
+      this->initializeEnstrophy();
 
       MHDFloat lfactor = 0.0;
       MHDFloat factor = 1.0;

@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef ENERGYTAGS_HPP
-#define ENERGYTAGS_HPP
+#ifndef ENSTROPHYTAGS_HPP
+#define ENSTROPHYTAGS_HPP
 
 // System includes
 //
@@ -61,4 +61,4 @@ namespace IoVariable {
 }
 }
 
-#endif // ENERGYTAGS_HPP
+#endif // ENSTROPHYTAGS_HPP

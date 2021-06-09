@@ -51,12 +51,12 @@ namespace IoVariable {
          virtual ~ISphericalTorPolEnstrophyBaseWriter();
 
          /**
-          * @brief Activate output of parity splitting in energy output
+          * @brief Activate output of parity splitting in enstrophy output
           */
          void showParity();
 
          /**
-          * @brief Compute energy for scalar field
+          * @brief Compute enstrophy for scalar field
           */
          void compute(Transform::TransformCoordinatorType& coord);
 
@@ -85,22 +85,22 @@ namespace IoVariable {
          /**
           * @brief Initialize enstrophy storage
           */
-         virtual void initializeEnergy() = 0;
+         virtual void initializeEnstrophy() = 0;
 
          /**
           * @brief Store first toroidal contribution to enstrophy
           */
-         virtual void storeT1Enstrophy(const int l, const int m, const MHDFloat energy) = 0;
+         virtual void storeT1Enstrophy(const int l, const int m, const MHDFloat enstrophy) = 0;
 
          /**
           * @brief Store second toroidal contribution to enstrophy
           */
-         virtual void storeT2Enstrophy(const int l, const int m, const MHDFloat energy) = 0;
+         virtual void storeT2Enstrophy(const int l, const int m, const MHDFloat enstrophy) = 0;
 
          /**
           * @brief Store poloidal contribution to enstrophy
           */
-         virtual void storePEnstrophy(const int l, const int m, const MHDFloat energy) = 0;
+         virtual void storePEnstrophy(const int l, const int m, const MHDFloat enstrophy) = 0;
    };
 
    inline bool ISphericalTorPolEnstrophyBaseWriter::isHeavy() const

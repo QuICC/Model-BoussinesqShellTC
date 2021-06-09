@@ -55,32 +55,32 @@ namespace IoVariable {
          /**
           * @brief Storage for the Toroidal enstrophy
           */
-         Array mTorEnergy;
+         Array mTorEnstrophy;
 
          /**
           * @brief Storage for the Poloidal enstrophy
           */
-         Array mPolEnergy;
+         Array mPolEnstrophy;
 
          /**
           * @brief Initialize enstrophy storage
           */
-         virtual void initializeEnergy();
+         virtual void initializeEnstrophy();
 
          /**
           * @brief Store first toroidal contribution to enstrophy
           */
-         virtual void storeT1Enstrophy(const int l, const int m, const MHDFloat energy);
+         virtual void storeT1Enstrophy(const int l, const int m, const MHDFloat enstrophy);
 
          /**
           * @brief Store second toroidal contribution to enstrophy
           */
-         virtual void storeT2Enstrophy(const int l, const int m, const MHDFloat energy);
+         virtual void storeT2Enstrophy(const int l, const int m, const MHDFloat enstrophy);
 
          /**
           * @brief Store poloidal contribution to enstrophy
           */
-         virtual void storePEnstrophy(const int l, const int m, const MHDFloat energy);
+         virtual void storePEnstrophy(const int l, const int m, const MHDFloat enstrophy);
    };
 
 }
