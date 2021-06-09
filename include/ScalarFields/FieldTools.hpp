@@ -16,7 +16,7 @@
 // System includes
 //
 #include <vector>
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -41,12 +41,12 @@ namespace Datatypes {
          /**
           * @brief Create const field data information
           */
-         template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> static std::vector<std::tr1::tuple<int, int , const T *> > createInfo(const TField<T,DIMENSION>& field);
+         template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> static std::vector<std::tuple<int, int , const T *> > createInfo(const TField<T,DIMENSION>& field);
 
          /**
           * @brief Create field data information
           */
-         template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> static std::vector<std::tr1::tuple<int, int , T *> >  createInfo(TField<T,DIMENSION>& rField);
+         template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> static std::vector<std::tuple<int, int , T *> >  createInfo(TField<T,DIMENSION>& rField);
 
          /**
           * @brief Combine two field with arithmetic operation
@@ -72,10 +72,10 @@ namespace Datatypes {
          virtual ~FieldTools();
    };
 
-   template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> std::vector<std::tr1::tuple<int, int , const T *> > FieldTools::createInfo(const TField<T,DIMENSION>& field)
+   template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> std::vector<std::tuple<int, int , const T *> > FieldTools::createInfo(const TField<T,DIMENSION>& field)
    {
       // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, const T *> > fieldInfo;
+      std::vector<std::tuple<int,int, const T *> > fieldInfo;
 
       // Shift for the pointers
       int shift = 0;
@@ -87,7 +87,7 @@ namespace Datatypes {
          int rows = field.slice(i).rows();
          int cols = field.slice(i).cols();
 
-         fieldInfo.push_back(std::tr1::make_tuple(rows, cols, field.data().data() + shift));
+         fieldInfo.push_back(std::make_tuple(rows, cols, field.data().data() + shift));
 
          shift += rows*cols;
       }
@@ -95,10 +95,10 @@ namespace Datatypes {
       return fieldInfo;
    }
 
-   template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> std::vector<std::tr1::tuple<int, int , T *> > FieldTools::createInfo(TField<T,DIMENSION>& rField)
+   template <typename T, Dimensions::Type DIMENSION, template <typename,Dimensions::Type> class TField> std::vector<std::tuple<int, int , T *> > FieldTools::createInfo(TField<T,DIMENSION>& rField)
    {
       // Storage for the field information
-      std::vector<std::tr1::tuple<int,int, T *> > fieldInfo;
+      std::vector<std::tuple<int,int, T *> > fieldInfo;
 
       // Shift for the pointers
       int shift = 0;
@@ -110,7 +110,7 @@ namespace Datatypes {
          int rows = rField.slice(i).rows();
          int cols = rField.slice(i).cols();
 
-         fieldInfo.push_back(std::tr1::make_tuple(rows, cols, rField.rData().data() + shift));
+         fieldInfo.push_back(std::make_tuple(rows, cols, rField.rData().data() + shift));
 
          shift += rows*cols;
       }

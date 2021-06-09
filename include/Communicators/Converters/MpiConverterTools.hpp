@@ -19,7 +19,7 @@
 #include <cassert>
 #include <set>
 #include <map>
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -48,7 +48,7 @@ namespace Parallel {
    {
       public:
          /// Typedef for a three indexes specifing a point
-         typedef std::tr1::tuple<int,int,int>   Coordinate;
+         typedef std::tuple<int,int,int>   Coordinate;
 
          /**
           * @brief Build local cpu map of forward data
@@ -179,7 +179,7 @@ namespace Parallel {
       // Create MPI displacement list
       for(it = coords.begin(); it != coords.end(); ++it)
       {
-         *(rBuffer+position) = data.point(std::tr1::get<0>(*it), std::tr1::get<1>(*it), std::tr1::get<2>(*it));
+         *(rBuffer+position) = data.point(std::get<0>(*it), std::get<1>(*it), std::get<2>(*it));
 
          // Increment datatype size
          position++;
@@ -194,7 +194,7 @@ namespace Parallel {
       // Create MPI displacement list
       for(it = coords.begin(); it != coords.end(); ++it)
       {
-         rData.rPoint(std::tr1::get<0>(*it), std::tr1::get<1>(*it), std::tr1::get<2>(*it)) = *(buffer + position);
+         rData.rPoint(std::get<0>(*it), std::get<1>(*it), std::get<2>(*it)) = *(buffer + position);
 
          // Increment datatype size
          position++;
@@ -229,7 +229,7 @@ namespace Parallel {
       for(it = sharedMap.begin(); it != sharedMap.end(); ++it)
       {
          // Get address of stored coordinates
-         MPI_Get_address(&data.rPoint(std::tr1::get<0>(it->second), std::tr1::get<1>(it->second), std::tr1::get<2>(it->second)), &element);
+         MPI_Get_address(&data.rPoint(std::get<0>(it->second), std::get<1>(it->second), std::get<2>(it->second)), &element);
 
          // Fill datatype information
          displ[tot] = element - base;
@@ -291,7 +291,7 @@ namespace Parallel {
                i_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,k);
 
                // Combine array indexes into coordinate tuple
-               coord = std::tr1::make_tuple(i, j, k);
+               coord = std::make_tuple(i, j, k);
 
                // Create key as (1D, 2D, 3D)
                key = spRes->counter()->makeKey(fwdDim, i_, j_, k_);
@@ -340,7 +340,7 @@ namespace Parallel {
                i_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
 
                // Combine array indexes into coordinate tuple
-               coord = std::tr1::make_tuple(i + spIdxConv->centralPadding(i_, k), j, k);
+               coord = std::make_tuple(i + spIdxConv->centralPadding(i_, k), j, k);
 
                // Create key as (2D, 3D, 1D)
                key = spRes->counter()->makeKey(Dimensions::jump(fwdDim,1), i_, j_, k_);

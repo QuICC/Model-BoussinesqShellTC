@@ -12,7 +12,7 @@ set(QUICC_COMPILERS "Intel" PARENT_SCOPE)
 #----------- AVAILABLE SMART POINTERS ------------#
 ###################################################
 
-set(QUICC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
+set(QUICC_SMARTPTRS "std" "Boost" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE THREADS MODELS ------------#
@@ -48,10 +48,10 @@ set(QUICC_LINALGS "Eigen" PARENT_SCOPE)
 set(QUICC_SPLINALGS "UmfPack" "MUMPS"  "SparseLU" PARENT_SCOPE)
 set(QUICC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 set(QUICC_LIBRARIES_MUMPS "mkl_scalapack_ilp64" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "mkl_blacs_intelmpi_ilp64" "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "metis" "ifcore" PARENT_SCOPE)
-set(QUICC_INCLUDES_UMFPACK_GCC "/home/stma7353/SuiteSparse/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_UMFPACK_GCC "/home/stma7353/SuiteSparse/lib" PARENT_SCOPE)
-set(QUICC_INCLUDES_UMFPACK_INTEL "/home/stma7353/SuiteSparse/include" PARENT_SCOPE)
-set(QUICC_LIBDIR_UMFPACK_INTEL "/home/stma7353/SuiteSparse/lib" "$ENV{CURC_MKL_LIB}" PARENT_SCOPE)
+set(QUICC_INCLUDES_UMFPACK_GCC "/home/mica5951/SuiteSparse/include" PARENT_SCOPE)
+set(QUICC_LIBDIR_UMFPACK_GCC "/home/mica5951/SuiteSparse/lib" PARENT_SCOPE)
+set(QUICC_INCLUDES_UMFPACK_INTEL "/home/mica5951/SuiteSparse/include" PARENT_SCOPE)
+set(QUICC_LIBDIR_UMFPACK_INTEL "/home/mica5951/SuiteSparse/lib" "$ENV{CURC_MKL_LIB}" PARENT_SCOPE)
 #set(QUICC_INCLUDES_MUMPS_INTEL "/home/phma6156/share/intel/mumps_4/include" PARENT_SCOPE)
 #set(QUICC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/mumps_4/lib" "/home/phma6156/share/intel/scalapack/lib" "/home/phma6156/share/intel/scotch_5/lib" "/home/phma6156/share/intel/parmetis_3/lib" PARENT_SCOPE)
 set(QUICC_INCLUDES_MUMPS "$ENV{CURC_PETSC_INC}" PARENT_SCOPE)
@@ -104,7 +104,7 @@ set(QUICC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
-set(QUICC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
+set(QUICC_CC_ARCH_GCC "-std=c++11 -march=native -O2" PARENT_SCOPE)
 
 set(QUICC_CC_INC_GCC "" PARENT_SCOPE)
 
@@ -118,7 +118,7 @@ set(QUICC_CC_SERIAL_INTEL "icpc" PARENT_SCOPE)
 
 set(QUICC_CC_MPI_INTEL "mpicxx" PARENT_SCOPE)
 
-set(QUICC_CC_ARCH_INTEL "-O2 -xHost" PARENT_SCOPE)
+set(QUICC_CC_ARCH_INTEL "-std=c++11 -O2 -xHost" PARENT_SCOPE)
 
 set(QUICC_CC_INC_INTEL "" PARENT_SCOPE)
 

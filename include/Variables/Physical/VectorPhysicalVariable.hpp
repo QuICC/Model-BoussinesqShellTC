@@ -168,7 +168,7 @@ namespace Datatypes {
 
    template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasPhys() const
    {
-      return this->mspPhys;
+      return static_cast<bool>(this->mspPhys);
    }
 
    template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasGrad() const
@@ -178,7 +178,7 @@ namespace Datatypes {
 
    template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasCurl() const
    {
-      return this->mspCurl;
+      return static_cast<bool>(this->mspCurl);
    }
 
    template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasGrad2() const

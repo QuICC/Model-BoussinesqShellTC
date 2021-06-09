@@ -62,7 +62,7 @@ namespace IoVariable {
       bool sizeStatus = (this->mScalars.size() + this->mVectors.size() == this->mExpected.size());
 
       // Check that the resolution has been set
-      bool resStatus = this->mspRes;
+      bool resStatus = static_cast<bool>(this->mspRes);
 
       return (sizeStatus && resStatus);
    }

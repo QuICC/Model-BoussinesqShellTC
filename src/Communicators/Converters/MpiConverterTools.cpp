@@ -85,9 +85,9 @@ namespace Parallel {
          int col = 0; 
          for(std::set<Coordinate>::iterator it = remoteKeys.begin(); it != remoteKeys.end(); ++it)
          {
-            matRemote(0,col) = std::tr1::get<0>(*it);
-            matRemote(1,col) = std::tr1::get<1>(*it);
-            matRemote(2,col) = std::tr1::get<2>(*it);
+            matRemote(0,col) = std::get<0>(*it);
+            matRemote(1,col) = std::get<1>(*it);
+            matRemote(2,col) = std::get<2>(*it);
             col++;
          }
    
@@ -121,7 +121,7 @@ namespace Parallel {
          // Convert matrix to remoteKeys set
          for(int i = 0; i < matRemote.cols(); i++)
          {
-            key = std::tr1::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
+            key = std::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
             remoteKeys.insert(key);
          }
       }
@@ -188,9 +188,9 @@ namespace Parallel {
          int col = 0; 
          for(std::set<Coordinate>::iterator it = remoteKeys.begin(); it != remoteKeys.end(); ++it)
          {
-            matRemote(0,col) = std::tr1::get<0>(*it);
-            matRemote(1,col) = std::tr1::get<1>(*it);
-            matRemote(2,col) = std::tr1::get<2>(*it);
+            matRemote(0,col) = std::get<0>(*it);
+            matRemote(1,col) = std::get<1>(*it);
+            matRemote(2,col) = std::get<2>(*it);
             col++;
          }
 
@@ -223,7 +223,7 @@ namespace Parallel {
          // Convert matrix to remoteKeys set
          for(int i = 0; i < matRemote.cols(); i++)
          {
-            key = std::tr1::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
+            key = std::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
             remoteKeys.insert(key);
          }
       }

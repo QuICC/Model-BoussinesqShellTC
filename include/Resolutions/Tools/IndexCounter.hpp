@@ -13,7 +13,7 @@
 
 // System includes
 //
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -79,7 +79,7 @@ namespace QuICC {
          /**
           * @brief Generate index key
           */
-         virtual std::tr1::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const;
+         virtual std::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const;
 
          /**
           * @brief Generate index key

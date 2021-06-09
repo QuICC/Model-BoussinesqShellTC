@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <set>
 #include <map>
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //

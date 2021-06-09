@@ -12,7 +12,7 @@ set(QUICC_COMPILERS "CLANG" PARENT_SCOPE)
 #----------- AVAILABLE SMART POINTERS ------------#
 ###################################################
 
-set(QUICC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
+set(QUICC_SMARTPTRS "std" "Boost" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE THREADS MODELS ------------#

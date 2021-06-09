@@ -14,7 +14,7 @@ set(QUICC_ENABLE_DYNAMIC ON PARENT_SCOPE)
 #----------- AVAILABLE SMART POINTERS ------------#
 ###################################################
 
-set(QUICC_SMARTPTRS "TR1" "cxx0x" PARENT_SCOPE)
+set(QUICC_SMARTPTRS "std" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE THREADS MODELS ------------#

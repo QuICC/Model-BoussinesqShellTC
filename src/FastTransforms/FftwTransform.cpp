@@ -20,6 +20,7 @@
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
+#include "FastTransforms/Validator/FftwTests.hpp"
 
 namespace QuICC {
 
@@ -97,6 +98,10 @@ namespace Transform {
 
       if(this->mspSetup->type() == FftSetup::MIXED)
       {
+         // Run validation tests
+         Validator::FftwTests::validateR2C();
+         Validator::FftwTests::validateC2R();
+
          // create temporary storage for plan computation
          Matrix    tmpReal(fwdSize, howmany);
          MatrixZ   tmpCplx(bwdSize, howmany);
@@ -108,6 +113,10 @@ namespace Transform {
          this->mBPlan = fftw_plan_many_dft_c2r(1, fftSize, howmany, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, tmpReal.data(), NULL, 1, fwdSize, FftwLibrary::planFlag());
       } else
       {
+         // Run validation tests
+         Validator::FftwTests::validateDftFwd();
+         Validator::FftwTests::validateDftBwd();
+
          MatrixZ   tmpCplxA(fwdSize, howmany);
          MatrixZ   tmpCplxB(bwdSize, howmany);
 

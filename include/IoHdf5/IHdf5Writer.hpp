@@ -15,7 +15,7 @@
 // System includes
 //
 #include <string>
-#include <tr1/tuple>
+#include <tuple>
 
 // External includes
 //
@@ -140,7 +140,7 @@ namespace IoHdf5 {
           *
           * \tparam T Type of the scalars
           */
-         template <typename T> void writeIrregularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage);
+         template <typename T> void writeIrregularField(hid_t loc, const std::string dsname, const std::vector<std::tuple<int, int, const T *> >& storage);
 
          /**
           * @brief Write a regular field vector dataset (on sliced map)
@@ -156,7 +156,7 @@ namespace IoHdf5 {
           *
           * \tparam T Type of the scalars
           */
-         template <typename T> void writeRegularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage);
+         template <typename T> void writeRegularField(hid_t loc, const std::string dsname, const std::vector<std::tuple<int, int, const T *> >& storage);
 
       private:
    };
@@ -253,7 +253,7 @@ namespace IoHdf5 {
       H5Dclose(dataset);
    }
 
-   template <typename T> void IHdf5Writer::writeRegularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage)
+   template <typename T> void IHdf5Writer::writeRegularField(hid_t loc, const std::string dsname, const std::vector<std::tuple<int, int, const T *> >& storage)
    {
       // Get dimensionality of file data
       int nDims = this->mFileDims.size();
@@ -294,7 +294,7 @@ namespace IoHdf5 {
       for(unsigned int i = 0; i < storage.size() ; ++i)
       {
          // Set memory space (number of columns of block)
-         iDims[0] = std::tr1::get<1>(storage.at(i));
+         iDims[0] = std::get<1>(storage.at(i));
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Set offsets
@@ -304,11 +304,11 @@ namespace IoHdf5 {
          }
 
          // Select corresponding hyperslab (medium dimension is number of block columns)
-         dims[nDims-2] = std::tr1::get<1>(storage.at(i));
+         dims[nDims-2] = std::get<1>(storage.at(i));
          H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffsets, NULL, dims, NULL);
 
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(i)));
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::get<2>(storage.at(i)));
 
          // Reset hyperslab to whole dataset
          H5Sselect_all(filespace);
@@ -333,7 +333,7 @@ namespace IoHdf5 {
       for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()) ; ++i)
       {
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(0)));
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::get<2>(storage.at(0)));
       }
 
       // Close memspace
@@ -349,7 +349,7 @@ namespace IoHdf5 {
       this->freePList(dsPList);
    }
 
-   template <typename T> void IHdf5Writer::writeIrregularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage)
+   template <typename T> void IHdf5Writer::writeIrregularField(hid_t loc, const std::string dsname, const std::vector<std::tuple<int, int, const T *> >& storage)
    {
       // Get dimensionality of file data
       int nDims = this->mFileDims.size();
@@ -381,7 +381,7 @@ namespace IoHdf5 {
       for(unsigned int i = 0; i < storage.size() ; ++i)
       {
          // Set memory space
-         iDims[0] = std::tr1::get<1>(storage.at(i));
+         iDims[0] = std::get<1>(storage.at(i));
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Create non regular hyperslab selection in file
@@ -395,7 +395,7 @@ namespace IoHdf5 {
          }
 
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(i)));
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::get<2>(storage.at(i)));
 
          // Reset hyperslab to whole dataset
          H5Sselect_all(filespace);
@@ -420,7 +420,7 @@ namespace IoHdf5 {
       for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()); ++i)
       {
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(0)));
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::get<2>(storage.at(0)));
       }
 
       // close memspace
