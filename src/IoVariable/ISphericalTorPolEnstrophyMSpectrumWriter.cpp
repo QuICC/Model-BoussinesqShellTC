@@ -41,8 +41,8 @@ namespace IoVariable {
    void ISphericalTorPolEnstrophyMSpectrumWriter::init()
    {
       // Resize storage for spectra
-      this->mTorEnstrophy = Array::Zero(this->res().sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::SPECTRAL));
-      this->mPolEnstrophy = Array::Zero(this->res().sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::SPECTRAL));
+      this->mTorEnstrophy = Array::Zero(this->res().sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::SPECTRAL));
+      this->mPolEnstrophy = Array::Zero(this->res().sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::SPECTRAL));
 
       ISphericalTorPolEnstrophyBaseWriter::init();
    }
