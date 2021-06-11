@@ -55,17 +55,17 @@ namespace IoVariable {
 
    void ISphericalTorPolEnstrophyMSpectrumWriter::storePEnstrophy(const int l, const int m, const MHDFloat enstrophy)
    {
-      this->mPolEnstrophy(l) += enstrophy; 
+      this->mPolEnstrophy(m) += enstrophy; 
    }
 
    void ISphericalTorPolEnstrophyMSpectrumWriter::storeT1Enstrophy(const int l, const int m, const MHDFloat enstrophy)
    {
-      this->mTorEnstrophy(l) += enstrophy; 
+      this->mTorEnstrophy(m) += enstrophy; 
    }
 
    void ISphericalTorPolEnstrophyMSpectrumWriter::storeT2Enstrophy(const int l, const int m, const MHDFloat enstrophy)
    {
-      this->mTorEnstrophy(l) += enstrophy; 
+      this->mTorEnstrophy(m) += enstrophy; 
    }
 
    void ISphericalTorPolEnstrophyMSpectrumWriter::write()
