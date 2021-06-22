@@ -40,8 +40,9 @@ namespace Diagnostics {
 
    MHDFloat SphereCflWrapper::effectiveMaxL(const MHDFloat r) const
    {
+      MHDFloat nL = static_cast<MHDFloat>(this->mspVelocity->spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL));
       MHDFloat l = 0;
-      for(; l < static_cast<MHDFloat>(this->mspVelocity->spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)); l++)
+      for(; l < nL; l++)
       {
          if(r < this->jacobiRoot(l))
          {
@@ -49,7 +50,7 @@ namespace Diagnostics {
          }
       }
 
-      return l;
+      return std::min(l+1, nL-1);
    }
 
    MHDFloat SphereCflWrapper::jacobiRoot(const MHDFloat l) const
