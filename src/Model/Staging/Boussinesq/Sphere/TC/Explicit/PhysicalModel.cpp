@@ -38,6 +38,8 @@
 #include "IoVariable/SphereTorPolLSpectrumWriter.hpp"
 #include "IoVariable/SphereTorPolMSpectrumWriter.hpp"
 #include "IoVariable/SphereTorPolEnstrophyWriter.hpp"
+#include "IoVariable/SphereTorPolEnstrophyLSpectrumWriter.hpp"
+#include "IoVariable/SphereTorPolEnstrophyMSpectrumWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/SphereExactStateIds.hpp"
@@ -251,6 +253,18 @@ namespace Explicit {
       IoVariable::SharedSphereTorPolEnstrophyWriter spEnstrophy(new IoVariable::SphereTorPolEnstrophyWriter("kinetic", SchemeType::type()));
       spEnstrophy->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spEnstrophy);
+
+      // Create kinetic enstrophy L spectrum writer
+      IoVariable::SharedSphereTorPolEnstrophyLSpectrumWriter spEnstrophyL(new IoVariable::SphereTorPolEnstrophyLSpectrumWriter("kinetic_enstrophy", SchemeType::type()));
+      spEnstrophyL->expect(PhysicalNames::VELOCITY);
+      //spEnstrophyL->numberOutput();
+      spSim->addAsciiOutputFile(spEnstrophyL);
+
+      // Create kinetic enstrophy M spectrum writer
+      IoVariable::SharedSphereTorPolEnstrophyMSpectrumWriter spEnstrophyM(new IoVariable::SphereTorPolEnstrophyMSpectrumWriter("kinetic_enstrophy", SchemeType::type()));
+      spEnstrophyM->expect(PhysicalNames::VELOCITY);
+      //spEnstrophyM->numberOutput();
+      spSim->addAsciiOutputFile(spEnstrophyM);
 }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)

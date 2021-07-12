@@ -18,6 +18,7 @@ set(MHDSources
    DissipationTags.cpp
    SpectrumTags.cpp
    EnstrophyTags.cpp
+   EnstrophySpectrumTags.cpp
 )
 
 if(QUICC_SPATIALSCHEME STREQUAL "TTT")
@@ -72,6 +73,8 @@ elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL" OR QUICC_SPATIALSCHEME STREQUAL "BLFM
       ISphericalTorPolMSpectrumWriter.cpp
       ISphericalTorPolEnstrophyBaseWriter.cpp
       ISphericalTorPolEnstrophyWriter.cpp
+      ISphericalTorPolEnstrophyLSpectrumWriter.cpp
+      ISphericalTorPolEnstrophyMSpectrumWriter.cpp
       SphereNusseltWriter.cpp
       SphereScalarEnergyWriter.cpp
       SphereScalarLSpectrumWriter.cpp
@@ -80,5 +83,7 @@ elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL" OR QUICC_SPATIALSCHEME STREQUAL "BLFM
       SphereTorPolLSpectrumWriter.cpp
       SphereTorPolMSpectrumWriter.cpp
       SphereTorPolEnstrophyWriter.cpp
+      SphereTorPolEnstrophyLSpectrumWriter.cpp
+      SphereTorPolEnstrophyMSpectrumWriter.cpp
       )
 endif(QUICC_SPATIALSCHEME STREQUAL "TTT")
