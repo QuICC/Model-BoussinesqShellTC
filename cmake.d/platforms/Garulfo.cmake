@@ -116,10 +116,10 @@ set(QUICC_CC_LIB_MPI_GCC "" PARENT_SCOPE)
 #--------------- PYTHON LIBRARIES ----------------#
 ###################################################
 
-set(QUICC_PYTHONS "python37" PARENT_SCOPE)
+set(QUICC_PYTHONS "python39" PARENT_SCOPE)
 
-set(QUICC_LIBRARIES_PYTHON37 "/usr/lib64/libpython3.7m.so" PARENT_SCOPE)
-set(QUICC_INCLUDES_PYTHON37 "/usr/include/python3.7m" "/usr/lib64/python3.7/site-packages/numpy/core/include/" PARENT_SCOPE)
+set(QUICC_LIBRARIES_PYTHON39 "/usr/lib64/libpython3.9.so" PARENT_SCOPE)
+set(QUICC_INCLUDES_PYTHON39 "/usr/include/python3.9" "/usr/lib64/python3.9/site-packages/numpy/core/include/" PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
