@@ -176,7 +176,7 @@ namespace IoVariable {
                idx += 1;
             }
          }
-	}
+      }
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor2);
