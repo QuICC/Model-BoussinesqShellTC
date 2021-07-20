@@ -2,6 +2,8 @@
 
 ### QuICC is a simulation framework for solving the Navier-Stokes equations in spherical, cylindrical and Cartesian geometry.
 
+An extended tutorial can be found at <https://quicc.github.io/tutorial>.
+
 ## Features:
 
    - Fully spectral using Fourier, Chebyshev, Worland and Associated Legendre basis
