@@ -23,7 +23,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh"]
+        return ["prandtl", "rayleigh", "alpha"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -204,6 +204,8 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
     def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit linear term"""
 
+        Nondim = eq_params['alpha']
+        # alpha=0: nondim. based on diffusive time scale, alpha=1: advective time scale
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -212,16 +214,32 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4(res[0], l, bc, l*(l+1.0))
 
-        elif field_row == ("temperature","") and field_col == ("velocity","pol"):
-            mat = geo.i2(res[0], l, bc, -l*(l+1.0))
+        if Nondim == 0:
+            if field_row == ("velocity","pol") and field_col == ("temperature",""):
+                mat = geo.i4(res[0], l, bc, Ra/Pr*l*(l+1.0))
 
-        if mat is None:
-            raise RuntimeError("Equations are not setup properly!")
+            elif field_row == ("temperature","") and field_col == ("velocity","pol"):
+                mat = geo.i2(res[0], l, bc, -l*(l+1.0))
 
-        return mat
+            if mat is None:
+                raise RuntimeError("Equations are not setup properly!")
+
+            return mat
+
+        elif Nondim == 1:
+            if field_row == ("velocity","pol") and field_col == ("temperature",""):
+                mat = geo.i4(res[0], l, bc, l*(l+1.0))
+
+            elif field_row == ("temperature","") and field_col == ("velocity","pol"):
+                mat = geo.i2(res[0], l, bc, -l*(l+1.0))
+
+            if mat is None:
+                raise RuntimeError("Equations are not setup properly!")
+
+            return mat
+        else:
+            raise RuntimeError("No existing nondimensionalisation chosen")
 
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
@@ -242,6 +260,8 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
+        Nondim = eq_params['alpha']
+        # alpha=0: nondim. based on diffusive time scale, alpha=1: advective time scale 
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -250,29 +270,59 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2lapl(res[0], l, bc, l*(l+1.0)*np.sqrt(Pr/Ra))
 
-        elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","pol"):
-                mat = geo.i4lapl2(res[0], l, bc, l*(l+1.0)*np.sqrt(Pr/Ra))
+        if Nondim == 0:
+            if field_row == ("velocity","tor") and field_col == field_row:
+                mat = geo.i2lapl(res[0], l, bc, l*(l+1.0))
 
-            elif field_col == ("temperature",""):
-                if self.linearize:
-                    mat = geo.i4(res[0], l, bc, -l*(l+1.0))
+            elif field_row == ("velocity","pol"):
+                if field_col == ("velocity","pol"):
+                    mat = geo.i4lapl2(res[0], l, bc, l*(l+1.0))
 
-        elif field_row == ("temperature",""):
-            if field_col == ("velocity","pol"):
-                if self.linearize:
-                    mat = geo.i2(res[0], l, bc, l*(l+1.0))
+                elif field_col == ("temperature",""):
+                    if self.linearize:
+                        mat = geo.i4(res[0], l, bc, -Ra/Pr*l*(l+1.0))
 
-            elif field_col == ("temperature",""):
-                mat = geo.i2lapl(res[0], l, bc, 1.0/np.sqrt(Ra*Pr))
+            elif field_row == ("temperature",""):
+                if field_col == ("velocity","pol"):
+                    if self.linearize:
+                        mat = geo.i2(res[0], l, bc, l*(l+1.0))
 
-        if mat is None:
-            raise RuntimeError("Equations are not setup properly!")
+                elif field_col == ("temperature",""):
+                    mat = geo.i2lapl(res[0], l, bc, 1.0/Pr)
 
-        return mat
+            if mat is None:
+                raise RuntimeError("Equations are not setup properly!")
+
+            return mat
+
+        elif Nondim == 1:
+            if field_row == ("velocity","tor") and field_col == field_row:
+                mat = geo.i2lapl(res[0], l, bc, l*(l+1.0)*np.sqrt(Pr/Ra))
+
+            elif field_row == ("velocity","pol"):
+                if field_col == ("velocity","pol"):
+                    mat = geo.i4lapl2(res[0], l, bc, l*(l+1.0)*np.sqrt(Pr/Ra))
+
+                elif field_col == ("temperature",""):
+                    if self.linearize:
+                        mat = geo.i4(res[0], l, bc, -l*(l+1.0))
+
+            elif field_row == ("temperature",""):
+                if field_col == ("velocity","pol"):
+                    if self.linearize:
+                        mat = geo.i2(res[0], l, bc, l*(l+1.0))
+
+                elif field_col == ("temperature",""):
+                    mat = geo.i2lapl(res[0], l, bc, 1.0/np.sqrt(Ra*Pr))
+
+            if mat is None:
+                raise RuntimeError("Equations are not setup properly!")
+
+            return mat
+         
+        else: 
+            raise RuntimeError("No existing nondimensionalisation chosen")
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
