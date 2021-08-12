@@ -222,24 +222,20 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
             elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                 mat = geo.i2(res[0], l, bc, -l*(l+1.0))
 
-            if mat is None:
-                raise RuntimeError("Equations are not setup properly!")
-
-            return mat
-
         elif Nondim == 1:
             if field_row == ("velocity","pol") and field_col == ("temperature",""):
                 mat = geo.i4(res[0], l, bc, l*(l+1.0))
 
             elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                 mat = geo.i2(res[0], l, bc, -l*(l+1.0))
-
-            if mat is None:
-                raise RuntimeError("Equations are not setup properly!")
-
-            return mat
+                
         else:
             raise RuntimeError("No existing nondimensionalisation chosen")
+            
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat    
 
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
@@ -291,11 +287,6 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                 elif field_col == ("temperature",""):
                     mat = geo.i2lapl(res[0], l, bc, 1.0/Pr)
 
-            if mat is None:
-                raise RuntimeError("Equations are not setup properly!")
-
-            return mat
-
         elif Nondim == 1:
             if field_row == ("velocity","tor") and field_col == field_row:
                 mat = geo.i2lapl(res[0], l, bc, l*(l+1.0)*np.sqrt(Pr/Ra))
@@ -316,13 +307,13 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                 elif field_col == ("temperature",""):
                     mat = geo.i2lapl(res[0], l, bc, 1.0/np.sqrt(Ra*Pr))
 
-            if mat is None:
-                raise RuntimeError("Equations are not setup properly!")
-
-            return mat
-         
         else: 
             raise RuntimeError("No existing nondimensionalisation chosen")
+            
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
