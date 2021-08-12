@@ -39,7 +39,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
-    
+
         fields = [field_row]
 
         return fields
@@ -92,7 +92,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
     def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
-        
+
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -157,7 +157,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                             bc = {0:12}
                     elif field_row == ("velocity","pol") and field_col == field_row:
                             bc = {0:21}
-            
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
@@ -184,7 +184,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                         bc = {0:-12, 'rt':1}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-21, 'rt':2}
-        
+
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
@@ -228,14 +228,14 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
 
             elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                 mat = geo.i2(res[0], l, bc, -l*(l+1.0))
-                
+
         else:
             raise RuntimeError("No existing nondimensionalisation chosen")
-            
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
-        return mat    
+        return mat
 
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
@@ -257,7 +257,7 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         Nondim = eq_params['alpha']
-        # alpha=0: nondim. based on diffusive time scale, alpha=1: advective time scale 
+        # alpha=0: nondim. based on diffusive time scale, alpha=1: advective time scale
         assert(eigs[0].is_integer())
         l = eigs[0]
 
@@ -307,9 +307,9 @@ class BoussinesqTCSphereStd(base_model.BaseModel):
                 elif field_col == ("temperature",""):
                     mat = geo.i2lapl(res[0], l, bc, 1.0/np.sqrt(Ra*Pr))
 
-        else: 
+        else:
             raise RuntimeError("No existing nondimensionalisation chosen")
-            
+
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
