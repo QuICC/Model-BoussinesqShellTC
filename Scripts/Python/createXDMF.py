@@ -64,7 +64,7 @@ def main(argv):
         gSlow = 'x'
         gMid = 'y'
         gFast = 'z'
-    elif scheme in [b'AFT', b'CFT', b'WFT']:
+    elif scheme in [b'AFT', b'WFT']:
         gSlow = 'r'
         gMid = 'theta'
         gFast = 'z'
@@ -108,8 +108,6 @@ def main(argv):
 
     # Open file
     out_file = open(outputfile, 'w')
-    if snapshots > 1:
-        print(xdmfSeries(), file=out_file)
     for fId in range(sId, sId+snapshots):
         sGrids = list([])
         current = basename+str(fId).zfill(4)+'.hdf5'
@@ -126,14 +124,14 @@ def main(argv):
             if scheme in [b'TTT', b'TT', b'TF']:
                 rMid = True
 
-            sHead = xdmfHead((basename,fId), gridfname, nFast = nFast, nMid = nMid, nSlow = nSlow)
-            sGrids.append(xdmfVGrid([(nFast, gFast, rFast),(nMid, gMid, rMid),(nSlow, gSlow, rSlow)]))
+            sHead = xdmfHead((basename,sId,sId+snapshots), gridfname, nFast = nFast, nMid = nMid, nSlow = nSlow)
+            sGrids.append(xdmfVGrid([(nFast, gFast, rFast),(nMid, gMid, rMid),(nSlow, gSlow, rSlow), fId]))
 
-        elif scheme in [b'CFT', b'WFT', b'AFT', b'SLFm', b'SLFl', b'WLFl', b'WLFm']:
+        elif scheme in [b'WFT', b'AFT', b'SLFm', b'SLFl', b'WLFl', b'WLFm']:
             nCells = None
             if fId == sId:
                 efuncs = None
-                if scheme in [b'CFT',b'WFT']:
+                if scheme in [b'WFT']:
                     gridfunc = cylinderXYZ
                     gridfname = 'cylinder'
                 elif scheme in [b'AFT']:
@@ -165,23 +163,26 @@ def main(argv):
 
                 makeGridFile(h5_file, gFast, gMid, gSlow, gridfname, gridfunc, efuncs)
 
-            sHead = xdmfHead((basename,fId), gridfname, nFast, nMid, nSlow, nCells = nCells)
+            sHead = xdmfHead((basename,sId,sId+snapshots), gridfname, nFast, nMid, nSlow, nCells = nCells)
             sGrids.append(xdmfGrid(comps = [gFast[0], gMid[0], gSlow[0]]))
             if with_unstructured:
                 sGrids.append(xdmfUnstructuredGrid(comps = [gFast[0], gMid[0], gSlow[0]]))
 
-        print(sHead, file=out_file)
+        if fId == sId:
+            print(sHead, file=out_file)
+            if snapshots > 1:
+                print(xdmfSeries(), file=out_file)
         for sGrid in sGrids:
             print(sGrid, file=out_file)
             # Create scalars
             for s in list(h5_file):
                 if s in list(h5_file[s]):
-                    print(xdmfScalar(s), file=out_file)
+                    print(xdmfScalar(s, fId = fId), file=out_file)
             # Create vectors
             for v in list(h5_file):
                 # Extract vectors
                 if v +  '_' + gFast in h5_file[v] and len(h5_file[v]) == 3:
-                    vcomps = vcompfunc(v, gFast, gMid, gSlow)
+                    vcomps = vcompfunc(v, gFast, gMid, gSlow, fId = fId)
                     print(xdmfVector(vname = v, comps = vcomps), file=out_file)
             # Create vectors as scalars if requested
             if with_components:
@@ -189,27 +190,29 @@ def main(argv):
                     # Extract vectors
                     for ext in [gFast, gMid, gSlow]:
                         if (ext is not None) and (v +  '_' + ext in list(h5_file[v])):
-                            print(xdmfVScalar(vname = v, sname = v +  '_' + ext), file=out_file)
+                            print(xdmfVScalar(vname = v, sname = v +  '_' + ext), fId = fId, file=out_file)
                     # Extract 2D tensors
                     for ext1 in [gFast, gMid, gSlow]:
                         for ext2 in [gFast, gMid, gSlow]:
                             if (ext1 is not None and ext2 is not None) and (v +  '_' + ext1 + ext2 in list(h5_file[v])):
-                                print(xdmfVScalar(vname = v, sname = v +  '_' + ext1 + ext2), file=out_file)
+                                print(xdmfVScalar(vname = v, sname = v +  '_' + ext1 + ext2), fId = fId, file=out_file)
             # Create energy density function if requested
             if with_energy:
                 for v in list(h5_file):
                     if v +  '_' + gFast in h5_file[v] and len(h5_file[v]) == 3:
-                        print(xdmfEScalar(ename = v +  '_energy', vname = v, comps = [gSlow,gMid,gFast]), file=out_file)
+                        print(xdmfEScalar(ename = v +  '_energy', vname = v, comps = [gSlow,gMid,gFast], fId = fId), file=out_file)
             # Create cylindrical radial component if requested
             if with_cylradius:
                 for v in list(h5_file):
                     if v +  '_' + gFast in h5_file[v] and len(h5_file[v]) == 3:
-                        comps = sphCylRadiusComps(v, gFast, gMid, gSlow)
+                        comps = sphCylRadiusComps(v, gFast, gMid, gSlow, fId = fId)
                         print(xdmfFScalar(fname = v +  '_s', func = xdmfFuncCylRad, comps = comps), file=out_file)
             time = h5_file['run']['time'][()]
             print(xdmfTime(time), file=out_file)
             print(xdmfEndGrid(), file=out_file)
         h5_file.close()
+    if snapshots > 1 and fId == sId + snapshots - 1:
+        print(xdmfEndGrid(), file=out_file)
     print(xdmfEnd(), file=out_file)
     out_file.close()
 
@@ -274,8 +277,9 @@ def xdmfHead(data, grid, nFast, nMid, nSlow, nCells = None):
         s += tab + f'<!ENTITY vDimsGrid "{nMid} {nFast} 2">' + endl
         s += tab + f'<!ENTITY gDimsGrid "{nN} 2">' + endl
     if data is not None:
-        dataFile = f'{data[0]}{data[1]:04d}.hdf5'
-        s += tab + f'<!ENTITY dataFile "{dataFile}">' + endl
+        for i in range(data[1], data[2]):
+            dataFile = f'{data[0]}{i:04d}.hdf5'
+            s += tab + f'<!ENTITY dataFile{i:04d} "{dataFile}">' + endl
     if grid is not None:
         gridFile = f'{grid}_grid.hdf5'
         s += tab + f'<!ENTITY gridFile "{gridFile}">' + endl
@@ -292,7 +296,7 @@ def xdmfRevGridEnd(bt = 4):
     s = tab*bt + '</DataItem>'
     return s
 
-def xdmfVGrid(comps, bt = 2):
+def xdmfVGrid(comps, fId, bt = 2):
     s  = tab*bt + '<Grid Name="structured_grid" GridType="Uniform">' + endl
     s += tab*(bt+1) + '<Topology TopologyType="&topoVType;" NumberOfElements="&topoCells;"/>' + endl
     s += tab*(bt+1) + '<Geometry GeometryType="&geoVType;">' + endl
@@ -300,7 +304,7 @@ def xdmfVGrid(comps, bt = 2):
         if c[2]:
             s += xdmfRevGrid(c[0], bt = bt+2) + endl
         s += tab*(bt+2) + f'<DataItem Dimensions="{c[0]}" NumberType="Float" Precision="8" Format="HDF">' + endl
-        s += tab*(bt+3) + '&dataFile;:/mesh/grid_{c[1]}' + endl
+        s += tab*(bt+3) + '&dataFile{fId:04d};:/mesh/grid_{c[1]}' + endl
         s += tab*(bt+2) + '</DataItem>' + endl
         if c[2]:
             s += xdmfRevGridEnd(bt = bt+2) + endl
@@ -332,18 +336,18 @@ def xdmfUnstructuredGrid(comps, bt = 2):
     return s
 
 
-def xdmfScalar(sname, bt = 3):
+def xdmfScalar(sname, fId, bt = 3):
     s  = tab*bt + f'<Attribute Name="{sname}" AttributeType="Scalar" Center="Node">' + endl
     s += tab*(bt+1) + '<DataItem Dimensions="&sDimsGrid;" NumberType="Float" Precision="8" Format="HDF">' + endl
-    s += tab*(bt+2) + f'&dataFile;:/{sname}/{sname}' + endl
+    s += tab*(bt+2) + f'&dataFile{fId:04d};:/{sname}/{sname}' + endl
     s += tab*(bt+1) + '</DataItem>' + endl
     s += tab*bt + '</Attribute>'
     return s
 
-def xdmfVScalar(vname, sname, bt = 3):
+def xdmfVScalar(vname, fId, sname, bt = 3):
     s  = tab*bt + f'<Attribute Name="{sname}" AttributeType="Scalar" Center="Node">' + endl
     s += tab*(bt+1) + '<DataItem Dimensions="&sDimsGrid;" NumberType="Float" Precision="8" Format="HDF">' + endl
-    s += tab*(bt+2) + f'&dataFile;:/{vname}/{sname}' + endl
+    s += tab*(bt+2) + f'&dataFile{fId:04d};:/{vname}/{sname}' + endl
     s += tab*(bt+1) + '</DataItem>' + endl
     s += tab*bt + '</Attribute>'
     return s
@@ -373,11 +377,11 @@ def xdmfVector(vname, comps, bt = 3):
     s += tab*bt + '</Attribute>'
     return s
 
-def xdmfEScalar(ename, vname, comps, bt = 3):
+def xdmfEScalar(ename, vname, fId, comps, bt = 3):
     s  = tab*bt + f'<Attribute Name="{ename}" AttributeType="Scalar" Center="Node">' + endl
     fcomps = list()
     for c in comps:
-        fcomps.append({'f':'&dataFile;',
+        fcomps.append({'f':'&dataFile{fId:04d};',
             'g':vname,
             's':f'{vname}_{c}'})
     s += xdmfFunction(xdmfFuncEnergy, fcomps, bt = bt+1) + endl
@@ -454,33 +458,33 @@ def sphereXYZ(pph, pth, pr):
 def shellXYZ(pph, pth, pr):
     return np.array([pr*cos(pth)*np.ones(pph.shape), pr*np.sin(pth)*np.cos(pph), pr*np.sin(pth)*np.sin(pph)]).T
 
-def sphVComps(vname, gFast, gMid, gSlow):
-    x = {'c': [{'f':'&dataFile;','g':vname,'s':f'{vname}_{gSlow}'},
-               {'f':'&dataFile;','g':vname,'s':f'{vname}_{gMid}'},
-               {'f':'&dataFile;','g':vname,'s':f'{vname}_{gFast}'},
+def sphVComps(vname, gFast, gMid, gSlow, fId):
+    x = {'c': [{'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gSlow}'},
+               {'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gMid}'},
+               {'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gFast}'},
                {'f':'&gridFile;','g':'mesh','s':'grid_cos_t'},
                {'f':'&gridFile;','g':'mesh','s':'grid_sin_t'},
                {'f':'&gridFile;','g':'mesh','s':'grid_cos_p'},
                {'f':'&gridFile;','g':'mesh','s':'grid_sin_p'},],
          'func':xdmfFuncSph2X}
-    y = {'c': [{'f':'&dataFile;','g':vname,'s':f'{vname}_{gSlow}'},
-               {'f':'&dataFile;','g':vname,'s':f'{vname}_{gMid}'},
-               {'f':'&dataFile;','g':vname,'s':f'{vname}_{gFast}'},
+    y = {'c': [{'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gSlow}'},
+               {'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gMid}'},
+               {'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gFast}'},
                {'f':'&gridFile;','g':'mesh','s':'grid_cos_t'},
                {'f':'&gridFile;','g':'mesh','s':'grid_sin_t'},
                {'f':'&gridFile;','g':'mesh','s':'grid_cos_p'},
                {'f':'&gridFile;','g':'mesh','s':'grid_sin_p'},],
          'func':xdmfFuncSph2Y}
-    z = {'c': [{'f':'&dataFile;','g':vname,'s':f'{vname}_{gSlow}'},
-               {'f':'&dataFile;','g':vname,'s':f'{vname}_{gMid}'},
+    z = {'c': [{'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gSlow}'},
+               {'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gMid}'},
                {'f':'&gridFile;','g':'mesh','s':'grid_cos_t'},
                {'f':'&gridFile;','g':'mesh','s':'grid_sin_t'},],
          'func':xdmfFuncSph2Z}
     return [x,y,z]
 
 def sphCylRadiusComps(vname, gFast, gMid, gSlow):
-    c = [{'f':'&dataFile;','g':vname,'s':f'{vname}_{gSlow}'},
-               {'f':'&dataFile;','g':vname,'s':f'{vname}_{gMid}'},
+    c = [{'f':'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gSlow}'},
+               {'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gMid}'},
                {'f':'&gridFile;','g':'mesh','s':'grid_cos_t'},
                {'f':'&gridFile;','g':'mesh','s':'grid_sin_t'},]
     return c
