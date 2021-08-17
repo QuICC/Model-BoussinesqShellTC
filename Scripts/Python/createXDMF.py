@@ -482,8 +482,8 @@ def sphVComps(vname, gFast, gMid, gSlow, fId):
          'func':xdmfFuncSph2Z}
     return [x,y,z]
 
-def sphCylRadiusComps(vname, gFast, gMid, gSlow):
-    c = [{'f':'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gSlow}'},
+def sphCylRadiusComps(vname, gFast, gMid, gSlow, fId):
+    c = [{'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gSlow}'},
                {'f':f'&dataFile{fId:04d};','g':vname,'s':f'{vname}_{gMid}'},
                {'f':'&gridFile;','g':'mesh','s':'grid_cos_t'},
                {'f':'&gridFile;','g':'mesh','s':'grid_sin_t'},]
