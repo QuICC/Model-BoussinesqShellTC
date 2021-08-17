@@ -317,7 +317,7 @@ class GEVP:
         self.evp_lmb = None
         self.evp_vec = None
         self.changed = True
-        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv, geometry = geometry, impose_symmetry = impose_symmetry, use_spherical_evp = use_spherical_evp)
+        self.solver = solver_mod.GEVPSolver(tol = tol, ellipse_radius = ellipse_radius, fixed_shift = fixed_shift, target = target, euler = euler, conv_idx = conv_idx, spectrum_conv = spectrum_conv, geometry = geometry, impose_symmetry = impose_symmetry, use_spherical_evp = use_spherical_evp, whichTarget = None)
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -325,6 +325,8 @@ class GEVP:
 
     def setupProblem(self, Ra):
         """Build A and B matrices for the given rayleigh number"""
+        # generate operators opA, opB, opC that args are already set by functools.partial(), but no calculation has been
+        # at this stage. functions are given in the first arg in partial().
 
         self.eq_params['rayleigh'] = Ra
 
@@ -702,7 +704,7 @@ def compute(gevp_opts, marginal_opts):
         Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
         gevp_opts['eigs'] = gevp_opts['wave'](kp)
         gevp_opts['tol'] = marginal_opts['evp_tol']
-        gevp = GEVP(**gevp_opts)
+        gevp = GEVP(**gevp_opts) # create solver GEVP object and its solver with gevp.solver
 
     if marginal_opts['plot_spy'] or marginal_opts['write_mtx']:
         gevp.viewOperators(Ra, spy = marginal_opts['plot_spy'], write_mtx = marginal_opts['write_mtx'])

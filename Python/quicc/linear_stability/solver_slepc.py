@@ -23,7 +23,7 @@ Print = PETSc.Sys.Print
 class GEVPSolver:
     """GEVP Solver using on SLEPc"""
 
-    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None, impose_symmetry = False, use_spherical_evp = False):
+    def __init__(self, shift_range = None, tol = 1e-8, ellipse_radius = None, fixed_shift = False, target = None, euler = None, conv_idx = 1, spectrum_conv = 1, geometry = None, impose_symmetry = False, use_spherical_evp = False, whichTarget = None):
         """Initialize the SLEPc solver"""
 
         self.tol = tol
@@ -36,6 +36,7 @@ class GEVPSolver:
         self.geometry = geometry
         self.impose_symmetry = impose_symmetry
         self.use_spherical_evp = use_spherical_evp
+        self.whichTarget = whichTarget
 
         if shift_range is None:
             #self.shift_range = (1e-2, 0.2)
@@ -73,6 +74,11 @@ class GEVPSolver:
         else:
             self.E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
             #self.E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
+
+        # Override target type
+        if self.whichTarget is not None:
+            self.E.setWhichEigenpairs(self.whichTarget)
+
         self.E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
         self.E.setTolerances(tol = self.tol)
 
@@ -85,10 +91,10 @@ class GEVPSolver:
             self.shift = self.target
         ST.setShift(self.shift)
 
-        KSP = ST.getKSP()
+        KSP = ST.getKSP() # Krylov subspace method
         KSP.setType('preonly')
 
-        PC = KSP.getPC()
+        PC = KSP.getPC() # Preconditioning
         PC.setType('lu')
         PC.setFactorSolverType('mumps')
 
