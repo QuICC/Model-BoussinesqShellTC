@@ -81,7 +81,7 @@ namespace TC {
          std::pair<Equations::SHMapType::iterator,bool> ptSH;
 
          // Add temperature initial state generator
-         spScalar = spGen->addEquation<Equations::ShellExactScalarState>();
+         spScalar = spGen->addEquation<Equations::ShellExactScalarState>(this->spBackend());
          spScalar->setIdentity(PhysicalNames::Temperature::id());
          switch(0)
          {
@@ -99,7 +99,7 @@ namespace TC {
          }
 
          // Add temperature initial state generator
-         spVector = spGen->addEquation<Equations::ShellExactVectorState>();
+         spVector = spGen->addEquation<Equations::ShellExactVectorState>(this->spBackend());
          spVector->setIdentity(PhysicalNames::Velocity::id());
          switch(2)
          {
@@ -169,12 +169,12 @@ namespace TC {
       Equations::SharedVectorFieldVisualizer spVector;
 
       // Add temperature field visualization
-      spScalar = spVis->addEquation<Equations::ScalarFieldVisualizer>();
+      spScalar = spVis->addEquation<Equations::ScalarFieldVisualizer>(this->spBackend());
       spScalar->setFields(true, true);
       spScalar->setIdentity(PhysicalNames::Temperature::id());
 
       // Add velocity field visualization
-      spVector = spVis->addEquation<Equations::VectorFieldVisualizer>();
+      spVector = spVis->addEquation<Equations::VectorFieldVisualizer>(this->spBackend());
       spVector->setFields(true, false, true);
       spVector->setIdentity(PhysicalNames::Velocity::id());
 
