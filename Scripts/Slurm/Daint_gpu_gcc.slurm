@@ -1,17 +1,21 @@
 #!/bin/bash -l
-#SBATCH --job-name="DynSphere"
-#SBATCH --partition=normal
-#SBATCH --time=00:15:00
+#SBATCH --job-name="QuICCJob"
+##SBATCH --account="s872"
+#SBATCH --mail-type=ALL
+##SBATCH --mail-user=forgot@tosetemail.com
+#SBATCH --time=01:00:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=12
 #SBATCH --ntasks-per-core=1
+#SBATCH --ntasks-per-node=12
 #SBATCH --cpus-per-task=1
+#SBATCH --partition=normal
 #SBATCH --constraint=gpu
 #SBATCH --hint=nomultithread
 #SBATCH --output=slurm_out.%j
 #SBATCH --error=slurm_err.%j
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export CRAY_CUDA_MPS=1
 
 module load daint-gpu
 module switch PrgEnv-cray PrgEnv-gnu
