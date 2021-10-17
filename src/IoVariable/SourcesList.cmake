@@ -9,6 +9,7 @@ set(MHDSources
    IVariableHdf5Reader.cpp
    VisualizationFileTags.cpp
    VisualizationFileWriter.cpp
+   AngularMomentumTags.cpp
    AverageTags.cpp
    EnergyTags.cpp
    NusseltTags.cpp
@@ -75,6 +76,7 @@ elseif(QUICC_SPATIALSCHEME STREQUAL "BLFL" OR QUICC_SPATIALSCHEME STREQUAL "BLFM
       ISphericalTorPolEnstrophyWriter.cpp
       ISphericalTorPolEnstrophyLSpectrumWriter.cpp
       ISphericalTorPolEnstrophyMSpectrumWriter.cpp
+      SphereAngularMomentumWriter.cpp
       SphereNusseltWriter.cpp
       SphereScalarEnergyWriter.cpp
       SphereScalarLSpectrumWriter.cpp

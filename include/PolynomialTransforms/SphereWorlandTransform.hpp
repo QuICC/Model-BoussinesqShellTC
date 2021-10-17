@@ -54,7 +54,7 @@ namespace Transform {
           *    - ENERGY_PROJ:
           *    - ENERGY_DIFFR:
           */
-         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL, ENERGY_PROJ, ENERGY_DIFFR, ENERGY_SLAPL};
+         enum Id {PROJ, DIVR, DIFF, DIFFR, DIVRDIFFR, SLAPL, ENERGY_PROJ, ENERGY_DIFFR, ENERGY_SLAPL, VOLUME_PROJ};
       };
 
       /**
@@ -74,7 +74,7 @@ namespace Transform {
           *    - ENERGY_INTG: compute definite energy integral
           *    - ENERGY_R2: compute definite energy integral with spherical radial weight
           */
-         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2, ENERGY_INTG, ENERGY_R2};
+         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2, ENERGY_INTG, ENERGY_R2, VOLUME_R3};
       };
 
    };
@@ -163,6 +163,17 @@ namespace Transform {
           */
          void integrate_energy(Array& spectrum, const MatrixZ& specVal, ProjectorType::Id projector, IntegratorType::Id integrator);
 
+         /**
+          * @brief Compute quadrature integration for volume integral
+          *
+          * Compute quadrature integration from energy integral
+          *
+          * @param spectrum   Output energy spectrum
+          * @param specVal    Input physical values
+          * @param integrator Integrator to use
+          */
+         void integrate_volume(ArrayZ& integral, const MatrixZ& specVal, ProjectorType::Id projector, IntegratorType::Id integrator);
+
      #ifdef QUICC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
@@ -192,6 +203,11 @@ namespace Transform {
           * @brief Compute energy integration with vector of operators
           */
          void setEnergyIntegrator(Array& spectrum, const MatrixZ& specVal, const std::vector<Matrix>& projOps, const std::vector<Matrix>& intgOps);
+
+         /**
+          * @brief Compute volume intetral with vector of operators
+          */
+         void setVolumeIntegrator(ArrayZ& integral, const MatrixZ& specVal, const std::vector<Matrix>& projOps, const std::vector<Matrix>& intgOps);
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1]

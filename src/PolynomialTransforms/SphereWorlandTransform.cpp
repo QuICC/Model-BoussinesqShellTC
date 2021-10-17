@@ -126,6 +126,8 @@ namespace Transform {
       this->mProjOp.find(ProjectorType::ENERGY_DIFFR)->second.reserve(this->mspSetup->slow().size()); 
       this->mProjOp.insert(std::make_pair(ProjectorType::ENERGY_SLAPL,std::vector<Matrix>()));
       this->mProjOp.find(ProjectorType::ENERGY_SLAPL)->second.reserve(this->mspSetup->slow().size());
+      this->mProjOp.insert(std::make_pair(ProjectorType::VOLUME_PROJ,std::vector<Matrix>()));
+      this->mProjOp.find(ProjectorType::VOLUME_PROJ)->second.reserve(this->mspSetup->slow().size());
 
       // Reserve storage for the weighted projectors 
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTG,std::vector<Matrix>()));
@@ -146,6 +148,8 @@ namespace Transform {
       this->mIntgOp.find(IntegratorType::ENERGY_INTG)->second.reserve(this->mspSetup->slow().size());
       this->mIntgOp.insert(std::make_pair(IntegratorType::ENERGY_R2,std::vector<Matrix>()));
       this->mIntgOp.find(IntegratorType::ENERGY_R2)->second.reserve(this->mspSetup->slow().size());
+      this->mIntgOp.insert(std::make_pair(IntegratorType::VOLUME_R3,std::vector<Matrix>()));
+      this->mIntgOp.find(IntegratorType::VOLUME_R3)->second.reserve(this->mspSetup->slow().size());
 
       // Prepare arguments to Python matrices call
       PyObject *pArgs, *pValue;
@@ -369,6 +373,12 @@ namespace Transform {
          Polynomial::WorlandPolynomial::slaplWnl(op, itmp, l, inrgGrid);
          projIt->second.at(iL) = op.transpose();
 
+         // Projector
+         projIt = this->mProjOp.find(ProjectorType::VOLUME_PROJ);
+         projIt->second.push_back(Matrix(this->mspSetup->fast().at(iL).size(), nrgGrid.size()));
+         Polynomial::WorlandPolynomial::Wnl(op, itmp, l, inrgGrid);
+         projIt->second.at(iL) = op.transpose();
+
          // Energy integrator's size
          op.resize(nrgGrid.size(), energySize);
 
@@ -389,6 +399,18 @@ namespace Transform {
          op.resize(nrgGrid.size(), energySize);
          Polynomial::WorlandPolynomial::Wnl(op, ipoly, 2*l, inrgGrid);
          intgIt->second.at(iL).col(0) = (energyWeights.transpose()*matNRG_R2*op.transpose()*nrgWeights.asDiagonal()).transpose();
+         if(intgIt->second.at(iL).rows() != nrgGrid.size()|| intgIt->second.at(iL).cols() != 1)
+         {
+            throw Exception("Spherical Worland transform operators not setup properly!");
+         }
+
+         // Integrator: VOLUME_R3
+         intgIt = this->mIntgOp.find(IntegratorType::VOLUME_R3);
+         intgIt->second.push_back(Matrix(nrgGrid.size(), 1));
+         op.resize(nrgGrid.size(), energySize);
+         Polynomial::WorlandPolynomial::Wnl(op, ipoly, 2*l, inrgGrid);
+         Array r3 = nrgWeights.array()*nrgGrid.array().pow(3);
+         intgIt->second.at(iL).col(0) = (energyWeights.topRows(energySize).transpose()*op.transpose()*r3.asDiagonal()).transpose();
          if(intgIt->second.at(iL).rows() != nrgGrid.size()|| intgIt->second.at(iL).cols() != 1)
          {
             throw Exception("Spherical Worland transform operators not setup properly!");
@@ -430,6 +452,24 @@ namespace Transform {
       } else
       {
          throw Exception("Requested an unknown energy integrator");
+      }
+
+   }
+
+   void SphereWorlandTransform::integrate_volume(ArrayZ& integral, const MatrixZ& specVal, SphereWorlandTransform::ProjectorType::Id projector, SphereWorlandTransform::IntegratorType::Id integrator)
+   {
+      // assert right sizes for output matrix
+      assert(specVal.cols() == this->mspSetup->howmany());
+      integral.resize(this->mspSetup->howmany());
+
+      // Compute energy integration
+      if((projector == SphereWorlandTransform::ProjectorType::VOLUME_PROJ) && (integrator == SphereWorlandTransform::IntegratorType::VOLUME_R3))
+      {
+         this->setVolumeIntegrator(integral, specVal, this->mProjOp.find(projector)->second, this->mIntgOp.find(integrator)->second);
+
+      } else
+      {
+         throw Exception("Requested an unknown volume integrator");
       }
 
    }
@@ -492,6 +532,20 @@ namespace Transform {
          MatrixZ tmp = projOps.at(i).topRows(specRows).transpose()*specVal.block(0,start, specRows, cols);
          tmp.array() = tmp.array()*tmp.conjugate().array();
          spectrum.segment(start, cols).transpose() = intgOps.at(i).transpose()*tmp.real();
+         start += cols;
+      }
+   }
+
+   void SphereWorlandTransform::setVolumeIntegrator(ArrayZ& integral, const MatrixZ& specVal, const std::vector<Matrix>& projOps, const std::vector<Matrix>& intgOps)
+   {
+      // Compute integration
+      int start = 0;
+      for(size_t i = 0; i < projOps.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = projOps.at(i).rows() - this->mspSetup->padSize();
+         MatrixZ tmp = projOps.at(i).topRows(specRows).transpose()*specVal.block(0,start, specRows, cols);
+         integral.segment(start, cols).transpose() = intgOps.at(i).transpose()*tmp.real();
          start += cols;
       }
    }
