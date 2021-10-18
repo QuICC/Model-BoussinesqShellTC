@@ -114,12 +114,11 @@ namespace IoVariable {
             for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-               // m = 0, no factor of two
-               if(m_ == 0)
+               if(l_ == 1 && m_ == 0)
                {
                   factor = 1.0;
                   this->mMomentum(2) = factor*lfactor*mom(idx).real();
-               } else
+               } else if(l_ == 1 && m_ == 1)
                {
                   factor = std::sqrt(2.0);
                   this->mMomentum(0) = -factor*lfactor*mom(idx).real();
@@ -142,7 +141,7 @@ namespace IoVariable {
 
       // Get the "global" value from MPI code
       #ifdef QUICC_MPI
-         MPI_Allreduce(MPI_IN_PLACE, this->mMomentum.data(), this->mMomemntum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, this->mMomentum.data(), this->mMomentum.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       #endif //QUICC_MPI
 
       // Check if the workflow allows IO to be performed

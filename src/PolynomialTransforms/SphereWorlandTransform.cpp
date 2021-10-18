@@ -545,7 +545,7 @@ namespace Transform {
          int cols = this->mspSetup->mult()(i);
          int specRows = projOps.at(i).rows() - this->mspSetup->padSize();
          MatrixZ tmp = projOps.at(i).topRows(specRows).transpose()*specVal.block(0,start, specRows, cols);
-         integral.segment(start, cols).transpose() = intgOps.at(i).transpose()*tmp.real();
+         integral.segment(start, cols).transpose() = intgOps.at(i).transpose()*tmp;
          start += cols;
       }
    }
