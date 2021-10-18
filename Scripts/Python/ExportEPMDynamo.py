@@ -62,7 +62,7 @@ if 'E' in out_params:
 
 if 'q' in out_params:
     if 'magnetic_prandtl' in quicc_params:
-        epm_params['q'] = quicc_params['magnetic_prandtl']/quicc_params['prandlt']
+        epm_params['q'] = quicc_params['magnetic_prandtl']/quicc_params['prandtl']
     else:
         epm_params['q'] = quicc_params['prandtl']
 

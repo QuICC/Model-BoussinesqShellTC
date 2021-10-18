@@ -31,6 +31,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "IoVariable/SphereAngularMomentumWriter.hpp"
+#include "IoVariable/SphereConserveAngularMomentumWriter.hpp"
 #include "IoVariable/SphereScalarEnergyWriter.hpp"
 #include "IoVariable/SphereScalarLSpectrumWriter.hpp"
 #include "IoVariable/SphereScalarMSpectrumWriter.hpp"
@@ -251,7 +252,8 @@ namespace Explicit {
 
 #if 0
       // Create angular momentum writer
-      IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
+      //IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
+      IoVariable::SharedSphereConserveAngularMomentumWriter spAngMom(new IoVariable::SphereConserveAngularMomentumWriter("", SchemeType::type()));
       spAngMom->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spAngMom);
 #endif
