@@ -92,10 +92,10 @@ namespace IoVariable {
                int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = std::sqrt(16.0*Math::PI/(2.0*l_+1.0));
 
-               if(m_ == 0)
+               if(l_ == 1 && m_ == 0)
                {
                   this->mMomentum(2) = factor*lfactor*mom(idx).real();
-               } else
+               } else if(l_ == 1 && m_ == 1)
                {
                   this->mMomentum(0) = -factor*lfactor*mom(idx).real();
                   this->mMomentum(1) = factor*lfactor*mom(idx).imag();
