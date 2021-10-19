@@ -320,7 +320,7 @@ def stencil_rdiffdivr(nr, l, coeffs = None):
         num = -wb.worland_norm_row(n,l,-1)*2.0*n*(3.0 - 3.0*l - 8.0*n + 4.0*l*n + 4.0*n**2)
         den = (-1.0 + 2.0*n)*(-1.0 + l + 4.0*l*n + 4.0*n**2)
         if l == 1:
-            num[0] = 1.0
+            num[0] = 0.0
             den[0] = 1.0
         return num/den
 
