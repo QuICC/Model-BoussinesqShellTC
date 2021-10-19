@@ -52,7 +52,6 @@ namespace IoVariable {
    void SphereAngularMomentumWriter::compute(Transform::TransformCoordinatorType& coord)
    {
       // get iterator to field
-      vector_iterator vIt;
       vector_iterator_range vRange = this->vectorRange();
       assert(std::distance(vRange.first, vRange.second) == 1);
       assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::TOR);
@@ -61,7 +60,7 @@ namespace IoVariable {
       this->mMomentum.setZero();
 
       // Dealias toroidal variable data
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
+      coord.communicator().dealiasSpectral(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR));
       
       // Recover dealiased BWD data
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();

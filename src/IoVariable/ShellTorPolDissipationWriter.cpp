@@ -122,7 +122,7 @@ namespace QuICC {
 
          // Dealias poloidal variable data
          coord.communicator().dealiasSpectral(
-                 vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+                 vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL));
 
          // Recover dealiased BWD data
          Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -265,7 +265,7 @@ namespace QuICC {
 
          // Dealias poloidal variable data
          coord.communicator().dealiasSpectral(
-                 vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+                 vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL));
 
          // Recover dealiased BWD data
          rInVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -409,7 +409,7 @@ namespace QuICC {
 
          // Dealias poloidal variable data
          coord.communicator().dealiasSpectral(
-                 vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+                 vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL));
 
          // Recover dealiased BWD data
          rInVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -550,7 +550,7 @@ namespace QuICC {
 
          // Dealias toroidal variable data for Q component
          coord.communicator().dealiasSpectral(
-                 vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
+                 vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR));
 
          // Recover dealiased BWD data
          Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTorQ = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -686,7 +686,7 @@ namespace QuICC {
 
          // Dealias toroidal variable data for S component
          coord.communicator().dealiasSpectral(
-                 vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
+                 vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR));
 
          // Recover dealiased BWD data
          Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTorS = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
