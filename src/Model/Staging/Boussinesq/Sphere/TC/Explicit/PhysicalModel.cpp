@@ -30,6 +30,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "IoVariable/SphereAngularMomentumWriter.hpp"
 #include "IoVariable/SphereNusseltWriter.hpp"
 #include "IoVariable/SphereScalarEnergyWriter.hpp"
 #include "IoVariable/SphereScalarLSpectrumWriter.hpp"
@@ -265,6 +266,13 @@ namespace Explicit {
       spEnstrophyM->expect(PhysicalNames::VELOCITY);
       //spEnstrophyM->numberOutput();
       spSim->addAsciiOutputFile(spEnstrophyM);
+
+#if 1
+      // Create angular momentum writer
+      IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
+      spAngMom->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spAngMom);
+#endif
 }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
