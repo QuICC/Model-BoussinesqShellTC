@@ -138,6 +138,11 @@ namespace Equations {
    void IVectorEquation::setGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
    {
       this->dispatchGalerkinStencil(comp, mat, matIdx, this->unknown().dom(0).spRes(), this->couplingInfo(comp).eigenTools().getEigs(this->spRes(), matIdx));
+
+      if(mat.rows() != this->couplingInfo(comp).tauN(matIdx) || mat.cols() != this->couplingInfo(comp).galerkinN(matIdx))
+      {
+         throw std::logic_error("Galerkin projection matrix has wrong size");
+      }
    }
 
    void IVectorEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const ModelOperator::Id opId, const SpectralFieldId fieldId, const int matIdx) const
