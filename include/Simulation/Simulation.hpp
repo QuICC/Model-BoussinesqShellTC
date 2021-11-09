@@ -102,8 +102,6 @@ namespace QuICC {
           */
          void updateEquationTime(const MHDFloat time, const bool finished);
 
-         void conserveAngularMomentum();
-
          /**
           * @brief Timestep coordinator
           */

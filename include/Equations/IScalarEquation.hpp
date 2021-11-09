@@ -346,6 +346,9 @@ namespace Equations {
             }
          }
       }
+
+      // Tune solution
+      this->tuneSolution(compId);
    }
 
    template <typename TData> void solveStencilUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)

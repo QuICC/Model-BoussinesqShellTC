@@ -665,5 +665,10 @@ namespace Equations {
       // This implementation should never get called!
       throw Exception("Called dummy implementation of buildModelMatrix!");
    }
+
+   void  IEquation::tuneSolution(FieldComponents::Spectral::Id compId)
+   {
+      // DO NOTHING IN GENERAL!
+   }
 }
 }

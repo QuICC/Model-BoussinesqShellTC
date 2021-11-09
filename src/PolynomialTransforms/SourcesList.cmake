@@ -13,6 +13,7 @@ if(QUICC_SPATIALSCHEME STREQUAL "WLFL" OR QUICC_SPATIALSCHEME STREQUAL "WLFM")
       ThreeTermRecurrence.cpp
       JacobiPolynomial.cpp
       WorlandPolynomial.cpp
+      WorlandOperators.cpp
       SphereWorlandTransform.cpp
       )
 endif(QUICC_SPATIALSCHEME STREQUAL "WLFL" OR QUICC_SPATIALSCHEME STREQUAL "WLFM")

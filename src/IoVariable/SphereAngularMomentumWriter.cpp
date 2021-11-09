@@ -23,6 +23,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/AngularMomentumTags.hpp"
+#include "PolynomialTransforms/WorlandOperators.hpp"
 
 namespace QuICC {
 
@@ -47,6 +48,59 @@ namespace IoVariable {
       #endif // defined QUICC_SPATIALSCHEME_BLFL || defined QUICC_SPATIALSCHEME_WLFL
 
       IVariableAsciiWriter::init();
+
+      this->mAngMomLM = MatrixI::Constant(2, 2, -1);
+
+      if(this->mHasMOrdering)
+      {
+         // Loop over harmonic order m
+         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+
+               if(l_ == 1 && m_ == 0)
+               {
+                  this->mAngMomLM(0,0) = k;
+                  this->mAngMomLM(1,0) = j;
+               } else if(l_ == 1 && m_ == 1)
+               {
+                  this->mAngMomLM(0,1) = k;
+                  this->mAngMomLM(1,1) = j;
+               }
+            }
+         }
+      } else
+      {
+         // Loop over harmonic degree l
+         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+               if(l_ == 1 && m_ == 0)
+               {
+                  this->mAngMomLM(0,0) = k;
+                  this->mAngMomLM(1,0) = j;
+               } else if(l_ == 1 && m_ == 1)
+               {
+                  this->mAngMomLM(0,1) = k;
+                  this->mAngMomLM(1,1) = j;
+               }
+            }
+         }
+      }
+
+      // Compute operator if required
+      if(this->mAngMomLM.sum() > -4)
+      {
+         int nN = this->res().sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+         Polynomial::WorlandOperators::integralR3(this->mAngMomOp, nN, 1);
+         assert(this->mAngMomOp.rows() == nN && this->mAngMomOp.cols() == 1);
+      }
    }
 
    void SphereAngularMomentumWriter::compute(Transform::TransformCoordinatorType& coord)
@@ -58,79 +112,20 @@ namespace IoVariable {
 
       ArrayZ mom;
       this->mMomentum.setZero();
-
-      // Dealias toroidal variable data
-      coord.communicator().dealiasSpectral(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR));
-      
-      // Recover dealiased BWD data
-      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-      // Compute energy integral for first dimension
-      coord.transform1D().integrate_volume(mom, rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::VOLUME_PROJ, Transform::TransformCoordinatorType::Transform1DType::IntegratorType::VOLUME_R3);
-
-      MHDFloat lfactor = 0.0;
-      MHDFloat factor = 1.0;
-      int idx = 0;
-      if(this->mHasMOrdering)
+      if(this->mAngMomLM(0,1) != -1)
       {
-         // Loop over harmonic order m
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            // m = 0, no factor of two
-            if(m_ == 0)
-            {
-               factor = 1.0;
-            } else
-            {
-               factor = std::sqrt(2.0);
-            }
-
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
-            {
-               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-               lfactor = std::sqrt(16.0*Math::PI/(2.0*l_+1.0));
-
-               if(l_ == 1 && m_ == 0)
-               {
-                  this->mMomentum(2) = factor*lfactor*mom(idx).real();
-               } else if(l_ == 1 && m_ == 1)
-               {
-                  this->mMomentum(0) = -factor*lfactor*mom(idx).real();
-                  this->mMomentum(1) = factor*lfactor*mom(idx).imag();
-               }
-
-               idx += 1;
-            }
-         }
-      } else
-      {
-         // Loop over harmonic degree l
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            lfactor = std::sqrt(16.0*Math::PI/(2.0*l_+1.0));
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
-            {
-               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-               if(l_ == 1 && m_ == 0)
-               {
-                  factor = 1.0;
-                  this->mMomentum(2) = factor*lfactor*mom(idx).real();
-               } else if(l_ == 1 && m_ == 1)
-               {
-                  factor = std::sqrt(2.0);
-                  this->mMomentum(0) = -factor*lfactor*mom(idx).real();
-                  this->mMomentum(1) = factor*lfactor*mom(idx).imag();
-               }
-
-               idx += 1;
-            }
-         }
+         MHDFloat c = std::sqrt(32.0*Math::PI/3.0);
+         mom = (this->mAngMomOp.transpose()*vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mAngMomLM(1,1),this->mAngMomLM(0,1)));
+         this->mMomentum(0) = -c*mom(0).real();
+         this->mMomentum(1) = c*mom(0).imag();
       }
 
-      // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
+      if(this->mAngMomLM(0,0) != -1)
+      {
+         MHDFloat c = std::sqrt(16.0*Math::PI/3.0);
+         mom = (this->mAngMomOp.transpose()*vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mAngMomLM(1,0),this->mAngMomLM(0,0)));
+         this->mMomentum(2) = c*mom(0).real();
+      }
    }
 
    void SphereAngularMomentumWriter::write()

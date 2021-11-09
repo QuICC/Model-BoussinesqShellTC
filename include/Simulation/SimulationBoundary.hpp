@@ -44,6 +44,11 @@ namespace QuICC {
           * @brief Get tag map
           */
          std::map<std::string,int> getTagMap() const;
+
+         /**
+          * @brief Get tag map
+          */
+         int bcId(const PhysicalNames::Id id) const;
          
       protected:
 
