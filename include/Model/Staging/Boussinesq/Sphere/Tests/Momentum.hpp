@@ -1,11 +1,11 @@
 /**
  * @file Momentum.hpp
- * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection sphere
+ * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
-#define QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SPHERE_TESTS_MOMENTUM_HPP
+#define QUICC_MODEL_BOUSSINESQ_SPHERE_TESTS_MOMENTUM_HPP
 
 // Configuration includes
 //
@@ -31,10 +31,10 @@ namespace Boussinesq {
 
 namespace Sphere {
 
-namespace TC {
+namespace Tests {
 
    /**
-    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection in a sphere
+    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection in a sphere
     */
    class Momentum: public IVectorEquation
    {
@@ -76,24 +76,14 @@ namespace TC {
          virtual void setNLComponents();
 
          /**
-          * @brief Tune timestepping solution
+          * @brief Storage for the cos(theta) grid values (if required)
           */
-         virtual void tuneSolution(const FieldComponents::Spectral::Id compId);
+         Array mCosTheta;
 
          /**
-          * @brief Force angular momentum conservation
+          * @brief Storage for the sin(theta) grid values (if required)
           */
-         bool mConserveAngMom;
-
-         /**
-          * @brief Storage for angular momentum indexes
-          */
-         MatrixI mAngMomLM;
-
-         /**
-          * @brief Storage for angular momentum operator
-          */
-         Matrix mAngMomOp;
+         Array mSinTheta;
 
       private:
    };
@@ -104,4 +94,4 @@ namespace TC {
 }
 }
 
-#endif // QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SPHERE_TESTS_MOMENTUM_HPP

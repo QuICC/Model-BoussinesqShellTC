@@ -1,11 +1,11 @@
 /**
- * @file Momentum.hpp
- * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection sphere
+ * @file Transport.hpp
+ * @brief Implementation of the transport equation for the Boussinesq rotating thermal convection in a sphere
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
-#define QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
+#ifndef QUICC_MODEL_BOUSSINESQ_SPHERE_TESTS_TRANSPORT_HPP
+#define QUICC_MODEL_BOUSSINESQ_SPHERE_TESTS_TRANSPORT_HPP
 
 // Configuration includes
 //
@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IVectorEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
 
 namespace QuICC {
 
@@ -31,12 +31,12 @@ namespace Boussinesq {
 
 namespace Sphere {
 
-namespace TC {
+namespace Tests {
 
    /**
-    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq thermal convection in a sphere
+    * @brief Implementation of the transport equation for the Boussinesq rotating thermal convection in a sphere 
     */
-   class Momentum: public IVectorEquation
+   class Transport: public IScalarEquation
    {
       public:
          /**
@@ -44,12 +44,12 @@ namespace TC {
           *
           * @param spEqParams  Shared equation parameters
           */
-         Momentum(SharedEquationParameters spEqParams);
+         Transport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Momentum();
+         virtual ~Transport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,31 +70,6 @@ namespace TC {
           */
          virtual void setCoupling();
 
-         /**
-          * @brief Set the nonlinear integration components
-          */
-         virtual void setNLComponents();
-
-         /**
-          * @brief Tune timestepping solution
-          */
-         virtual void tuneSolution(const FieldComponents::Spectral::Id compId);
-
-         /**
-          * @brief Force angular momentum conservation
-          */
-         bool mConserveAngMom;
-
-         /**
-          * @brief Storage for angular momentum indexes
-          */
-         MatrixI mAngMomLM;
-
-         /**
-          * @brief Storage for angular momentum operator
-          */
-         Matrix mAngMomOp;
-
       private:
    };
 
@@ -104,4 +79,4 @@ namespace TC {
 }
 }
 
-#endif // QUICC_MODEL_BOUSSINESQ_SPHERE_TC_MOMENTUM_HPP
+#endif // QUICC_MODEL_BOUSSINESQ_SPHERE_TESTS_TRANSPORT_HPP
