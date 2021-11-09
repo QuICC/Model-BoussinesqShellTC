@@ -1,7 +1,6 @@
 /** 
  * @file PhysicalModel.cpp
- * @brief Source of the Boussinesq rotating thermal convection in a sphere (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
- * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @brief Source of the Sphere timestepping tests 
  */
 
 /// Define small macros allowing to convert to string
@@ -19,12 +18,12 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/RTC/Explicit/PhysicalModel.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/Tests/Explicit/PhysicalModel.hpp )
 
 // Project includes
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/RTC/Transport.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/RTC/Momentum.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/Tests/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/Tests/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
@@ -54,21 +53,21 @@ namespace Boussinesq {
 
 namespace Sphere {
 
-namespace RTC {
+namespace Tests {
 
 namespace Explicit {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_rtcsphere_std";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_testssphere_std";
 
-   const std::string PhysicalModel::PYCLASS = "BoussinesqRTCSphereStd";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqTestsSphereStd";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::Boussinesq::Sphere::RTC::Transport>();
+      spSim->addScalarEquation<Equations::Boussinesq::Sphere::Tests::Transport>();
                                                                  
       // Add Navier-Stokes equation                              
-      spSim->addVectorEquation<Equations::Boussinesq::Sphere::RTC::Momentum>();
+      spSim->addVectorEquation<Equations::Boussinesq::Sphere::Tests::Momentum>();
    }
 
    void PhysicalModel::addStates(SharedStateGenerator spGen)
@@ -249,7 +248,7 @@ namespace Explicit {
       spSim->addAsciiOutputFile(spKineticM);
 #endif
 
-#if 0
+#if 1
       // Create angular momentum writer
       IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
       spAngMom->expect(PhysicalNames::VELOCITY);

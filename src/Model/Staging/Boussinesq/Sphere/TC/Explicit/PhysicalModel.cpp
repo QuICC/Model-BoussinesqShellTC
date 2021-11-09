@@ -267,7 +267,7 @@ namespace Explicit {
       //spEnstrophyM->numberOutput();
       spSim->addAsciiOutputFile(spEnstrophyM);
 
-#if 1
+#if 0
       // Create angular momentum writer
       IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
       spAngMom->expect(PhysicalNames::VELOCITY);

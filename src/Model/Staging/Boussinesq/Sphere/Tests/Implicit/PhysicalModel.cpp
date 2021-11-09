@@ -1,6 +1,6 @@
 /** 
  * @file PhysicalModel.cpp
- * @brief Source of the Boussinesq rotating thermal convection in a sphere (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
+ * @brief Source of the Boussinesq rotating thermal convection in a sphere (Toroidal/Poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -19,24 +19,19 @@
 
 // Class include
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/RTC/Explicit/PhysicalModel.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/Tests/Implicit/PhysicalModel.hpp )
 
 // Project includes
 //
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/RTC/Transport.hpp )
-#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/RTC/Momentum.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/Tests/Transport.hpp )
+#include MAKE_STR( QUICC_MODEL_PATH/Boussinesq/Sphere/Tests/Momentum.hpp )
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "IoVariable/SphereAngularMomentumWriter.hpp"
 #include "IoVariable/SphereScalarEnergyWriter.hpp"
-#include "IoVariable/SphereScalarLSpectrumWriter.hpp"
-#include "IoVariable/SphereScalarMSpectrumWriter.hpp"
 #include "IoVariable/SphereTorPolEnergyWriter.hpp"
-#include "IoVariable/SphereTorPolLSpectrumWriter.hpp"
-#include "IoVariable/SphereTorPolMSpectrumWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/SphereExactStateIds.hpp"
@@ -54,21 +49,21 @@ namespace Boussinesq {
 
 namespace Sphere {
 
-namespace RTC {
+namespace Tests {
 
-namespace Explicit {
+namespace Implicit {
 
-   const std::string PhysicalModel::PYMODULE = "boussinesq_rtcsphere_std";
+   const std::string PhysicalModel::PYMODULE = "boussinesq_testssphere";
 
-   const std::string PhysicalModel::PYCLASS = "BoussinesqRTCSphereStd";
+   const std::string PhysicalModel::PYCLASS = "BoussinesqTestsSphere";
 
    void PhysicalModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::Boussinesq::Sphere::RTC::Transport>();
-                                                                 
-      // Add Navier-Stokes equation                              
-      spSim->addVectorEquation<Equations::Boussinesq::Sphere::RTC::Momentum>();
+      spSim->addScalarEquation<Equations::Boussinesq::Sphere::Tests::Transport>();
+                                                              
+      // Add Navier-Stokes equation                           
+      spSim->addVectorEquation<Equations::Boussinesq::Sphere::Tests::Momentum>();
    }
 
    void PhysicalModel::addStates(SharedStateGenerator spGen)
@@ -131,8 +126,8 @@ namespace Explicit {
                ptSH = tSH.insert(std::make_pair(std::make_pair(1,1), std::map<int,MHDComplex>()));
                ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
-               // Poloidal
                tSH.clear(); 
+               // Poloidal
                ptSH = tSH.insert(std::make_pair(std::make_pair(2,0), std::map<int,MHDComplex>()));
                ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
@@ -181,12 +176,12 @@ namespace Explicit {
 
       // Add temperature field visualization
       spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spScalar->setFields(true, true);
+      spScalar->setFields(true, false);
       spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity field visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
-      spVector->setFields(true, false, true);
+      spVector->setFields(true, false, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
       // Add output file
@@ -212,49 +207,14 @@ namespace Explicit {
    void PhysicalModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create temperature energy writer
-      IoVariable::SharedSphereScalarEnergyWriter spTemp(new IoVariable::SphereScalarEnergyWriter("temperature", SchemeType::type()));
-      spTemp->expect(PhysicalNames::TEMPERATURE);
-      spSim->addAsciiOutputFile(spTemp);
-
-#if 0
-      // Create temperature L energy spectrum writer
-      IoVariable::SharedSphereScalarLSpectrumWriter spTempL(new IoVariable::SphereScalarLSpectrumWriter("temperature", SchemeType::type()));
-      spTempL->expect(PhysicalNames::TEMPERATURE);
-      //spTempL->numberOutput();
-      spSim->addAsciiOutputFile(spTempL);
-
-      // Create temperature M energy spectrum writer
-      IoVariable::SharedSphereScalarMSpectrumWriter spTempM(new IoVariable::SphereScalarMSpectrumWriter("temperature", SchemeType::type()));
-      spTempM->expect(PhysicalNames::TEMPERATURE);
-      //spTempM->numberOutput();
-      spSim->addAsciiOutputFile(spTempM);
-#endif
+      IoVariable::SharedSphereScalarEnergyWriter spScalar(new IoVariable::SphereScalarEnergyWriter("temperature", SchemeType::type()));
+      spScalar->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spScalar);
 
       // Create kinetic energy writer
-      IoVariable::SharedSphereTorPolEnergyWriter spKinetic(new IoVariable::SphereTorPolEnergyWriter("kinetic", SchemeType::type()));
-      spKinetic->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spKinetic);
-
-#if 0
-      // Create kinetic L energy Spectrum writer
-      IoVariable::SharedSphereTorPolLSpectrumWriter spKineticL(new IoVariable::SphereTorPolLSpectrumWriter("kinetic", SchemeType::type()));
-      spKineticL->expect(PhysicalNames::VELOCITY);
-      //spKineticL->numberOutput();
-      spSim->addAsciiOutputFile(spKineticL);
-
-      // Create kinetic M energy spectrum writer
-      IoVariable::SharedSphereTorPolMSpectrumWriter spKineticM(new IoVariable::SphereTorPolMSpectrumWriter("kinetic", SchemeType::type()));
-      spKineticM->expect(PhysicalNames::VELOCITY);
-      //spKineticM->numberOutput();
-      spSim->addAsciiOutputFile(spKineticM);
-#endif
-
-#if 0
-      // Create angular momentum writer
-      IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
-      spAngMom->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spAngMom);
-#endif
+      IoVariable::SharedSphereTorPolEnergyWriter spVector(new IoVariable::SphereTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector);
    }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)
