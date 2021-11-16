@@ -110,7 +110,10 @@ namespace QuICC {
          FrameworkMacro::synchronize();
 
          // Update simulation run control
-         this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
+         if(this->mTimestepCoordinator.finishedStep())
+         {
+            this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
+         }
       }
    }
 
