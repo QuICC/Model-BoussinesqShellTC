@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Simulation.cpp
  * @brief Source of the high level simulation
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
@@ -108,14 +108,17 @@ namespace QuICC {
 
          // Synchronise computation nodes
          FrameworkMacro::synchronize();
-      
+
          // Update simulation run control
-         this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
+         if(this->mTimestepCoordinator.finishedStep())
+         {
+            this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
+         }
       }
    }
 
    void Simulation::preSolveEquations()
-   {  
+   {
       StageTimer stage;
       stage.start("initializing fields");
 
@@ -280,10 +283,10 @@ namespace QuICC {
 
          // Adapt timestepper time step
          this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
-      
+
          // Update simulation run control
          this->mSimRunCtrl.updateSimulation(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
-      
+
          // Update simulation IO control
          this->mSimIoCtrl.update();
       }

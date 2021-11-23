@@ -75,6 +75,26 @@ namespace TC {
           */
          virtual void setNLComponents();
 
+         /**
+          * @brief Tune timestepping solution
+          */
+         virtual void tuneSolution(const FieldComponents::Spectral::Id compId);
+
+         /**
+          * @brief Force angular momentum conservation
+          */
+         bool mConserveAngMom;
+
+         /**
+          * @brief Storage for angular momentum indexes
+          */
+         MatrixI mAngMomLM;
+
+         /**
+          * @brief Storage for angular momentum operator
+          */
+         Matrix mAngMomOp;
+
       private:
    };
 

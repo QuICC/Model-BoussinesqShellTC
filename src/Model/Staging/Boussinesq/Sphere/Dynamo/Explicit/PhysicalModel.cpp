@@ -31,6 +31,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "IoVariable/SphereAngularMomentumWriter.hpp"
 #include "IoVariable/SphereScalarEnergyWriter.hpp"
 #include "IoVariable/SphereScalarLSpectrumWriter.hpp"
 #include "IoVariable/SphereScalarMSpectrumWriter.hpp"
@@ -301,6 +302,13 @@ namespace Explicit {
       spKineticM->expect(PhysicalNames::VELOCITY);
       //spKineticM->numberOutput();
       spSim->addAsciiOutputFile(spKineticM);
+#endif
+
+#if 0
+      // Create angular momentum writer
+      IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
+      spAngMom->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spAngMom);
 #endif
 
       // Create magnetic energy writer

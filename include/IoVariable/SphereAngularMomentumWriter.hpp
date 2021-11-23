@@ -77,9 +77,19 @@ namespace IoVariable {
          bool mHasMOrdering;
 
          /**
-          * @brief Spherical volume to normalize energy to energy density
+          * @brief Angular momentum in X, Y, Z directions
           */
          Array mMomentum;
+
+         /**
+          * @brief Angular momentum operator
+          */
+         MatrixI mAngMomLM;
+
+         /**
+          * @brief Angular momentum operator
+          */
+         Matrix mAngMomOp;
 
       private:
    };

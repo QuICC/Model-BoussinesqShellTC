@@ -113,7 +113,7 @@ namespace IoVariable {
       assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
       // Dealias toroidal variable data
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
+      coord.communicator().dealiasSpectral(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::TOR));
       
       // Recover dealiased BWD data
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -252,7 +252,7 @@ namespace IoVariable {
       this->mTorEnergy /= 2*this->mVolume;
 
       // Dealias poloidal variable data for Q component
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+      coord.communicator().dealiasSpectral(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL));
 
       // Recover dealiased BWD data
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPolQ = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -379,7 +379,7 @@ namespace IoVariable {
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPolQ);
 
       // Dealias poloidal variable data for S component
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+      coord.communicator().dealiasSpectral(vRange.first->second->dom(0).total().comp(FieldComponents::Spectral::POL));
 
       // Recover dealiased BWD data
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPolS = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();

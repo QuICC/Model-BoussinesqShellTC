@@ -402,7 +402,8 @@ def stencil(nr, l, bc, make_square):
 
     mat = qid(nr, l, 0, radbc.no_bc())
 
-    if not make_square:
+    if make_square:
         bc['rb'] = bc['rt']
+    bc['rt'] = 0
 
     return radbc.constrain(mat, l, bc)

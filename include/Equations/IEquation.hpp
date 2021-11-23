@@ -173,6 +173,11 @@ namespace Equations {
           */
          virtual MHDComplex updateStoredSolution(const MHDComplex newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
 
+         /**
+          * @brief Tune solution obtained from solver
+          */
+         virtual void tuneSolution(const FieldComponents::Spectral::Id compId);
+
       private:
          /**
           * @brief Initialise the quasi-inverse spectral  matrices for given component

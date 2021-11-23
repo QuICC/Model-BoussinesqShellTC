@@ -112,12 +112,12 @@ namespace IoVariable {
 
    IVariableAsciiWriter::scalar_iterator_range  IVariableAsciiWriter::scalarRange()
    {
-      return std::make_pair(this->mScalars.begin(), this->mScalars.end());
+      return std::make_pair(this->mScalars.cbegin(), this->mScalars.cend());
    }
 
    IVariableAsciiWriter::vector_iterator_range  IVariableAsciiWriter::vectorRange()
    {
-      return std::make_pair(this->mVectors.begin(), this->mVectors.end());
+      return std::make_pair(this->mVectors.cbegin(), this->mVectors.cend());
    }
 
    void IVariableAsciiWriter::compute(Transform::TransformCoordinatorType& coord)

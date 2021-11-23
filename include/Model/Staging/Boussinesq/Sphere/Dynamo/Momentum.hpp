@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/FieldIds.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -76,6 +77,16 @@ namespace Dynamo {
          virtual void setNLComponents();
 
          /**
+          * @brief Tune timestepping solution
+          */
+         virtual void tuneSolution(const FieldComponents::Spectral::Id compId);
+
+         /**
+          * @brief Force angular momentum conservation
+          */
+         bool mConserveAngMom;
+
+         /**
           * @brief Storage for the cos(theta) grid values (if required)
           */
          Array mCosTheta;
@@ -84,6 +95,16 @@ namespace Dynamo {
           * @brief Storage for the sin(theta) grid values (if required)
           */
          Array mSinTheta;
+
+         /**
+          * @brief Storage for angular momentum indexes
+          */
+         MatrixI mAngMomLM;
+
+         /**
+          * @brief Storage for angular momentum operator
+          */
+         Matrix mAngMomOp;
 
       private:
    };

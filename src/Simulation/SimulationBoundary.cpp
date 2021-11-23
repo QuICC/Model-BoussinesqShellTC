@@ -56,4 +56,10 @@ namespace QuICC {
       return tagMap;
    }
 
+   int  SimulationBoundary::bcId(const PhysicalNames::Id id) const
+   {
+      assert(this->mBcs.count(id) > 0);
+      return this->mBcs.at(id);
+   }
+
 }

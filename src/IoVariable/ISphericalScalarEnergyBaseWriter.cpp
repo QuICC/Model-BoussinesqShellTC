@@ -51,7 +51,7 @@ namespace IoVariable {
       assert(std::distance(sRange.first, sRange.second) == 1);
 
       // Dealias variable data
-      coord.communicator().dealiasSpectral(sRange.first->second->rDom(0).rTotal());
+      coord.communicator().dealiasSpectral(sRange.first->second->dom(0).total());
       
       // Recover dealiased BWD data
       Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
