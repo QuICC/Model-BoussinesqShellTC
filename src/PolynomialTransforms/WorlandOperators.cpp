@@ -37,7 +37,7 @@ namespace Polynomial {
       internal::Array ilegGrid, ilegWeights;
       LegendreRule::computeQuadrature(legGrid, legWeights, ilegGrid, ilegWeights, legGrid.size());
       legGrid.array() = ((legGrid.array() + 1.0)/2.0);
-      ilegGrid.array() = ((ilegGrid.array() + 1.0)/2.0);
+      ilegGrid.array() = ((ilegGrid.array() + MHD_MP(1.0))/MHD_MP(2.0));
 
       tOp.resize(legGrid.size(), specSize);
       internal::Matrix  itmp, ipoly;
