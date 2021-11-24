@@ -176,7 +176,7 @@ namespace Equations {
          /**
           * @brief Tune solution obtained from solver
           */
-         virtual void tuneSolution(const FieldComponents::Spectral::Id compId);
+         virtual void tuneSolution(const FieldComponents::Spectral::Id compId, const int k);
 
       private:
          /**

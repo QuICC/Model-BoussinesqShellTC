@@ -356,7 +356,7 @@ namespace Equations {
       }
 
       // Tune solution
-      this->tuneSolution(compId);
+      this->tuneSolution(compId, matIdx);
    }
 
    template <typename TData> void solveStencilUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
