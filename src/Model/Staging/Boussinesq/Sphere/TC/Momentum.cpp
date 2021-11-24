@@ -169,21 +169,20 @@ namespace TC {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
    }
 
-   void Momentum::tuneSolution(const FieldComponents::Spectral::Id compId)
+   void Momentum::tuneSolution(const FieldComponents::Spectral::Id compId, const int k)
    {
       if(this->mConserveAngMom)
       {
          if(compId == FieldComponents::Spectral::TOR)
          {
             ArrayZ mom;
-            if(this->mAngMomLM(0,1) != -1)
+            if(this->mAngMomLM(0,1) == k)
             {
                mom = (this->mAngMomOp.transpose()*this->unknown().dom(0).total().comp(compId).profile(this->mAngMomLM(1,1),this->mAngMomLM(0,1)));
-               mom(0).real(-mom(0).real());
                this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(mom(0), 0, this->mAngMomLM(1,1),this->mAngMomLM(0,1));
             }
 
-            if(this->mAngMomLM(0,0) != -1)
+            if(this->mAngMomLM(0,0) == k)
             {
                mom = (this->mAngMomOp.transpose()*this->unknown().dom(0).total().comp(compId).profile(this->mAngMomLM(1,0),this->mAngMomLM(0,0)));
                this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(mom(0), 0, this->mAngMomLM(1,0),this->mAngMomLM(0,0));

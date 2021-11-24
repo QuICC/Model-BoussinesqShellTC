@@ -78,7 +78,7 @@ namespace TC {
          /**
           * @brief Tune timestepping solution
           */
-         virtual void tuneSolution(const FieldComponents::Spectral::Id compId);
+         virtual void tuneSolution(const FieldComponents::Spectral::Id compId, const int k);
 
          /**
           * @brief Force angular momentum conservation
