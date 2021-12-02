@@ -69,6 +69,8 @@ namespace QuICC {
             RO,
             /// Radii ratio R_i/R_o
             RRATIO,
+	    /// Density ratio (rho_i-rho_o)/rho_o
+	    RHORATIO, 
 
             //
             // Flags

@@ -23,7 +23,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "rratio", "heating"]
+        return ["prandtl", "rayleigh", "rratio", "rhoratio", "heating"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -204,21 +204,36 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
+        Eta = eq_params['rratio']
+        D = eq_params['rhoratio']
+        # D = 0 (i.e. inner and outer core have the same density) yields a linear gravity in r, whereas D =/= 0 leads to a different gravity profile
         Ra = eq_params['rayleigh']
+        Pr = eq_params['prandtl']
 
         ro = self.automatic_parameters(eq_params)['ro']
         a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4r4(res[0], a, b, bc, Ra*l*(l+1.0))
 
-        elif field_row == ("temperature","") and field_col == ("velocity","pol"):
-            if eq_params["heating"] == 0:
-                mat = geo.i2r2(res[0], a, b, bc, -l*(l+1.0))
-            else:
-                mat = geo.i2(res[0], a, b, bc, -l*(l+1.0))
+        if D > 0:
+            if field_row == ("velocity","pol") and field_col == ("temperature",""):
+                mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra/Pr*l(l+1.0)*D*Eta**3.0)
+        
+            elif field_row == ("temperature","") and field_col == ("velocity","pol"):
+                if eq_params["heating"] == 0:
+                    mat = geo.i2r2(res[0], a, b, bc, -l*(l+1.0))
+                else:
+                    mat = geo.i2(res[0], a, b, bc, -l*(l+1.0))
+        else: 
+            if field_row == ("velocity","pol") and field_col == ("temperature",""):
+                mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0))
+            
+            elif field_row == ("temperature","") and field_col == ("velocity","pol"):
+                if eq_params["heating"] == 0:
+                    mat = geo.i2r2(res[0], a, b, bc, -l*(l+1.0))
+                else:
+                    mat = geo.i2(res[0], a, b, bc, -l*(l+1.0))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -252,36 +267,67 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        Eta = eq_params['rratio']
+        D = eq_params['rhoratio']
+        # D = 0 (i.e. inner and outer core have the same density) yields a linear gravity in r, whereas D =/= 0 leads to a different gravity profile
 
         ro = self.automatic_parameters(eq_params)['ro']
         a, b = geo.linear_r2x(ro, eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
-        elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+        if D > 0:
+            if field_row == ("velocity","tor") and field_col == field_row:
+                mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
-            elif field_col == ("temperature",""):
-                if self.linearize:
-                    mat = geo.i4r4(res[0], a, b, bc, -Ra*l*(l+1.0))
+            elif field_row == ("velocity","pol"):
+                if field_col == ("velocity","pol"):
+                    mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0))
 
-        elif field_row == ("temperature",""):
-            if field_col == ("velocity","pol"):
-                if self.linearize:
+                elif field_col == ("temperature",""):
+                    if self.linearize:
+                        mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, -Ra/Pr*l(l+1.0)*D*Eta**3.0)
+
+            elif field_row == ("temperature",""):
+                if field_col == ("velocity","pol"):
+                    if self.linearize:
+                        if eq_params["heating"] == 0:
+                            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
+                        else:
+                            mat = geo.i2(res[0], a, b, bc, l*(l+1.0))
+
+                elif field_col == ("temperature",""):
                     if eq_params["heating"] == 0:
-                        mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
+                        mat = geo.i2r2lapl(res[0], l, a, b, bc, 1.0/Pr)
                     else:
-                        mat = geo.i2(res[0], a, b, bc, l*(l+1.0))
+                        mat = geo.i2r3lapl(res[0], l, a, b, bc, 1.0/Pr)
 
-            elif field_col == ("temperature",""):
-                if eq_params["heating"] == 0:
-                    mat = geo.i2r2lapl(res[0], l, a, b, bc, 1.0/Pr)
-                else:
-                    mat = geo.i2r3lapl(res[0], l, a, b, bc, 1.0/Pr)
+        else:
+            if field_row == ("velocity","tor") and field_col == field_row:
+                mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0))
+
+            elif field_row == ("velocity","pol"):
+                if field_col == ("velocity","pol"):
+                    mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+
+                elif field_col == ("temperature",""):
+                    if self.linearize:
+                        mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0))
+
+            elif field_row == ("temperature",""):
+                if field_col == ("velocity","pol"):
+                    if self.linearize:
+                        if eq_params["heating"] == 0:
+                            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
+                        else:
+                            mat = geo.i2(res[0], a, b, bc, l*(l+1.0))
+
+                elif field_col == ("temperature",""):
+                    if eq_params["heating"] == 0:
+                        mat = geo.i2r2lapl(res[0], l, a, b, bc, 1.0/Pr)
+                    else:
+                        mat = geo.i2r3lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

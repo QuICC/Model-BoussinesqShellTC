@@ -639,6 +639,9 @@ namespace IoTools {
          case NonDimensional::RRATIO:
             return "rratio";
 
+         case NonDimensional::RHORATIO:
+            return "rhoratio";
+
          //
          // Flags
          case NonDimensional::HEATING:
