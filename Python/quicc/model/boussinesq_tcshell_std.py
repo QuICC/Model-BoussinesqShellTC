@@ -23,7 +23,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "rratio", "rhoratio", "heating"]
+        return ["prandtl", "rayleigh", "rratio", "alpha", "heating"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -204,11 +204,10 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        Eta = eq_params['rratio']
-        D = eq_params['rhoratio']
-        # D = 0 (i.e. inner and outer core have the same density) yields a linear gravity in r, whereas D =/= 0 leads to a different gravity profile
+        # A = 0  yields a linear gravity in r, whereas A =/= 0 leads to a different gravity profile
         Ra = eq_params['rayleigh']
         Pr = eq_params['prandtl']
+        A = eq_params['alpha']
 
         ro = self.automatic_parameters(eq_params)['ro']
         a, b = geo.linear_r2x(ro, eq_params['rratio'])
@@ -216,9 +215,9 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
 
-        if D > 0:
+        if A > 0:
             if field_row == ("velocity","pol") and field_col == ("temperature",""):
-                mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra/Pr*l(l+1.0)*D*Eta**3.0)
+                mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra/Pr*l(l+1.0)*A)
         
             elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                 if eq_params["heating"] == 0:
@@ -267,9 +266,8 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        Eta = eq_params['rratio']
-        D = eq_params['rhoratio']
-        # D = 0 (i.e. inner and outer core have the same density) yields a linear gravity in r, whereas D =/= 0 leads to a different gravity profile
+        A = eq_params['alpha']
+        # A = 0 yields a linear gravity in r, whereas A =/= 0 leads to a different gravity profile
 
         ro = self.automatic_parameters(eq_params)['ro']
         a, b = geo.linear_r2x(ro, eq_params['rratio'])
@@ -277,7 +275,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
 
-        if D > 0:
+        if A > 0:
             if field_row == ("velocity","tor") and field_col == field_row:
                 mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
@@ -287,7 +285,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
                 elif field_col == ("temperature",""):
                     if self.linearize:
-                        mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, -Ra/Pr*l(l+1.0)*D*Eta**3.0)
+                        mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, -Ra/Pr*l(l+1.0)*A)
 
             elif field_row == ("temperature",""):
                 if field_col == ("velocity","pol"):

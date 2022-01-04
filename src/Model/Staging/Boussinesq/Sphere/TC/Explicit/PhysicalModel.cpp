@@ -217,13 +217,13 @@ namespace Explicit {
       // Create temperature L energy spectrum writer
       IoVariable::SharedSphereScalarLSpectrumWriter spTempL(new IoVariable::SphereScalarLSpectrumWriter("temperature", SchemeType::type()));
       spTempL->expect(PhysicalNames::TEMPERATURE);
-      //spTempL->numberOutput();
+      spTempL->numberOutput();
       spSim->addAsciiOutputFile(spTempL);
 
       // Create temperature M energy spectrum writer
       IoVariable::SharedSphereScalarMSpectrumWriter spTempM(new IoVariable::SphereScalarMSpectrumWriter("temperature", SchemeType::type()));
       spTempM->expect(PhysicalNames::TEMPERATURE);
-      //spTempM->numberOutput();
+      spTempM->numberOutput();
       spSim->addAsciiOutputFile(spTempM);
 
 
@@ -241,13 +241,13 @@ namespace Explicit {
       // Create kinetic L energy spectrum writer
       IoVariable::SharedSphereTorPolLSpectrumWriter spKineticL(new IoVariable::SphereTorPolLSpectrumWriter("kinetic", SchemeType::type()));
       spKineticL->expect(PhysicalNames::VELOCITY);
-      //spKineticL->numberOutput();
+      spKineticL->numberOutput();
       spSim->addAsciiOutputFile(spKineticL);
 
       // Create kinetic M energy spectrum writer
       IoVariable::SharedSphereTorPolMSpectrumWriter spKineticM(new IoVariable::SphereTorPolMSpectrumWriter("kinetic", SchemeType::type()));
       spKineticM->expect(PhysicalNames::VELOCITY);
-      //spKineticM->numberOutput();
+      spKineticM->numberOutput();
       spSim->addAsciiOutputFile(spKineticM);
   
       // Create enstrophy writer
@@ -267,12 +267,12 @@ namespace Explicit {
       //spEnstrophyM->numberOutput();
       spSim->addAsciiOutputFile(spEnstrophyM);
 
-#if 0
+
       // Create angular momentum writer
       IoVariable::SharedSphereAngularMomentumWriter spAngMom(new IoVariable::SphereAngularMomentumWriter("", SchemeType::type()));
       spAngMom->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spAngMom);
-#endif
+
 }
 
    void PhysicalModel::addHdf5OutputFiles(SharedSimulation spSim)

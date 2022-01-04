@@ -99,10 +99,6 @@ namespace IoTools {
       {
          return NonDimensional::RRATIO;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::RHORATIO))
-      {
-         return NonDimensional::RHORATIO;
-
       // Flags
       //
       } else if(id == IdToHuman::toTag(NonDimensional::HEATING))

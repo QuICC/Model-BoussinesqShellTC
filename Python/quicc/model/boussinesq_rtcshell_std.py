@@ -23,7 +23,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "rratio", "rhoratio", "heating"]
+        return ["taylor", "prandtl", "rayleigh", "rratio", "alpha", "heating"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -219,8 +219,8 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Eta = eq_params['rratio']
-        D = eq_params['rhoratio']
-        # D = 0 (i.e. inner and outer core have the same density) yields a linear gravity in r, whereas D =/= 0 leads to a different gravity profile
+        A = eq_params['alpha']
+        # A = 0 yields a linear gravity in r, whereas A =/= 0 leads to a different gravity profile
         Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
         ro = self.automatic_parameters(eq_params)['ro']
@@ -231,7 +231,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
         if D > 0:
             if field_row == ("velocity","pol") and field_col == ("temperature",""):
-                mat = geo.i4r4(res[0], a, b, bc, Ra_eff/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra_eff/Pr*l*(l+1.0)*D*Eta**3.0)
+                mat = geo.i4r4(res[0], a, b, bc, Ra_eff/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra_eff/Pr*l*(l+1.0)*A)
 
             elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                 if eq_params["heating"] == 0:
