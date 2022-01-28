@@ -219,7 +219,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         if B > 0:
             if A > 0:
                 if field_row == ("velocity","pol") and field_col == ("temperature",""):
-                    mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra/Pr*l(l+1.0)*A)
+                    mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra/Pr*l*(l+1.0)*A)
             
                 elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                     if eq_params["heating"] == 0:
@@ -238,7 +238,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         else:
             if A > 0:
                 if field_row == ("velocity","pol") and field_col == ("temperature",""):
-                    mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra/Pr*l(l+1.0)*A)
+                    mat = geo.i4r4(res[0], a, b, bc, Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, Ra/Pr*l*(l+1.0)*A)
             
                 elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                     if eq_params["heating"] == 0:
@@ -314,7 +314,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
                     elif field_col == ("temperature",""):
                         if self.linearize:
-                            mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, -Ra/Pr*l(l+1.0)*A)
+                            mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)*A)
 
                 elif field_row == ("temperature",""):
                     if field_col == ("velocity","pol"):
@@ -361,7 +361,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
                     elif field_col == ("temperature",""):
                         if self.linearize:
-                            mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, -Ra/Pr*l(l+1.0)*A)
+                            mat = geo.i4r4(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)) + geo.i4r1(res[0], a, b, bc, -Ra/Pr*l*(l+1.0)*A)
 
                 elif field_row == ("temperature",""):
                     if field_col == ("velocity","pol"):
