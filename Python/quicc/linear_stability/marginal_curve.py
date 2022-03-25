@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import copy
 import numpy as np
 import scipy.optimize as optimize
+import scipy.interpolate as interpol
 import functools
 
 import h5py
@@ -56,8 +57,7 @@ class MarginalCurve:
             data_freq[i] = freq
             if i > 2:
                 lb = max(0, i-3)
-                z = np.polyfit(data_k[lb:i+1], data_Ra[lb:i+1], min(i,3))
-                p = np.poly1d(z)
+                p = interpol.CubicSpline(data_k[lb:i+1], data_Ra[lb:i+1], bc_type = 'natural')
 
         return (data_k, data_Ra, data_freq)
 

@@ -11,25 +11,25 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-#res = [64, 0, 0]
-#bc_vel = 0 # 0: NS/NS
-#bc_temp = 0 # 0: FT/FT
+res = [64, 0, 0]
+bc_vel = 0 # 0: NS/NS
+bc_temp = 0 # 0: FT/FT
 #l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.2, 'heating':0}
 #l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.3, 'heating':0}
 #l = 3; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.4, 'heating':0}
-#l = 4; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.5, 'heating':0}
+l = 4; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.5, 'alpha':1, 'beta':1, 'gamma':0.8}
 #l = 6; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.6, 'heating':0}
 #l = 14; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.8, 'heating':0}
 
-res = [64, 0, 0]
-bc_vel = 1 # SF/SF
-bc_temp = 0 # 0: FT/FT
+#res = [64, 0, 0]
+#bc_vel = 1 # SF/SF
+#bc_temp = 0 # 0: FT/FT
 #l = 1; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.2, 'heating':0}
 #l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.3, 'heating':0}
 #l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.4, 'heating':0}
 #l = 3; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.5, 'heating':0}
 #l = 4; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.6, 'heating':0}
-l = 10; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.8, 'heating':0}
+#l = 10; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.8, 'heating':0}
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -44,6 +44,7 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_options = MarginalCurve.default_options()
+marginal_options['mode'] = 1
 marginal_options['evp_tol'] = 1e-16
 marginal_options['geometry'] = 's1d'
 marginal_options['curve'] = True
