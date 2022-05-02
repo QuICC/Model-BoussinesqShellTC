@@ -30,16 +30,17 @@ class PhysicalModel(base_model.BaseModel):
 
         d = dict()
 
+        rratio = eq_params['rratio']
         # Unit gap width
         if True:
             gap = {
-                    "lower1d":eq_params["rratio"]/(1.0 - eq_params["rratio"]),
-                    "upper1d":1.0/(1.0 - eq_params["rratio"])
+                    "lower1d":rratio/(1.0 - rratio),
+                    "upper1d":1.0/(1.0 - rratio)
                     }
         # Unit radius
         else:
             gap = {
-                    "lower1d":eq_params["rratio"],
+                    "lower1d":rratio,
                     "upper1d":1.0
                     }
 
@@ -61,7 +62,7 @@ class PhysicalModel(base_model.BaseModel):
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
-    
+
         fields = [field_row]
 
         return fields
@@ -112,6 +113,22 @@ class PhysicalModel(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
+        """Create the galerkin stencil"""
+
+        assert(eigs[0].is_integer())
+        l = eigs[0]
+
+        # Get boundary condition
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        mat = geo.stencil(res[0], bc, make_square)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
@@ -145,11 +162,11 @@ class PhysicalModel(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:20}
+                        bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:40}
+                        bc = {0:40}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                            bc = {0:20}
+                        bc = {0:20}
 
             elif bcId == 1:
                 if self.use_galerkin:
@@ -160,10 +177,10 @@ class PhysicalModel(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:22}
+                        bc = {0:22}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:41}
-            
+                        bc = {0:41}
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
@@ -179,18 +196,18 @@ class PhysicalModel(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        bc = {0:-40, 'rt':4}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'rt':0}
+                        bc = {0:-22, 'rt':2}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':0}
-        
+                        bc = {0:-41, 'rt':4}
+
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
@@ -213,20 +230,20 @@ class PhysicalModel(base_model.BaseModel):
         assert(eigs[0].is_integer())
         l = eigs[0]
 
-        Ra = eq_params['rayleigh']
+        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
         ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4r4(res[0], ri, ro, bc, Ra)
+            mat = geo.i4r4(res[0], ri, ro, bc, Ra_eff)
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = geo.i2r2(res[0], ri, ro, bc, -l*(l+1.0))
+                mat = geo.i2r2(res[0], ri, ro, bc, -bg_eff*l*(l+1.0))
             else:
-                mat = geo.i2(res[0], ri, ro, bc, -l*(l+1.0))
+                mat = geo.i2(res[0], ri, ro, bc, -bg_eff*l*(l+1.0))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -334,3 +351,26 @@ class PhysicalModel(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
+
+    def nondimensional_factors(self, eq_params):
+        """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
+
+        Ra = eq_params['rayleigh']
+        ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
+        rratio = eq_params['rratio']
+
+        # Switch from nondimensionalistion by R_o and (R_o - R_i)
+        if ro == 1.0:
+            # R_o rescaling
+            Ra_eff = Ra
+            bg_eff = 1.0
+        elif eq_params['heating'] == 0:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra/ro)
+            bg_eff = 2.0/(ro*(1.0 + rratio))
+        elif eq_params['heating'] == 1:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra/ro)
+            bg_eff = ro**2*rratio
+
+        return (Ra_eff, bg_eff)
