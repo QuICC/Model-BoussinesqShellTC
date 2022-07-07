@@ -23,6 +23,8 @@
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Transform/Path/I2CurlNL.hpp"
+#include "QuICC/Transform/Path/I4CurlCurlNL.hpp"
 #include "QuICC/Model/Boussinesq/Shell/TC/MomentumKernel.hpp"
 
 namespace QuICC {
@@ -70,9 +72,9 @@ namespace TC {
 
    void Momentum::setNLComponents()
    {
-      this->addNLComponent(FieldComponents::Spectral::TOR, 0);
+      this->addNLComponent(FieldComponents::Spectral::TOR, Transform::Path::I2CurlNL::id());
 
-      this->addNLComponent(FieldComponents::Spectral::POL, 0);
+      this->addNLComponent(FieldComponents::Spectral::POL, Transform::Path::I4CurlCurlNL::id());
    }
 
    void Momentum::initNLKernel(const bool force)
