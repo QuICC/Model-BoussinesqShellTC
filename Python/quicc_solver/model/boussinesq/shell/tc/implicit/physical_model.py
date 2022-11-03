@@ -23,7 +23,7 @@ class PhysicalModel(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "rratio", "heating"]
+        return ["prandtl", "rayleigh", "r_ratio", "heating"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -33,13 +33,13 @@ class PhysicalModel(base_model.BaseModel):
         # Unit gap width
         if True:
             gap = {
-                    "lower1d":eq_params["rratio"]/(1.0 - eq_params["rratio"]),
-                    "upper1d":1.0/(1.0 - eq_params["rratio"])
+                    "lower1d":eq_params["r_ratio"]/(1.0 - eq_params["r_ratio"]),
+                    "upper1d":1.0/(1.0 - eq_params["r_ratio"])
                     }
         # Unit radius
         else:
             gap = {
-                    "lower1d":eq_params["rratio"],
+                    "lower1d":eq_params["r_ratio"],
                     "upper1d":1.0
                     }
 
