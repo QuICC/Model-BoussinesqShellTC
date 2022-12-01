@@ -20,6 +20,7 @@
 //
 #include "QuICC/Model/Boussinesq/Shell/TC/Transport.hpp"
 #include "QuICC/Model/Boussinesq/Shell/TC/Momentum.hpp"
+#include "Model/Boussinesq/Shell/TC/gitHash.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
@@ -60,6 +61,11 @@ namespace TC {
    VectorFormulation::Id ITCModel::SchemeFormulation()
    {
       return VectorFormulation::TORPOL;
+   }
+
+   std::string ITCModel::version() const
+   {
+      return std::string(gitHash);
    }
 
    void ITCModel::addEquations(SharedSimulation spSim)
