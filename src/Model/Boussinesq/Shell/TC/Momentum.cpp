@@ -3,28 +3,20 @@
  * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq thermal convection in a spherical shell model
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Model/Boussinesq/Shell/TC/Momentum.hpp"
-
 // Project includes
 //
+#include "QuICC/Model/Boussinesq/Shell/TC/Momentum.hpp"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
-#include "QuICC/Transform/Path/I4CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegI2CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegI4CurlCurlNl.hpp"
 #include "QuICC/Model/Boussinesq/Shell/TC/MomentumKernel.hpp"
 
 namespace QuICC {
@@ -74,7 +66,14 @@ namespace TC {
    {
       this->addNLComponent(FieldComponents::Spectral::TOR, Transform::Path::I2CurlNl::id());
 
-      this->addNLComponent(FieldComponents::Spectral::POL, Transform::Path::I4CurlCurlNl::id());
+      if(this->couplingInfo(FieldComponents::Spectral::POL).isSplitEquation())
+      {
+         this->addNLComponent(FieldComponents::Spectral::POL, Transform::Path::NegI2CurlCurlNl::id());
+      }
+      else
+      {
+         this->addNLComponent(FieldComponents::Spectral::POL, Transform::Path::NegI4CurlCurlNl::id());
+      }
    }
 
    void Momentum::initNLKernel(const bool force)
