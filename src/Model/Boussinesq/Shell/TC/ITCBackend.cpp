@@ -30,7 +30,6 @@
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/NonDimensional/Prandtl.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
-#include "QuICC/NonDimensional/Ekman.hpp"
 #include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/NonDimensional/RRatio.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
@@ -126,7 +125,6 @@ namespace TC {
 
    std::map<std::string,MHDFloat> ITCBackend::automaticParameters(const std::map<std::string,MHDFloat>& cfg) const
    {
-      auto E = cfg.find(NonDimensional::Ekman().tag())->second;
       auto rratio = cfg.find(NonDimensional::RRatio().tag())->second;
 
       std::map<std::string,MHDFloat> params;
@@ -154,8 +152,7 @@ namespace TC {
       // Scaled on gap width
       if(ro != 1.0)
       {
-         auto T = 1.0/nds.find(NonDimensional::Ekman::id())->second->value();
-         effRa *= T/ro;
+         effRa *= 1.0/ro;
       }
 
       return effRa;
