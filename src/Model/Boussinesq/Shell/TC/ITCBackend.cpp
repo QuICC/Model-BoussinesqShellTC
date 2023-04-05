@@ -70,7 +70,7 @@ namespace Shell {
 namespace TC {
 
    ITCBackend::ITCBackend()
-      : IModelBackend(), mUseGalerkin(false), mUseSplitEquation(false)
+      : IModelBackend()
    {
    }
 
@@ -101,26 +101,6 @@ namespace TC {
       std::vector<bool> periodic = {false, false, false};
 
       return periodic;
-   }
-
-   void ITCBackend::enableGalerkin(const bool flag)
-   {
-      this->mUseGalerkin = flag;
-   }
-
-   bool ITCBackend::useGalerkin() const
-   {
-      return this->mUseGalerkin;
-   }
-
-   bool ITCBackend::useSplitEquation() const
-   {
-      return this->mUseSplitEquation;
-   }
-
-   void ITCBackend::enableSplitEquation(const bool tag)
-   {
-      this->mUseSplitEquation = tag;
    }
 
    std::map<std::string,MHDFloat> ITCBackend::automaticParameters(const std::map<std::string,MHDFloat>& cfg) const
