@@ -23,7 +23,7 @@ class PhysicalModel(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "r_ratio", "heating"]
+        return ["prandtl", "rayleigh", "rratio", "alpha", "beta", "gamma"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -31,18 +31,11 @@ class PhysicalModel(base_model.BaseModel):
         d = dict()
 
         rratio = eq_params['r_ratio']
-        # Unit gap width
-        if True:
-            gap = {
-                    "lower1d":rratio/(1.0 - rratio),
-                    "upper1d":1.0/(1.0 - rratio)
-                    }
         # Unit radius
-        else:
-            gap = {
-                    "lower1d":rratio,
-                    "upper1d":1.0
-                    }
+        gap = {
+                "lower1d":rratio,
+                "upper1d":1.0
+                }
 
         d.update(gap)
 
@@ -229,21 +222,45 @@ class PhysicalModel(base_model.BaseModel):
 
         assert(eigs[0].is_integer())
         l = eigs[0]
+        ll1 = l*(l + 1)
 
-        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
+        # A = 1 yields a linear gravity in r, whereas A = 0 leads to a 1/r^2 gravity profile
+        # B = 1 yields a linear background temperature gradient in r, whereas B = 0 leads to a more general temperature gradient profile
+	    # G = 0 solves the linear onset problem; G =/= 0 solves the eigenproblem associated with the energy method
+        Ra = eq_params['rayleigh']
+        Pr = eq_params['prandtl']
+        A = eq_params['alpha']
+        B = eq_params['beta']
+        G = eq_params['gamma']
+
+        Ra_eff = (Ra/Pr)*ll1
 
         ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4r4(res[0], ri, ro, bc, Ra_eff)
+        if G == 0:
+            if field_row == ("velocity","pol") and field_col == ("temperature",""):
+                mat = geo.i4r4(res[0], ri, ro, bc, Ra_eff*A) + geo.i4r1(res[0], ri, ro, bc, Ra_eff*(1. - A))
 
-        elif field_row == ("temperature","") and field_col == ("velocity","pol"):
-            if eq_params["heating"] == 0:
-                mat = geo.i2r2(res[0], ri, ro, bc, -bg_eff*l*(l+1.0))
-            else:
-                mat = geo.i2(res[0], ri, ro, bc, -bg_eff*l*(l+1.0))
+            elif field_row == ("temperature","") and field_col == ("velocity","pol"):
+                if B == 1:
+                    mat = geo.i2r2(res[0], ri, ro, bc, -ll1*B)
+                else:
+                    mat = geo.i2r3(res[0], ri, ro, bc, -ll1*B) + geo.i2(res[0], ri, ro, bc, -ll1*(1. - B))
+        else:
+            if field_row == ("velocity","pol") and field_col == ("temperature",""):
+                c1 = 0.5*Ra_eff*(A + G**2*B)
+                c2 = 0.5*Ra_eff*((1. - A)+G**2*(1. - B))
+                mat = geo.i4r4(res[0], ri, ro, bc, c1) + geo.i4r1(res[0], ri, ro, bc, c2) 
+
+            elif field_row == ("temperature","") and field_col == ("velocity","pol"):
+                if A == 1 and B == 1:
+                    mat = geo.i2r2(res[0], ri, ro, bc, -ll1*0.5*(A/G**2 + B))
+                else:
+                    c1 = -ll1*0.5*(A/G**2 + B)
+                    c2 = -ll1*0.5*((1. - A) + G**2*(1. - B))/G**2
+                    mat = geo.i2r3(res[0], ri, ro, bc, c1) + geo.i2(res[0], ri, ro, bc, c2)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -255,13 +272,26 @@ class PhysicalModel(base_model.BaseModel):
 
         ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
 
+        # A = 1 yields a linear gravity in r, whereas A = 0 leads to a 1/r^2 gravity profile
+        # B = 1 yields a linear background temperature gradient in r, whereas B = 0 leads to a more general temperature gradient profile
+	    # G = 0 solves the linear onset problem; G =/= 0 solves the eigenproblem associated with the energy method
+        A = eq_params['alpha']
+        B = eq_params['beta']
+        G = eq_params['gamma']
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
-            if eq_params["heating"] == 0:
-                mat = geo.i2r2(res[0], ri, ro, bc)
-            else:
-                mat = geo.i2r3(res[0], ri, ro, bc)
+            if G == 0:
+                if B == 1:
+                    mat = geo.i2r2(res[0], ri, ro, bc)
+                else:
+                    mat = geo.i2r3(res[0], ri, ro, bc)
+             else:
+                if A == 1 and B == 1:
+                    mat = geo.i2r2(res[0], ri, ro, bc)
+                else:
+                    mat = geo.i2r3(res[0], ri, ro, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -273,38 +303,81 @@ class PhysicalModel(base_model.BaseModel):
 
         assert(eigs[0].is_integer())
         l = eigs[0]
+        ll1 = l*(l + 1.)
 
-        Pr = eq_params['prandtl']
+        # A = 1 yields a linear gravity in r, whereas A = 0 leads to a 1/r^2 gravity profile
+        # B = 1 yields a linear background temperature gradient in r, whereas B = 0 leads to a more general temperature gradient profile
+	    # G = 0 solves the linear onset problem; G =/= 0 solves the eigenproblem associated with the energy method
         Ra = eq_params['rayleigh']
+        Pr = eq_params['prandtl']
+        A = eq_params['alpha']
+        B = eq_params['beta']
+        G = eq_params['gamma']
+
+        Ra_eff = Ra/Pr*ll1
 
         ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2r2lapl(res[0], ri, ro, l, bc)
+        if G == 0:
+            if field_row == ("velocity","tor") and field_col == field_row:
+                mat = geo.i2r2lapl(res[0], ri, ro, l, bc, ll1)
 
-        elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","pol"):
-                mat = geo.i4r4lapl2(res[0], ri, ro, l, bc)
+            elif field_row == ("velocity","pol"):
+                if field_col == ("velocity","pol"):
+                    mat = geo.i4r4lapl2(res[0], ri, ro, l, bc, ll1)
 
-            elif field_col == ("temperature",""):
-                if self.linearize:
-                    mat = geo.i4r4(res[0], ri, ro, bc, -Ra)
+                elif field_col == ("temperature",""):
+                    if self.linearize:
+                        c1 = -Ra_eff*A
+                        c2 = -Ra_eff*(1. - A)
+                        mat = geo.i4r4(res[0], ri, ro, bc, c1) + geo.i4r1(res[0], ri, ro, bc, c2)
 
-        elif field_row == ("temperature",""):
-            if field_col == ("velocity","pol"):
-                if self.linearize:
-                    if eq_params["heating"] == 0:
-                        mat = geo.i2r2(res[0], ri, ro, bc, l*(l+1.0))
+            elif field_row == ("temperature",""):
+                if field_col == ("velocity","pol"):
+                    if self.linearize:
+                        if B == 1:
+                            mat = geo.i2r2(res[0], ri, ro, bc, ll1*B)
+                        else:
+                            c1 = ll1*B
+                            c2 = ll1*(1. - B)
+                            mat = geo.i2r3(res[0], ri, ro, bc, c1) + geo.i2(res[0], ri, ro, bc, c2)
+
+                elif field_col == ("temperature",""):
+                    if B == 1:
+                        mat = geo.i2r2lapl(res[0], ri, ro, l, bc, 1.0/Pr)
                     else:
-                        mat = geo.i2(res[0], ri, ro, bc, l*(l+1.0))
+                        mat = geo.i2r3lapl(res[0], ri, ro, l, bc, 1.0/Pr)
+        else:
+            if field_row == ("velocity","tor") and field_col == field_row:
+                mat = geo.i2r2lapl(res[0], ri, ro, l, bc, ll1)
 
-            elif field_col == ("temperature",""):
-                if eq_params["heating"] == 0:
-                    mat = geo.i2r2lapl(res[0], ri, ro, l, bc, 1.0/Pr)
-                else:
-                    mat = geo.i2r3lapl(res[0], ri, ro, l, bc, 1.0/Pr)
+            elif field_row == ("velocity","pol"):
+                if field_col == ("velocity","pol"):
+                    mat = geo.i4r4lapl2(res[0], ri, ro, l, bc, ll1)
+
+                elif field_col == ("temperature",""):
+                    if self.linearize:
+                        c1 = -0.5*Ra_eff*(A + G**2*B)
+                        c2 = -0.5*Ra_eff*((1. - A)+G**2*(1 - B))
+                        mat = geo.i4r4(res[0], ri, ro, bc, c1) + geo.i4r1(res[0], ri, ro, bc, c2)
+
+            elif field_row == ("temperature",""):
+                if field_col == ("velocity","pol"):
+                    if self.linearize:
+                        if A == 1 and B == 1:
+                            mat = geo.i2r2(res[0], ri, ro, bc, 0.5*ll1*(A/G**2 + B))
+                        else:
+                            c1 = 0.5*ll1*(A/G**2 + B)
+                            c2 = 0.5*ll1*((1. - A)+G**2*(1. - B))/G**2
+                            mat = geo.i2r3(res[0], a, b, bc, c1) + geo.i2(res[0], ri, ro, bc, c2)
+
+                elif field_col == ("temperature",""):
+                    if A == 1 and B == 1:
+                        mat = geo.i2r2lapl(res[0], ri, ro, l, bc, 1.0/Pr)
+                    else:
+                        mat = geo.i2r3lapl(res[0], ri, ro, l, bc, 1.0/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -316,22 +389,43 @@ class PhysicalModel(base_model.BaseModel):
 
         assert(eigs[0].is_integer())
         l = eigs[0]
+        ll1 = l*(l + 1.)
+
+        # A = 1 yields a linear gravity in r, whereas A = 0 leads to a 1/r^2 gravity profile
+        # B = 1 yields a linear background temperature gradient in r, whereas B = 0 leads to a more general temperature gradient profile
+	    # G = 0 solves the linear onset problem; G =/= 0 solves the eigenproblem associated with the energy method
+        A = eq_params['alpha']
+        B = eq_params['beta']
+        G = eq_params['gamma']
 
         ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","tor"):
-            mat = geo.i2r2(res[0], ri, ro, bc)
+        if G == 0:
+            if field_row == ("velocity","tor"):
+                mat = geo.i2r2(res[0], ri, ro, bc, ll1)
 
-        elif field_row == ("velocity","pol"):
-            mat = geo.i4r4lapl(res[0], ri, ro, l, bc)
+            elif field_row == ("velocity","pol"):
+                mat = geo.i4r4lapl(res[0], ri, ro, l, bc, ll1)
 
-        elif field_row == ("temperature",""):
-            if eq_params["heating"] == 0:
-                mat = geo.i2r2(res[0], ri, ro, bc)
-            else:
-                mat = geo.i2r3(res[0], ri, ro, bc)
+            elif field_row == ("temperature",""):
+                if B == 1:
+                    mat = geo.i2r2(res[0], ri, ro, bc)
+                else:
+                    mat = geo.i2r3(res[0], ri, ro, bc)
+        else:
+            if field_row == ("velocity","tor"):
+                mat = geo.i2r2(res[0], ri, ro, bc, ll1)
+
+            elif field_row == ("velocity","pol"):
+                mat = geo.i4r4lapl(res[0], ri, ro, l, bc, ll1)
+
+            elif field_row == ("temperature",""):
+                if A == 1 and B == 1:
+                    mat = geo.i2r2(res[0], ri, ro, bc)
+                else:
+                    mat = geo.i2r3(res[0], ri, ro, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -351,26 +445,3 @@ class PhysicalModel(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
-
-    def nondimensional_factors(self, eq_params):
-        """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
-
-        Ra = eq_params['rayleigh']
-        ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
-        rratio = eq_params['r_ratio']
-
-        # Switch from nondimensionalistion by R_o and (R_o - R_i)
-        if ro == 1.0:
-            # R_o rescaling
-            Ra_eff = Ra
-            bg_eff = 1.0
-        elif eq_params['heating'] == 0:
-            # (R_o - R_i) rescaling
-            Ra_eff = (Ra/ro)
-            bg_eff = 2.0/(ro*(1.0 + rratio))
-        elif eq_params['heating'] == 1:
-            # (R_o - R_i) rescaling
-            Ra_eff = (Ra/ro)
-            bg_eff = ro**2*rratio
-
-        return (Ra_eff, bg_eff)
