@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Momentum.cpp
  * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq thermal convection in a spherical shell model
  */
@@ -9,8 +9,6 @@
 // Project includes
 //
 #include "QuICC/Model/Boussinesq/Shell/TC/Momentum.hpp"
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Math/Constants.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
