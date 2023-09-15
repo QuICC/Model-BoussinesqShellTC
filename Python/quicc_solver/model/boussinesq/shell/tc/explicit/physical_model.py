@@ -32,7 +32,7 @@ class PhysicalModel(base_model.BaseModel):
 
         rratio = eq_params['r_ratio']
 
-        useGapWidth = True;
+        useGapWidth = False;
         # Unit gap width
         if useGapWidth:
             gap = {
