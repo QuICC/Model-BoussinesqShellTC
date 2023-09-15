@@ -33,10 +33,12 @@
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/NonDimensional/Prandtl.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
-#include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/NonDimensional/RRatio.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Alpha.hpp"
+#include "QuICC/NonDimensional/Beta.hpp"
+#include "QuICC/NonDimensional/Gamma.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
@@ -48,6 +50,7 @@
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y2SphLapl.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y3SphLapl.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y4.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y4SphLapl.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y4SphLapl2.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/Operator.hpp"
@@ -199,6 +202,17 @@ namespace Explicit {
       auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
       auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
 
+      // alpha = 1 yields a linear gravity in r, whereas alpha = 0 leads to a 1/r^2 gravity profile
+      auto alpha = nds.find(NonDimensional::Alpha::id())->second->value();
+      // beta = 1 yields a linear background temperature gradient in r, whereas beta = 0 leads to a more general temperature gradient profile
+      auto beta = nds.find(NonDimensional::Beta::id())->second->value();
+	   // gamma = 0 solves the linear onset problem; gamma /= 0 solves the eigenproblem associated with the energy method
+      auto gamma = nds.find(NonDimensional::Gamma::id())->second->value();
+
+      auto Ra = this->effectiveRa(nds);
+      auto Pr = nds.find(NonDimensional::Prandtl::id())->second->value();
+      auto Ra_eff = Ra/Pr;
+
       if(rowId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::TOR) && rowId == colId)
       {
          SparseSM::Chebyshev::LinearMap::I2Y2SphLapl spasm(nN, nN, ri, ro, l);
@@ -225,20 +239,96 @@ namespace Explicit {
             decMat.real() = spasm.mat();
          }
       }
-      else if(rowId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR) && rowId == colId)
+      else if(
+            this->useLinearized() &&
+            rowId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::POL) &&
+            colId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR)
+            )
       {
-         auto Pr = nds.find(NonDimensional::Prandtl::id())->second->value();
-         auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
-
-         if(heatingMode == 0)
+         MHDFloat c1, c2;
+         if(gamma == 0)
          {
-            SparseSM::Chebyshev::LinearMap::I2Y2SphLapl spasm(nN, nN, ri, ro, l);
-            decMat.real() = (1.0/Pr)*spasm.mat();
+            c1 = -Ra_eff*alpha;
+            c2 = -Ra_eff*(1. - alpha);
          }
          else
          {
-            SparseSM::Chebyshev::LinearMap::I2Y3SphLapl spasm(nN, nN, ri, ro, l);
-            decMat.real() = (1.0/Pr)*spasm.mat();
+            c1 = -0.5*Ra_eff*(alpha + gamma*gamma*beta);
+            c2 = -0.5*Ra_eff*((1. - alpha) + gamma*gamma*(1. - beta));
+         }
+         SparseSM::Chebyshev::LinearMap::I4Y4 i4r4(nN, nN, ri, ro);
+         SparseSM::Chebyshev::LinearMap::I4Y1 i4r1(nN, nN, ri, ro);
+         decMat.real() = c1*i4r4.mat() + c2*i4r1.mat();
+      }
+      else if(rowId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR) && rowId == colId)
+      {
+         auto Pr = nds.find(NonDimensional::Prandtl::id())->second->value();
+
+         if(gamma == 0)
+         {
+            if(beta == 1)
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y2SphLapl spasm(nN, nN, ri, ro, l);
+               decMat.real() = (1.0/Pr)*spasm.mat();
+            }
+            else
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y3SphLapl spasm(nN, nN, ri, ro, l);
+               decMat.real() = (1.0/Pr)*spasm.mat();
+            }
+         }
+         else
+         {
+            if(alpha == 1 && beta == 1)
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y2SphLapl spasm(nN, nN, ri, ro, l);
+               decMat.real() = (1.0/Pr)*spasm.mat();
+            }
+            else
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y3SphLapl spasm(nN, nN, ri, ro, l);
+               decMat.real() = (1.0/Pr)*spasm.mat();
+            }
+         }
+      }
+      else if(
+            this->useLinearized() &&
+            rowId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR) &&
+            colId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::POL)
+            )
+      {
+         if(gamma == 0)
+         {
+            if(beta == 1)
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+               decMat.real() = (beta)*spasm.mat();
+            }
+            else
+            {
+               auto c1 = beta;
+               auto c2 = (1. - beta);
+               SparseSM::Chebyshev::LinearMap::I2Y3 i2r3(nN, nN, ri, ro);
+               SparseSM::Chebyshev::LinearMap::I2 i2(nN, nN, ri, ro);
+               decMat.real() = c1*i2r3.mat() + c2*i2.mat();
+            }
+         }
+         else
+         {
+            if(alpha == 1 && beta == 1)
+            {
+               auto c = 0.5*(alpha/(gamma*gamma) + beta);
+               SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+               decMat.real() = c*spasm.mat();
+            }
+            else
+            {
+               auto c1 = 0.5*(alpha/(gamma*gamma) + beta);
+               auto c2 = 0.5*((1. - alpha) + gamma*gamma*(1. - beta))/(gamma*gamma);
+               SparseSM::Chebyshev::LinearMap::I2Y3 i2r3(nN, nN, ri, ro);
+               SparseSM::Chebyshev::LinearMap::I2 i2(nN, nN, ri, ro);
+               decMat.real() = c1*i2r3.mat() + c2*i2.mat();
+            }
          }
       }
       else
@@ -256,6 +346,13 @@ namespace Explicit {
 
       auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
       auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
+
+      // alpha = 1 yields a linear gravity in r, whereas alpha = 0 leads to a 1/r^2 gravity profile
+      auto alpha = nds.find(NonDimensional::Alpha::id())->second->value();
+      // beta = 1 yields a linear background temperature gradient in r, whereas beta = 0 leads to a more general temperature gradient profile
+      auto beta = nds.find(NonDimensional::Beta::id())->second->value();
+	   // gamma = 0 solves the linear onset problem; gamma /= 0 solves the eigenproblem associated with the energy method
+      auto gamma = nds.find(NonDimensional::Gamma::id())->second->value();
 
       if(fieldId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::TOR))
       {
@@ -277,17 +374,31 @@ namespace Explicit {
       }
       else if(fieldId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR))
       {
-         auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
-
-         if(heatingMode == 0)
+         if(gamma == 0)
          {
-            SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
-            decMat.real() = spasm.mat();
+            if(beta == 1)
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+               decMat.real() = spasm.mat();
+            }
+            else
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y3 spasm(nN, nN, ri, ro);
+               decMat.real() = spasm.mat();
+            }
          }
          else
          {
-            SparseSM::Chebyshev::LinearMap::I2Y3 spasm(nN, nN, ri, ro);
-            decMat.real() = spasm.mat();
+            if(alpha == 1 && beta == 1)
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+               decMat.real() = spasm.mat();
+            }
+            else
+            {
+               SparseSM::Chebyshev::LinearMap::I2Y3 spasm(nN, nN, ri, ro);
+               decMat.real() = spasm.mat();
+            }
          }
       }
    }
@@ -421,43 +532,99 @@ namespace Explicit {
       auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
       auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
 
+      // alpha = 1 yields a linear gravity in r, whereas alpha = 0 leads to a 1/r^2 gravity profile
+      auto alpha = nds.find(NonDimensional::Alpha::id())->second->value();
+      // beta = 1 yields a linear background temperature gradient in r, whereas beta = 0 leads to a more general temperature gradient profile
+      auto beta = nds.find(NonDimensional::Beta::id())->second->value();
+	   // gamma = 0 solves the linear onset problem; gamma /= 0 solves the eigenproblem associated with the energy method
+      auto gamma = nds.find(NonDimensional::Gamma::id())->second->value();
+
+      auto Pr = nds.find(NonDimensional::Prandtl::id())->second->value();
+      auto Ra = this->effectiveRa(nds);
+
+      auto Ra_eff = Ra/Pr;
+
       int s = this->nBc(rowId);
       // Explicit linear operator
       if(opId == ModelOperator::ExplicitLinear::id())
       {
-         if(rowId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::POL) &&
+         if(
+               rowId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::POL) &&
                colId == std::make_pair(PhysicalNames::Temperature::id(),FieldComponents::Spectral::SCALAR))
          {
-            auto Ra = effectiveRa(nds);
-
-            if(this->useSplitEquation())
+            if(gamma == 0)
             {
-               SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
-               decMat.real() = Ra*spasm.mat();
+               if(this->useSplitEquation())
+               {
+                  SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+                  decMat.real() = Ra*spasm.mat();
+               }
+               else
+               {
+                  auto c1 = Ra_eff*alpha;
+                  auto c2 = Ra_eff*(1. - alpha);
+                  SparseSM::Chebyshev::LinearMap::I4Y4 i4r4(nN, nN, ri, ro);
+                  SparseSM::Chebyshev::LinearMap::I4Y4 i4r1(nN, nN, ri, ro);
+                  decMat.real() = c1*i4r4.mat() + c2*i4r1.mat();
+               }
             }
             else
             {
-               SparseSM::Chebyshev::LinearMap::I4Y4 spasm(nN, nN, ri, ro);
-               decMat.real() = Ra*spasm.mat();
+               if(this->useSplitEquation())
+               {
+                  SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+                  decMat.real() = Ra*spasm.mat();
+               }
+               else
+               {
+                  auto c1 = 0.5*Ra_eff*(alpha + gamma*gamma*beta);
+                  auto c2 = 0.5*Ra_eff*((1. - alpha) + gamma*gamma*(1. - beta));
+                  SparseSM::Chebyshev::LinearMap::I4Y4 i4r4(nN, nN, ri, ro);
+                  SparseSM::Chebyshev::LinearMap::I4Y4 i4r1(nN, nN, ri, ro);
+                  decMat.real() = c1*i4r4.mat() + c2*i4r1.mat();
+               }
             }
          }
-         else if(rowId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR) && 
+         else if(rowId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR) &&
                colId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::POL))
          {
-            auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
             auto bg = effectiveBg(nds);
             auto dl = static_cast<MHDFloat>(l);
             auto ll1 = dl*(dl + 1.0);
 
-            if(heatingMode == 0)
+            if(gamma == 0)
             {
-               SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
-               decMat.real() = -bg*ll1*spasm.mat();
+               if(beta == 1)
+               {
+                  auto c = -bg*ll1*beta;
+                  SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+                  decMat.real() = c*spasm.mat();
+               }
+               else
+               {
+                  auto c1 = -bg*ll1*beta;
+                  auto c2 = -bg*ll1*(1. - beta);
+                  SparseSM::Chebyshev::LinearMap::I2Y3 i2r3(nN, nN, ri, ro);
+                  SparseSM::Chebyshev::LinearMap::I2 i2(nN, nN, ri, ro);
+                  decMat.real() = c1*i2r3.mat() + c2*i2.mat();
+               }
             }
             else
             {
-               SparseSM::Chebyshev::LinearMap::I2 spasm(nN, nN, ri, ro);
-               decMat.real() = -bg*ll1*spasm.mat();
+               if(alpha == 1 && beta == 1)
+               {
+                  auto c = -bg*ll1*0.5*(alpha/(gamma*gamma) + beta);
+                  SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+                  decMat.real() = c*spasm.mat();
+               }
+               else
+               {
+                  auto c1 = -bg*ll1*0.5*(alpha/(gamma*gamma) + beta);
+                  auto c2 = -bg*ll1*0.5*((1. - alpha) + gamma*gamma*(1. - beta))/(gamma*gamma);
+                  SparseSM::Chebyshev::LinearMap::I2Y3 i2r3(nN, nN, ri, ro);
+                  SparseSM::Chebyshev::LinearMap::I2 i2(nN, nN, ri, ro);
+                  decMat.real() = c1*i2r3.mat() + c2*i2.mat();
+               }
             }
          }
          else
@@ -471,17 +638,31 @@ namespace Explicit {
       {
          if(rowId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR) && rowId == colId)
          {
-            auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
-
-            if(heatingMode == 0)
+            if(gamma == 0)
             {
-               SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
-               decMat.real() = spasm.mat();
+               if(beta == 1)
+               {
+                  SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+                  decMat.real() = spasm.mat();
+               }
+               else
+               {
+                  SparseSM::Chebyshev::LinearMap::I2Y3 spasm(nN, nN, ri, ro);
+                  decMat.real() = spasm.mat();
+               }
             }
             else
             {
-               SparseSM::Chebyshev::LinearMap::I2Y3 spasm(nN, nN, ri, ro);
-               decMat.real() = spasm.mat();
+               if(alpha == 1 && beta == 1)
+               {
+                  SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
+                  decMat.real() = spasm.mat();
+               }
+               else
+               {
+                  SparseSM::Chebyshev::LinearMap::I2Y3 spasm(nN, nN, ri, ro);
+                  decMat.real() = spasm.mat();
+               }
             }
          }
          else

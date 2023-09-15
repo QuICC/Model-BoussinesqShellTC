@@ -31,11 +31,20 @@ class PhysicalModel(base_model.BaseModel):
         d = dict()
 
         rratio = eq_params['r_ratio']
+
+        useGapWidth = False;
+        # Unit gap width
+        if useGapWidth:
+            gap = {
+                    "lower1d":rratio/(1. - rratio),
+                    "upper1d":1.0/(1. - rratio)
+                    }
         # Unit radius
-        gap = {
-                "lower1d":rratio,
-                "upper1d":1.0
-                }
+        else:
+            gap = {
+                    "lower1d":rratio,
+                    "upper1d":1.0
+                    }
 
         d.update(gap)
 

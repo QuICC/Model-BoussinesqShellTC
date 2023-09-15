@@ -30,10 +30,12 @@
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/NonDimensional/Prandtl.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
-#include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/NonDimensional/RRatio.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Alpha.hpp"
+#include "QuICC/NonDimensional/Beta.hpp"
+#include "QuICC/NonDimensional/Gamma.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
@@ -89,8 +91,10 @@ namespace TC {
       std::vector<std::string> names = {
          NonDimensional::Prandtl().tag(),
          NonDimensional::Rayleigh().tag(),
-         NonDimensional::Heating().tag(),
-         NonDimensional::RRatio().tag()
+         NonDimensional::RRatio().tag(),
+         NonDimensional::Alpha().tag(),
+         NonDimensional::Beta().tag(),
+         NonDimensional::Gamma().tag()
       };
 
       return names;
@@ -109,7 +113,7 @@ namespace TC {
 
       std::map<std::string,MHDFloat> params;
 
-      bool useGapWidth = true;
+      bool useGapWidth = false;
       if(useGapWidth)
       {
          params.emplace(NonDimensional::Lower1d().tag(), rratio/(1.0 - rratio));
@@ -143,7 +147,14 @@ namespace TC {
       MHDFloat effBg = 1.0;
       auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
       auto rratio = nds.find(NonDimensional::RRatio::id())->second->value();
-      auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
+
+      // alpha = 1 yields a linear gravity in r, whereas alpha = 0 leads to a 1/r^2 gravity profile
+      //auto alpha = nds.find(NonDimensional::Alpha::id())->second->value();
+      // beta = 1 yields a linear background temperature gradient in r, whereas beta = 0 leads to a more general temperature gradient profile
+      auto beta = nds.find(NonDimensional::Beta::id())->second->value();
+	   // gamma = 0 solves the linear onset problem; gamma /= 0 solves the eigenproblem associated with the energy method
+      //auto gamma = nds.find(NonDimensional::Gamma::id())->second->value();
+
 
       if(ro == 1.0)
       {
@@ -151,12 +162,12 @@ namespace TC {
          //
       }
       // gap width and internal heating
-      else if(heatingMode == 0)
+      else if(beta == 1)
       {
          effBg = 2.0/(ro*(1.0 + rratio));
       }
       // gap width and differential heating
-      else if(heatingMode == 1)
+      else if(beta == 0)
       {
          effBg = ro*ro*rratio;
       }
