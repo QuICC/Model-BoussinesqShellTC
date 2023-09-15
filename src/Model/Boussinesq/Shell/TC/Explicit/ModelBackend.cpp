@@ -297,17 +297,21 @@ namespace Explicit {
             colId == std::make_pair(PhysicalNames::Velocity::id(),FieldComponents::Spectral::POL)
             )
       {
+         auto dl = static_cast<MHDFloat>(l);
+         auto ll1 = dl*(dl + 1.0);
+
          if(gamma == 0)
          {
             if(beta == 1)
             {
+               auto c = ll1*beta;
                SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
-               decMat.real() = (beta)*spasm.mat();
+               decMat.real() = c*spasm.mat();
             }
             else
             {
-               auto c1 = beta;
-               auto c2 = (1. - beta);
+               auto c1 = ll1*beta;
+               auto c2 = ll1*(1. - beta);
                SparseSM::Chebyshev::LinearMap::I2Y3 i2r3(nN, nN, ri, ro);
                SparseSM::Chebyshev::LinearMap::I2 i2(nN, nN, ri, ro);
                decMat.real() = c1*i2r3.mat() + c2*i2.mat();
@@ -317,14 +321,14 @@ namespace Explicit {
          {
             if(alpha == 1 && beta == 1)
             {
-               auto c = 0.5*(alpha/(gamma*gamma) + beta);
+               auto c = 0.5*ll1*(alpha/(gamma*gamma) + beta);
                SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
                decMat.real() = c*spasm.mat();
             }
             else
             {
-               auto c1 = 0.5*(alpha/(gamma*gamma) + beta);
-               auto c2 = 0.5*((1. - alpha) + gamma*gamma*(1. - beta))/(gamma*gamma);
+               auto c1 = 0.5*ll1*(alpha/(gamma*gamma) + beta);
+               auto c2 = 0.5*ll1*((1. - alpha) + gamma*gamma*(1. - beta))/(gamma*gamma);
                SparseSM::Chebyshev::LinearMap::I2Y3 i2r3(nN, nN, ri, ro);
                SparseSM::Chebyshev::LinearMap::I2 i2(nN, nN, ri, ro);
                decMat.real() = c1*i2r3.mat() + c2*i2.mat();
@@ -557,7 +561,7 @@ namespace Explicit {
                if(this->useSplitEquation())
                {
                   SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
-                  decMat.real() = Ra*spasm.mat();
+                  decMat.real() = Ra_eff*spasm.mat();
                }
                else
                {
@@ -573,7 +577,7 @@ namespace Explicit {
                if(this->useSplitEquation())
                {
                   SparseSM::Chebyshev::LinearMap::I2Y2 spasm(nN, nN, ri, ro);
-                  decMat.real() = Ra*spasm.mat();
+                  decMat.real() = Ra_eff*spasm.mat();
                }
                else
                {

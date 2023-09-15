@@ -113,7 +113,7 @@ namespace TC {
 
       std::map<std::string,MHDFloat> params;
 
-      bool useGapWidth = false;
+      bool useGapWidth = true;
       if(useGapWidth)
       {
          params.emplace(NonDimensional::Lower1d().tag(), rratio/(1.0 - rratio));

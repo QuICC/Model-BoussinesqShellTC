@@ -23,7 +23,7 @@ class PhysicalModel(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "rratio", "alpha", "beta", "gamma"]
+        return ["prandtl", "rayleigh", "r_ratio", "alpha", "beta", "gamma"]
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
@@ -32,7 +32,7 @@ class PhysicalModel(base_model.BaseModel):
 
         rratio = eq_params['r_ratio']
 
-        useGapWidth = False;
+        useGapWidth = True;
         # Unit gap width
         if useGapWidth:
             gap = {
@@ -236,13 +236,14 @@ class PhysicalModel(base_model.BaseModel):
         # A = 1 yields a linear gravity in r, whereas A = 0 leads to a 1/r^2 gravity profile
         # B = 1 yields a linear background temperature gradient in r, whereas B = 0 leads to a more general temperature gradient profile
 	    # G = 0 solves the linear onset problem; G =/= 0 solves the eigenproblem associated with the energy method
-        Ra = eq_params['rayleigh']
-        Pr = eq_params['prandtl']
         A = eq_params['alpha']
         B = eq_params['beta']
         G = eq_params['gamma']
 
-        Ra_eff = (Ra/Pr)*ll1
+        Ra = self.effective_Ra(eq_params)
+        Pr = eq_params['prandtl']
+        bg = self.effective_bg(eq_params)
+        Ra_eff = (Ra/Pr)
 
         ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
 
@@ -250,25 +251,31 @@ class PhysicalModel(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if G == 0:
             if field_row == ("velocity","pol") and field_col == ("temperature",""):
-                mat = geo.i4r4(res[0], ri, ro, bc, Ra_eff*A) + geo.i4r1(res[0], ri, ro, bc, Ra_eff*(1. - A))
+                c1 = Ra_eff*A
+                c2 = Ra_eff*(1. - A)
+                mat = geo.i4r4(res[0], ri, ro, bc, c1) + geo.i4r1(res[0], ri, ro, bc, c2)
 
             elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                 if B == 1:
-                    mat = geo.i2r2(res[0], ri, ro, bc, -ll1*B)
+                    c = -bg*ll1*B
+                    mat = geo.i2r2(res[0], ri, ro, bc, c)
                 else:
-                    mat = geo.i2r3(res[0], ri, ro, bc, -ll1*B) + geo.i2(res[0], ri, ro, bc, -ll1*(1. - B))
+                    c1 = -bg*ll1*B
+                    c2 = -bg*ll1*(1. - B)
+                    mat = geo.i2r3(res[0], ri, ro, bc, c1) + geo.i2(res[0], ri, ro, bc, c2)
         else:
             if field_row == ("velocity","pol") and field_col == ("temperature",""):
                 c1 = 0.5*Ra_eff*(A + G**2*B)
                 c2 = 0.5*Ra_eff*((1. - A)+G**2*(1. - B))
-                mat = geo.i4r4(res[0], ri, ro, bc, c1) + geo.i4r1(res[0], ri, ro, bc, c2) 
+                mat = geo.i4r4(res[0], ri, ro, bc, c1) + geo.i4r1(res[0], ri, ro, bc, c2)
 
             elif field_row == ("temperature","") and field_col == ("velocity","pol"):
                 if A == 1 and B == 1:
-                    mat = geo.i2r2(res[0], ri, ro, bc, -ll1*0.5*(A/G**2 + B))
+                    c = -bg*ll1*0.5*(A/G**2 + B)
+                    mat = geo.i2r2(res[0], ri, ro, bc, c)
                 else:
-                    c1 = -ll1*0.5*(A/G**2 + B)
-                    c2 = -ll1*0.5*((1. - A) + G**2*(1. - B))/G**2
+                    c1 = -bg*ll1*0.5*(A/G**2 + B)
+                    c2 = -bg*ll1*0.5*((1. - A) + G**2*(1. - B))/G**2
                     mat = geo.i2r3(res[0], ri, ro, bc, c1) + geo.i2(res[0], ri, ro, bc, c2)
 
         if mat is None:
@@ -296,7 +303,7 @@ class PhysicalModel(base_model.BaseModel):
                     mat = geo.i2r2(res[0], ri, ro, bc)
                 else:
                     mat = geo.i2r3(res[0], ri, ro, bc)
-             else:
+            else:
                 if A == 1 and B == 1:
                     mat = geo.i2r2(res[0], ri, ro, bc)
                 else:
@@ -317,13 +324,13 @@ class PhysicalModel(base_model.BaseModel):
         # A = 1 yields a linear gravity in r, whereas A = 0 leads to a 1/r^2 gravity profile
         # B = 1 yields a linear background temperature gradient in r, whereas B = 0 leads to a more general temperature gradient profile
 	    # G = 0 solves the linear onset problem; G =/= 0 solves the eigenproblem associated with the energy method
-        Ra = eq_params['rayleigh']
+        Ra = self.effective_Ra(eq_params)
         Pr = eq_params['prandtl']
         A = eq_params['alpha']
         B = eq_params['beta']
         G = eq_params['gamma']
 
-        Ra_eff = Ra/Pr*ll1
+        Ra_eff = Ra/Pr
 
         ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
 
@@ -331,11 +338,11 @@ class PhysicalModel(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if G == 0:
             if field_row == ("velocity","tor") and field_col == field_row:
-                mat = geo.i2r2lapl(res[0], ri, ro, l, bc, ll1)
+                mat = geo.i2r2lapl(res[0], ri, ro, l, bc)
 
             elif field_row == ("velocity","pol"):
                 if field_col == ("velocity","pol"):
-                    mat = geo.i4r4lapl2(res[0], ri, ro, l, bc, ll1)
+                    mat = geo.i4r4lapl2(res[0], ri, ro, l, bc)
 
                 elif field_col == ("temperature",""):
                     if self.linearize:
@@ -347,7 +354,8 @@ class PhysicalModel(base_model.BaseModel):
                 if field_col == ("velocity","pol"):
                     if self.linearize:
                         if B == 1:
-                            mat = geo.i2r2(res[0], ri, ro, bc, ll1*B)
+                            c = ll1*B
+                            mat = geo.i2r2(res[0], ri, ro, bc, c)
                         else:
                             c1 = ll1*B
                             c2 = ll1*(1. - B)
@@ -360,11 +368,11 @@ class PhysicalModel(base_model.BaseModel):
                         mat = geo.i2r3lapl(res[0], ri, ro, l, bc, 1.0/Pr)
         else:
             if field_row == ("velocity","tor") and field_col == field_row:
-                mat = geo.i2r2lapl(res[0], ri, ro, l, bc, ll1)
+                mat = geo.i2r2lapl(res[0], ri, ro, l, bc)
 
             elif field_row == ("velocity","pol"):
                 if field_col == ("velocity","pol"):
-                    mat = geo.i4r4lapl2(res[0], ri, ro, l, bc, ll1)
+                    mat = geo.i4r4lapl2(res[0], ri, ro, l, bc)
 
                 elif field_col == ("temperature",""):
                     if self.linearize:
@@ -376,10 +384,11 @@ class PhysicalModel(base_model.BaseModel):
                 if field_col == ("velocity","pol"):
                     if self.linearize:
                         if A == 1 and B == 1:
-                            mat = geo.i2r2(res[0], ri, ro, bc, 0.5*ll1*(A/G**2 + B))
+                            c = 0.5*ll1*(A/G**2 + B)
+                            mat = geo.i2r2(res[0], ri, ro, bc, c)
                         else:
                             c1 = 0.5*ll1*(A/G**2 + B)
-                            c2 = 0.5*ll1*((1. - A)+G**2*(1. - B))/G**2
+                            c2 = 0.5*ll1*((1. - A) + G**2*(1. - B))/G**2
                             mat = geo.i2r3(res[0], a, b, bc, c1) + geo.i2(res[0], ri, ro, bc, c2)
 
                 elif field_col == ("temperature",""):
@@ -413,10 +422,10 @@ class PhysicalModel(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if G == 0:
             if field_row == ("velocity","tor"):
-                mat = geo.i2r2(res[0], ri, ro, bc, ll1)
+                mat = geo.i2r2(res[0], ri, ro, bc)
 
             elif field_row == ("velocity","pol"):
-                mat = geo.i4r4lapl(res[0], ri, ro, l, bc, ll1)
+                mat = geo.i4r4lapl(res[0], ri, ro, l, bc)
 
             elif field_row == ("temperature",""):
                 if B == 1:
@@ -425,10 +434,10 @@ class PhysicalModel(base_model.BaseModel):
                     mat = geo.i2r3(res[0], ri, ro, bc)
         else:
             if field_row == ("velocity","tor"):
-                mat = geo.i2r2(res[0], ri, ro, bc, ll1)
+                mat = geo.i2r2(res[0], ri, ro, bc)
 
             elif field_row == ("velocity","pol"):
-                mat = geo.i4r4lapl(res[0], ri, ro, l, bc, ll1)
+                mat = geo.i4r4lapl(res[0], ri, ro, l, bc)
 
             elif field_row == ("temperature",""):
                 if A == 1 and B == 1:
@@ -454,3 +463,42 @@ class PhysicalModel(base_model.BaseModel):
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
+
+    def effective_Ra(self, eq_params):
+        """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
+
+        Ra_eff = eq_params['rayleigh']
+        ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
+
+        # Switch from nondimensionalistion by R_o and (R_o - R_i)
+        if ro != 1.0:
+            # R_o rescaling
+            Ra_eff *= 1.0/ro
+
+        return Ra_eff
+
+    def effective_bg(self, eq_params):
+        """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
+        bg_eff = 1.0
+
+        ri, ro = (self.automatic_parameters(eq_params)['lower1d'], self.automatic_parameters(eq_params)['upper1d'])
+        rratio = eq_params['r_ratio']
+
+        # A = 1 yields a linear gravity in r, whereas A = 0 leads to a 1/r^2 gravity profile
+        # B = 1 yields a linear background temperature gradient in r, whereas B = 0 leads to a more general temperature gradient profile
+	    # G = 0 solves the linear onset problem; G =/= 0 solves the eigenproblem associated with the energy method
+        A = eq_params['alpha']
+        B = eq_params['beta']
+        G = eq_params['gamma']
+
+        # Switch from nondimensionalistion by R_o and (R_o - R_i)
+        if ro == 1.0:
+            pass
+        elif B == 1:
+            # (R_o - R_i) rescaling
+            bg_eff = 2.0/(ro*(1.0 + rratio))
+        elif B == 0:
+            # (R_o - R_i) rescaling
+            bg_eff = ro**2*rratio
+
+        return bg_eff
