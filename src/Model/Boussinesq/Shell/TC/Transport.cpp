@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Transport.cpp
  * @brief Source of the implementation of the transport equation in the Boussinesq thermal convection in a spherical shell
  */
@@ -18,8 +18,6 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Math/Constants.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
