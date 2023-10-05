@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Model/Boussinesq/Shell/TC/ITCModel.hpp"
+#include "Model/Boussinesq//Shell/TC/ITCModel.hpp"
 #include "QuICC/SpatialScheme/3D/SLFl.hpp"
 
 namespace QuICC {

@@ -8,14 +8,14 @@
 
 // Project includes
 //
-#include "QuICC/Model/Boussinesq/Shell/TC/Momentum.hpp"
+#include "Model/Boussinesq//Shell/TC/Momentum.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
 #include "QuICC/Transform/Path/NegI2CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegI4CurlCurlNl.hpp"
-#include "QuICC/Model/Boussinesq/Shell/TC/MomentumKernel.hpp"
+#include "Model/Boussinesq//Shell/TC/MomentumKernel.hpp"
 
 namespace QuICC {
 
