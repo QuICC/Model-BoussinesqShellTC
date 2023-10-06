@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "Model/Boussinesq//Shell/TC/ITCBackend.hpp"
+#include "Model/Boussinesq/Shell/TC/ITCBackend.hpp"
 
 namespace QuICC {
 

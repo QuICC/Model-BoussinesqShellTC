@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Model/Boussinesq//Shell/TC/Implicit/PhysicalModel.hpp"
+#include "Model/Boussinesq/Shell/TC/Implicit/PhysicalModel.hpp"
 
 // Project includes
 //

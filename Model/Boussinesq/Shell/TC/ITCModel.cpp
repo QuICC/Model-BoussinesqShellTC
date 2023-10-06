@@ -14,12 +14,12 @@
 
 // Class include
 //
-#include "Model/Boussinesq//Shell/TC/ITCModel.hpp"
+#include "Model/Boussinesq/Shell/TC/ITCModel.hpp"
 
 // Project includes
 //
-#include "Model/Boussinesq//Shell/TC/Transport.hpp"
-#include "Model/Boussinesq//Shell/TC/Momentum.hpp"
+#include "Model/Boussinesq/Shell/TC/Transport.hpp"
+#include "Model/Boussinesq/Shell/TC/Momentum.hpp"
 #include "Model/Boussinesq/Shell/TC/gitHash.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
