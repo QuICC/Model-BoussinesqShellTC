@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "QuICC/Model/Boussinesq/Shell/TC/MomentumKernel.hpp"
+#include "Model/Boussinesq/Shell/TC/MomentumKernel.hpp"
 
 // Project includes
 //
