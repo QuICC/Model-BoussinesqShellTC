@@ -111,11 +111,18 @@ namespace Explicit {
 
       protected:
          /**
+          * @brief Operators are complex?
+          *
+          * @param fId  Field ID
+          */
+         bool isComplex(const SpectralFieldId& fId) const final;
+
+         /**
           * @brief Set field coupling in implicit model matrix
           *
           * @param fId  Field ID
           */
-         SpectralFieldIds implicitFields(const SpectralFieldId& fId) const;
+         SpectralFieldIds implicitFields(const SpectralFieldId& fId) const final;
 
          /**
           * @brief Set field coupling in explicit linear terms
@@ -132,18 +139,98 @@ namespace Explicit {
          SpectralFieldIds explicitNonlinearFields(const SpectralFieldId& fId) const;
 
          /**
-          * @brief Get operator information
+          * @brief Build implicit matrix block description
           *
-          * @param tN      Tau radial size
-          * @param gN      Galerkin radial truncation
-          * @param shift   Shift in each direction due to Galerkin basis
-          * @param rhs     Numer of RHS
-          * @param fId     ID of the field
+          * @param rowId   Field ID of block matrix row
+          * @param colId   Field ID of block matrix column
           * @param res     Resolution object
-          * @param eigs    Indexes of other dimensions
-          * @param bcs     Boundary conditions
+          * @param eigs    Slow indexes
+          * @param bcs     Boundary conditions for each field
+          * @param nds     Nondimension parameters
+          * @param isSplitOperator  Set operator of split system
           */
-         void blockSize(int& tN, int& gN, ArrayI& shift, int& rhs, const SpectralFieldId& fId, const Resolution& res, const std::vector<MHDFloat>& eigs, const BcMap& bcs) const;
+         std::vector<details::BlockDescription> implicitBlockBuilder(
+               const SpectralFieldId& rowId, const SpectralFieldId& colId,
+               const Resolution& res, const std::vector<MHDFloat>& eigs,
+               const BcMap& bcs, const NonDimensional::NdMap& nds,
+               const bool isSplitOperator) const;
+
+         /**
+          * @brief Build time matrix block description
+          *
+          * @param rowId   Field ID of block matrix row
+          * @param colId   Field ID of block matrix column
+          * @param res     Resolution object
+          * @param eigs    Slow indexes
+          * @param bcs     Boundary conditions for each field
+          * @param nds     Nondimension parameters
+          */
+         std::vector<details::BlockDescription> timeBlockBuilder(
+               const SpectralFieldId& rowId, const SpectralFieldId& colId,
+               const Resolution& res, const std::vector<MHDFloat>& eigs,
+               const BcMap& bcs, const NonDimensional::NdMap& nds) const;
+
+         /**
+          * @brief Build boundary matrix block description
+          *
+          * @param rowId   Field ID of block matrix row
+          * @param colId   Field ID of block matrix column
+          * @param res     Resolution object
+          * @param eigs    Slow indexes
+          * @param bcs     Boundary conditions for each field
+          * @param nds     Nondimension parameters
+          * @param isSplitOperator  Set operator of split system
+          */
+         std::vector<details::BlockDescription> boundaryBlockBuilder(
+               const SpectralFieldId& rowId, const SpectralFieldId& colId,
+               const Resolution& res, const std::vector<MHDFloat>& eigs,
+               const BcMap& bcs, const NonDimensional::NdMap& nds,
+               const bool isSplitOperator) const;
+
+         /**
+          * @brief Build boundary matrix block description
+          *
+          * @param rowId   Field ID of block matrix row
+          * @param colId   Field ID of block matrix column
+          * @param res     Resolution object
+          * @param eigs    Slow indexes
+          * @param bcs     Boundary conditions for each field
+          * @param nds     Nondimension parameters
+          */
+         std::vector<details::BlockDescription> splitBoundaryValueBlockBuilder(
+               const SpectralFieldId& rowId, const SpectralFieldId& colId,
+               const Resolution& res, const std::vector<MHDFloat>& eigs,
+               const BcMap& bcs, const NonDimensional::NdMap& nds) const;
+
+         /**
+          * @brief Build explicit linear matrix block description
+          *
+          * @param rowId   Field ID of block matrix row
+          * @param colId   Field ID of block matrix column
+          * @param res     Resolution object
+          * @param eigs    Slow indexes
+          * @param bcs     Boundary conditions for each field
+          * @param nds     Nondimension parameters
+          */
+         std::vector<details::BlockDescription> explicitLinearBlockBuilder(
+               const SpectralFieldId& rowId, const SpectralFieldId& colId,
+               const Resolution& res, const std::vector<MHDFloat>& eigs,
+               const BcMap& bcs, const NonDimensional::NdMap& nds) const;
+
+         /**
+          * @brief Build explicit nonlinear matrix block description
+          *
+          * @param rowId   Field ID of block matrix row
+          * @param colId   Field ID of block matrix column
+          * @param res     Resolution object
+          * @param eigs    Slow indexes
+          * @param bcs     Boundary conditions for each field
+          * @param nds     Nondimension parameters
+          */
+         std::vector<details::BlockDescription> explicitNonlinearBlockBuilder(
+               const SpectralFieldId& rowId, const SpectralFieldId& colId,
+               const Resolution& res, const std::vector<MHDFloat>& eigs,
+               const BcMap& bcs, const NonDimensional::NdMap& nds) const;
 
          /**
           * @brief Build implicit matrix block
@@ -191,11 +278,11 @@ namespace Explicit {
 
    };
 
-} // Explicit
-} // TC
-} // Shell
-} // Boussinesq
-} // Model
-} // QuICC
+} // namespace Explicit
+} // namespace TC
+} // namespace Shell
+} // namespace Boussinesq
+} // namespace Model
+} // namespace QuICC
 
 #endif // QUICC_MODEL_BOUSSINESQ_SHELL_TC_EXPLICIT_MODELBACKEND_HPP

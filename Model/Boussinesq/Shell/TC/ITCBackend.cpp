@@ -69,11 +69,6 @@ namespace Shell {
 
 namespace TC {
 
-   ITCBackend::ITCBackend()
-      : IModelBackend()
-   {
-   }
-
    std::vector<std::string> ITCBackend::fieldNames() const
    {
       std::vector<std::string> names = {
@@ -124,44 +119,25 @@ namespace TC {
       return params;
    }
 
-   MHDFloat ITCBackend::effectiveRa(const NonDimensional::NdMap& nds) const
+   int ITCBackend::nBc(const SpectralFieldId& fId) const
    {
-      auto effRa = nds.find(NonDimensional::Rayleigh::id())->second->value();
-      auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
+      int nBc = 0;
 
-      // Scaled on gap width
-      if(ro != 1.0)
+      if(fId == std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR) ||
+            fId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR))
       {
-         effRa *= 1.0/ro;
+         nBc = 2;
+      }
+      else if(fId == std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL))
+      {
+         nBc = 4;
+      }
+      else
+      {
+         nBc = 0;
       }
 
-      return effRa;
-   }
-
-   MHDFloat ITCBackend::effectiveBg(const NonDimensional::NdMap& nds) const
-   {
-      MHDFloat effBg = 1.0;
-      auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
-      auto rratio = nds.find(NonDimensional::RRatio::id())->second->value();
-      auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
-
-      if(ro == 1.0)
-      {
-         // Nothing
-         //
-      }
-      // gap width and internal heating
-      else if(heatingMode == 0)
-      {
-         effBg = 2.0/(ro*(1.0 + rratio));
-      }
-      // gap width and differential heating
-      else if(heatingMode == 1)
-      {
-         effBg = ro*ro*rratio;
-      }
-
-      return effBg;
+      return nBc;
    }
 
    void ITCBackend::applyTau(SparseMatrix& mat, const SpectralFieldId& rowId, const SpectralFieldId& colId, const int l, const Resolution& res, const BcMap& bcs, const NonDimensional::NdMap& nds, const bool isSplitOperator) const
@@ -179,39 +155,66 @@ namespace TC {
 
       if(rowId == std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR) && rowId == colId)
       {
-         if(bcId == Bc::Name::NoSlip::id())
+         if (l > 0)
          {
-            bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
-            bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
-         }
-         else if(bcId == Bc::Name::StressFree::id())
-         {
-            bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::R1D1DivR1>(Position::TOP);
-            bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::R1D1DivR1>(Position::BOTTOM);
-         }
-         else
-         {
-            throw std::logic_error("Boundary conditions for Velocity Toroidal component not implemented");
+            if(bcId == Bc::Name::NoSlip::id())
+            {
+               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
+               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
+            }
+            else if(bcId == Bc::Name::StressFree::id())
+            {
+               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::R1D1DivR1>(Position::TOP);
+               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::R1D1DivR1>(Position::BOTTOM);
+            }
+            else
+            {
+               throw std::logic_error("Boundary conditions for Velocity Toroidal component not implemented");
+            }
          }
       }
       else if(rowId == std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL) && rowId == colId)
       {
-         if(this->useSplitEquation())
+         if (l > 0)
          {
-            if(isSplitOperator)
+            if(this->useSplitEquation())
             {
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
+               if(isSplitOperator)
+               {
+                  bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
+                  bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
+               }
+               else
+               {
+                  if(bcId == Bc::Name::NoSlip::id())
+                  {
+                     bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D1>(Position::TOP);
+                     bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D1>(Position::BOTTOM);
+                  }
+                  else if(bcId == Bc::Name::StressFree::id())
+                  {
+                     bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D2>(Position::TOP);
+                     bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D2>(Position::BOTTOM);
+                  }
+                  else
+                  {
+                     throw std::logic_error("Boundary conditions for Velocity Poloidal component not implemented");
+                  }
+               }
             }
             else
             {
                if(bcId == Bc::Name::NoSlip::id())
                {
+                  bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
+                  bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
                   bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D1>(Position::TOP);
                   bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D1>(Position::BOTTOM);
                }
                else if(bcId == Bc::Name::StressFree::id())
                {
+                  bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
+                  bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
                   bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D2>(Position::TOP);
                   bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D2>(Position::BOTTOM);
                }
@@ -219,27 +222,6 @@ namespace TC {
                {
                   throw std::logic_error("Boundary conditions for Velocity Poloidal component not implemented");
                }
-            }
-         }
-         else
-         {
-            if(bcId == Bc::Name::NoSlip::id())
-            {
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D1>(Position::TOP);
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D1>(Position::BOTTOM);
-            }
-            else if(bcId == Bc::Name::StressFree::id())
-            {
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::TOP);
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::Value>(Position::BOTTOM);
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D2>(Position::TOP);
-               bcOp.addRow<SparseSM::Chebyshev::LinearMap::Boundary::D2>(Position::BOTTOM);
-            }
-            else
-            {
-               throw std::logic_error("Boundary conditions for Velocity Poloidal component not implemented");
             }
          }
       }
@@ -278,12 +260,12 @@ namespace TC {
       {
          if(bcId == Bc::Name::NoSlip::id())
          {
-            SparseSM::Chebyshev::LinearMap::Stencil::Value bc(nN, nN-s, ri, ro);
+            SparseSM::Chebyshev::LinearMap::Stencil::Value bc(nN, nN - s, ri, ro);
             mat = bc.mat();
          }
          else if(bcId == Bc::Name::StressFree::id())
          {
-            SparseSM::Chebyshev::LinearMap::Stencil::R1D1DivR1 bc(nN, nN-s, ri, ro);
+            SparseSM::Chebyshev::LinearMap::Stencil::R1D1DivR1 bc(nN, nN - s, ri, ro);
             mat = bc.mat();
          }
          else
@@ -295,12 +277,12 @@ namespace TC {
       {
          if(bcId == Bc::Name::NoSlip::id())
          {
-            SparseSM::Chebyshev::LinearMap::Stencil::ValueD1 bc(nN, nN-s, ri, ro);
+            SparseSM::Chebyshev::LinearMap::Stencil::ValueD1 bc(nN, nN - s, ri, ro);
             mat = bc.mat();
          }
          else if(bcId == Bc::Name::StressFree::id())
          {
-            SparseSM::Chebyshev::LinearMap::Stencil::ValueD2 bc(nN, nN-s, ri, ro);
+            SparseSM::Chebyshev::LinearMap::Stencil::ValueD2 bc(nN, nN - s, ri, ro);
             mat = bc.mat();
          }
          else
@@ -312,12 +294,12 @@ namespace TC {
       {
          if(bcId == Bc::Name::FixedTemperature::id())
          {
-            SparseSM::Chebyshev::LinearMap::Stencil::Value bc(nN, nN-s, ri, ro);
+            SparseSM::Chebyshev::LinearMap::Stencil::Value bc(nN, nN - s, ri, ro);
             mat = bc.mat();
          }
          else if(bcId == Bc::Name::FixedFlux::id())
          {
-            SparseSM::Chebyshev::LinearMap::Stencil::D1 bc(nN, nN-s, ri, ro);
+            SparseSM::Chebyshev::LinearMap::Stencil::D1 bc(nN, nN - s, ri, ro);
             mat = bc.mat();
          }
          else
@@ -328,74 +310,71 @@ namespace TC {
 
       if(makeSquare)
       {
-         SparseSM::Chebyshev::LinearMap::Id qId(nN-s, nN, ri, ro);
+         SparseSM::Chebyshev::LinearMap::Id qId(nN - s, nN, ri, ro);
          mat = qId.mat()*mat;
       }
    }
 
-   void ITCBackend::applyGalerkinStencil(SparseMatrix& mat, const SpectralFieldId& rowId, const SpectralFieldId& colId, const int l, const Resolution& res, const BcMap& bcs, const NonDimensional::NdMap& nds) const
+   void ITCBackend::applyGalerkinStencil(SparseMatrix& mat, const SpectralFieldId& rowId, const SpectralFieldId& colId, const int lr, const int lc, const Resolution& res, const BcMap& bcs, const NonDimensional::NdMap& nds) const
    {
-      auto nN = res.counter().dimensions(Dimensions::Space::SPECTRAL, l)(0);
+      auto nN = res.counter().dimensions(Dimensions::Space::SPECTRAL, lr)(0);
 
       auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
       auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
 
       auto S = mat;
-      this->stencil(S, colId, l, res, false, bcs, nds);
+      this->stencil(S, colId, lc, res, false, bcs, nds);
 
       auto s = this->nBc(rowId);
-      SparseSM::Chebyshev::LinearMap::Id qId(nN-s, nN, ri, ro, 0, s);
-      mat = qId.mat()*(mat*S);
+      SparseSM::Chebyshev::LinearMap::Id qId(nN - s, nN, ri, ro, 0, s);
+      mat = qId.mat() * (mat * S);
    }
 
-   int ITCBackend::nBc(const SpectralFieldId& fId) const
+namespace implDetails {
+
+   MHDFloat effectiveRa(const NonDimensional::NdMap& nds)
    {
-      int nBc = 0;
+      auto effRa = nds.find(NonDimensional::Rayleigh::id())->second->value();
+      auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
 
-      if(fId == std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR) ||
-            fId == std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR))
+      // Scaled on gap width
+      if(ro != 1.0)
       {
-         nBc = 2;
-      }
-      else if(fId == std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL))
-      {
-         nBc = 4;
-      }
-      else
-      {
-         nBc = 0;
+         effRa *= 1.0/ro;
       }
 
-      return nBc;
+      return effRa;
    }
 
-   void ITCBackend::blockInfo(int& tN, int& gN, ArrayI& shift, int& rhs, const SpectralFieldId& fId, const Resolution& res, const MHDFloat l, const BcMap& bcs) const
+   MHDFloat effectiveBg(const NonDimensional::NdMap& nds)
    {
-      auto nN = res.counter().dimensions(Dimensions::Space::SPECTRAL, l)(0);
-      tN = nN;
+      MHDFloat effBg = 1.0;
+      auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
+      auto rratio = nds.find(NonDimensional::RRatio::id())->second->value();
+      auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
 
-      int shiftR = this->nBc(fId);
-      if(this->useGalerkin())
+      if(ro == 1.0)
       {
-         gN = (nN - shiftR);
+         // Nothing
+         //
       }
-      else
+      // gap width and internal heating
+      else if(heatingMode == 0)
       {
-         shiftR = 0;
-         gN = nN;
+         effBg = 2.0/(ro*(1.0 + rratio));
+      }
+      // gap width and differential heating
+      else if(heatingMode == 1)
+      {
+         effBg = ro*ro*rratio;
       }
 
-      // Set galerkin shifts
-      shift(0) = shiftR;
-      shift(1) = 0;
-      shift(2) = 0;
-
-      rhs = 1;
+      return effBg;
    }
 
-
-} // TC
-} // Shell
-} // Boussinesq
-} // Model
-} // QuICC
+} // namespace details
+} // namespace TC
+} // namespace Shell
+} // namespace Boussinesq
+} // namespace Model
+} // namespace QuICC
