@@ -372,7 +372,7 @@ namespace implDetails {
       return effBg;
    }
 
-} // namespace details
+} // namespace implDetails
 } // namespace TC
 } // namespace Shell
 } // namespace Boussinesq

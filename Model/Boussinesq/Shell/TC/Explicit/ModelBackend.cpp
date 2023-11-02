@@ -254,9 +254,6 @@ struct BlockOptionsImpl : public details::BlockOptions
 
             if (l > 0)
             {
-               auto& o =
-                  *std::dynamic_pointer_cast<implDetails::BlockOptionsImpl>(
-                        opts);
                const auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
                const auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
                SparseSM::Chebyshev::LinearMap::I2Y2SphLapl spasm(nNr, nNc, ri, ro, l);
@@ -332,9 +329,6 @@ struct BlockOptionsImpl : public details::BlockOptions
          {
             SparseMatrix bMat(nNr, nNc);
 
-            auto& o =
-               *std::dynamic_pointer_cast<implDetails::BlockOptionsImpl>(opts);
-
             const auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
             const auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
             const auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
@@ -407,8 +401,6 @@ struct BlockOptionsImpl : public details::BlockOptions
             assert(nNr == nNc);
 
             SparseMatrix bMat(nNr, nNc);
-            auto& o =
-               *std::dynamic_pointer_cast<implDetails::BlockOptionsImpl>(opts);
 
             const auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
             const auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
@@ -509,9 +501,6 @@ struct BlockOptionsImpl : public details::BlockOptions
                std::shared_ptr<details::BlockOptions> opts,
                const NonDimensional::NdMap& nds)
          {
-            auto& o =
-               *std::dynamic_pointer_cast<implDetails::BlockOptionsImpl>(opts);
-
             const auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
             const auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
             const auto heatingMode = nds.find(NonDimensional::Heating::id())->second->value();
@@ -678,8 +667,9 @@ struct BlockOptionsImpl : public details::BlockOptions
          {
             auto rowId = *pRowId;
             auto colId = rowId;
+            const auto& fields = this->implicitFields(rowId);
             auto descr = timeBlockBuilder(rowId, colId, res, eigs, bcs, nds);
-            buildBlock(rModelMatrix, descr, rowId, colId, matIdx, bcType, res,
+            buildBlock(rModelMatrix, descr, rowId, colId, fields, matIdx, bcType, res,
                   l, l, bcs, nds, false);
          }
       }
@@ -690,14 +680,15 @@ struct BlockOptionsImpl : public details::BlockOptions
 
          for (auto pRowId = imRange.first; pRowId != imRange.second; pRowId++)
          {
+            auto rowId = *pRowId;
+            const auto& fields = this->implicitFields(rowId);
             for (auto pColId = imRange.first; pColId != imRange.second;
                   pColId++)
             {
-               auto rowId = *pRowId;
                auto colId = *pColId;
                auto descr = implicitBlockBuilder(rowId, colId, res, eigs, bcs,
                      nds, isSplit);
-               buildBlock(rModelMatrix, descr, rowId, colId, matIdx, bcType,
+               buildBlock(rModelMatrix, descr, rowId, colId, fields, matIdx, bcType,
                      res, l, l, bcs, nds, isSplit);
             }
          }
@@ -709,14 +700,15 @@ struct BlockOptionsImpl : public details::BlockOptions
 
          for (auto pRowId = imRange.first; pRowId != imRange.second; pRowId++)
          {
+            auto rowId = *pRowId;
+            const auto& fields = this->implicitFields(rowId);
             for (auto pColId = imRange.first; pColId != imRange.second;
                   pColId++)
             {
-               auto rowId = *pRowId;
                auto colId = *pColId;
                auto descr = boundaryBlockBuilder(rowId, colId, res, eigs, bcs,
                      nds, isSplit);
-               buildBlock(rModelMatrix, descr, rowId, colId, matIdx, bcType,
+               buildBlock(rModelMatrix, descr, rowId, colId, fields, matIdx, bcType,
                      res, l, l, bcs, nds, isSplit);
             }
          }
@@ -726,14 +718,15 @@ struct BlockOptionsImpl : public details::BlockOptions
       {
          for (auto pRowId = imRange.first; pRowId != imRange.second; pRowId++)
          {
+            auto rowId = *pRowId;
+            const auto& fields = this->implicitFields(rowId);
             for (auto pColId = imRange.first; pColId != imRange.second;
                   pColId++)
             {
-               auto rowId = *pRowId;
                auto colId = *pColId;
                auto descr = splitBoundaryValueBlockBuilder(rowId, colId, res,
                      eigs, bcs, nds);
-               buildBlock(rModelMatrix, descr, rowId, colId, matIdx, bcType,
+               buildBlock(rModelMatrix, descr, rowId, colId, fields, matIdx, bcType,
                      res, l, l, bcs, nds, false);
             }
          }
@@ -749,6 +742,36 @@ struct BlockOptionsImpl : public details::BlockOptions
       assert(eigs.size() == 1);
       int l = eigs.at(0);
       this->stencil(mat, fieldId, l, res, makeSquare, bcs, nds);
+   }
+
+   void ModelBackend::explicitBlock(DecoupledZSparse& decMat, const SpectralFieldId& rowId, const std::size_t opId,  const SpectralFieldId colId, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs, const BcMap& bcs, const NonDimensional::NdMap& nds) const
+   {
+      assert(eigs.size() == 1);
+      int l = eigs.at(0);
+
+      auto bcType = ModelOperatorBoundary::SolverNoTau::id();
+
+      // Explicit linear operator
+      if(opId == ModelOperator::ExplicitLinear::id())
+      {
+         const auto& fields = this->explicitLinearFields(rowId);
+         auto descr = explicitLinearBlockBuilder(rowId, colId, res, eigs, bcs, nds);
+         buildBlock(decMat, descr, rowId, colId, fields, matIdx, bcType, res,
+               l, l, bcs, nds, false, true);
+      }
+      // Explicit nonlinear operator
+      else if(opId == ModelOperator::ExplicitNonlinear::id())
+      {
+         const auto& fields = this->explicitNonlinearFields(rowId);
+         auto descr = explicitNonlinearBlockBuilder(rowId, colId, res, eigs, bcs, nds);
+         buildBlock(decMat, descr, rowId, colId, fields, matIdx, bcType, res,
+               l, l, bcs, nds, false, true);
+      }
+      // Explicit nextstep operator
+      else if(opId == ModelOperator::ExplicitNextstep::id())
+      {
+         throw std::logic_error("There are no explicit nextstep operators");
+      }
    }
 
    std::vector<details::BlockDescription> ModelBackend::explicitLinearBlockBuilder(const SpectralFieldId& rowId,  const SpectralFieldId& colId, const Resolution& res, const std::vector<MHDFloat>& eigs, const BcMap& bcs, const NonDimensional::NdMap& nds) const
@@ -820,8 +843,6 @@ struct BlockOptionsImpl : public details::BlockOptions
                const NonDimensional::NdMap& nds)
          {
             SparseMatrix bMat(nNr, nNc);
-            auto& o =
-               *std::dynamic_pointer_cast<implDetails::BlockOptionsImpl>(opts);
 
             const auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
             const auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
@@ -890,8 +911,6 @@ struct BlockOptionsImpl : public details::BlockOptions
                const NonDimensional::NdMap& nds)
          {
             SparseMatrix bMat(nNr, nNc);
-            auto& o =
-               *std::dynamic_pointer_cast<implDetails::BlockOptionsImpl>(opts);
 
             const auto ri = nds.find(NonDimensional::Lower1d::id())->second->value();
             const auto ro = nds.find(NonDimensional::Upper1d::id())->second->value();
@@ -926,37 +945,9 @@ struct BlockOptionsImpl : public details::BlockOptions
       return descr;
    }
 
-   void ModelBackend::explicitBlock(DecoupledZSparse& decMat, const SpectralFieldId& rowId, const std::size_t opId,  const SpectralFieldId colId, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs, const BcMap& bcs, const NonDimensional::NdMap& nds) const
-   {
-      assert(eigs.size() == 1);
-      int l = eigs.at(0);
-
-      auto bcType = ModelOperatorBoundary::SolverNoTau::id();
-
-      // Explicit linear operator
-      if(opId == ModelOperator::ExplicitLinear::id())
-      {
-         auto descr = explicitLinearBlockBuilder(rowId, colId, res, eigs, bcs, nds);
-         buildBlock(decMat, descr, rowId, colId, matIdx, bcType, res,
-               l, l, bcs, nds, false, true);
-      }
-      // Explicit nonlinear operator
-      else if(opId == ModelOperator::ExplicitNonlinear::id())
-      {
-         auto descr = explicitNonlinearBlockBuilder(rowId, colId, res, eigs, bcs, nds);
-         buildBlock(decMat, descr, rowId, colId, matIdx, bcType, res,
-               l, l, bcs, nds, false, true);
-      }
-      // Explicit nextstep operator
-      else if(opId == ModelOperator::ExplicitNextstep::id())
-      {
-         throw std::logic_error("There are no explicit nextstep operators");
-      }
-   }
-
-} // Explicit
-} // TC
-} // Shell
-} // Boussinesq
-} // Model
-} // QuICC
+} // namespace Explicit
+} // namespace TC
+} // namespace Shell
+} // namespace Boussinesq
+} // namespace Model
+} // namespace QuICC
