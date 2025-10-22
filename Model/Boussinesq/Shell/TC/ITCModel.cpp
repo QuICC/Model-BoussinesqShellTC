@@ -40,7 +40,7 @@ VectorFormulation::Id ITCModel::SchemeFormulation()
 
 std::string ITCModel::version() const
 {
-   return std::string(gitHash);
+   return "BoussinesqShellTC:" + std::string(gitHash);
 }
 
 void ITCModel::addEquations(SharedSimulation spSim)
