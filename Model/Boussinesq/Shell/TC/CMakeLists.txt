@@ -1,4 +1,6 @@
 target_sources(${QUICC_CURRENT_MODEL_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
+  ITCState.cpp
+  ITCVisualization.cpp
   ITCModel.cpp
   ITCBackend.cpp
   Momentum.cpp
